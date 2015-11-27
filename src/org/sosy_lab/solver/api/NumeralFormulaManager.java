@@ -38,65 +38,64 @@ import java.util.List;
 public interface NumeralFormulaManager<
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula> {
 
-  public ResultFormulaType makeNumber(long number);
+  ResultFormulaType makeNumber(long number);
 
-  public ResultFormulaType makeNumber(BigInteger number);
-
-  /**
-   * Create a numeric literal with a given value.
-   * Note: if the theory represented by this instance cannot handle rational numbers,
-   * the value may get rounded or otherwise represented imprecisely.
-   */
-  public ResultFormulaType makeNumber(double number);
+  ResultFormulaType makeNumber(BigInteger number);
 
   /**
    * Create a numeric literal with a given value.
    * Note: if the theory represented by this instance cannot handle rational numbers,
    * the value may get rounded or otherwise represented imprecisely.
    */
-  public ResultFormulaType makeNumber(BigDecimal number);
+  ResultFormulaType makeNumber(double number);
 
-  public ResultFormulaType makeNumber(String pI);
+  /**
+   * Create a numeric literal with a given value.
+   * Note: if the theory represented by this instance cannot handle rational numbers,
+   * the value may get rounded or otherwise represented imprecisely.
+   */
+  ResultFormulaType makeNumber(BigDecimal number);
 
-  public ResultFormulaType makeNumber(Rational pRational);
+  ResultFormulaType makeNumber(String pI);
 
-  public ResultFormulaType makeVariable(String pVar);
+  ResultFormulaType makeNumber(Rational pRational);
 
-  public FormulaType<ResultFormulaType> getFormulaType();
+  ResultFormulaType makeVariable(String pVar);
+
+  FormulaType<ResultFormulaType> getFormulaType();
 
   // ----------------- Arithmetic relations, return type NumeralFormula -----------------
 
-  public ResultFormulaType negate(ParamFormulaType number);
+  ResultFormulaType negate(ParamFormulaType number);
 
-  public ResultFormulaType add(ParamFormulaType number1, ParamFormulaType number2);
+  ResultFormulaType add(ParamFormulaType number1, ParamFormulaType number2);
 
-  public ResultFormulaType sum(List<ParamFormulaType> operands);
+  ResultFormulaType sum(List<ParamFormulaType> operands);
 
-  public ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2);
+  ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2);
 
-  public ResultFormulaType divide(ParamFormulaType number1, ParamFormulaType number2);
+  ResultFormulaType divide(ParamFormulaType number1, ParamFormulaType number2);
 
-  public ResultFormulaType modulo(ParamFormulaType number1, ParamFormulaType number2);
+  ResultFormulaType modulo(ParamFormulaType number1, ParamFormulaType number2);
 
   /**
    * Create a term stating that (n1 == n2) when using modulo arithmetic regarding mod).
    * This is an optional operation,
    * and instead may return `true`.
    */
-  public BooleanFormula modularCongruence(
-      ParamFormulaType number1, ParamFormulaType number2, long mod);
+  BooleanFormula modularCongruence(ParamFormulaType number1, ParamFormulaType number2, long mod);
 
-  public ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
+  ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 
-  public BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2);
+  BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2);
 
-  public BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2);
+  BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2);
 
-  public BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2);
+  BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2);
 
-  public BooleanFormula lessThan(ParamFormulaType number1, ParamFormulaType number2);
+  BooleanFormula lessThan(ParamFormulaType number1, ParamFormulaType number2);
 
-  public BooleanFormula lessOrEquals(ParamFormulaType number1, ParamFormulaType number2);
+  BooleanFormula lessOrEquals(ParamFormulaType number1, ParamFormulaType number2);
 }

@@ -40,7 +40,7 @@ public interface QuantifiedFormulaManager {
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
    */
-  public BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody);
+  BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
    * @return An universal quantified formula.
@@ -48,7 +48,7 @@ public interface QuantifiedFormulaManager {
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
    */
-  public BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
+  BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
    * Eliminate the quantifiers for a given formula.
@@ -56,7 +56,7 @@ public interface QuantifiedFormulaManager {
    * @param pF Formula with quantifiers.
    * @return  New formula without quantifiers.
    */
-  public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
+  BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException;
 
   /**

@@ -36,6 +36,6 @@ public interface InterpolatingProverEnvironmentWithAssumptions<T>
    * @throws InterruptedException
    * @throws SolverException
    */
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 }

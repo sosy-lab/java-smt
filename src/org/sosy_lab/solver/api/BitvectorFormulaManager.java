@@ -30,51 +30,45 @@ import java.math.BigInteger;
  */
 public interface BitvectorFormulaManager {
 
-  public BitvectorFormula makeBitvector(int length, long pI);
+  BitvectorFormula makeBitvector(int length, long pI);
 
-  public BitvectorFormula makeBitvector(int length, BigInteger pI);
+  BitvectorFormula makeBitvector(int length, BigInteger pI);
 
-  public BitvectorFormula makeVariable(int length, String pVar);
+  BitvectorFormula makeVariable(int length, String pVar);
 
-  public int getLength(BitvectorFormula number);
+  int getLength(BitvectorFormula number);
 
   // Numeric Operations
 
-  public BitvectorFormula negate(BitvectorFormula number, boolean resultSigned);
+  BitvectorFormula negate(BitvectorFormula number, boolean resultSigned);
 
-  public BitvectorFormula add(
+  BitvectorFormula add(BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
+
+  BitvectorFormula subtract(
       BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
 
-  public BitvectorFormula subtract(
-      BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
+  BitvectorFormula divide(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
-  public BitvectorFormula divide(
-      BitvectorFormula number1, BitvectorFormula number2, boolean signed);
+  BitvectorFormula modulo(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
-  public BitvectorFormula modulo(
-      BitvectorFormula number1, BitvectorFormula number2, boolean signed);
-
-  public BooleanFormula modularCongruence(
+  BooleanFormula modularCongruence(
       BitvectorFormula pNumber1, BitvectorFormula pNumbe2, long pModulo);
 
-  public BitvectorFormula multiply(
+  BitvectorFormula multiply(
       BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
 
   // ----------------- Numeric relations -----------------
 
-  public BooleanFormula equal(BitvectorFormula number1, BitvectorFormula number2);
+  BooleanFormula equal(BitvectorFormula number1, BitvectorFormula number2);
 
-  public BooleanFormula greaterThan(
+  BooleanFormula greaterThan(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
+
+  BooleanFormula greaterOrEquals(
       BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
-  public BooleanFormula greaterOrEquals(
-      BitvectorFormula number1, BitvectorFormula number2, boolean signed);
+  BooleanFormula lessThan(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
-  public BooleanFormula lessThan(
-      BitvectorFormula number1, BitvectorFormula number2, boolean signed);
-
-  public BooleanFormula lessOrEquals(
-      BitvectorFormula number1, BitvectorFormula number2, boolean signed);
+  BooleanFormula lessOrEquals(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
   // Bitvector operations
 
@@ -83,7 +77,7 @@ public interface BitvectorFormulaManager {
    * @param bits Formula
    * @return {@code !f1}
    */
-  public BitvectorFormula not(BitvectorFormula bits);
+  BitvectorFormula not(BitvectorFormula bits);
 
   /**
    * Creates a formula representing an AND of the two arguments.
@@ -91,7 +85,7 @@ public interface BitvectorFormulaManager {
    * @param bits2 a Formula
    * @return {@code f1 & f2}
    */
-  public BitvectorFormula and(BitvectorFormula bits1, BitvectorFormula bits2);
+  BitvectorFormula and(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
    * Creates a formula representing an OR of the two arguments.
@@ -99,21 +93,20 @@ public interface BitvectorFormulaManager {
    * @param bits2 a Formula
    * @return {@code f1 | f2}
    */
-  public BitvectorFormula or(BitvectorFormula bits1, BitvectorFormula bits2);
+  BitvectorFormula or(BitvectorFormula bits1, BitvectorFormula bits2);
 
-  public BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2);
+  BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
    * Returns a term representing the (arithmetic if signed is true) right shift of number by toShift.
    */
-  public BitvectorFormula shiftRight(
-      BitvectorFormula number, BitvectorFormula toShift, boolean signed);
+  BitvectorFormula shiftRight(BitvectorFormula number, BitvectorFormula toShift, boolean signed);
 
-  public BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
+  BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
 
-  public BitvectorFormula concat(BitvectorFormula number, BitvectorFormula append);
+  BitvectorFormula concat(BitvectorFormula number, BitvectorFormula append);
 
-  public BitvectorFormula extract(BitvectorFormula number, int msb, int lsb, boolean signed);
+  BitvectorFormula extract(BitvectorFormula number, int msb, int lsb, boolean signed);
 
   /**
    * Extend a bitvector to the left (add most significant bits).
@@ -121,5 +114,5 @@ public interface BitvectorFormulaManager {
    * @param extensionBits How many bits to add.
    * @param signed Whether the extension should depend on the sign bit.
    */
-  public BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed);
+  BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed);
 }

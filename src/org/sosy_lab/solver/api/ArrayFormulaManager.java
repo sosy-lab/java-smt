@@ -36,8 +36,7 @@ public interface ArrayFormulaManager {
    * @param pIndex    The position from which to read
    * @return          A formula that represents the result of the "read"
    */
-  public <TI extends Formula, TE extends Formula> TE select(
-      ArrayFormula<TI, TE> pArray, Formula pIndex);
+  <TI extends Formula, TE extends Formula> TE select(ArrayFormula<TI, TE> pArray, Formula pIndex);
 
   /**
    * Store a value into a cell of the specified array.
@@ -47,7 +46,7 @@ public interface ArrayFormulaManager {
    * @param pValue    The value that should be written
    * @return          A formula that represents the "write"
    */
-  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
+  <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
       ArrayFormula<TI, TE> pArray, Formula pIndex, Formula pValue);
 
   /**
@@ -58,18 +57,17 @@ public interface ArrayFormulaManager {
    * @param pElementType  The type of the array elements
    * @return              Formula that represents the array
    */
-  public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>,
-          FTE extends FormulaType<TE>>
+  <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType);
 
   /**
    * Make a {@link BooleanFormula} that represents the equality of
    * two {@link ArrayFormula}.
    */
-  public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
+  <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2);
 
-  public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray);
+  <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray);
 
-  public <TE extends Formula> FormulaType<TE> getElementType(ArrayFormula<?, TE> pArray);
+  <TE extends Formula> FormulaType<TE> getElementType(ArrayFormula<?, TE> pArray);
 }

@@ -112,7 +112,7 @@ public interface FormulaManager {
    * Returns the type of the given Formula.
    * Undefined behavior when an untyped Formula from UnsafeFormulaManager is given.
    */
-  public <T extends Formula> FormulaType<T> getFormulaType(T formula);
+  <T extends Formula> FormulaType<T> getFormulaType(T formula);
 
   /**
    * Parse a formula given as a String in a solver-specific file format.
@@ -121,7 +121,7 @@ public interface FormulaManager {
    */
   // TODO: Implement solver independent file format and remove this method from the solver interface
   // Instead implement the format in the View
-  public BooleanFormula parse(String s) throws IllegalArgumentException;
+  BooleanFormula parse(String s) throws IllegalArgumentException;
 
   /**
    * Create string representation of a formula in a format which may be dumped
@@ -135,10 +135,10 @@ public interface FormulaManager {
    */
   // TODO: Implement solver independent file format and remove this method from the solver interface
   // Instead implement the format in the View
-  public Appender dumpFormula(BooleanFormula pT);
+  Appender dumpFormula(BooleanFormula pT);
 
   /**
    * Get some version information of the solver.
    */
-  public String getVersion();
+  String getVersion();
 }

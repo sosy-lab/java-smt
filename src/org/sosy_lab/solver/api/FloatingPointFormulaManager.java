@@ -31,38 +31,38 @@ import java.math.BigDecimal;
  * This interface represents the floating-foint theory
  */
 public interface FloatingPointFormulaManager {
-  public FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makePlusInfinity(FormulaType.FloatingPointType type);
+  FloatingPointFormula makePlusInfinity(FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makeMinusInfinity(FormulaType.FloatingPointType type);
+  FloatingPointFormula makeMinusInfinity(FormulaType.FloatingPointType type);
 
-  public FloatingPointFormula makeNaN(FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNaN(FormulaType.FloatingPointType type);
 
-  public <T extends Formula> T castTo(FloatingPointFormula number, FormulaType<T> targetType);
+  <T extends Formula> T castTo(FloatingPointFormula number, FormulaType<T> targetType);
 
-  public FloatingPointFormula castFrom(
+  FloatingPointFormula castFrom(
       Formula number, boolean signed, FormulaType.FloatingPointType targetType);
 
   // ----------------- Arithmetic relations, return type NumeralFormula -----------------
 
-  public FloatingPointFormula negate(FloatingPointFormula number);
+  FloatingPointFormula negate(FloatingPointFormula number);
 
-  public FloatingPointFormula add(FloatingPointFormula number1, FloatingPointFormula number2);
+  FloatingPointFormula add(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public FloatingPointFormula subtract(FloatingPointFormula number1, FloatingPointFormula number2);
+  FloatingPointFormula subtract(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public FloatingPointFormula divide(FloatingPointFormula number1, FloatingPointFormula number2);
+  FloatingPointFormula divide(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public FloatingPointFormula multiply(FloatingPointFormula number1, FloatingPointFormula number2);
+  FloatingPointFormula multiply(FloatingPointFormula number1, FloatingPointFormula number2);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 
@@ -71,7 +71,7 @@ public interface FloatingPointFormulaManager {
    * This means both terms are considered equal afterwards.
    * This method is the same as the method <code>equal</code> for other theories.
    */
-  public BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2);
+  BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2);
 
   /**
    * Create a term for comparing the equality of two floating-point terms,
@@ -79,22 +79,21 @@ public interface FloatingPointFormulaManager {
    * Be careful to not use this method when you really need
    * {@link #assignment(FloatingPointFormula, FloatingPointFormula)}.
    */
-  public BooleanFormula equalWithFPSemantics(
-      FloatingPointFormula number1, FloatingPointFormula number2);
+  BooleanFormula equalWithFPSemantics(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public BooleanFormula greaterThan(FloatingPointFormula number1, FloatingPointFormula number2);
+  BooleanFormula greaterThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public BooleanFormula greaterOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
+  BooleanFormula greaterOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public BooleanFormula lessThan(FloatingPointFormula number1, FloatingPointFormula number2);
+  BooleanFormula lessThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public BooleanFormula lessOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
+  BooleanFormula lessOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
-  public BooleanFormula isNaN(FloatingPointFormula number);
+  BooleanFormula isNaN(FloatingPointFormula number);
 
-  public BooleanFormula isInfinity(FloatingPointFormula number);
+  BooleanFormula isInfinity(FloatingPointFormula number);
 
-  public BooleanFormula isZero(FloatingPointFormula number);
+  BooleanFormula isZero(FloatingPointFormula number);
 
-  public BooleanFormula isSubnormal(FloatingPointFormula number);
+  BooleanFormula isSubnormal(FloatingPointFormula number);
 }
