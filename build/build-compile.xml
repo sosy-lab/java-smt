@@ -31,7 +31,6 @@
             <classpath refid="classpath"/>
             <compilerarg value="-Xlint"/>
             <compilerarg value="-Xlint:-processing"/>
-            <compilerarg value="-Werror"/>
             <compilerclasspath refid="errorprone"/>
         </javac>
     </target>
