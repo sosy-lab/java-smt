@@ -21,11 +21,11 @@ package org.sosy_lab.solver.basicimpl;
 
 import org.junit.Test;
 
-public class AbstractUninterpretedFunctionDeclarationTest {
+public class DefaultUninterpretedFunctionDeclarationTest {
 
   @Test
   public void testEquals() {
-    // equals method of AbstractUninterpretedFunctionDeclaration
+    // equals method of DefaultUninterpretedFunctionDeclaration
     // is not testable with PackageSanityTest because of type fields
   }
 }

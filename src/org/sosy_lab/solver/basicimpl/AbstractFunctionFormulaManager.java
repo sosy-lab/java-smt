@@ -69,7 +69,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       argTypes.add(toSolverType(argtype));
     }
 
-    return new AbstractUninterpretedFunctionDeclaration<>(
+    return new DefaultUninterpretedFunctionDeclaration<>(
         pReturnType,
         declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes),
         pArgTypes);
@@ -98,8 +98,8 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
   final <T extends Formula> TFormulaInfo createUninterpretedFunctionCallImpl(
       UninterpretedFunctionDeclaration<T> pFunc, List<TFormulaInfo> pArgs) {
     @SuppressWarnings("unchecked")
-    AbstractUninterpretedFunctionDeclaration<T, TFunctionDecl> func =
-        (AbstractUninterpretedFunctionDeclaration<T, TFunctionDecl>) pFunc;
+    DefaultUninterpretedFunctionDeclaration<T, TFunctionDecl> func =
+        (DefaultUninterpretedFunctionDeclaration<T, TFunctionDecl>) pFunc;
 
     return createUninterpretedFunctionCallImpl(func.getFuncDecl(), pArgs);
   }

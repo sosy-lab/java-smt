@@ -32,12 +32,12 @@ import javax.annotation.Nullable;
 /**
  * A simple straightforward implementation of FunctionFormulaType<T>
  */
-class AbstractUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
+class DefaultUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
     extends UninterpretedFunctionDeclaration<T> {
 
   private final TFuncDecl funcDecl;
 
-  AbstractUninterpretedFunctionDeclaration(
+  DefaultUninterpretedFunctionDeclaration(
       FormulaType<T> returnType, TFuncDecl funcDecl, List<FormulaType<?>> argumentTypes) {
     super(returnType, argumentTypes);
     this.funcDecl = checkNotNull(funcDecl);
@@ -57,11 +57,11 @@ class AbstractUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof AbstractUninterpretedFunctionDeclaration)) {
+    if (!(obj instanceof DefaultUninterpretedFunctionDeclaration)) {
       return false;
     }
-    AbstractUninterpretedFunctionDeclaration<?, ?> other =
-        (AbstractUninterpretedFunctionDeclaration<?, ?>) obj;
+    DefaultUninterpretedFunctionDeclaration<?, ?> other =
+        (DefaultUninterpretedFunctionDeclaration<?, ?>) obj;
 
     return funcDecl.equals(other.funcDecl);
   }
