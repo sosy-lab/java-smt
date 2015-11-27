@@ -5,13 +5,14 @@
 
     <!-- Targets for publishing the project to an Ivy repository. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
 
     <target name="publish-artifacts">
         <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
         <fail unless="ivy.hasrepository"
             message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
+        <fail unless="version.publishable"
+            message="Cannot publish version ${version}, only unmodified working copies may be published." />
         <ivy:publish
             conf="runtime, sources"
             pubrevision="${version}"

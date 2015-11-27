@@ -4,24 +4,24 @@
 
     <!-- Targets for formatting source code. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
 
     <target name="format-source" depends="resolve-dependencies"
-        description="Reormat the whole source">
+        description="Reformat the whole source">
         <fileset dir="${source.dir}" id="source.files">
             <include name="**/*.java" />
         </fileset>
-        <pathconvert property="source.files" refid="source.files" pathsep=" "/>
+        <pathconvert property="source.files" refid="source.files" pathsep="' '"/>
         <java fork="true" jar="${ivy.lib.dir}/build/google-java-format.jar">
             <arg value="-i"/>
-            <arg line="${source.files}"/>
+            <arg line="'${source.files}'"/>
         </java>
     </target>
 
     <target name="format-diff" depends="resolve-dependencies"
         description="Reformat all lines that are currently changed but not yet committed">
-        <exec executable="git"
-                outputproperty="git.diff"
+        <exec executable="svn"
+                outputproperty="svn.diff"
                 failonerror="false" failifexecutionfails="false"
                 logError="false" error="/dev/null">
             <arg value="diff"/>
@@ -38,17 +38,17 @@
             <arg value="diff"/>
             <arg value="--cached"/>
             <arg value="-U0"/>
+            <arg value="--no-prefix"/>
             <arg value="${source.dir}"/>
         </exec>
 
-        <condition property="diff" value="${git.diff}" else="${git.diff}">
-            <not><equals arg1="${git.diff}" arg2=""/></not>
+        <condition property="diff" value="${svn.diff}" else="${git.diff}">
+            <not><equals arg1="${svn.diff}" arg2=""/></not>
         </condition>
 
         <exec executable="build/google-java-format-diff.py"
                 inputstring="${diff}">
             <arg value="-i"/>
-            <arg value="-p1"/>
         </exec>
     </target>
 </project>

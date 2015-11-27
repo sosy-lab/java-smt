@@ -4,12 +4,12 @@
 
     <!-- Targets for generating JAR files. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
 
     <!-- These properties can and should be overridden from including file. -->
     <property name="class.main" value=""/>
     <property name="project.url" value=""/>
-    <!--<property name="jar.excludes" value="**/*Test.class **/*Test$*.class"/>-->
+    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class"/>
 
     <target name="jar" depends="determine-version,build" description="Create a runnable JAR file">
         <property name="jar.file" value="${ivy.module}-${version}.jar"/>
@@ -18,11 +18,10 @@
             <classpath><fileset dir="${ivy.lib.dir}/runtime" includes="*.jar"/></classpath>
         </manifestclasspath>
         <jar basedir="${class.dir}/"
+                destfile="${jar.file}"
                 includes="**"
                 excludes="${jar.excludes}"
-                destfile="${jar.file}"
                 whenmanifestonly="fail">
-
             <manifest>
                 <attribute name="Class-Path" value="${classpath.jar}"/>
                 <attribute name="Main-Class" value="${class.main}"/>
@@ -34,10 +33,10 @@
     </target>
 
     <target name="sources" depends="determine-version, resolve-dependencies">
-        <jar basedir="${source.dir}/"
-                destfile="${ivy.module}-${version}-sources.jar"
-                includes="**/*.java"
+        <jar destfile="${ivy.module}-${version}-sources.jar"
                 whenmanifestonly="fail">
+            <fileset dir="${source.dir}/" includes="**/*.java"/>
+            <fileset dir="${source.generated.dir}/" includes="**/*.java"/>
             <manifest>
                     <attribute name="Implementation-Title" value="${ant.project.name}"/>
                     <attribute name="Implementation-Version" value="${version}"/>

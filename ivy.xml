@@ -45,11 +45,6 @@
         <!-- SoSy-Lab Common Library -->
         <dependency org="org.sosy_lab" name="common" rev="0.548" conf="runtime->runtime; contrib->sources"/>
 
-
-        <!-- google-java-format
-            A source-code formatter for Java -->
-        <dependency org="com.google.google-java-format" name="google-java-format" rev="0.1-SNAPSHOT-104-g79b7f0f" conf="build->runtime"/>
-
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
         <dependency org="com.google.guava" name="guava" rev="18.0" conf="runtime->default; contrib->sources"/>
@@ -90,8 +85,12 @@
         <dependency org="com.google.errorprone" name="error_prone_ant" rev="2.0.5" transitive="false" conf="build->default" />
         <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.0.5" conf="build->default; contrib->sources" />
 
+        <!-- google-java-format
+             A source-code formatter for Java -->
+        <dependency org="com.google.google-java-format" name="google-java-format" rev="0.1-SNAPSHOT-104-g79b7f0f" conf="build->runtime"/>
+
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.13.6" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.17.0" conf="checkstyle->default"/>
 
         <!-- FindBugs -->
         <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>

@@ -2,11 +2,17 @@
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
 <project name="version" basedir=".">
 
+    <!-- Targets for determining the version number based on the version-control revision. -->
+
     <target name="determine-version">
         <exec executable="git"
                 outputproperty="version"
                 failonerror="true">
             <arg value="describe"/>
+            <arg value="--dirty"/>
         </exec>
+        <condition property="version.publishable">
+            <not><matches string="${version}" pattern="-dirty" /></not>
+        </condition>
     </target>
 </project>

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
 <project name="checkstyle" basedir="."
-        xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+        xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
 
     <!-- Targets for running Checkstyle. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
 
     <target name="checkstyle" depends="resolve-dependencies">
         <path id="checkstyle.lib.path">
             <fileset dir="${ivy.lib.dir}/checkstyle" includes="*.jar"/>
         </path>
-        <taskdef resource="checkstyletask.properties" uri="antlib:com.puppycrawl.tools.checkstyle" classpathref="checkstyle.lib.path"/>
+        <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" uri="antlib:com.puppycrawl.tools.checkstyle.ant" classpathref="checkstyle.lib.path"/>
 
         <cs:checkstyle config=".settings/checkstyle.xml">
             <fileset dir="${source.dir}" includes="**/*.java" excludes="**/*Test.java"/>

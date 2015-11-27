@@ -35,5 +35,8 @@ lib/native/source/libmathsat5j/*.so
 .idea/uiDesigner.xml
 
 /*.so
+/*.jar
 
 build.properties
+/.apt-generated/
+/repository/

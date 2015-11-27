@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: JavaSMT
+    Checkstyle-Configuration: Test-Code Configuration
     Description: none
 -->
 <module name="Checker">
@@ -30,20 +30,20 @@
       <property name="allowMissingJavadoc" value="true"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
-    <module name="AbstractClassName">
-      <property name="format" value="^(Abstract|Forwarding).*$"/>
-      <property name="ignoreName" value="true"/>
-    </module>
     <module name="ClassTypeParameterName">
       <property name="format" value="^[A-Z][0-9]?$"/>
     </module>
-    <module name="ConstantName"/>
+    <module name="ConstantName">
+      <property name="applyToPrivate" value="false"/>
+    </module>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName">
       <property name="format" value="^([a-z][a-zA-Z0-9]*|_)$"/>
     </module>
     <module name="MemberName"/>
-    <module name="MethodName"/>
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
+    </module>
     <module name="MethodTypeParameterName">
       <property name="format" value="^[A-Z][0-9]?$"/>
     </module>
@@ -51,9 +51,7 @@
     <module name="ParameterName"/>
     <module name="StaticVariableName"/>
     <module name="TypeName"/>
-    <module name="IllegalImport">
-      <property name="illegalPkgs" value="sun,com.google.common.testing,org.junit,junit"/>
-    </module>
+    <module name="IllegalImport"/>
     <module name="ImportOrder">
       <property name="option" value="top"/>
       <property name="groups" value="com,edu,junit,org,sun,java,javax"/>
@@ -121,7 +119,7 @@
     </module>
     <module name="IllegalType">
       <property name="tokens" value="METHOD_DEF,PARAMETER_DEF,VARIABLE_DEF"/>
-      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector, java.nio.file.Path, java.nio.file.Paths"/>
+      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector"/>
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>
@@ -133,15 +131,8 @@
     <module name="SimplifyBooleanExpression"/>
     <module name="StringLiteralEquality"/>
     <module name="OneStatementPerLine"/>
-    <module name="ArrayTrailingComma"/>
-    <module name="HideUtilityClassConstructor"/>
     <module name="InterfaceIsType"/>
     <module name="MutableException"/>
-    <module name="VisibilityModifier">
-      <property name="packageAllowed" value="true"/>
-      <property name="protectedAllowed" value="true"/>
-      <property name="publicMemberPattern" value="^$"/>
-    </module>
     <module name="ArrayTypeStyle"/>
     <module name="UpperEll"/>
     <module name="OuterTypeFilename"/>
@@ -149,10 +140,6 @@
       <property name="tokens" value="ARRAY_INIT"/>
     </module>
     <module name="AvoidStarImport"/>
-    <module name="com.github.sevntu.checkstyle.checks.annotation.ForbidAnnotation">
-      <property name="annotationNames" value="Test"/>
-      <property name="annotationTargets" value="METHOD_DEF"/>
-    </module>
     <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClasses"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBoolean"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.ForbidReturnInFinallyBlockCheck"/>
@@ -181,7 +168,9 @@
     <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
   </module>
   <module name="Header">
-    <property name="header" value="/*\n *  JavaSMT is an API wrapper for a collection of SMT solvers.\n *  This file is part of JavaSMT.\n *\n *  Copyright (C) 2007-2015  Dirk Beyer\n *  All rights reserved.\n *\n *  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);\n *  you may not use this file except in compliance with the License.\n *  You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n *  Unless required by applicable law or agreed to in writing, software\n *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,\n *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n *  See the License for the specific language governing permissions and\n *  limitations under the License.\n */"/>
+    <property name="severity" value="ignore"/>
+    <property name="header" value="/*\n *  SoSy-Lab Common is a library of useful utilities.\n *  This file is part of SoSy-Lab Common.\n *\n *  Copyright (C) 2007-2015  Dirk Beyer\n *  All rights reserved.\n *\n *  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);\n *  you may not use this file except in compliance with the License.\n *  You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n *  Unless required by applicable law or agreed to in writing, software\n *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,\n *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n *  See the License for the specific language governing permissions and\n *  limitations under the License.\n */"/>
+    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
