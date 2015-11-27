@@ -1,6 +1,7 @@
 .idea/workspace.xml
 
 /bin
+/lib/java
 /lib/*.jar
 /lib/java/build/*.jar
 /lib/java/checkstyle/*.jar
