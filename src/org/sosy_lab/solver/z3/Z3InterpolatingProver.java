@@ -23,7 +23,34 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_get;
+import static org.sosy_lab.solver.z3.Z3NativeApi.compute_interpolant;
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_interpolant;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
+import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
+
+import org.sosy_lab.common.Pair;
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
+import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
+import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -33,19 +60,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Pair;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
-import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Longs;
 
 class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 

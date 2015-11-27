@@ -23,8 +23,6 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import java.math.BigDecimal;
-
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FloatingPointFormula;
@@ -33,6 +31,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
+
+import java.math.BigDecimal;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package,

@@ -23,7 +23,9 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_array_read;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_array_write;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_equal;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;

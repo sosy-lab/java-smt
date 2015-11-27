@@ -23,10 +23,10 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.common.base.Preconditions;
+
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Represents a type of a formula.

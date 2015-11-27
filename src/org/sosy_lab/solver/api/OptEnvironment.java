@@ -23,11 +23,11 @@
  */
 package org.sosy_lab.solver.api;
 
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.Model;
-
 import com.google.common.base.Optional;
+
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverException;
 
 public interface OptEnvironment extends AutoCloseable {
 

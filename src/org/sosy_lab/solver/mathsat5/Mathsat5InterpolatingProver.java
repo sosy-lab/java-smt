@@ -23,17 +23,24 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import java.util.List;
+import java.util.Set;
 
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
     implements InterpolatingProverEnvironmentWithAssumptions<Integer> {

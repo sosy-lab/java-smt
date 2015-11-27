@@ -23,9 +23,8 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -35,8 +34,9 @@ import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package,

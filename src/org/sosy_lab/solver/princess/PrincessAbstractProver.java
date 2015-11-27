@@ -23,11 +23,12 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Preconditions.*;
-
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import org.sosy_lab.solver.Model;
+
+import javax.annotation.Nullable;
 
 abstract class PrincessAbstractProver {
 

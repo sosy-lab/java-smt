@@ -24,12 +24,26 @@
 package org.sosy_lab.solver.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_array_sort_domain;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_array_sort_range;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_bv_sort_size;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_const;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
+import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_ast;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-import java.util.Map;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -49,9 +63,9 @@ import org.sosy_lab.solver.z3.Z3Formula.Z3BooleanFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.Map;
 
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {

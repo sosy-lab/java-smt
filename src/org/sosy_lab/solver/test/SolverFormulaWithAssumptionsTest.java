@@ -26,8 +26,7 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import java.math.BigDecimal;
-import java.util.Collections;
+import com.google.common.collect.Lists;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +41,8 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
-import com.google.common.collect.Lists;
+import java.math.BigDecimal;
+import java.util.Collections;
 
 @RunWith(Parameterized.class)
 public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {

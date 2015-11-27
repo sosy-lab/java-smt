@@ -23,10 +23,10 @@
  */
 package org.sosy_lab.solver.api;
 
+import org.sosy_lab.solver.SolverException;
+
 import java.util.List;
 import java.util.Set;
-
-import org.sosy_lab.solver.SolverException;
 
 /**
  * This class provides an interface to an incremental SMT solver

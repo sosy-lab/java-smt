@@ -25,8 +25,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
-
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -37,6 +35,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+
+import javax.annotation.Nullable;
 
 /**
  * Simplifies building a solver from the specific theories.

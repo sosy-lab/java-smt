@@ -23,9 +23,9 @@
  */
 package org.sosy_lab.solver.api;
 
-import java.util.List;
-
 import org.sosy_lab.solver.SolverException;
+
+import java.util.List;
 
 /**
  * This class provides an interface to an incremental SMT solver

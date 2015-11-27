@@ -23,17 +23,19 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static scala.collection.JavaConversions.*;
+import static scala.collection.JavaConversions.asScalaSet;
+import static scala.collection.JavaConversions.iterableAsScalaIterable;
+import static scala.collection.JavaConversions.seqAsJavaList;
+
+import org.sosy_lab.common.Pair;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
-
-import org.sosy_lab.common.Pair;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
 
 import ap.SimpleAPI;
 import ap.parser.IExpression;

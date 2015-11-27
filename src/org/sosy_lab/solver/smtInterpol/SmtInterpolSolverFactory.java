@@ -23,8 +23,6 @@
  */
 package org.sosy_lab.solver.smtInterpol;
 
-import javax.annotation.Nullable;
-
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -33,6 +31,8 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.FormulaManagerFactory;
 import org.sosy_lab.solver.FormulaManagerFactory.SolverFactory;
 import org.sosy_lab.solver.api.FormulaManager;
+
+import javax.annotation.Nullable;
 
 /**
  * Entry point for loading SmtInterpol.

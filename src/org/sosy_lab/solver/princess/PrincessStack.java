@@ -26,9 +26,9 @@ package org.sosy_lab.solver.princess;
 import java.util.List;
 import java.util.Set;
 
-import scala.Option;
 import ap.SimpleAPI;
 import ap.parser.IFormula;
+import scala.Option;
 
 /** This is a Interface for the Wrapper around some parts of the PrincessAPI.
  * It allows to have a stack with operations like: push, pop, assert, checkSat, getInterpolants, getModel.

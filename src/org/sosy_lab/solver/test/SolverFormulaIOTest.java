@@ -24,12 +24,17 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.collect.Iterables.getLast;
-import static com.google.common.truth.Truth.*;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import com.google.common.base.Splitter;
+import com.google.common.base.Supplier;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multiset;
+
+import junit.framework.AssertionFailedError;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,14 +48,9 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multiset;
-
-import junit.framework.AssertionFailedError;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class SolverFormulaIOTest extends SolverBasedTest0 {

@@ -23,15 +23,15 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import java.util.Collection;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
+import java.util.Collection;
 
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {

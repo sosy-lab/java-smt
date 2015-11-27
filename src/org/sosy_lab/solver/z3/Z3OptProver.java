@@ -24,9 +24,34 @@
 package org.sosy_lab.solver.z3;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_optimize;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_params;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_assert;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_check;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_lower;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_model;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_reason_unknown;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_upper;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_maximize;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_minimize;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_pop;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_push;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_set_params;
+import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_to_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.params_set_symbol;
+import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
 
-import java.util.logging.Level;
+import com.google.common.base.Optional;
+import com.google.common.base.Verify;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
@@ -40,9 +65,7 @@ import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Verify;
-import com.google.common.collect.ImmutableList;
+import java.util.logging.Level;
 
 class Z3OptProver implements OptEnvironment {
 

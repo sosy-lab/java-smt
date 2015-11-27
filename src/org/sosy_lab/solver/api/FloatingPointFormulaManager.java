@@ -23,9 +23,9 @@
  */
 package org.sosy_lab.solver.api;
 
-import java.math.BigDecimal;
-
 import org.sosy_lab.common.rationals.Rational;
+
+import java.math.BigDecimal;
 
 /**
  * This interface represents the floating-foint theory

@@ -27,10 +27,8 @@ import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,8 +43,10 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains some simple Junit-tests to check the interpolation-API of our solvers.

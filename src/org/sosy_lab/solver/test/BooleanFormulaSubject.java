@@ -25,7 +25,12 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
+import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.Subject;
+import com.google.common.truth.SubjectFactory;
+import com.google.common.truth.TestVerb;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.sosy_lab.solver.FormulaManagerFactory;
 import org.sosy_lab.solver.Model;
@@ -35,12 +40,7 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
-import com.google.common.truth.FailureStrategy;
-import com.google.common.truth.Subject;
-import com.google.common.truth.SubjectFactory;
-import com.google.common.truth.TestVerb;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 
 /**
  * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth

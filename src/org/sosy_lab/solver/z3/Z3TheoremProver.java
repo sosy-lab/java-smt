@@ -23,15 +23,36 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_get;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_size;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert_and_track;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_num_scopes;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_unsat_core;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.Model;
@@ -43,8 +64,12 @@ import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 class Z3TheoremProver implements ProverEnvironment {
 

@@ -24,7 +24,28 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_element_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_index_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_bool_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_bv_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_bv_type_size;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_fp_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_array_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bool_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;

@@ -23,12 +23,18 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
-
-import java.math.BigInteger;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_leq;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_not;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_plus;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_times;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
+
+import java.math.BigInteger;
 
 abstract class Mathsat5NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>

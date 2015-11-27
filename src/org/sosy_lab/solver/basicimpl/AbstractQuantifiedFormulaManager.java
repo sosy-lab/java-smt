@@ -23,14 +23,14 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>

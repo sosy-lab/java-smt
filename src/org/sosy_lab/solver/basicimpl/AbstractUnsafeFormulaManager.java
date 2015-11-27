@@ -23,17 +23,17 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements UnsafeFormulaManager {

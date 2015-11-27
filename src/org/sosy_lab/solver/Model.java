@@ -23,18 +23,18 @@
  */
 package org.sosy_lab.solver;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Ordering;
+
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * This class represents a model returned from an SMT solver:

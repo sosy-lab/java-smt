@@ -23,13 +23,35 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
-
-import java.math.BigDecimal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_cast;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_div;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_from_sbv;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_from_ubv;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_isinf;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_isnan;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_issubnormal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_iszero;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_leq;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_lt;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_minus;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_minus_inf;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_nan;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_neg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_plus;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_plus_inf;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_rat_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_nearest_even;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_times;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_fp_to_bv;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 import org.sosy_lab.solver.basicimpl.AbstractFloatingPointFormulaManager;
+
+import java.math.BigDecimal;
 
 class Mathsat5FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long> {

@@ -25,16 +25,16 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionFormulaManager;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class simplifies the implementation of the FunctionFormulaManager by converting the types to the solver specific type.

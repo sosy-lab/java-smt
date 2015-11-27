@@ -26,9 +26,7 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +50,9 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
-import com.google.common.collect.ImmutableList;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class SolverStackTest extends SolverBasedTest0 {

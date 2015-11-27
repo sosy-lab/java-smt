@@ -24,8 +24,61 @@
 package org.sosy_lab.solver.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_index_value;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_name;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_app;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvuge;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvule;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_const;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_func_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ge;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_le;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SYMBOL;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IMPLIES;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
+
+import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,14 +86,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Longs;
 
 class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 

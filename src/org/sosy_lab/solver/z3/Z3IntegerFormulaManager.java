@@ -23,12 +23,16 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-
-import java.math.BigDecimal;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_div;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_mod;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_mul;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
 
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+
+import java.math.BigDecimal;
 
 class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, IntegerFormula> {
 

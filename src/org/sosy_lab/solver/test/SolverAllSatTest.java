@@ -26,8 +26,7 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +42,8 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment.AllSatCallback;
 
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class SolverAllSatTest extends SolverBasedTest0 {

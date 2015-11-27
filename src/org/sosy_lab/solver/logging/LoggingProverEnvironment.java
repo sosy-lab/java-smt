@@ -25,15 +25,15 @@ package org.sosy_lab.solver.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-import java.util.logging.Level;
-
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
+
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Wraps a prover environment with a logging object.

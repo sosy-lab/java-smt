@@ -23,10 +23,10 @@
  */
 package org.sosy_lab.solver.smtInterpol;
 
-import java.math.BigInteger;
-
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
+
+import java.math.BigInteger;
 
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;

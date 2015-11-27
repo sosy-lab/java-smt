@@ -23,18 +23,12 @@
  */
 package org.sosy_lab.solver.smtInterpol;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.logging.Level;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -46,8 +40,16 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.logging.Level;
+
+import javax.annotation.Nullable;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;

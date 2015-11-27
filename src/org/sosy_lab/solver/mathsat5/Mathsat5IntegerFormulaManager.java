@@ -23,12 +23,16 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
-
-import java.math.BigDecimal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_int_modular_congruence;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_times;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+
+import java.math.BigDecimal;
 
 class Mathsat5IntegerFormulaManager
     extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula> {

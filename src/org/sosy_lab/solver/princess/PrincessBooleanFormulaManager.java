@@ -23,12 +23,12 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static org.sosy_lab.solver.princess.PrincessUtil.*;
+import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
+import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
-import scala.Enumeration;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
@@ -37,6 +37,7 @@ import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
 import ap.parser.INot;
 import ap.parser.ITermITE;
+import scala.Enumeration;
 
 class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {

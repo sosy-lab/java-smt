@@ -23,11 +23,38 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-
-import java.math.BigInteger;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvadd;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvand;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvashr;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvlshr;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvmul;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvneg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvnot;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvor;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsdiv;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvshl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsle;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvslt;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsrem;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsub;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvudiv;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvule;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvult;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvurem;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvxor;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_concat;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_extract;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_int64;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_numeral;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_sign_ext;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_zero_ext;
 
 import org.sosy_lab.solver.basicimpl.AbstractBitvectorFormulaManager;
+
+import java.math.BigInteger;
 
 class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Long, Long> {
 

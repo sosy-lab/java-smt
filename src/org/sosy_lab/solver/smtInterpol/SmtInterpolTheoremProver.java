@@ -25,11 +25,9 @@ package org.sosy_lab.solver.smtInterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
@@ -37,9 +35,11 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 

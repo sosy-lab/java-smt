@@ -26,17 +26,8 @@ package org.sosy_lab.solver;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
 
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
@@ -54,8 +45,17 @@ import org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager;
 import org.sosy_lab.solver.princess.PrincessFormulaManager;
 import org.sosy_lab.solver.z3.Z3FormulaManager;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Factory class for loading and instantiating SMT solvers.

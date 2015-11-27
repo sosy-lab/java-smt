@@ -30,6 +30,18 @@ import static java.util.Collections.singleton;
 import static org.sosy_lab.solver.princess.PrincessUtil.getVarsAndUIFs;
 import static scala.collection.JavaConversions.asJavaIterable;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
+
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -46,18 +58,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 
 import ap.SimpleAPI;
 import ap.basetypes.IdealInt;

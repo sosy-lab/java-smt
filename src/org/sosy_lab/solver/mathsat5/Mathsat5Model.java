@@ -23,25 +23,46 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_ModelIterator;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_return_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_array_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bool_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_array_const;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_array_read;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_array_write;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_boolean_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.UnsignedInteger;
+import com.google.common.primitives.UnsignedLong;
+
+import org.sosy_lab.solver.AssignableTerm;
+import org.sosy_lab.solver.AssignableTerm.Function;
+import org.sosy_lab.solver.AssignableTerm.Variable;
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.ModelIterator;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.AssignableTerm;
-import org.sosy_lab.solver.AssignableTerm.Function;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.ModelIterator;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.UnsignedInteger;
-import com.google.common.primitives.UnsignedLong;
 
 class Mathsat5Model {
 

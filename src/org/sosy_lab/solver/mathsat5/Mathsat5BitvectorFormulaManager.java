@@ -23,11 +23,36 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
-
-import java.math.BigInteger;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_and;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_ashr;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_concat;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_extract;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_lshl;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_lshr;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_minus;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_neg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_not;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_or;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_plus;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_sdiv;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_sext;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_sleq;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_slt;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_srem;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_times;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_udiv;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_uleq;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_ult;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_urem;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_xor;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_zext;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
 
 import org.sosy_lab.solver.basicimpl.AbstractBitvectorFormulaManager;
+
+import java.math.BigInteger;
 
 /**
  * Mathsat Bitvector Theory, build out of Bitvector*Operations.

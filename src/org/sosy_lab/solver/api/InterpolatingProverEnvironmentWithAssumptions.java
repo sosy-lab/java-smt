@@ -23,9 +23,9 @@
  */
 package org.sosy_lab.solver.api;
 
-import java.util.List;
-
 import org.sosy_lab.solver.SolverException;
+
+import java.util.List;
 
 public interface InterpolatingProverEnvironmentWithAssumptions<T>
     extends InterpolatingProverEnvironment<T> {

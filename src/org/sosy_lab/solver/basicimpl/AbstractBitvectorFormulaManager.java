@@ -23,12 +23,12 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import java.math.BigInteger;
-
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BitvectorFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
+
+import java.math.BigInteger;
 
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>

@@ -25,9 +25,9 @@ package org.sosy_lab.solver.smtInterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.PrintWriter;
-
 import org.sosy_lab.solver.api.BooleanFormula;
+
+import java.io.PrintWriter;
 
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 

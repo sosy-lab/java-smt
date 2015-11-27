@@ -23,17 +23,17 @@
  */
 package org.sosy_lab.solver.smtInterpol;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.google.common.base.Verify;
 
-import org.sosy_lab.solver.AssignableTerm.Variable;
 import org.sosy_lab.solver.AssignableTerm;
 import org.sosy_lab.solver.AssignableTerm.Function;
+import org.sosy_lab.solver.AssignableTerm.Variable;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.TermType;
 
-import com.google.common.base.Verify;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Term;

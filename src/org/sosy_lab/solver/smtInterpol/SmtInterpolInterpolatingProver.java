@@ -23,8 +23,16 @@
  */
 package org.sosy_lab.solver.smtInterpol;
 
-import static com.google.common.base.Predicates.*;
+import static com.google.common.base.Predicates.in;
+import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
+
+import com.google.common.base.Preconditions;
+
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,13 +42,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-
-import com.google.common.base.Preconditions;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;

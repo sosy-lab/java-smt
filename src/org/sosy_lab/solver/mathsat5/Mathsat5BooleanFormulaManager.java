@@ -23,7 +23,23 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bool_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_and;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_false;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_iff;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_not;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_or;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term_ite;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_and;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_iff;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_not;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_or;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_term_ite;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 

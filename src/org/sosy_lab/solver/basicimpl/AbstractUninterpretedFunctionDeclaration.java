@@ -25,13 +25,13 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * A simple straightforward implementation of FunctionFormulaType<T>

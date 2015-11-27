@@ -23,15 +23,29 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_add;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_div;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ge;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_gt;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_int;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_int64;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_le;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_lt;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_mul;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_numeral;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_sub;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
 
-import java.math.BigInteger;
-import java.util.List;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 
-import com.google.common.primitives.Longs;
+import java.math.BigInteger;
+import java.util.List;
 
 abstract class Z3NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>

@@ -23,15 +23,14 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_string;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.FileWriteMode;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -40,10 +39,13 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.FileWriteMode;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 class Z3SmtLogger {
 

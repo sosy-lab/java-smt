@@ -23,10 +23,10 @@
  */
 package org.sosy_lab.solver;
 
+import com.google.common.testing.AbstractPackageSanityTests;
+
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
-
-import com.google.common.testing.AbstractPackageSanityTests;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 

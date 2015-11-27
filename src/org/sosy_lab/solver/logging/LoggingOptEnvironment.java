@@ -25,7 +25,7 @@ package org.sosy_lab.solver.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.logging.Level;
+import com.google.common.base.Optional;
 
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
@@ -35,7 +35,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptEnvironment;
 
-import com.google.common.base.Optional;
+import java.util.logging.Level;
 
 /**
  * Wrapper for an optimizing solver.

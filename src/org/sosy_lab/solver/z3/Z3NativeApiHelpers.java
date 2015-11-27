@@ -23,7 +23,24 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_get_num_subgoals;
+import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_get_subgoal;
+import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.goal_assert;
+import static org.sosy_lab.solver.z3.Z3NativeApi.goal_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.goal_formula;
+import static org.sosy_lab.solver.z3.Z3NativeApi.goal_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.goal_size;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_goal;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_tactic;
+import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_apply;
+import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_inc_ref;
 
 import org.sosy_lab.solver.SolverException;
 

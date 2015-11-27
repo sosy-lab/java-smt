@@ -26,11 +26,11 @@ package org.sosy_lab.solver.smtInterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.smtInterpol.SmtInterpolUtil.toTermArray;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.LetTerm;

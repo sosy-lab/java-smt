@@ -23,8 +23,8 @@
  */
 package org.sosy_lab.solver.test;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import com.google.common.collect.ImmutableList;
+import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +36,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.testing.EqualsTester;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @RunWith(Parameterized.class)
 public class SolverBasicTest extends SolverBasedTest0 {

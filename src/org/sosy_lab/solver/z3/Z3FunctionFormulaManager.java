@@ -23,13 +23,15 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_func_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
 
-import java.util.List;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
-import com.google.common.primitives.Longs;
+import java.util.List;
 
 class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {
 

@@ -23,11 +23,11 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
+import com.google.common.base.Function;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-
-import com.google.common.base.Function;
 
 /**
  * A BaseFormulaManager because all Abstract*FormulaManager-Classes wrap a FormulaCreator-instance.

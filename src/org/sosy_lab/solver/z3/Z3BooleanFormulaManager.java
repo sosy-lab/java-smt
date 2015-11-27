@@ -23,14 +23,36 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_false;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_implies;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ite;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_xor;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IFF;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IMPLIES;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
-import java.util.Collection;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
-import com.google.common.primitives.Longs;
+import java.util.Collection;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 

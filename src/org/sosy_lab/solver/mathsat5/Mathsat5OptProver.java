@@ -1,16 +1,25 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_OPTIMUM;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_objective_iterator;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_objective_iterator;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_objective_iterator_has_next;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_objective_iterator_next;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_objective_value_repr;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_maximize;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_minimize;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_model;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
@@ -20,8 +29,14 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptEnvironment;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment {
   private UniqueIdGenerator idGenerator = new UniqueIdGenerator();

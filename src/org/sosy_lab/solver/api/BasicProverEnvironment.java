@@ -23,10 +23,10 @@
  */
 package org.sosy_lab.solver.api;
 
-import javax.annotation.Nullable;
-
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
+
+import javax.annotation.Nullable;
 
 /**
  * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment}

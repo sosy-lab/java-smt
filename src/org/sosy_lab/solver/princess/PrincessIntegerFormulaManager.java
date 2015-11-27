@@ -23,14 +23,15 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static org.sosy_lab.solver.princess.PrincessUtil.*;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
+import static org.sosy_lab.solver.princess.PrincessUtil.isNumber;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;

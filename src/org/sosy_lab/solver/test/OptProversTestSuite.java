@@ -2,8 +2,7 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.math.BigInteger;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -32,7 +31,8 @@ import org.sosy_lab.solver.api.OptEnvironment.OptStatus;
 import org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager;
 import org.sosy_lab.solver.z3.Z3FormulaManager;
 
-import com.google.common.collect.ImmutableList;
+import java.math.BigInteger;
+import java.util.List;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

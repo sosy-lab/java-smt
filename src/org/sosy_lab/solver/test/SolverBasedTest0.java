@@ -27,7 +27,7 @@ import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.solver.test.ProverEnvironmentSubject.proverEnvironment;
 
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.After;
 import org.junit.Before;
@@ -52,7 +52,7 @@ import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import javax.annotation.Nullable;
 
 /**
  * Abstract base class with helpful utilities for writing tests

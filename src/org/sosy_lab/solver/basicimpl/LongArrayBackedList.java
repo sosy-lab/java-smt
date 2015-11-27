@@ -23,12 +23,13 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkElementIndex;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.errorprone.annotations.ForOverride;
 
 import java.util.AbstractList;
 import java.util.RandomAccess;
-
-import com.google.errorprone.annotations.ForOverride;
 
 /**
  * Immutable list that is backed by a <code>long[]</code> and can have any

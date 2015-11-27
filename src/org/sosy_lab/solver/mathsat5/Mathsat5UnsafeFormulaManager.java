@@ -24,17 +24,40 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_return_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_function_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_roundingmode_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_uleq;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_leq;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_uf;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_atom;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.Longs;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 

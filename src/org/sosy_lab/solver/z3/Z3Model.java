@@ -23,20 +23,47 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.*;
-
-import java.math.BigInteger;
-
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.AssignableTerm;
-import org.sosy_lab.solver.AssignableTerm.Function;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.TermType;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_app;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_consts;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.AssignableTerm;
+import org.sosy_lab.solver.AssignableTerm.Function;
+import org.sosy_lab.solver.AssignableTerm.Variable;
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.TermType;
+
+import java.math.BigInteger;
 
 class Z3Model {
   private static TermType toZ3Type(long z3context, long sort) {

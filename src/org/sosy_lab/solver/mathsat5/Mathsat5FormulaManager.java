@@ -24,13 +24,20 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_version;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_termination_test;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -53,9 +60,11 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Splitter.MapSplitter;
-import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.annotation.Nullable;
 
 public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     implements AutoCloseable {

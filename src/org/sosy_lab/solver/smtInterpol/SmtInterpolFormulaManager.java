@@ -25,15 +25,6 @@ package org.sosy_lab.solver.smtInterpol;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -47,6 +38,15 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;

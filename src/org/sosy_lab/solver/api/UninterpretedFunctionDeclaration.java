@@ -25,10 +25,10 @@ package org.sosy_lab.solver.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 /**
  * Represents a uninterpreted function.

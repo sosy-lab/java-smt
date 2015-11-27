@@ -23,7 +23,12 @@
  */
 package org.sosy_lab.solver.test;
 
-import java.util.List;
+import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.Subject;
+import com.google.common.truth.SubjectFactory;
+import com.google.common.truth.TestVerb;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
@@ -31,12 +36,7 @@ import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
-import com.google.common.truth.FailureStrategy;
-import com.google.common.truth.Subject;
-import com.google.common.truth.SubjectFactory;
-import com.google.common.truth.TestVerb;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 
 /**
  * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth

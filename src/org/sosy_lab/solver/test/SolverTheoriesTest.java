@@ -26,6 +26,9 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,9 +46,6 @@ import org.sosy_lab.solver.api.FormulaType.NumeralType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 @RunWith(Parameterized.class)
 public class SolverTheoriesTest extends SolverBasedTest0 {

@@ -23,15 +23,16 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.*;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 
-import java.util.Collections;
-import java.util.List;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 
-import com.google.common.primitives.Longs;
+import java.util.Collections;
+import java.util.List;
 
 class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long> {
 

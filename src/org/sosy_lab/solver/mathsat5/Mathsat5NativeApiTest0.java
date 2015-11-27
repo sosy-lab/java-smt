@@ -23,8 +23,31 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.junit.Assert.*;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_bv_type_size;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_fp_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_int_modular_congruence;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import org.junit.After;
 import org.junit.Before;

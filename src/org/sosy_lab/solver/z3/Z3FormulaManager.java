@@ -23,12 +23,30 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.*;
+import static org.sosy_lab.solver.z3.Z3NativeApi.del_config;
+import static org.sosy_lab.solver.z3.Z3NativeApi.del_context;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_version;
+import static org.sosy_lab.solver.z3.Z3NativeApi.global_param_set;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.interrupt;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bool_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_config;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_context_rc;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_int_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_params;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_real_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
+import static org.sosy_lab.solver.z3.Z3NativeApi.open_log;
+import static org.sosy_lab.solver.z3.Z3NativeApi.params_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.params_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.params_set_uint;
+import static org.sosy_lab.solver.z3.Z3NativeApi.parse_smtlib2_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.setInternalErrorHandler;
+import static org.sosy_lab.solver.z3.Z3NativeApi.set_ast_print_mode;
+import static org.sosy_lab.solver.z3.Z3NativeApi.set_param_value;
+import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_ast;
 
-import java.io.IOException;
-import java.util.logging.Level;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Splitter;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -52,7 +70,10 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
-import com.google.common.base.Splitter;
+import java.io.IOException;
+import java.util.logging.Level;
+
+import javax.annotation.Nullable;
 
 @Options(deprecatedPrefix = "cpa.predicate.solver.z3", prefix = "solver.z3")
 public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>

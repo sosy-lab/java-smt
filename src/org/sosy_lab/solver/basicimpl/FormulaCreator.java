@@ -25,8 +25,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
-
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -42,6 +40,8 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.BooleanFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
+
+import javax.annotation.Nullable;
 
 /**
  * This is a helper class with several methods that are commonly used

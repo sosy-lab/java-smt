@@ -24,12 +24,15 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_all_sat;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_last_error_message;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
+import com.google.common.base.Preconditions;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -38,7 +41,10 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
-import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvironment {
 

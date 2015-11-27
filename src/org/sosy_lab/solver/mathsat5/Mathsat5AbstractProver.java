@@ -23,19 +23,25 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
-
-import java.util.List;
-
-import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.api.BooleanFormula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
+
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.api.BooleanFormula;
+
+import java.util.List;
 
 /**
  * Common base class for {@link Mathsat5TheoremProver}

@@ -23,8 +23,17 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Predicates.*;
+import static com.google.common.base.Predicates.in;
+import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,16 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 class PrincessInterpolatingProver extends PrincessAbstractProver
     implements InterpolatingProverEnvironment<Integer> {

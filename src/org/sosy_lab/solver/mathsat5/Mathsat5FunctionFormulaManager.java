@@ -23,13 +23,15 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.*;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_function_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_uf;
 
-import java.util.List;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
-import com.google.common.primitives.Longs;
+import java.util.List;
 
 class Mathsat5FunctionFormulaManager
     extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {

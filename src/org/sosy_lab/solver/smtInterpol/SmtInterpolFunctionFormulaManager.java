@@ -23,9 +23,9 @@
  */
 package org.sosy_lab.solver.smtInterpol;
 
-import java.util.List;
-
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
+
+import java.util.List;
 
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
