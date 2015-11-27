@@ -1,0 +1,8 @@
+<FindBugsFilter>
+    <Match><And>
+        <!-- PackageSanityTest wants @Nullable on equals(Object) parameter,
+             FindBugs does not. -->
+        <Bug pattern="NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION"/>
+        <Method name="equals" returns="boolean" params="java.lang.Object"/>
+    </And></Match>
+</FindBugsFilter>
