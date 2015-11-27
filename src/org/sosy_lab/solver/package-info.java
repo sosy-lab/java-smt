@@ -19,9 +19,7 @@
  */
 
 /**
- * Generic SMT solver API.
- * Should have only minimal (in future no) dependencies on the rest of the
- * CPAchecker codebase.
+ * JavaSMT: a generic SMT solver API.
  */
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

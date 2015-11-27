@@ -212,7 +212,7 @@ public class FormulaManagerFactory {
 
   /**
    * Interface for completely encapsulating all accesses to a solver's package
-   * to discouple the solver's package from the rest of CPAchecker.
+   * to discouple the solver's package from the rest of the code.
    *
    * This interface is only meant to be implemented by SMT solvers
    * and used by this class, not by other classes.

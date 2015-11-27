@@ -91,7 +91,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
           || msg.contains("can't build ie-local interpolant")
           || msg.contains("splitting of AB-mixed terms not supported")
           || msg.contains("Hypothesis belongs neither to A nor to B")) {
-        // This is not a bug in CPAchecker, but a problem of MathSAT which happens during interpolation
+        // This is not a bug in our code,
+        // but a problem of MathSAT which happens during interpolation
         throw new SolverException(e.getMessage(), e);
       }
       throw e;

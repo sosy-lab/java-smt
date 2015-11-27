@@ -50,7 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This class is not part of the normal CPAchecker test suite because
+ * This class is not part of the normal JavaSMT test suite because
  * the java.library.path needs to be defined in order to execute the tests.
  */
 public class Mathsat5NativeApiTest0 {

@@ -62,7 +62,7 @@ class SmtInterpolUnsafeFormulaManager
   @Override
   public int getArity(Term pT) {
     assert !(pT instanceof LetTerm)
-        : "Formulas used by CPAchecker are expected to not have LetTerms."
+        : "Formulas used by JavaSMT are expected to not have LetTerms."
             + " Check how this formula was created: "
             + pT;
     return SmtInterpolUtil.getArity(pT);

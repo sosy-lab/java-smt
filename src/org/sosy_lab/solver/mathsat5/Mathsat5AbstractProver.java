@@ -102,7 +102,7 @@ abstract class Mathsat5AbstractProver {
         || msg.contains("impossible to build a suitable congruence graph!")
         || msg.contains("can't produce proofs")
         || msg.equals("msat_solve returned \"unknown\": unsupported")) {
-      // This is not a bug in CPAchecker, but a problem of MathSAT which happens during interpolation
+      // This is not a bug in our code, but a problem of MathSAT which happens during interpolation
       throw new SolverException(e.getMessage(), e);
     }
   }

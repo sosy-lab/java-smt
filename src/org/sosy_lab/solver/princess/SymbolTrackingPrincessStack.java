@@ -96,7 +96,7 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   /** This function pops levels from the assertion-stack. */
   @Override
   public void pop(int levels) {
-    // we have to recreate symbols on lower levels, because CPAchecker assumes "global" symbols.
+    // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
     final Deque<Level> toAdd = new ArrayDeque<>(levels);
     for (int i = 0; i < levels; i++) {
       api.pop();

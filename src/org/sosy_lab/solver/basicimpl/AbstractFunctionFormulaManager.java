@@ -60,7 +60,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkArgument(
         !pArgTypes.contains(FormulaType.BooleanType),
-        "Uninterpreted functions with boolean arguments are currently not supported in CPAchecker.");
+        "Uninterpreted functions with boolean arguments are currently not supported in JavaSMT.");
 
     List<TType> argTypes = new ArrayList<>(pArgTypes.size());
     for (FormulaType<?> argtype : pArgTypes) {
