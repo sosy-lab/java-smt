@@ -90,23 +90,24 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
     BooleanFormula term3 =
         bmgr.or(bmgr.not(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE))), suffix3);
 
-    InterpolatingProverEnvironmentWithAssumptions<T> env = newEnvironmentForTest();
+    try (InterpolatingProverEnvironmentWithAssumptions<T> env = newEnvironmentForTest()) {
 
-    T firstPartForInterpolant = env.push(term1);
-    env.push(term2);
-    env.push(term3);
+      T firstPartForInterpolant = env.push(term1);
+      env.push(term2);
+      env.push(term3);
 
-    assertThat(
-            env.isUnsatWithAssumptions(
-                Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
-        .isTrue();
-    assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
-        .doesNotContain("suffix");
-    assertThat(
-            env.isUnsatWithAssumptions(
-                Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix3), suffix2)))
-        .isTrue();
-    assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
-        .doesNotContain("suffix");
+      assertThat(
+              env.isUnsatWithAssumptions(
+                  Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
+          .isTrue();
+      assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
+          .doesNotContain("suffix");
+      assertThat(
+              env.isUnsatWithAssumptions(
+                  Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix3), suffix2)))
+          .isTrue();
+      assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
+          .doesNotContain("suffix");
+    }
   }
 }

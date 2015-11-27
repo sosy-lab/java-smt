@@ -70,12 +70,11 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,8 +89,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     this.z3context = pCreator.getEnv();
   }
 
-  private final static Collection<Integer> nonAtomicOpTypes =
-      Sets.newHashSet(Z3_OP_AND, Z3_OP_OR, Z3_OP_IMPLIES, Z3_OP_ITE, Z3_OP_NOT);
+  private final static ImmutableSet<Integer> nonAtomicOpTypes =
+      ImmutableSet.of(Z3_OP_AND, Z3_OP_OR, Z3_OP_IMPLIES, Z3_OP_ITE, Z3_OP_NOT);
 
   @Override
   public boolean isAtom(Long t) {

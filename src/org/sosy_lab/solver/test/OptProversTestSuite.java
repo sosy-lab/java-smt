@@ -106,7 +106,7 @@ public class OptProversTestSuite {
         prover.addConstraint(bfmgr.and(constraints));
         int handle = prover.maximize(obj);
         prover.check();
-        Assert.assertTrue(!prover.upper(handle, Rational.ZERO).isPresent());
+        assertThat(prover.upper(handle, Rational.ZERO)).isAbsent();
       }
     }
 
