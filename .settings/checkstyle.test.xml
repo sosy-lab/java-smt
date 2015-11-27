@@ -17,7 +17,9 @@
       <property name="message" value="Avoid using corresponding octal or Unicode escape."/>
     </module>
     <module name="SuppressWarningsHolder"/>
-    <module name="AnnotationUseStyle"/>
+    <module name="AnnotationUseStyle">
+      <property name="trailingArrayComma" value="ignore"/>
+    </module>
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
@@ -38,7 +40,7 @@
     </module>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName">
-      <property name="format" value="^([a-z][a-zA-Z0-9]*|_)$"/>
+      <property name="format" value="^[a-zA-Z0-9_]*$"/>
     </module>
     <module name="MemberName"/>
     <module name="MethodName">
@@ -131,6 +133,7 @@
     <module name="SimplifyBooleanExpression"/>
     <module name="StringLiteralEquality"/>
     <module name="OneStatementPerLine"/>
+    <module name="ArrayTrailingComma"/>
     <module name="InterfaceIsType"/>
     <module name="MutableException"/>
     <module name="ArrayTypeStyle"/>

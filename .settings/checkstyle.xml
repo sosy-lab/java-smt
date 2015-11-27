@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: JavaSMT
+    Checkstyle-Configuration: SoSy-Lab Common
     Description: none
 -->
 <module name="Checker">
@@ -17,11 +17,15 @@
       <property name="message" value="Avoid using corresponding octal or Unicode escape."/>
     </module>
     <module name="SuppressWarningsHolder"/>
-    <module name="AnnotationUseStyle"/>
+    <module name="AnnotationUseStyle">
+      <property name="trailingArrayComma" value="ignore"/>
+    </module>
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
-    <module name="JavadocStyle"/>
+    <module name="JavadocStyle">
+      <property name="checkFirstSentence" value="false"/>
+    </module>
     <module name="JavadocMethod">
       <property name="allowUndeclaredRTE" value="true"/>
       <property name="allowMissingParamTags" value="true"/>
@@ -35,7 +39,7 @@
       <property name="ignoreName" value="true"/>
     </module>
     <module name="ClassTypeParameterName">
-      <property name="format" value="^[A-Z][0-9]?$"/>
+      <property name="format" value="^([A-Z][A-Z0-9]?|T[A-Za-z]*|[A-Z][a-zA-Z0-9]*T(ype)?)$"/>
     </module>
     <module name="ConstantName"/>
     <module name="LocalFinalVariableName"/>
@@ -45,7 +49,7 @@
     <module name="MemberName"/>
     <module name="MethodName"/>
     <module name="MethodTypeParameterName">
-      <property name="format" value="^[A-Z][0-9]?$"/>
+      <property name="format" value="^([A-Z][A-Z]?[A-Z0-9]?|[A-Z][a-zA-Z0-9]*T(ype)?)$"/>
     </module>
     <module name="PackageName"/>
     <module name="ParameterName"/>

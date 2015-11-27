@@ -14,13 +14,13 @@
         <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" uri="antlib:com.puppycrawl.tools.checkstyle.ant" classpathref="checkstyle.lib.path"/>
 
         <cs:checkstyle config=".settings/checkstyle.xml">
-            <fileset dir="${source.dir}" includes="**/*.java" excludes="**/*Test.java"/>
+            <fileset dir="${source.dir}" includes="**/*.java" excludes="**/*Test.java **/*Test0.java **/*TestSuite.java"/>
             <formatter type="xml" toFile="Checkstyle.xml"/>
         </cs:checkstyle>
         <xslt in="Checkstyle.xml" out="Checkstyle.html" style="build/checkstyle.xsl"/>
 
         <cs:checkstyle config=".settings/checkstyle.test.xml">
-            <fileset dir="${source.dir}" includes="**/*Test.java"/>
+            <fileset dir="${source.dir}" includes="**/*Test.java **/*Test0.java **/*TestSuite.java"/>
             <formatter type="xml" toFile="Checkstyle.Test.xml"/>
         </cs:checkstyle>
         <xslt in="Checkstyle.Test.xml" out="Checkstyle.Test.html" style="build/checkstyle.xsl"/>
