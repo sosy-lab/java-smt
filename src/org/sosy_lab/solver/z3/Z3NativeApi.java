@@ -23,9 +23,9 @@
  */
 package org.sosy_lab.solver.z3;
 
-import javax.annotation.Nullable;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import javax.annotation.Nullable;
 
 /** This class contains the native calls for Z3.
  *
@@ -34,7 +34,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * should not be incremented. The object will be destroyed after next usage.
  * If the user wants to use the object several times, he has to increment
  * the reference (only once!), so that the object remains valid. */
-@SuppressWarnings("unused")
+@SuppressWarnings({
+  "unused",
+  "checkstyle:methodname",
+  "checkstyle:parametername",
+  "checkstyle:parameternumber"
+})
 public final class Z3NativeApi {
 
   // Helper Classes,
