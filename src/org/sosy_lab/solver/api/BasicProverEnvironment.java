@@ -40,7 +40,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * The return value may be used to identify this formula later on
    * in a query (this depends on the sub-type of the environment).
    */
-  @Nullable T push(BooleanFormula f);
+  @Nullable
+  T push(BooleanFormula f);
 
   /**
    * Remove one formula from the environment stack.

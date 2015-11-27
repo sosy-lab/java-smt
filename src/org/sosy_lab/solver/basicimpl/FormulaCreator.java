@@ -62,11 +62,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   private final TEnv environment;
 
   protected FormulaCreator(
-      TEnv env,
-      TType boolType,
-      @Nullable TType pIntegerType,
-      @Nullable TType pRationalType
-      ) {
+      TEnv env, TType boolType, @Nullable TType pIntegerType, @Nullable TType pRationalType) {
     this.environment = env;
     this.boolType = boolType;
     this.integerType = pIntegerType;
@@ -115,49 +111,50 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
     return new FloatingPointFormulaImpl<>(pTerm);
   }
 
-  protected <TI extends Formula, TE extends Formula>
-  ArrayFormula<TI, TE>
-  encapsulateArray(TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(FormulaType<T> pType, TFormulaInfo pTerm) {
     if (pType.isBooleanType()) {
-      return (T)new BooleanFormulaImpl<>(pTerm);
+      return (T) new BooleanFormulaImpl<>(pTerm);
     } else if (pType.isIntegerType()) {
-      return (T)new IntegerFormulaImpl<>(pTerm);
+      return (T) new IntegerFormulaImpl<>(pTerm);
     } else if (pType.isRationalType()) {
-      return (T)new RationalFormulaImpl<>(pTerm);
+      return (T) new RationalFormulaImpl<>(pTerm);
     } else if (pType.isBitvectorType()) {
-      return (T)new BitvectorFormulaImpl<>(pTerm);
+      return (T) new BitvectorFormulaImpl<>(pTerm);
     } else if (pType.isFloatingPointType()) {
-      return (T)new FloatingPointFormulaImpl<>(pTerm);
+      return (T) new FloatingPointFormulaImpl<>(pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
       return (T) encapsulateArray(pTerm, arrayType.getIndexType(), arrayType.getElementType());
     }
-    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in the Solver!");
+    throw new IllegalArgumentException(
+        "Cannot create formulas of type " + pType + " in the Solver!");
   }
 
   @SuppressWarnings("unchecked")
   protected TFormulaInfo extractInfo(Formula pT) {
     if (pT instanceof AbstractFormula) {
-      return ((AbstractFormula<TFormulaInfo>)pT).getFormulaInfo();
+      return ((AbstractFormula<TFormulaInfo>) pT).getFormulaInfo();
     }
-    throw new IllegalArgumentException("Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
   @SuppressWarnings("unchecked")
-  protected <TI extends Formula, TE extends Formula>
-  FormulaType<TE> getArrayFormulaElementType(ArrayFormula<TI, TE> pArray) {
-    return ((ArrayFormulaImpl<TI, TE, TFormulaInfo>)pArray).getElementType();
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
+      ArrayFormula<TI, TE> pArray) {
+    return ((ArrayFormulaImpl<TI, TE, TFormulaInfo>) pArray).getElementType();
   }
 
   @SuppressWarnings("unchecked")
-  protected <TI extends Formula, TE extends Formula>
-  FormulaType<TI> getArrayFormulaIndexType(ArrayFormula<TI, TE> pArray) {
-    return ((ArrayFormulaImpl<TI, TE, TFormulaInfo>)pArray).getIndexType();
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
+      ArrayFormula<TI, TE> pArray) {
+    return ((ArrayFormulaImpl<TI, TE, TFormulaInfo>) pArray).getIndexType();
   }
 
   /**
@@ -174,9 +171,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
     } else if (formula instanceof RationalFormula) {
       t = FormulaType.RationalType;
     } else if (formula instanceof ArrayFormula) {
-      throw new UnsupportedOperationException("SMT solvers with support for arrays needs to overwrite FormulaCreator.getFormulaType()");
+      throw new UnsupportedOperationException(
+          "SMT solvers with support for arrays needs to overwrite FormulaCreator.getFormulaType()");
     } else if (formula instanceof BitvectorFormula) {
-      throw new UnsupportedOperationException("SMT solvers with support for bitvectors needs to overwrite FormulaCreator.getFormulaType()");
+      throw new UnsupportedOperationException(
+          "SMT solvers with support for bitvectors needs to overwrite FormulaCreator.getFormulaType()");
     } else {
       throw new IllegalArgumentException("Formula with unexpected type " + formula.getClass());
     }
@@ -184,5 +183,4 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   }
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
-
 }

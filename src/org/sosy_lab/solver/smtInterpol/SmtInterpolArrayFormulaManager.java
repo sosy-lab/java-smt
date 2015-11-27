@@ -31,7 +31,6 @@ import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-
 class SmtInterpolArrayFormulaManager
     extends AbstractArrayFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
@@ -56,8 +55,8 @@ class SmtInterpolArrayFormulaManager
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
-    final ArrayFormulaType<TI, TE> arrayFormulaType = FormulaType.getArrayType(
-        pIndexType, pElementType);
+    final ArrayFormulaType<TI, TE> arrayFormulaType =
+        FormulaType.getArrayType(pIndexType, pElementType);
     final Sort smtInterpolArrayType = toSolverType(arrayFormulaType);
 
     return getFormulaCreator().makeVariable(smtInterpolArrayType, pName);

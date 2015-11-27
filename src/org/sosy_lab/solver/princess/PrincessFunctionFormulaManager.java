@@ -36,11 +36,11 @@ import ap.parser.IFunction;
 
 import com.google.common.base.Predicates;
 
-class PrincessFunctionFormulaManager extends AbstractFunctionFormulaManager<IExpression, IFunction, TermType, PrincessEnvironment> {
+class PrincessFunctionFormulaManager
+    extends AbstractFunctionFormulaManager<IExpression, IFunction, TermType, PrincessEnvironment> {
 
   PrincessFunctionFormulaManager(
-      PrincessFormulaCreator creator,
-      PrincessUnsafeFormulaManager unsafe) {
+      PrincessFormulaCreator creator, PrincessUnsafeFormulaManager unsafe) {
     super(creator, unsafe);
   }
 
@@ -52,10 +52,12 @@ class PrincessFunctionFormulaManager extends AbstractFunctionFormulaManager<IExp
 
   @Override
   protected IFunction declareUninterpretedFunctionImpl(
-        String pName, TermType pReturnType, List<TermType> args) {
-    checkArgument(pReturnType == TermType.Integer || pReturnType == TermType.Boolean,
+      String pName, TermType pReturnType, List<TermType> args) {
+    checkArgument(
+        pReturnType == TermType.Integer || pReturnType == TermType.Boolean,
         "Princess does not support return types of UFs other than Integer");
-    checkArgument(from(args).allMatch(Predicates.equalTo(TermType.Integer)),
+    checkArgument(
+        from(args).allMatch(Predicates.equalTo(TermType.Integer)),
         "Princess does not support argument types of UFs other than Integer");
 
     return getFormulaCreator().getEnv().declareFun(pName, args.size(), pReturnType);

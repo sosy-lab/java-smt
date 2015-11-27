@@ -30,7 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * This class is not part of the normal CPAchecker test suite because
  * the java.library.path needs to be defined in order to execute the tests.
@@ -79,7 +78,7 @@ public class Mathsat5NativeApiTest0 {
     assertEquals(23, msat_get_fp_type_mant_width(env, type));
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void fpExpWidthIllegal() {
     long type = msat_get_integer_type(env);
     msat_get_fp_type_exp_width(env, type);
@@ -96,8 +95,7 @@ public class Mathsat5NativeApiTest0 {
 
     long t = msat_make_int_modular_congruence(env, 42, t1, t2);
 
-    assertEquals("(`int_mod_congr_42` (`+_int` v1 (`*_int` -1 v2)) 0)",
-        msat_term_repr(t));
+    assertEquals("(`int_mod_congr_42` (`+_int` v1 (`*_int` -1 v2)) 0)", msat_term_repr(t));
 
     msat_assert_formula(env, t);
 

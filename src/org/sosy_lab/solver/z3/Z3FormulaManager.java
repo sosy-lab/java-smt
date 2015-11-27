@@ -54,20 +54,26 @@ import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
 import com.google.common.base.Splitter;
 
-@Options(deprecatedPrefix="cpa.predicate.solver.z3",
-         prefix="solver.z3")
-public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> implements AutoCloseable {
+@Options(deprecatedPrefix = "cpa.predicate.solver.z3", prefix = "solver.z3")
+public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
+    implements AutoCloseable {
 
-  @Option(secure=true, description = "simplify formulas when they are asserted in a solver.")
+  @Option(secure = true, description = "simplify formulas when they are asserted in a solver.")
   boolean simplifyFormulas = false;
 
   /** Optimization settings */
-  @Option(secure=true, description = "Engine to use for the optimization",
-    values = {"basic", "farkas", "symba"})
+  @Option(
+    secure = true,
+    description = "Engine to use for the optimization",
+    values = {"basic", "farkas", "symba"}
+  )
   String optimizationEngine = "basic";
 
-  @Option(secure=true, description = "Ordering for objectives in the optimization" +
-      " context", values = {"lex", "pareto", "box"})
+  @Option(
+    secure = true,
+    description = "Ordering for objectives in the optimization" + " context",
+    values = {"lex", "pareto", "box"}
+  )
   String objectivePrioritizationMode = "box";
 
   private final Z3SmtLogger z3smtLogger;
@@ -81,16 +87,20 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
 
-  @Options(deprecatedPrefix="cpa.predicate.solver.z3",
-           prefix="solver.z3")
+  @Options(deprecatedPrefix = "cpa.predicate.solver.z3", prefix = "solver.z3")
   public static class ExtraOptions {
-    @Option(secure=true, description="Require proofs from SMT solver")
+    @Option(secure = true, description = "Require proofs from SMT solver")
     boolean requireProofs = true;
 
-    @Option(secure=true, description="Activate replayable logging in Z3."
-        + " The log can be given as an input to the solver and replayed.")
+    @Option(
+      secure = true,
+      description =
+          "Activate replayable logging in Z3."
+              + " The log can be given as an input to the solver and replayed."
+    )
     @FileOption(Type.OUTPUT_FILE)
-    @Nullable Path log = null;
+    @Nullable
+    Path log = null;
   }
 
   private Z3FormulaManager(
@@ -103,14 +113,25 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
       Z3BitvectorFormulaManager pBitpreciseManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager,
-      Z3SmtLogger smtLogger, Configuration config, long pZ3params,
+      Z3SmtLogger smtLogger,
+      Configuration config,
+      long pZ3params,
       ShutdownNotifier.ShutdownRequestListener pInterruptListener,
       ShutdownNotifier pShutdownNotifier,
-      LogManager pLogger) throws
-        InvalidConfigurationException {
+      LogManager pLogger)
+      throws InvalidConfigurationException {
 
-    super(pFormulaCreator, pUnsafeManager, pFunctionManager, pBooleanManager,
-        pIntegerManager, pRationalManager, pBitpreciseManager, null, pQuantifiedManager, pArrayManager);
+    super(
+        pFormulaCreator,
+        pUnsafeManager,
+        pFunctionManager,
+        pBooleanManager,
+        pIntegerManager,
+        pRationalManager,
+        pBitpreciseManager,
+        null,
+        pQuantifiedManager,
+        pArrayManager);
 
     config.inject(this);
     z3params = pZ3params;
@@ -121,16 +142,19 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
     logger = pLogger;
   }
 
-  public static synchronized Z3FormulaManager create(LogManager logger,
-      Configuration config, ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate solverLogfile, long randomSeed,
-      boolean pUseNonLinearIntegerArithmetic, boolean pUseNonLinearRationalArithmetic)
+  public static synchronized Z3FormulaManager create(
+      LogManager logger,
+      Configuration config,
+      ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate solverLogfile,
+      long randomSeed,
+      boolean pUseNonLinearIntegerArithmetic,
+      boolean pUseNonLinearRationalArithmetic)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
 
-    if (NativeLibraries.OS.guessOperatingSystem() ==
-        NativeLibraries.OS.WINDOWS) {
+    if (NativeLibraries.OS.guessOperatingSystem() == NativeLibraries.OS.WINDOWS) {
       // Z3 itself
       NativeLibraries.loadLibrary("libz3");
     }
@@ -193,17 +217,20 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
     long z3params = mk_params(context);
     params_inc_ref(context, z3params);
     params_set_uint(context, z3params, mk_string_symbol(context, ":random-seed"), 42);
-    smtLogger.logOption("random-seed", Integer.toString((int)randomSeed));
+    smtLogger.logOption("random-seed", Integer.toString((int) randomSeed));
 
-    Z3FormulaCreator creator = new Z3FormulaCreator(
-        context, boolSort, integerSort, realSort, smtLogger, config);
+    Z3FormulaCreator creator =
+        new Z3FormulaCreator(context, boolSort, integerSort, realSort, smtLogger, config);
 
     // Create managers
     Z3UnsafeFormulaManager unsafeManager = new Z3UnsafeFormulaManager(creator);
-    Z3FunctionFormulaManager functionTheory = new Z3FunctionFormulaManager(creator, unsafeManager, smtLogger);
+    Z3FunctionFormulaManager functionTheory =
+        new Z3FunctionFormulaManager(creator, unsafeManager, smtLogger);
     Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
-    Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
-    Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator, functionTheory, pUseNonLinearRationalArithmetic);
+    Z3IntegerFormulaManager integerTheory =
+        new Z3IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    Z3RationalFormulaManager rationalTheory =
+        new Z3RationalFormulaManager(creator, functionTheory, pUseNonLinearRationalArithmetic);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
@@ -214,14 +241,25 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
     setInternalErrorHandler(context);
     return new Z3FormulaManager(
         creator,
-        unsafeManager, functionTheory, booleanTheory,
-        integerTheory, rationalTheory, bitvectorTheory, quantifierManager, arrayManager,
-        smtLogger, config, z3params, interruptListener, pShutdownNotifier,
+        unsafeManager,
+        functionTheory,
+        booleanTheory,
+        integerTheory,
+        rationalTheory,
+        bitvectorTheory,
+        quantifierManager,
+        arrayManager,
+        smtLogger,
+        config,
+        z3params,
+        interruptListener,
+        pShutdownNotifier,
         logger);
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(boolean pGenerateModels, boolean pGenerateUnsatCore) {
+  public ProverEnvironment newProverEnvironment(
+      boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return new Z3TheoremProver(this, z3params, shutdownNotifier, pGenerateUnsatCore);
   }
 
@@ -256,9 +294,10 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
 
   static long getZ3Expr(Formula pT) {
     if (pT instanceof Z3Formula) {
-      return ((Z3Formula)pT).getFormulaInfo();
+      return ((Z3Formula) pT).getFormulaInfo();
     }
-    throw new IllegalArgumentException("Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
   @Override
@@ -268,29 +307,27 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> i
     PointerToInt build = new PointerToInt();
     PointerToInt revision = new PointerToInt();
     get_version(major, minor, build, revision);
-    return "Z3 " +
-        major.value + "." + minor.value + "." +
-        build.value + "." + revision.value;
+    return "Z3 " + major.value + "." + minor.value + "." + build.value + "." + revision.value;
   }
 
   @Override
   public Appender dumpFormula(final Long expr) {
-    assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType : "Only BooleanFormulas may be dumped";
+    assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
 
     return new Appenders.AbstractAppender() {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
-        String txt = Z3NativeApi.benchmark_to_smtlib_string(getEnvironment(), "dumped-formula", "", "unknown", "", 0, new long[]{}, expr);
+        String txt =
+            Z3NativeApi.benchmark_to_smtlib_string(
+                getEnvironment(), "dumped-formula", "", "unknown", "", 0, new long[] {}, expr);
 
         for (String line : Splitter.on('\n').split(txt)) {
 
-          if (line.startsWith("(set-info")
-              || line.startsWith(";")
-              || line.startsWith("(check")) {
+          if (line.startsWith("(set-info") || line.startsWith(";") || line.startsWith("(check")) {
             // ignore
-          } else if (line.startsWith("(assert")
-              || line.startsWith("(dec")) {
+          } else if (line.startsWith("(assert") || line.startsWith("(dec")) {
             out.append('\n');
             out.append(line);
           } else {

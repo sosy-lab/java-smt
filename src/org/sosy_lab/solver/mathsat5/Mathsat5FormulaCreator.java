@@ -45,7 +45,8 @@ import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5RationalFormula;
 class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
   public Mathsat5FormulaCreator(final Long msatEnv) {
-    super(msatEnv,
+    super(
+        msatEnv,
         msat_get_bool_type(msatEnv),
         msat_get_integer_type(msatEnv),
         msat_get_rational_type(msatEnv));
@@ -68,25 +69,24 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
     long env = getEnv();
     if (pFormula instanceof BitvectorFormula) {
       long type = msat_term_get_type(extractInfo(pFormula));
-      checkArgument(msat_is_bv_type(env, type),
+      checkArgument(
+          msat_is_bv_type(env, type),
           "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
-      return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(
-          msat_get_bv_type_size(env, type));
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
 
     } else if (pFormula instanceof FloatingPointFormula) {
       long type = msat_term_get_type(extractInfo(pFormula));
-      checkArgument(msat_is_fp_type(env, type),
+      checkArgument(
+          msat_is_fp_type(env, type),
           "FloatingPointFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
-      return (FormulaType<T>)FormulaType.getFloatingPointType(
-          msat_get_fp_type_exp_width(env, type),
-          msat_get_fp_type_mant_width(env, type));
-    } else if (pFormula instanceof ArrayFormula<?,?>) {
-      FormulaType<T> arrayIndexType = getArrayFormulaIndexType(
-          (ArrayFormula<T, T>) pFormula);
-      FormulaType<T> arrayElementType = getArrayFormulaElementType(
-          (ArrayFormula<T, T>) pFormula);
-      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType,
-          arrayElementType);
+      return (FormulaType<T>)
+          FormulaType.getFloatingPointType(
+              msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
+    } else if (pFormula instanceof ArrayFormula<?, ?>) {
+      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
     return super.getFormulaType(pFormula);
   }
@@ -106,21 +106,18 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
     } else if (msat_is_rational_type(env, type)) {
       return FormulaType.RationalType;
     } else if (msat_is_bv_type(env, type)) {
-      return FormulaType.getBitvectorTypeWithSize(
-          msat_get_bv_type_size(env, type));
+      return FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
     } else if (msat_is_fp_type(env, type)) {
       return FormulaType.getFloatingPointType(
-          msat_get_fp_type_exp_width(env, type),
-          msat_get_fp_type_mant_width(env, type));
+          msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
     } else if (msat_is_array_type(env, type)) {
       long indexType = msat_get_array_index_type(env, type);
       long elementType = msat_get_array_element_type(env, type);
       return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(indexType),
-          getFormulaTypeFromTermType(elementType));
+          getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
     }
-    throw new IllegalArgumentException("Unknown formula type "
-        + msat_type_repr(type) + " for term " + msat_term_repr(type));
+    throw new IllegalArgumentException(
+        "Unknown formula type " + msat_type_repr(type) + " for term " + msat_term_repr(type));
   }
 
   @Override
@@ -137,19 +134,18 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
     if (pType.isBooleanType()) {
-      return (T)new Mathsat5BooleanFormula(pTerm);
+      return (T) new Mathsat5BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
-      return (T)new Mathsat5IntegerFormula(pTerm);
+      return (T) new Mathsat5IntegerFormula(pTerm);
     } else if (pType.isRationalType()) {
-      return (T)new Mathsat5RationalFormula(pTerm);
+      return (T) new Mathsat5RationalFormula(pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
-      return (T)new Mathsat5ArrayFormula<>(pTerm,
-          arrFt.getIndexType(), arrFt.getElementType());
+      return (T) new Mathsat5ArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType());
     } else if (pType.isBitvectorType()) {
-      return (T)new Mathsat5BitvectorFormula(pTerm);
+      return (T) new Mathsat5BitvectorFormula(pTerm);
     } else if (pType.isFloatingPointType()) {
-      return (T)new Mathsat5FloatingPointFormula(pTerm);
+      return (T) new Mathsat5FloatingPointFormula(pTerm);
     }
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
   }
@@ -170,32 +166,31 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE>
-      encapsulateArray(Long pTerm, FormulaType<TI> pIndexType,
-          FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     return new Mathsat5ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula>
-  FormulaType<TE> getArrayFormulaElementType(ArrayFormula<TI, TE> pArray) {
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
+      ArrayFormula<TI, TE> pArray) {
     return ((Mathsat5ArrayFormula<TI, TE>) pArray).getElementType();
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula>
-  FormulaType<TI> getArrayFormulaIndexType(ArrayFormula<TI, TE> pArray) {
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
+      ArrayFormula<TI, TE> pArray) {
     return ((Mathsat5ArrayFormula<TI, TE>) pArray).getIndexType();
   }
 
   @Override
   public Long getArrayType(Long pIndexType, Long pElementType) {
-//    Long allocatedArraySort = allocatedArraySorts.get(pIndexType, pElementType);
-//    if (allocatedArraySort == null) {
-//      allocatedArraySort = msat_make_array_const(getEnv(), pIndexType, pElementType);
-//      allocatedArraySorts.put(pIndexType, pElementType, allocatedArraySort);
-//    }
-//    return allocatedArraySort;
+    //    Long allocatedArraySort = allocatedArraySorts.get(pIndexType, pElementType);
+    //    if (allocatedArraySort == null) {
+    //      allocatedArraySort = msat_make_array_const(getEnv(), pIndexType, pElementType);
+    //      allocatedArraySorts.put(pIndexType, pElementType, allocatedArraySort);
+    //    }
+    //    return allocatedArraySort;
     return msat_get_array_type(getEnv(), pIndexType, pElementType);
     //throw new IllegalArgumentException("MathSAT5.getArrayType(): Implement me!");
   }

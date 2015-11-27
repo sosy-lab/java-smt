@@ -66,7 +66,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       // (for example, arguments to floating-point arithmetic operators),
       // but we do not want to work with them.
       // So we just return an untyped formula here.
-      return new Mathsat5Formula(arg) { };
+      return new Mathsat5Formula(arg) {};
     }
     return super.getArg(pF, pN);
   }
@@ -132,14 +132,10 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       long type = msat_term_get_type(arg0);
       if (msat_is_bv_type(msatEnv, type)) {
         return ImmutableList.of(
-            msat_make_bv_uleq(msatEnv, arg0, arg1),
-            msat_make_bv_uleq(msatEnv, arg1, arg0)
-        );
+            msat_make_bv_uleq(msatEnv, arg0, arg1), msat_make_bv_uleq(msatEnv, arg1, arg0));
       } else if (msat_is_integer_type(msatEnv, type) || msat_is_rational_type(msatEnv, type)) {
         return ImmutableList.of(
-            msat_make_leq(msatEnv, arg0, arg1),
-            msat_make_leq(msatEnv, arg1, arg0)
-        );
+            msat_make_leq(msatEnv, arg0, arg1), msat_make_leq(msatEnv, arg1, arg0));
       }
     }
     return ImmutableList.of(pF);
@@ -169,8 +165,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       long[] updatedChildren = new long[arity];
       for (int childIdx = 0; childIdx < arity; childIdx++) {
         long child = getArg(expr, childIdx);
-        updatedChildren[childIdx] = recSubstitute(child,
-            memoization);
+        updatedChildren[childIdx] = recSubstitute(child, memoization);
       }
 
       long decl = msat_term_get_decl(expr);
@@ -206,5 +201,4 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   protected Long replaceQuantifiedBody(Long pF, Long pBody) {
     throw new UnsupportedOperationException();
   }
-
 }

@@ -67,32 +67,60 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
       SmtInterpolArrayFormulaManager pArrayFormulaManager) {
-    super(pCreator, pUnsafeManager, pFunctionManager, pBooleanManager,
-        pIntegerManager, pRationalManager, null, null, null, pArrayFormulaManager);
+    super(
+        pCreator,
+        pUnsafeManager,
+        pFunctionManager,
+        pBooleanManager,
+        pIntegerManager,
+        pRationalManager,
+        null,
+        null,
+        null,
+        pArrayFormulaManager);
   }
 
-  public static SmtInterpolFormulaManager create(Configuration config, LogManager logger,
-      ShutdownNotifier pShutdownNotifier, @Nullable PathCounterTemplate smtLogfile,
-      long randomSeed, boolean pUseNonLinearIntegerArithmetic, boolean pUseNonLinearRationalArithmetic)
-          throws InvalidConfigurationException {
+  public static SmtInterpolFormulaManager create(
+      Configuration config,
+      LogManager logger,
+      ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate smtLogfile,
+      long randomSeed,
+      boolean pUseNonLinearIntegerArithmetic,
+      boolean pUseNonLinearRationalArithmetic)
+      throws InvalidConfigurationException {
 
-    SmtInterpolEnvironment env = new SmtInterpolEnvironment(config, logger, pShutdownNotifier, smtLogfile, randomSeed);
+    SmtInterpolEnvironment env =
+        new SmtInterpolEnvironment(config, logger, pShutdownNotifier, smtLogfile, randomSeed);
     SmtInterpolFormulaCreator creator = new SmtInterpolFormulaCreator(env);
 
     // Create managers
     SmtInterpolUnsafeFormulaManager unsafeManager = new SmtInterpolUnsafeFormulaManager(creator);
-    SmtInterpolFunctionFormulaManager functionTheory = new SmtInterpolFunctionFormulaManager(creator, unsafeManager);
-    SmtInterpolBooleanFormulaManager booleanTheory = new SmtInterpolBooleanFormulaManager(creator, env.getTheory());
-    SmtInterpolIntegerFormulaManager integerTheory = new SmtInterpolIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
-    SmtInterpolRationalFormulaManager rationalTheory = new SmtInterpolRationalFormulaManager(creator, functionTheory, pUseNonLinearRationalArithmetic);
+    SmtInterpolFunctionFormulaManager functionTheory =
+        new SmtInterpolFunctionFormulaManager(creator, unsafeManager);
+    SmtInterpolBooleanFormulaManager booleanTheory =
+        new SmtInterpolBooleanFormulaManager(creator, env.getTheory());
+    SmtInterpolIntegerFormulaManager integerTheory =
+        new SmtInterpolIntegerFormulaManager(
+            creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    SmtInterpolRationalFormulaManager rationalTheory =
+        new SmtInterpolRationalFormulaManager(
+            creator, functionTheory, pUseNonLinearRationalArithmetic);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
 
-    return new SmtInterpolFormulaManager(creator, unsafeManager, functionTheory,
-            booleanTheory, integerTheory, rationalTheory, arrayTheory);
+    return new SmtInterpolFormulaManager(
+        creator,
+        unsafeManager,
+        functionTheory,
+        booleanTheory,
+        integerTheory,
+        rationalTheory,
+        arrayTheory);
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(boolean pGenerateModels, boolean pGenerateUnsatCore) {
+  public ProverEnvironment newProverEnvironment(
+      boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return getEnvironment().createProver(this);
   }
 
@@ -118,7 +146,8 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
 
   @Override
   public Appender dumpFormula(final Term formula) {
-    assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType : "Only BooleanFormulas may be dumped";
+    assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
 
     return new Appenders.AbstractAppender() {
 
@@ -136,12 +165,11 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
           while (t instanceof AnnotatedTerm) {
             t = ((AnnotatedTerm) t).getSubterm();
           }
-          if (!(t instanceof ApplicationTerm)
-              || !seen.add(t)) {
+          if (!(t instanceof ApplicationTerm) || !seen.add(t)) {
             continue;
           }
 
-          ApplicationTerm term = (ApplicationTerm)t;
+          ApplicationTerm term = (ApplicationTerm) t;
           Collections.addAll(todo, term.getParameters());
 
           FunctionSymbol func = term.getFunction();

@@ -80,8 +80,7 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
   }
 
   @Override
-  public <T> T allSat(ProverEnvironment.AllSatCallback<T> callback,
-      List<BooleanFormula> important)
+  public <T> T allSat(ProverEnvironment.AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
 
     // unpack formulas to terms
@@ -99,7 +98,7 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
       for (final IFormula f : importantFormulas) {
         final Option<Object> value = stack.evalPartial(f);
         if (value.isDefined()) {
-          final boolean isTrueValue = (boolean)value.get();
+          final boolean isTrueValue = (boolean) value.get();
           final IFormula newElement = isTrueValue ? f : new INot(f);
 
           wrappedPartialModel.add(mgr.encapsulateBooleanFormula(newElement));

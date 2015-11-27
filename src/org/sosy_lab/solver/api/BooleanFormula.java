@@ -23,7 +23,4 @@
  */
 package org.sosy_lab.solver.api;
 
-
-public interface BooleanFormula extends Formula {
-
-}
+public interface BooleanFormula extends Formula {}

@@ -32,7 +32,7 @@ import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 import org.sosy_lab.solver.basicimpl.AbstractFloatingPointFormulaManager;
 
 class Mathsat5FloatingPointFormulaManager
-        extends AbstractFloatingPointFormulaManager<Long, Long, Long> {
+    extends AbstractFloatingPointFormulaManager<Long, Long, Long> {
 
   private final Mathsat5FunctionFormulaManager ffmgr;
 
@@ -40,8 +40,8 @@ class Mathsat5FloatingPointFormulaManager
 
   private final long roundingMode;
 
-  public Mathsat5FloatingPointFormulaManager(Mathsat5FormulaCreator pCreator,
-      Mathsat5FunctionFormulaManager pFfmgr) {
+  public Mathsat5FloatingPointFormulaManager(
+      Mathsat5FormulaCreator pCreator, Mathsat5FunctionFormulaManager pFfmgr) {
     super(pCreator);
 
     ffmgr = pFfmgr;
@@ -61,14 +61,13 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(String pN, FloatingPointType pType) {
-    return msat_make_fp_rat_number(mathsatEnv, pN,
-        pType.getExponentSize(), pType.getMantissaSize(), roundingMode);
+    return msat_make_fp_rat_number(
+        mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), roundingMode);
   }
 
   @Override
   public Long makeVariableImpl(String var, FloatingPointType type) {
-    return getFormulaCreator().makeVariable(
-        getFormulaCreator().getFloatingPointType(type), var);
+    return getFormulaCreator().makeVariable(getFormulaCreator().getFloatingPointType(type), var);
   }
 
   @Override
@@ -89,13 +88,16 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType) {
     if (pTargetType.isFloatingPointType()) {
-      FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType)pTargetType;
-      return msat_make_fp_cast(mathsatEnv,
-          targetType.getExponentSize(), targetType.getMantissaSize(),
-          roundingMode, pNumber);
+      FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
+      return msat_make_fp_cast(
+          mathsatEnv,
+          targetType.getExponentSize(),
+          targetType.getMantissaSize(),
+          roundingMode,
+          pNumber);
 
     } else if (pTargetType.isBitvectorType()) {
-      FormulaType.BitvectorType targetType = (FormulaType.BitvectorType)pTargetType;
+      FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
       return msat_make_fp_to_bv(mathsatEnv, targetType.getSize(), roundingMode, pNumber);
 
     } else {
@@ -112,13 +114,19 @@ class Mathsat5FloatingPointFormulaManager
 
     } else if (formulaType.isBitvectorType()) {
       if (signed) {
-        return msat_make_fp_from_sbv(mathsatEnv,
-            pTargetType.getExponentSize(), pTargetType.getMantissaSize(),
-            roundingMode, pNumber);
+        return msat_make_fp_from_sbv(
+            mathsatEnv,
+            pTargetType.getExponentSize(),
+            pTargetType.getMantissaSize(),
+            roundingMode,
+            pNumber);
       } else {
-        return msat_make_fp_from_ubv(mathsatEnv,
-            pTargetType.getExponentSize(), pTargetType.getMantissaSize(),
-            roundingMode, pNumber);
+        return msat_make_fp_from_ubv(
+            mathsatEnv,
+            pTargetType.getExponentSize(),
+            pTargetType.getMantissaSize(),
+            roundingMode,
+            pNumber);
       }
 
     } else {
@@ -128,10 +136,12 @@ class Mathsat5FloatingPointFormulaManager
 
   private Long genericCast(Long pNumber, FormulaType<?> pTargetType) {
     long argType = msat_term_get_type(pNumber);
-    long castFuncDecl = ffmgr.createFunctionImpl(
-        "__cast_" + argType + "_to_" + pTargetType,
-        toSolverType(pTargetType), new long[]{argType});
-    return ffmgr.createUIFCallImpl(castFuncDecl, new long[]{pNumber});
+    long castFuncDecl =
+        ffmgr.createFunctionImpl(
+            "__cast_" + argType + "_to_" + pTargetType,
+            toSolverType(pTargetType),
+            new long[] {argType});
+    return ffmgr.createUIFCallImpl(castFuncDecl, new long[] {pNumber});
   }
 
   @Override

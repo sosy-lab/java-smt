@@ -35,8 +35,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-
-public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements UnsafeFormulaManager {
+public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements UnsafeFormulaManager {
 
   protected AbstractUnsafeFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> creator) {
     super(creator);
@@ -63,18 +63,21 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ex
     TFormulaInfo t = extractInfo(pF);
     return isAtom(t);
   }
-  protected abstract boolean isAtom(TFormulaInfo pT) ;
+
+  protected abstract boolean isAtom(TFormulaInfo pT);
 
   @Override
   public int getArity(Formula pF) {
     TFormulaInfo t = extractInfo(pF);
     return getArity(t);
   }
-  protected abstract int getArity(TFormulaInfo pT) ;
+
+  protected abstract int getArity(TFormulaInfo pT);
 
   @Override
   public Formula getArg(Formula pF, int pN) {
-    assert 0 <= pN && pN < getArity(pF) : String.format("index %d out of bounds %d", pN, getArity(pF));
+    assert 0 <= pN && pN < getArity(pF)
+        : String.format("index %d out of bounds %d", pN, getArity(pF));
     TFormulaInfo t = extractInfo(pF);
     TFormulaInfo arg = getArg(t, pN);
     return typeFormula(getFormulaCreator().getFormulaType(arg), arg);
@@ -166,33 +169,32 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ex
 
   @Override
   public <T extends Formula> T replaceArgsAndName(T f, String newName, List<Formula> args) {
-    return encapsulateWithTypeOf(f,
-        replaceArgsAndName(extractInfo(f), newName, Lists.transform(args, extractor)));
+    return encapsulateWithTypeOf(
+        f, replaceArgsAndName(extractInfo(f), newName, Lists.transform(args, extractor)));
   }
 
-  protected abstract TFormulaInfo replaceArgsAndName(TFormulaInfo pT, String newName, List<TFormulaInfo> newArgs);
+  protected abstract TFormulaInfo replaceArgsAndName(
+      TFormulaInfo pT, String newName, List<TFormulaInfo> newArgs);
 
   @Override
   public <T extends Formula> T replaceArgs(T pF, List<Formula> pArgs) {
     assert pArgs.size() == getArity(pF) : "number of args must match arity.";
-    return encapsulateWithTypeOf(pF, replaceArgs(extractInfo(pF), Lists.transform(pArgs, extractor)));
+    return encapsulateWithTypeOf(
+        pF, replaceArgs(extractInfo(pF), Lists.transform(pArgs, extractor)));
   }
 
   protected abstract TFormulaInfo replaceArgs(TFormulaInfo pT, List<TFormulaInfo> newArgs);
 
   @Override
   public <ResultFormulaType extends Formula, ParamFormulaType extends Formula>
-    ResultFormulaType
-    substitute(
-      ResultFormulaType f,
-      List<ParamFormulaType> changeFrom,
-      List<ParamFormulaType> changeTo) {
+      ResultFormulaType substitute(
+          ResultFormulaType f, List<ParamFormulaType> changeFrom, List<ParamFormulaType> changeTo) {
 
-    TFormulaInfo newExpression = substitute(
-        getFormulaCreator().extractInfo(f),
-        Lists.transform(changeFrom, extractor),
-        Lists.transform(changeTo, extractor)
-    );
+    TFormulaInfo newExpression =
+        substitute(
+            getFormulaCreator().extractInfo(f),
+            Lists.transform(changeFrom, extractor),
+            Lists.transform(changeTo, extractor));
 
     FormulaType<ResultFormulaType> type = getFormulaCreator().getFormulaType(f);
     return getFormulaCreator().encapsulate(type, newExpression);
@@ -207,12 +209,10 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ex
           public T apply(TFormulaInfo input) {
             return encapsulateWithTypeOf(pF, input);
           }
-        }
-    );
+        });
   }
 
   protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
-
 
   @Override
   public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
@@ -223,9 +223,7 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ex
   }
 
   protected abstract TFormulaInfo substitute(
-      TFormulaInfo expr,
-      List<TFormulaInfo> substituteFrom,
-      List<TFormulaInfo> substituteTo);
+      TFormulaInfo expr, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo);
 
   @Override
   public <T extends Formula> T simplify(T f) {

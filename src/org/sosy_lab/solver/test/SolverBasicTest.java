@@ -42,7 +42,7 @@ import com.google.common.testing.EqualsTester;
 @RunWith(Parameterized.class)
 public class SolverBasicTest extends SolverBasedTest0 {
 
-  @Parameters(name="{0}")
+  @Parameters(name = "{0}")
   public static Solvers[] getAllSolvers() {
     return Solvers.values();
   }
@@ -61,40 +61,53 @@ public class SolverBasicTest extends SolverBasedTest0 {
         fmgr.declareUninterpretedFunction("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
 
     new EqualsTester()
-      .addEqualityGroup(bmgr.makeBoolean(true))
-      .addEqualityGroup(bmgr.makeBoolean(false))
-      .addEqualityGroup(bmgr.makeVariable("bool_a"))
-      .addEqualityGroup(imgr.makeVariable("int_a"))
+        .addEqualityGroup(bmgr.makeBoolean(true))
+        .addEqualityGroup(bmgr.makeBoolean(false))
+        .addEqualityGroup(bmgr.makeVariable("bool_a"))
+        .addEqualityGroup(imgr.makeVariable("int_a"))
 
-      // Way of creating numbers should not make a difference.
-      .addEqualityGroup(imgr.makeNumber(0.0), imgr.makeNumber(0L), imgr.makeNumber(BigInteger.ZERO), imgr.makeNumber(BigDecimal.ZERO), imgr.makeNumber("0"))
-      .addEqualityGroup(imgr.makeNumber(1.0), imgr.makeNumber(1L), imgr.makeNumber(BigInteger.ONE), imgr.makeNumber(BigDecimal.ONE), imgr.makeNumber("1"))
+        // Way of creating numbers should not make a difference.
+        .addEqualityGroup(
+            imgr.makeNumber(0.0),
+            imgr.makeNumber(0L),
+            imgr.makeNumber(BigInteger.ZERO),
+            imgr.makeNumber(BigDecimal.ZERO),
+            imgr.makeNumber("0"))
+        .addEqualityGroup(
+            imgr.makeNumber(1.0),
+            imgr.makeNumber(1L),
+            imgr.makeNumber(BigInteger.ONE),
+            imgr.makeNumber(BigDecimal.ONE),
+            imgr.makeNumber("1"))
 
-      // The same formula when created twice should compare equal.
-      .addEqualityGroup(bmgr.makeVariable("bool_b"),
-                        bmgr.makeVariable("bool_b"))
-      .addEqualityGroup(bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")),
-                        bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")))
-      .addEqualityGroup(imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")),
-                        imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")))
+        // The same formula when created twice should compare equal.
+        .addEqualityGroup(bmgr.makeVariable("bool_b"), bmgr.makeVariable("bool_b"))
+        .addEqualityGroup(
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")),
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")))
+        .addEqualityGroup(
+            imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")),
+            imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")))
 
-      // Not all solvers normalize formulas, thus the following does not hold
-      // (and it is not strictly required to hold):
-      //.addEqualityGroup(bmgr.and(bmgr.makeVariable("bool_c"), bmgr.makeVariable("bool_d")),
-      //                  bmgr.and(bmgr.makeVariable("bool_d"), bmgr.makeVariable("bool_c")))
-      //.addEqualityGroup(imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_b")),
-      //                  imgr.equal(imgr.makeVariable("int_b"), imgr.makeNumber(0)))
+        // Not all solvers normalize formulas, thus the following does not hold
+        // (and it is not strictly required to hold):
+        //.addEqualityGroup(bmgr.and(bmgr.makeVariable("bool_c"), bmgr.makeVariable("bool_d")),
+        //                  bmgr.and(bmgr.makeVariable("bool_d"), bmgr.makeVariable("bool_c")))
+        //.addEqualityGroup(imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_b")),
+        //                  imgr.equal(imgr.makeVariable("int_b"), imgr.makeNumber(0)))
 
-      // UninterpretedFunctionDeclarations should not compare equal to Formulas,
-      // but declaring one twice needs to return the same UIF.
-      .addEqualityGroup(fmgr.declareUninterpretedFunction("f_a", FormulaType.IntegerType, FormulaType.IntegerType),
-                        fmgr.declareUninterpretedFunction("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
-
-      .addEqualityGroup(f_b)
-      .addEqualityGroup(fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(0))))
-      .addEqualityGroup(fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))),
-                        fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))))
-
-      .testEquals();
+        // UninterpretedFunctionDeclarations should not compare equal to Formulas,
+        // but declaring one twice needs to return the same UIF.
+        .addEqualityGroup(
+            fmgr.declareUninterpretedFunction(
+                "f_a", FormulaType.IntegerType, FormulaType.IntegerType),
+            fmgr.declareUninterpretedFunction(
+                "f_a", FormulaType.IntegerType, FormulaType.IntegerType))
+        .addEqualityGroup(f_b)
+        .addEqualityGroup(fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(0))))
+        .addEqualityGroup(
+            fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))),
+            fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))))
+        .testEquals();
   }
 }

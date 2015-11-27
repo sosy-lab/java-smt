@@ -31,17 +31,17 @@ import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-
-abstract class SmtInterpolNumeralFormulaManager
-        <ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-        extends AbstractNumeralFormulaManager<Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType> {
+abstract class SmtInterpolNumeralFormulaManager<
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<
+        Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType> {
 
   private final SmtInterpolEnvironment env;
 
   SmtInterpolNumeralFormulaManager(
-          SmtInterpolFormulaCreator pCreator,
-          SmtInterpolFunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      SmtInterpolFormulaCreator pCreator,
+      SmtInterpolFunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
     env = pCreator.getEnv();
   }
@@ -77,9 +77,7 @@ abstract class SmtInterpolNumeralFormulaManager
     // if x >= 0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     // if x <  0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     Sort intSort = pNumber1.getTheory().getNumericSort();
-    if (pModulo > 0
-        && intSort.equals(pNumber1.getSort())
-        && intSort.equals(pNumber2.getSort())) {
+    if (pModulo > 0 && intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort())) {
       Term n = env.numeral(BigInteger.valueOf(pModulo));
       Term x = subtract(pNumber1, pNumber2);
       return env.term("=", x, env.term("*", n, env.term("div", x, n)));

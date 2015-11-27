@@ -32,8 +32,7 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-class SmtInterpolFormulaCreator
-    extends FormulaCreator<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEnvironment> {
 
   private final Sort booleanSort;
   private final Sort integerSort;
@@ -54,14 +53,14 @@ class SmtInterpolFormulaCreator
       return FormulaType.IntegerType;
     } else if (SmtInterpolUtil.hasRationalType(pFormula)) {
       return FormulaType.RationalType;
-    } else if (SmtInterpolUtil.hasArrayType(pFormula)){
+    } else if (SmtInterpolUtil.hasArrayType(pFormula)) {
       Sort[] argumentSorts = pFormula.getSort().getArguments();
-      assert argumentSorts.length == 2 : "Array sort has to have two arguments,"
-          + " one for index type and one for element type!";
+      assert argumentSorts.length == 2
+          : "Array sort has to have two arguments,"
+              + " one for index type and one for element type!";
 
       return new FormulaType.ArrayFormulaType<>(
-          getFormulaTypeOfSort(argumentSorts[0]),
-          getFormulaTypeOfSort(argumentSorts[1]));
+          getFormulaTypeOfSort(argumentSorts[0]), getFormulaTypeOfSort(argumentSorts[1]));
     }
     throw new IllegalArgumentException("Unknown formula type");
   }
@@ -82,12 +81,10 @@ class SmtInterpolFormulaCreator
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(final T pFormula) {
     if (pFormula instanceof ArrayFormula<?, ?>) {
-      final FormulaType<?> arrayIndexType = getArrayFormulaIndexType(
-          (ArrayFormula<?, ?>) pFormula);
-      final FormulaType<?> arrayElementType = getArrayFormulaElementType(
-          (ArrayFormula<?, ?>) pFormula);
-      return (FormulaType<T>)new ArrayFormulaType<>(arrayIndexType,
-          arrayElementType);
+      final FormulaType<?> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<?, ?>) pFormula);
+      final FormulaType<?> arrayElementType =
+          getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
+      return (FormulaType<T>) new ArrayFormulaType<>(arrayIndexType, arrayElementType);
     }
 
     return super.getFormulaType(pFormula);
@@ -96,20 +93,20 @@ class SmtInterpolFormulaCreator
   @Override
   public Term makeVariable(final Sort type, final String varName) {
     SmtInterpolEnvironment env = getEnv();
-    env.declareFun(varName, new Sort[]{}, type);
+    env.declareFun(varName, new Sort[] {}, type);
     return env.term(varName);
   }
 
   @Override
   public Sort getBitvectorType(final int pBitwidth) {
-    throw new UnsupportedOperationException("Bitvector theory is not supported "
-        + "by SmtInterpol");
+    throw new UnsupportedOperationException(
+        "Bitvector theory is not supported " + "by SmtInterpol");
   }
 
   @Override
   public Sort getFloatingPointType(final FormulaType.FloatingPointType type) {
-    throw new UnsupportedOperationException("FloatingPoint theory is not "
-        + "supported by SmtInterpol");
+    throw new UnsupportedOperationException(
+        "FloatingPoint theory is not " + "supported by SmtInterpol");
   }
 
   @Override

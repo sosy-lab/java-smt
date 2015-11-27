@@ -123,8 +123,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
       // get unsat core for failure message
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
-      if (unsatCore.isEmpty()
-          || (unsatCore.size() == 1 && getSubject().equals(unsatCore.get(0)))) {
+      if (unsatCore.isEmpty() || (unsatCore.size() == 1 && getSubject().equals(unsatCore.get(0)))) {
         // empty or trivial unsat core
         fail("is", "satisfiable");
       } else {
@@ -144,8 +143,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       return;
     }
 
-    final BooleanFormula f = mgr.getBooleanFormulaManager()
-        .xor(getSubject(), expected);
+    final BooleanFormula f = mgr.getBooleanFormulaManager().xor(getSubject(), expected);
 
     checkIsUnsat(f, "is equivalent to", expected);
   }
@@ -155,8 +153,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * i.e. <code>subject => expected</code> always holds.
    * Will show a counterexample on failure.
    */
-  public void implies(final BooleanFormula expected)
-      throws SolverException, InterruptedException {
+  public void implies(final BooleanFormula expected) throws SolverException, InterruptedException {
     if (getSubject().equals(expected)) {
       return;
     }

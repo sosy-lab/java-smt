@@ -44,13 +44,12 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
 
   private static final boolean USE_SHARED_ENV = true;
 
-  Mathsat5TheoremProver(Mathsat5FormulaManager pMgr,
-      boolean generateModels, boolean generateUnsatCore) {
+  Mathsat5TheoremProver(
+      Mathsat5FormulaManager pMgr, boolean generateModels, boolean generateUnsatCore) {
     super(pMgr, createConfig(generateModels, generateUnsatCore), USE_SHARED_ENV, true);
   }
 
-  private static long createConfig(
-      boolean generateModels, boolean generateUnsatCore) {
+  private static long createConfig(boolean generateModels, boolean generateUnsatCore) {
     long cfg = msat_create_config();
     if (generateModels) {
       msat_set_option_checked(cfg, "model_generation", "true");
@@ -80,10 +79,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
     return result;
   }
 
-
   @Override
-  public <T> T allSat(AllSatCallback<T> callback,
-      List<BooleanFormula> important)
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
 
     long[] imp = new long[important.size()];
@@ -95,7 +92,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
     int numModels = msat_all_sat(curEnv, imp, uCallback);
 
     if (numModels == -1) {
-      throw new RuntimeException("Error occurred during Mathsat allsat: " + msat_last_error_message(curEnv));
+      throw new RuntimeException(
+          "Error occurred during Mathsat allsat: " + msat_last_error_message(curEnv));
 
     } else if (numModels == -2) {
       throw new SolverException("Number of models should be finite with boolean predicates");
@@ -108,7 +106,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
     throw new UnsupportedOperationException("Mathsat5 solver does not support evaluation");
   }
 
-  class MathsatAllSatCallback<T> implements  AllSatModelCallback {
+  class MathsatAllSatCallback<T> implements AllSatModelCallback {
     private final AllSatCallback<T> clientCallback;
 
     MathsatAllSatCallback(AllSatCallback<T> pClientCallback) {
@@ -117,13 +115,13 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
 
     @Override
     public void callback(long[] model) throws InterruptedException {
-      clientCallback.apply(new LongArrayBackedList<BooleanFormula>(model) {
-        @Override
-        protected BooleanFormula convert(long pE) {
-          return mgr.encapsulateBooleanFormula(pE);
-        }
-      });
+      clientCallback.apply(
+          new LongArrayBackedList<BooleanFormula>(model) {
+            @Override
+            protected BooleanFormula convert(long pE) {
+              return mgr.encapsulateBooleanFormula(pE);
+            }
+          });
     }
   }
-
 }

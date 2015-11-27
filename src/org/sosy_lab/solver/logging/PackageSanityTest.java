@@ -25,6 +25,4 @@ package org.sosy_lab.solver.logging;
 
 import com.google.common.testing.AbstractPackageSanityTests;
 
-public class PackageSanityTest extends AbstractPackageSanityTests {
-
-}
+public class PackageSanityTest extends AbstractPackageSanityTests {}

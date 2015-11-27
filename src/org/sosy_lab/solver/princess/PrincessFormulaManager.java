@@ -44,15 +44,18 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
+public class PrincessFormulaManager
+    extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
-public class PrincessFormulaManager extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
-
-  @Options(prefix="solver.princess")
+  @Options(prefix = "solver.princess")
   static class PrincessOptions {
-    @Option(secure=true, description="The number of atoms a term has to have before"
-        + " it gets abbreviated if there are more identical terms.")
+    @Option(
+      secure = true,
+      description =
+          "The number of atoms a term has to have before"
+              + " it gets abbreviated if there are more identical terms."
+    )
     private int minAtomsForAbbreviation = 100;
-
 
     public PrincessOptions(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
@@ -66,35 +69,52 @@ public class PrincessFormulaManager extends AbstractFormulaManager<IExpression, 
   private final ShutdownNotifier shutdownNotifier;
 
   private PrincessFormulaManager(
-          PrincessFormulaCreator pCreator,
-          PrincessUnsafeFormulaManager pUnsafeManager,
-          PrincessFunctionFormulaManager pFunctionManager,
-          PrincessBooleanFormulaManager pBooleanManager,
-          PrincessIntegerFormulaManager pIntegerManager,
-          ShutdownNotifier pShutdownNotifier) {
-    super(pCreator, pUnsafeManager, pFunctionManager, pBooleanManager, pIntegerManager, null, null, null, null, null);
+      PrincessFormulaCreator pCreator,
+      PrincessUnsafeFormulaManager pUnsafeManager,
+      PrincessFunctionFormulaManager pFunctionManager,
+      PrincessBooleanFormulaManager pBooleanManager,
+      PrincessIntegerFormulaManager pIntegerManager,
+      ShutdownNotifier pShutdownNotifier) {
+    super(
+        pCreator,
+        pUnsafeManager,
+        pFunctionManager,
+        pBooleanManager,
+        pIntegerManager,
+        null,
+        null,
+        null,
+        null,
+        null);
     shutdownNotifier = pShutdownNotifier;
   }
 
-  public static PrincessFormulaManager create(Configuration config, LogManager logger,
-      ShutdownNotifier pShutdownNotifier, PathCounterTemplate pLogfileTemplate,
-      boolean pUseNonLinearIntegerArithmetic) throws InvalidConfigurationException {
+  public static PrincessFormulaManager create(
+      Configuration config,
+      LogManager logger,
+      ShutdownNotifier pShutdownNotifier,
+      PathCounterTemplate pLogfileTemplate,
+      boolean pUseNonLinearIntegerArithmetic)
+      throws InvalidConfigurationException {
 
     PrincessOptions options = new PrincessOptions(config);
 
-    PrincessEnvironment env = new PrincessEnvironment(logger, pLogfileTemplate, pShutdownNotifier, options);
+    PrincessEnvironment env =
+        new PrincessEnvironment(logger, pLogfileTemplate, pShutdownNotifier, options);
 
-    PrincessFormulaCreator creator = new PrincessFormulaCreator(env,
-        TermType.Boolean, TermType.Integer);
+    PrincessFormulaCreator creator =
+        new PrincessFormulaCreator(env, TermType.Boolean, TermType.Integer);
 
     // Create managers
     PrincessUnsafeFormulaManager unsafeManager = new PrincessUnsafeFormulaManager(creator);
-    PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator, unsafeManager);
+    PrincessFunctionFormulaManager functionTheory =
+        new PrincessFunctionFormulaManager(creator, unsafeManager);
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
-    PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    PrincessIntegerFormulaManager integerTheory =
+        new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
 
-    return new PrincessFormulaManager(creator, unsafeManager, functionTheory,
-            booleanTheory, integerTheory, pShutdownNotifier);
+    return new PrincessFormulaManager(
+        creator, unsafeManager, functionTheory, booleanTheory, integerTheory, pShutdownNotifier);
   }
 
   BooleanFormula encapsulateBooleanFormula(IExpression t) {
@@ -102,7 +122,8 @@ public class PrincessFormulaManager extends AbstractFormulaManager<IExpression, 
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(boolean pGenerateModels, boolean pGenerateUnsatCore) {
+  public ProverEnvironment newProverEnvironment(
+      boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return new PrincessTheoremProver(this, shutdownNotifier);
   }
 
@@ -121,11 +142,11 @@ public class PrincessFormulaManager extends AbstractFormulaManager<IExpression, 
     return encapsulateBooleanFormula(getOnlyElement(getEnvironment().parseStringToTerms(pS)));
   }
 
-
   @Override
   public Appender dumpFormula(final IExpression formula) {
-    assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType : "Only BooleanFormulas may be dumped";
-    return getEnvironment().dumpFormula((IFormula)formula);
+    assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
+    return getEnvironment().dumpFormula((IFormula) formula);
   }
 
   @Override

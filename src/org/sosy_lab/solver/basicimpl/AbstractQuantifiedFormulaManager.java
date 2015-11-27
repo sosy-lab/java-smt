@@ -32,13 +32,11 @@ import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
 import com.google.common.collect.Lists;
 
-
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
-  extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-  implements QuantifiedFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+    implements QuantifiedFormulaManager {
 
-  protected AbstractQuantifiedFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractQuantifiedFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
   }
 
@@ -48,56 +46,61 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(exists(
-        Lists.transform(pVariables, extractor),
-        extractInfo(pBody)));
+    return wrap(exists(Lists.transform(pVariables, extractor), extractInfo(pBody)));
   }
+
   protected abstract TFormulaInfo exists(List<TFormulaInfo> pVariables, TFormulaInfo pBody);
 
   @Override
   public final BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(forall(
-        Lists.transform(pVariables, extractor),
-        extractInfo(pBody)));
+    return wrap(forall(Lists.transform(pVariables, extractor), extractInfo(pBody)));
   }
+
   protected abstract TFormulaInfo forall(List<TFormulaInfo> pVariables, TFormulaInfo pBody);
 
   @Override
-  public BooleanFormula eliminateQuantifiers(BooleanFormula pF) throws InterruptedException, SolverException {
+  public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return wrap(eliminateQuantifiers(extractInfo(pF)));
   }
-  protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo) throws SolverException, InterruptedException;
+
+  protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
+      throws SolverException, InterruptedException;
 
   @Override
   public boolean isQuantifier(BooleanFormula pF) {
     return isQuantifier(extractInfo(pF));
   }
+
   protected abstract boolean isQuantifier(TFormulaInfo pExtractInfo);
 
   @Override
   public boolean isForall(BooleanFormula pF) {
     return isForall(extractInfo(pF));
   }
+
   protected abstract boolean isForall(TFormulaInfo pExtractInfo);
 
   @Override
   public boolean isExists(BooleanFormula pF) {
     return isExists(extractInfo(pF));
   }
+
   protected abstract boolean isExists(TFormulaInfo pExtractInfo);
 
   @Override
   public int numQuantifierBound(BooleanFormula pF) {
     return numQuantifierBound(extractInfo(pF));
   }
+
   protected abstract int numQuantifierBound(TFormulaInfo pExtractInfo);
 
   @Override
   public BooleanFormula getQuantifierBody(BooleanFormula pF) {
     return wrap(getQuantifierBody(extractInfo(pF)));
   }
-  protected abstract TFormulaInfo getQuantifierBody(TFormulaInfo pExtractInfo);
 
+  protected abstract TFormulaInfo getQuantifierBody(TFormulaInfo pExtractInfo);
 
   @Override
   public boolean isBoundByQuantifier(Formula pF) {

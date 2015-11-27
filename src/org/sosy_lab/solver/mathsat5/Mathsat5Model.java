@@ -53,7 +53,6 @@ class Mathsat5Model {
 
   private static TermType toMathsatType(long e, long mType) {
 
-
     if (msat_is_bool_type(e, mType)) {
       return TermType.Boolean;
     } else if (msat_is_integer_type(e, mType)) {
@@ -73,8 +72,10 @@ class Mathsat5Model {
 
   private static AssignableTerm toConstant(final long env, final long variableId) {
     if (!msat_term_is_constant(env, variableId)) {
-      throw new IllegalArgumentException("Given mathsat id doesn't correspond to a constant! (" +
-                                         msat_term_repr(variableId) + ")");
+      throw new IllegalArgumentException(
+          "Given mathsat id doesn't correspond to a constant! ("
+              + msat_term_repr(variableId)
+              + ")");
     }
 
     final long declarationId = msat_term_get_decl(variableId);
@@ -83,10 +84,10 @@ class Mathsat5Model {
     return new Variable(name, type);
   }
 
-
   private static Function toFunction(long env, long pFunctionId) {
     if (msat_term_is_constant(env, pFunctionId)) {
-      throw new IllegalArgumentException("Given mathsat id is a variable! (" + msat_term_repr(pFunctionId) + ")");
+      throw new IllegalArgumentException(
+          "Given mathsat id is a variable! (" + msat_term_repr(pFunctionId) + ")");
     }
 
     long lDeclarationId = msat_term_get_decl(pFunctionId);
@@ -121,7 +122,6 @@ class Mathsat5Model {
 
     return new Function(lName, lType, lArguments);
   }
-
 
   private static AssignableTerm toAssignable(long env, long pTermId) {
     if (!msat_term_is_constant(env, pTermId)) {
@@ -162,7 +162,9 @@ class Mathsat5Model {
       // TODO maybe we have to convert to SMTLIB format and then read in values in a controlled way, e.g., size of bitvector
       // TODO we are assuming numbers as values
       if (!(msat_term_is_number(sourceEnvironment, lValueTerm)
-            || msat_term_is_boolean_constant(sourceEnvironment, lValueTerm) || msat_term_is_false(sourceEnvironment, lValueTerm) || msat_term_is_true(sourceEnvironment, lValueTerm))) {
+          || msat_term_is_boolean_constant(sourceEnvironment, lValueTerm)
+          || msat_term_is_false(sourceEnvironment, lValueTerm)
+          || msat_term_is_true(sourceEnvironment, lValueTerm))) {
         throw new IllegalArgumentException("Mathsat term is not a number!");
       }
 
@@ -171,33 +173,35 @@ class Mathsat5Model {
       Object lValue;
 
       switch (lAssignable.getType()) {
-      case Boolean:
-        if (lTermRepresentation.equals("`true`")) {
-          lValue = true;
-        } else if (lTermRepresentation.equals("`false`")) {
-          lValue = false;
-        } else {
-          throw new IllegalArgumentException("Mathsat unhandled boolean value " + lTermRepresentation);
-        }
-        break;
-      case Real:
-        lValue = parseReal(lTermRepresentation);
-        break;
+        case Boolean:
+          if (lTermRepresentation.equals("`true`")) {
+            lValue = true;
+          } else if (lTermRepresentation.equals("`false`")) {
+            lValue = false;
+          } else {
+            throw new IllegalArgumentException(
+                "Mathsat unhandled boolean value " + lTermRepresentation);
+          }
+          break;
+        case Real:
+          lValue = parseReal(lTermRepresentation);
+          break;
 
-      case Integer:
-        lValue = new BigInteger(lTermRepresentation);
-        break;
+        case Integer:
+          lValue = new BigInteger(lTermRepresentation);
+          break;
 
-      case Bitvector:
-        lValue = interpreteBitvector(lTermRepresentation);
-        break;
+        case Bitvector:
+          lValue = interpreteBitvector(lTermRepresentation);
+          break;
 
-      case FloatingPoint:
-        lValue = interpreteFloatingPoint(lTermRepresentation);
-        break;
+        case FloatingPoint:
+          lValue = interpreteFloatingPoint(lTermRepresentation);
+          break;
 
-      default:
-        throw new IllegalArgumentException("Mathsat term with unhandled type " + lAssignable.getType());
+        default:
+          throw new IllegalArgumentException(
+              "Mathsat term with unhandled type " + lAssignable.getType());
       }
 
       model.put(lAssignable, lValue);
@@ -212,7 +216,7 @@ class Mathsat5Model {
   //TODO: change this to the latest version (if possible try to use a BitvectorFormula instance here)
   private static Object interpreteBitvector(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<WIDTH>"
-    Matcher matcher =  BITVECTOR_PATTERN.matcher(lTermRepresentation);
+    Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
       throw new NumberFormatException("Unknown bitvector format: " + lTermRepresentation);
     }
@@ -235,7 +239,7 @@ class Mathsat5Model {
 
   private static Object interpreteFloatingPoint(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
-    Matcher matcher =  FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
+    Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
       throw new NumberFormatException("Unknown floating-point format: " + lTermRepresentation);
     }
@@ -257,8 +261,7 @@ class Mathsat5Model {
     BigDecimal lValue;
     try {
       lValue = new BigDecimal(lTermRepresentation);
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e) {
       // lets try special case for mathsat
       String[] lNumbers = lTermRepresentation.split("/");
 
@@ -273,5 +276,4 @@ class Mathsat5Model {
     }
     return lValue;
   }
-
 }

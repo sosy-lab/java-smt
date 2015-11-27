@@ -23,7 +23,4 @@
  */
 package org.sosy_lab.solver.api;
 
-
-public interface FloatingPointFormula extends Formula {
-
-}
+public interface FloatingPointFormula extends Formula {}

@@ -30,13 +30,13 @@ import java.math.BigDecimal;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
-
-class Mathsat5IntegerFormulaManager extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula> {
+class Mathsat5IntegerFormulaManager
+    extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
   public Mathsat5IntegerFormulaManager(
-          Mathsat5FormulaCreator pCreator,
-          Mathsat5FunctionFormulaManager functionManager,
-          boolean useNonLinearArithmetic) {
+      Mathsat5FormulaCreator pCreator,
+      Mathsat5FunctionFormulaManager functionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, functionManager, useNonLinearArithmetic);
   }
 
@@ -52,7 +52,7 @@ class Mathsat5IntegerFormulaManager extends Mathsat5NumeralFormulaManager<Intege
 
   @Override
   protected Long makeNumberImpl(double pNumber) {
-    return makeNumberImpl((long)pNumber);
+    return makeNumberImpl((long) pNumber);
   }
 
   @Override
@@ -67,28 +67,28 @@ class Mathsat5IntegerFormulaManager extends Mathsat5NumeralFormulaManager<Intege
     long t1 = pNumber1;
     long t2 = pNumber2;
 
-      // invert t2 and multiply with it
-      String n = msat_term_repr(t2);
-      if (n.startsWith("(")) {
-        n = n.substring(1, n.length() - 1);
-      }
-      String[] frac = n.split("/");
-      if (frac.length == 1) {
-        // cannot multiply with term 1/n because the result will have type rat instead of int
-        return super.linearDivide(pNumber1, pNumber2);
-      } else {
-        assert (frac.length == 2);
-        n = frac[1] + "/" + frac[0];
-      }
-      t2 = msat_make_number(mathsatEnv, n);
-      return msat_make_times(mathsatEnv, t2, t1);
+    // invert t2 and multiply with it
+    String n = msat_term_repr(t2);
+    if (n.startsWith("(")) {
+      n = n.substring(1, n.length() - 1);
+    }
+    String[] frac = n.split("/");
+    if (frac.length == 1) {
+      // cannot multiply with term 1/n because the result will have type rat instead of int
+      return super.linearDivide(pNumber1, pNumber2);
+    } else {
+      assert (frac.length == 2);
+      n = frac[1] + "/" + frac[0];
+    }
+    t2 = msat_make_number(mathsatEnv, n);
+    return msat_make_times(mathsatEnv, t2, t1);
   }
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
     if (pModulo > 0) {
-      return msat_make_int_modular_congruence(getFormulaCreator().getEnv(),
-          pModulo, pNumber1, pNumber2);
+      return msat_make_int_modular_congruence(
+          getFormulaCreator().getEnv(), pModulo, pNumber1, pNumber2);
     }
     return msat_make_true(getFormulaCreator().getEnv());
   }

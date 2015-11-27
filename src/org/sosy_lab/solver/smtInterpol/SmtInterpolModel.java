@@ -51,7 +51,8 @@ class SmtInterpolModel {
       return TermType.Array;
     }
 
-    throw new IllegalArgumentException("Given sort cannot be converted to a TermType: " + t.getSort());
+    throw new IllegalArgumentException(
+        "Given sort cannot be converted to a TermType: " + t.getSort());
   }
 
   private static AssignableTerm toVariable(Term t) {
@@ -59,19 +60,19 @@ class SmtInterpolModel {
       throw new IllegalArgumentException("Given term is no variable! (" + t.toString() + ")");
     }
 
-    ApplicationTerm appTerm = (ApplicationTerm)t;
+    ApplicationTerm appTerm = (ApplicationTerm) t;
     String lName = appTerm.getFunction().getName();
     TermType lType = getType(appTerm);
     return new Variable(lName, lType);
   }
 
-
-  private static Function toFunction(Term t, de.uni_freiburg.informatik.ultimate.logic.Model values) {
+  private static Function toFunction(
+      Term t, de.uni_freiburg.informatik.ultimate.logic.Model values) {
     if (SmtInterpolUtil.isVariable(t)) {
       throw new IllegalArgumentException("Given term is no function! (" + t.toString() + ")");
     }
 
-    ApplicationTerm appTerm = (ApplicationTerm)t;
+    ApplicationTerm appTerm = (ApplicationTerm) t;
     String lName = appTerm.getFunction().getName();
     TermType lType = getType(appTerm);
 
@@ -88,8 +89,8 @@ class SmtInterpolModel {
     return new Function(lName, lType, lArguments);
   }
 
-
-  private static AssignableTerm toAssignable(Term t, de.uni_freiburg.informatik.ultimate.logic.Model values) {
+  private static AssignableTerm toAssignable(
+      Term t, de.uni_freiburg.informatik.ultimate.logic.Model values) {
 
     assert t instanceof ApplicationTerm : "This is no ApplicationTerm: " + t.toString();
 
@@ -112,7 +113,8 @@ class SmtInterpolModel {
     throw new IllegalArgumentException("SmtInterpol model term with expected value " + value);
   }
 
-  static Model createSmtInterpolModel(SmtInterpolEnvironment env, Collection<Term> assertedFormulas) {
+  static Model createSmtInterpolModel(
+      SmtInterpolEnvironment env, Collection<Term> assertedFormulas) {
     de.uni_freiburg.informatik.ultimate.logic.Model values = env.getModel();
 
     Map<AssignableTerm, Object> model = new LinkedHashMap<>();
@@ -131,9 +133,12 @@ class SmtInterpolModel {
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
       // leading to two entries for "uf(1)" (if value is 1).
       Object existingValue = model.get(lAssignable);
-      Verify.verify(existingValue == null || lValue.equals(existingValue),
-          "Duplicate values for model entry %s: %s and %s", lAssignable, existingValue, lValue
-          );
+      Verify.verify(
+          existingValue == null || lValue.equals(existingValue),
+          "Duplicate values for model entry %s: %s and %s",
+          lAssignable,
+          existingValue,
+          lValue);
       model.put(lAssignable, lValue);
     }
 

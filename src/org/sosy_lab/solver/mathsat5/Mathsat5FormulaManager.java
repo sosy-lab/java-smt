@@ -57,31 +57,40 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 
-public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long> implements AutoCloseable {
+public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long>
+    implements AutoCloseable {
 
-  @Options(deprecatedPrefix="cpa.predicate.solver.mathsat5",
-           prefix="solver.mathsat5")
+  @Options(deprecatedPrefix = "cpa.predicate.solver.mathsat5", prefix = "solver.mathsat5")
   private static class Mathsat5Settings {
 
-    @Option(secure=true, description = "List of further options which will be passed to Mathsat in addition to the default options. "
-        + "Format is 'key1=value1,key2=value2'")
+    @Option(
+      secure = true,
+      description =
+          "List of further options which will be passed to Mathsat in addition to the default options. "
+              + "Format is 'key1=value1,key2=value2'"
+    )
     private String furtherOptions = "";
 
     private final @Nullable PathCounterTemplate logfile;
 
-    private final ImmutableMap<String, String> furtherOptionsMap ;
+    private final ImmutableMap<String, String> furtherOptionsMap;
 
-    private Mathsat5Settings(Configuration config, PathCounterTemplate pLogfile) throws InvalidConfigurationException {
+    private Mathsat5Settings(Configuration config, PathCounterTemplate pLogfile)
+        throws InvalidConfigurationException {
       config.inject(this);
       logfile = pLogfile;
 
-      MapSplitter optionSplitter = Splitter.on(',').trimResults().omitEmptyStrings()
-                      .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
+      MapSplitter optionSplitter =
+          Splitter.on(',')
+              .trimResults()
+              .omitEmptyStrings()
+              .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
 
       try {
         furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(furtherOptions));
       } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException("Invalid Mathsat option in \"" + furtherOptions + "\": " + e.getMessage(), e);
+        throw new InvalidConfigurationException(
+            "Invalid Mathsat option in \"" + furtherOptions + "\": " + e.getMessage(), e);
       }
     }
   }
@@ -94,11 +103,12 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
   private final ShutdownNotifier shutdownNotifier;
   private final TerminationTest terminationTest;
 
-  @Options(deprecatedPrefix="cpa.predicate.solver.mathsat5",
-    prefix="solver.mathsat5")
+  @Options(deprecatedPrefix = "cpa.predicate.solver.mathsat5", prefix = "solver.mathsat5")
   private static class ExtraOptions {
-    @Option(secure=true, description="Load less stable optimizing version of"
-        + " mathsat5 solver.")
+    @Option(
+      secure = true,
+      description = "Load less stable optimizing version of" + " mathsat5 solver."
+    )
     boolean loadOptimathsat5 = false;
   }
 
@@ -117,8 +127,17 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
       Mathsat5Settings pSettings,
       long pRandomSeed,
       final ShutdownNotifier pShutdownNotifier) {
-    super(creator, unsafeManager, pFunctionManager, pBooleanManager,
-        pIntegerManager, pRationalManager, pBitpreciseManager, pFloatingPointmanager, null, pArrayManager);
+    super(
+        creator,
+        unsafeManager,
+        pFunctionManager,
+        pBooleanManager,
+        pIntegerManager,
+        pRationalManager,
+        pBitpreciseManager,
+        pFloatingPointmanager,
+        null,
+        pArrayManager);
 
     mathsatConfig = pMathsatConfig;
     settings = pSettings;
@@ -126,13 +145,14 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
     logger = checkNotNull(pLogger);
 
     shutdownNotifier = checkNotNull(pShutdownNotifier);
-    terminationTest = new TerminationTest() {
-        @Override
-        public boolean shouldTerminate() throws InterruptedException {
-          pShutdownNotifier.shutdownIfNecessary();
-          return false;
-        }
-      };
+    terminationTest =
+        new TerminationTest() {
+          @Override
+          public boolean shouldTerminate() throws InterruptedException {
+            pShutdownNotifier.shutdownIfNecessary();
+            return false;
+          }
+        };
   }
 
   ShutdownNotifier getShutdownNotifier() {
@@ -140,14 +160,18 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   static long getMsatTerm(Formula pT) {
-    return ((Mathsat5Formula)pT).getTerm();
+    return ((Mathsat5Formula) pT).getTerm();
   }
 
-  public static Mathsat5FormulaManager create(LogManager logger,
-      Configuration config, ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate solverLogFile, long randomSeed,
-      boolean pUseNonLinearIntegerArithmetic, boolean pUseNonLinearRationalArithmetic)
-          throws InvalidConfigurationException {
+  public static Mathsat5FormulaManager create(
+      LogManager logger,
+      Configuration config,
+      ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate solverLogFile,
+      long randomSeed,
+      boolean pUseNonLinearIntegerArithmetic,
+      boolean pUseNonLinearRationalArithmetic)
+      throws InvalidConfigurationException {
 
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -179,18 +203,35 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
 
     // Create managers
     Mathsat5UnsafeFormulaManager unsafeManager = new Mathsat5UnsafeFormulaManager(creator);
-    Mathsat5FunctionFormulaManager functionTheory = new Mathsat5FunctionFormulaManager(creator, unsafeManager);
+    Mathsat5FunctionFormulaManager functionTheory =
+        new Mathsat5FunctionFormulaManager(creator, unsafeManager);
     Mathsat5BooleanFormulaManager booleanTheory = Mathsat5BooleanFormulaManager.create(creator);
-    Mathsat5IntegerFormulaManager integerTheory = new Mathsat5IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
-    Mathsat5RationalFormulaManager rationalTheory = new Mathsat5RationalFormulaManager(creator, functionTheory, pUseNonLinearRationalArithmetic);
-    Mathsat5BitvectorFormulaManager bitvectorTheory  = Mathsat5BitvectorFormulaManager.create(creator);
-    Mathsat5FloatingPointFormulaManager floatingPointTheory = new Mathsat5FloatingPointFormulaManager(creator, functionTheory);
+    Mathsat5IntegerFormulaManager integerTheory =
+        new Mathsat5IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    Mathsat5RationalFormulaManager rationalTheory =
+        new Mathsat5RationalFormulaManager(
+            creator, functionTheory, pUseNonLinearRationalArithmetic);
+    Mathsat5BitvectorFormulaManager bitvectorTheory =
+        Mathsat5BitvectorFormulaManager.create(creator);
+    Mathsat5FloatingPointFormulaManager floatingPointTheory =
+        new Mathsat5FloatingPointFormulaManager(creator, functionTheory);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
 
-    return new Mathsat5FormulaManager(logger, msatConf, creator,
-        unsafeManager, functionTheory, booleanTheory,
-        integerTheory, rationalTheory, bitvectorTheory, floatingPointTheory, arrayTheory,
-        settings, randomSeed, pShutdownNotifier);
+    return new Mathsat5FormulaManager(
+        logger,
+        msatConf,
+        creator,
+        unsafeManager,
+        functionTheory,
+        booleanTheory,
+        integerTheory,
+        rationalTheory,
+        bitvectorTheory,
+        floatingPointTheory,
+        arrayTheory,
+        settings,
+        randomSeed,
+        pShutdownNotifier);
   }
 
   BooleanFormula encapsulateBooleanFormula(long t) {
@@ -198,7 +239,8 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(boolean pGenerateModels, boolean pGenerateUnsatCore) {
+  public ProverEnvironment newProverEnvironment(
+      boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return new Mathsat5TheoremProver(this, pGenerateModels, pGenerateUnsatCore);
   }
 
@@ -220,7 +262,8 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
 
   @Override
   public Appender dumpFormula(final Long f) {
-    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType : "Only BooleanFormulas may be dumped";
+    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
 
     // Lazy invocation of msat_to_smtlib2 wrapped in an Appender.
     return Appenders.fromToStringMethod(
@@ -231,7 +274,6 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
           }
         });
   }
-
 
   @Override
   public String getVersion() {
@@ -261,7 +303,8 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
       }
 
       msat_set_option_checked(cfg, "debug.api_call_trace", "1");
-      msat_set_option_checked(cfg, "debug.api_call_trace_filename", filename.toAbsolutePath().toString());
+      msat_set_option_checked(
+          cfg, "debug.api_call_trace_filename", filename.toAbsolutePath().toString());
     }
 
     if (shared) {

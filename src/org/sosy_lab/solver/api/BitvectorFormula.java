@@ -23,7 +23,4 @@
  */
 package org.sosy_lab.solver.api;
 
-
-public interface BitvectorFormula extends Formula {
-
-}
+public interface BitvectorFormula extends Formula {}

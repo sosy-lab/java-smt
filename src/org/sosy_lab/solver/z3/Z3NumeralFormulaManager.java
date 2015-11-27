@@ -33,16 +33,16 @@ import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 
 import com.google.common.primitives.Longs;
 
-abstract class Z3NumeralFormulaManager
-        <ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-        extends AbstractNumeralFormulaManager<Long, Long, Long, ParamFormulaType, ResultFormulaType> {
+abstract class Z3NumeralFormulaManager<
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<Long, Long, Long, ParamFormulaType, ResultFormulaType> {
 
   protected final long z3context;
 
   public Z3NumeralFormulaManager(
-          Z3FormulaCreator pCreator,
-          Z3FunctionFormulaManager functionManager,
-          boolean useNonLinearArithmetic) {
+      Z3FormulaCreator pCreator,
+      Z3FunctionFormulaManager functionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, functionManager, useNonLinearArithmetic);
 
     this.z3context = pCreator.getEnv();

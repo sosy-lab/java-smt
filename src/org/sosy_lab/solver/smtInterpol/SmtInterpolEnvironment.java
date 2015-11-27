@@ -73,17 +73,24 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.TerminationReques
  * so functions remain declared, if levels are popped.
  * This Wrapper allows to set a logfile for all Smt-Queries (default "smtinterpol.smt2").
  */
-@Options(deprecatedPrefix="cpa.predicate.solver.smtinterpol",
-    prefix="solver.smtinterpol")
+@Options(deprecatedPrefix = "cpa.predicate.solver.smtinterpol", prefix = "solver.smtinterpol")
 class SmtInterpolEnvironment {
 
-  @Option(secure=true, description="Double check generated results like interpolants and models whether they are correct")
+  @Option(
+    secure = true,
+    description =
+        "Double check generated results like interpolants and models whether they are correct"
+  )
   private boolean checkResults = false;
 
   private final @Nullable PathCounterTemplate smtLogfile;
 
-  @Option(secure=true, description = "List of further options which will be set to true for SMTInterpol in addition to the default options. "
-      + "Format is 'option1,option2,option3'")
+  @Option(
+    secure = true,
+    description =
+        "List of further options which will be set to true for SMTInterpol in addition to the default options. "
+            + "Format is 'option1,option2,option3'"
+  )
   private List<String> furtherOptions = ImmutableList.of();
 
   private final LogManager logger;
@@ -98,22 +105,27 @@ class SmtInterpolEnvironment {
 
   /** The Constructor creates the wrapped Element, sets some options
    * and initializes the logger. */
-  public SmtInterpolEnvironment(Configuration config,
-      final LogManager pLogger, final ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate pSmtLogfile, long randomSeed)
-          throws InvalidConfigurationException {
+  public SmtInterpolEnvironment(
+      Configuration config,
+      final LogManager pLogger,
+      final ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate pSmtLogfile,
+      long randomSeed)
+      throws InvalidConfigurationException {
     config.inject(this);
     logger = pLogger;
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     smtLogfile = pSmtLogfile;
 
-    final SMTInterpol smtInterpol = new SMTInterpol(createLog4jLogger(logger),
-        new TerminationRequest() {
-          @Override
-          public boolean isTerminationRequested() {
-            return pShutdownNotifier.shouldShutdown();
-          }
-        });
+    final SMTInterpol smtInterpol =
+        new SMTInterpol(
+            createLog4jLogger(logger),
+            new TerminationRequest() {
+              @Override
+              public boolean isTerminationRequested() {
+                return pShutdownNotifier.shouldShutdown();
+              }
+            });
 
     if (smtLogfile != null) {
       script = createLoggingWrapper(smtInterpol);
@@ -140,7 +152,8 @@ class SmtInterpolEnvironment {
       try {
         script.setOption(":" + option, true);
       } catch (SMTLIBException | UnsupportedOperationException e) {
-        throw new InvalidConfigurationException("Invalid option \"" + option + "\" for SMTInterpol.", e);
+        throw new InvalidConfigurationException(
+            "Invalid option \"" + option + "\" for SMTInterpol.", e);
       }
     }
 
@@ -165,41 +178,43 @@ class SmtInterpolEnvironment {
     // levels: ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
     // WARN is too noisy.
     logger.setLevel(org.apache.log4j.Level.ERROR);
-    logger.addAppender(new org.apache.log4j.AppenderSkeleton() {
+    logger.addAppender(
+        new org.apache.log4j.AppenderSkeleton() {
 
-      @Override
-      public boolean requiresLayout() {
-        return false;
-      }
+          @Override
+          public boolean requiresLayout() {
+            return false;
+          }
 
-      @Override
-      public void close() {}
+          @Override
+          public void close() {}
 
-      @Override
-      protected void append(org.apache.log4j.spi.LoggingEvent pArg0) {
-        // SMTInterpol has serveral "catch (Throwable t) { log(t); }",
-        // which is very ugly because it also catches errors like OutOfMemoryError
-        // and ThreadDeath.
-        // We do a similarly ugly thing and rethrow such exceptions here
-        // (at least for errors and runtime exceptions).
-        org.apache.log4j.spi.ThrowableInformation throwable = pArg0.getThrowableInformation();
-        if (throwable != null) {
-          Throwables.propagateIfPossible(throwable.getThrowable());
-        }
+          @Override
+          protected void append(org.apache.log4j.spi.LoggingEvent pArg0) {
+            // SMTInterpol has serveral "catch (Throwable t) { log(t); }",
+            // which is very ugly because it also catches errors like OutOfMemoryError
+            // and ThreadDeath.
+            // We do a similarly ugly thing and rethrow such exceptions here
+            // (at least for errors and runtime exceptions).
+            org.apache.log4j.spi.ThrowableInformation throwable = pArg0.getThrowableInformation();
+            if (throwable != null) {
+              Throwables.propagateIfPossible(throwable.getThrowable());
+            }
 
-        // Always log at SEVERE because it is a ERROR message (see above).
-        ourLogger.log(Level.SEVERE,
-            pArg0.getLoggerName(),
-            pArg0.getLevel(),
-            "output:",
-            pArg0.getRenderedMessage());
+            // Always log at SEVERE because it is a ERROR message (see above).
+            ourLogger.log(
+                Level.SEVERE,
+                pArg0.getLoggerName(),
+                pArg0.getLevel(),
+                "output:",
+                pArg0.getRenderedMessage());
 
-        if (throwable != null) {
-          ourLogger.logException(Level.SEVERE, throwable.getThrowable(),
-              pArg0.getLoggerName() + " exception");
-        }
-      }
-    });
+            if (throwable != null) {
+              ourLogger.logException(
+                  Level.SEVERE, throwable.getThrowable(), pArg0.getLoggerName() + " exception");
+            }
+          }
+        });
     return logger;
   }
 
@@ -240,7 +255,8 @@ class SmtInterpolEnvironment {
   }
 
   SmtInterpolTheoremProver createProver(SmtInterpolFormulaManager mgr) {
-    checkState(stackDepth == 0,
+    checkState(
+        stackDepth == 0,
         "Not allowed to create a new prover environment while solver stack is still non-empty, parallel stacks are not supported.");
     return new SmtInterpolTheoremProver(mgr);
   }
@@ -250,15 +266,16 @@ class SmtInterpolEnvironment {
    * Use Prefix-notation! */
   public List<Term> parseStringToTerms(String s) {
     FormulaCollectionScript parseScript = new FormulaCollectionScript(script, theory);
-    ParseEnvironment parseEnv = new ParseEnvironment(parseScript) {
-      @Override
-      public void printError(String pMessage) {
-        throw new SMTLIBException(pMessage);
-      }
+    ParseEnvironment parseEnv =
+        new ParseEnvironment(parseScript) {
+          @Override
+          public void printError(String pMessage) {
+            throw new SMTLIBException(pMessage);
+          }
 
-      @Override
-      public void printSuccess() { }
-    };
+          @Override
+          public void printSuccess() {}
+        };
 
     try {
       parseEnv.parseStream(new StringReader(s), "<stdin>");
@@ -287,7 +304,8 @@ class SmtInterpolEnvironment {
       script.declareFun(fun, paramSorts, resultSort);
     } else {
       if (!fsym.getReturnSort().equals(resultSort)) {
-        throw new SMTLIBException("Function " + fun + " is already declared with different definition");
+        throw new SMTLIBException(
+            "Function " + fun + " is already declared with different definition");
       }
     }
   }
@@ -339,26 +357,27 @@ class SmtInterpolEnvironment {
 
       LBool result = script.checkSat();
       switch (result) {
-      case SAT:
-        return true;
-      case UNSAT:
-        return false;
-      case UNKNOWN:
-        shutdownNotifier.shutdownIfNecessary();
-        Object reason = script.getInfo(":reason-unknown");
-        if (!(reason instanceof ReasonUnknown)) {
-          throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
-        }
-        switch ((ReasonUnknown)reason) {
-        case MEMOUT:
-          // SMTInterpol catches OOM, but we want to have it thrown.
-          throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
-        default:
-          throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
-        }
+        case SAT:
+          return true;
+        case UNSAT:
+          return false;
+        case UNKNOWN:
+          shutdownNotifier.shutdownIfNecessary();
+          Object reason = script.getInfo(":reason-unknown");
+          if (!(reason instanceof ReasonUnknown)) {
+            throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
+          }
+          switch ((ReasonUnknown) reason) {
+            case MEMOUT:
+              // SMTInterpol catches OOM, but we want to have it thrown.
+              throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
+            default:
+              throw new SMTLIBException(
+                  "checkSat returned UNKNOWN with unexpected reason " + reason);
+          }
 
-      default:
-        throw new SMTLIBException("checkSat returned " + result);
+        default:
+          throw new SMTLIBException("checkSat returned " + result);
       }
     } catch (SMTLIBException e) {
       throw new AssertionError(e);
@@ -418,8 +437,8 @@ class SmtInterpolEnvironment {
     }
   }
 
-  public Term term(String funcname, BigInteger[] indices,
-      @Nullable Sort returnSort, Term... params) {
+  public Term term(
+      String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
     try {
       return script.term(funcname, indices, returnSort, params);
     } catch (SMTLIBException e) {
@@ -578,8 +597,8 @@ class SmtInterpolEnvironment {
 
   /** This function returns the version of SmtInterpol, for logging. */
   public String getVersion() {
-    QuotedObject program = (QuotedObject)script.getInfo(":name");
-    QuotedObject version = (QuotedObject)script.getInfo(":version");
+    QuotedObject program = (QuotedObject) script.getInfo(":name");
+    QuotedObject version = (QuotedObject) script.getInfo(":version");
     return program.getValue() + " " + version.getValue();
   }
 }

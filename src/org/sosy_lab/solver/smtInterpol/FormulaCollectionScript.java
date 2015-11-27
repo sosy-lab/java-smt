@@ -46,7 +46,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
-
 /**
  * This {@link Script} implementation allows to use the SMTLIB2 parser
  * of SMTInterpol for parsing single formulas.
@@ -87,22 +86,22 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public void declareFun(String fun, Sort[] paramSorts, Sort resultSort)
-      throws SMTLIBException {
+  public void declareFun(String fun, Sort[] paramSorts, Sort resultSort) throws SMTLIBException {
     FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
 
     if (fsym == null) {
       script.declareFun(fun, paramSorts, resultSort);
     } else {
       if (!fsym.getReturnSort().equals(resultSort)) {
-        throw new SMTLIBException("Function " + fun + " is already declared with different definition");
+        throw new SMTLIBException(
+            "Function " + fun + " is already declared with different definition");
       }
     }
   }
 
   @Override
-  public void defineFun(String fun, TermVariable[] params,
-      Sort resultSort, Term definition) throws SMTLIBException {
+  public void defineFun(String fun, TermVariable[] params, Sort resultSort, Term definition)
+      throws SMTLIBException {
     Sort[] paramSorts = new Sort[params.length];
     for (int i = 0; i < paramSorts.length; i++) {
       paramSorts[i] = params[i].getSort();
@@ -112,9 +111,9 @@ class FormulaCollectionScript implements Script {
     if (fsym == null) {
       script.defineFun(fun, params, resultSort, definition);
     } else {
-      if (!fsym.getDefinition().equals(definition)
-          || !fsym.getReturnSort().equals(resultSort)) {
-        throw new SMTLIBException("Function " + fun + " is already defined with different definition");
+      if (!fsym.getDefinition().equals(definition) || !fsym.getReturnSort().equals(resultSort)) {
+        throw new SMTLIBException(
+            "Function " + fun + " is already defined with different definition");
       }
     }
   }
@@ -130,8 +129,7 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public void defineSort(String sort, Sort[] sortParams, Sort definition)
-      throws SMTLIBException {
+  public void defineSort(String sort, Sort[] sortParams, Sort definition) throws SMTLIBException {
     script.defineSort(sort, sortParams, definition);
   }
 
@@ -141,8 +139,7 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Sort sort(String sortname, BigInteger[] indices, Sort... params)
-      throws SMTLIBException {
+  public Sort sort(String sortname, BigInteger[] indices, Sort... params) throws SMTLIBException {
     return script.sort(sortname, indices, params);
   }
 
@@ -153,8 +150,8 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Term term(String funcname, BigInteger[] indices,
-      Sort returnSort, Term... params) throws SMTLIBException {
+  public Term term(String funcname, BigInteger[] indices, Sort returnSort, Term... params)
+      throws SMTLIBException {
     Term result = script.term(funcname, indices, returnSort, params);
     return replaceWithDefinition(result);
   }
@@ -162,9 +159,8 @@ class FormulaCollectionScript implements Script {
   private Term replaceWithDefinition(Term result) {
     // Replace a term with its definition so that we do not have to handle defined terms later on.
     if (result instanceof ApplicationTerm) {
-      FunctionSymbol func = ((ApplicationTerm)result).getFunction();
-      if (!func.isIntern()
-          && func.getDefinition() != null) {
+      FunctionSymbol func = ((ApplicationTerm) result).getFunction();
+      if (!func.isIntern() && func.getDefinition() != null) {
         if (func.getParameterSorts().length == 0) {
           result = func.getDefinition();
         } else {
@@ -179,26 +175,23 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public TermVariable variable(String varname, Sort sort)
-      throws SMTLIBException {
+  public TermVariable variable(String varname, Sort sort) throws SMTLIBException {
     return script.variable(varname, sort);
   }
 
   @Override
-  public Term quantifier(int quantor, TermVariable[] vars, Term body,
-      Term[]... patterns) throws SMTLIBException {
+  public Term quantifier(int quantor, TermVariable[] vars, Term body, Term[]... patterns)
+      throws SMTLIBException {
     return script.quantifier(quantor, vars, body, patterns);
   }
 
   @Override
-  public Term let(TermVariable[] vars, Term[] values, Term body)
-      throws SMTLIBException {
+  public Term let(TermVariable[] vars, Term[] values, Term body) throws SMTLIBException {
     return script.let(vars, values, body);
   }
 
   @Override
-  public Term annotate(Term t, Annotation... annotations)
-      throws SMTLIBException {
+  public Term annotate(Term t, Annotation... annotations) throws SMTLIBException {
     return script.annotate(t, annotations);
   }
 
@@ -248,38 +241,33 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Term getProof() throws SMTLIBException,
-      UnsupportedOperationException {
+  public Term getProof() throws SMTLIBException, UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Term[] getUnsatCore() throws SMTLIBException,
-      UnsupportedOperationException {
+  public Term[] getUnsatCore() throws SMTLIBException, UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Map<Term, Term> getValue(Term[] terms) throws SMTLIBException,
-      UnsupportedOperationException {
+  public Map<Term, Term> getValue(Term[] terms)
+      throws SMTLIBException, UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Assignments getAssignment() throws SMTLIBException,
-      UnsupportedOperationException {
+  public Assignments getAssignment() throws SMTLIBException, UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Object getOption(String opt)
-      throws UnsupportedOperationException {
+  public Object getOption(String opt) throws UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Object getInfo(String info)
-      throws UnsupportedOperationException {
+  public Object getInfo(String info) throws UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
@@ -299,8 +287,7 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Model getModel() throws SMTLIBException,
-      UnsupportedOperationException {
+  public Model getModel() throws SMTLIBException, UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 
@@ -326,8 +313,8 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Term[] getInterpolants(Term[] partition) throws SMTLIBException,
-      UnsupportedOperationException {
+  public Term[] getInterpolants(Term[] partition)
+      throws SMTLIBException, UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 

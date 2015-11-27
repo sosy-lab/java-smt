@@ -46,8 +46,9 @@ public class Z3NativeApiConstants {
     Z3_L_TRUE(1);
 
     final int status;
+
     Z3_LBOOL(int status) {
-       this.status = status;
+      this.status = status;
     }
   }
 
@@ -244,5 +245,4 @@ public class Z3NativeApiConstants {
   public static final int Z3_PRINT_LOW_LEVEL = 1;
   public static final int Z3_PRINT_SMTLIB_COMPLIANT = 2;
   public static final int Z3_PRINT_SMTLIB2_COMPLIANT = 3;
-
 }

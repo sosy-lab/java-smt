@@ -47,8 +47,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   private final Set<Long> uifs = new HashSet<>(); // contains used declarations of UIFs
   private final long z3context;
 
-  Z3UnsafeFormulaManager(
-      Z3FormulaCreator pCreator) {
+  Z3UnsafeFormulaManager(Z3FormulaCreator pCreator) {
     super(pCreator);
     this.z3context = pCreator.getEnv();
   }
@@ -60,11 +59,11 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   public boolean isAtom(Long t) {
     int astKind = get_ast_kind(z3context, t);
     switch (astKind) {
-    case Z3_APP_AST:
-      long decl = get_app_decl(z3context, t);
-      return !nonAtomicOpTypes.contains(get_decl_kind(z3context, decl));
-    default:
-      return true;
+      case Z3_APP_AST:
+        long decl = get_app_decl(z3context, t);
+        return !nonAtomicOpTypes.contains(get_decl_kind(z3context, decl));
+      default:
+        return true;
     }
   }
 
@@ -80,7 +79,9 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
   @Override
   public boolean isVariable(Long t) {
-    if (isOP(z3context, t, Z3_OP_TRUE) || isOP(z3context, t, Z3_OP_FALSE)) { return false; }
+    if (isOP(z3context, t, Z3_OP_TRUE) || isOP(z3context, t, Z3_OP_FALSE)) {
+      return false;
+    }
     int astKind = get_ast_kind(z3context, t);
     return (astKind == Z3_VAR_AST) || ((astKind == Z3_APP_AST) && (getArity(t) == 0));
   }
@@ -115,12 +116,12 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       long funcDecl = get_app_decl(z3context, t);
       long symbol = get_decl_name(z3context, funcDecl);
       switch (get_symbol_kind(z3context, symbol)) {
-      case Z3_INT_SYMBOL:
-        return Integer.toString(get_symbol_int(z3context, symbol));
-      case Z3_STRING_SYMBOL:
-        return get_symbol_string(z3context, symbol);
-      default:
-        throw new AssertionError();
+        case Z3_INT_SYMBOL:
+          return Integer.toString(get_symbol_int(z3context, symbol));
+        case Z3_STRING_SYMBOL:
+          return get_symbol_string(z3context, symbol);
+        default:
+          throw new AssertionError();
       }
     }
   }
@@ -166,15 +167,14 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       return uif;
 
     } else {
-      throw new IllegalArgumentException("Cannot replace name '" + pNewName
-              + "' in term '" + ast_to_string(z3context, t) + "'.");
+      throw new IllegalArgumentException(
+          "Cannot replace name '" + pNewName + "' in term '" + ast_to_string(z3context, t) + "'.");
     }
   }
 
   @Override
   protected List<Long> splitNumeralEqualityIfPossible(Long pF) {
-    if (isOP(z3context, pF, Z3_OP_EQ)
-        && get_app_num_args(z3context, pF) == 2) {
+    if (isOP(z3context, pF, Z3_OP_EQ) && get_app_num_args(z3context, pF) == 2) {
       long arg0 = getArg(pF, 0);
       inc_ref(z3context, arg0);
       long arg1 = getArg(pF, 1);
@@ -193,7 +193,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           return ImmutableList.of(out1, out2);
         } else if (sortKind == Z3_INT_SORT || sortKind == Z3_REAL_SORT) {
 
-          long out1  = mk_le(z3context, arg0, arg1);
+          long out1 = mk_le(z3context, arg0, arg1);
           inc_ref(z3context, out1);
           long out2 = mk_ge(z3context, arg0, arg1);
           inc_ref(z3context, out2);
@@ -223,12 +223,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     int size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
     return Z3NativeApi.substitute(
-        z3context,
-        t,
-        size,
-        Longs.toArray(changeFrom),
-        Longs.toArray(changeTo)
-    );
+        z3context, t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
   }
 
   @Override
@@ -252,7 +247,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     int boundCount = get_quantifier_num_bound(z3context, pF);
     ArrayList<Long> boundVars = Lists.newArrayList();
 
-    for (int b=0; b<boundCount; b++) {
+    for (int b = 0; b < boundCount; b++) {
       long varName = get_quantifier_bound_name(z3context, pF, b);
       long varSort = get_quantifier_bound_sort(z3context, pF, b);
       long var = mk_const(z3context, varName, varSort);
@@ -278,8 +273,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           0,
           Longs.toArray(Collections.<Long>emptyList()),
           pBody);
-
     }
   }
-
 }

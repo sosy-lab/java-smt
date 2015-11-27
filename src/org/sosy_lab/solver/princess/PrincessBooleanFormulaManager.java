@@ -38,7 +38,8 @@ import ap.parser.IFormulaITE;
 import ap.parser.INot;
 import ap.parser.ITermITE;
 
-class PrincessBooleanFormulaManager extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
+class PrincessBooleanFormulaManager
+    extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
   PrincessBooleanFormulaManager(PrincessFormulaCreator creator) {
     super(creator);
@@ -46,7 +47,8 @@ class PrincessBooleanFormulaManager extends AbstractBooleanFormulaManager<IExpre
 
   @Override
   public IFormula makeVariableImpl(String varName) {
-    return castToFormula(getFormulaCreator().makeVariable(getFormulaCreator().getBoolType(), varName));
+    return castToFormula(
+        getFormulaCreator().makeVariable(getFormulaCreator().getBoolType(), varName));
   }
 
   @Override
@@ -81,7 +83,7 @@ class PrincessBooleanFormulaManager extends AbstractBooleanFormulaManager<IExpre
   @Override
   public IFormula not(IExpression pBits) {
     if (isNot(pBits)) {
-      return ((INot)pBits).subformula(); // "not not a" == "a"
+      return ((INot) pBits).subformula(); // "not not a" == "a"
     } else {
       return new INot(castToFormula(pBits));
     }
@@ -89,25 +91,36 @@ class PrincessBooleanFormulaManager extends AbstractBooleanFormulaManager<IExpre
 
   @Override
   public IFormula and(IExpression t1, IExpression t2) {
-    if (t1.equals(t2)) { return castToFormula(t1); }
-    if (PrincessUtil.isTrue(t1)) { return castToFormula(t2); }
-    if (PrincessUtil.isTrue(t2)) { return castToFormula(t1); }
+    if (t1.equals(t2)) {
+      return castToFormula(t1);
+    }
+    if (PrincessUtil.isTrue(t1)) {
+      return castToFormula(t2);
+    }
+    if (PrincessUtil.isTrue(t2)) {
+      return castToFormula(t1);
+    }
     return simplify(new IBinFormula(IBinJunctor.And(), castToFormula(t1), castToFormula(t2)));
   }
 
   @Override
   public IFormula or(IExpression t1, IExpression t2) {
-    if (PrincessUtil.isFalse(t1)) { return castToFormula(t2); }
-    if (PrincessUtil.isFalse(t2)) { return castToFormula(t1); }
+    if (PrincessUtil.isFalse(t1)) {
+      return castToFormula(t2);
+    }
+    if (PrincessUtil.isFalse(t2)) {
+      return castToFormula(t1);
+    }
     return simplify(new IBinFormula(IBinJunctor.Or(), castToFormula(t1), castToFormula(t2)));
   }
 
   /** simplification to avoid identical subgraphs: (a&b)&(a&c) --> a&(b&c), etc */
   private IFormula simplify(IFormula f) {
     if (f instanceof IBinFormula) {
-      final IBinFormula bin = (IBinFormula)f;
-      if (bin.f1() instanceof IBinFormula && bin.f2() instanceof IBinFormula
-              && ((IBinFormula) bin.f1()).j().equals(((IBinFormula) bin.f2()).j())) {
+      final IBinFormula bin = (IBinFormula) f;
+      if (bin.f1() instanceof IBinFormula
+          && bin.f2() instanceof IBinFormula
+          && ((IBinFormula) bin.f1()).j().equals(((IBinFormula) bin.f2()).j())) {
         Enumeration.Value operator = ((IBinFormula) f).j();
         Enumeration.Value innerOperator = ((IBinFormula) bin.f1()).j();
 
@@ -172,5 +185,4 @@ class PrincessBooleanFormulaManager extends AbstractBooleanFormulaManager<IExpre
   protected boolean isIfThenElse(IExpression pBits) {
     return PrincessUtil.isIfThenElse(pBits);
   }
-
 }

@@ -82,7 +82,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Test that rely on a theory that not all solvers support
  * should call one of the require methods at the beginning.
  */
-@SuppressFBWarnings(value="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification="test code")
+@SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "test code")
 public abstract class SolverBasedTest0 {
 
   protected Configuration config;
@@ -108,16 +108,14 @@ public abstract class SolverBasedTest0 {
   }
 
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    return Configuration.builder()
-        .setOption("solver.solver", solverToUse().toString());
+    return Configuration.builder().setOption("solver.solver", solverToUse().toString());
   }
 
   @Before
   public final void initSolver() throws Exception {
     config = createTestConfigBuilder().build();
 
-    factory = new FormulaManagerFactory(config, logger, ShutdownNotifier
-        .create());
+    factory = new FormulaManagerFactory(config, logger, ShutdownNotifier.create());
     mgr = factory.getFormulaManager();
 
     fmgr = mgr.getFunctionFormulaManager();
@@ -148,7 +146,7 @@ public abstract class SolverBasedTest0 {
   @After
   public final void closeSolver() throws Exception {
     if (mgr instanceof AutoCloseable) {
-      ((AutoCloseable)mgr).close();
+      ((AutoCloseable) mgr).close();
     }
   }
 
@@ -156,31 +154,40 @@ public abstract class SolverBasedTest0 {
    * Skip test if the solver does not support rationals.
    */
   protected final void requireRationals() {
-    assume().withFailureMessage("Solver " + solverToUse() + " does not support the theory of rationals")
-            .that(rmgr).isNotNull();
+    assume()
+        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of rationals")
+        .that(rmgr)
+        .isNotNull();
   }
 
   /**
    * Skip test if the solver does not support bitvectors.
    */
   protected final void requireBitvectors() {
-    assume().withFailureMessage("Solver " + solverToUse() + " does not support the theory of bitvectors")
-            .that(bvmgr).isNotNull();
+    assume()
+        .withFailureMessage(
+            "Solver " + solverToUse() + " does not support the theory of bitvectors")
+        .that(bvmgr)
+        .isNotNull();
   }
   /**
    * Skip test if the solver does not support quantifiers.
    */
   protected final void requireQuantifiers() {
-    assume().withFailureMessage("Solver " + solverToUse() + " does not support quantifiers")
-            .that(qmgr).isNotNull();
+    assume()
+        .withFailureMessage("Solver " + solverToUse() + " does not support quantifiers")
+        .that(qmgr)
+        .isNotNull();
   }
 
   /**
    * Skip test if the solver does not support arrays.
    */
   protected final void requireArrays() {
-    assume().withFailureMessage("Solver " + solverToUse() + " does not support the theory of arrays")
-            .that(amgr).isNotNull();
+    assume()
+        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of arrays")
+        .that(amgr)
+        .isNotNull();
   }
 
   /**

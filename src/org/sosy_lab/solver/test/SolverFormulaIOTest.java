@@ -54,35 +54,45 @@ import junit.framework.AssertionFailedError;
 
 @RunWith(Parameterized.class)
 public class SolverFormulaIOTest extends SolverBasedTest0 {
-  private static final String MATHSAT_DUMP1 = "(set-info :source |printed by MathSAT|)\n(declare-fun a () Bool)\n(declare-fun b () Bool)\n(declare-fun d () Bool)\n(declare-fun e () Bool)\n(define-fun .def_9 () Bool (= a b))\n(define-fun .def_10 () Bool (not .def_9))\n(define-fun .def_13 () Bool (and .def_10 d))\n(define-fun .def_14 () Bool (or e .def_13))\n(assert .def_14)";
-  private static final String MATHSAT_DUMP2 = "(set-info :source |printed by MathSAT|)\n(declare-fun a () Int)\n(declare-fun b () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(define-fun .def_15 () Int (* (- 1) c))\n(define-fun .def_16 () Int (+ b .def_15))\n(define-fun .def_17 () Int (+ a .def_16))\n(define-fun .def_19 () Bool (= .def_17 0))\n(define-fun .def_27 () Bool (= .def_19 q))\n(define-fun .def_28 () Bool (not .def_27))\n(define-fun .def_23 () Bool (<= b a))\n(define-fun .def_29 () Bool (and .def_23 .def_28))\n(define-fun .def_11 () Bool (= a b))\n(define-fun .def_34 () Bool (and .def_11 .def_29))\n(define-fun .def_30 () Bool (or u .def_29))\n(define-fun .def_31 () Bool (and q .def_30))\n(define-fun .def_35 () Bool (and .def_31 .def_34))\n(assert .def_35)";
-  private static final String MATHSAT_DUMP3 = "(set-info :source |printed by MathSAT|)\n(declare-fun fun_b (Int) Bool)\n(define-fun .def_11 () Bool (fun_b 1))\n(assert .def_11)";
-  private static final String SMTINTERPOL_DUMP1 = "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert (or e (and (xor a b) d)))";
-  private static final String SMTINTERPOL_DUMP2 = "(declare-fun b () Int)(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert (let ((.cse0 (xor q (= (+ a b) c))) (.cse1 (>= a b))) (and (or (and .cse0 .cse1) u) q (= a b) .cse0 .cse1)))";
-  private static final String Z3_DUMP1 = "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert  (or e (and (xor a b) d)))";
-  private static final String Z3_DUMP2 = "(declare-fun b () Int)\n(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and (and (or $x35 u) q) (and $x9 $x35)))))";
-  private Supplier<BooleanFormula> boolExprGen1 = new Supplier<BooleanFormula>() {
-    @Override
-    public BooleanFormula get() {
-      return genBoolExpr();
-    }
-  };
+  private static final String MATHSAT_DUMP1 =
+      "(set-info :source |printed by MathSAT|)\n(declare-fun a () Bool)\n(declare-fun b () Bool)\n(declare-fun d () Bool)\n(declare-fun e () Bool)\n(define-fun .def_9 () Bool (= a b))\n(define-fun .def_10 () Bool (not .def_9))\n(define-fun .def_13 () Bool (and .def_10 d))\n(define-fun .def_14 () Bool (or e .def_13))\n(assert .def_14)";
+  private static final String MATHSAT_DUMP2 =
+      "(set-info :source |printed by MathSAT|)\n(declare-fun a () Int)\n(declare-fun b () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(define-fun .def_15 () Int (* (- 1) c))\n(define-fun .def_16 () Int (+ b .def_15))\n(define-fun .def_17 () Int (+ a .def_16))\n(define-fun .def_19 () Bool (= .def_17 0))\n(define-fun .def_27 () Bool (= .def_19 q))\n(define-fun .def_28 () Bool (not .def_27))\n(define-fun .def_23 () Bool (<= b a))\n(define-fun .def_29 () Bool (and .def_23 .def_28))\n(define-fun .def_11 () Bool (= a b))\n(define-fun .def_34 () Bool (and .def_11 .def_29))\n(define-fun .def_30 () Bool (or u .def_29))\n(define-fun .def_31 () Bool (and q .def_30))\n(define-fun .def_35 () Bool (and .def_31 .def_34))\n(assert .def_35)";
+  private static final String MATHSAT_DUMP3 =
+      "(set-info :source |printed by MathSAT|)\n(declare-fun fun_b (Int) Bool)\n(define-fun .def_11 () Bool (fun_b 1))\n(assert .def_11)";
+  private static final String SMTINTERPOL_DUMP1 =
+      "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert (or e (and (xor a b) d)))";
+  private static final String SMTINTERPOL_DUMP2 =
+      "(declare-fun b () Int)(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert (let ((.cse0 (xor q (= (+ a b) c))) (.cse1 (>= a b))) (and (or (and .cse0 .cse1) u) q (= a b) .cse0 .cse1)))";
+  private static final String Z3_DUMP1 =
+      "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert  (or e (and (xor a b) d)))";
+  private static final String Z3_DUMP2 =
+      "(declare-fun b () Int)\n(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and (and (or $x35 u) q) (and $x9 $x35)))))";
+  private Supplier<BooleanFormula> boolExprGen1 =
+      new Supplier<BooleanFormula>() {
+        @Override
+        public BooleanFormula get() {
+          return genBoolExpr();
+        }
+      };
 
-  private Supplier<BooleanFormula> boolExprGen2 = new Supplier<BooleanFormula>() {
-    @Override
-    public BooleanFormula get() {
-      return redundancyExprGen();
-    }
-  };
+  private Supplier<BooleanFormula> boolExprGen2 =
+      new Supplier<BooleanFormula>() {
+        @Override
+        public BooleanFormula get() {
+          return redundancyExprGen();
+        }
+      };
 
-  private Supplier<BooleanFormula> boolExprGen3 = new Supplier<BooleanFormula>() {
-    @Override
-    public BooleanFormula get() {
-      return functionExprGen();
-    }
-  };
+  private Supplier<BooleanFormula> boolExprGen3 =
+      new Supplier<BooleanFormula>() {
+        @Override
+        public BooleanFormula get() {
+          return functionExprGen();
+        }
+      };
 
-  @Parameters(name="{0}")
+  @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
   }
@@ -177,7 +187,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     args1.add(int1);
     args1.add(var);
 
-    UninterpretedFunctionDeclaration<IntegerFormula> funA = fmgr.declareUninterpretedFunction("fun_a", FormulaType.IntegerType, FormulaType.IntegerType, FormulaType.IntegerType);
+    UninterpretedFunctionDeclaration<IntegerFormula> funA =
+        fmgr.declareUninterpretedFunction(
+            "fun_a", FormulaType.IntegerType, FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, args1);
     BooleanFormula formula = imgr.equal(res1, var);
 
@@ -277,8 +289,12 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     args1.add(int1);
     args2.add(int2);
 
-    UninterpretedFunctionDeclaration<IntegerFormula> funA = fmgr.declareUninterpretedFunction("fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
-    UninterpretedFunctionDeclaration<IntegerFormula> funB = fmgr.declareUninterpretedFunction("fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
+    UninterpretedFunctionDeclaration<IntegerFormula> funA =
+        fmgr.declareUninterpretedFunction(
+            "fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
+    UninterpretedFunctionDeclaration<IntegerFormula> funB =
+        fmgr.declareUninterpretedFunction(
+            "fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, args1);
     IntegerFormula res2 = fmgr.callUninterpretedFunction(funB, args2);
 
@@ -296,7 +312,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
-    UninterpretedFunctionDeclaration<IntegerFormula> funA = fmgr.declareUninterpretedFunction("fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
+    UninterpretedFunctionDeclaration<IntegerFormula> funA =
+        fmgr.declareUninterpretedFunction(
+            "fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(int1));
     IntegerFormula res2 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(int2));
 
@@ -336,7 +354,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   private void checkThatFunOnlyDeclaredOnce(String formDump) {
     Multiset<String> funDeclares = HashMultiset.create();
 
-    for (String line: Splitter.on('\n').split(formDump)) {
+    for (String line : Splitter.on('\n').split(formDump)) {
       if (line.startsWith("(declare-fun ")) {
         funDeclares.add(line.replaceAll("\\s+", ""));
       }
@@ -355,14 +373,14 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   private void checkThatAssertIsInLastLine(String lines) {
     lines = lines.trim();
     assertThat(getLast(Splitter.on('\n').split(lines)))
-      .named("last line of <\n"+lines+">")
-      .startsWith("(assert ");
+        .named("last line of <\n" + lines + ">")
+        .startsWith("(assert ");
   }
 
   private void checkThatDumpIsParseable(String dump) {
     try {
       mgr.parse(dump);
-    } catch (Exception e){
+    } catch (Exception e) {
       fail("Dump could not be parsed again.");
     }
   }
@@ -403,7 +421,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private BooleanFormula functionExprGen() {
     IntegerFormula arg = imgr.makeNumber(1);
-    UninterpretedFunctionDeclaration<BooleanFormula> funA = fmgr.declareUninterpretedFunction("fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
+    UninterpretedFunctionDeclaration<BooleanFormula> funA =
+        fmgr.declareUninterpretedFunction(
+            "fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula res1 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(arg));
     return bmgr.and(res1, bmgr.makeBoolean(true));
   }

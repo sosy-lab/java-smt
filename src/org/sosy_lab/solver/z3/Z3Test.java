@@ -37,7 +37,7 @@ public class Z3Test extends SolverBasedTest0 {
     return Solvers.Z3;
   }
 
-  @Test(expected=Exception.class)
+  @Test(expected = Exception.class)
   public void testErrorHandling() throws Exception {
     // Will exit(1) without an exception handler.
     //noinspection ConstantConditions,ResultOfMethodCallIgnored

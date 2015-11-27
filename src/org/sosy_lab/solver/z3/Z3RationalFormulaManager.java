@@ -32,9 +32,9 @@ import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 class Z3RationalFormulaManager extends Z3NumeralFormulaManager<NumeralFormula, RationalFormula> {
 
   Z3RationalFormulaManager(
-          Z3FormulaCreator pCreator,
-          Z3FunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      Z3FormulaCreator pCreator,
+      Z3FunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
   }
 

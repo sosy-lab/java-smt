@@ -39,13 +39,14 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.BitShiftMultiplication;
 
-
-class PrincessIntegerFormulaManager extends org.sosy_lab.solver.princess.PrincessNumeralFormulaManager<IntegerFormula, IntegerFormula> {
+class PrincessIntegerFormulaManager
+    extends org.sosy_lab.solver.princess.PrincessNumeralFormulaManager<
+        IntegerFormula, IntegerFormula> {
 
   PrincessIntegerFormulaManager(
-          PrincessFormulaCreator pCreator,
-          PrincessFunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      PrincessFormulaCreator pCreator,
+      PrincessFunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
   }
 
@@ -71,7 +72,7 @@ class PrincessIntegerFormulaManager extends org.sosy_lab.solver.princess.Princes
 
   @Override
   protected ITerm makeNumberImpl(double pNumber) {
-    return makeNumberImpl((long)pNumber);
+    return makeNumberImpl((long) pNumber);
   }
 
   @Override
@@ -86,7 +87,8 @@ class PrincessIntegerFormulaManager extends org.sosy_lab.solver.princess.Princes
   }
 
   @Override
-  protected IExpression modularCongruence(IExpression pNumber1, IExpression pNumber2, long pModulo) {
+  protected IExpression modularCongruence(
+      IExpression pNumber1, IExpression pNumber2, long pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     if (pModulo > 0) {
       ITerm n = makeNumberImpl(pModulo);

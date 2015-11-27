@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableList;
 @RunWith(Parameterized.class)
 public class SolverAllSatTest extends SolverBasedTest0 {
 
-  @Parameters(name="{0}")
+  @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
   }
@@ -108,16 +108,15 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     env.push(bmgr.equivalence(v1, cond1));
     env.push(bmgr.equivalence(v2, cond2));
 
-
-    TestAllSatCallback callback = new TestAllSatCallback() {
+    TestAllSatCallback callback =
+        new TestAllSatCallback() {
           @Override
           public void apply(List<BooleanFormula> pModel) {
             fail("Formula is unsat, but all-sat callback called with model " + pModel);
           }
         };
 
-    assertThat(env.allSat(callback, ImmutableList.of(v1, v2)))
-              .isEqualTo(EXPECTED_RESULT);
+    assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
   }
 
   @Test
@@ -139,11 +138,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
     TestAllSatCallback callback = new TestAllSatCallback();
 
-    assertThat(env.allSat(callback, ImmutableList.of(v1, v2)))
-              .isEqualTo(EXPECTED_RESULT);
+    assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
 
-    assertThat(callback.models).containsExactly(
-        ImmutableList.of(v1, bmgr.not(v2)),
-        ImmutableList.of(bmgr.not(v1), v2));
+    assertThat(callback.models)
+        .containsExactly(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(bmgr.not(v1), v2));
   }
 }

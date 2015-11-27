@@ -31,12 +31,13 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
-class Mathsat5RationalFormulaManager extends Mathsat5NumeralFormulaManager<NumeralFormula, RationalFormula> {
+class Mathsat5RationalFormulaManager
+    extends Mathsat5NumeralFormulaManager<NumeralFormula, RationalFormula> {
 
   public Mathsat5RationalFormulaManager(
-          Mathsat5FormulaCreator pCreator,
-          Mathsat5FunctionFormulaManager functionManager,
-          boolean useNonLinearArithmetic) {
+      Mathsat5FormulaCreator pCreator,
+      Mathsat5FunctionFormulaManager functionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, functionManager, useNonLinearArithmetic);
   }
 
@@ -67,20 +68,20 @@ class Mathsat5RationalFormulaManager extends Mathsat5NumeralFormulaManager<Numer
     long t1 = pNumber1;
     long t2 = pNumber2;
 
-      // invert t2 and multiply with it
-      String n = msat_term_repr(t2);
-      if (n.startsWith("(")) {
-        n = n.substring(1, n.length() - 1);
-      }
-      String[] frac = n.split("/");
-      if (frac.length == 1) {
-        n = "1/" + n;
-      } else {
-        assert (frac.length == 2);
-        n = frac[1] + "/" + frac[0];
-      }
-      t2 = msat_make_number(mathsatEnv, n);
-      return msat_make_times(mathsatEnv, t2, t1);
+    // invert t2 and multiply with it
+    String n = msat_term_repr(t2);
+    if (n.startsWith("(")) {
+      n = n.substring(1, n.length() - 1);
+    }
+    String[] frac = n.split("/");
+    if (frac.length == 1) {
+      n = "1/" + n;
+    } else {
+      assert (frac.length == 2);
+      n = frac[1] + "/" + frac[0];
+    }
+    t2 = msat_make_number(mathsatEnv, n);
+    return msat_make_times(mathsatEnv, t2, t1);
   }
 
   @Override

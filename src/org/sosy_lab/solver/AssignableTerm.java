@@ -76,8 +76,7 @@ public interface AssignableTerm {
         return false;
       }
       final Variable otherConstant = (Variable) other;
-      return name.equals(otherConstant.name)
-          && type.equals(otherConstant.type);
+      return name.equals(otherConstant.name) && type.equals(otherConstant.type);
     }
   }
 
@@ -96,8 +95,7 @@ public interface AssignableTerm {
       mName = pName;
       mReturnType = pReturnType;
       mArguments = ImmutableList.copyOf(pArguments);
-      mHashCode = Objects
-          .hashCode(pName, pReturnType, Arrays.hashCode(pArguments));
+      mHashCode = Objects.hashCode(pName, pReturnType, Arrays.hashCode(pArguments));
     }
 
     @Override
@@ -142,7 +140,7 @@ public interface AssignableTerm {
         return false;
       }
 
-      Function lFunction = (Function)pOther;
+      Function lFunction = (Function) pOther;
 
       return (lFunction.mName.equals(mName)
           && lFunction.mReturnType.equals(mReturnType)

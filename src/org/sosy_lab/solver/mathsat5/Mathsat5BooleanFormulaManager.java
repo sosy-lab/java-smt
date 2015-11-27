@@ -31,12 +31,10 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
 
   private final long mathsatEnv;
 
-  protected Mathsat5BooleanFormulaManager(
-      Mathsat5FormulaCreator pCreator) {
+  protected Mathsat5BooleanFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.mathsatEnv = pCreator.getEnv();
   }
-
 
   public static Mathsat5BooleanFormulaManager create(Mathsat5FormulaCreator creator) {
     return new Mathsat5BooleanFormulaManager(creator);
@@ -87,7 +85,9 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
       t = msat_make_term_ite(msatEnv, cond, f1, f2);
     } else {
       t =
-          msat_make_and(msatEnv, msat_make_or(msatEnv, msat_make_not(msatEnv, cond), f1),
+          msat_make_and(
+              msatEnv,
+              msat_make_or(msatEnv, msat_make_not(msatEnv, cond), f1),
               msat_make_or(msatEnv, cond, f2));
     }
     return t;
@@ -152,5 +152,4 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
   public boolean isIfThenElse(Long pBits) {
     return msat_term_is_term_ite(mathsatEnv, pBits);
   }
-
 }

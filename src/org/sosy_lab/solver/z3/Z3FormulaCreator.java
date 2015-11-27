@@ -53,20 +53,18 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 
-@Options(prefix="solver.z3")
+@Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
-  @Option(secure=true, description="Whether to use PhantomReferences for discarding Z3 AST")
+  @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
 
   private final Z3SmtLogger smtLogger;
 
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
-  private final ReferenceQueue<Z3Formula> referenceQueue =
-      new ReferenceQueue<>();
-  private final Map<PhantomReference<Z3Formula>, Long> referenceMap =
-      Maps.newIdentityHashMap();
+  private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
+  private final Map<PhantomReference<Z3Formula>, Long> referenceMap = Maps.newIdentityHashMap();
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -77,7 +75,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
       long pIntegerType,
       long pRealType,
       Z3SmtLogger smtLogger,
-      Configuration config) throws InvalidConfigurationException {
+      Configuration config)
+      throws InvalidConfigurationException {
     super(pEnv, pBoolType, pIntegerType, pRealType);
     config.inject(this);
 
@@ -103,8 +102,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    if (pFormula instanceof ArrayFormula<?,?>
-    || pFormula instanceof BitvectorFormula) {
+    if (pFormula instanceof ArrayFormula<?, ?> || pFormula instanceof BitvectorFormula) {
       long term = extractInfo(pFormula);
       return (FormulaType<T>) getFormulaType(term);
     }
@@ -123,8 +121,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
       long domainSort = get_array_sort_domain(z3context, pSort);
       long rangeSort = get_array_sort_range(z3context, pSort);
       return FormulaType.getArrayType(
-          getFormulaTypeFromSort(domainSort),
-          getFormulaTypeFromSort(rangeSort));
+          getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
     } else if (sortKind == Z3_REAL_SORT) {
       return FormulaType.RationalType;
     } else if (sortKind == Z3_BV_SORT) {
@@ -140,31 +137,30 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   }
 
   @Override
-  protected <TD extends Formula, TR extends Formula>
-  FormulaType<TR> getArrayFormulaElementType(ArrayFormula<TD, TR> pArray) {
-    return ((Z3ArrayFormula<TD,TR>) pArray).getElementType();
+  protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
+      ArrayFormula<TD, TR> pArray) {
+    return ((Z3ArrayFormula<TD, TR>) pArray).getElementType();
   }
 
   @Override
-  protected <TD extends Formula, TR extends Formula>
-  FormulaType<TD> getArrayFormulaIndexType(ArrayFormula<TD, TR> pArray) {
-    return ((Z3ArrayFormula<TD,TR>) pArray).getIndexType();
+  protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
+      ArrayFormula<TD, TR> pArray) {
+    return ((Z3ArrayFormula<TD, TR>) pArray).getIndexType();
   }
 
   @Override
-  protected <TD extends Formula, TR extends Formula> ArrayFormula<TD, TR> encapsulateArray(Long pTerm,
-      FormulaType<TD> pIndexType, FormulaType<TR> pElementType) {
+  protected <TD extends Formula, TR extends Formula> ArrayFormula<TD, TR> encapsulateArray(
+      Long pTerm, FormulaType<TD> pIndexType, FormulaType<TR> pElementType) {
     cleanupReferences();
     return storePhantomReference(
-        new Z3ArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType),
-        pTerm);
+        new Z3ArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType), pTerm);
   }
 
   @SuppressWarnings("unchecked")
   private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
     if (usePhantomReferences) {
       PhantomReference<T> ref = new PhantomReference<>(out, referenceQueue);
-      referenceMap.put((PhantomReference<Z3Formula>)ref, pTerm);
+      referenceMap.put((PhantomReference<Z3Formula>) ref, pTerm);
     }
     return out;
   }
@@ -174,24 +170,19 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
     cleanupReferences();
     if (pType.isBooleanType()) {
-      return (T)storePhantomReference(new Z3BooleanFormula(getEnv(), pTerm),
-          pTerm);
+      return (T) storePhantomReference(new Z3BooleanFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isIntegerType()) {
-      return (T)storePhantomReference(new Z3IntegerFormula(getEnv(), pTerm),
-          pTerm);
+      return (T) storePhantomReference(new Z3IntegerFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isRationalType()) {
-      return (T)storePhantomReference(new Z3RationalFormula(getEnv(), pTerm),
-          pTerm);
+      return (T) storePhantomReference(new Z3RationalFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isBitvectorType()) {
-      return (T)storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm),
-          pTerm);
+      return (T) storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
-      return (T) storePhantomReference(new Z3ArrayFormula<>(
-          getEnv(),
-          pTerm,
-          arrFt.getIndexType(),
-          arrFt.getElementType()), pTerm);
+      return (T)
+          storePhantomReference(
+              new Z3ArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType()),
+              pTerm);
     }
 
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in Z3");
@@ -233,7 +224,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     throw new UnsupportedOperationException("FloatingPoint theory is not supported by Z3");
   }
 
-
   private void cleanupReferences() {
     if (!usePhantomReferences) {
       return;
@@ -241,9 +231,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     cleanupTimer.start();
     try {
       PhantomReference<? extends Z3Formula> ref;
-      while ((ref =
-          (PhantomReference<? extends Z3Formula>)referenceQueue
-              .poll()) != null) {
+      while ((ref = (PhantomReference<? extends Z3Formula>) referenceQueue.poll()) != null) {
 
         Long z3ast = referenceMap.remove(ref);
         assert z3ast != null;

@@ -27,24 +27,30 @@ import java.math.BigDecimal;
 
 import org.sosy_lab.common.rationals.Rational;
 
-
 /**
  * This interface represents the floating-foint theory
  */
 public interface FloatingPointFormulaManager {
   public FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type);
+
   public FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type);
+
   public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type);
+
   public FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type);
 
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType type);
 
   public FloatingPointFormula makePlusInfinity(FormulaType.FloatingPointType type);
+
   public FloatingPointFormula makeMinusInfinity(FormulaType.FloatingPointType type);
+
   public FloatingPointFormula makeNaN(FormulaType.FloatingPointType type);
 
   public <T extends Formula> T castTo(FloatingPointFormula number, FormulaType<T> targetType);
-  public FloatingPointFormula castFrom(Formula number, boolean signed, FormulaType.FloatingPointType targetType);
+
+  public FloatingPointFormula castFrom(
+      Formula number, boolean signed, FormulaType.FloatingPointType targetType);
 
   // ----------------- Arithmetic relations, return type NumeralFormula -----------------
 
@@ -73,7 +79,8 @@ public interface FloatingPointFormulaManager {
    * Be careful to not use this method when you really need
    * {@link #assignment(FloatingPointFormula, FloatingPointFormula)}.
    */
-  public BooleanFormula equalWithFPSemantics(FloatingPointFormula number1, FloatingPointFormula number2);
+  public BooleanFormula equalWithFPSemantics(
+      FloatingPointFormula number1, FloatingPointFormula number2);
 
   public BooleanFormula greaterThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
@@ -84,7 +91,10 @@ public interface FloatingPointFormulaManager {
   public BooleanFormula lessOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
   public BooleanFormula isNaN(FloatingPointFormula number);
+
   public BooleanFormula isInfinity(FloatingPointFormula number);
+
   public BooleanFormula isZero(FloatingPointFormula number);
+
   public BooleanFormula isSubnormal(FloatingPointFormula number);
 }

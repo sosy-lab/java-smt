@@ -65,8 +65,12 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   /** data-structures for tracking symbols */
   private final Deque<Level> trackingStack = new ArrayDeque<>();
 
-  public SymbolTrackingPrincessStack(final PrincessEnvironment env, final SimpleAPI api,
-      boolean usableForInterpolation, ShutdownNotifier shutdownNotifier, PrincessOptions princessOptions) {
+  public SymbolTrackingPrincessStack(
+      final PrincessEnvironment env,
+      final SimpleAPI api,
+      boolean usableForInterpolation,
+      ShutdownNotifier shutdownNotifier,
+      PrincessOptions princessOptions) {
     this.env = env;
     this.api = api;
     this.usableForInterpolation = usableForInterpolation;
@@ -118,7 +122,8 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   /** This function adds the term on top of the stack. */
   @Override
   public void assertTerm(IFormula booleanFormula) {
-    api.addAssertion(api.abbrevSharedExpressions(booleanFormula, princessOptions.getMinAtomsForAbbreviation()));
+    api.addAssertion(
+        api.abbrevSharedExpressions(booleanFormula, princessOptions.getMinAtomsForAbbreviation()));
   }
 
   /** This function sets a partition number for all the term,
@@ -173,7 +178,8 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     // do the hard work
     final Seq<IFormula> itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
 
-    assert itps.length() == partitions.size() - 1 : "There should be (n-1) interpolants for n partitions";
+    assert itps.length() == partitions.size() - 1
+        : "There should be (n-1) interpolants for n partitions";
 
     // convert data-structure back
     // TODO check that interpolants do not contain abbreviations we did not introduce ourselves
@@ -227,9 +233,9 @@ class SymbolTrackingPrincessStack implements PrincessStack {
 
   private void addAbbrevToStack(IExpression abbrev, IExpression formula) {
     if (abbrev instanceof IFormula) {
-      api.addAbbrev((IFormula)abbrev, (IFormula)formula);
+      api.addAbbrev((IFormula) abbrev, (IFormula) formula);
     } else if (abbrev instanceof ITerm) {
-      api.addAbbrev((ITerm)abbrev, (ITerm)formula);
+      api.addAbbrev((ITerm) abbrev, (ITerm) formula);
     } else {
       throw new AssertionError("No abbreviation possible for " + abbrev.getClass());
     }

@@ -23,7 +23,7 @@ import org.sosy_lab.solver.api.OptEnvironment;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-class Mathsat5OptProver  extends Mathsat5AbstractProver implements OptEnvironment{
+class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment {
   private UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /**
@@ -65,26 +65,20 @@ class Mathsat5OptProver  extends Mathsat5AbstractProver implements OptEnvironmen
     // todo: code duplication.
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
-    msat_push_maximize(
-        curEnv, getMsatTerm(objective), null, null
-    );
+    msat_push_maximize(curEnv, getMsatTerm(objective), null, null);
     return id;
   }
-
 
   @Override
   public int minimize(Formula objective) {
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
-    msat_push_minimize(
-        curEnv, getMsatTerm(objective), null, null
-    );
+    msat_push_minimize(curEnv, getMsatTerm(objective), null, null);
     return id;
   }
 
   @Override
-  public OptStatus check()
-      throws InterruptedException, SolverException {
+  public OptStatus check() throws InterruptedException, SolverException {
     boolean out = msat_check_sat(curEnv);
     if (out) {
       if (!objectiveMap.isEmpty()) {

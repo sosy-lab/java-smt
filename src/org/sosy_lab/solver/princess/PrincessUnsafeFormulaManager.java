@@ -43,7 +43,8 @@ import ap.parser.PartialEvaluator;
 
 import com.google.common.collect.ImmutableList;
 
-class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
+class PrincessUnsafeFormulaManager
+    extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
   PrincessUnsafeFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);
@@ -79,7 +80,7 @@ class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpress
     if (isVariable(t)) {
       return t.toString();
     } else if (isUF(t)) {
-      return ((IFunApp)t).fun().name();
+      return ((IFunApp) t).fun().name();
     } else {
       throw new IllegalArgumentException("The Term " + t + " has no name!");
     }
@@ -95,8 +96,8 @@ class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpress
 
     if (isVariable(t)) {
       checkArgument(newArgs.isEmpty());
-      return getFormulaCreator().makeVariable(isBoolean(t) ? TermType.Boolean : TermType.Integer,
-                                              pNewName);
+      return getFormulaCreator()
+          .makeVariable(isBoolean(t) ? TermType.Boolean : TermType.Integer, pNewName);
 
     } else if (isUF(t)) {
       IFunApp fun = (IFunApp) t;
@@ -113,11 +114,10 @@ class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpress
   protected List<? extends IExpression> splitNumeralEqualityIfPossible(IExpression pF) {
     // Princess does not support Equal.
     // Formulas are converted from "a==b" to "a+(-b)==0".
-    if (pF instanceof IIntFormula && ((IIntFormula)pF).rel() == IIntRelation.EqZero()) {
+    if (pF instanceof IIntFormula && ((IIntFormula) pF).rel() == IIntRelation.EqZero()) {
       return ImmutableList.of(
-          ((IIntFormula)pF).t().$less$eq(new IIntLit(IdealInt.ZERO())),
-          ((IIntFormula)pF).t().$greater$eq(new IIntLit(IdealInt.ZERO()))
-      );
+          ((IIntFormula) pF).t().$less$eq(new IIntLit(IdealInt.ZERO())),
+          ((IIntFormula) pF).t().$greater$eq(new IIntLit(IdealInt.ZERO())));
     }
     return ImmutableList.of(pF);
   }
@@ -128,7 +128,8 @@ class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpress
   }
 
   @Override
-  protected IExpression substitute(IExpression expr, List<IExpression> substituteFrom, List<IExpression> substituteTo) {
+  protected IExpression substitute(
+      IExpression expr, List<IExpression> substituteFrom, List<IExpression> substituteTo) {
     throw new UnsupportedOperationException();
   }
 
@@ -136,7 +137,7 @@ class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpress
   protected IExpression simplify(IExpression f) {
     // TODO this method is not tested, check it!
     if (f instanceof IFormula) {
-      f = BooleanCompactifier.apply((IFormula)f);
+      f = BooleanCompactifier.apply((IFormula) f);
     }
     return PartialEvaluator.apply(f);
   }
@@ -165,5 +166,4 @@ class PrincessUnsafeFormulaManager extends AbstractUnsafeFormulaManager<IExpress
   protected boolean isBoundVariable(IExpression pT) {
     return false;
   }
-
 }

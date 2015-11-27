@@ -34,12 +34,13 @@ import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-class SmtInterpolRationalFormulaManager extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula> {
+class SmtInterpolRationalFormulaManager
+    extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula> {
 
   SmtInterpolRationalFormulaManager(
-          SmtInterpolFormulaCreator pCreator,
-          SmtInterpolFunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      SmtInterpolFormulaCreator pCreator,
+      SmtInterpolFunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
   }
 
@@ -65,9 +66,7 @@ class SmtInterpolRationalFormulaManager extends SmtInterpolNumeralFormulaManager
 
   @Override
   protected Term makeNumberImpl(Rational pI) {
-    return getFormulaCreator().getEnv().getTheory().rational(
-        pI.getNum(), pI.getDen()
-    );
+    return getFormulaCreator().getEnv().getTheory().rational(pI.getNum(), pI.getDen());
   }
 
   @Override

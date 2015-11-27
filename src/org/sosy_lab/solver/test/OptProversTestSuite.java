@@ -36,8 +36,8 @@ import com.google.common.collect.ImmutableList;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    OptProversTestSuite.Mathsat5MaximizationTest.class,
-    OptProversTestSuite.Z3MaximizationTest.class,
+  OptProversTestSuite.Mathsat5MaximizationTest.class,
+  OptProversTestSuite.Z3MaximizationTest.class,
 })
 public class OptProversTestSuite {
 
@@ -45,14 +45,9 @@ public class OptProversTestSuite {
 
     @Override
     public FormulaManager getFormulaManager(
-        LogManager logger,
-        Configuration config,
-        ShutdownNotifier pShutdownNotifier
-    ) throws InvalidConfigurationException {
-      return Z3FormulaManager.create(
-          logger, config, pShutdownNotifier, null, 42, false, false
-      );
-
+        LogManager logger, Configuration config, ShutdownNotifier pShutdownNotifier)
+        throws InvalidConfigurationException {
+      return Z3FormulaManager.create(logger, config, pShutdownNotifier, null, 42, false, false);
     }
   }
 
@@ -60,13 +55,10 @@ public class OptProversTestSuite {
 
     @Override
     public FormulaManager getFormulaManager(
-        LogManager logger,
-        Configuration config,
-        ShutdownNotifier pShutdownNotifier
-    ) throws InvalidConfigurationException {
+        LogManager logger, Configuration config, ShutdownNotifier pShutdownNotifier)
+        throws InvalidConfigurationException {
       return Mathsat5FormulaManager.create(
-          logger, config, pShutdownNotifier, null, 42, false, false
-      );
+          logger, config, pShutdownNotifier, null, 42, false, false);
     }
   }
 
@@ -78,28 +70,27 @@ public class OptProversTestSuite {
     private BooleanFormulaManager bfmgr;
 
     protected abstract FormulaManager getFormulaManager(
-        LogManager logger, Configuration config, ShutdownNotifier pShutdownNotifier
-    ) throws InvalidConfigurationException;
+        LogManager logger, Configuration config, ShutdownNotifier pShutdownNotifier)
+        throws InvalidConfigurationException;
 
     @Before
     public void loadLibrary() throws Exception {
-      Configuration config = Configuration.builder().setOption(
-          "solver.mathsat5.loadOptimathsat5", "true"
-      ).build();
+      Configuration config =
+          Configuration.builder().setOption("solver.mathsat5.loadOptimathsat5", "true").build();
 
       LogManager logger = TestLogManager.getInstance();
       ShutdownNotifier shutdownNotifier = ShutdownNotifier.create();
 
       mgr = getFormulaManager(logger, config, shutdownNotifier);
-      rfmgr =  mgr.getRationalFormulaManager();
-      ifmgr =  mgr.getIntegerFormulaManager();
-      bfmgr =  mgr.getBooleanFormulaManager();
+      rfmgr = mgr.getRationalFormulaManager();
+      ifmgr = mgr.getIntegerFormulaManager();
+      bfmgr = mgr.getBooleanFormulaManager();
     }
 
     @After
     public void free() throws Exception {
       if (mgr instanceof AutoCloseable) {
-        ((AutoCloseable)mgr).close();
+        ((AutoCloseable) mgr).close();
       }
     }
 
@@ -109,10 +100,8 @@ public class OptProversTestSuite {
         RationalFormula x, obj;
         x = rfmgr.makeVariable("x");
         obj = rfmgr.makeVariable("obj");
-        List<BooleanFormula> constraints = ImmutableList.of(
-            rfmgr.greaterOrEquals(x, rfmgr.makeNumber("10")),
-            rfmgr.equal(x, obj)
-        );
+        List<BooleanFormula> constraints =
+            ImmutableList.of(rfmgr.greaterOrEquals(x, rfmgr.makeNumber("10")), rfmgr.equal(x, obj));
         prover.addConstraint(bfmgr.and(constraints));
         int handle = prover.maximize(obj);
         prover.check();
@@ -120,24 +109,23 @@ public class OptProversTestSuite {
       }
     }
 
-    @Test public void testUnfeasible() throws Exception {
+    @Test
+    public void testUnfeasible() throws Exception {
       try (OptEnvironment prover = mgr.newOptEnvironment()) {
         RationalFormula x, y;
         x = rfmgr.makeVariable("x");
         y = rfmgr.makeVariable("y");
-        List<BooleanFormula> constraints = ImmutableList.of(
-            rfmgr.lessThan(x, y),
-            rfmgr.greaterThan(x, y)
-        );
+        List<BooleanFormula> constraints =
+            ImmutableList.of(rfmgr.lessThan(x, y), rfmgr.greaterThan(x, y));
         prover.addConstraint(bfmgr.and(constraints));
         prover.maximize(x);
         OptStatus response = prover.check();
-        Assert.assertEquals(OptStatus.UNSAT,
-            response);
+        Assert.assertEquals(OptStatus.UNSAT, response);
       }
     }
 
-    @Test public void testOptimal() throws Exception {
+    @Test
+    public void testOptimal() throws Exception {
       try (OptEnvironment prover = mgr.newOptEnvironment()) {
 
         IntegerFormula x, y, obj;
@@ -145,19 +133,19 @@ public class OptProversTestSuite {
         y = ifmgr.makeVariable("y");
         obj = ifmgr.makeVariable("obj");
 
-      /*
-        int x, y, obj
-        x <= 10
-        y <= 15
-        obj = x + y
-        x - y >= 1
-       */
-        List<BooleanFormula> constraints = ImmutableList.of(
-            ifmgr.lessOrEquals(x, ifmgr.makeNumber(10)),
-            ifmgr.lessOrEquals(y, ifmgr.makeNumber(15)),
-            ifmgr.equal(obj, ifmgr.add(x, y)),
-            ifmgr.greaterOrEquals(ifmgr.subtract(x, y), ifmgr.makeNumber(1))
-        );
+        /*
+         int x, y, obj
+         x <= 10
+         y <= 15
+         obj = x + y
+         x - y >= 1
+        */
+        List<BooleanFormula> constraints =
+            ImmutableList.of(
+                ifmgr.lessOrEquals(x, ifmgr.makeNumber(10)),
+                ifmgr.lessOrEquals(y, ifmgr.makeNumber(15)),
+                ifmgr.equal(obj, ifmgr.add(x, y)),
+                ifmgr.greaterOrEquals(ifmgr.subtract(x, y), ifmgr.makeNumber(1)));
 
         prover.addConstraint(bfmgr.and(constraints));
         int handle = prover.maximize(obj);
@@ -171,40 +159,37 @@ public class OptProversTestSuite {
         Assert.assertEquals(Rational.ofString("19"), prover.upper(handle, Rational.ZERO).get());
 
         Model model = prover.getModel();
-        BigInteger xValue =
-            (BigInteger)model.get(new Variable("x", TermType.Integer));
-        BigInteger objValue =
-            (BigInteger)model.get(new Variable("obj", TermType.Integer));
-        BigInteger yValue =
-            (BigInteger)model.get(new Variable("y", TermType.Integer));
+        BigInteger xValue = (BigInteger) model.get(new Variable("x", TermType.Integer));
+        BigInteger objValue = (BigInteger) model.get(new Variable("obj", TermType.Integer));
+        BigInteger yValue = (BigInteger) model.get(new Variable("y", TermType.Integer));
 
         assertThat(objValue).isEqualTo(BigInteger.valueOf(19));
         assertThat(xValue).isEqualTo(BigInteger.valueOf(10));
         assertThat(yValue).isEqualTo(BigInteger.valueOf(9));
-
       }
     }
 
-    @Test public void testSwitchingObjectives() throws Exception {
+    @Test
+    public void testSwitchingObjectives() throws Exception {
       try (OptEnvironment prover = mgr.newOptEnvironment()) {
         RationalFormula x, y, obj;
         x = rfmgr.makeVariable("x");
         y = rfmgr.makeVariable("y");
         obj = rfmgr.makeVariable("obj");
 
-      /*
-        real x, y, obj
-        x <= 10
-        y <= 15
-        obj = x + y
-        x - y >= 1
-       */
-        List<BooleanFormula> constraints = ImmutableList.of(
-            rfmgr.lessOrEquals(x, rfmgr.makeNumber(10)),
-            rfmgr.lessOrEquals(y, rfmgr.makeNumber(15)),
-            rfmgr.equal(obj, rfmgr.add(x, y)),
-            rfmgr.greaterOrEquals(rfmgr.subtract(x, y), rfmgr.makeNumber(1))
-        );
+        /*
+         real x, y, obj
+         x <= 10
+         y <= 15
+         obj = x + y
+         x - y >= 1
+        */
+        List<BooleanFormula> constraints =
+            ImmutableList.of(
+                rfmgr.lessOrEquals(x, rfmgr.makeNumber(10)),
+                rfmgr.lessOrEquals(y, rfmgr.makeNumber(15)),
+                rfmgr.equal(obj, rfmgr.add(x, y)),
+                rfmgr.greaterOrEquals(rfmgr.subtract(x, y), rfmgr.makeNumber(1)));
         prover.addConstraint(bfmgr.and(constraints));
         OptStatus response;
 
@@ -234,5 +219,5 @@ public class OptProversTestSuite {
         prover.pop();
       }
     }
-}
+  }
 }

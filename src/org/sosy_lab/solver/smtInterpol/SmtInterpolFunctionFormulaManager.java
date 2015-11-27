@@ -30,27 +30,26 @@ import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-class SmtInterpolFunctionFormulaManager extends AbstractFunctionFormulaManager<Term, String, Sort, SmtInterpolEnvironment> {
+class SmtInterpolFunctionFormulaManager
+    extends AbstractFunctionFormulaManager<Term, String, Sort, SmtInterpolEnvironment> {
 
   private final SmtInterpolUnsafeFormulaManager unsafeManager;
 
   SmtInterpolFunctionFormulaManager(
-      SmtInterpolFormulaCreator creator,
-      SmtInterpolUnsafeFormulaManager unsafeManager) {
+      SmtInterpolFormulaCreator creator, SmtInterpolUnsafeFormulaManager unsafeManager) {
     super(creator, unsafeManager);
     this.unsafeManager = unsafeManager;
   }
 
   @Override
-  public Term createUninterpretedFunctionCallImpl(
-      String funcDecl, List<Term> pArgs) {
+  public Term createUninterpretedFunctionCallImpl(String funcDecl, List<Term> pArgs) {
     Term[] args = SmtInterpolUtil.toTermArray(pArgs);
     return unsafeManager.createUIFCallImpl(funcDecl, args);
   }
 
   @Override
   protected String declareUninterpretedFunctionImpl(
-          String pName, Sort returnType, List<Sort> pArgs) {
+      String pName, Sort returnType, List<Sort> pArgs) {
     Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
     getFormulaCreator().getEnv().declareFun(pName, types, returnType);
 

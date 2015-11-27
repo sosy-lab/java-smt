@@ -74,7 +74,8 @@ class Mathsat5BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Lo
     if (pI.signum() < 0) {
       BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
       if (pI.compareTo(max.negate()) < 0) {
-        throw new IllegalArgumentException(pI + " is to small for a bitvector with length " + pLength);
+        throw new IllegalArgumentException(
+            pI + " is to small for a bitvector with length " + pLength);
       }
       BigInteger n = BigInteger.valueOf(2).pow(pLength);
       pI = pI.add(n);
@@ -134,12 +135,12 @@ class Mathsat5BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Lo
 
   @Override
   public Long add(Long pNumber1, Long pNumber2) {
-    return msat_make_bv_plus(mathsatEnv, pNumber1,  pNumber2);
+    return msat_make_bv_plus(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
   public Long subtract(Long pNumber1, Long pNumber2) {
-    return msat_make_bv_minus(mathsatEnv, pNumber1,  pNumber2);
+    return msat_make_bv_minus(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override

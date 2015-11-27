@@ -84,8 +84,7 @@ public class LoggingProverEnvironment implements ProverEnvironment {
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> callback,
-      List<BooleanFormula> important)
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     T result = wrapped.allSat(callback, important);
     logger.log(Level.FINE, "allsat-result:", result);
@@ -102,5 +101,4 @@ public class LoggingProverEnvironment implements ProverEnvironment {
     wrapped.close();
     logger.log(Level.FINER, "closed");
   }
-
 }

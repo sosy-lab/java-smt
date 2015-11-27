@@ -32,13 +32,13 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-
-class SmtInterpolIntegerFormulaManager extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula> {
+class SmtInterpolIntegerFormulaManager
+    extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
   SmtInterpolIntegerFormulaManager(
-          SmtInterpolFormulaCreator pCreator,
-          SmtInterpolFunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      SmtInterpolFormulaCreator pCreator,
+      SmtInterpolFunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
   }
 
@@ -64,7 +64,7 @@ class SmtInterpolIntegerFormulaManager extends SmtInterpolNumeralFormulaManager<
 
   @Override
   protected Term makeNumberImpl(double pNumber) {
-    return makeNumberImpl((long)pNumber);
+    return makeNumberImpl((long) pNumber);
   }
 
   @Override

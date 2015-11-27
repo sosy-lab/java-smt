@@ -44,7 +44,8 @@ import ap.parser.IFormula;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-class PrincessInterpolatingProver extends PrincessAbstractProver implements InterpolatingProverEnvironment<Integer> {
+class PrincessInterpolatingProver extends PrincessAbstractProver
+    implements InterpolatingProverEnvironment<Integer> {
 
   private final List<Integer> assertedFormulas = new ArrayList<>(); // Collection of termNames
   private final Map<Integer, IFormula> annotatedTerms = new HashMap<>(); // Collection of termNames
@@ -56,7 +57,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver implements Inte
 
   @Override
   public Integer push(BooleanFormula f) {
-    IFormula t = (IFormula)mgr.extractInfo(f);
+    IFormula t = (IFormula) mgr.extractInfo(f);
     int termIndex = counter.getFreshId();
 
     stack.push(1);
@@ -70,7 +71,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver implements Inte
 
   @Override
   public void pop() {
-    Integer removed = assertedFormulas.remove(assertedFormulas.size()-1); // remove last term
+    Integer removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
     annotatedTerms.remove(removed);
     assert assertedFormulas.size() == annotatedTerms.size();
     stack.pop(1);
@@ -82,9 +83,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver implements Inte
     Set<Integer> indizesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<Integer> indizesOfB = from(assertedFormulas)
-                                 .filter(not(in(indizesOfA)))
-                                 .toSet();
+    Set<Integer> indizesOfB = from(assertedFormulas).filter(not(in(indizesOfA))).toSet();
 
     // get interpolant of groups
     List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indizesOfA, indizesOfB));
@@ -107,9 +106,11 @@ class PrincessInterpolatingProver extends PrincessAbstractProver implements Inte
   }
 
   @Override
-  public List<BooleanFormula> getTreeInterpolants(List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
-    throw new UnsupportedOperationException("directly receiving of tree interpolants is not supported." +
-        "Use another solver or another strategy for interpolants.");
+  public List<BooleanFormula> getTreeInterpolants(
+      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
+    throw new UnsupportedOperationException(
+        "directly receiving of tree interpolants is not supported."
+            + "Use another solver or another strategy for interpolants.");
   }
 
   @Override

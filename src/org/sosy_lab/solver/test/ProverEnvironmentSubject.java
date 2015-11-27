@@ -47,7 +47,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * {@link #proverEnvironment()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
-public class ProverEnvironmentSubject extends Subject<ProverEnvironmentSubject, BasicProverEnvironment<?>> {
+public class ProverEnvironmentSubject
+    extends Subject<ProverEnvironmentSubject, BasicProverEnvironment<?>> {
 
   private ProverEnvironmentSubject(
       FailureStrategy pFailureStrategy, BasicProverEnvironment<?> pStack) {
@@ -98,7 +99,7 @@ public class ProverEnvironmentSubject extends Subject<ProverEnvironmentSubject, 
 
     // get unsat core for failure message if possible
     if (getSubject() instanceof ProverEnvironment) {
-      final List<BooleanFormula> unsatCore = ((ProverEnvironment)getSubject()).getUnsatCore();
+      final List<BooleanFormula> unsatCore = ((ProverEnvironment) getSubject()).getUnsatCore();
       if (!unsatCore.isEmpty()) {
         failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
         return;

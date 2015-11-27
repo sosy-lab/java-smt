@@ -121,20 +121,24 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     }
 
     // binary interpolant is a sequence interpolant of only 2 elements
-    return Iterables.getOnlyElement(getSeqInterpolants(Lists.<Set<Long>>newArrayList(
-            Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
+    return Iterables.getOnlyElement(
+        getSeqInterpolants(
+            Lists.<Set<Long>>newArrayList(
+                Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas) {
-    Preconditions.checkArgument(partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
+    Preconditions.checkArgument(
+        partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
 
     // a 'tree' with all subtrees starting at 0 is called a 'sequence'
     return getTreeInterpolants(partitionedFormulas, new int[partitionedFormulas.size()]);
   }
 
   @Override
-  public List<BooleanFormula> getTreeInterpolants(List<Set<Long>> partitionedFormulas, int[] startOfSubTree) {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<Set<Long>> partitionedFormulas, int[] startOfSubTree) {
 
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
@@ -148,7 +152,8 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     // build tree of interpolation-points
     final long[] interpolationFormulas = new long[partitionedFormulas.size()];
-    final Deque<Pair<Integer,Long>> stack = new ArrayDeque<>(); // contains <subtree,interpolationPoint>
+    final Deque<Pair<Integer, Long>> stack =
+        new ArrayDeque<>(); // contains <subtree,interpolationPoint>
 
     int lastSubtree = -1; // subtree starts with 0. With -1<0 we start a new subtree.
     for (int i = 0; i < startOfSubTree.length; i++) {
@@ -185,22 +190,26 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
       lastSubtree = currentSubtree;
     }
 
-    Preconditions.checkState(stack.peekLast().getFirst() == 0, "subtree of root should start at 0.");
+    Preconditions.checkState(
+        stack.peekLast().getFirst() == 0, "subtree of root should start at 0.");
     long root = stack.pollLast().getSecond();
-    Preconditions.checkState(stack.isEmpty(), "root should have been the last element in the stack.");
+    Preconditions.checkState(
+        stack.isEmpty(), "root should have been the last element in the stack.");
 
     final PointerToLong model = new PointerToLong();
     final PointerToLong interpolant = new PointerToLong();
-    int isSat = compute_interpolant(
-        z3context,
-        root, // last element is end of chain (root of tree)
-        0,
-        interpolant,
-        model
-    );
+    int isSat =
+        compute_interpolant(
+            z3context,
+            root, // last element is end of chain (root of tree)
+            0,
+            interpolant,
+            model);
 
-    Preconditions.checkState(isSat == Z3_LBOOL.Z3_L_FALSE.status,
-            "interpolation not possible, because SAT-check returned status '%s'", isSat);
+    Preconditions.checkState(
+        isSat == Z3_LBOOL.Z3_L_FALSE.status,
+        "interpolation not possible, because SAT-check returned status '%s'",
+        isSat);
 
     // n partitions -> n-1 interpolants
     // the given tree interpolants are sorted in post-order,

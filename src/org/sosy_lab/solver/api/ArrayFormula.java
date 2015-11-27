@@ -24,6 +24,4 @@
 package org.sosy_lab.solver.api;
 
 @SuppressWarnings("unused")
-public interface ArrayFormula <TI extends Formula, TE extends Formula> extends Formula {
-
-}
+public interface ArrayFormula<TI extends Formula, TE extends Formula> extends Formula {}

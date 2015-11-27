@@ -31,11 +31,10 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
 
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
-  extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-  implements BitvectorFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+    implements BitvectorFormulaManager {
 
-  protected AbstractBitvectorFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractBitvectorFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
   }
 
@@ -52,14 +51,17 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
 
   @Override
-  public BitvectorFormula add(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula add(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't add bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't add bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-
 
     return wrap(add(param1, param2));
   }
@@ -67,9 +69,14 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public BitvectorFormula subtract(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula subtract(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't subtract bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't subtract bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -77,13 +84,17 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrap(subtract(param1, param2));
   }
 
-  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public BitvectorFormula divide(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula divide(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't divide bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't divide bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -91,13 +102,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrap(divide(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo divide(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
-
+  protected abstract TFormulaInfo divide(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BitvectorFormula modulo(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula modulo(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't modulo bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't modulo bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -105,24 +121,30 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrap(modulo(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo modulo(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
-
+  protected abstract TFormulaInfo modulo(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BooleanFormula modularCongruence(BitvectorFormula pNumber1, BitvectorFormula pNumber2, long pModulo) {
+  public BooleanFormula modularCongruence(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, long pModulo) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
     return wrapBool(modularCongruence(param1, param2, pModulo));
   }
 
-  protected abstract TFormulaInfo modularCongruence(TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
-
+  protected abstract TFormulaInfo modularCongruence(
+      TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
 
   @Override
-  public BitvectorFormula multiply(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula multiply(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't multiply bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't multiply bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -132,11 +154,14 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-
   @Override
   public BooleanFormula equal(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't compare bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -147,9 +172,14 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public BooleanFormula greaterThan(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BooleanFormula greaterThan(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't compare bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -157,13 +187,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrapBool(greaterThan(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed) ;
-
+  protected abstract TFormulaInfo greaterThan(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BooleanFormula greaterOrEquals(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BooleanFormula greaterOrEquals(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't compare bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -171,12 +206,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrapBool(greaterOrEquals(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed) ;
+  protected abstract TFormulaInfo greaterOrEquals(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BooleanFormula lessThan(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BooleanFormula lessThan(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't compare bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -184,13 +225,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrapBool(lessThan(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed) ;
-
+  protected abstract TFormulaInfo lessThan(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BooleanFormula lessOrEquals(BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BooleanFormula lessOrEquals(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
     assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes (" + getLength(pNumber1) + " and " + getLength(pNumber2) + ")";
+        : "Can't compare bitvectors with different sizes ("
+            + getLength(pNumber1)
+            + " and "
+            + getLength(pNumber2)
+            + ")";
 
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -198,8 +244,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrapBool(lessOrEquals(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
-
+  protected abstract TFormulaInfo lessOrEquals(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
   public BitvectorFormula not(BitvectorFormula pBits) {
@@ -207,8 +253,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return wrap(not(param1));
   }
 
-  protected abstract TFormulaInfo not(TFormulaInfo pParam1) ;
-
+  protected abstract TFormulaInfo not(TFormulaInfo pParam1);
 
   @Override
   public BitvectorFormula and(BitvectorFormula pBits1, BitvectorFormula pBits2) {
@@ -221,7 +266,6 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo and(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-
   @Override
   public BitvectorFormula or(BitvectorFormula pBits1, BitvectorFormula pBits2) {
     assert getLength(pBits1) == getLength(pBits2);
@@ -232,6 +276,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract TFormulaInfo or(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
   @Override
   public BitvectorFormula xor(BitvectorFormula pBits1, BitvectorFormula pBits2) {
     assert getLength(pBits1) == getLength(pBits2);
@@ -243,37 +288,41 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-
   @Override
   public BitvectorFormula makeBitvector(int pLength, long i) {
     return wrap(makeBitvectorImpl(pLength, i));
   }
-  protected abstract TFormulaInfo makeBitvectorImpl(int pLength, long pI) ;
+
+  protected abstract TFormulaInfo makeBitvectorImpl(int pLength, long pI);
 
   @Override
   public BitvectorFormula makeBitvector(int pLength, BigInteger i) {
     return wrap(makeBitvectorImpl(pLength, i));
   }
-  protected abstract TFormulaInfo makeBitvectorImpl(int pLength, BigInteger pI) ;
+
+  protected abstract TFormulaInfo makeBitvectorImpl(int pLength, BigInteger pI);
 
   @Override
   public BitvectorFormula makeVariable(int pLength, String pVar) {
     return wrap(makeVariableImpl(pLength, pVar));
   }
+
   protected abstract TFormulaInfo makeVariableImpl(int pLength, String pVar);
 
   /**
    * Returns a term representing the (arithmetic if signed is true) right shift of number by toShift.
    */
   @Override
-  public BitvectorFormula shiftRight(BitvectorFormula pNumber, BitvectorFormula toShift, boolean signed) {
+  public BitvectorFormula shiftRight(
+      BitvectorFormula pNumber, BitvectorFormula toShift, boolean signed) {
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(toShift);
 
     return wrap(shiftRight(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo shiftRight(TFormulaInfo pNumber, TFormulaInfo toShift, boolean signed);
+  protected abstract TFormulaInfo shiftRight(
+      TFormulaInfo pNumber, TFormulaInfo toShift, boolean signed);
 
   @Override
   public BitvectorFormula shiftLeft(BitvectorFormula pNumber, BitvectorFormula toShift) {
@@ -285,7 +334,6 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo shiftLeft(TFormulaInfo pExtract, TFormulaInfo pExtract2);
 
-
   @Override
   public final BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
     TFormulaInfo param1 = extractInfo(pNumber);
@@ -296,27 +344,30 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo concat(TFormulaInfo number, TFormulaInfo pAppend);
 
-
   @Override
-  public final BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb, boolean pSigned) {
+  public final BitvectorFormula extract(
+      BitvectorFormula pNumber, int pMsb, int pLsb, boolean pSigned) {
     TFormulaInfo param = extractInfo(pNumber);
 
     return wrap(extract(param, pMsb, pLsb, pSigned));
   }
-  protected abstract TFormulaInfo extract(TFormulaInfo pNumber, int pMsb, int pLsb, boolean pSigned) ;
 
+  protected abstract TFormulaInfo extract(
+      TFormulaInfo pNumber, int pMsb, int pLsb, boolean pSigned);
 
   @Override
-  public final BitvectorFormula extend(BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
+  public final BitvectorFormula extend(
+      BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
     TFormulaInfo param = extractInfo(pNumber);
 
     return wrap(extend(param, pExtensionBits, pSigned));
   }
-  protected abstract TFormulaInfo extend(TFormulaInfo pNumber, int pExtensionBits, boolean pSigned) ;
+
+  protected abstract TFormulaInfo extend(TFormulaInfo pNumber, int pExtensionBits, boolean pSigned);
 
   @Override
   public int getLength(BitvectorFormula pNumber) {
     FormulaType<BitvectorFormula> type = getFormulaCreator().getFormulaType(pNumber);
-    return ((FormulaType.BitvectorType)type).getSize();
+    return ((FormulaType.BitvectorType) type).getSize();
   }
 }

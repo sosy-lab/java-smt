@@ -42,7 +42,8 @@ public abstract class UninterpretedFunctionDeclaration<T extends Formula> {
   private final FormulaType<T> returnType;
   private final List<FormulaType<?>> argumentTypes;
 
-  protected UninterpretedFunctionDeclaration(FormulaType<T> pReturnType, List<FormulaType<?>> pArgumentTypes) {
+  protected UninterpretedFunctionDeclaration(
+      FormulaType<T> pReturnType, List<FormulaType<?>> pArgumentTypes) {
     returnType = checkNotNull(pReturnType);
     argumentTypes = ImmutableList.copyOf(pArgumentTypes);
   }

@@ -99,7 +99,7 @@ public interface OptEnvironment extends AutoCloseable {
    */
   enum OptStatus {
     OPT, // All good, the solution was found (may be unbounded).
-    UNSAT,  // SMT problem is unsatisfiable.
+    UNSAT, // SMT problem is unsatisfiable.
     UNDEF // The result is unknown.
   }
 
@@ -107,5 +107,4 @@ public interface OptEnvironment extends AutoCloseable {
 
   @Override
   void close();
-
 }

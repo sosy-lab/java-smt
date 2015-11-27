@@ -23,7 +23,6 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.annotation.Nullable;
@@ -51,7 +50,9 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
   @Override
   public final boolean equals(@Nullable Object o) {
-    if (!(o instanceof AbstractFormula)) { return false; }
+    if (!(o instanceof AbstractFormula)) {
+      return false;
+    }
     return formulaInfo.equals(((AbstractFormula<?>) o).formulaInfo);
   }
 
@@ -73,13 +74,13 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
    * Simple ArrayFormula implementation.
    */
   static final class ArrayFormulaImpl<TI extends Formula, TE extends Formula, TFormulaInfo>
-      extends AbstractFormula<TFormulaInfo>
-      implements ArrayFormula<TI, TE> {
+      extends AbstractFormula<TFormulaInfo> implements ArrayFormula<TI, TE> {
 
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    public ArrayFormulaImpl(TFormulaInfo info, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    public ArrayFormulaImpl(
+        TFormulaInfo info, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(info);
       this.indexType = checkNotNull(pIndexType);
       this.elementType = checkNotNull(pElementType);
@@ -97,7 +98,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /**
    * Simple BooleanFormula implementation. Just tracing the size and the sign-treatment
    */
-  static final class BitvectorFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo> implements BitvectorFormula {
+  static final class BitvectorFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements BitvectorFormula {
     public BitvectorFormulaImpl(TFormulaInfo info) {
       super(info);
     }
@@ -106,7 +108,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /**
    * Simple FloatingPointFormula implementation.
    */
-  static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo> implements FloatingPointFormula {
+  static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements FloatingPointFormula {
     public FloatingPointFormulaImpl(TFormulaInfo info) {
       super(info);
     }
@@ -115,7 +118,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /**
    * Simple BooleanFormula implementation.
    */
-  static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo> implements BooleanFormula {
+  static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements BooleanFormula {
     public BooleanFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }
@@ -124,7 +128,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /**
    * Simple IntegerFormula implementation.
    */
-  static final class IntegerFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo> implements IntegerFormula {
+  static final class IntegerFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements IntegerFormula {
     public IntegerFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
     }
@@ -133,10 +138,10 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /**
    * Simple RationalFormula implementation.
    */
-  static final class RationalFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo> implements RationalFormula {
+  static final class RationalFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements RationalFormula {
     public RationalFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
     }
   }
 }
-

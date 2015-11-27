@@ -25,7 +25,6 @@ package org.sosy_lab.solver.api;
 
 import java.util.Collection;
 
-
 /**
  * This interface represents the Boolean-Theory
  */
@@ -90,7 +89,6 @@ public interface BooleanFormulaManager {
    */
   public boolean isFalse(BooleanFormula formula);
 
-
   /**
    * Creates a formula representing "IF cond THEN f1 ELSE f2"
    * @param cond a Formula
@@ -117,6 +115,7 @@ public interface BooleanFormulaManager {
    * @return (bits1 & bits2)
    */
   public BooleanFormula and(BooleanFormula bits1, BooleanFormula bits2);
+
   public BooleanFormula and(Collection<BooleanFormula> bits);
 
   /**
@@ -126,10 +125,10 @@ public interface BooleanFormulaManager {
    * @return (bits1 | bits2)
    */
   public BooleanFormula or(BooleanFormula bits1, BooleanFormula bits2);
+
   public BooleanFormula or(Collection<BooleanFormula> bits);
 
   public BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2);
-
 
   /** Check, if the formula matches NOT(f) with one boolean arg. */
   public boolean isNot(BooleanFormula bits);
@@ -151,8 +150,7 @@ public interface BooleanFormulaManager {
     NNF("nnf", "Convert the formula to NNF"),
     CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding"),
     QE_LIGHT("qe-light", "Perform light quantifier elimination"),
-    QE("qe", "Perform quantifier elimination")
-    ;
+    QE("qe", "Perform quantifier elimination");
 
     private final String name;
     private final String description;

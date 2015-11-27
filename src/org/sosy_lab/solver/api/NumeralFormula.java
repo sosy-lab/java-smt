@@ -23,11 +23,9 @@
  */
 package org.sosy_lab.solver.api;
 
-
 public interface NumeralFormula extends Formula {
 
   public interface IntegerFormula extends NumeralFormula {}
 
   public interface RationalFormula extends NumeralFormula {}
-
 }

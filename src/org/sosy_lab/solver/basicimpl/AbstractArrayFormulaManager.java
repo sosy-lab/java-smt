@@ -30,8 +30,7 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv>
-  extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-  implements ArrayFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements ArrayFormulaManager {
 
   public AbstractArrayFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator) {
     super(pFormulaCreator);
@@ -39,40 +38,40 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv>
 
   @SuppressWarnings("unchecked")
   @Override
-  public <TI extends Formula, TE extends Formula> TE select (
+  public <TI extends Formula, TE extends Formula> TE select(
       ArrayFormula<TI, TE> pArray, Formula pIndex) {
 
-    final FormulaType<? extends Formula> elementType = getFormulaCreator().getArrayFormulaElementType(pArray);
+    final FormulaType<? extends Formula> elementType =
+        getFormulaCreator().getArrayFormulaElementType(pArray);
     // Examples:
     //    Array<Bitvector,Bitvector>
     //    Rational
 
-    final TFormulaInfo term = select(
-        extractInfo(pArray),
-        extractInfo(pIndex));
+    final TFormulaInfo term = select(extractInfo(pArray), extractInfo(pIndex));
 
     return (TE) getFormulaCreator().encapsulate(elementType, term);
   }
+
   protected abstract TFormulaInfo select(TFormulaInfo pArray, TFormulaInfo pIndex);
 
   @Override
-  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store (
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
       ArrayFormula<TI, TE> pArray, Formula pIndex, Formula pValue) {
 
     final FormulaType<TI> indexType = getFormulaCreator().getArrayFormulaIndexType(pArray);
     final FormulaType<TE> elementType = getFormulaCreator().getArrayFormulaElementType(pArray);
 
-    final TFormulaInfo term = store(
-        extractInfo(pArray),
-        extractInfo(pIndex),
-        extractInfo(pValue));
+    final TFormulaInfo term = store(extractInfo(pArray), extractInfo(pIndex), extractInfo(pValue));
     return getFormulaCreator().encapsulateArray(term, indexType, elementType);
   }
-  protected abstract TFormulaInfo store(TFormulaInfo pArray, TFormulaInfo pIndex, TFormulaInfo pValue);
+
+  protected abstract TFormulaInfo store(
+      TFormulaInfo pArray, TFormulaInfo pIndex, TFormulaInfo pValue);
 
   @Override
-  public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>> ArrayFormula<TI, TE> makeArray(
-      String pName, FTI pIndexType, FTE pElementType) {
+  public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
 
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
     return getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
@@ -92,10 +91,11 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   @Override
-  public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(ArrayFormula<TI, TE> pArray1,
-      ArrayFormula<TI, TE> pArray2) {
-    return getFormulaCreator().encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
+  public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
+      ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
+    return getFormulaCreator()
+        .encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
   }
-  protected abstract TFormulaInfo equivalence(TFormulaInfo pArray1, TFormulaInfo pArray2);
 
+  protected abstract TFormulaInfo equivalence(TFormulaInfo pArray1, TFormulaInfo pArray2);
 }

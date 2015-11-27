@@ -33,14 +33,15 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.ITerm;
 
-abstract class PrincessNumeralFormulaManager
-        <ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-        extends AbstractNumeralFormulaManager<IExpression, TermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType> {
+abstract class PrincessNumeralFormulaManager<
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<
+        IExpression, TermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType> {
 
   PrincessNumeralFormulaManager(
-          PrincessFormulaCreator pCreator,
-          PrincessFunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      PrincessFormulaCreator pCreator,
+      PrincessFunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
   }
 

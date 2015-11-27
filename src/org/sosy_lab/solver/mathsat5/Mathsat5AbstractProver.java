@@ -50,8 +50,8 @@ abstract class Mathsat5AbstractProver {
 
   private final long terminationTest;
 
-  protected Mathsat5AbstractProver(Mathsat5FormulaManager pMgr, long pConfig,
-      boolean pShared, boolean pGhostFilter) {
+  protected Mathsat5AbstractProver(
+      Mathsat5FormulaManager pMgr, long pConfig, boolean pShared, boolean pGhostFilter) {
     mgr = pMgr;
     curConfig = pConfig;
     useSharedEnv = pShared;
@@ -69,19 +69,24 @@ abstract class Mathsat5AbstractProver {
     }
   }
 
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
     Preconditions.checkState(curEnv != 0);
     try {
-      long[] assumptions = Longs.toArray(Lists.transform(pAssumptions, new Function<BooleanFormula, Long>() {
-        @Override
-        public Long apply(BooleanFormula pInput) {
-          long t = Mathsat5FormulaManager.getMsatTerm(pInput);
-          if (!useSharedEnv) {
-            t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
-          }
-          return t;
-        }
-      }));
+      long[] assumptions =
+          Longs.toArray(
+              Lists.transform(
+                  pAssumptions,
+                  new Function<BooleanFormula, Long>() {
+                    @Override
+                    public Long apply(BooleanFormula pInput) {
+                      long t = Mathsat5FormulaManager.getMsatTerm(pInput);
+                      if (!useSharedEnv) {
+                        t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
+                      }
+                      return t;
+                    }
+                  }));
       return !msat_check_sat_with_assumptions(curEnv, assumptions);
     } catch (IllegalStateException e) {
       handleSolverExceptionInUnsatCheck(e);

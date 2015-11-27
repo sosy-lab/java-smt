@@ -23,7 +23,6 @@
  */
 package org.sosy_lab.solver.api;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -146,11 +145,11 @@ public interface UnsafeFormulaManager {
    */
   <T extends Formula> T replaceArgsAndName(T f, String newName, List<Formula> args);
   /**
-  * Replaces the arguments of the given formula
-  * @param f
-  * @param args
-  * @return
-  */
+   * Replaces the arguments of the given formula
+   * @param f
+   * @param args
+   * @return
+   */
   <T extends Formula> T replaceArgs(T f, List<Formula> args);
 
   /**
@@ -178,11 +177,10 @@ public interface UnsafeFormulaManager {
    * @return Formula with variables being replaced.
    *
    */
-  <T1 extends Formula, T2 extends Formula> T1
-      substitute(T1 f, List<T2> changeFrom, List<T2> changeTo);
+  <T1 extends Formula, T2 extends Formula> T1 substitute(
+      T1 f, List<T2> changeFrom, List<T2> changeTo);
 
-  <T1 extends Formula, T2 extends Formula> T1
-      substitute(T1 f, Map<T2, T2> fromToMapping);
+  <T1 extends Formula, T2 extends Formula> T1 substitute(T1 f, Map<T2, T2> fromToMapping);
 
   /**
    * Simplify a given formula (as good as possible).
@@ -195,5 +193,4 @@ public interface UnsafeFormulaManager {
    * @return  Simplified version of the formula
    */
   <T extends Formula> T simplify(T f);
-
 }

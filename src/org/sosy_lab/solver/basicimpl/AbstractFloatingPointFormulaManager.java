@@ -50,8 +50,8 @@ import org.sosy_lab.solver.api.NumeralFormulaManager;
  * and implemented by all sub-classes).
  */
 public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv>
-  extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-  implements FloatingPointFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+    implements FloatingPointFormulaManager {
 
   protected AbstractFloatingPointFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
@@ -71,57 +71,68 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type) {
     return wrap(makeNumberImpl(n, type));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(double n, FormulaType.FloatingPointType type);
 
   @Override
   public FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type) {
     return wrap(makeNumberImpl(n, type));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(BigDecimal n, FormulaType.FloatingPointType type);
 
   @Override
   public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type) {
     return wrap(makeNumberImpl(n, type));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(String n, FormulaType.FloatingPointType type);
 
   @Override
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {
     return wrap(makeVariableImpl(pVar, pType));
   }
-  protected abstract TFormulaInfo makeVariableImpl(String pVar, FormulaType.FloatingPointType pType);
+
+  protected abstract TFormulaInfo makeVariableImpl(
+      String pVar, FormulaType.FloatingPointType pType);
 
   @Override
   public FloatingPointFormula makePlusInfinity(FormulaType.FloatingPointType pType) {
     return wrap(makePlusInfinityImpl(pType));
   }
+
   protected abstract TFormulaInfo makePlusInfinityImpl(FormulaType.FloatingPointType pType);
 
   @Override
   public FloatingPointFormula makeMinusInfinity(FormulaType.FloatingPointType pType) {
     return wrap(makeMinusInfinityImpl(pType));
   }
+
   protected abstract TFormulaInfo makeMinusInfinityImpl(FormulaType.FloatingPointType pType);
 
   @Override
   public FloatingPointFormula makeNaN(FormulaType.FloatingPointType pType) {
     return wrap(makeNaNImpl(pType));
   }
-  protected abstract TFormulaInfo makeNaNImpl(FormulaType.FloatingPointType pType);
 
+  protected abstract TFormulaInfo makeNaNImpl(FormulaType.FloatingPointType pType);
 
   @Override
   public <T extends Formula> T castTo(FloatingPointFormula pNumber, FormulaType<T> pTargetType) {
-    return getFormulaCreator().encapsulate(pTargetType, castToImpl(extractInfo(pNumber), pTargetType));
+    return getFormulaCreator()
+        .encapsulate(pTargetType, castToImpl(extractInfo(pNumber), pTargetType));
   }
+
   protected abstract TFormulaInfo castToImpl(TFormulaInfo pNumber, FormulaType<?> pTargetType);
 
   @Override
-  public FloatingPointFormula castFrom(Formula pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType) {
+  public FloatingPointFormula castFrom(
+      Formula pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType) {
     return wrap(castFromImpl(extractInfo(pNumber), pSigned, pTargetType));
   }
-  protected abstract TFormulaInfo castFromImpl(TFormulaInfo pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType);
 
+  protected abstract TFormulaInfo castFromImpl(
+      TFormulaInfo pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {
@@ -130,7 +141,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
-
 
   @Override
   public FloatingPointFormula add(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
@@ -143,15 +153,15 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public FloatingPointFormula subtract(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public FloatingPointFormula subtract(
+      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
     return wrap(subtract(param1, param2));
   }
 
-  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public FloatingPointFormula divide(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
@@ -163,9 +173,9 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   protected abstract TFormulaInfo divide(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-
   @Override
-  public FloatingPointFormula multiply(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public FloatingPointFormula multiply(
+      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -173,7 +183,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2);
-
 
   @Override
   public BooleanFormula assignment(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
@@ -185,9 +194,9 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   protected abstract TFormulaInfo assignment(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-
   @Override
-  public BooleanFormula equalWithFPSemantics(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public BooleanFormula equalWithFPSemantics(
+      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -195,7 +204,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo equalWithFPSemantics(TFormulaInfo pParam1, TFormulaInfo pParam2);
-
 
   @Override
   public BooleanFormula greaterThan(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
@@ -205,18 +213,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrapBool(greaterThan(param1, param2));
   }
 
-  protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public BooleanFormula greaterOrEquals(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public BooleanFormula greaterOrEquals(
+      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
     return wrapBool(greaterOrEquals(param1, param2));
   }
 
-  protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
+  protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessThan(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
@@ -226,8 +234,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrapBool(lessThan(param1, param2));
   }
 
-  protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessOrEquals(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {

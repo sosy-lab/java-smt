@@ -30,7 +30,6 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 
-
 class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long> {
 
   private final long z3context;
@@ -51,7 +50,8 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
     } catch (IllegalArgumentException ae) {
       int errorCode = Z3NativeApi.get_error_code(z3context);
       throw new IllegalArgumentException(
-          String.format("Errorcode: %d, msg: %s",
+          String.format(
+              "Errorcode: %d, msg: %s",
               errorCode,
               Z3NativeApi.get_error_msg_ex(z3context, errorCode)));
     }
@@ -65,10 +65,11 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(String pName, FormulaType<TI> pIndexType,
-      FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
-    final ArrayFormulaType<TI, TE> arrayFormulaType = FormulaType.getArrayType(pIndexType, pElementType);
+    final ArrayFormulaType<TI, TE> arrayFormulaType =
+        FormulaType.getArrayType(pIndexType, pElementType);
     final Long z3ArrayType = toSolverType(arrayFormulaType);
 
     final long arrayTerm = getFormulaCreator().makeVariable(z3ArrayType, pName);
@@ -83,5 +84,4 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
     Z3NativeApi.inc_ref(z3context, term);
     return term;
   }
-
 }

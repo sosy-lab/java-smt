@@ -48,19 +48,26 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager;
 
-  private final @Nullable AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula> integerManager;
+  private final @Nullable AbstractNumeralFormulaManager<
+          TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula>
+      integerManager;
 
-  private final @Nullable AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula> rationalManager;
+  private final @Nullable AbstractNumeralFormulaManager<
+          TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula>
+      rationalManager;
 
-  private final @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> bitvectorManager;
+  private final @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
+      bitvectorManager;
 
-  private final @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv> floatingPointManager;
+  private final @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv>
+      floatingPointManager;
 
   private final AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager;
 
   private final AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager;
 
-  private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> quantifiedManager;
+  private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
+      quantifiedManager;
 
   private final FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator;
 
@@ -78,15 +85,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager,
       AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager,
-      @Nullable AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula> pIntegerManager,
-      @Nullable AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula> pRationalManager,
+      @Nullable
+      AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula>
+          pIntegerManager,
+      @Nullable
+      AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula>
+          pRationalManager,
       @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> bitvectorManager,
       @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv> floatingPointManager,
       @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> quantifiedManager,
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv> arrayManager) {
 
     if (functionManager == null || booleanManager == null || unsafeManager == null) {
-      throw new IllegalArgumentException("boolean, function and unsafe manager instances have to be valid!");
+      throw new IllegalArgumentException(
+          "boolean, function and unsafe manager instances have to be valid!");
     }
 
     this.arrayManager = arrayManager;
@@ -112,14 +124,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     if (booleanManager.getFormulaCreator() != formulaCreator
         || unsafeManager.getFormulaCreator() != formulaCreator
         || functionManager.getFormulaCreator() != formulaCreator
-            || (integerManager != null && integerManager.getFormulaCreator() != formulaCreator)
-            || (rationalManager != null && rationalManager.getFormulaCreator() != formulaCreator)
+        || (integerManager != null && integerManager.getFormulaCreator() != formulaCreator)
+        || (rationalManager != null && rationalManager.getFormulaCreator() != formulaCreator)
         || (bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
-        || (floatingPointManager != null && floatingPointManager.getFormulaCreator() != formulaCreator)
-        ) {
+        || (floatingPointManager != null
+            && floatingPointManager.getFormulaCreator() != formulaCreator)) {
       throw new IllegalArgumentException("The creator instances must match across the managers!");
     }
-
   }
 
   public final FormulaCreator<TFormulaInfo, TType, TEnv> getFormulaCreator() {
@@ -127,7 +138,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula> getIntegerFormulaManager() {
+  public AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula>
+      getIntegerFormulaManager() {
     if (integerManager == null) {
       // TODO fallback to rationalManager?
       throw new UnsupportedOperationException();
@@ -136,7 +148,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula> getRationalFormulaManager() {
+  public AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula>
+      getRationalFormulaManager() {
     if (rationalManager == null) {
       // TODO fallback to integerManager?
       throw new UnsupportedOperationException();
@@ -177,7 +190,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   @Override
   public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> getQuantifiedFormulaManager() {
-    if (quantifiedManager == null){
+    if (quantifiedManager == null) {
       throw new UnsupportedOperationException();
     }
     return quantifiedManager;

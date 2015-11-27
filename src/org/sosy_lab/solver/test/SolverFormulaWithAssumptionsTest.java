@@ -47,7 +47,7 @@ import com.google.common.collect.Lists;
 @RunWith(Parameterized.class)
 public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
 
-  @Parameters(name="{0}")
+  @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
   }
@@ -64,16 +64,21 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
    * Can be overridden to parameterize the test.
    * @param <T>
    * @throws InvalidConfigurationException */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest() throws InvalidConfigurationException {
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest()
+      throws InvalidConfigurationException {
     InterpolatingProverEnvironment<?> env = mgr.newProverEnvironmentWithInterpolation(false);
-    assume().withFailureMessage("Solver " + solverToUse() + " does not support solving under assumptions")
-      .that(env).isInstanceOf(InterpolatingProverEnvironmentWithAssumptions.class);
-    return (InterpolatingProverEnvironmentWithAssumptions<T>)env;
+    assume()
+        .withFailureMessage(
+            "Solver " + solverToUse() + " does not support solving under assumptions")
+        .that(env)
+        .isInstanceOf(InterpolatingProverEnvironmentWithAssumptions.class);
+    return (InterpolatingProverEnvironmentWithAssumptions<T>) env;
   }
 
   @Test
-  public <T> void basicAssumptionsTest() throws SolverException, InterruptedException, InvalidConfigurationException {
+  public <T> void basicAssumptionsTest()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
     IntegerFormula v1 = imgr.makeVariable("v1");
     IntegerFormula v2 = imgr.makeVariable("v2");
 
@@ -81,32 +86,31 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
     BooleanFormula suffix2 = bmgr.makeVariable("suffix2");
     BooleanFormula suffix3 = bmgr.makeVariable("suffix3");
 
-    BooleanFormula term1 = bmgr.or(bmgr.and(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE)),
-                                            bmgr.not(imgr.equal(v1, v2))),
-                                   suffix1);
-    BooleanFormula term2 = bmgr.or(imgr.equal(v2, imgr.makeNumber(BigDecimal.ONE)),
-                                   suffix2);
-    BooleanFormula term3 = bmgr.or(bmgr.not(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE))),
-                                   suffix3);
+    BooleanFormula term1 =
+        bmgr.or(
+            bmgr.and(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE)), bmgr.not(imgr.equal(v1, v2))),
+            suffix1);
+    BooleanFormula term2 = bmgr.or(imgr.equal(v2, imgr.makeNumber(BigDecimal.ONE)), suffix2);
+    BooleanFormula term3 =
+        bmgr.or(bmgr.not(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE))), suffix3);
 
     InterpolatingProverEnvironmentWithAssumptions<T> env = newEnvironmentForTest();
-
 
     T firstPartForInterpolant = env.push(term1);
     env.push(term2);
     env.push(term3);
 
-    assertThat(env.isUnsatWithAssumptions(Lists.newArrayList(bmgr.not(suffix1),
-                                                             bmgr.not(suffix2),
-                                                             suffix3)))
-               .isTrue();
+    assertThat(
+            env.isUnsatWithAssumptions(
+                Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
+        .isTrue();
     assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
-              .doesNotContain("suffix");
-    assertThat(env.isUnsatWithAssumptions(Lists.newArrayList(bmgr.not(suffix1),
-                                                             bmgr.not(suffix3),
-                                                             suffix2)))
-               .isTrue();
+        .doesNotContain("suffix");
+    assertThat(
+            env.isUnsatWithAssumptions(
+                Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix3), suffix2)))
+        .isTrue();
     assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
-              .doesNotContain("suffix");
+        .doesNotContain("suffix");
   }
 }

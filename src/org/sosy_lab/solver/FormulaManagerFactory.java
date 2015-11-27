@@ -60,8 +60,7 @@ import com.google.common.base.Predicate;
 /**
  * Factory class for loading and instantiating SMT solvers.
  */
-@Options(deprecatedPrefix="cpa.predicate",
-         prefix="solver")
+@Options(deprecatedPrefix = "cpa.predicate", prefix = "solver")
 public class FormulaManagerFactory {
 
   @VisibleForTesting
@@ -72,34 +71,45 @@ public class FormulaManagerFactory {
     PRINCESS
   }
 
-  @Option(secure=true,
-      description = "Export solver queries in Smtlib format into a file.")
+  @Option(secure = true, description = "Export solver queries in Smtlib format into a file.")
   private boolean logAllQueries = false;
 
-  @Option(secure=true,
-      description = "Export solver queries in Smtlib format into a file.")
+  @Option(secure = true, description = "Export solver queries in Smtlib format into a file.")
   @FileOption(Type.OUTPUT_FILE)
-  private @Nullable PathCounterTemplate logfile = PathCounterTemplate.ofFormatString("smtquery.%03d.smt2");
+  private @Nullable PathCounterTemplate logfile =
+      PathCounterTemplate.ofFormatString("smtquery.%03d.smt2");
 
-  @Option(secure=true, description = "Random seed for SMT solver.")
+  @Option(secure = true, description = "Random seed for SMT solver.")
   private long randomSeed = 42;
 
-  @Option(secure=true, description="Which SMT solver to use.")
+  @Option(secure = true, description = "Which SMT solver to use.")
   private Solvers solver = Solvers.SMTINTERPOL;
 
-  @Option(secure=true, description="Which solver to use specifically for interpolation (default is to use the main one).")
+  @Option(
+    secure = true,
+    description =
+        "Which solver to use specifically for interpolation (default is to use the main one)."
+  )
   private @Nullable Solvers interpolationSolver = null;
 
-  @Option(secure=true, description = "Use non-linear arithmetic when encoding formulas in corresponding theory. "
-      + "This effects the operations DIV, MOD, and MULT with two non-numeral operands, "
-      + "which are encoded with uninterpreted functions otherwise. "
-      + "If a solver does not support non-linear arithmetic, and this option is set, an exception is thrown.")
+  @Option(
+    secure = true,
+    description =
+        "Use non-linear arithmetic when encoding formulas in corresponding theory. "
+            + "This effects the operations DIV, MOD, and MULT with two non-numeral operands, "
+            + "which are encoded with uninterpreted functions otherwise. "
+            + "If a solver does not support non-linear arithmetic, and this option is set, an exception is thrown."
+  )
   private boolean useNonLinearIntegerArithmetic = false;
 
-  @Option(secure=true, description = "Use non-linear arithmetic when encoding formulas in corresponding theory. "
-      + "This effects the operations DIV, MOD, and MULT with two non-numeral operands, "
-      + "which are encoded with uninterpreted functions otherwise. "
-      + "If a solver does not support non-linear arithmetic, and this option is set, an exception is thrown.")
+  @Option(
+    secure = true,
+    description =
+        "Use non-linear arithmetic when encoding formulas in corresponding theory. "
+            + "This effects the operations DIV, MOD, and MULT with two non-numeral operands, "
+            + "which are encoded with uninterpreted functions otherwise. "
+            + "If a solver does not support non-linear arithmetic, and this option is set, an exception is thrown."
+  )
   private boolean useNonLinearRationalArithmetic = false;
 
   private final LogManager logger;
@@ -111,8 +121,9 @@ public class FormulaManagerFactory {
   private volatile @Nullable SolverFactory smtInterpolFactory = null;
 
   @VisibleForTesting
-  public FormulaManagerFactory(Configuration config, LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier) throws InvalidConfigurationException {
+  public FormulaManagerFactory(
+      Configuration config, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
+      throws InvalidConfigurationException {
     config.inject(this);
     logger = checkNotNull(pLogger);
     shutdownNotifier = checkNotNull(pShutdownNotifier);
@@ -142,28 +153,56 @@ public class FormulaManagerFactory {
       throws InvalidConfigurationException {
     try {
       switch (solver) {
-      case SMTINTERPOL:
-        return loadSmtInterpol().create(config, logger, shutdownNotifier, logfile, randomSeed, useNonLinearIntegerArithmetic, useNonLinearRationalArithmetic);
+        case SMTINTERPOL:
+          return loadSmtInterpol()
+              .create(
+                  config,
+                  logger,
+                  shutdownNotifier,
+                  logfile,
+                  randomSeed,
+                  useNonLinearIntegerArithmetic,
+                  useNonLinearRationalArithmetic);
 
-      case MATHSAT5:
-          return Mathsat5FormulaManager.create(logger, config, shutdownNotifier, logfile, randomSeed, useNonLinearIntegerArithmetic, useNonLinearRationalArithmetic);
+        case MATHSAT5:
+          return Mathsat5FormulaManager.create(
+              logger,
+              config,
+              shutdownNotifier,
+              logfile,
+              randomSeed,
+              useNonLinearIntegerArithmetic,
+              useNonLinearRationalArithmetic);
 
-      case Z3:
-        return Z3FormulaManager.create(logger, config, shutdownNotifier, logfile, randomSeed, useNonLinearIntegerArithmetic, useNonLinearRationalArithmetic);
+        case Z3:
+          return Z3FormulaManager.create(
+              logger,
+              config,
+              shutdownNotifier,
+              logfile,
+              randomSeed,
+              useNonLinearIntegerArithmetic,
+              useNonLinearRationalArithmetic);
 
-      case PRINCESS:
-        // TODO: pass randomSeed to Princess
-        return PrincessFormulaManager.create(config, logger, shutdownNotifier, logfile, useNonLinearIntegerArithmetic);
+        case PRINCESS:
+          // TODO: pass randomSeed to Princess
+          return PrincessFormulaManager.create(
+              config, logger, shutdownNotifier, logfile, useNonLinearIntegerArithmetic);
 
-      default:
-        throw new AssertionError("no solver selected");
+        default:
+          throw new AssertionError("no solver selected");
       }
 
     } catch (UnsatisfiedLinkError e) {
-      throw new InvalidConfigurationException("The SMT solver " + solver
-          + " is not available on this machine because of missing libraries"
-          + " (" + e.getMessage() + ")."
-          + " You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.", e);
+      throw new InvalidConfigurationException(
+          "The SMT solver "
+              + solver
+              + " is not available on this machine because of missing libraries"
+              + " ("
+              + e.getMessage()
+              + ")."
+              + " You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
+          e);
     }
   }
 
@@ -183,10 +222,15 @@ public class FormulaManagerFactory {
    * and used by this class, not by other classes.
    */
   public static interface SolverFactory {
-    FormulaManager create(Configuration config, LogManager logger,
+    FormulaManager create(
+        Configuration config,
+        LogManager logger,
         ShutdownNotifier pShutdownNotifier,
-        @Nullable PathCounterTemplate solverLogfile, long randomSeed,
-        boolean pUseNonLinearIntegerArithmetic, boolean pUseNonLinearRationalArithmetic) throws InvalidConfigurationException;
+        @Nullable PathCounterTemplate solverLogfile,
+        long randomSeed,
+        boolean pUseNonLinearIntegerArithmetic,
+        boolean pUseNonLinearRationalArithmetic)
+        throws InvalidConfigurationException;
   }
 
   // ------------------------- SmtInterpol -------------------------
@@ -195,13 +239,16 @@ public class FormulaManagerFactory {
   // and we already have the normal (unmodified) version of Java CUP
   // on the class path of the normal class loader.
 
-  private static final Pattern SMTINTERPOL_CLASSES = Pattern.compile("^("
-      + "org\\.sosy_lab\\.solver\\.smtInterpol|"
-      + "de\\.uni_freiburg\\.informatik\\.ultimate|"
-      + "java_cup\\.runtime|"
-      + "org\\.apache\\.log4j"
-      + ")\\..*");
-  private static final String SMTINTERPOL_FACTORY_CLASS = "org.sosy_lab.solver.smtInterpol.SmtInterpolSolverFactory";
+  private static final Pattern SMTINTERPOL_CLASSES =
+      Pattern.compile(
+          "^("
+              + "org\\.sosy_lab\\.solver\\.smtInterpol|"
+              + "de\\.uni_freiburg\\.informatik\\.ultimate|"
+              + "java_cup\\.runtime|"
+              + "org\\.apache\\.log4j"
+              + ")\\..*");
+  private static final String SMTINTERPOL_FACTORY_CLASS =
+      "org.sosy_lab.solver.smtInterpol.SmtInterpolSolverFactory";
 
   // We keep the class loader for SmtInterpol around
   // in case someone creates a seconds instance of FormulaManagerFactory
@@ -220,8 +267,10 @@ public class FormulaManagerFactory {
             ClassLoader classLoader = getClassLoader(logger);
 
             @SuppressWarnings("unchecked")
-            Class<? extends SolverFactory> factoryClass = (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
-            Constructor<? extends SolverFactory> factoryConstructor = factoryClass.getConstructor(new Class<?>[0]);
+            Class<? extends SolverFactory> factoryClass =
+                (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
+            Constructor<? extends SolverFactory> factoryConstructor =
+                factoryClass.getConstructor(new Class<?>[0]);
             smtInterpolFactory = result = factoryConstructor.newInstance();
           } catch (ReflectiveOperationException e) {
             throw new Classes.UnexpectedCheckedException("Failed to load SmtInterpol", e);
@@ -250,17 +299,18 @@ public class FormulaManagerFactory {
       // Filter out java-cup-runtime.jar from the class path,
       // so that the class loader for SmtInterpol loads the Java CUP classes
       // from SmtInterpol's JAR file.
-      URL[] urls = from(Arrays.asList(((URLClassLoader)classLoader).getURLs()))
-        .filter(new Predicate<URL>() {
-            @Override
-            public boolean apply(@Nonnull URL pInput) {
-              return !pInput.getPath().contains("java-cup");
-            }
-          })
-        .toArray(URL.class);
+      URL[] urls =
+          from(Arrays.asList(((URLClassLoader) classLoader).getURLs()))
+              .filter(
+                  new Predicate<URL>() {
+                    @Override
+                    public boolean apply(@Nonnull URL pInput) {
+                      return !pInput.getPath().contains("java-cup");
+                    }
+                  })
+              .toArray(URL.class);
 
-      classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls,
-          classLoader);
+      classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls, classLoader);
     }
     smtInterpolClassLoader = new WeakReference<>(classLoader);
     return classLoader;

@@ -30,17 +30,16 @@ import java.math.BigInteger;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 
-
-abstract class Mathsat5NumeralFormulaManager
-        <ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-        extends AbstractNumeralFormulaManager<Long, Long, Long, ParamFormulaType, ResultFormulaType> {
+abstract class Mathsat5NumeralFormulaManager<
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<Long, Long, Long, ParamFormulaType, ResultFormulaType> {
 
   private final long mathsatEnv;
 
   public Mathsat5NumeralFormulaManager(
-          Mathsat5FormulaCreator pCreator,
-          Mathsat5FunctionFormulaManager functionManager,
-          boolean useNonLinearArithmetic) {
+      Mathsat5FormulaCreator pCreator,
+      Mathsat5FunctionFormulaManager functionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, functionManager, useNonLinearArithmetic);
 
     this.mathsatEnv = pCreator.getEnv();
@@ -90,7 +89,8 @@ abstract class Mathsat5NumeralFormulaManager
 
   @Override
   public Long linearMultiply(Long pNumber1, Long pNumber2) {
-    assert isNumeral(pNumber1) || isNumeral(pNumber2) : "at least one of the operands must be a number";
+    assert isNumeral(pNumber1) || isNumeral(pNumber2)
+        : "at least one of the operands must be a number";
     return msat_make_times(mathsatEnv, pNumber1, pNumber2);
   }
 

@@ -48,14 +48,13 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-
 /**
  * This class contains some simple Junit-tests to check the interpolation-API of our solvers.
  */
 @RunWith(Parameterized.class)
 public class SolverInterpolationTest extends SolverBasedTest0 {
 
-  @Parameters(name="{0} (shared={1})")
+  @Parameters(name = "{0} (shared={1})")
   public static List<Object[]> getAllCombinations() {
     List<Object[]> result = new ArrayList<>();
     for (Solvers solver : Solvers.values()) {
@@ -79,7 +78,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    return (InterpolatingProverEnvironment<T>)mgr.newProverEnvironmentWithInterpolation(shared);
+    return (InterpolatingProverEnvironment<T>) mgr.newProverEnvironmentWithInterpolation(shared);
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
@@ -146,13 +145,17 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   private void requireSequentialItp() {
-    assume().withFailureMessage("Solver does not support sequential interpolation.")
-            .that(solver).isNotEqualTo(Solvers.MATHSAT5);
+    assume()
+        .withFailureMessage("Solver does not support sequential interpolation.")
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
   }
 
   private void requireTreeItp() {
-    assume().withFailureMessage("Solver does not support tree-interpolation.")
-        .that(solver).isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL);
+    assume()
+        .withFailureMessage("Solver does not support tree-interpolation.")
+        .that(solver)
+        .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL);
   }
 
   @Test
@@ -185,7 +188,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps = stack.getSeqInterpolants(Lists.newArrayList(TA,TB,TC,TD));
+    List<BooleanFormula> itps = stack.getSeqInterpolants(Lists.newArrayList(TA, TB, TC, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -234,9 +237,10 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // B  C
     // | /
     // R
-    List<BooleanFormula> itps = stack.getTreeInterpolants(
-        Lists.newArrayList(TA, TB, TD, TC, TR),  // post-order
-        new int[]         { 0,  0,  2,  2,  0}); // left-most node in current subtree
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(
+            Lists.newArrayList(TA, TB, TD, TC, TR), // post-order
+            new int[] {0, 0, 2, 2, 0}); // left-most node in current subtree
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -245,10 +249,11 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     stack.pop();
 
     checkImplies(stack, A, itps.get(0));
-    checkImplies(stack, bmgr.and(itps.get(0),B), itps.get(1));
+    checkImplies(stack, bmgr.and(itps.get(0), B), itps.get(1));
     checkImplies(stack, D, itps.get(2));
-    checkImplies(stack, bmgr.and(itps.get(2),C), itps.get(3));
-    checkImplies(stack, bmgr.and(Lists.newArrayList(itps.get(1), itps.get(3), R)), bmgr.makeBoolean(false));
+    checkImplies(stack, bmgr.and(itps.get(2), C), itps.get(3));
+    checkImplies(
+        stack, bmgr.and(Lists.newArrayList(itps.get(1), itps.get(3), R)), bmgr.makeBoolean(false));
   }
 
   @Test
@@ -295,9 +300,10 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // R1 D
     // | /
     // R2
-    List<BooleanFormula> itps = stack.getTreeInterpolants(
-        Lists.newArrayList(TA, TB, TC, TR1, TD, TR2),  // post-order
-        new int[]         { 0,  0,  2,   0,  4,  0}); // left-most node in current subtree
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(
+            Lists.newArrayList(TA, TB, TC, TR1, TD, TR2), // post-order
+            new int[] {0, 0, 2, 0, 4, 0}); // left-most node in current subtree
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -307,28 +313,31 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     stack.pop();
 
     checkImplies(stack, A, itps.get(0));
-    checkImplies(stack, bmgr.and(itps.get(0),B), itps.get(1));
+    checkImplies(stack, bmgr.and(itps.get(0), B), itps.get(1));
     checkImplies(stack, C, itps.get(2));
     checkImplies(stack, bmgr.and(Lists.newArrayList(itps.get(1), itps.get(2), R1)), itps.get(3));
     checkImplies(stack, D, itps.get(4));
-    checkImplies(stack, bmgr.and(Lists.newArrayList(itps.get(3), itps.get(4), R2)), bmgr.makeBoolean(false));
+    checkImplies(
+        stack, bmgr.and(Lists.newArrayList(itps.get(3), itps.get(4), R2)), bmgr.makeBoolean(false));
   }
 
-  private void checkItpSequence(InterpolatingProverEnvironment<?> stack,
-                                    List<BooleanFormula> formulas, List<BooleanFormula> itps)
-          throws SolverException, InterruptedException {
+  private void checkItpSequence(
+      InterpolatingProverEnvironment<?> stack,
+      List<BooleanFormula> formulas,
+      List<BooleanFormula> itps)
+      throws SolverException, InterruptedException {
 
     assert formulas.size() - 1 == itps.size() : "there should be N-1 interpolants for N formulas";
 
     checkImplies(stack, formulas.get(0), itps.get(0));
     for (int i = 1; i < formulas.size() - 1; i++) {
-      checkImplies(stack, bmgr.and(itps.get(i-1), formulas.get(i)), itps.get(i));
+      checkImplies(stack, bmgr.and(itps.get(i - 1), formulas.get(i)), itps.get(i));
     }
     checkImplies(stack, bmgr.and(getLast(itps), getLast(formulas)), bmgr.makeBoolean(false));
   }
 
   private void checkImplies(BasicProverEnvironment<?> stack, BooleanFormula a, BooleanFormula b)
-          throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException {
     // a=>b  <-->  !a||b
     stack.push(bmgr.or(bmgr.not(a), b));
     assertThatEnvironment(stack).isSatisfiable();

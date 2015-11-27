@@ -31,8 +31,8 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
-
-class SmtInterpolBooleanFormulaManager extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolBooleanFormulaManager
+    extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
   // We use the Theory directly here because the methods there perform simplifications
   // that we could not use otherwise.
@@ -50,7 +50,7 @@ class SmtInterpolBooleanFormulaManager extends AbstractBooleanFormulaManager<Ter
 
   @Override
   public Term makeBooleanImpl(boolean pValue) {
-    Term t ;
+    Term t;
     if (pValue) {
       t = theory.mTrue;
     } else {
@@ -61,9 +61,11 @@ class SmtInterpolBooleanFormulaManager extends AbstractBooleanFormulaManager<Ter
 
   @Override
   public Term equivalence(Term t1, Term t2) {
-    assert SmtInterpolUtil.isBoolean(t1) && SmtInterpolUtil.isBoolean(t2) :
-      "Cannot make equivalence of non-boolean terms:\nTerm 1:\n" +
-      t1.toStringDirect() + "\nTerm 2:\n" + t2.toStringDirect();
+    assert SmtInterpolUtil.isBoolean(t1) && SmtInterpolUtil.isBoolean(t2)
+        : "Cannot make equivalence of non-boolean terms:\nTerm 1:\n"
+            + t1.toStringDirect()
+            + "\nTerm 2:\n"
+            + t2.toStringDirect();
     return theory.equals(t1, t2);
   }
 
@@ -146,5 +148,4 @@ class SmtInterpolBooleanFormulaManager extends AbstractBooleanFormulaManager<Ter
   protected boolean isIfThenElse(Term pBits) {
     return SmtInterpolUtil.isIfThenElse(pBits);
   }
-
 }

@@ -27,14 +27,14 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.*;
 
 import org.sosy_lab.solver.SolverException;
 
-
 public class Z3NativeApiHelpers {
   /**
    * Apply multiple tactics in sequence.
    */
-  static long applyTactics(long z3context, final Long pF, String ... pTactics) throws InterruptedException, SolverException {
+  static long applyTactics(long z3context, final Long pF, String... pTactics)
+      throws InterruptedException, SolverException {
     long overallResult = pF;
-    for (String tactic: pTactics) {
+    for (String tactic : pTactics) {
       long tacticResult = applyTactic(z3context, overallResult, tactic);
       if (overallResult != pF) {
         dec_ref(z3context, overallResult);
@@ -76,7 +76,7 @@ public class Z3NativeApiHelpers {
     int no_subgoals = apply_result_get_num_subgoals(z3context, applyResult);
     long[] goal_formulas = new long[no_subgoals];
 
-    for (int i=0; i<no_subgoals; i++) {
+    for (int i = 0; i < no_subgoals; i++) {
       long subgoal = apply_result_get_subgoal(z3context, applyResult, i);
       goal_inc_ref(z3context, subgoal);
       long subgoal_ast = goalToAST(z3context, subgoal);
@@ -85,11 +85,11 @@ public class Z3NativeApiHelpers {
       goal_dec_ref(z3context, subgoal);
     }
     try {
-      return goal_formulas.length == 1 ?
-          goal_formulas[0] :
-          mk_or(z3context, goal_formulas.length, goal_formulas);
+      return goal_formulas.length == 1
+          ? goal_formulas[0]
+          : mk_or(z3context, goal_formulas.length, goal_formulas);
     } finally {
-      for (int i=0; i<no_subgoals; i++) {
+      for (int i = 0; i < no_subgoals; i++) {
         dec_ref(z3context, goal_formulas[i]);
       }
     }
@@ -98,17 +98,17 @@ public class Z3NativeApiHelpers {
   private static long goalToAST(long z3context, long goal) {
     int no_subgoal_f = goal_size(z3context, goal);
     long[] subgoal_formulas = new long[no_subgoal_f];
-    for (int k=0; k<no_subgoal_f; k++) {
+    for (int k = 0; k < no_subgoal_f; k++) {
       long f = goal_formula(z3context, goal, k);
       inc_ref(z3context, f);
       subgoal_formulas[k] = f;
     }
     try {
-      return subgoal_formulas.length == 1 ?
-          subgoal_formulas[0] :
-          mk_and(z3context, subgoal_formulas.length, subgoal_formulas);
+      return subgoal_formulas.length == 1
+          ? subgoal_formulas[0]
+          : mk_and(z3context, subgoal_formulas.length, subgoal_formulas);
     } finally {
-      for (int k=0; k<no_subgoal_f; k++) {
+      for (int k = 0; k < no_subgoal_f; k++) {
         dec_ref(z3context, subgoal_formulas[k]);
       }
     }

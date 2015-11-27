@@ -33,9 +33,9 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
   Z3IntegerFormulaManager(
-          Z3FormulaCreator pCreator,
-          Z3FunctionFormulaManager pFunctionManager,
-          boolean useNonLinearArithmetic) {
+      Z3FormulaCreator pCreator,
+      Z3FunctionFormulaManager pFunctionManager,
+      boolean useNonLinearArithmetic) {
     super(pCreator, pFunctionManager, useNonLinearArithmetic);
   }
 
@@ -51,7 +51,7 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
 
   @Override
   protected Long makeNumberImpl(double pNumber) {
-    return makeNumberImpl((long)pNumber);
+    return makeNumberImpl((long) pNumber);
   }
 
   @Override

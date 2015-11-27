@@ -42,19 +42,19 @@ class Z3Model {
   private static TermType toZ3Type(long z3context, long sort) {
     int sortKind = get_sort_kind(z3context, sort);
     switch (sortKind) {
-    case Z3_BOOL_SORT:
-      return TermType.Boolean;
-    case Z3_INT_SORT:
-      return TermType.Integer;
-    case Z3_REAL_SORT:
-      return TermType.Real;
-    case Z3_BV_SORT:
-      return TermType.Bitvector;
-    case Z3_ARRAY_SORT:
-      return TermType.Array;
-    default:
-      // TODO Uninterpreted;
-      throw new IllegalArgumentException("Given parameter cannot be converted to a TermType!");
+      case Z3_BOOL_SORT:
+        return TermType.Boolean;
+      case Z3_INT_SORT:
+        return TermType.Integer;
+      case Z3_REAL_SORT:
+        return TermType.Real;
+      case Z3_BV_SORT:
+        return TermType.Bitvector;
+      case Z3_ARRAY_SORT:
+        return TermType.Array;
+      default:
+        // TODO Uninterpreted;
+        throw new IllegalArgumentException("Given parameter cannot be converted to a TermType!");
     }
   }
 
@@ -62,8 +62,10 @@ class Z3Model {
     long decl = get_app_decl(z3context, expr);
     long symbol = get_decl_name(z3context, decl);
 
-    Preconditions.checkArgument(get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
-        "Given symbol of expression is no stringSymbol! (%s)", new LazyString(expr, z3context));
+    Preconditions.checkArgument(
+        get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
+        "Given symbol of expression is no stringSymbol! (%s)",
+        new LazyString(expr, z3context));
 
     String lName = get_symbol_string(z3context, symbol);
     long sort = get_sort(z3context, expr);
@@ -71,13 +73,14 @@ class Z3Model {
     return new Variable(lName, lType);
   }
 
-
   private static Function toFunction(long z3context, long expr) {
     long decl = get_app_decl(z3context, expr);
     long symbol = get_decl_name(z3context, decl);
 
-    Preconditions.checkArgument(get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
-        "Given symbol of expression is no stringSymbol! (%s)", new LazyString(expr, z3context));
+    Preconditions.checkArgument(
+        get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
+        "Given symbol of expression is no stringSymbol! (%s)",
+        new LazyString(expr, z3context));
 
     String lName = get_symbol_string(z3context, symbol);
     long sort = get_sort(z3context, expr);
@@ -95,23 +98,28 @@ class Z3Model {
       long argSort = get_sort(z3context, arg);
       int sortKind = get_sort_kind(z3context, argSort);
       switch (sortKind) {
-      case Z3_INT_SORT: {
-        lValue = new BigInteger(get_numeral_string(z3context, arg));
-        break;
-      }
-      case Z3_REAL_SORT: {
-        String s = get_numeral_string(z3context, arg);
-        lValue = Rational.ofString(s);
-        break;
-      }
-      case Z3_BV_SORT: {
-        lValue = interpretBitvector(z3context, arg);
-        break;
-      }
-      default:
-        throw new IllegalArgumentException(
-            "function " + ast_to_string(z3context, expr) + " with unhandled arg "
-                + ast_to_string(z3context, arg));
+        case Z3_INT_SORT:
+          {
+            lValue = new BigInteger(get_numeral_string(z3context, arg));
+            break;
+          }
+        case Z3_REAL_SORT:
+          {
+            String s = get_numeral_string(z3context, arg);
+            lValue = Rational.ofString(s);
+            break;
+          }
+        case Z3_BV_SORT:
+          {
+            lValue = interpretBitvector(z3context, arg);
+            break;
+          }
+        default:
+          throw new IllegalArgumentException(
+              "function "
+                  + ast_to_string(z3context, expr)
+                  + " with unhandled arg "
+                  + ast_to_string(z3context, arg));
       }
 
       dec_ref(z3context, arg);
@@ -122,10 +130,11 @@ class Z3Model {
     return new Function(lName, lType, lArguments);
   }
 
-
   private static AssignableTerm toAssignable(long z3context, long expr) {
-    Preconditions.checkArgument(is_app(z3context, expr),
-        "Given expr is no application! (%s)", new LazyString(expr, z3context));
+    Preconditions.checkArgument(
+        is_app(z3context, expr),
+        "Given expr is no application! (%s)",
+        new LazyString(expr, z3context));
 
     if (get_app_num_args(z3context, expr) == 0) {
       return toVariable(z3context, expr);
@@ -139,17 +148,13 @@ class Z3Model {
     return parseZ3Model(mgr, z3context, z3model);
   }
 
-  public static Model parseZ3Model(
-      Z3FormulaManager mgr,
-      long z3context,
-      long z3model) {
+  public static Model parseZ3Model(Z3FormulaManager mgr, long z3context, long z3model) {
     mgr.getSmtLogger().logGetModel();
     return new Model(parseMapFromModel(z3context, z3model));
   }
 
   private static ImmutableMap<AssignableTerm, Object> parseMapFromModel(
-      long z3context, long z3model
-  ) {
+      long z3context, long z3model) {
     model_inc_ref(z3context, z3model);
     ImmutableMap.Builder<AssignableTerm, Object> model = ImmutableMap.builder();
 
@@ -158,8 +163,7 @@ class Z3Model {
       long keyDecl = model_get_const_decl(z3context, z3model, i);
       inc_ref(z3context, keyDecl);
 
-      Preconditions.checkArgument(get_arity(z3context, keyDecl) == 0,
-          "declaration is no constant");
+      Preconditions.checkArgument(get_arity(z3context, keyDecl) == 0, "declaration is no constant");
 
       long var = mk_app(z3context, keyDecl);
       inc_ref(z3context, var);
@@ -172,7 +176,8 @@ class Z3Model {
       Object lValue;
       switch (lAssignable.getType()) {
         case Boolean:
-          lValue = isOP(z3context, value, Z3_OP_TRUE); // if IS_TRUE, true, else false. TODO IS_UNKNOWN ?
+          lValue =
+              isOP(z3context, value, Z3_OP_TRUE); // if IS_TRUE, true, else false. TODO IS_UNKNOWN ?
           break;
 
         case Integer:
@@ -193,7 +198,8 @@ class Z3Model {
           continue;
 
         default:
-          throw new IllegalArgumentException("Z3 expr with unhandled type " + lAssignable.getType());
+          throw new IllegalArgumentException(
+              "Z3 expr with unhandled type " + lAssignable.getType());
       }
 
       model.put(lAssignable, lValue);

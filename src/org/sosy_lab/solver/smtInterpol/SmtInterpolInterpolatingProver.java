@@ -53,7 +53,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   private final List<String> assertedFormulas; // Collection of termNames
   private final Map<String, Term> annotatedTerms; // Collection of termNames
   private static final String prefix = "term_"; // for termnames
-  private static final UniqueIdGenerator termIdGenerator = new UniqueIdGenerator(); // for different termnames // TODO static?
+  private static final UniqueIdGenerator termIdGenerator =
+      new UniqueIdGenerator(); // for different termnames // TODO static?
 
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
     mgr = pMgr;
@@ -86,7 +87,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   @Override
   public void pop() {
     Preconditions.checkNotNull(env);
-    String removed = assertedFormulas.remove(assertedFormulas.size()-1); // remove last term
+    String removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
     annotatedTerms.remove(removed);
     assert assertedFormulas.size() == annotatedTerms.size();
     env.pop(1);
@@ -104,9 +105,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<String> termNamesOfB = from(assertedFormulas)
-                                 .filter(not(in(termNamesOfA)))
-                                 .toSet();
+    Set<String> termNamesOfB = from(assertedFormulas).filter(not(in(termNamesOfA))).toSet();
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     Term termA = buildConjunctionOfNamedTerms(termNamesOfA);
@@ -135,7 +134,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
-  public List<BooleanFormula> getTreeInterpolants(List<Set<String>> partitionedTermNames, int[] startOfSubTree) {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<Set<String>> partitionedTermNames, int[] startOfSubTree) {
     Preconditions.checkNotNull(env);
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
@@ -157,7 +157,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   /** checks for a valid subtree-structure.
    * This code is taken from SMTinterpol itself, where it is disabled. */
-  private static boolean checkSubTrees(List<Set<String>> partitionedTermNames, int[] startOfSubTree) {
+  private static boolean checkSubTrees(
+      List<Set<String>> partitionedTermNames, int[] startOfSubTree) {
     for (int i = 0; i < partitionedTermNames.size(); i++) {
       if (startOfSubTree[i] < 0) {
         throw new AssertionError("subtree array must not contain negative element");
@@ -187,8 +188,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   private Term buildConjunctionOfNamedTerms(Set<String> termNames) {
     Term[] terms = new Term[termNames.size()];
-    int i=0;
-    for (String termName: termNames) {
+    int i = 0;
+    for (String termName : termNames) {
       terms[i] = env.term(termName);
       i++;
     }

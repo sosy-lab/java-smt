@@ -62,7 +62,8 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
   @Override
   public final <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
-    checkArgument(!pArgTypes.contains(FormulaType.BooleanType),
+    checkArgument(
+        !pArgTypes.contains(FormulaType.BooleanType),
         "Uninterpreted functions with boolean arguments are currently not supported in CPAchecker.");
 
     List<TType> argTypes = new ArrayList<>(pArgTypes.size());
@@ -70,7 +71,8 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       argTypes.add(toSolverType(argtype));
     }
 
-    return new AbstractUninterpretedFunctionDeclaration<>(pReturnType,
+    return new AbstractUninterpretedFunctionDeclaration<>(
+        pReturnType,
         declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes),
         pArgTypes);
   }
@@ -99,7 +101,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       UninterpretedFunctionDeclaration<T> pFunc, List<TFormulaInfo> pArgs) {
     @SuppressWarnings("unchecked")
     AbstractUninterpretedFunctionDeclaration<T, TFunctionDecl> func =
-        (AbstractUninterpretedFunctionDeclaration<T, TFunctionDecl>)pFunc;
+        (AbstractUninterpretedFunctionDeclaration<T, TFunctionDecl>) pFunc;
 
     return createUninterpretedFunctionCallImpl(func.getFuncDecl(), pArgs);
   }

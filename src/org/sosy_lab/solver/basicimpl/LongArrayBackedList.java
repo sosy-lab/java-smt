@@ -63,5 +63,4 @@ public abstract class LongArrayBackedList<E> extends AbstractList<E> implements 
   public final int size() {
     return array.length;
   }
-
 }

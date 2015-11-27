@@ -31,10 +31,7 @@ import ap.parser.IExpression;
 
 class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, PrincessEnvironment> {
 
-  PrincessFormulaCreator(
-          PrincessEnvironment pEnv,
-          TermType pBoolType,
-          TermType pIntegerType) {
+  PrincessFormulaCreator(PrincessEnvironment pEnv, TermType pBoolType, TermType pIntegerType) {
     super(pEnv, pBoolType, pIntegerType, null);
   }
 

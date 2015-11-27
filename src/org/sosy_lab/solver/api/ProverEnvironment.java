@@ -53,9 +53,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    * @return A region representing all satisfying models of the formula.
    * @throws InterruptedException
    */
-  <T> T allSat(
-      AllSatCallback<T> callback,
-      List<BooleanFormula> important)
+  <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
 
   /**

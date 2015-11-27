@@ -69,8 +69,7 @@ public class LoggingOptEnvironment implements OptEnvironment {
   }
 
   @Override
-  public OptStatus check()
-      throws InterruptedException, SolverException {
+  public OptStatus check() throws InterruptedException, SolverException {
     logger.log(Level.FINE, "Performing optimization");
     return wrapped.check();
   }

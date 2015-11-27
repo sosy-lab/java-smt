@@ -64,14 +64,13 @@ class PrincessModel {
     return new Variable(lName, lType);
   }
 
-
-  private static Function toFunction(IExpression t,
-      PrincessEnvironment env, SimpleAPI.PartialModel partialModel) {
+  private static Function toFunction(
+      IExpression t, PrincessEnvironment env, SimpleAPI.PartialModel partialModel) {
     if (PrincessUtil.isVariable(t)) {
       throw new IllegalArgumentException("Given term is no function! (" + t.toString() + ")");
     }
 
-    IFunApp appTerm = (IFunApp)t;
+    IFunApp appTerm = (IFunApp) t;
     String lName = appTerm.fun().name();
 
     int lArity = PrincessUtil.getArity(appTerm);
@@ -94,9 +93,8 @@ class PrincessModel {
     return new Function(lName, TermType.Integer, lArguments);
   }
 
-
-  private static AssignableTerm toAssignable(IExpression t,
-      PrincessEnvironment env, SimpleAPI.PartialModel partialModel) {
+  private static AssignableTerm toAssignable(
+      IExpression t, PrincessEnvironment env, SimpleAPI.PartialModel partialModel) {
     if (PrincessUtil.isVariable(t)) {
       return toVariable(t);
     } else {
@@ -106,13 +104,14 @@ class PrincessModel {
 
   private static Object getValue(SimpleAPI.ModelValue value) {
     if (value instanceof SimpleAPI.BoolValue) {
-      return ((SimpleAPI.BoolValue)value).v();
+      return ((SimpleAPI.BoolValue) value).v();
 
     } else if (value instanceof SimpleAPI.IntValue) {
-      return ((SimpleAPI.IntValue)value).v().bigIntValue();
+      return ((SimpleAPI.IntValue) value).v().bigIntValue();
 
     } else {
-      throw new IllegalArgumentException("unhandled model value " + value + " of type " + value.getClass());
+      throw new IllegalArgumentException(
+          "unhandled model value " + value + " of type " + value.getClass());
     }
   }
 
@@ -137,14 +136,16 @@ class PrincessModel {
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
       // leading to two entries for "uf(1)" (if value is 1).
       Object existingValue = model.get(lAssignable);
-      Verify.verify(existingValue == null || lValue.equals(existingValue),
-          "Duplicate values for model entry %s: %s and %s", lAssignable, existingValue, lValue
-          );
+      Verify.verify(
+          existingValue == null || lValue.equals(existingValue),
+          "Duplicate values for model entry %s: %s and %s",
+          lAssignable,
+          existingValue,
+          lValue);
 
       model.put(lAssignable, lValue);
     }
 
     return new Model(model);
   }
-
 }

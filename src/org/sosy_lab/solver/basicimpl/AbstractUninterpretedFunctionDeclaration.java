@@ -36,11 +36,13 @@ import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 /**
  * A simple straightforward implementation of FunctionFormulaType<T>
  */
-class AbstractUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl> extends UninterpretedFunctionDeclaration<T> {
+class AbstractUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
+    extends UninterpretedFunctionDeclaration<T> {
 
   private final TFuncDecl funcDecl;
 
-  AbstractUninterpretedFunctionDeclaration(FormulaType<T> returnType, TFuncDecl funcDecl, List<FormulaType<?>> argumentTypes) {
+  AbstractUninterpretedFunctionDeclaration(
+      FormulaType<T> returnType, TFuncDecl funcDecl, List<FormulaType<?>> argumentTypes) {
     super(returnType, argumentTypes);
     this.funcDecl = checkNotNull(funcDecl);
   }
@@ -63,7 +65,7 @@ class AbstractUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl> ext
       return false;
     }
     AbstractUninterpretedFunctionDeclaration<?, ?> other =
-        (AbstractUninterpretedFunctionDeclaration<?, ?>)obj;
+        (AbstractUninterpretedFunctionDeclaration<?, ?>) obj;
 
     return funcDecl.equals(other.funcDecl);
   }

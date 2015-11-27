@@ -25,7 +25,6 @@ package org.sosy_lab.solver.api;
 
 import java.util.List;
 
-
 /**
  * This interface represents the Functiontype-Theory
  */
@@ -36,6 +35,7 @@ public interface FunctionFormulaManager {
    */
   public <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args);
+
   public <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
       String name, FormulaType<T> returnType, FormulaType<?>... args);
 

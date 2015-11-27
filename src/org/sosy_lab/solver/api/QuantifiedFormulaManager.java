@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.sosy_lab.solver.SolverException;
 
-
 /**
  * This interface represents the a theory with quantifiers.
  *
@@ -41,7 +40,7 @@ public interface QuantifiedFormulaManager {
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
    */
-  public BooleanFormula exists (List<? extends Formula> pVariables, BooleanFormula pBody);
+  public BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
    * @return An universal quantified formula.
@@ -49,7 +48,7 @@ public interface QuantifiedFormulaManager {
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
    */
-  public BooleanFormula forall (List<? extends Formula> pVariables, BooleanFormula pBody);
+  public BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
    * Eliminate the quantifiers for a given formula.
@@ -57,7 +56,8 @@ public interface QuantifiedFormulaManager {
    * @param pF Formula with quantifiers.
    * @return  New formula without quantifiers.
    */
-  public BooleanFormula eliminateQuantifiers(BooleanFormula pF) throws InterruptedException, SolverException;
+  public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
+      throws InterruptedException, SolverException;
 
   /**
    * @return Whether {@code pF} is a quantifier.

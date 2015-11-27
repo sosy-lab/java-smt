@@ -38,7 +38,7 @@ import org.sosy_lab.solver.SolverException;
  * (preferably using the try-with-resources syntax).
  * All methods are expected to throw {@link IllegalStateException}s after
  * close was called.
-
+ *
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */
 public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironment<T> {
@@ -102,5 +102,6 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @param startOfSubtree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
    */
-  public List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree);
+  public List<BooleanFormula> getTreeInterpolants(
+      List<Set<T>> partitionedFormulas, int[] startOfSubTree);
 }

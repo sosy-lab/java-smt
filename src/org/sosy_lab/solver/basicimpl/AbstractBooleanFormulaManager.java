@@ -33,14 +33,10 @@ import org.sosy_lab.solver.api.FormulaType;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 
-
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
-  extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-  implements
-    BooleanFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
 
-  protected AbstractBooleanFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractBooleanFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
   }
 
@@ -48,7 +44,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   public boolean isBoolean(Formula f) {
     return f instanceof BooleanFormula;
   }
-
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateBoolean(formulaInfo);
@@ -61,11 +56,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
 
-
   @Override
   public BooleanFormula makeBoolean(boolean value) {
     return wrap(makeBooleanImpl(value));
   }
+
   protected abstract TFormulaInfo makeBooleanImpl(boolean value);
 
   @Override
@@ -74,8 +69,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     return wrap(not(param1));
   }
 
-  protected abstract TFormulaInfo not(TFormulaInfo pParam1) ;
-
+  protected abstract TFormulaInfo not(TFormulaInfo pParam1);
 
   @Override
   public BooleanFormula and(BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -116,6 +110,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract TFormulaInfo or(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
   @Override
   public BooleanFormula xor(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
@@ -152,28 +147,31 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     return isNot(param);
   }
 
-  protected abstract boolean isNot(TFormulaInfo pParam) ;
-
+  protected abstract boolean isNot(TFormulaInfo pParam);
 
   @Override
   public boolean isAnd(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isAnd(param);
   }
-  protected abstract boolean isAnd(TFormulaInfo pParam) ;
+
+  protected abstract boolean isAnd(TFormulaInfo pParam);
+
   @Override
   public boolean isOr(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isOr(param);
   }
-  protected abstract boolean isOr(TFormulaInfo pParam) ;
+
+  protected abstract boolean isOr(TFormulaInfo pParam);
+
   @Override
   public boolean isXor(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isXor(param);
   }
-  protected abstract boolean isXor(TFormulaInfo pParam) ;
 
+  protected abstract boolean isXor(TFormulaInfo pParam);
 
   /**
    * Creates a formula representing an equivalence of the two arguments.
@@ -187,6 +185,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     TFormulaInfo param2 = extractInfo(pBits2);
     return wrap(equivalence(param1, param2));
   }
+
   protected abstract TFormulaInfo equivalence(TFormulaInfo bits1, TFormulaInfo bits2);
 
   @Override
@@ -200,19 +199,19 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     return or(not(bits1), bits2);
   }
 
-
   @Override
   public final boolean isTrue(BooleanFormula pBits) {
     return isTrue(extractInfo(pBits));
   }
+
   protected abstract boolean isTrue(TFormulaInfo bits);
 
   @Override
   public final boolean isFalse(BooleanFormula pBits) {
     return isFalse(extractInfo(pBits));
   }
-  protected abstract boolean isFalse(TFormulaInfo bits);
 
+  protected abstract boolean isFalse(TFormulaInfo bits);
 
   /**
    * Creates a formula representing "IF cond THEN f1 ELSE f2"
@@ -226,13 +225,20 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     FormulaType<T> t1 = getFormulaCreator().getFormulaType(f1);
     FormulaType<T> t2 = getFormulaCreator().getFormulaType(f2);
     if (!t1.equals(t2)) {
-      throw new IllegalArgumentException("Cannot create if-then-else formula with branches of different types: "
-          + f1 + " is of type " + t1 + "; "
-          + f2 + " is of type " + t2);
+      throw new IllegalArgumentException(
+          "Cannot create if-then-else formula with branches of different types: "
+              + f1
+              + " is of type "
+              + t1
+              + "; "
+              + f2
+              + " is of type "
+              + t2);
     }
     TFormulaInfo result = ifThenElse(extractInfo(pBits), extractInfo(f1), extractInfo(f2));
     return getFormulaCreator().encapsulate(t1, result);
   }
+
   protected abstract TFormulaInfo ifThenElse(TFormulaInfo cond, TFormulaInfo f1, TFormulaInfo f2);
 
   @Override

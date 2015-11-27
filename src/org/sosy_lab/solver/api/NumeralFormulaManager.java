@@ -29,16 +29,14 @@ import java.util.List;
 
 import org.sosy_lab.common.rationals.Rational;
 
-
 /**
  * This interface represents the Numeral-Theory
  *
  * @param <ParamFormulaType> formulaType of the parameters
  * @param <ResultFormulaType> formulaType of arithmetic results
  */
-public interface NumeralFormulaManager
-        <ParamFormulaType extends NumeralFormula,
-         ResultFormulaType extends NumeralFormula>  {
+public interface NumeralFormulaManager<
+    ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula> {
 
   public ResultFormulaType makeNumber(long number);
 
@@ -71,6 +69,7 @@ public interface NumeralFormulaManager
   public ResultFormulaType negate(ParamFormulaType number);
 
   public ResultFormulaType add(ParamFormulaType number1, ParamFormulaType number2);
+
   public ResultFormulaType sum(List<ParamFormulaType> operands);
 
   public ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2);
@@ -84,7 +83,8 @@ public interface NumeralFormulaManager
    * This is an optional operation,
    * and instead may return `true`.
    */
-  public BooleanFormula modularCongruence(ParamFormulaType number1, ParamFormulaType number2, long mod);
+  public BooleanFormula modularCongruence(
+      ParamFormulaType number1, ParamFormulaType number2, long mod);
 
   public ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
 

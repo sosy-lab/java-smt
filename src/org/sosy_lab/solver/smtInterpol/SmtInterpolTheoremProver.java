@@ -22,6 +22,7 @@
  *    http://cpachecker.sosy-lab.org
  */
 package org.sosy_lab.solver.smtInterpol;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
@@ -48,12 +49,13 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   private @Nullable SmtInterpolEnvironment env;
   private final List<Term> assertedTerms;
 
-  private final Function<Term, BooleanFormula> encapsulateBoolean = new Function<Term, BooleanFormula>() {
-    @Override
-    public BooleanFormula apply(Term pInput) {
-      return mgr.encapsulateBooleanFormula(pInput);
-    }
-  };
+  private final Function<Term, BooleanFormula> encapsulateBoolean =
+      new Function<Term, BooleanFormula>() {
+        @Override
+        public BooleanFormula apply(Term pInput) {
+          return mgr.encapsulateBooleanFormula(pInput);
+        }
+      };
 
   SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr) {
     mgr = pMgr;
@@ -107,10 +109,8 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
     return Lists.transform(Arrays.asList(terms), encapsulateBoolean);
   }
 
-
   @Override
-  public <T> T allSat(AllSatCallback<T> callback,
-      List<BooleanFormula> important)
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
@@ -125,7 +125,6 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
 
   @Override
   public Formula evaluate(Formula f) {
-    throw new UnsupportedOperationException("SmtInterpol does not support model "
-        + "evaluation");
+    throw new UnsupportedOperationException("SmtInterpol does not support model " + "evaluation");
   }
 }

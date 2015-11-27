@@ -38,9 +38,7 @@ class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long
   private final Z3SmtLogger smtLogger;
 
   Z3FunctionFormulaManager(
-      Z3FormulaCreator creator,
-      Z3UnsafeFormulaManager unsafeManager,
-      Z3SmtLogger smtLogger) {
+      Z3FormulaCreator creator, Z3UnsafeFormulaManager unsafeManager, Z3SmtLogger smtLogger) {
     super(creator, unsafeManager);
     this.z3context = creator.getEnv();
     this.unsafeManager = unsafeManager;
@@ -55,9 +53,7 @@ class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long
 
   @Override
   protected Long declareUninterpretedFunctionImpl(
-        String pName,
-        Long returnType,
-        List<Long> pArgTypes) {
+      String pName, Long returnType, List<Long> pArgTypes) {
 
     long symbol = mk_string_symbol(z3context, pName);
     long[] sorts = Longs.toArray(pArgTypes);

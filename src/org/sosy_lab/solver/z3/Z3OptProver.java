@@ -54,10 +54,9 @@ class Z3OptProver implements OptEnvironment {
   private long z3optContext;
   private final ShutdownNotifier shutdownNotifier;
 
-  Z3OptProver(Z3FormulaManager pMgr, ShutdownNotifier pShutdownNotifier,
-      LogManager pLogger) {
+  Z3OptProver(Z3FormulaManager pMgr, ShutdownNotifier pShutdownNotifier, LogManager pLogger) {
     mgr = pMgr;
-    rfmgr = (Z3RationalFormulaManager)pMgr.getRationalFormulaManager();
+    rfmgr = (Z3RationalFormulaManager) pMgr.getRationalFormulaManager();
     z3context = mgr.getEnvironment();
     z3optContext = mk_optimize(z3context);
     optimize_inc_ref(z3context, z3optContext);
@@ -73,16 +72,14 @@ class Z3OptProver implements OptEnvironment {
 
   @Override
   public int maximize(Formula objective) {
-    Z3Formula z3Objective = (Z3Formula)objective;
-    return optimize_maximize(
-        z3context, z3optContext, z3Objective.getFormulaInfo());
+    Z3Formula z3Objective = (Z3Formula) objective;
+    return optimize_maximize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
   public int minimize(Formula objective) {
     Z3Formula z3Objective = (Z3Formula) objective;
-    return optimize_minimize(
-        z3context, z3optContext, z3Objective.getFormulaInfo());
+    return optimize_minimize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
@@ -92,7 +89,8 @@ class Z3OptProver implements OptEnvironment {
       if (status == Z3_LBOOL.Z3_L_FALSE.status) {
         return OptStatus.UNSAT;
       } else if (status == Z3_LBOOL.Z3_L_UNDEF.status) {
-        logger.log(Level.INFO,
+        logger.log(
+            Level.INFO,
             "Solver returned an unknown status, explanation: ",
             optimize_get_reason_unknown(z3context, z3optContext));
         return OptStatus.UNDEF;
@@ -147,13 +145,10 @@ class Z3OptProver implements OptEnvironment {
     model_inc_ref(z3context, z3model);
 
     PointerToLong out = new PointerToLong();
-    boolean status = model_eval(z3context, z3model, input.getFormulaInfo(),
-        true, out);
+    boolean status = model_eval(z3context, z3model, input.getFormulaInfo(), true, out);
     Verify.verify(status, "Error during model evaluation");
 
-    Formula outValue = mgr.getFormulaCreator().encapsulate(
-        mgr.getFormulaType(expr), out.value
-    );
+    Formula outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(expr), out.value);
 
     model_dec_ref(z3context, z3model);
     return outValue;
@@ -193,15 +188,15 @@ class Z3OptProver implements OptEnvironment {
   private long replaceEpsilon(long ast, Rational newValue) {
     Z3Formula z = new Z3RationalFormula(z3context, ast);
 
-    Z3Formula epsFormula = (Z3Formula)rfmgr.makeVariable("epsilon");
+    Z3Formula epsFormula = (Z3Formula) rfmgr.makeVariable("epsilon");
 
-    Z3Formula out = mgr.getUnsafeFormulaManager().substitute(
-        z,
-        ImmutableList.of(epsFormula),
-        ImmutableList.of((Z3Formula)rfmgr.makeNumber(newValue.toString()))
-    );
+    Z3Formula out =
+        mgr.getUnsafeFormulaManager()
+            .substitute(
+                z,
+                ImmutableList.of(epsFormula),
+                ImmutableList.of((Z3Formula) rfmgr.makeNumber(newValue.toString())));
     return simplify(z3context, out.getFormulaInfo());
-
   }
 
   private Rational rationalFromZ3AST(long ast) {

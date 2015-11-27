@@ -34,8 +34,7 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
 
   private final long mathsatEnv;
 
-  public Mathsat5ArrayFormulaManager(
-      Mathsat5FormulaCreator pCreator) {
+  public Mathsat5ArrayFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.mathsatEnv = pCreator.getEnv();
   }
@@ -52,11 +51,10 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
 
   @Override
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
-      String pName, FormulaType<TI> pIndexType,
-      FormulaType<TE> pElementType) {
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     //throw new UnsupportedOperationException("Please implement me!");
-    final ArrayFormulaType<TI, TE> arrayFormulaType = FormulaType.getArrayType(
-        pIndexType, pElementType);
+    final ArrayFormulaType<TI, TE> arrayFormulaType =
+        FormulaType.getArrayType(pIndexType, pElementType);
     final Long mathsatArrayType = toSolverType(arrayFormulaType);
 
     return getFormulaCreator().makeVariable(mathsatArrayType, pName);
@@ -66,5 +64,4 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
   protected Long equivalence(Long pArray1, Long pArray2) {
     return msat_make_equal(mathsatEnv, pArray1, pArray2);
   }
-
 }

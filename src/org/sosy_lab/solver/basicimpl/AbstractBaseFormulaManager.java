@@ -29,7 +29,6 @@ import org.sosy_lab.solver.api.FormulaType;
 
 import com.google.common.base.Function;
 
-
 /**
  * A BaseFormulaManager because all Abstract*FormulaManager-Classes wrap a FormulaCreator-instance.
  * @param <TFormulaInfo> the solver specific type.
@@ -46,8 +45,7 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> {
         }
       };
 
-  AbstractBaseFormulaManager(
-          FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator) {
+  AbstractBaseFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator) {
     this.formulaCreator = pFormulaCreator;
   }
 
@@ -75,10 +73,10 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> {
       FormulaType.BitvectorType bitPreciseType = (FormulaType.BitvectorType) formulaType;
       t = getFormulaCreator().getBitvectorType(bitPreciseType.getSize());
     } else if (formulaType.isFloatingPointType()) {
-      FormulaType.FloatingPointType fpType = (FormulaType.FloatingPointType)formulaType;
+      FormulaType.FloatingPointType fpType = (FormulaType.FloatingPointType) formulaType;
       t = getFormulaCreator().getFloatingPointType(fpType);
     } else if (formulaType.isArrayType()) {
-      FormulaType.ArrayFormulaType<?, ?> arrType = (FormulaType.ArrayFormulaType<?, ?>)formulaType;
+      FormulaType.ArrayFormulaType<?, ?> arrType = (FormulaType.ArrayFormulaType<?, ?>) formulaType;
       TType indexType = toSolverType(arrType.getIndexType());
       TType elementType = toSolverType(arrType.getElementType());
       t = getFormulaCreator().getArrayType(indexType, elementType);

@@ -35,35 +35,36 @@ import com.google.common.collect.testing.features.CollectionSize;
 
 public class LongArrayBackedListTest extends TestCase {
 
-  private static final TestStringListGenerator listGenerator = new TestStringListGenerator() {
+  private static final TestStringListGenerator listGenerator =
+      new TestStringListGenerator() {
 
-    @Override
-    protected List<String> create(final String[] pElements) {
-      long[] backingArray = new long[pElements.length];
-      for (int i = 0; i < backingArray.length; i++) {
-        backingArray[i] = i;
-      }
-      return new LongArrayBackedList<String>(backingArray) {
         @Override
-        protected String convert(long pE) {
-          return pElements[(int)pE];
+        protected List<String> create(final String[] pElements) {
+          long[] backingArray = new long[pElements.length];
+          for (int i = 0; i < backingArray.length; i++) {
+            backingArray[i] = i;
+          }
+          return new LongArrayBackedList<String>(backingArray) {
+            @Override
+            protected String convert(long pE) {
+              return pElements[(int) pE];
+            }
+          };
         }
-
       };
-    }
-  };
 
   public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
     TestSuite suite = new TestSuite();
 
-    suite.addTest(ListTestSuiteBuilder.using(listGenerator)
-        .named("LongArrayBackedListList")
-        .withFeatures(CollectionFeature.KNOWN_ORDER,
-                      CollectionFeature.ALLOWS_NULL_VALUES,
-                      CollectionSize.ANY)
-        .createTestSuite());
+    suite.addTest(
+        ListTestSuiteBuilder.using(listGenerator)
+            .named("LongArrayBackedListList")
+            .withFeatures(
+                CollectionFeature.KNOWN_ORDER,
+                CollectionFeature.ALLOWS_NULL_VALUES,
+                CollectionSize.ANY)
+            .createTestSuite());
 
     return suite;
   }
-
 }

@@ -45,7 +45,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 /** This is a Class similiar to Mathsat-NativeApi,
  *  it contains some useful functions. */
 class SmtInterpolUtil {
-  private SmtInterpolUtil() { }
+  private SmtInterpolUtil() {}
 
   /** A Term is an Atom, iff its function is no element of {"And", "Or", "Not"}.*/
   public static boolean isAtom(Term t) {
@@ -56,7 +56,8 @@ class SmtInterpolUtil {
 
   public static boolean isVariable(Term t) {
     // A variable is the same as an UIF without parameters
-    return !isTrue(t) && !isFalse(t)
+    return !isTrue(t)
+        && !isFalse(t)
         && (t instanceof ApplicationTerm)
         && ((ApplicationTerm) t).getParameters().length == 0
         && ((ApplicationTerm) t).getFunction().getDefinition() == null;
@@ -68,9 +69,7 @@ class SmtInterpolUtil {
     }
     ApplicationTerm applicationTerm = (ApplicationTerm) t;
     FunctionSymbol func = applicationTerm.getFunction();
-    return applicationTerm.getParameters().length > 0
-        && !func.isIntern()
-        && !func.isInterpreted();
+    return applicationTerm.getParameters().length > 0 && !func.isIntern() && !func.isInterpreted();
   }
 
   /** check for ConstantTerm with Number or
@@ -117,12 +116,11 @@ class SmtInterpolUtil {
       if (value instanceof Number) {
         return value;
       } else if (value instanceof Rational) {
-        Rational rat = (Rational)value;
+        Rational rat = (Rational) value;
         if (t.getSort().getName().equals("Int") && rat.isIntegral()) {
           return rat.numerator();
         }
-        return org.sosy_lab.common.rationals.Rational.of(
-            rat.numerator(), rat.denominator());
+        return org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
       }
 
       // ApplicationTerm with negative Number --> "-123"
@@ -132,19 +130,19 @@ class SmtInterpolUtil {
       if ("-".equals(at.getFunction().getName())) {
         Object value = toNumber(at.getParameters()[0]);
         if (value instanceof BigDecimal) {
-          return ((BigDecimal)value).negate();
+          return ((BigDecimal) value).negate();
         } else if (value instanceof BigInteger) {
-          return ((BigInteger)value).negate();
+          return ((BigInteger) value).negate();
         } else if (value instanceof Long) {
-          return -((Long)value).longValue();
+          return -((Long) value).longValue();
         } else if (value instanceof Integer) {
-          return -((Integer)value).intValue();
+          return -((Integer) value).intValue();
         } else if (value instanceof Double) {
-          return -((Double)value).doubleValue();
+          return -((Double) value).doubleValue();
         } else if (value instanceof Float) {
-          return -((Float)value).floatValue();
+          return -((Float) value).floatValue();
         } else if (value instanceof org.sosy_lab.common.rationals.Rational) {
-          return ((org.sosy_lab.common.rationals.Rational)value).negate();
+          return ((org.sosy_lab.common.rationals.Rational) value).negate();
         }
       }
     }
@@ -214,12 +212,14 @@ class SmtInterpolUtil {
   /** (ite t1 t2 t3) */
   public static boolean isIfThenElse(Term t) {
     return isFunction(t, "ite");
-
   }
 
   /** t1 = t2 */
   public static boolean isEquivalence(Term t) {
-    return isFunction(t, "=") && getArity(t) == 2 && isBoolean(getArg(t, 0)) && isBoolean(getArg(t, 1));
+    return isFunction(t, "=")
+        && getArity(t) == 2
+        && isBoolean(getArg(t, 0))
+        && isBoolean(getArg(t, 1));
   }
 
   public static boolean isFunction(Term t, String name) {
@@ -228,8 +228,7 @@ class SmtInterpolUtil {
   }
 
   public static boolean isFunction(Term t, FunctionSymbol func) {
-    return (t instanceof ApplicationTerm)
-        && func == ((ApplicationTerm) t).getFunction();
+    return (t instanceof ApplicationTerm) && func == ((ApplicationTerm) t).getFunction();
   }
 
   public static int getArity(Term t) {
@@ -263,9 +262,9 @@ class SmtInterpolUtil {
       Term[] oldParams = at.getParameters();
 
       assert oldParams.length == newParams.length;
-      for (int i=0; i < newParams.length; i++) {
-        assert oldParams[i].getSort() == newParams[i].getSort() :
-          "Cannot replace " + oldParams[i] + " with " + newParams[i] + ".";
+      for (int i = 0; i < newParams.length; i++) {
+        assert oldParams[i].getSort() == newParams[i].getSort()
+            : "Cannot replace " + oldParams[i] + " with " + newParams[i] + ".";
       }
 
       FunctionSymbol funcSymb = at.getFunction();
@@ -319,7 +318,7 @@ class SmtInterpolUtil {
   }
 
   private static void prettyPrint(Term t, StringBuilder str, int n) {
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
       str.append("  ");
     }
     if (t instanceof ApplicationTerm) {
@@ -328,9 +327,9 @@ class SmtInterpolUtil {
       if ("and".equals(function) || "or".equals(function)) {
         str.append("(").append(function).append("\n");
         for (Term child : at.getParameters()) {
-          prettyPrint(child, str, n+1);
+          prettyPrint(child, str, n + 1);
         }
-        for (int i=0; i<n; i++) {
+        for (int i = 0; i < n; i++) {
           str.append("  ");
         }
         str.append(")\n");
@@ -341,5 +340,4 @@ class SmtInterpolUtil {
       str.append(t.toStringDirect()).append("\n");
     }
   }
-
 }

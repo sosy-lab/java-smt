@@ -31,13 +31,13 @@ import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
 import com.google.common.primitives.Longs;
 
-class Mathsat5FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {
+class Mathsat5FunctionFormulaManager
+    extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {
 
   private final long mathsatEnv;
 
   public Mathsat5FunctionFormulaManager(
-      Mathsat5FormulaCreator pCreator,
-      Mathsat5UnsafeFormulaManager unsafeManager) {
+      Mathsat5FormulaCreator pCreator, Mathsat5UnsafeFormulaManager unsafeManager) {
     super(pCreator, unsafeManager);
     this.mathsatEnv = pCreator.getEnv();
   }
@@ -54,7 +54,7 @@ class Mathsat5FunctionFormulaManager extends AbstractFunctionFormulaManager<Long
 
   @Override
   protected Long declareUninterpretedFunctionImpl(
-        String pName, Long returnType, List<Long> pArgTypes) {
+      String pName, Long returnType, List<Long> pArgTypes) {
     long[] types = Longs.toArray(pArgTypes);
     return createFunctionImpl(pName, returnType, types);
   }

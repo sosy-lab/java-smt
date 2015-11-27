@@ -111,21 +111,25 @@ class PrincessEnvironment {
    * and initializes the logger.
    * @param pShutdownNotifier
    * @param pOptions */
-  public PrincessEnvironment(final LogManager pLogger, final PathCounterTemplate pBasicLogfile,
-      ShutdownNotifier pShutdownNotifier, PrincessOptions pOptions) {
+  public PrincessEnvironment(
+      final LogManager pLogger,
+      final PathCounterTemplate pBasicLogfile,
+      ShutdownNotifier pShutdownNotifier,
+      PrincessOptions pOptions) {
 
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
-    api = getNewApi(false); // this api is only used local in this environment, no need for interpolation
+    api =
+        getNewApi(
+            false); // this api is only used local in this environment, no need for interpolation
     princessOptions = pOptions;
   }
-
 
   /** This method returns a new stack, that is registered in this environment.
    * All variables are shared in all registered stacks. */
   PrincessStack getNewStack(boolean useForInterpolation) {
     // shortcut if we have a reusable stack
-    for (Iterator<SymbolTrackingPrincessStack> it = reusableStacks.iterator(); it.hasNext();) {
+    for (Iterator<SymbolTrackingPrincessStack> it = reusableStacks.iterator(); it.hasNext(); ) {
       SymbolTrackingPrincessStack stack = it.next();
       if (stack.canBeUsedForInterpolation() == useForInterpolation) {
         registeredStacks.add(stack);
@@ -137,8 +141,9 @@ class PrincessEnvironment {
     // if not we have to create a new one
 
     SimpleAPI newApi = getNewApi(useForInterpolation);
-    SymbolTrackingPrincessStack stack = new SymbolTrackingPrincessStack(this, newApi,
-        useForInterpolation, shutdownNotifier, princessOptions);
+    SymbolTrackingPrincessStack stack =
+        new SymbolTrackingPrincessStack(
+            this, newApi, useForInterpolation, shutdownNotifier, princessOptions);
 
     // add all symbols, that are available until now
     for (IFormula s : boolVariablesCache.values()) {
@@ -150,7 +155,7 @@ class PrincessEnvironment {
     for (IFunction s : functionsCache.values()) {
       stack.addSymbol(s);
     }
-    for(Entry<IExpression, IExpression> e : abbrevCache.entrySet()) {
+    for (Entry<IExpression, IExpression> e : abbrevCache.entrySet()) {
       stack.addAbbrev(e.getKey(), e.getValue());
     }
     registeredStacks.add(stack);
@@ -164,7 +169,7 @@ class PrincessEnvironment {
       Path logPath = basicLogfile.getFreshPath();
       String fileName = logPath.getName();
       String absPath = logPath.getAbsolutePath();
-      File directory = new File(absPath.substring(0, absPath.length()-fileName.length()));
+      File directory = new File(absPath.substring(0, absPath.length() - fileName.length()));
       newApi = SimpleAPI.spawnWithLogNoSanitise(fileName, directory);
     } else {
       newApi = SimpleAPI.spawnNoSanitise();
@@ -190,22 +195,24 @@ class PrincessEnvironment {
   }
 
   public List<IExpression> parseStringToTerms(String s) {
-    List<IExpression> formula = castToExpression(JavaConversions.seqAsJavaList(api.extractSMTLIBAssertions(new StringReader(s))));
+    List<IExpression> formula =
+        castToExpression(
+            JavaConversions.seqAsJavaList(api.extractSMTLIBAssertions(new StringReader(s))));
 
     Set<IExpression> declaredfunctions = PrincessUtil.getVarsAndUIFs(formula);
     for (IExpression var : declaredfunctions) {
       if (var instanceof IConstant) {
         intVariablesCache.put(var.toString(), (ITerm) var);
         for (SymbolTrackingPrincessStack stack : registeredStacks) {
-          stack.addSymbol((IConstant)var);
+          stack.addSymbol((IConstant) var);
         }
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
         for (SymbolTrackingPrincessStack stack : registeredStacks) {
-          stack.addSymbol((IAtom)var);
+          stack.addSymbol((IAtom) var);
         }
       } else if (var instanceof IFunApp) {
-        IFunction fun = ((IFunApp)var).fun();
+        IFunction fun = ((IFunApp) var).fun();
         functionsCache.put(fun.name(), fun);
         // up to now princess only supports int as return type
         functionsReturnTypes.put(fun, TermType.Integer);
@@ -244,7 +251,7 @@ class PrincessEnvironment {
 
           // we don't want to declare variables twice, so doublecheck
           // if we have already found the current variable
-          if(doneFunctions.contains(name)) {
+          if (doneFunctions.contains(name)) {
             continue;
           }
           doneFunctions.add(name);
@@ -253,14 +260,14 @@ class PrincessEnvironment {
           // the rest is done afterwards
           if (name.startsWith("abbrev_")) {
             todoAbbrevs.add(name);
-            Set<IExpression> varsFromAbbrev = getVarsAndUIFs(singleton(abbrevCache.get(stringToAbbrev.get(name))));
+            Set<IExpression> varsFromAbbrev =
+                getVarsAndUIFs(singleton(abbrevCache.get(stringToAbbrev.get(name))));
             for (IExpression addVar : Sets.difference(varsFromAbbrev, allVars)) {
               declaredFunctions.push(addVar);
             }
             allVars.addAll(varsFromAbbrev);
           } else {
-            out.append("(declare-fun ")
-               .append(name);
+            out.append("(declare-fun ").append(name);
 
             // function parameters
             out.append(" (");
@@ -293,12 +300,11 @@ class PrincessEnvironment {
           String name = getName(getOnlyElement(getVarsAndUIFs(singleton(abbrev))));
 
           //only add the necessary abbreviations
-          if(!todoAbbrevs.contains(name)) {
+          if (!todoAbbrevs.contains(name)) {
             continue;
           }
 
-          out.append("(define-fun ")
-             .append(name);
+          out.append("(define-fun ").append(name);
 
           // the type of each abbreviation
           if (fullFormula instanceof IFormula) {
@@ -308,14 +314,11 @@ class PrincessEnvironment {
           }
 
           // the abbreviated formula
-          out.append(SMTLineariser.asString(fullFormula))
-             .append(" )\n");
+          out.append(SMTLineariser.asString(fullFormula)).append(" )\n");
         }
 
         // now add the final assert
-        out.append("(assert ")
-           .append(SMTLineariser.asString(lettedFormula))
-           .append(")");
+        out.append("(assert ").append(SMTLineariser.asString(lettedFormula)).append(")");
       }
     };
   }
@@ -324,9 +327,9 @@ class PrincessEnvironment {
     if (var instanceof IAtom) {
       return ((IAtom) var).pred().name();
     } else if (var instanceof IConstant) {
-      return ((IConstant)var).toString();
+      return ((IConstant) var).toString();
     } else if (var instanceof IFunApp) {
-      String fullStr = ((IFunApp)var).fun().toString();
+      String fullStr = ((IFunApp) var).fun().toString();
       return fullStr.substring(0, fullStr.indexOf("/"));
     }
 
@@ -347,32 +350,33 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(TermType type, String varname) {
     switch (type) {
-
-      case Boolean: {
-        if (boolVariablesCache.containsKey(varname)) {
-          return boolVariablesCache.get(varname);
-        } else {
-          IFormula var = api.createBooleanVariable(varname);
-          for (SymbolTrackingPrincessStack stack : allStacks) {
-            stack.addSymbol(var);
+      case Boolean:
+        {
+          if (boolVariablesCache.containsKey(varname)) {
+            return boolVariablesCache.get(varname);
+          } else {
+            IFormula var = api.createBooleanVariable(varname);
+            for (SymbolTrackingPrincessStack stack : allStacks) {
+              stack.addSymbol(var);
+            }
+            boolVariablesCache.put(varname, var);
+            return var;
           }
-          boolVariablesCache.put(varname, var);
-          return var;
         }
-      }
 
-      case Integer: {
-        if (intVariablesCache.containsKey(varname)) {
-          return intVariablesCache.get(varname);
-        } else {
-          ITerm var = api.createConstant(varname);
-          for (SymbolTrackingPrincessStack stack : allStacks) {
-            stack.addSymbol(var);
+      case Integer:
+        {
+          if (intVariablesCache.containsKey(varname)) {
+            return intVariablesCache.get(varname);
+          } else {
+            ITerm var = api.createConstant(varname);
+            for (SymbolTrackingPrincessStack stack : allStacks) {
+              stack.addSymbol(var);
+            }
+            intVariablesCache.put(varname, var);
+            return var;
           }
-          intVariablesCache.put(varname, var);
-          return var;
         }
-      }
 
       default:
         throw new AssertionError("unsupported type: " + type);
@@ -389,7 +393,7 @@ class PrincessEnvironment {
     } else {
       IFunction funcDecl = api.createFunction(name, nofArgs);
       for (SymbolTrackingPrincessStack stack : allStacks) {
-         stack.addSymbol(funcDecl);
+        stack.addSymbol(funcDecl);
       }
       functionsCache.put(name, funcDecl);
       functionsReturnTypes.put(funcDecl, returnType);
@@ -402,14 +406,14 @@ class PrincessEnvironment {
   }
 
   public IExpression makeFunction(IFunction funcDecl, List<IExpression> args) {
-    checkArgument(args.size() == funcDecl.arity(),
-        "functiontype has different number of args.");
+    checkArgument(args.size() == funcDecl.arity(), "functiontype has different number of args.");
 
     final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
     for (IExpression arg : args) {
       ITerm termArg;
       if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1), TODO why not ITE(t,1,0) ??
-        termArg = new ITermITE((IFormula)arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
+        termArg =
+            new ITermITE((IFormula) arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
       } else {
         termArg = (ITerm) arg;
       }
@@ -425,7 +429,8 @@ class PrincessEnvironment {
       return ap.apply(argsBuf);
 
     } else if (returnType != TermType.Integer) {
-      throw new AssertionError("Not possible to have return types for functions other than bool or int.");
+      throw new AssertionError(
+          "Not possible to have return types for functions other than bool or int.");
     }
 
     return returnFormula;
@@ -434,9 +439,9 @@ class PrincessEnvironment {
   public IExpression abbrev(IExpression expr) {
     IExpression abbrev;
     if (expr instanceof IFormula) {
-      abbrev = api.abbrev((IFormula)expr);
+      abbrev = api.abbrev((IFormula) expr);
     } else if (expr instanceof ITerm) {
-      abbrev = api.abbrev((ITerm)expr);
+      abbrev = api.abbrev((ITerm) expr);
     } else {
       throw new AssertionError("no possibility to create abbreviation for " + expr.getClass());
     }

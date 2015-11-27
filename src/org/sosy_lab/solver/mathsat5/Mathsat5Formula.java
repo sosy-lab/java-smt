@@ -47,8 +47,10 @@ abstract class Mathsat5Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof Mathsat5Formula)) {return false;}
-    return msatTerm == ((Mathsat5Formula)o).msatTerm;
+    if (!(o instanceof Mathsat5Formula)) {
+      return false;
+    }
+    return msatTerm == ((Mathsat5Formula) o).msatTerm;
   }
 
   @Override
@@ -66,15 +68,20 @@ abstract class Mathsat5Formula implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    public Mathsat5ArrayFormula(long pTerm,
-        FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    public Mathsat5ArrayFormula(
+        long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(pTerm);
       indexType = pIndexType;
       elementType = pElementType;
     }
 
-    public FormulaType<TI> getIndexType() { return indexType; }
-    public FormulaType<TE> getElementType() { return elementType; }
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
+    }
   }
 
   static final class Mathsat5BitvectorFormula extends Mathsat5Formula implements BitvectorFormula {
@@ -83,7 +90,8 @@ abstract class Mathsat5Formula implements Formula {
     }
   }
 
-  static final class Mathsat5FloatingPointFormula extends Mathsat5Formula implements FloatingPointFormula {
+  static final class Mathsat5FloatingPointFormula extends Mathsat5Formula
+      implements FloatingPointFormula {
     public Mathsat5FloatingPointFormula(long pTerm) {
       super(pTerm);
     }

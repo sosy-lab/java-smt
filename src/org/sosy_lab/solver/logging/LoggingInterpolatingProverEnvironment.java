@@ -35,14 +35,15 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 
-
-public class LoggingInterpolatingProverEnvironment<T> implements InterpolatingProverEnvironmentWithAssumptions<T> {
+public class LoggingInterpolatingProverEnvironment<T>
+    implements InterpolatingProverEnvironmentWithAssumptions<T> {
 
   private final InterpolatingProverEnvironmentWithAssumptions<T> wrapped;
   private final LogManager logger;
   int level = 0;
 
-  public LoggingInterpolatingProverEnvironment(LogManager logger, InterpolatingProverEnvironmentWithAssumptions<T> ipe) {
+  public LoggingInterpolatingProverEnvironment(
+      LogManager logger, InterpolatingProverEnvironmentWithAssumptions<T> ipe) {
     this.wrapped = checkNotNull(ipe);
     this.logger = checkNotNull(logger);
   }
@@ -71,7 +72,8 @@ public class LoggingInterpolatingProverEnvironment<T> implements InterpolatingPr
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
     logger.log(Level.FINE, "assumptions:", pAssumptions);
     boolean result = wrapped.isUnsatWithAssumptions(pAssumptions);
     logger.log(Level.FINE, "unsat-check returned:", result);
@@ -95,7 +97,8 @@ public class LoggingInterpolatingProverEnvironment<T> implements InterpolatingPr
   }
 
   @Override
-  public List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree) {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<Set<T>> partitionedFormulas, int[] startOfSubTree) {
     logger.log(Level.FINE, "formulasOfA:", partitionedFormulas);
     logger.log(Level.FINE, "startOfSubTree:", startOfSubTree);
     List<BooleanFormula> bf = wrapped.getTreeInterpolants(partitionedFormulas, startOfSubTree);
@@ -115,5 +118,4 @@ public class LoggingInterpolatingProverEnvironment<T> implements InterpolatingPr
     wrapped.close();
     logger.log(Level.FINER, "closed");
   }
-
 }

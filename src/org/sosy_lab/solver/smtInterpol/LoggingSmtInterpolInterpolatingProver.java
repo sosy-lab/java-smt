@@ -31,13 +31,11 @@ import org.sosy_lab.solver.api.BooleanFormula;
 
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-
 class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProver {
 
   private final PrintWriter out;
 
-  LoggingSmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr,
-      PrintWriter pOut) {
+  LoggingSmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, PrintWriter pOut) {
     super(pMgr);
     out = checkNotNull(pOut);
   }

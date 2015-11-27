@@ -60,8 +60,11 @@ class Z3TheoremProver implements ProverEnvironment {
 
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
-  Z3TheoremProver(Z3FormulaManager pMgr, long z3params,
-      ShutdownNotifier pShutdownNotifier, boolean generateUnsatCore) {
+  Z3TheoremProver(
+      Z3FormulaManager pMgr,
+      long z3params,
+      ShutdownNotifier pShutdownNotifier,
+      boolean generateUnsatCore) {
     mgr = pMgr;
     z3context = mgr.getEnvironment();
     z3solver = mk_solver(z3context);
@@ -135,21 +138,18 @@ class Z3TheoremProver implements ProverEnvironment {
   public List<BooleanFormula> getUnsatCore() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
-          "Option to generate the UNSAT core wasn't enabled when creating" +
-          " the prover environment."
-      );
+          "Option to generate the UNSAT core wasn't enabled when creating"
+              + " the prover environment.");
     }
 
     List<BooleanFormula> constraints = new ArrayList<>();
     long ast_vector = solver_get_unsat_core(z3context, z3solver);
     ast_vector_inc_ref(z3context, ast_vector);
-    for (int i=0; i<ast_vector_size(z3context, ast_vector); i++) {
+    for (int i = 0; i < ast_vector_size(z3context, ast_vector); i++) {
       long ast = ast_vector_get(z3context, ast_vector, i);
       BooleanFormula f = mgr.encapsulateBooleanFormula(ast);
 
-      constraints.add(storedConstraints.get(
-          mgr.getUnsafeFormulaManager().getName(f)
-      ));
+      constraints.add(storedConstraints.get(mgr.getUnsafeFormulaManager().getName(f)));
     }
     ast_vector_dec_ref(z3context, ast_vector);
     return constraints;
@@ -159,7 +159,8 @@ class Z3TheoremProver implements ProverEnvironment {
   public void close() {
     Preconditions.checkArgument(z3context != 0);
     Preconditions.checkArgument(z3solver != 0);
-    Preconditions.checkArgument(solver_get_num_scopes(z3context, z3solver) >= 0,
+    Preconditions.checkArgument(
+        solver_get_num_scopes(z3context, z3solver) >= 0,
         "a negative number of scopes is not allowed");
 
     while (level > 0) { // TODO do we need this?
@@ -172,10 +173,8 @@ class Z3TheoremProver implements ProverEnvironment {
     z3solver = 0;
   }
 
-
   @Override
-  public <T> T allSat(AllSatCallback<T> callback,
-      List<BooleanFormula> important)
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     // unpack formulas to terms
     long[] importantFormulas = new long[important.size()];
@@ -206,12 +205,13 @@ class Z3TheoremProver implements ProverEnvironment {
         }
       }
 
-      callback.apply(new LongArrayBackedList<BooleanFormula>(valuesOfModel) {
-        @Override
-        protected BooleanFormula convert(long pE) {
-          return mgr.encapsulateBooleanFormula(pE);
-        }
-      });
+      callback.apply(
+          new LongArrayBackedList<BooleanFormula>(valuesOfModel) {
+            @Override
+            protected BooleanFormula convert(long pE) {
+              return mgr.encapsulateBooleanFormula(pE);
+            }
+          });
 
       long negatedModel = mk_not(z3context, mk_and(z3context, valuesOfModel));
       inc_ref(z3context, negatedModel);
@@ -234,13 +234,10 @@ class Z3TheoremProver implements ProverEnvironment {
     model_inc_ref(z3context, z3model);
 
     PointerToLong out = new PointerToLong();
-    boolean status = model_eval(z3context, z3model, input.getFormulaInfo(),
-        true, out);
+    boolean status = model_eval(z3context, z3model, input.getFormulaInfo(), true, out);
     Verify.verify(status, "Error during model evaluation");
 
-    Formula outValue = mgr.getFormulaCreator().encapsulate(
-        mgr.getFormulaType(f), out.value
-    );
+    Formula outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(f), out.value);
 
     model_dec_ref(z3context, z3model);
     return outValue;

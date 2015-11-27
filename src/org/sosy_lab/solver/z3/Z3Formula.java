@@ -52,10 +52,11 @@ abstract class Z3Formula implements Formula {
 
   @Override
   public final boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof Z3Formula)) { return false; }
+    if (obj == null || !(obj instanceof Z3Formula)) {
+      return false;
+    }
     Z3Formula other = (Z3Formula) obj;
-    return (z3context == other.z3context)
-        && Z3NativeApi.is_eq_ast(z3context, z3expr, other.z3expr);
+    return (z3context == other.z3context) && Z3NativeApi.is_eq_ast(z3context, z3expr, other.z3expr);
   }
 
   @Override
@@ -76,14 +77,20 @@ abstract class Z3Formula implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    public Z3ArrayFormula(long pZ3context, long pZ3expr, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    public Z3ArrayFormula(
+        long pZ3context, long pZ3expr, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(pZ3context, pZ3expr);
       indexType = pIndexType;
       elementType = pElementType;
     }
 
-    public FormulaType<TI> getIndexType() { return indexType; }
-    public FormulaType<TE> getElementType() { return elementType; }
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
+    }
   }
 
   static final class Z3BitvectorFormula extends Z3Formula implements BitvectorFormula {
@@ -113,4 +120,3 @@ abstract class Z3Formula implements Formula {
     }
   }
 }
-

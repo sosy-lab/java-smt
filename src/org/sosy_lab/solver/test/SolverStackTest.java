@@ -57,7 +57,7 @@ import com.google.common.collect.ImmutableList;
 @RunWith(Parameterized.class)
 public class SolverStackTest extends SolverBasedTest0 {
 
-  @Parameters(name="{0} (interpolation={1}}")
+  @Parameters(name = "{0} (interpolation={1}}")
   public static List<Object[]> getAllCombinations() {
     List<Object[]> result = new ArrayList<>();
     for (Solvers solver : Solvers.values()) {
@@ -90,19 +90,23 @@ public class SolverStackTest extends SolverBasedTest0 {
     }
   }
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
   private void requireMultipleStackSupport() {
-    assume().withFailureMessage("Solver does not support multiple stacks yet")
-            .that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
+    assume()
+        .withFailureMessage("Solver does not support multiple stacks yet")
+        .that(solver)
+        .isNotEqualTo(Solvers.SMTINTERPOL);
   }
 
   protected final void requireUfValuesInModel() {
-    assume().withFailureMessage("Integration of solver does not support retrieving values for UFs from a model")
-            .that(solver).isNotEqualTo(Solvers.Z3);
+    assume()
+        .withFailureMessage(
+            "Integration of solver does not support retrieving values for UFs from a model")
+        .that(solver)
+        .isNotEqualTo(Solvers.Z3);
   }
 
   @Test
@@ -110,14 +114,14 @@ public class SolverStackTest extends SolverBasedTest0 {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(true);
 
     int i = index.getFreshId();
-    BooleanFormula a = bmgr.makeVariable("bool_a"+i);
-    BooleanFormula b = bmgr.makeVariable("bool_b"+i);
+    BooleanFormula a = bmgr.makeVariable("bool_a" + i);
+    BooleanFormula b = bmgr.makeVariable("bool_b" + i);
     BooleanFormula or = bmgr.or(a, b);
 
     stack.push(or); //L1
     assertThatEnvironment(stack).isSatisfiable();
-    BooleanFormula c = bmgr.makeVariable("bool_c"+i);
-    BooleanFormula d = bmgr.makeVariable("bool_d"+i);
+    BooleanFormula c = bmgr.makeVariable("bool_c" + i);
+    BooleanFormula d = bmgr.makeVariable("bool_d" + i);
     BooleanFormula and = bmgr.and(c, d);
 
     stack.push(and); //L2
@@ -165,16 +169,17 @@ public class SolverStackTest extends SolverBasedTest0 {
     simpleStackTestNum(rmgr, env);
   }
 
-  private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack) throws Exception {
+  private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
+      NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack) throws Exception {
     int i = index.getFreshId();
-    X a = nmgr.makeVariable("num_a"+i);
-    X b = nmgr.makeVariable("num_b"+i);
+    X a = nmgr.makeVariable("num_a" + i);
+    X b = nmgr.makeVariable("num_b" + i);
     BooleanFormula leqAB = nmgr.lessOrEquals(a, b);
 
     stack.push(leqAB); //L1
     assertThatEnvironment(stack).isSatisfiable();
-    X c = nmgr.makeVariable("num_c"+i);
-    X d = nmgr.makeVariable("num_d"+i);
+    X c = nmgr.makeVariable("num_c" + i);
+    X d = nmgr.makeVariable("num_d" + i);
     BooleanFormula eqCD = nmgr.lessOrEquals(c, d);
 
     stack.push(eqCD); //L2
@@ -343,7 +348,8 @@ public class SolverStackTest extends SolverBasedTest0 {
       IntegerFormula varB = imgr.makeVariable("b");
       stack.push(imgr.equal(varA, zero));
       stack.push(imgr.equal(varB, zero));
-      UninterpretedFunctionDeclaration<IntegerFormula> uf = fmgr.declareUninterpretedFunction("uf", FormulaType.IntegerType, FormulaType.IntegerType);
+      UninterpretedFunctionDeclaration<IntegerFormula> uf =
+          fmgr.declareUninterpretedFunction("uf", FormulaType.IntegerType, FormulaType.IntegerType);
       stack.push(imgr.equal(fmgr.callUninterpretedFunction(uf, ImmutableList.of(varA)), zero));
       stack.push(imgr.equal(fmgr.callUninterpretedFunction(uf, ImmutableList.of(varB)), zero));
       assertThatEnvironment(stack).isSatisfiable();
@@ -358,7 +364,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       requireUfValuesInModel();
 
-      Function expectedFunc = new Function("uf", TermType.Integer, new Object[]{BigInteger.ZERO});
+      Function expectedFunc = new Function("uf", TermType.Integer, new Object[] {BigInteger.ZERO});
       assertThat(model.keySet()).containsExactly(expectedVarA, expectedVarB, expectedFunc);
       assertThat(model).containsEntry(expectedFunc, BigInteger.ZERO);
     }

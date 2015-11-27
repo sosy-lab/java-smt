@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.sosy_lab.solver.SolverException;
 
-
-public interface InterpolatingProverEnvironmentWithAssumptions<T> extends InterpolatingProverEnvironment<T> {
+public interface InterpolatingProverEnvironmentWithAssumptions<T>
+    extends InterpolatingProverEnvironment<T> {
 
   /**
    * Check whether the conjunction of all formulas on the stack is unsatisfiable,
@@ -36,5 +36,6 @@ public interface InterpolatingProverEnvironmentWithAssumptions<T> extends Interp
    * @throws InterruptedException
    * @throws SolverException
    */
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions) throws SolverException, InterruptedException;
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
 }

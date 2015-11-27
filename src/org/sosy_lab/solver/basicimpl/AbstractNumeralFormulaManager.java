@@ -53,10 +53,11 @@ import com.google.common.collect.Lists;
  * (for example multiplication with constants should be supported by all solvers
  * and implemented by all sub-classes).
  */
-public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
-        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-  extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-  implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
+public abstract class AbstractNumeralFormulaManager<
+        TFormulaInfo, TType, TEnv, ParamFormulaType extends NumeralFormula,
+        ResultFormulaType extends NumeralFormula>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+    implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
 
   private static final String UF_MULTIPLY_NAME = "_*_";
   private static final String UF_DIVIDE_NAME = "_/_";
@@ -69,7 +70,8 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
   private final UninterpretedFunctionDeclaration<ResultFormulaType> modUfDecl;
 
   private final boolean useNonLinearArithmetic;
-  private static final String NON_LINEAR_MSG = "the used solver does not support non-linear arithmetic.";
+  private static final String NON_LINEAR_MSG =
+      "the used solver does not support non-linear arithmetic.";
 
   protected AbstractNumeralFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv> pCreator,
@@ -80,12 +82,19 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     useNonLinearArithmetic = pUseNonLinearArithmetic;
 
     FormulaType<ResultFormulaType> resultType = getFormulaType();
-    multUfDecl = functionManager.declareUninterpretedFunction(resultType + "_" + UF_MULTIPLY_NAME, resultType, resultType, resultType);
-    divUfDecl = functionManager.declareUninterpretedFunction(resultType + "_" + UF_DIVIDE_NAME, resultType, resultType, resultType);
-    modUfDecl = functionManager.declareUninterpretedFunction(resultType + "_" + UF_MODULO_NAME, resultType, resultType, resultType);
+    multUfDecl =
+        functionManager.declareUninterpretedFunction(
+            resultType + "_" + UF_MULTIPLY_NAME, resultType, resultType, resultType);
+    divUfDecl =
+        functionManager.declareUninterpretedFunction(
+            resultType + "_" + UF_DIVIDE_NAME, resultType, resultType, resultType);
+    modUfDecl =
+        functionManager.declareUninterpretedFunction(
+            resultType + "_" + UF_MODULO_NAME, resultType, resultType, resultType);
   }
 
-  private TFormulaInfo makeUf(UninterpretedFunctionDeclaration<?> decl, TFormulaInfo t1, TFormulaInfo t2) {
+  private TFormulaInfo makeUf(
+      UninterpretedFunctionDeclaration<?> decl, TFormulaInfo t1, TFormulaInfo t2) {
     return functionManager.createUninterpretedFunctionCallImpl(decl, ImmutableList.of(t1, t2));
   }
 
@@ -99,24 +108,28 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
   public ResultFormulaType makeNumber(long i) {
     return wrap(makeNumberImpl(i));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(long i);
 
   @Override
   public ResultFormulaType makeNumber(BigInteger i) {
     return wrap(makeNumberImpl(i));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(BigInteger i);
 
   @Override
   public ResultFormulaType makeNumber(String i) {
     return wrap(makeNumberImpl(i));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(String i);
 
   @Override
   public ResultFormulaType makeNumber(Rational pRational) {
     return wrap(makeNumberImpl(pRational));
   }
+
   protected TFormulaInfo makeNumberImpl(Rational pRational) {
     return makeNumberImpl(pRational.toString());
   }
@@ -125,12 +138,14 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
   public ResultFormulaType makeNumber(double pNumber) {
     return wrap(makeNumberImpl(pNumber));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(double pNumber);
 
   @Override
   public ResultFormulaType makeNumber(BigDecimal pNumber) {
     return wrap(makeNumberImpl(pNumber));
   }
+
   protected abstract TFormulaInfo makeNumberImpl(BigDecimal pNumber);
 
   /**
@@ -163,7 +178,8 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     try {
       return d.toBigIntegerExact();
     } catch (ArithmeticException e) {
-      NumberFormatException nfe = new NumberFormatException("Cannot represent BigDecimal " + d + " as BigInteger");
+      NumberFormatException nfe =
+          new NumberFormatException("Cannot represent BigDecimal " + d + " as BigInteger");
       nfe.initCause(e);
       throw nfe;
     }
@@ -173,6 +189,7 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
   public ResultFormulaType makeVariable(String pVar) {
     return wrap(makeVariableImpl(pVar));
   }
+
   protected abstract TFormulaInfo makeVariableImpl(String i);
 
   @Override
@@ -181,10 +198,7 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     return wrap(negate(param1));
   }
 
-
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
-
-
 
   @Override
   public ResultFormulaType add(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
@@ -217,8 +231,7 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     return wrap(subtract(param1, param2));
   }
 
-  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public ResultFormulaType divide(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
@@ -289,14 +302,16 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
   }
 
   @Override
-  public BooleanFormula modularCongruence(ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
+  public BooleanFormula modularCongruence(
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
     return wrapBool(modularCongruence(param1, param2, pModulo));
   }
 
-  protected abstract TFormulaInfo modularCongruence(TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
+  protected abstract TFormulaInfo modularCongruence(
+      TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
 
   @Override
   public ResultFormulaType multiply(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
@@ -343,7 +358,6 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-
   @Override
   public BooleanFormula greaterThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
@@ -352,8 +366,7 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     return wrapBool(greaterThan(param1, param2));
   }
 
-  protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula greaterOrEquals(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
@@ -363,7 +376,7 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     return wrapBool(greaterOrEquals(param1, param2));
   }
 
-  protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
+  protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
@@ -373,8 +386,7 @@ public abstract class AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv,
     return wrapBool(lessThan(param1, param2));
   }
 
-  protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2) ;
-
+  protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessOrEquals(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {

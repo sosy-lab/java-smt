@@ -37,7 +37,8 @@ import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolUnsafeFormulaManager
+    extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
   SmtInterpolUnsafeFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);
@@ -46,10 +47,10 @@ class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term,
   /** ApplicationTerms can be wrapped with "|".
    * This function removes those chars. */
   static String dequote(String s) {
-   return s.replace("|", "");
+    return s.replace("|", "");
   }
 
- /** ApplicationTerms can be wrapped with "|".
+  /** ApplicationTerms can be wrapped with "|".
    * This function replaces those chars with "\"". */
   // TODO: Check where this was used in the past.
   @SuppressWarnings("unused")
@@ -66,7 +67,8 @@ class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term,
   public int getArity(Term pT) {
     assert !(pT instanceof LetTerm)
         : "Formulas used by CPAchecker are expected to not have LetTerms."
-            + " Check how this formula was created: " + pT;
+            + " Check how this formula was created: "
+            + pT;
     return SmtInterpolUtil.getArity(pT);
   }
 
@@ -90,7 +92,7 @@ class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term,
     if (isVariable(t)) {
       return dequote(t.toString());
     } else if (isUF(t)) {
-      return ((ApplicationTerm)t).getFunction().getName();
+      return ((ApplicationTerm) t).getFunction().getName();
     } else {
       throw new IllegalArgumentException("The Term " + t + " has no name!");
     }
@@ -98,7 +100,8 @@ class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term,
 
   @Override
   public Term replaceArgs(Term pT, List<Term> newArgs) {
-    return SmtInterpolUtil.replaceArgs(getFormulaCreator().getEnv(), pT, SmtInterpolUtil.toTermArray(newArgs));
+    return SmtInterpolUtil.replaceArgs(
+        getFormulaCreator().getEnv(), pT, SmtInterpolUtil.toTermArray(newArgs));
   }
 
   @Override
@@ -130,8 +133,7 @@ class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term,
       if (!SmtInterpolUtil.isBoolean(arg0)) {
         return ImmutableList.of(
             getFormulaCreator().getEnv().term("<=", arg0, arg1),
-            getFormulaCreator().getEnv().term("<=", arg1, arg0)
-        );
+            getFormulaCreator().getEnv().term("<=", arg1, arg0));
       }
     }
     return ImmutableList.of(pF);
@@ -182,5 +184,4 @@ class SmtInterpolUnsafeFormulaManager extends AbstractUnsafeFormulaManager<Term,
   protected boolean isBoundVariable(Term pT) {
     return false;
   }
-
 }

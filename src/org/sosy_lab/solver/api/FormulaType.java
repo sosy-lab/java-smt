@@ -75,44 +75,47 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static final FormulaType<RationalFormula> RationalType = new NumeralType<RationalFormula>() {
+  public static final FormulaType<RationalFormula> RationalType =
+      new NumeralType<RationalFormula>() {
 
-    @Override
-    public boolean isRationalType() {
-      return true;
-    }
+        @Override
+        public boolean isRationalType() {
+          return true;
+        }
 
-    @Override
-    public String toString() {
-      return "Rational";
-    }
-  };
+        @Override
+        public String toString() {
+          return "Rational";
+        }
+      };
 
-  public static final FormulaType<IntegerFormula> IntegerType = new NumeralType<IntegerFormula>() {
+  public static final FormulaType<IntegerFormula> IntegerType =
+      new NumeralType<IntegerFormula>() {
 
-    @Override
-    public boolean isIntegerType() {
-      return true;
-    }
+        @Override
+        public boolean isIntegerType() {
+          return true;
+        }
 
-    @Override
-    public String toString() {
-      return "Integer";
-    }
-  };
+        @Override
+        public String toString() {
+          return "Integer";
+        }
+      };
 
-  public static final FormulaType<BooleanFormula> BooleanType = new FormulaType<BooleanFormula>() {
+  public static final FormulaType<BooleanFormula> BooleanType =
+      new FormulaType<BooleanFormula>() {
 
-    @Override
-    public boolean isBooleanType() {
-      return true;
-    }
+        @Override
+        public boolean isBooleanType() {
+          return true;
+        }
 
-    @Override
-    public String toString() {
-      return "Boolean";
-    }
-  };
+        @Override
+        public String toString() {
+          return "Boolean";
+        }
+      };
 
   public static BitvectorType getBitvectorTypeWithSize(int size) {
     return new BitvectorType(size);
@@ -147,7 +150,7 @@ public abstract class FormulaType<T extends Formula> {
       if (!(pObj instanceof BitvectorType)) {
         return false;
       }
-      BitvectorType other = (BitvectorType)pObj;
+      BitvectorType other = (BitvectorType) pObj;
       return size == other.size;
     }
 
@@ -173,7 +176,7 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   public static final class ArrayFormulaType<TI extends Formula, TE extends Formula>
-  extends FormulaType<ArrayFormula<TI,TE>> {
+      extends FormulaType<ArrayFormula<TI, TE>> {
 
     private final FormulaType<TE> elementType;
     private final FormulaType<TI> indexType;
@@ -232,7 +235,6 @@ public abstract class FormulaType<T extends Formula> {
 
       return true;
     }
-
   }
 
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
@@ -272,8 +274,7 @@ public abstract class FormulaType<T extends Formula> {
         return false;
       }
       FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize
-          && this.mantissaSize == other.mantissaSize;
+      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
     }
 
     @Override
@@ -282,8 +283,8 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR>
-  getArrayType(FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
+  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
+      FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
     return new ArrayFormulaType<>(pDomainSort, pRangeSort);
   }
 
@@ -300,8 +301,7 @@ public abstract class FormulaType<T extends Formula> {
       // FloatingPoint<exp=11,mant=52>
       String[] exman = t.substring(14, t.length() - 1).split(",");
       return FormulaType.getFloatingPointType(
-          Integer.parseInt(exman[0].substring(4)),
-          Integer.parseInt(exman[1].substring(5)));
+          Integer.parseInt(exman[0].substring(4)), Integer.parseInt(exman[1].substring(5)));
     } else if (t.startsWith("Bitvector<")) {
       // Bitvector<32>
       return FormulaType.getBitvectorTypeWithSize(
@@ -310,5 +310,4 @@ public abstract class FormulaType<T extends Formula> {
       throw new AssertionError("unknown type:" + t);
     }
   }
-
 }

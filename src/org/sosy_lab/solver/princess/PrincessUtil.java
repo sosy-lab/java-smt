@@ -58,7 +58,7 @@ import scala.collection.JavaConversions;
 /** This is a Class similiar to Mathsat-NativeApi,
  *  it contains some useful static functions. */
 class PrincessUtil {
-  private PrincessUtil() { }
+  private PrincessUtil() {}
 
   /** ITerm is the arithmetic subclass of IExpression. */
   public static ITerm castToTerm(IExpression e) {
@@ -145,7 +145,7 @@ class PrincessUtil {
   /** (ite t1 t2 t3) */
   public static boolean isIfThenElse(IExpression t) {
     return t instanceof IFormulaITE // boolean args
-        || t instanceof ITermITE;   // arithmetic args
+        || t instanceof ITermITE; // arithmetic args
   }
 
   /** t1 = t2 */
@@ -155,7 +155,7 @@ class PrincessUtil {
 
   private static boolean isBinaryFunction(IExpression t, Enumeration.Value val) {
     return (t instanceof IBinFormula)
-            && val == ((IBinFormula) t).j(); // j is the operator and Scala is evil!
+        && val == ((IBinFormula) t).j(); // j is the operator and Scala is evil!
   }
 
   public static int getArity(IExpression t) {
@@ -163,7 +163,8 @@ class PrincessUtil {
   }
 
   public static IExpression getArg(IExpression t, int i) {
-    assert i < getArity(t) : String.format("index %d out of bounds %d in expression %s", i, getArity(t), t);
+    assert i < getArity(t)
+        : String.format("index %d out of bounds %d in expression %s", i, getArity(t), t);
 
     return t.apply(i);
     /*
@@ -176,15 +177,16 @@ class PrincessUtil {
   }
 
   public static boolean isTrue(IExpression t) {
-    return t instanceof IBoolLit && ((IBoolLit)t).value();
+    return t instanceof IBoolLit && ((IBoolLit) t).value();
   }
 
   public static boolean isFalse(IExpression t) {
-    return t instanceof IBoolLit && !((IBoolLit)t).value();
+    return t instanceof IBoolLit && !((IBoolLit) t).value();
   }
 
   /** this function creates a new Term with the same function and new parameters. */
-  public static IExpression replaceArgs(PrincessEnvironment env, IExpression t, List<IExpression> newParams) {
+  public static IExpression replaceArgs(
+      PrincessEnvironment env, IExpression t, List<IExpression> newParams) {
 
     return t.update(JavaConversions.asScalaBuffer(newParams));
 
@@ -242,7 +244,7 @@ class PrincessUtil {
         // this is a real variable we can skip here
         continue;
 
-      } else if (isUIF(t) && uifs.add(((IFunApp)t).fun())) {
+      } else if (isUIF(t) && uifs.add(((IFunApp) t).fun())) {
         result.add(t);
       }
 
@@ -270,7 +272,9 @@ class PrincessUtil {
    */
   @Deprecated
   public static IExpression let(IExpression expr, PrincessEnvironment env) {
-    IExpression lettedExp = replaceCommonExpressionsInTree(expr, getCommonSubTreeExpressions(expr), env, new HashMap<IExpression, IExpression>());
+    IExpression lettedExp =
+        replaceCommonExpressionsInTree(
+            expr, getCommonSubTreeExpressions(expr), env, new HashMap<IExpression, IExpression>());
     assert areEqualTerms(expr, lettedExp, env);
     return lettedExp;
   }
@@ -279,18 +283,24 @@ class PrincessUtil {
    * Compares two expressions for equality by checking the negated equivalence
    * of both for satisfiability.
    */
-  private static boolean areEqualTerms(IExpression expr1, IExpression expr2, PrincessEnvironment env) {
+  private static boolean areEqualTerms(
+      IExpression expr1, IExpression expr2, PrincessEnvironment env) {
     SymbolTrackingPrincessStack stack = (SymbolTrackingPrincessStack) env.getNewStack(false);
     stack.push(1);
 
     IFormula formula;
     // create !(expr1 <=> expr2) if this is unsat we know that the formulas are equal
     if (expr1 instanceof IFormula) {
-      formula = new INot(new IBinFormula(IBinJunctor.Eqv(), castToFormula(expr1), castToFormula(expr2)));
+      formula =
+          new INot(new IBinFormula(IBinJunctor.Eqv(), castToFormula(expr1), castToFormula(expr2)));
 
       // create !(expr1 - expr2 = 0) if this is unsat we know that the formulas are equal
     } else {
-      formula = new INot(castToTerm(expr1).$minus(castToTerm(expr2)).$eq$eq$eq(new IIntLit(IdealInt.apply(0))));
+      formula =
+          new INot(
+              castToTerm(expr1)
+                  .$minus(castToTerm(expr2))
+                  .$eq$eq$eq(new IIntLit(IdealInt.apply(0))));
     }
     stack.assertTerm(formula);
 
@@ -306,7 +316,11 @@ class PrincessUtil {
    * This method replaces parts of the given expression tree that match a key of
    * the map with the corresponding value in the map.
    */
-  private static IExpression replaceCommonExpressionsInTree(IExpression expr, List<IExpression> pCommonExprs, PrincessEnvironment pEnv, Map<IExpression, IExpression> abbreviatedTerms) {
+  private static IExpression replaceCommonExpressionsInTree(
+      IExpression expr,
+      List<IExpression> pCommonExprs,
+      PrincessEnvironment pEnv,
+      Map<IExpression, IExpression> abbreviatedTerms) {
     if (pCommonExprs.isEmpty()) {
       return expr;
     }
@@ -324,11 +338,12 @@ class PrincessUtil {
         // terms where we already have abbreviations for do not need
         // to be traversed again
       } else if (abbreviatedTerms.containsKey(child)) {
-          newChilds.add(abbreviatedTerms.get(child));
+        newChilds.add(abbreviatedTerms.get(child));
 
-          // traversal of yet unknown subtree
+        // traversal of yet unknown subtree
       } else {
-        IExpression newChild = replaceCommonExpressionsInTree(child, pCommonExprs, pEnv, abbreviatedTerms);
+        IExpression newChild =
+            replaceCommonExpressionsInTree(child, pCommonExprs, pEnv, abbreviatedTerms);
         if (pCommonExprs.contains(child)) {
           IExpression abbrev = pEnv.abbrev(newChild);
           abbreviatedTerms.put(child, abbrev);
@@ -346,8 +361,8 @@ class PrincessUtil {
     Deque<IExpression> todo = new ArrayDeque<>();
     Set<IExpression> seen = new HashSet<>();
     List<IExpression> duplicates = new ArrayList<>(); // we want to retain the insertion order
-                                                      // largest common subtrees are found first
-                                                      // and should be replaced first
+    // largest common subtrees are found first
+    // and should be replaced first
     todo.add(expr);
 
     while (!todo.isEmpty()) {
