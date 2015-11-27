@@ -28,7 +28,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -87,7 +86,6 @@ public class PrincessFormulaManager
 
   public static PrincessFormulaManager create(
       Configuration config,
-      LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       PathCounterTemplate pLogfileTemplate,
       boolean pUseNonLinearIntegerArithmetic)
@@ -95,8 +93,7 @@ public class PrincessFormulaManager
 
     PrincessOptions options = new PrincessOptions(config);
 
-    PrincessEnvironment env =
-        new PrincessEnvironment(logger, pLogfileTemplate, pShutdownNotifier, options);
+    PrincessEnvironment env = new PrincessEnvironment(pLogfileTemplate, pShutdownNotifier, options);
 
     PrincessFormulaCreator creator =
         new PrincessFormulaCreator(env, TermType.Boolean, TermType.Integer);

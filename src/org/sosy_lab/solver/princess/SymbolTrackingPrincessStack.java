@@ -82,11 +82,6 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   }
 
   @Override
-  public PrincessEnvironment getEnv() {
-    return env;
-  }
-
-  @Override
   public void push(int levels) {
     for (int i = 0; i < levels; i++) {
       api.push();

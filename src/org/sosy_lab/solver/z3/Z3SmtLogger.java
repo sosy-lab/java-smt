@@ -23,7 +23,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_string;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.FileWriteMode;
@@ -37,7 +36,6 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -194,40 +192,6 @@ class Z3SmtLogger {
       return;
     }
     logBracket("get-model");
-  }
-
-  public void logInterpolation(
-      List<Long> formulasOfA, List<Long> formulasOfB, long conjunctionA, long conjunctionB) {
-    if (logfile == null) {
-      return;
-    }
-
-    StringBuilder itpQuery = new StringBuilder();
-    switch (settings.target) {
-      case Z3:
-        itpQuery
-            .append("get-interpolant ")
-            .append(ast_to_string(z3context, conjunctionA))
-            .append(" ")
-            .append(ast_to_string(z3context, conjunctionB));
-        break;
-
-      case MATHSAT5:
-        itpQuery.append("get-interpolant (");
-
-        for (long f : formulasOfA) {
-          Preconditions.checkArgument(interpolationFormulas.containsKey(f));
-          itpQuery.append(interpolationFormulas.get(f)).append(" ");
-        }
-
-        itpQuery.append(")");
-        break;
-      default:
-        throw new AssertionError();
-    }
-
-    logCheck(); // TODO remove check?
-    logBracket(itpQuery.toString());
   }
 
   public void logSeqInterpolation(long[] interpolationFormulas) {

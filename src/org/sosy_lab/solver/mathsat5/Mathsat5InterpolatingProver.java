@@ -44,11 +44,11 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
   private final boolean useSharedEnv;
 
   Mathsat5InterpolatingProver(Mathsat5FormulaManager pMgr, boolean shared) {
-    super(pMgr, createConfig(pMgr), shared, false);
+    super(pMgr, createConfig(), shared, false);
     useSharedEnv = shared;
   }
 
-  private static long createConfig(Mathsat5FormulaManager mgr) {
+  private static long createConfig() {
     long cfg = msat_create_config();
     msat_set_option_checked(cfg, "interpolation", "true");
     msat_set_option_checked(cfg, "model_generation", "true");

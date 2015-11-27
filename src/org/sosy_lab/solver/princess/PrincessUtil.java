@@ -181,8 +181,7 @@ class PrincessUtil {
   }
 
   /** this function creates a new Term with the same function and new parameters. */
-  public static IExpression replaceArgs(
-      PrincessEnvironment env, IExpression t, List<IExpression> newParams) {
+  public static IExpression replaceArgs(IExpression t, List<IExpression> newParams) {
 
     return t.update(JavaConversions.asScalaBuffer(newParams));
 

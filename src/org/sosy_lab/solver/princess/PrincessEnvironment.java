@@ -34,7 +34,6 @@ import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
 
@@ -103,21 +102,15 @@ class PrincessEnvironment {
 
   private final PrincessOptions princessOptions;
 
-  /** The Constructor creates the wrapped Element, sets some options
-   * and initializes the logger.
-   * @param pShutdownNotifier
-   * @param pOptions */
   PrincessEnvironment(
-      final LogManager pLogger,
       final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,
       PrincessOptions pOptions) {
 
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
-    api =
-        getNewApi(
-            false); // this api is only used local in this environment, no need for interpolation
+    // this api is only used local in this environment, no need for interpolation
+    api = getNewApi(false);
     princessOptions = pOptions;
   }
 

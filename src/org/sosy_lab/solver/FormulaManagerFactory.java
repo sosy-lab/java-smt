@@ -185,7 +185,7 @@ public class FormulaManagerFactory {
         case PRINCESS:
           // TODO: pass randomSeed to Princess
           return PrincessFormulaManager.create(
-              config, logger, shutdownNotifier, logfile, useNonLinearIntegerArithmetic);
+              config, shutdownNotifier, logfile, useNonLinearIntegerArithmetic);
 
         default:
           throw new AssertionError("no solver selected");

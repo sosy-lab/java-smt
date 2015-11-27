@@ -33,8 +33,6 @@ import scala.Option;
  * One PrincessEnvironment can manage several stacks. */
 public interface PrincessStack {
 
-  PrincessEnvironment getEnv();
-
   void push(int levels);
 
   void pop(int levels);

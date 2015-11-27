@@ -61,8 +61,7 @@ class PrincessModel {
     return new Variable(lName, lType);
   }
 
-  private static Function toFunction(
-      IExpression t, PrincessEnvironment env, SimpleAPI.PartialModel partialModel) {
+  private static Function toFunction(IExpression t, SimpleAPI.PartialModel partialModel) {
     if (PrincessUtil.isVariable(t)) {
       throw new IllegalArgumentException("Given term is no function! (" + t.toString() + ")");
     }
@@ -90,12 +89,11 @@ class PrincessModel {
     return new Function(lName, TermType.Integer, lArguments);
   }
 
-  private static AssignableTerm toAssignable(
-      IExpression t, PrincessEnvironment env, SimpleAPI.PartialModel partialModel) {
+  private static AssignableTerm toAssignable(IExpression t, SimpleAPI.PartialModel partialModel) {
     if (PrincessUtil.isVariable(t)) {
       return toVariable(t);
     } else {
-      return toFunction(t, env, partialModel);
+      return toFunction(t, partialModel);
     }
   }
 
@@ -126,7 +124,7 @@ class PrincessModel {
         continue;
       }
 
-      AssignableTerm lAssignable = toAssignable(lKeyTerm, stack.getEnv(), partialModel);
+      AssignableTerm lAssignable = toAssignable(lKeyTerm, partialModel);
       Object lValue = getValue(value.get());
 
       // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas

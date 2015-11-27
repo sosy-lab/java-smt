@@ -84,7 +84,7 @@ class PrincessUnsafeFormulaManager
 
   @Override
   public IExpression replaceArgs(IExpression pT, List<IExpression> newArgs) {
-    return PrincessUtil.replaceArgs(getFormulaCreator().getEnv(), pT, newArgs);
+    return PrincessUtil.replaceArgs(pT, newArgs);
   }
 
   @Override
