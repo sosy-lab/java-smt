@@ -61,6 +61,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Mathsat5Model {
+  private Mathsat5Model() {}
 
   // A model can contain arbitrary real numbers, such as 1/3.
   // Java does not provide a representation of such numbers with arbitrary precision,
@@ -179,10 +180,10 @@ class Mathsat5Model {
       // TODO maybe we have to convert to SMTLIB format and then read in values in a controlled way,
       // e.g., size of bitvector
       // TODO we are assuming numbers as values
-      if (!(msat_term_is_number(sourceEnvironment, lValueTerm)
-          || msat_term_is_boolean_constant(sourceEnvironment, lValueTerm)
-          || msat_term_is_false(sourceEnvironment, lValueTerm)
-          || msat_term_is_true(sourceEnvironment, lValueTerm))) {
+      if (!msat_term_is_number(sourceEnvironment, lValueTerm)
+          && !msat_term_is_boolean_constant(sourceEnvironment, lValueTerm)
+          && !msat_term_is_false(sourceEnvironment, lValueTerm)
+          && !msat_term_is_true(sourceEnvironment, lValueTerm)) {
         throw new IllegalArgumentException("Mathsat term is not a number!");
       }
 
@@ -229,7 +230,7 @@ class Mathsat5Model {
     return new Model(model.build());
   }
 
-  private static Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
+  private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
   //TODO: change this to the latest version
   // (if possible try to use a BitvectorFormula instance here)
@@ -254,7 +255,7 @@ class Mathsat5Model {
     return value;
   }
 
-  private static Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
+  private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
 
   private static Object interpreteFloatingPoint(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"

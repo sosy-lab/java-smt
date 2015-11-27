@@ -30,7 +30,7 @@ import java.util.List;
  */
 public interface QuantifiedFormulaManager {
 
-  /**<
+  /**
    * @return An existential quantified formula.
    *
    * @param pVariables  The variables that will get bound (variables) by the quantification.

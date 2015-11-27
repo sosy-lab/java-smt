@@ -98,8 +98,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * partition      = [A,B,D,E,C,F,H,G]  // post-order of tree
    * startOfSubTree = [0,0,2,2,0,0,6,0]  // index of left-most leaf of the current element
    *
-   * @param partitions of formulas
-   * @param startOfSubtree The start of the subtree containing the formula at this index as root.
+   * @param partitionedFormulas of formulas
+   * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
    */
   List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree);

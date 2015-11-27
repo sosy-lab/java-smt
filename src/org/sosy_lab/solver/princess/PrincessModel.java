@@ -41,6 +41,7 @@ import ap.parser.IFunApp;
 import scala.Option;
 
 class PrincessModel {
+  private PrincessModel() {}
 
   private static AssignableTerm toVariable(IExpression t) {
     if (!PrincessUtil.isVariable(t)) {

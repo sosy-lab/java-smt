@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
 class Mathsat5NativeApi {
+  private Mathsat5NativeApi() {}
 
   // msat_result
   private static final int MSAT_UNKNOWN = -1;

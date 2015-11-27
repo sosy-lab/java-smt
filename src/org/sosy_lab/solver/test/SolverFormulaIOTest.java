@@ -30,8 +30,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -272,9 +270,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
-    if (!(count == 1 || count2 == 1)) {
-      throw new AssertionFailedError(formDump + " does not contain <= or >= only once.");
-    }
+    assertThat(count == 1 || count2 == 1)
+        .named(formDump + " does not contain <= or >= only once.")
+        .isTrue();
   }
 
   @Test

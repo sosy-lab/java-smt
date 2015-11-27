@@ -62,6 +62,8 @@ import org.sosy_lab.solver.TermType;
 import java.math.BigInteger;
 
 class Z3Model {
+  private Z3Model() {}
+
   private static TermType toZ3Type(long z3context, long sort) {
     int sortKind = get_sort_kind(z3context, sort);
     switch (sortKind) {

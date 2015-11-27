@@ -25,6 +25,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.is_app;
 
 /** This class contains many constants (enums) from Z3. */
 public class Z3NativeApiConstants {
+  private Z3NativeApiConstants() {}
 
   /** returns, if the function of the expression is the given operation. */
   public static boolean isOP(long z3context, long expr, int op) {

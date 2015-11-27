@@ -35,6 +35,7 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolModel {
+  private SmtInterpolModel() {}
 
   private static TermType getType(Term t) {
     if (SmtInterpolUtil.isBoolean(t)) {

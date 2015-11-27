@@ -37,9 +37,9 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -76,10 +76,10 @@ class Z3SmtLogger {
   private final Z3Settings settings;
   private final long z3context;
 
-  private final HashSet<Long> declarations = Sets.newHashSet();
+  private final Set<Long> declarations = Sets.newHashSet();
 
   private int itpIndex = 0; // each interpolation gets its own index
-  private final HashMap<Long, String> interpolationFormulas =
+  private final Map<Long, String> interpolationFormulas =
       Maps.newHashMap(); // for mathsat-compatibility
 
   Z3SmtLogger(long z3context, Configuration config, @Nullable PathCounterTemplate logfile)

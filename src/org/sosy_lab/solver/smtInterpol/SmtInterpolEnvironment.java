@@ -564,7 +564,7 @@ class SmtInterpolEnvironment {
    *
    * @param partition The array of formulas (post-order of tree).
    *                  This should contain either top-level names or conjunction of top-level names.
-   * @param startOfSubtree The start of the subtree containing the formula at this index as root.
+   * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
    */
   public Term[] getTreeInterpolants(Term[] partition, int[] startOfSubTree) {

@@ -185,7 +185,7 @@ public interface UnsafeFormulaManager {
    * A solver that does not provide a simplify method
    *  might just return the original formula.
    *
-   * @param   The input formula
+   * @param f The input formula
    * @return  Simplified version of the formula
    */
   <T extends Formula> T simplify(T f);

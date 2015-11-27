@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
   "checkstyle:parameternumber"
 })
 public final class Z3NativeApi {
+  private Z3NativeApi() {}
 
   // Helper Classes,
   // they are used during the native operations
