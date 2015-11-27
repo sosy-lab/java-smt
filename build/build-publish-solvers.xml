@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers" basedir="."
+        xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <!-- SECTION: Publishing Z3 {{{1
+         ===============================================================
+    -->
+    <target name="compile-z3-bindings"
+        description="Compile JNI bindings to Z3">
+        <fail unless="z3.path">
+            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
+            The path has to point to the root Z3 folder.
+            Note that shell substitutions do not work and a full absolute
+            path has to be specified.
+        </fail>
+        <exec executable="lib/native/source/libz3j/compile.sh">
+            <arg value="${z3.path}" />
+        </exec>
+    </target>
+
+    <target name="package-z3" depends="compile-z3-bindings"
+        description="Copy Z3 binaries to the root folder along with the version postfix.">
+        <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
+            <arg value="describe" />
+        </exec>
+        <copy file="lib/native/source/libz3j/libz3j.so" tofile="libz3j-${z3.version}.so"/>
+        <copy file="${z3.path}/build/libz3.so" tofile="libz3-${z3.version}.so"/>
+    </target>
+
+    <target name="publish-z3" depends="package-z3, load-ivy"
+        description="Publish Z3 binaries to Ivy repo.">
+
+        <ivy:resolve conf="solver-z3" file="solvers_ivy_conf/ivy_z3.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${z3.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${z3.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${z3.version} of Z3 Solver"
+            to make the new version publicly available.</echo>
+    </target>
+
+    <!-- SECTION: Publishing [Opti-]MathSAT {{{1
+         ===============================================================
+    -->
+    <target name="compile-mathsat-bindings"
+        description="Compile MathSAT bindings">
+        <compile-mathsatlike-bindings flag="mathsat"/>
+    </target>
+
+    <target name="compile-optimathsat-bindings"
+        description="Compile OptiMathSAT bindings">
+        <compile-mathsatlike-bindings flag="optimathsat"/>
+    </target>
+
+    <target name="publish-mathsat" depends="compile-mathsat-bindings, load-ivy"
+        description="Publish OptiMathSAT binaries to Ivy repo.">
+
+        <publish-mathsatlike flag="mathsat" />
+    </target>
+
+    <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
+        description="Publish OptiMathSAT binaries to Ivy repo.">
+
+        <publish-mathsatlike flag="optimathsat" />
+    </target>
+
+    <macrodef name="compile-mathsatlike-bindings">
+       <attribute name="flag"/>
+       <sequential>
+           <fail unless="mathsat.path">
+               Please specify the path to the Mathsat5 source folder with the flag -Dmathsat.path=/path/to/mathsat.
+               The path has to point to the root Mathsat5 folder.
+               Note that shell substitutions do not work and a full absolute
+               path has to be specified.
+           </fail>
+
+           <fail unless="gmp.path">
+               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
+               The path has to point to the root GMP folder.
+               Note that shell substitutions do not work and a full absolute
+               path has to be specified.
+           </fail>
+
+           <exec executable="lib/native/source/libmathsat5j/compile.sh">
+               <arg value="${mathsat.path}" />
+               <arg value="${gmp.path}" />
+               <arg value="-@{flag}" />
+           </exec>
+
+       </sequential>
+    </macrodef>
+
+    <macrodef name="publish-mathsatlike">
+        <attribute name="flag" default="mathsat"/>
+
+        <sequential>
+            <fail unless="mathsat.version">
+                Please specify the @{flag} version with the flag -Dmathsat.version=... .
+            </fail>
+
+            <copy file="lib/native/source/libmathsat5j/lib@{flag}5j.so" tofile="lib@{flag}5j-${mathsat.version}.so"/>
+
+            <ivy:resolve conf="solver-@{flag}" file="solvers_ivy_conf/ivy_@{flag}.xml" />
+            <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+            <fail unless="ivy.hasrepository"
+                message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+            <ivy:publish
+                pubrevision="${mathsat.version}"
+                resolver="Sosy-Lab-Publish"
+                artifactspattern="[artifact]-[revision].[ext]"
+                status="release"
+                />
+            <echo>
+                You now want to run
+                svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
+                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of @{flag} Solver"
+                to make the new version publicly available.</echo>
+        </sequential>
+    </macrodef>
+    <!-- }}} -->
+</project>

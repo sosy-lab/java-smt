@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
+<project name="publish" basedir="."
+        xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <!-- Targets for publishing the project to an Ivy repository. -->
+
+    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker and VerifierCloud. -->
+
+    <target name="publish-artifacts">
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            conf="runtime, sources"
+            pubrevision="${version}"
+            resolver="Sosy-Lab-Publish"
+            status="release"
+            artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${version} of ${ant.project.name}"
+            to make the new version publicly available.</echo>
+    </target>
+</project>

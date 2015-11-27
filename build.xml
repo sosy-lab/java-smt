@@ -1,0 +1,72 @@
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab : -->
+<project name="JavaSMT Solver Library" basedir="." default="build">
+    <!-- Include a file in which all properties can be overridden.
+         This file won't get checked in and can be used to change properties
+         locally for one machine if necessary. -->
+    <property file="build.properties"/>
+    <property environment="env"/>
+
+    <property name="ivy.configurations" value="build, runtime, test, checkstyle, findbugs"/>
+
+    <import file="build/build-version.xml"/>
+    <import file="build/build-ivy.xml"/>
+    <import file="build/build-compile.xml"/>
+    <import file="build/build-jar.xml"/>
+    <import file="build/build-junit.xml"/>
+    <import file="build/build-checkstyle.xml"/>
+    <import file="build/build-findbugs.xml"/>
+    <import file="build/build-publish.xml"/>
+    <import file="build/build-publish-solvers.xml"/>
+    <import file="build/build-format-source.xml"/>
+
+    <path id="classpath">
+        <pathelement location="${class.dir}"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-service.jar build/auto-common.jar build/error_prone_annotations.jar"/>
+    </path>
+
+
+    <!-- Main targets -->
+
+    <target name="clean" description="Clean">
+        <delete includeEmptyDirs="true">
+            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.jar"/>
+        </delete>
+    </target>
+
+    <target name="build" depends="build-project, build-documentation" description="Build"/>
+
+    <target name="dist" depends="jar, sources" description="Make a distributable release"/>
+
+    <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
+
+    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version to Ivy repository"/>
+
+    <!-- Auxiliary targets -->
+
+    <target name="init" depends="determine-version">
+        <echo message="Building ${ant.project.name} ${version}"/>
+        <mkdir dir="${class.dir}"/>
+    </target>
+
+    <target name="build-dependencies" depends="init, resolve-dependencies"/>
+
+    <target name="build-documentation" depends="build-project">
+        <echo message="running OptionCollector..." level="info"/>
+
+        <!-- the output of OptionCollector is written into "doc/ConfigurationOptions.txt" -->
+        <java classname="org.sosy_lab.common.configuration.OptionCollector"
+            fork="true"
+            output="${class.dir}/org/sosy_lab/solver/ConfigurationOptions.txt" append="false"
+            failonerror="true"
+            logError="true">
+
+            <classpath refid="classpath"/>
+
+            <!-- "-v" is a optional param for verbose output of OptionCollector -->
+            <!-- <arg value="-v"/> -->
+        </java>
+        <echo message="Options collected." level="info"/>
+    </target>
+
+</project>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
+<project name="version" basedir=".">
+
+    <target name="determine-version">
+        <exec executable="git"
+                outputproperty="version"
+                failonerror="true">
+            <arg value="describe"/>
+        </exec>
+    </target>
+</project>
