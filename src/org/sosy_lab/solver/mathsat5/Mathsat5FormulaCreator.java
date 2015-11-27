@@ -61,7 +61,7 @@ import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5RationalFormula;
 
 class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
-  public Mathsat5FormulaCreator(final Long msatEnv) {
+  Mathsat5FormulaCreator(final Long msatEnv) {
     super(
         msatEnv,
         msat_get_bool_type(msatEnv),

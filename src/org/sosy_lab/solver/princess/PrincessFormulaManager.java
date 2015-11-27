@@ -53,7 +53,7 @@ public class PrincessFormulaManager
     )
     private int minAtomsForAbbreviation = 100;
 
-    public PrincessOptions(Configuration config) throws InvalidConfigurationException {
+    PrincessOptions(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
     }
 

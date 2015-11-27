@@ -60,7 +60,7 @@ import javax.annotation.Nullable;
 public class FormulaManagerFactory {
 
   @VisibleForTesting
-  public static enum Solvers {
+  public enum Solvers {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
@@ -217,7 +217,7 @@ public class FormulaManagerFactory {
    * This interface is only meant to be implemented by SMT solvers
    * and used by this class, not by other classes.
    */
-  public static interface SolverFactory {
+  public interface SolverFactory {
     FormulaManager create(
         Configuration config,
         LogManager logger,

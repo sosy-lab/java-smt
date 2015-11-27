@@ -32,7 +32,7 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
 
   private final long mathsatEnv;
 
-  public Mathsat5ArrayFormulaManager(Mathsat5FormulaCreator pCreator) {
+  Mathsat5ArrayFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.mathsatEnv = pCreator.getEnv();
   }

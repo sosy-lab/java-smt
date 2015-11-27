@@ -33,7 +33,7 @@ import java.math.BigDecimal;
 class Mathsat5RationalFormulaManager
     extends Mathsat5NumeralFormulaManager<NumeralFormula, RationalFormula> {
 
-  public Mathsat5RationalFormulaManager(
+  Mathsat5RationalFormulaManager(
       Mathsat5FormulaCreator pCreator,
       Mathsat5FunctionFormulaManager functionManager,
       boolean useNonLinearArithmetic) {

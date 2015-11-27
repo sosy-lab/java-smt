@@ -107,7 +107,7 @@ class PrincessEnvironment {
    * and initializes the logger.
    * @param pShutdownNotifier
    * @param pOptions */
-  public PrincessEnvironment(
+  PrincessEnvironment(
       final LogManager pLogger,
       final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,

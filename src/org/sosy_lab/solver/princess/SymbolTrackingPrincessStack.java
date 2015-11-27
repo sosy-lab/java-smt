@@ -63,7 +63,7 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   /** data-structures for tracking symbols */
   private final Deque<Level> trackingStack = new ArrayDeque<>();
 
-  public SymbolTrackingPrincessStack(
+  SymbolTrackingPrincessStack(
       final PrincessEnvironment env,
       final SimpleAPI api,
       boolean usableForInterpolation,

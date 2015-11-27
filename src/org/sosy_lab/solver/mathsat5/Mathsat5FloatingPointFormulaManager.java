@@ -58,7 +58,7 @@ class Mathsat5FloatingPointFormulaManager
 
   private final long roundingMode;
 
-  public Mathsat5FloatingPointFormulaManager(
+  Mathsat5FloatingPointFormulaManager(
       Mathsat5FormulaCreator pCreator, Mathsat5FunctionFormulaManager pFfmgr) {
     super(pCreator);
 

@@ -49,7 +49,7 @@ abstract class Z3NumeralFormulaManager<
 
   protected final long z3context;
 
-  public Z3NumeralFormulaManager(
+  Z3NumeralFormulaManager(
       Z3FormulaCreator pCreator,
       Z3FunctionFormulaManager functionManager,
       boolean useNonLinearArithmetic) {

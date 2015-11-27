@@ -75,8 +75,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    public ArrayFormulaImpl(
-        TFormulaInfo info, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    ArrayFormulaImpl(TFormulaInfo info, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(info);
       this.indexType = checkNotNull(pIndexType);
       this.elementType = checkNotNull(pElementType);
@@ -96,7 +95,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
    */
   static final class BitvectorFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BitvectorFormula {
-    public BitvectorFormulaImpl(TFormulaInfo info) {
+    BitvectorFormulaImpl(TFormulaInfo info) {
       super(info);
     }
   }
@@ -106,7 +105,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
    */
   static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements FloatingPointFormula {
-    public FloatingPointFormulaImpl(TFormulaInfo info) {
+    FloatingPointFormulaImpl(TFormulaInfo info) {
       super(info);
     }
   }
@@ -116,7 +115,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
    */
   static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BooleanFormula {
-    public BooleanFormulaImpl(TFormulaInfo pT) {
+    BooleanFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }
   }
@@ -126,7 +125,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
    */
   static final class IntegerFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements IntegerFormula {
-    public IntegerFormulaImpl(TFormulaInfo pTerm) {
+    IntegerFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
     }
   }
@@ -136,7 +135,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
    */
   static final class RationalFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements RationalFormula {
-    public RationalFormulaImpl(TFormulaInfo pTerm) {
+    RationalFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
     }
   }

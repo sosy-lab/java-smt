@@ -64,8 +64,7 @@ abstract class Mathsat5Formula implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    public Mathsat5ArrayFormula(
-        long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    Mathsat5ArrayFormula(long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(pTerm);
       indexType = pIndexType;
       elementType = pElementType;
@@ -81,32 +80,32 @@ abstract class Mathsat5Formula implements Formula {
   }
 
   static final class Mathsat5BitvectorFormula extends Mathsat5Formula implements BitvectorFormula {
-    public Mathsat5BitvectorFormula(long pTerm) {
+    Mathsat5BitvectorFormula(long pTerm) {
       super(pTerm);
     }
   }
 
   static final class Mathsat5FloatingPointFormula extends Mathsat5Formula
       implements FloatingPointFormula {
-    public Mathsat5FloatingPointFormula(long pTerm) {
+    Mathsat5FloatingPointFormula(long pTerm) {
       super(pTerm);
     }
   }
 
   static final class Mathsat5IntegerFormula extends Mathsat5Formula implements IntegerFormula {
-    public Mathsat5IntegerFormula(long pTerm) {
+    Mathsat5IntegerFormula(long pTerm) {
       super(pTerm);
     }
   }
 
   static final class Mathsat5RationalFormula extends Mathsat5Formula implements RationalFormula {
-    public Mathsat5RationalFormula(long pTerm) {
+    Mathsat5RationalFormula(long pTerm) {
       super(pTerm);
     }
   }
 
   static final class Mathsat5BooleanFormula extends Mathsat5Formula implements BooleanFormula {
-    public Mathsat5BooleanFormula(long pTerm) {
+    Mathsat5BooleanFormula(long pTerm) {
       super(pTerm);
     }
   }

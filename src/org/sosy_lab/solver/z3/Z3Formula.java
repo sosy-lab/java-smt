@@ -73,7 +73,7 @@ abstract class Z3Formula implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    public Z3ArrayFormula(
+    Z3ArrayFormula(
         long pZ3context, long pZ3expr, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(pZ3context, pZ3expr);
       indexType = pIndexType;
@@ -91,27 +91,27 @@ abstract class Z3Formula implements Formula {
 
   static final class Z3BitvectorFormula extends Z3Formula implements BitvectorFormula {
 
-    public Z3BitvectorFormula(long z3context, long z3expr) {
+    Z3BitvectorFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }
 
   static final class Z3IntegerFormula extends Z3Formula implements IntegerFormula {
 
-    public Z3IntegerFormula(long z3context, long z3expr) {
+    Z3IntegerFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }
 
   static final class Z3RationalFormula extends Z3Formula implements RationalFormula {
 
-    public Z3RationalFormula(long z3context, long z3expr) {
+    Z3RationalFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }
 
   static final class Z3BooleanFormula extends Z3Formula implements BooleanFormula {
-    public Z3BooleanFormula(long z3context, long z3expr) {
+    Z3BooleanFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }

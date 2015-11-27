@@ -60,7 +60,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   private final long msatEnv;
   private final Mathsat5FormulaCreator creator;
 
-  public Mathsat5UnsafeFormulaManager(Mathsat5FormulaCreator pCreator) {
+  Mathsat5UnsafeFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.msatEnv = pCreator.getEnv();
     this.creator = pCreator;

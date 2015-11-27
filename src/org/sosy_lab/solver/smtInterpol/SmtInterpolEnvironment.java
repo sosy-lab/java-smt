@@ -103,7 +103,7 @@ class SmtInterpolEnvironment {
 
   /** The Constructor creates the wrapped Element, sets some options
    * and initializes the logger. */
-  public SmtInterpolEnvironment(
+  SmtInterpolEnvironment(
       Configuration config,
       final LogManager pLogger,
       final ShutdownNotifier pShutdownNotifier,

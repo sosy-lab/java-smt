@@ -38,7 +38,7 @@ abstract class Mathsat5NumeralFormulaManager<
 
   private final long mathsatEnv;
 
-  public Mathsat5NumeralFormulaManager(
+  Mathsat5NumeralFormulaManager(
       Mathsat5FormulaCreator pCreator,
       Mathsat5FunctionFormulaManager functionManager,
       boolean useNonLinearArithmetic) {
