@@ -33,4 +33,4 @@ lib/native/source/libmathsat5j/*.so
 .idea/workspace.xml
 .idea/uiDesigner.xml
 
-*.so
+/*.so
