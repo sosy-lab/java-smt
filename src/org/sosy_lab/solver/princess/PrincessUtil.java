@@ -206,7 +206,8 @@ class PrincessUtil {
       assert tt.cond().getClass() == newParams.get(0).getClass();
       assert tt.left().getClass() == newParams.get(1).getClass();
       assert tt.right().getClass() == newParams.get(2).getClass();
-      return new IFormulaITE((IFormula)newParams.get(0), (IFormula)newParams.get(1), (IFormula)newParams.get(2));
+      return new IFormulaITE((IFormula)newParams.get(0),
+          (IFormula)newParams.get(1), (IFormula)newParams.get(2));
 
     } else if (t instanceof IPlus) {
       assert newParams.size() == 2;

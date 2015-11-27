@@ -27,7 +27,8 @@ import ap.parser.IFormula;
 import scala.Option;
 
 /** This is a Interface for the Wrapper around some parts of the PrincessAPI.
- * It allows to have a stack with operations like: push, pop, assert, checkSat, getInterpolants, getModel.
+ * It allows to have a stack with operations like:
+ * push, pop, assert, checkSat, getInterpolants, getModel.
  * A stack is always connected with a PrincessEnvironment, because Variables are declared there.
  * One PrincessEnvironment can manage several stacks. */
 public interface PrincessStack {

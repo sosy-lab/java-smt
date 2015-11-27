@@ -33,8 +33,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class simplifies the implementation of the FunctionFormulaManager by converting the types to the solver specific type.
- * It depends on UnsafeFormulaManager to make clear that the UnsafeFormulaManager should not depend on FunktionFormulaManager.
+ * This class simplifies the implementation of the FunctionFormulaManager by converting the types
+ * to the solver specific type.
+ * It depends on UnsafeFormulaManager to make clear
+ * that the UnsafeFormulaManager should not depend on FunktionFormulaManager.
  * @param <TFormulaInfo> The solver specific type.
  * @param <TFunctionDecl> The solver specific type of declarations of uninterpreted functions
  * @param <TType> The solver specific type of formula-types.

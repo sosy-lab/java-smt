@@ -48,13 +48,16 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
 
   /**
    * Get an interpolant for two groups of formulas.
-   * This should be called only immediately after an {@link #isUnsat()} call that returned <code>true</code>.
+   * This should be called only immediately after an {@link #isUnsat()} call
+   * that returned <code>true</code>.
    *
-   * There is no direct guarantee, that the interpolants returned are part of an 'inductive sequence',
+   * There is no direct guarantee
+   * that the interpolants returned are part of an inductive sequence',
    * however this seems to work for most (all?) solvers as long as the same proof is used,
    * i.e. all interpolants are computed after the same SAT-check.
    *
-   * @param formulasOfA A list of values returned by {@link #push(BooleanFormula)}. All the corresponding formulas from group A, the remaining formulas form group B.
+   * @param formulasOfA A list of values returned by {@link #push(BooleanFormula)}.
+   *     All the corresponding formulas from group A, the remaining formulas form group B.
    * @return An interpolant for A and B
    */
   BooleanFormula getInterpolant(List<T> formulasOfA) throws SolverException;
@@ -62,7 +65,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
   /**
    * This method returns interpolants of an 'inductive sequence'.
    * This property must be supported by the interpolation-strategy of the underlying SMT-solver!
-   * Depending on the underlying SMT-solver this method might be faster than N direct calls to getInterpolant().
+   * Depending on the underlying SMT-solver this method might be faster than N direct calls
+   * to getInterpolant().
    *
    * The stack must contain exactly the partitioned formulas, but any order is allowed.
    * For an input of N partitions we return N-1 interpolants.

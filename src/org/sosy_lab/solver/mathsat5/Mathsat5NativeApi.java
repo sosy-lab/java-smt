@@ -577,7 +577,7 @@ class Mathsat5NativeApi {
   private static native int msat_all_sat(
       long e, long[] important, int num_important, AllSatModelCallback func)
       throws InterruptedException;
-  //private static native int msat_solve_diversify(long e, DiversifyModelCallback func, long userData)
+
   public static native long[] msat_get_asserted_formulas(long e);
 
   public static native long[] msat_get_theory_lemmas(long e);

@@ -111,7 +111,7 @@ class Mathsat5BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Lo
   }
 
   /**
-   * Returns a term representing the (arithmetic if signed is true) right shift of number by toShift.
+   * Return a term representing the (arithmetic if signed is true) right shift of number by toShift.
    */
   @Override
   public Long shiftRight(Long number, Long toShift, boolean signed) {

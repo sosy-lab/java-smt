@@ -96,8 +96,9 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   @Override
   protected Long eliminateQuantifiers(Long pExtractInfo)
       throws SolverException, InterruptedException {
-    // It is recommended (personal communication with Nikolaj Bjorner) to run "qe-light" before "qe".
-    //  "qe" does not perform a "qe-light" as a preprocessing on its own!
+    // It is recommended (personal communication with Nikolaj Bjorner)
+    // to run "qe-light" before "qe".
+    // "qe" does not perform a "qe-light" as a preprocessing on its own!
 
     // You might want to run the tactic "ctx-solver-simplify" on the result...
 

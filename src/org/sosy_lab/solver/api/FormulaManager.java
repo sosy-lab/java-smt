@@ -32,16 +32,16 @@ public interface FormulaManager {
   /**
    * Returns the Integer-Theory.
    * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
-   * the Integer- and the RationalFormulaManager both return the same Formulas for numeric operations
-   * like ADD, SUBSTRACT, TIMES, LESSTHAN, EQUAL, etc.
+   * the Integer- and the RationalFormulaManager both return the same Formulas
+   * for numeric operations like ADD, SUBSTRACT, TIMES, LESSTHAN, EQUAL, etc.
    */
   NumeralFormulaManager<IntegerFormula, IntegerFormula> getIntegerFormulaManager();
 
   /**
    * Returns the Rational-Theory.
    * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
-   * the Integer- and the RationalFormulaManager both return the same Formulas for numeric operations
-   * like ADD, SUBSTRACT, TIMES, LESSTHAN, EQUAL, etc.
+   * the Integer- and the RationalFormulaManager both return the same Formulas
+   * for numeric operations like ADD, SUBSTRACT, TIMES, LESSTHAN, EQUAL, etc.
    */
   NumeralFormulaManager<NumeralFormula, RationalFormula> getRationalFormulaManager();
 
@@ -83,8 +83,10 @@ public interface FormulaManager {
   /**
    * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack
    * and can be used to check formulas for unsatisfiability.
-   * @param generateModels Whether the solver should generate models (i.e., satisfying assignments) for satisfiable formulas.
-   * @param generateUnsatCore Whether the solver should generate an unsat core for unsatisfiable formulas.
+   * @param generateModels Whether the solver should generate models (i.e., satisfying assignments)
+   *     for satisfiable formulas.
+   * @param generateUnsatCore Whether the solver should generate an unsat core
+   *     for unsatisfiable formulas.
    */
   ProverEnvironment newProverEnvironment(boolean generateModels, boolean generateUnsatCore);
 

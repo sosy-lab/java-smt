@@ -110,7 +110,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
 
     //final List<BooleanFormula> itps = new ArrayList<>();
     //for (int i = 0; i < partitionedFormulas.size(); i++) {
-    //  itps.add(getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
+    //  itps.add(getInterpolant(
+    //      Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
     //}
     //return itps;
 

@@ -123,7 +123,8 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   public BooleanFormula getInterpolant(final List<Long> formulasOfA) {
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
-    // we have to handle equal formulas on the stack, so we copy the whole stack and remove the formulas of A once.
+    // we have to handle equal formulas on the stack,
+    // so we copy the whole stack and remove the formulas of A once.
     final List<Long> formulasOfB = Lists.newLinkedList(assertedFormulas);
     for (long af : formulasOfA) {
       boolean check = formulasOfB.remove(af); // remove only first occurrence

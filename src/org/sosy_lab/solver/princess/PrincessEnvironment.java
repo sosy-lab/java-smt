@@ -94,8 +94,8 @@ class PrincessEnvironment {
 
   /** the wrapped api is the first created api.
    * It will never be used outside of this class and never be closed.
-   * If a variable is declared, it is declared in the first api, then copied into all registered apis.
-   * Each api has its own stack for formulas. */
+   * If a variable is declared, it is declared in the first api,
+   * then copied into all registered apis. Each api has its own stack for formulas. */
   private final SimpleAPI api;
   private final List<SymbolTrackingPrincessStack> registeredStacks = new ArrayList<>();
   private final List<SymbolTrackingPrincessStack> reusableStacks = new ArrayList<>();

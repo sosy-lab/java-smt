@@ -94,7 +94,7 @@ public interface BitvectorFormulaManager {
   BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
-   * Returns a term representing the (arithmetic if signed is true) right shift of number by toShift.
+   * Return a term representing the (arithmetic if signed is true) right shift of number by toShift.
    */
   BitvectorFormula shiftRight(BitvectorFormula number, BitvectorFormula toShift, boolean signed);
 

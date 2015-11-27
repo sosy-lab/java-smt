@@ -94,7 +94,8 @@ public class FormulaManagerFactory {
         "Use non-linear arithmetic when encoding formulas in corresponding theory. "
             + "This effects the operations DIV, MOD, and MULT with two non-numeral operands, "
             + "which are encoded with uninterpreted functions otherwise. "
-            + "If a solver does not support non-linear arithmetic, and this option is set, an exception is thrown."
+            + "If a solver does not support non-linear arithmetic, and this option is set, "
+            + "an exception is thrown."
   )
   private boolean useNonLinearIntegerArithmetic = false;
 
@@ -104,7 +105,8 @@ public class FormulaManagerFactory {
         "Use non-linear arithmetic when encoding formulas in corresponding theory. "
             + "This effects the operations DIV, MOD, and MULT with two non-numeral operands, "
             + "which are encoded with uninterpreted functions otherwise. "
-            + "If a solver does not support non-linear arithmetic, and this option is set, an exception is thrown."
+            + "If a solver does not support non-linear arithmetic, and this option is set, "
+            + "an exception is thrown."
   )
   private boolean useNonLinearRationalArithmetic = false;
 

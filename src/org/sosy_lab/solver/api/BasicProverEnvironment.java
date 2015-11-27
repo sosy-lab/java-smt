@@ -51,7 +51,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
    * Get a satisfying assignment.
-   * This should be called only immediately after an {@link #isUnsat()} call that returned <code>false</code>.
+   * This should be called only immediately after an {@link #isUnsat()} call
+   * that returned <code>false</code>.
    */
   Model getModel() throws SolverException;
 

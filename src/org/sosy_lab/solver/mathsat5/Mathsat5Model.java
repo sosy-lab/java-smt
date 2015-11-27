@@ -176,7 +176,8 @@ class Mathsat5Model {
 
       AssignableTerm lAssignable = toAssignable(sourceEnvironment, lKeyTerm);
 
-      // TODO maybe we have to convert to SMTLIB format and then read in values in a controlled way, e.g., size of bitvector
+      // TODO maybe we have to convert to SMTLIB format and then read in values in a controlled way,
+      // e.g., size of bitvector
       // TODO we are assuming numbers as values
       if (!(msat_term_is_number(sourceEnvironment, lValueTerm)
           || msat_term_is_boolean_constant(sourceEnvironment, lValueTerm)
@@ -230,7 +231,8 @@ class Mathsat5Model {
 
   private static Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
-  //TODO: change this to the latest version (if possible try to use a BitvectorFormula instance here)
+  //TODO: change this to the latest version
+  // (if possible try to use a BitvectorFormula instance here)
   private static Object interpreteBitvector(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<WIDTH>"
     Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);

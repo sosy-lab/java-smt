@@ -86,8 +86,8 @@ class SmtInterpolEnvironment {
   @Option(
     secure = true,
     description =
-        "List of further options which will be set to true for SMTInterpol in addition to the default options. "
-            + "Format is 'option1,option2,option3'"
+        "Further options that will be set to true for SMTInterpol "
+            + "in addition to the default options. Format is 'option1,option2,option3'"
   )
   private List<String> furtherOptions = ImmutableList.of();
 
@@ -255,7 +255,8 @@ class SmtInterpolEnvironment {
   SmtInterpolTheoremProver createProver(SmtInterpolFormulaManager mgr) {
     checkState(
         stackDepth == 0,
-        "Not allowed to create a new prover environment while solver stack is still non-empty, parallel stacks are not supported.");
+        "Not allowed to create a new prover environment while solver stack is still non-empty, "
+            + "parallel stacks are not supported.");
     return new SmtInterpolTheoremProver(mgr);
   }
 

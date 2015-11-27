@@ -44,7 +44,8 @@ import scala.collection.Seq;
 import scala.collection.mutable.ArrayBuffer;
 
 /** This is a Wrapper around some parts of the PrincessAPI.
- * It allows to have a stack with operations like: push, pop, assert, checkSat, getInterpolants, getModel.
+ * It allows to have a stack with operations like:
+ * push, pop, assert, checkSat, getInterpolants, getModel.
  * A stack is always connected with a PrincessEnvironment, because Variables are declared there.
  * One PrincessEnvironment can manage several stacks.
  *
@@ -132,7 +133,8 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     api.setPartitionNumber(index);
     assertTerm(booleanFormula);
 
-    // reset partition number to magic number -1, that represents formulae belonging to all partitions.
+    // reset partition number to magic number -1,
+    // which represents formulae belonging to all partitions.
     api.setPartitionNumber(-1);
   }
 

@@ -153,7 +153,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivModNonLinear() throws Exception {
-    // not all solvers support division-by-variable, we guarantee soundness by allowing any value, that yields SAT.
+    // not all solvers support division-by-variable,
+    // we guarantee soundness by allowing any value that yields SAT.
     assume()
         .withFailureMessage(
             "Solver " + solverToUse() + " does not support the operations MOD and DIV")
@@ -174,8 +175,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     // check division-by-variable, a=10 && b=2 && a/b=5
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, fADivB))).isSatisfiable();
 
-    // TODO disabled, because we would need the option solver.solver.useNonLinearIntegerArithmetic=true.
-    // assert_().about(BooleanFormula()).that(bmgr.and(Lists.newArrayList(fa,fb,bmgr.not(fADivB)))).isUnsatisfiable();
+    // TODO disabled, because we would need the option
+    // solver.solver.useNonLinearIntegerArithmetic=true.
+    // assertThatFormula(bmgr.and(Lists.newArrayList(fa,fb,bmgr.not(fADivB)))).isUnsatisfiable();
   }
 
   @Test
@@ -238,7 +240,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivMod_NegativeNumbersNonLinear() throws Exception {
-    // TODO not all solvers support division-by-variable, we guarantee soundness by allowing any value, that yields SAT.
+    // TODO not all solvers support division-by-variable,
+    // we guarantee soundness by allowing any value that yields SAT.
     assume()
         .withFailureMessage(
             "Solver " + solverToUse() + " does not support the operations MOD and DIV")
@@ -261,8 +264,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     // check division-by-variable, a=-10 && b=-2 && a/b=5
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, fADivB))).isSatisfiable();
-    // TODO disabled, because we would need the option solver.solver.useNonLinearIntegerArithmetic=true.
-    // assert_().about(BooleanFormula()).that(bmgr.and(Lists.newArrayList(fa,fb,bmgr.not(fADivB)))).isUnsatisfiable();
+    // TODO disabled, because we would need the option
+    // solver.solver.useNonLinearIntegerArithmetic=true.
+    // assertThatFormula(bmgr.and(Lists.newArrayList(fa,fb,bmgr.not(fADivB)))).isUnsatisfiable();
   }
 
   @Test
@@ -296,7 +300,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, bmgr.not(fADiv3)))).isUnsatisfiable();
 
     // check division-by-variable, a=10 && b=2 && a/b=5
-    // TODO not all solvers support division-by-variable, we guarantee soundness by allowing any value, that yields SAT.
+    // TODO not all solvers support division-by-variable,
+    // we guarantee soundness by allowing any value that yields SAT.
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, fADivB))).isSatisfiable();
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, bmgr.not(fADivB)))).isUnsatisfiable();
 
@@ -349,7 +354,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, bmgr.not(fADivNeg3)))).isUnsatisfiable();
 
     // check division-by-variable, a=-10 && b=-2 && a/b=5
-    // TODO not all solvers support division-by-variable, we guarantee soundness by allowing any value, that yields SAT.
+    // TODO not all solvers support division-by-variable
+    // we guarantee soundness by allowing any value, that yields SAT.
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, fADivB))).isSatisfiable();
     assertThatFormula(bmgr.and(Lists.newArrayList(fa, fb, bmgr.not(fADivB)))).isUnsatisfiable();
 

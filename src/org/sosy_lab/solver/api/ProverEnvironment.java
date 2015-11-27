@@ -36,7 +36,8 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
 
   /**
    * Get an unsat core.
-   * This should be called only immediately after an {@link #isUnsat()} call that returned <code>false</code>.
+   * This should be called only immediately after an {@link #isUnsat()} call
+   * that returned <code>false</code>.
    */
   List<BooleanFormula> getUnsatCore();
 
@@ -45,7 +46,8 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    * to a subset of terms,
    * and create a region representing all those models.
    *
-   * @param important A set of variables appearing in f. Only these variables will appear in the region.
+   * @param important A set of variables appearing in f.
+   *     Only these variables will appear in the region.
    * @return A region representing all satisfying models of the formula.
    * @throws InterruptedException
    */
