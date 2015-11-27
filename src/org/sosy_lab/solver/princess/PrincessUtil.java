@@ -125,14 +125,14 @@ class PrincessUtil {
   }
 
   /** t1 => t2 */
-  public static boolean isImplication(IExpression t) {
+  public static boolean isImplication(@SuppressWarnings("unused") IExpression t) {
     // Princess does not support implication.
     // Formulas are converted from "a=>b" to "!a||b".
     return false;
   }
 
   /** t1 or t2 */
-  public static boolean isXor(IExpression t) {
+  public static boolean isXor(@SuppressWarnings("unused") IExpression t) {
     // Princess does not support Xor.
     // Formulas are converted from "a^b" to "!(a<=>b)".
     return false;

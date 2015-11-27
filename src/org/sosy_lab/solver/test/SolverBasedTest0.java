@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.log.TestLogManager;
 import org.sosy_lab.solver.FormulaManagerFactory;
@@ -103,7 +102,7 @@ public abstract class SolverBasedTest0 {
     return Solvers.SMTINTERPOL;
   }
 
-  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+  protected ConfigurationBuilder createTestConfigBuilder() {
     return Configuration.builder().setOption("solver.solver", solverToUse().toString());
   }
 

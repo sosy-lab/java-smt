@@ -263,6 +263,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     return wrap(applyTacticImpl(extractInfo(f), tactic));
   }
 
+  @SuppressWarnings("unused")
   protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
     throw new UnsupportedOperationException("Tactics are not supported by the solver");
   }

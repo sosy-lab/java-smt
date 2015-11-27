@@ -48,6 +48,7 @@ import java.util.Set;
  * This class contains some simple Junit-tests to check the interpolation-API of our solvers.
  */
 @RunWith(Parameterized.class)
+@SuppressWarnings("resource")
 public class SolverInterpolationTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0} (shared={1})")

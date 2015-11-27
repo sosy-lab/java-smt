@@ -42,8 +42,11 @@ import org.sosy_lab.solver.SolverException;
 
 public class Z3NativeApiHelpers {
   private Z3NativeApiHelpers() {}
+
   /**
    * Apply multiple tactics in sequence.
+   * @throws InterruptedException thrown by JNI code in case of termination request
+   * @throws SolverException thrown by JNI code in case of error
    */
   static long applyTactics(long z3context, final Long pF, String... pTactics)
       throws InterruptedException, SolverException {

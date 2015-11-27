@@ -78,6 +78,7 @@ public class OptProversTestSuite {
       Configuration config =
           Configuration.builder().setOption("solver.mathsat5.loadOptimathsat5", "true").build();
 
+      @SuppressWarnings("resource")
       LogManager logger = TestLogManager.getInstance();
       ShutdownNotifier shutdownNotifier = ShutdownNotifier.create();
 

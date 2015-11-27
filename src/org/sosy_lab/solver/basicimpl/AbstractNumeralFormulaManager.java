@@ -259,6 +259,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   /** returns DIV for two non-numeric operands.
    * If the solver or theory does not support this, an exception is thrown. */
+  @SuppressWarnings("unused")
   protected TFormulaInfo nonLinearDivide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException(NON_LINEAR_MSG);
   }
@@ -293,6 +294,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   /** returns MOD for two non-numeric operands.
    * If the solver or theory does not support this, an exception is thrown. */
+  @SuppressWarnings("unused")
   protected TFormulaInfo nonLinearModulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException(NON_LINEAR_MSG);
   }
@@ -340,6 +342,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   /** returns MULT for two non-numeric operands.
    * If the solver or theory does not support this, an exception is thrown. */
+  @SuppressWarnings("unused")
   protected TFormulaInfo nonLinearMultiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException(NON_LINEAR_MSG);
   }

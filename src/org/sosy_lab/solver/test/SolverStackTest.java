@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(Parameterized.class)
+@SuppressWarnings("resource")
 public class SolverStackTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0} (interpolation={1}}")

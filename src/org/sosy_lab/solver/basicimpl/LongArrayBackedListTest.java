@@ -49,7 +49,7 @@ public class LongArrayBackedListTest extends TestCase {
         }
       };
 
-  public static junit.framework.Test suite() throws NoSuchMethodException, SecurityException {
+  public static junit.framework.Test suite() {
     TestSuite suite = new TestSuite();
 
     suite.addTest(
