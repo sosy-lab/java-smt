@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 
@@ -220,16 +222,14 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   public final <T extends Formula> T ifThenElse(BooleanFormula pBits, T f1, T f2) {
     FormulaType<T> t1 = getFormulaCreator().getFormulaType(f1);
     FormulaType<T> t2 = getFormulaCreator().getFormulaType(f2);
-    if (!t1.equals(t2)) {
-      throw new IllegalArgumentException(
-          String.format(
-              "Cannot create if-then-else formula with branches of different types: "
-                  + "%s is of type %s; %s is of type %s",
-              f1,
-              t1,
-              f2,
-              t2));
-    }
+    checkArgument(
+        t1.equals(t2),
+        "Cannot create if-then-else formula with branches of different types: "
+            + "%s is of type %s; %s is of type %s",
+        f1,
+        t1,
+        f2,
+        t2);
     TFormulaInfo result = ifThenElse(extractInfo(pBits), extractInfo(f1), extractInfo(f2));
     return getFormulaCreator().encapsulate(t1, result);
   }

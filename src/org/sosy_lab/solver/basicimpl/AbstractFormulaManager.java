@@ -93,29 +93,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> quantifiedManager,
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv> arrayManager) {
 
-    if (functionManager == null || booleanManager == null || unsafeManager == null) {
-      throw new IllegalArgumentException(
-          "boolean, function and unsafe manager instances have to be valid!");
-    }
-
     this.arrayManager = arrayManager;
-
     this.quantifiedManager = quantifiedManager;
-
-    this.functionManager = functionManager;
-
-    this.booleanManager = booleanManager;
-
+    this.functionManager = checkNotNull(functionManager, "function manager needed");
+    this.booleanManager = checkNotNull(booleanManager, "boolean manager needed");
     this.integerManager = pIntegerManager;
-
     this.rationalManager = pRationalManager;
-
     this.bitvectorManager = bitvectorManager;
-
     this.floatingPointManager = floatingPointManager;
-
-    this.unsafeManager = unsafeManager;
-
+    this.unsafeManager = checkNotNull(unsafeManager, "unsafe manager needed");
     this.formulaCreator = pFormulaCreator;
 
     if (booleanManager.getFormulaCreator() != formulaCreator
