@@ -186,6 +186,20 @@ public abstract class SolverBasedTest0 {
   }
 
   /**
+   * Skip test if the solver does not support optimization.
+   */
+  protected final void requireOptimization() {
+    try {
+      mgr.newOptEnvironment().close();
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withFailureMessage("Solver " + solverToUse() + " does not support optimization")
+          .that(e)
+          .isNull();
+    }
+  }
+
+  /**
    * Use this for checking assertions about BooleanFormulas with Truth:
    * <code>assertThatFormula(formula).is...()</code>.
    */
