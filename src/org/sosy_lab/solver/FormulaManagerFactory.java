@@ -25,6 +25,8 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -86,6 +88,7 @@ public class FormulaManagerFactory {
     description =
         "Which solver to use specifically for interpolation (default is to use the main one)."
   )
+  @SuppressFBWarnings(value="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE")
   private @Nullable Solvers interpolationSolver = null;
 
   @Option(
@@ -268,7 +271,8 @@ public class FormulaManagerFactory {
                 (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
             Constructor<? extends SolverFactory> factoryConstructor =
                 factoryClass.getConstructor(new Class<?>[0]);
-            smtInterpolFactory = result = factoryConstructor.newInstance();
+            result = factoryConstructor.newInstance();
+            smtInterpolFactory = result;
           } catch (ReflectiveOperationException e) {
             throw new Classes.UnexpectedCheckedException("Failed to load SmtInterpol", e);
           }
