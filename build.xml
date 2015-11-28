@@ -9,6 +9,7 @@
 
     <property name="ivy.configurations" value="build, runtime, test, checkstyle, findbugs"/>
     <property name="jar.excludes" value=""/>
+    <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
 
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>

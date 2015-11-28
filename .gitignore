@@ -2,6 +2,7 @@
 
 /bin
 /lib/java
+/lib/java-contrib
 /lib/*.jar
 /lib/java/build/*.jar
 /lib/java/checkstyle/*.jar

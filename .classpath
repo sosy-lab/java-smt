@@ -12,9 +12,9 @@
 	<classpathentry kind="lib" path="lib/java/build/annotations.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/auto-service.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/common.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol-comp.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/princess-assertionless.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol-comp.jar" sourcepath="lib/java-contrib/smtinterpol-sources.zip"/>
+	<classpathentry kind="lib" path="lib/java/runtime/princess-assertionless.jar" sourcepath="lib/java-contrib/princess-sources-assertionless.zip"/>
 	<classpathentry kind="lib" path="lib/java/runtime/scala-library.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="src" path=".apt-generated">
