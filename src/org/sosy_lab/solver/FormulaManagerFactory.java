@@ -193,13 +193,12 @@ public class FormulaManagerFactory {
 
     } catch (UnsatisfiedLinkError e) {
       throw new InvalidConfigurationException(
-          "The SMT solver "
-              + solver
-              + " is not available on this machine because of missing libraries"
-              + " ("
-              + e.getMessage()
-              + ")."
-              + " You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
+          String.format(
+              "The SMT solver %s is not available on this machine because of missing libraries "
+                  + "(%s). "
+                  + "You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
+              solver,
+              e.getMessage()),
           e);
     }
   }

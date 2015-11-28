@@ -222,14 +222,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     FormulaType<T> t2 = getFormulaCreator().getFormulaType(f2);
     if (!t1.equals(t2)) {
       throw new IllegalArgumentException(
-          "Cannot create if-then-else formula with branches of different types: "
-              + f1
-              + " is of type "
-              + t1
-              + "; "
-              + f2
-              + " is of type "
-              + t2);
+          String.format(
+              "Cannot create if-then-else formula with branches of different types: "
+                  + "%s is of type %s; %s is of type %s",
+              f1,
+              t1,
+              f2,
+              t2));
     }
     TFormulaInfo result = ifThenElse(extractInfo(pBits), extractInfo(f1), extractInfo(f2));
     return getFormulaCreator().encapsulate(t1, result);
