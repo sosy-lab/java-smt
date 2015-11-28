@@ -4,6 +4,7 @@ install:
 script:
   - ant unit-tests
   - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
+  - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
 notifications:
   email:
   - java-smt-dev@googlegroups.com
