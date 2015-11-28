@@ -73,7 +73,9 @@
     <module name="ParameterNumber"/>
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
-    <module name="EmptyForIteratorPad"/>
+    <module name="EmptyForIteratorPad">
+      <property name="option" value="space"/>
+    </module>
     <module name="NoWhitespaceAfter">
       <property name="allowLineBreaks" value="false"/>
       <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS"/>
@@ -126,7 +128,6 @@
     </module>
     <module name="InnerAssignment"/>
     <module name="MissingSwitchDefault"/>
-    <module name="MultipleVariableDeclarations"/>
     <module name="NoClone"/>
     <module name="NoFinalizer"/>
     <module name="PackageDeclaration"/>

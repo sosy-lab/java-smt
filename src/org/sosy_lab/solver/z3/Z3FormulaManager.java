@@ -120,6 +120,7 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     Path log = null;
   }
 
+  @SuppressWarnings("checkstyle:parameternumber")
   private Z3FormulaManager(
       Z3FormulaCreator pFormulaCreator,
       Z3UnsafeFormulaManager pUnsafeManager,

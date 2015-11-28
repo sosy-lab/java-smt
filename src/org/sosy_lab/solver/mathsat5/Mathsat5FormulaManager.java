@@ -117,6 +117,7 @@ public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, L
     boolean loadOptimathsat5 = false;
   }
 
+  @SuppressWarnings("checkstyle:parameternumber")
   private Mathsat5FormulaManager(
       LogManager pLogger,
       long pMathsatConfig,
