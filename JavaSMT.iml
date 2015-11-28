@@ -30,9 +30,6 @@
           <root url="jar://$MODULE_DIR$/lib/java-contrib/error_prone_annotations-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-testlib-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/javabdd-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/org.eclipse.cdt.core-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/org.eclipse.jdt.core-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java-contrib/truth-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/DeltaDebugger/src" />
           <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/Library-SMTLIB/src" />

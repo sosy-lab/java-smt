@@ -56,10 +56,6 @@
              Change version number in build.xml for upgrading. -->
         <dependency org="org.apache.ivy" name="ivy" rev="${ivy.version}" conf="build->default"/>
 
-        <!-- Google Auto-Service
-             Library for easy registration of services for java.util.ServiceLoader. -->
-        <dependency org="com.google.auto.service" name="auto-service" rev="1.0-rc2" conf="build->default"/>
-
         <!-- JUnit
              Testing framework. -->
         <dependency org="junit" name="junit" rev="4.12" conf="test->default"/>
@@ -71,10 +67,6 @@
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
         <dependency org="org.apache.ant" name="ant-junit" rev="${ant.version.exact}" transitive="false" conf="build->default"/>
-
-        <!-- Mockito
-             Mocking framework for tests. -->
-        <dependency org="org.mockito" name="mockito-core" rev="1.10.19" conf="test->default"/>
 
         <!-- Truth
              Library for writing literal assertions. -->
