@@ -168,13 +168,12 @@ class Z3Model {
     }
   }
 
-  public static Model createZ3Model(Z3FormulaManager mgr, long z3context, long z3solver) {
+  public static Model createZ3Model(long z3context, long z3solver) {
     long z3model = solver_get_model(z3context, z3solver);
-    return parseZ3Model(mgr, z3context, z3model);
+    return parseZ3Model(z3context, z3model);
   }
 
-  public static Model parseZ3Model(Z3FormulaManager mgr, long z3context, long z3model) {
-    mgr.getSmtLogger().logGetModel();
+  public static Model parseZ3Model(long z3context, long z3model) {
     return new Model(parseMapFromModel(z3context, z3model));
   }
 

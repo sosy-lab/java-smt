@@ -62,7 +62,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   private final Z3FormulaManager mgr;
   private long z3context;
   private long z3solver;
-  private final Z3SmtLogger smtLogger;
   private int level = 0;
   private @Nullable List<Long> assertedFormulas = new LinkedList<>();
 
@@ -72,7 +71,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     this.z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
-    this.smtLogger = mgr.getSmtLogger();
   }
 
   @Override
@@ -89,10 +87,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     solver_assert(z3context, z3solver, e);
     assertedFormulas.add(e);
-
-    smtLogger.logPush(1);
-    smtLogger.logInterpolationAssert(e);
-
     return e;
   }
 
@@ -102,8 +96,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     solver_pop(z3context, z3solver, 1);
-
-    smtLogger.logPop(1);
   }
 
   @Override
@@ -111,8 +103,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     Preconditions.checkState(z3context != 0);
     Preconditions.checkState(z3solver != 0);
     int result = solver_check(z3context, z3solver);
-
-    smtLogger.logCheck();
 
     Preconditions.checkState(result != Z3_LBOOL.Z3_L_UNDEF.status);
     return result == Z3_LBOOL.Z3_L_FALSE.status;
@@ -243,7 +233,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   @Override
   public Model getModel() {
-    return Z3Model.createZ3Model(mgr, z3context, z3solver);
+    return Z3Model.createZ3Model(z3context, z3solver);
   }
 
   @Override

@@ -154,7 +154,7 @@ class Z3OptProver implements OptEnvironment {
   @Override
   public Model getModel() throws SolverException {
     long z3model = optimize_get_model(z3context, z3optContext);
-    return Z3Model.parseZ3Model(mgr, z3context, z3model);
+    return Z3Model.parseZ3Model(z3context, z3model);
   }
 
   @Override

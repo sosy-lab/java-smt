@@ -93,8 +93,6 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
   )
   String objectivePrioritizationMode = "box";
 
-  private final Z3SmtLogger z3smtLogger;
-
   // Pointer from class is needed to avoid GC claiming this listener.
   private final ShutdownNotifier.ShutdownRequestListener interruptListener;
   private final long z3params;
@@ -131,7 +129,6 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
       Z3BitvectorFormulaManager pBitpreciseManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager,
-      Z3SmtLogger smtLogger,
       Configuration config,
       long pZ3params,
       ShutdownNotifier.ShutdownRequestListener pInterruptListener,
@@ -153,7 +150,6 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
 
     config.inject(this);
     z3params = pZ3params;
-    this.z3smtLogger = smtLogger;
     interruptListener = pInterruptListener;
     pShutdownNotifier.register(interruptListener);
     shutdownNotifier = pShutdownNotifier;
@@ -171,6 +167,13 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
+
+    if (solverLogfile != null) {
+      logger.log(
+          Level.WARNING,
+          "Z3 does not support dumping a log file in SMTLIB format. "
+              + "Please use the option solver.z3.log for a Z3-specific log instead.");
+    }
 
     if (NativeLibraries.OS.guessOperatingSystem() == NativeLibraries.OS.WINDOWS) {
       // Z3 itself
@@ -221,29 +224,16 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     // The string representations of Z3s formulas should be in SMTLib2!
     set_ast_print_mode(context, Z3NativeApiConstants.Z3_PRINT_SMTLIB2_COMPLIANT);
 
-    // create logger for variables and set initial options in this logger,
-    // note: logger for the solvers are created later,
-    // they will not contain variable-declaration!
-    Z3SmtLogger smtLogger = new Z3SmtLogger(context, config, solverLogfile);
-
-    // this options should match the option set above!
-    smtLogger.logOption("model", "true");
-    if (extraOptions.requireProofs) {
-      smtLogger.logOption("proof", "true");
-    }
-
     long z3params = mk_params(context);
     params_inc_ref(context, z3params);
     params_set_uint(context, z3params, mk_string_symbol(context, ":random-seed"), 42);
-    smtLogger.logOption("random-seed", Integer.toString((int) randomSeed));
 
     Z3FormulaCreator creator =
-        new Z3FormulaCreator(context, boolSort, integerSort, realSort, smtLogger, config);
+        new Z3FormulaCreator(context, boolSort, integerSort, realSort, config);
 
     // Create managers
     Z3UnsafeFormulaManager unsafeManager = new Z3UnsafeFormulaManager(creator);
-    Z3FunctionFormulaManager functionTheory =
-        new Z3FunctionFormulaManager(creator, unsafeManager, smtLogger);
+    Z3FunctionFormulaManager functionTheory = new Z3FunctionFormulaManager(creator, unsafeManager);
     Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
     Z3IntegerFormulaManager integerTheory =
         new Z3IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
@@ -267,7 +257,6 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
         bitvectorTheory,
         quantifierManager,
         arrayManager,
-        smtLogger,
         config,
         z3params,
         interruptListener,
@@ -360,11 +349,6 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
 
   protected BooleanFormula encapsulateBooleanFormula(long t) {
     return getFormulaCreator().encapsulateBoolean(t);
-  }
-
-  /** returns a new logger with a new logfile. */
-  Z3SmtLogger getSmtLogger() {
-    return z3smtLogger.cloneWithNewLogfile();
   }
 
   @Override

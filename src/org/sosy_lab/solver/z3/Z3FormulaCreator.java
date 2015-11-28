@@ -69,8 +69,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
 
-  private final Z3SmtLogger smtLogger;
-
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
@@ -80,28 +78,17 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   private final Timer cleanupTimer = new Timer();
 
   Z3FormulaCreator(
-      long pEnv,
-      long pBoolType,
-      long pIntegerType,
-      long pRealType,
-      Z3SmtLogger smtLogger,
-      Configuration config)
+      long pEnv, long pBoolType, long pIntegerType, long pRealType, Configuration config)
       throws InvalidConfigurationException {
     super(pEnv, pBoolType, pIntegerType, pRealType);
     config.inject(this);
-
-    this.smtLogger = smtLogger;
   }
 
   @Override
   public Long makeVariable(Long type, String varName) {
     long z3context = getEnv();
     long symbol = mk_string_symbol(z3context, varName);
-    long var = mk_const(z3context, symbol, type);
-
-    smtLogger.logVarDeclaration(var, type);
-
-    return var;
+    return mk_const(z3context, symbol, type);
   }
 
   @Override

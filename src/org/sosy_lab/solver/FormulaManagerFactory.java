@@ -88,7 +88,7 @@ public class FormulaManagerFactory {
     description =
         "Which solver to use specifically for interpolation (default is to use the main one)."
   )
-  @SuppressFBWarnings(value="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE")
+  @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE")
   private @Nullable Solvers interpolationSolver = null;
 
   @Option(
