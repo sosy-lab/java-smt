@@ -20,6 +20,7 @@
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
     <target name="build-project" depends="build-dependencies">
         <depend srcdir="${source.dir}" destdir="${class.dir}"/>
+        <mkdir dir="${source.generated.dir}"/>
         <javac debug="true"
                debuglevel="source,lines,vars"
                destdir="${class.dir}"
