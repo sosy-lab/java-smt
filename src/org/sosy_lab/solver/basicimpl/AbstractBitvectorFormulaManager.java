@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BitvectorFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -38,6 +40,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
     return getFormulaCreator().encapsulateBitvector(pTerm);
   }
 
+  private void checkSameSize(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, String operation) {
+    final int len1 = getLength(pNumber1);
+    final int len2 = getLength(pNumber2);
+    checkArgument(
+        len1 == len2,
+        "Can't %s bitvectors with different sizes (%s and %s)",
+        operation,
+        len1,
+        len2);
+  }
+
   @Override
   public BitvectorFormula negate(BitvectorFormula pNumber, boolean signed) {
     TFormulaInfo param1 = extractInfo(pNumber);
@@ -49,13 +63,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BitvectorFormula add(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't add bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "add");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -67,13 +75,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BitvectorFormula subtract(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't subtract bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "subtract");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -85,13 +87,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BitvectorFormula divide(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't divide bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "divide");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -104,13 +100,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BitvectorFormula modulo(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't modulo bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "modulo");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -135,13 +125,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BitvectorFormula multiply(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't multiply bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "modulo");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -152,13 +136,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
 
   @Override
   public BooleanFormula equal(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -170,13 +148,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BooleanFormula greaterThan(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -189,13 +161,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BooleanFormula greaterOrEquals(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -208,13 +174,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BooleanFormula lessThan(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
@@ -227,13 +187,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public BooleanFormula lessOrEquals(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    assert getLength(pNumber1) == getLength(pNumber2)
-        : "Can't compare bitvectors with different sizes ("
-            + getLength(pNumber1)
-            + " and "
-            + getLength(pNumber2)
-            + ")";
-
+    checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
