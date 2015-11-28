@@ -56,13 +56,13 @@ public class Model extends ForwardingMap<AssignableTerm, Object> implements Appe
     return data;
   }
 
-  private static final MapJoiner joiner =
+  private static final MapJoiner TEXTUAL_MAP_JOINER =
       Joiner.on(System.lineSeparator()).withKeyValueSeparator(": ");
 
   public static void appendModel(Appendable output, Map<AssignableTerm, Object> data)
       throws IOException {
     Map<AssignableTerm, Object> sorted = ImmutableSortedMap.copyOf(data, Ordering.usingToString());
-    joiner.appendTo(output, sorted);
+    TEXTUAL_MAP_JOINER.appendTo(output, sorted);
   }
 
   @Override

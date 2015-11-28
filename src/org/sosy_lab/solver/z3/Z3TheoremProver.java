@@ -164,15 +164,15 @@ class Z3TheoremProver implements ProverEnvironment {
     }
 
     List<BooleanFormula> constraints = new ArrayList<>();
-    long ast_vector = solver_get_unsat_core(z3context, z3solver);
-    ast_vector_inc_ref(z3context, ast_vector);
-    for (int i = 0; i < ast_vector_size(z3context, ast_vector); i++) {
-      long ast = ast_vector_get(z3context, ast_vector, i);
+    long unsatCore = solver_get_unsat_core(z3context, z3solver);
+    ast_vector_inc_ref(z3context, unsatCore);
+    for (int i = 0; i < ast_vector_size(z3context, unsatCore); i++) {
+      long ast = ast_vector_get(z3context, unsatCore, i);
       BooleanFormula f = mgr.encapsulateBooleanFormula(ast);
 
       constraints.add(storedConstraints.get(mgr.getUnsafeFormulaManager().getName(f)));
     }
-    ast_vector_dec_ref(z3context, ast_vector);
+    ast_vector_dec_ref(z3context, unsatCore);
     return constraints;
   }
 

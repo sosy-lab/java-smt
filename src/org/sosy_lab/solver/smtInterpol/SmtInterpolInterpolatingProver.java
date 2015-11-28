@@ -49,7 +49,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   private final List<String> assertedFormulas; // Collection of termNames
   private final Map<String, Term> annotatedTerms; // Collection of termNames
-  private static final String prefix = "term_"; // for termnames
+  private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames // TODO static?
 
@@ -67,7 +67,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     Term t = mgr.extractInfo(f);
     //Term t = ((SmtInterpolFormula)f).getTerm();
 
-    String termName = prefix + termIdGenerator.getFreshId();
+    String termName = PREFIX + termIdGenerator.getFreshId();
     Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
     pushAndAssert(annotatedTerm);
     assertedFormulas.add(termName);

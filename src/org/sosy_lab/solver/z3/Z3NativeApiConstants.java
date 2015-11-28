@@ -39,6 +39,7 @@ public class Z3NativeApiConstants {
 
   // CONSTANT VALUES, TODO should we make enums?
 
+  @SuppressWarnings("checkstyle:typename")
   public enum Z3_LBOOL {
     Z3_L_FALSE(-1),
     Z3_L_UNDEF(0),

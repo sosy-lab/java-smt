@@ -89,7 +89,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     this.z3context = pCreator.getEnv();
   }
 
-  private final static ImmutableSet<Integer> nonAtomicOpTypes =
+  private final static ImmutableSet<Integer> NON_ATOMIC_OP_TYPES =
       ImmutableSet.of(Z3_OP_AND, Z3_OP_OR, Z3_OP_IMPLIES, Z3_OP_ITE, Z3_OP_NOT);
 
   @Override
@@ -98,7 +98,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     switch (astKind) {
       case Z3_APP_AST:
         long decl = get_app_decl(z3context, t);
-        return !nonAtomicOpTypes.contains(get_decl_kind(z3context, decl));
+        return !NON_ATOMIC_OP_TYPES.contains(get_decl_kind(z3context, decl));
       default:
         return true;
     }

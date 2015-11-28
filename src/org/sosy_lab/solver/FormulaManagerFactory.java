@@ -147,10 +147,10 @@ public class FormulaManagerFactory {
     }
   }
 
-  private FormulaManager instantiateSolver(Solvers solver, Configuration config)
+  private FormulaManager instantiateSolver(Solvers solverToCreate, Configuration config)
       throws InvalidConfigurationException {
     try {
-      switch (solver) {
+      switch (solverToCreate) {
         case SMTINTERPOL:
           return loadSmtInterpol()
               .create(
@@ -197,7 +197,7 @@ public class FormulaManagerFactory {
               "The SMT solver %s is not available on this machine because of missing libraries "
                   + "(%s). "
                   + "You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
-              solver,
+              solverToCreate,
               e.getMessage()),
           e);
     }

@@ -299,12 +299,12 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     // TODO do we need sorts or decls?
     // the context should know them already,
     // TODO check this
-    long[] sort_symbols = new long[0];
+    long[] sortSymbols = new long[0];
     long[] sorts = new long[0];
-    long[] decl_symbols = new long[0];
+    long[] declSymbols = new long[0];
     long[] decls = new long[0];
 
-    long e = parse_smtlib2_string(getEnvironment(), str, sort_symbols, sorts, decl_symbols, decls);
+    long e = parse_smtlib2_string(getEnvironment(), str, sortSymbols, sorts, declSymbols, decls);
 
     return encapsulateBooleanFormula(e);
   }
