@@ -51,6 +51,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -75,7 +76,7 @@ class Z3TheoremProver implements ProverEnvironment {
   private long z3solver;
   private final Z3SmtLogger smtLogger;
   private int level = 0;
-  private int track_no = 0;
+  private final UniqueIdGenerator trackId = new UniqueIdGenerator();
 
   private static final String UNSAT_CORE_TEMP_VARNAME = "UNSAT_CORE_%d";
 
@@ -102,7 +103,6 @@ class Z3TheoremProver implements ProverEnvironment {
 
   @Override
   public Void push(BooleanFormula f) {
-    track_no++;
     level++;
 
     Preconditions.checkArgument(z3context != 0);
@@ -115,7 +115,7 @@ class Z3TheoremProver implements ProverEnvironment {
     }
 
     if (storedConstraints != null) { // Unsat core generation is on.
-      String varName = String.format(UNSAT_CORE_TEMP_VARNAME, track_no);
+      String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
       BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
       solver_assert_and_track(z3context, z3solver, e, mgr.extractInfo(t));
