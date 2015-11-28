@@ -27,7 +27,6 @@ import com.google.common.primitives.Longs;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 
-import java.util.Collections;
 import java.util.List;
 
 class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long> {
@@ -42,25 +41,13 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   @Override
   protected Long exists(List<Long> pVariables, Long pBody) {
     return Z3NativeApi.mk_exists_const(
-        z3context,
-        0,
-        pVariables.size(),
-        Longs.toArray(pVariables),
-        0,
-        Longs.toArray(Collections.<Long>emptyList()),
-        pBody);
+        z3context, 0, pVariables.size(), Longs.toArray(pVariables), 0, new long[0], pBody);
   }
 
   @Override
   protected Long forall(List<Long> pVariables, Long pBody) {
     return Z3NativeApi.mk_forall_const(
-        z3context,
-        0,
-        pVariables.size(),
-        Longs.toArray(pVariables),
-        0,
-        Longs.toArray(Collections.<Long>emptyList()),
-        pBody);
+        z3context, 0, pVariables.size(), Longs.toArray(pVariables), 0, new long[0], pBody);
   }
 
   @Override

@@ -29,10 +29,10 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptEnvironment;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +61,7 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
   Mathsat5OptProver(Mathsat5FormulaManager pMgr) {
     super(pMgr, createConfig(), true, false);
     objectiveMap = new HashMap<>();
-    stack = new LinkedList<>();
+    stack = new ArrayDeque<>();
   }
 
   private static long createConfig() {

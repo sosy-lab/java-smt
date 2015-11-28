@@ -43,7 +43,6 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 @RunWith(Parameterized.class)
@@ -178,9 +177,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   public void funcsDumpTest() {
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula var = imgr.makeVariable("var_a");
-    List<IntegerFormula> args1 = new LinkedList<>();
-    args1.add(int1);
-    args1.add(var);
+    List<IntegerFormula> args1 = ImmutableList.of(int1, var);
 
     UninterpretedFunctionDeclaration<IntegerFormula> funA =
         fmgr.declareUninterpretedFunction(
@@ -279,10 +276,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   public void funDeclareTest() {
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
-    List<IntegerFormula> args1 = new LinkedList<>();
-    List<IntegerFormula> args2 = new LinkedList<>();
-    args1.add(int1);
-    args2.add(int2);
 
     UninterpretedFunctionDeclaration<IntegerFormula> funA =
         fmgr.declareUninterpretedFunction(
@@ -290,8 +283,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     UninterpretedFunctionDeclaration<IntegerFormula> funB =
         fmgr.declareUninterpretedFunction(
             "fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
-    IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, args1);
-    IntegerFormula res2 = fmgr.callUninterpretedFunction(funB, args2);
+    IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(int1));
+    IntegerFormula res2 = fmgr.callUninterpretedFunction(funB, ImmutableList.of(int2));
 
     IntegerFormula calc = imgr.add(res1, res2);
     String formDump = mgr.dumpFormula(imgr.equal(calc, int1)).toString();

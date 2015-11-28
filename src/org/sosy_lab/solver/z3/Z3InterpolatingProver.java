@@ -36,6 +36,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -51,7 +52,6 @@ import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -63,7 +63,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   private long z3context;
   private long z3solver;
   private int level = 0;
-  private @Nullable List<Long> assertedFormulas = new LinkedList<>();
+  private @Nullable Deque<Long> assertedFormulas = new ArrayDeque<>();
 
   Z3InterpolatingProver(Z3FormulaManager mgr, long z3params) {
     this.mgr = mgr;
@@ -86,7 +86,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     }
 
     solver_assert(z3context, z3solver, e);
-    assertedFormulas.add(e);
+    assertedFormulas.addLast(e);
     return e;
   }
 
@@ -94,7 +94,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   public void pop() {
     level--;
 
-    assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
+    assertedFormulas.removeLast();
     solver_pop(z3context, z3solver, 1);
   }
 
@@ -124,7 +124,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(
         getSeqInterpolants(
-            Lists.<Set<Long>>newArrayList(
+            ImmutableList.<Set<Long>>of(
                 Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
   }
 
