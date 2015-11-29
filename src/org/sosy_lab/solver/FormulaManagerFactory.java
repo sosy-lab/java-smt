@@ -242,13 +242,13 @@ public class FormulaManagerFactory {
   private static final Pattern SMTINTERPOL_CLASSES =
       Pattern.compile(
           "^("
-              + "org\\.sosy_lab\\.solver\\.smtInterpol|"
+              + "org\\.sosy_lab\\.solver\\.smtinterpol|"
               + "de\\.uni_freiburg\\.informatik\\.ultimate|"
               + "java_cup\\.runtime|"
               + "org\\.apache\\.log4j"
               + ")\\..*");
   private static final String SMTINTERPOL_FACTORY_CLASS =
-      "org.sosy_lab.solver.smtInterpol.SmtInterpolSolverFactory";
+      "org.sosy_lab.solver.smtinterpol.SmtInterpolSolverFactory";
 
   // We keep the class loader for SmtInterpol around
   // in case someone creates a seconds instance of FormulaManagerFactory

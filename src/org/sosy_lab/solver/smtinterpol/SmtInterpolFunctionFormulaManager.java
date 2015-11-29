@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.smtInterpol;
+package org.sosy_lab.solver.smtinterpol;
 
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 

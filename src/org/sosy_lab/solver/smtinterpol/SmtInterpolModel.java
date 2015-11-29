@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.smtInterpol;
+package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Verify;
 
