@@ -31,6 +31,7 @@ lib/native/source/libmathsat5j/*.so
 /FindBugs.xml
 /FindBugs.diff.html
 /FindBugs.diff.xml
+/Javadoc
 
 .idea/workspace.xml
 .idea/uiDesigner.xml
