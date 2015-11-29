@@ -62,7 +62,7 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-public class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long>
+public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     implements AutoCloseable {
 
   @Options(deprecatedPrefix = "cpa.predicate.solver.mathsat5", prefix = "solver.mathsat5")

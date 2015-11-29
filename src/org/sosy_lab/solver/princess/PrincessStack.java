@@ -31,7 +31,7 @@ import scala.Option;
  * push, pop, assert, checkSat, getInterpolants, getModel.
  * A stack is always connected with a PrincessEnvironment, because Variables are declared there.
  * One PrincessEnvironment can manage several stacks. */
-public interface PrincessStack {
+interface PrincessStack {
 
   void push(int levels);
 

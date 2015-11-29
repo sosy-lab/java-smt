@@ -39,7 +39,7 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
-public class PrincessFormulaManager
+public final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
   @Options(prefix = "solver.princess")

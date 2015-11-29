@@ -40,7 +40,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_inc_ref;
 
 import org.sosy_lab.solver.SolverException;
 
-public class Z3NativeApiHelpers {
+class Z3NativeApiHelpers {
   private Z3NativeApiHelpers() {}
 
   /**

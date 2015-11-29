@@ -72,7 +72,7 @@ import java.util.logging.Level;
 import javax.annotation.Nullable;
 
 @Options(deprecatedPrefix = "cpa.predicate.solver.z3", prefix = "solver.z3")
-public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
+public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     implements AutoCloseable {
 
   @Option(secure = true, description = "simplify formulas when they are asserted in a solver.")
@@ -103,7 +103,7 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
 
   @Options(deprecatedPrefix = "cpa.predicate.solver.z3", prefix = "solver.z3")
-  public static class ExtraOptions {
+  private static class ExtraOptions {
     @Option(secure = true, description = "Require proofs from SMT solver")
     boolean requireProofs = true;
 
@@ -347,7 +347,7 @@ public class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     };
   }
 
-  protected BooleanFormula encapsulateBooleanFormula(long t) {
+  BooleanFormula encapsulateBooleanFormula(long t) {
     return getFormulaCreator().encapsulateBoolean(t);
   }
 
