@@ -13,7 +13,10 @@
 	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol-comp.jar" sourcepath="lib/java-contrib/smtinterpol-sources.zip"/>
 	<classpathentry kind="lib" path="lib/java/runtime/princess-assertionless.jar" sourcepath="lib/java-contrib/princess-sources-assertionless.zip"/>
 	<classpathentry kind="lib" path="lib/java/runtime/scala-library.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+        <classpathentry kind="lib" path="lib/java/runtime/scala-actors.jar"/>
+        <classpathentry kind="lib" path="lib/java/runtime/smt-parser.jar" />
+        <classpathentry kind="lib" path="lib/java/runtime/java-cup-runtime.jar" />
+        <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="src" path=".apt-generated">
 		<attributes>
 			<attribute name="optional" value="true"/>
