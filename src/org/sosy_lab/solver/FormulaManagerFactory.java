@@ -122,7 +122,6 @@ public class FormulaManagerFactory {
 
   private volatile @Nullable SolverFactory smtInterpolFactory = null;
 
-  @VisibleForTesting
   public FormulaManagerFactory(
       Configuration config, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
