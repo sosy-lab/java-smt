@@ -92,7 +92,7 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
     long f1Type = msat_term_get_type(f1);
     long f2Type = msat_term_get_type(f2);
 
-    // ite currently doesnt work with bool-types as branch arguments
+    // ite currently doesn't work with bool-types as branch arguments
     if (!msat_is_bool_type(msatEnv, f1Type) || !msat_is_bool_type(msatEnv, f2Type)) {
       t = msat_make_term_ite(msatEnv, cond, f1, f2);
     } else {

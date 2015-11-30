@@ -39,7 +39,7 @@ import java.util.logging.Level;
 public class LoggingOptEnvironment implements OptEnvironment {
 
   private final OptEnvironment wrapped;
-  LogManager logger;
+  private final LogManager logger;
 
   public LoggingOptEnvironment(LogManager logger, OptEnvironment oe) {
     this.wrapped = checkNotNull(oe);

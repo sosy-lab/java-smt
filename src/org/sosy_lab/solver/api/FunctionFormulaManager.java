@@ -37,9 +37,9 @@ public interface FunctionFormulaManager {
 
   /**
    * Create a uninterpreted function call.
-   * @param funcType
-   * @param args
-   * @return
+   * @param funcType Declaration of the function to call.
+   * @param args Arguments of the function.
+   * @return Instantiated function call.
    */
   <T extends Formula> T callUninterpretedFunction(
       UninterpretedFunctionDeclaration<T> funcType, List<? extends Formula> args);

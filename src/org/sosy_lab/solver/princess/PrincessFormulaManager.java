@@ -39,6 +39,8 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
+import javax.annotation.Nullable;
+
 public final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
@@ -87,7 +89,7 @@ public final class PrincessFormulaManager
   public static PrincessFormulaManager create(
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
-      PathCounterTemplate pLogfileTemplate,
+      @Nullable PathCounterTemplate pLogfileTemplate,
       boolean pUseNonLinearIntegerArithmetic)
       throws InvalidConfigurationException {
 

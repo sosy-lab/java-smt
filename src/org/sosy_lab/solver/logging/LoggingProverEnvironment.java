@@ -37,7 +37,7 @@ import java.util.logging.Level;
 public class LoggingProverEnvironment implements ProverEnvironment {
 
   private final ProverEnvironment wrapped;
-  LogManager logger;
+  private final LogManager logger;
   int level = 0;
 
   public LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {

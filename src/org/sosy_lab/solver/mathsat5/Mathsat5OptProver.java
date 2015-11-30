@@ -39,7 +39,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment {
-  private UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+  private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /**
    * Number of the objective -> objective pointer.
@@ -56,7 +56,7 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
    * Stack of the objective maps.
    * Some duplication, but shouldn't be too important.
    */
-  private Deque<ImmutableMap<Integer, Integer>> stack;
+  private final Deque<ImmutableMap<Integer, Integer>> stack;
 
   Mathsat5OptProver(Mathsat5FormulaManager pMgr) {
     super(pMgr, createConfig(), true, false);
@@ -137,6 +137,9 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
 
   private Optional<Rational> getValue(int handle) {
     // todo: use epsilon if the bound is non-strict.
+    assert objectiveMap.get(handle) != null;
+    assert objectives != null;
+    assert objectives.get(objectiveMap.get(handle)) != null;
 
     long objective = objectives.get(objectiveMap.get(handle));
     int isUnbounded = msat_objective_value_is_unbounded(curEnv, objective, MSAT_OPTIMUM);
@@ -174,10 +177,5 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
   @Override
   public String dump() {
     throw new UnsupportedOperationException("Mathsat solver does not constraint dumping");
-  }
-
-  @Override
-  public void close() {
-    super.close();
   }
 }

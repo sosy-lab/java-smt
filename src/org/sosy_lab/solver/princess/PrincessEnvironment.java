@@ -98,7 +98,7 @@ class PrincessEnvironment {
   private final PrincessOptions princessOptions;
 
   PrincessEnvironment(
-      final PathCounterTemplate pBasicLogfile,
+      @Nullable final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,
       PrincessOptions pOptions) {
 
@@ -315,7 +315,7 @@ class PrincessEnvironment {
     if (var instanceof IAtom) {
       return ((IAtom) var).pred().name();
     } else if (var instanceof IConstant) {
-      return ((IConstant) var).toString();
+      return var.toString();
     } else if (var instanceof IFunApp) {
       String fullStr = ((IFunApp) var).fun().toString();
       return fullStr.substring(0, fullStr.indexOf("/"));

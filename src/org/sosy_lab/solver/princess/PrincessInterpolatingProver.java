@@ -76,14 +76,15 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
 
   @Override
   public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) {
-
-    Set<Integer> indizesOfA = new HashSet<>(pTermNamesOfA);
+    assert stack != null;
+    assert mgr != null;
+    Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<Integer> indizesOfB = from(assertedFormulas).filter(not(in(indizesOfA))).toSet();
+    Set<Integer> indexesOfB = from(assertedFormulas).filter(not(in(indexesOfA))).toSet();
 
     // get interpolant of groups
-    List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indizesOfA, indizesOfB));
+    List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
     assert itp.size() == 1; // 2 groups -> 1 interpolant
 
     return mgr.encapsulateBooleanFormula(itp.get(0));

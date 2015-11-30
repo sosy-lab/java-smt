@@ -80,7 +80,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
 
     private final ImmutableMap<String, String> furtherOptionsMap;
 
-    private Mathsat5Settings(Configuration config, PathCounterTemplate pLogfile)
+    private Mathsat5Settings(Configuration config, @Nullable PathCounterTemplate pLogfile)
         throws InvalidConfigurationException {
       config.inject(this);
       logfile = pLogfile;
@@ -128,7 +128,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
       Mathsat5IntegerFormulaManager pIntegerManager,
       Mathsat5RationalFormulaManager pRationalManager,
       Mathsat5BitvectorFormulaManager pBitpreciseManager,
-      Mathsat5FloatingPointFormulaManager pFloatingPointmanager,
+      Mathsat5FloatingPointFormulaManager pFloatingPointManager,
       Mathsat5ArrayFormulaManager pArrayManager,
       Mathsat5Settings pSettings,
       long pRandomSeed,
@@ -141,7 +141,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
         pIntegerManager,
         pRationalManager,
         pBitpreciseManager,
-        pFloatingPointmanager,
+        pFloatingPointManager,
         null,
         pArrayManager);
 

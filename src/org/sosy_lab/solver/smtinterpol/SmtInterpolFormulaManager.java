@@ -219,7 +219,6 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
   /** This method returns a 'shared' environment or
    * a complete new environment. */
   SmtInterpolEnvironment createEnvironment() {
-    assert getEnvironment() != null;
     return getEnvironment();
   }
 }

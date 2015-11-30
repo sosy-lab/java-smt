@@ -48,7 +48,7 @@ public interface BooleanFormulaManager {
    * Creates a formula representing an equivalence of the two arguments.
    * @param formula1 a Formula
    * @param formula2 a Formula
-   * @return (formula1 <-> formula2)
+   * @return {@code formula1 <-> formula2}
    */
   BooleanFormula equivalence(BooleanFormula formula1, BooleanFormula formula2);
 
@@ -100,7 +100,7 @@ public interface BooleanFormulaManager {
   /**
    * Creates a formula representing a negation of the argument.
    * @param bits a Formula
-   * @return (!bits)
+   * @return {@code !bits}
    */
   BooleanFormula not(BooleanFormula bits);
 
@@ -108,7 +108,7 @@ public interface BooleanFormulaManager {
    * Creates a formula representing an AND of the two arguments.
    * @param bits1 a Formula
    * @param bits2 a Formula
-   * @return (bits1 & bits2)
+   * @return {@code bits1 & bits2}
    */
   BooleanFormula and(BooleanFormula bits1, BooleanFormula bits2);
 
@@ -118,7 +118,7 @@ public interface BooleanFormulaManager {
    * Creates a formula representing an OR of the two arguments.
    * @param bits1 a Formula
    * @param bits2 a Formula
-   * @return (bits1 | bits2)
+   * @return {@code bits1 | bits2}
    */
   BooleanFormula or(BooleanFormula bits1, BooleanFormula bits2);
 

@@ -48,7 +48,7 @@ public interface BitvectorFormulaManager {
   BitvectorFormula modulo(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
   BooleanFormula modularCongruence(
-      BitvectorFormula pNumber1, BitvectorFormula pNumbe2, long pModulo);
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2, long pModulo);
 
   BitvectorFormula multiply(
       BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);

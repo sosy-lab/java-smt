@@ -173,9 +173,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   /**
    * Creates a formula representing an equivalence of the two arguments.
-   * @param f1 a Formula
-   * @param f2 a Formula
-   * @return (f1 <-> f2)
+   * @param pBits1 a Formula
+   * @param pBits2 a Formula
+   * @return {@code f1 <-> f2}
    */
   @Override
   public final BooleanFormula equivalence(BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -213,7 +213,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   /**
    * Creates a formula representing "IF cond THEN f1 ELSE f2"
-   * @param cond a Formula
+   * @param pBits a Formula
    * @param f1 a Formula
    * @param f2 a Formula
    * @return (IF cond THEN f1 ELSE f2)

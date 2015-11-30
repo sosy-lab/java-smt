@@ -23,6 +23,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public interface AssignableTerm {
     }
 
     @Override
-    public boolean equals(final Object other) {
+    public boolean equals(@Nullable final Object other) {
       if (this == other) {
         return true;
       }
@@ -123,7 +124,7 @@ public interface AssignableTerm {
     }
 
     @Override
-    public boolean equals(Object pOther) {
+    public boolean equals(@Nullable Object pOther) {
       if (this == pOther) {
         return true;
       }

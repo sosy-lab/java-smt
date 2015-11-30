@@ -67,8 +67,8 @@ class Mathsat5BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Lo
   }
 
   @Override
-  public Long concat(Long pFirst, Long pSecound) {
-    return msat_make_bv_concat(mathsatEnv, pFirst, pSecound);
+  public Long concat(Long pFirst, Long pSecond) {
+    return msat_make_bv_concat(mathsatEnv, pFirst, pSecond);
   }
 
   @Override

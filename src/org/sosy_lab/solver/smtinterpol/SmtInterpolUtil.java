@@ -38,8 +38,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-/** This is a Class similiar to Mathsat-NativeApi,
- *  it contains some useful functions. */
+/** Collection of utilities for working with SmtInterpol */
 class SmtInterpolUtil {
   private SmtInterpolUtil() {}
 
@@ -130,13 +129,13 @@ class SmtInterpolUtil {
         } else if (value instanceof BigInteger) {
           return ((BigInteger) value).negate();
         } else if (value instanceof Long) {
-          return -((Long) value).longValue();
+          return -(Long) value;
         } else if (value instanceof Integer) {
-          return -((Integer) value).intValue();
+          return -(Integer) value;
         } else if (value instanceof Double) {
-          return -((Double) value).doubleValue();
+          return -(Double) value;
         } else if (value instanceof Float) {
-          return -((Float) value).floatValue();
+          return -(Float) value;
         } else if (value instanceof org.sosy_lab.common.rationals.Rational) {
           return ((org.sosy_lab.common.rationals.Rational) value).negate();
         }

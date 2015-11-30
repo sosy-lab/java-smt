@@ -222,15 +222,7 @@ public abstract class FormulaType<T extends Formula> {
 
       ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
 
-      if (!elementType.equals(other.elementType)) {
-        return false;
-      }
-
-      if (!indexType.equals(other.indexType)) {
-        return false;
-      }
-
-      return true;
+      return elementType.equals(other.elementType) && indexType.equals(other.indexType);
     }
   }
 

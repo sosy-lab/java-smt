@@ -37,66 +37,47 @@ public interface UnsafeFormulaManager {
   <T extends Formula> T typeFormula(FormulaType<T> type, Formula f);
 
   /**
-   * see getArguments.
-   * @param f
-   * @return
+   * @return arity of the input formula.
    */
   int getArity(Formula f);
 
   /**
-   * see getArguments.
-   * @param f
-   * @param n
-   * @return
+   * @return argument under the given index for the input function.
    */
   Formula getArg(Formula f, int n);
 
   /**
-   * Checks if the given Formula is an atom.
-   * @param f
-   * @return
+   * @return whether the given Formula is an atom.
    */
   boolean isAtom(Formula f);
 
   /**
-   * Checks if the given Formula is a variable.
-   * (either free or quantified)
-   * @param f
-   * @return
+   * @return whether the given Formula is a variable, either free or quantified
    */
   boolean isVariable(Formula f);
 
   /**
-   * Checks if the given Formula is a free (not quantified) variable.
-   * @param f
-   * @return
+   * @return whether the given Formula is a free (not quantified) variable.
    */
   boolean isFreeVariable(Formula f);
 
   /**
-   * Checks if the given Formula is a bound (by a quantifier) variable.
-   * @param f
-   * @return
+   * @return whether the given Formula is a bound (by a quantifier) variable.
    */
   boolean isBoundVariable(Formula f);
 
   /**
-   * Checks if the given Formula is a Number.
-   * @param pTt
-   * @return
+   * @return whether if the given Formula is a Number.
    */
   boolean isNumber(Formula pTt);
   /**
-   * Checks if the given Formula is an uninterpreted function call.
-   * @param f
-   * @return
+   * @return whether if the given Formula is an uninterpreted function call.
    */
   boolean isUF(Formula f);
 
   /**
-   * Checks if the given Formula is quantified (either FORALL ..., or EXISTS ...).
-   * @param f
-   * @return
+   * @return whether if the given Formula is quantified
+   * (either FORALL ..., or EXISTS ...).
    */
   boolean isQuantification(Formula f);
 
@@ -105,9 +86,6 @@ public interface UnsafeFormulaManager {
    *
    * Precondition:
    *    isQuantification(f) == true
-   *
-   * @param f
-   * @return
    */
   BooleanFormula getQuantifiedBody(Formula pQuantifiedFormula);
 
@@ -116,17 +94,11 @@ public interface UnsafeFormulaManager {
    *
    * Precondition:
    *    isQuantification(pF) == true
-   *
-   * @param pTt
-   * @param pNewBody
-   * @return
    */
   BooleanFormula replaceQuantifiedBody(BooleanFormula pF, BooleanFormula pNewBody);
 
   /**
    * Returns the name of the formula (or function)
-   * @param f
-   * @return
    */
   String getName(Formula f);
 
@@ -134,17 +106,10 @@ public interface UnsafeFormulaManager {
    * Replaces the name and the arguments of the given formula.
    * The old and the new name need to be of the same type.
    * If f is a variable, use an empty list of arguments.
-   * @param f
-   * @param newName
-   * @param args
-   * @return
    */
   <T extends Formula> T replaceArgsAndName(T f, String newName, List<Formula> args);
   /**
    * Replaces the arguments of the given formula
-   * @param f
-   * @param args
-   * @return
    */
   <T extends Formula> T replaceArgs(T f, List<Formula> args);
 

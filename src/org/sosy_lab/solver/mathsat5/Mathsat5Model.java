@@ -128,9 +128,9 @@ class Mathsat5Model {
       } else if (msat_is_rational_type(env, msatType)) {
         lValue = parseReal(lTermRepresentation);
       } else if (msat_is_bv_type(env, msatType)) {
-        lValue = interpreteBitvector(lTermRepresentation);
+        lValue = interpretBitvector(lTermRepresentation);
       } else if (msat_is_fp_type(env, msatType)) {
-        lValue = interpreteFloatingPoint(lTermRepresentation);
+        lValue = interpretFloatingPoint(lTermRepresentation);
       } else {
         throw new NumberFormatException("Unknown number format: " + lTermRepresentation);
       }
@@ -193,13 +193,16 @@ class Mathsat5Model {
 
       switch (lAssignable.getType()) {
         case Boolean:
-          if (lTermRepresentation.equals("`true`")) {
-            lValue = true;
-          } else if (lTermRepresentation.equals("`false`")) {
-            lValue = false;
-          } else {
-            throw new IllegalArgumentException(
-                "Mathsat unhandled boolean value " + lTermRepresentation);
+          switch (lTermRepresentation) {
+            case "`true`":
+              lValue = true;
+              break;
+            case "`false`":
+              lValue = false;
+              break;
+            default:
+              throw new IllegalArgumentException(
+                  "Mathsat unhandled boolean value " + lTermRepresentation);
           }
           break;
         case Real:
@@ -211,11 +214,11 @@ class Mathsat5Model {
           break;
 
         case Bitvector:
-          lValue = interpreteBitvector(lTermRepresentation);
+          lValue = interpretBitvector(lTermRepresentation);
           break;
 
         case FloatingPoint:
-          lValue = interpreteFloatingPoint(lTermRepresentation);
+          lValue = interpretFloatingPoint(lTermRepresentation);
           break;
 
         default:
@@ -234,7 +237,7 @@ class Mathsat5Model {
 
   //TODO: change this to the latest version
   // (if possible try to use a BitvectorFormula instance here)
-  private static Object interpreteBitvector(String lTermRepresentation) {
+  private static Object interpretBitvector(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<WIDTH>"
     Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
@@ -257,7 +260,7 @@ class Mathsat5Model {
 
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
 
-  private static Object interpreteFloatingPoint(String lTermRepresentation) {
+  private static Object interpretFloatingPoint(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
     Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {

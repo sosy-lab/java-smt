@@ -154,7 +154,7 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   }
 
   /** This function returns a list of interpolants for the partitions.
-   * Each partition contains the indizes of its terms.
+   * Each partition contains the indexes of its terms.
    * There will be (n-1) interpolants for n partitions. */
   @Override
   public List<IFormula> getInterpolants(List<Set<Integer>> partitions) {

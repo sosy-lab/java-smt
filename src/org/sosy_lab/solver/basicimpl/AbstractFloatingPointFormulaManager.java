@@ -25,20 +25,17 @@ import org.sosy_lab.solver.api.FloatingPointFormula;
 import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.NumeralFormula;
-import org.sosy_lab.solver.api.NumeralFormulaManager;
 
 import java.math.BigDecimal;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package,
- * this class serves as a helper for implementing {@link NumeralFormulaManager}.
+ * this class serves as a helper for implementing {@link FloatingPointFormulaManager}.
  * It handles all the unwrapping and wrapping from and to the {@link Formula}
  * instances, such that the concrete class needs to handle only its own internal types.
  *
- * For {@link #multiply(NumeralFormula, NumeralFormula)},
- * {@link #divide(NumeralFormula, NumeralFormula)}, and
- * {@link #modulo(NumeralFormula, NumeralFormula)},
+ * For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and
+ * {@link #divide(FloatingPointFormula, FloatingPointFormula)}
  * this class even offers an implementation based on UFs.
  * Sub-classes are supposed to override them
  * if they can implement these operations more precisely

@@ -69,10 +69,10 @@ public class FormulaManagerFactory {
     PRINCESS
   }
 
-  @Option(secure = true, description = "Export solver queries in Smtlib format into a file.")
+  @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
   private boolean logAllQueries = false;
 
-  @Option(secure = true, description = "Export solver queries in Smtlib format into a file.")
+  @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
   @FileOption(Type.OUTPUT_FILE)
   private @Nullable PathCounterTemplate logfile =
       PathCounterTemplate.ofFormatString("smtquery.%03d.smt2");
@@ -216,7 +216,7 @@ public class FormulaManagerFactory {
 
   /**
    * Interface for completely encapsulating all accesses to a solver's package
-   * to discouple the solver's package from the rest of the code.
+   * to decouple the solver's package from the rest of the code.
    *
    * This interface is only meant to be implemented by SMT solvers
    * and used by this class, not by other classes.

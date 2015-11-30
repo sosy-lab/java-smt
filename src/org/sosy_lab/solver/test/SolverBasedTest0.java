@@ -56,7 +56,8 @@ import javax.annotation.Nullable;
  * and provides fields with direct access to the most relevant instances.
  *
  * To run the tests using all available solvers, add the following code to your class:
- * <code>
+ * <pre>
+ * {@code
  * @Parameters(name="{0}")
  *  public static List<Object[]> getAllSolvers() {
  *    return allSolversAsParameters();
@@ -69,9 +70,10 @@ import javax.annotation.Nullable;
  *  protected Solvers solverToUse() {
  *    return solver;
  *  }
- * </code>
+ * }
+ * </pre>
  *
- * {@link #assertThatFormula()} can be used to easily write assertions
+ * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions
  * about formulas using Truth.
  *
  * Test that rely on a theory that not all solvers support

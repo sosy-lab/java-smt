@@ -28,7 +28,6 @@ import com.google.common.truth.TestVerb;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import org.sosy_lab.solver.FormulaManagerFactory;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -44,7 +43,7 @@ import java.util.List;
  *
  * Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)},
  * or {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and
- * {@link #forSolver(FormulaManagerFactory)}.
+ * {@link #forSolver(FormulaManager)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {

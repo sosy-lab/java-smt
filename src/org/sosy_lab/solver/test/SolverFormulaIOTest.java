@@ -137,7 +137,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     assertThat(formDump).contains("(declare-fun a () Bool)");
     assertThat(formDump).contains("(declare-fun b () Bool)");
 
-    // the last line has to begin with assert and the dump has to be parseable
+    // the last line has to begin with assert and the dump has to be parsable.
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
