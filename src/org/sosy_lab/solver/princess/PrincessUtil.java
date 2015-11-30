@@ -45,8 +45,7 @@ import scala.Enumeration;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 
-/** This is a Class similiar to Mathsat-NativeApi,
- *  it contains some useful static functions. */
+/** Static helper functions for Princess. */
 class PrincessUtil {
   private PrincessUtil() {}
 
@@ -174,45 +173,10 @@ class PrincessUtil {
     return t instanceof IBoolLit && !((IBoolLit) t).value();
   }
 
-  /** this function creates a new Term with the same function and new parameters. */
+  /** @return a new Term with the same function and new parameters. */
   public static IExpression replaceArgs(IExpression t, List<IExpression> newParams) {
 
     return t.update(JavaConversions.asScalaBuffer(newParams));
-
-    /*
-    if (t instanceof INot) {
-      assert newParams.size() == 1;
-      INot tt = (INot) t;
-      assert tt.subformula().getClass() == newParams.get(0).getClass();
-      return new INot((IFormula)newParams.get(0));
-
-    } else if (t instanceof IBinFormula) {
-      assert newParams.size() == 2;
-      IBinFormula tt = (IBinFormula) t;
-      assert tt.f1().getClass() == newParams.get(0).getClass();
-      assert tt.f2().getClass() == newParams.get(1).getClass();
-      return new IBinFormula(tt.j(), (IFormula)newParams.get(0), (IFormula)newParams.get(1));
-
-    } else if (t instanceof IFormulaITE) {
-      assert newParams.size() == 3;
-      IFormulaITE tt = (IFormulaITE) t;
-      assert tt.cond().getClass() == newParams.get(0).getClass();
-      assert tt.left().getClass() == newParams.get(1).getClass();
-      assert tt.right().getClass() == newParams.get(2).getClass();
-      return new IFormulaITE((IFormula)newParams.get(0),
-          (IFormula)newParams.get(1), (IFormula)newParams.get(2));
-
-    } else if (t instanceof IPlus) {
-      assert newParams.size() == 2;
-      IPlus tt = (IPlus) t;
-      assert tt.t1().getClass() == newParams.get(0).getClass();
-      assert tt.t2().getClass() == newParams.get(1).getClass();
-      return new IPlus((ITerm)newParams.get(0), (ITerm)newParams.get(1));
-
-    } else {
-      return t;
-    }
-    */
   }
 
   /** this function returns all variables in the terms.
