@@ -126,7 +126,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/princess.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime/princess-assertionless.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
