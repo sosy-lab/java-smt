@@ -152,7 +152,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     // build tree of interpolation-points
     final long[] interpolationFormulas = new long[partitionedFormulas.size()];
-    final Deque<Z3TreeInterpolant> stack = new ArrayDeque<>(); // contains <subtree,interpolationPoint>
+    final Deque<Z3TreeInterpolant> stack = new ArrayDeque<>();
 
     int lastSubtree = -1; // subtree starts with 0. With -1<0 we start a new subtree.
     for (int i = 0; i < startOfSubTree.length; i++) {

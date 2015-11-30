@@ -219,8 +219,8 @@ class PrincessEnvironment {
     // TODO do we want to remove redundancy completely (as checked in the unit
     // tests (SolverFormulaIOTest class)) or do we want to remove redundancy up
     // to the point we do it for formulas that should be asserted
-    Tuple2<IExpression, scala.collection.immutable.Map<IExpression, IExpression>> tuple
-        = api.abbrevSharedExpressionsWithMap(formula, 1);
+    Tuple2<IExpression, scala.collection.immutable.Map<IExpression, IExpression>> tuple =
+        api.abbrevSharedExpressionsWithMap(formula, 1);
     final IExpression lettedFormula = tuple._1();
     final Map<IExpression, IExpression> abbrevMap = mapAsJavaMap(tuple._2());
 
