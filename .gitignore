@@ -42,4 +42,4 @@ lib/native/source/libmathsat5j/*.so
 
 build.properties
 /.apt-generated/
-/repository/
+/repository
