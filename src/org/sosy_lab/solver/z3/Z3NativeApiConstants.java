@@ -37,7 +37,7 @@ class Z3NativeApiConstants {
     return get_decl_kind(z3context, decl) == op;
   }
 
-  // CONSTANT VALUES, TODO should we make enums?
+  // CONSTANT VALUES
 
   @SuppressWarnings("checkstyle:typename")
   enum Z3_LBOOL {

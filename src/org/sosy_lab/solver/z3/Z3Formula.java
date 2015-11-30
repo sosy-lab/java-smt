@@ -27,6 +27,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
+import javax.annotation.Nullable;
+
 abstract class Z3Formula implements Formula {
 
   private final long z3expr;
@@ -47,7 +49,7 @@ abstract class Z3Formula implements Formula {
   }
 
   @Override
-  public final boolean equals(Object obj) {
+  public final boolean equals(@Nullable Object obj) {
     if (obj == null || !(obj instanceof Z3Formula)) {
       return false;
     }

@@ -23,9 +23,6 @@ import org.junit.Test;
 import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.test.SolverBasedTest0;
 
-/**
- * Testing the custom SSA implementation.
- */
 public class Z3Test extends SolverBasedTest0 {
 
   @Override

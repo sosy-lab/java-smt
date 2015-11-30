@@ -54,15 +54,13 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   private final Z3FormulaManager mgr;
   private long z3context;
   private long z3solver;
   private int level = 0;
-  private @Nullable Deque<Long> assertedFormulas = new ArrayDeque<>();
+  private final Deque<Long> assertedFormulas = new ArrayDeque<>();
 
   Z3InterpolatingProver(Z3FormulaManager mgr, long z3params) {
     this.mgr = mgr;
@@ -242,8 +240,8 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     while (level > 0) { // TODO do we need this?
       pop();
     }
+    assertedFormulas.clear();
 
-    assertedFormulas = null;
     //TODO solver_reset(z3context, z3solver);
     solver_dec_ref(z3context, z3solver);
     z3context = 0;

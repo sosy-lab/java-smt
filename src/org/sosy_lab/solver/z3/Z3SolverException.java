@@ -21,11 +21,14 @@ package org.sosy_lab.solver.z3;
 
 import org.sosy_lab.solver.SolverException;
 
+/**
+ * This exception is thrown by native Z3 code, through our customized JNI
+ * bindings.
+ */
 class Z3SolverException extends SolverException {
 
   private static final long serialVersionUID = 9047786707330265032L;
 
-  // Needs to have constructor with String argument for being called from native code.
   Z3SolverException(String msg) {
     super(msg);
   }

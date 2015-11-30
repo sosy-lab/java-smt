@@ -79,7 +79,6 @@ public interface AssignableTerm {
 
   /**
    * A function call can have a concrete return value.
-   * TODO: Describe why handling pointers/references is not needed in this case
    */
   class Function implements AssignableTerm {
 

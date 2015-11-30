@@ -261,8 +261,7 @@ class Z3Model {
     //    return p.value;
   }
 
-  /** just a wrapper around a value,
-   * this class allows to call the toString-method later. */
+  /** Delays the conversion to string. */
   private static class LazyString {
 
     final long value;

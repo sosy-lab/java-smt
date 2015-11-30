@@ -56,6 +56,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * Main entry point.
  * Factory class for loading and instantiating SMT solvers.
  */
 @Options(deprecatedPrefix = "cpa.predicate", prefix = "solver")

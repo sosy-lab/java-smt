@@ -22,7 +22,7 @@ package org.sosy_lab.solver;
 import javax.annotation.Nullable;
 
 /**
- * Exception that should be used if the SMT solver did something wrong.
+ * Exception thrown if there is an error during SMT solving.
  */
 public class SolverException extends Exception {
 
