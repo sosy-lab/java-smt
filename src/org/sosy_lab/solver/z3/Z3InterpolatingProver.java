@@ -42,7 +42,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.common.Pair;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
@@ -153,8 +152,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     // build tree of interpolation-points
     final long[] interpolationFormulas = new long[partitionedFormulas.size()];
-    final Deque<Pair<Integer, Long>> stack =
-        new ArrayDeque<>(); // contains <subtree,interpolationPoint>
+    final Deque<Z3TreeInterpolant> stack = new ArrayDeque<>(); // contains <subtree,interpolationPoint>
 
     int lastSubtree = -1; // subtree starts with 0. With -1<0 we start a new subtree.
     for (int i = 0; i < startOfSubTree.length; i++) {
@@ -167,9 +165,9 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
       } else { // if (currentSubtree <= lastSubtree) {
         // merge-point in tree, several children at a node -> pop from stack and conjunct
         final List<Long> children = new ArrayList<>();
-        while (!stack.isEmpty() && currentSubtree <= stack.peekLast().getFirstNotNull()) {
+        while (!stack.isEmpty() && currentSubtree <= stack.peekLast().getRootOfTree()) {
           // adding at front is important for tree-structure!
-          children.add(0, stack.pollLast().getSecond());
+          children.add(0, stack.pollLast().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
         conjunction = mk_and(z3context, Longs.toArray(children));
@@ -187,13 +185,13 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
       inc_ref(z3context, interpolationPoint);
       interpolationFormulas[i] = interpolationPoint;
-      stack.addLast(Pair.of(currentSubtree, interpolationPoint));
+      stack.addLast(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
       lastSubtree = currentSubtree;
     }
 
     Preconditions.checkState(
-        stack.peekLast().getFirst() == 0, "subtree of root should start at 0.");
-    long root = stack.pollLast().getSecond();
+        stack.peekLast().getRootOfTree() == 0, "subtree of root should start at 0.");
+    long root = stack.pollLast().getInterpolationPoint();
     Preconditions.checkState(
         stack.isEmpty(), "root should have been the last element in the stack.");
 
@@ -250,5 +248,23 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     solver_dec_ref(z3context, z3solver);
     z3context = 0;
     z3solver = 0;
+  }
+
+  private static class Z3TreeInterpolant {
+    private final int rootOfSubTree;
+    private final long interpolationPoint;
+
+    private Z3TreeInterpolant(int pRootOfSubtree, long pInterpolationPoint) {
+      rootOfSubTree = pRootOfSubtree;
+      interpolationPoint = pInterpolationPoint;
+    }
+
+    private int getRootOfTree() {
+      return rootOfSubTree;
+    }
+
+    private long getInterpolationPoint() {
+      return interpolationPoint;
+    }
   }
 }
