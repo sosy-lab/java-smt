@@ -48,6 +48,7 @@
             <link href="http://docs.oracle.com/javase/7/docs/api/"/>
             <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/"/>
             <link href="https://google.github.io/truth/api/latest/"/>
+            <link href="https://dbeyer.github.io/common-java/api/"/>
             <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
         </javadoc>
     </target>
