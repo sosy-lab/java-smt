@@ -23,7 +23,6 @@ import static scala.collection.JavaConversions.asScalaSet;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
-import org.sosy_lab.common.Pair;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
 
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import ap.SimpleAPI;
-import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
@@ -103,9 +101,6 @@ class SymbolTrackingPrincessStack implements PrincessStack {
       api.addConstants(iterableAsScalaIterable(level.intSymbols));
       for (IFunction function : level.functionSymbols) {
         api.addFunction(function);
-      }
-      for (Pair<IExpression, IExpression> abbrev : level.abbreviations) {
-        addAbbrevToStack(abbrev.getFirst(), abbrev.getSecond());
       }
       if (!trackingStack.isEmpty()) {
         trackingStack.getLast().mergeWithHigher(level);
@@ -218,38 +213,16 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     }
   }
 
-  /** add external definition: abbreviation for formula. */
-  void addAbbrev(IExpression abbrev, IExpression formula) {
-    addAbbrevToStack(abbrev, formula);
-    if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().abbreviations.add(Pair.of(abbrev, formula));
-    }
-  }
-
-  private void addAbbrevToStack(IExpression abbrev, IExpression formula) {
-    if (abbrev instanceof IFormula) {
-      api.addAbbrev((IFormula) abbrev, (IFormula) formula);
-    } else if (abbrev instanceof ITerm) {
-      api.addAbbrev((ITerm) abbrev, (ITerm) formula);
-    } else {
-      throw new AssertionError("No abbreviation possible for " + abbrev.getClass());
-    }
-  }
-
   private static class Level {
     List<IFormula> booleanSymbols = new ArrayList<>();
     List<ITerm> intSymbols = new ArrayList<>();
     List<IFunction> functionSymbols = new ArrayList<>();
-
-    // order is important for abbreviations, because a abbreviation might depend on another one.
-    List<Pair<IExpression, IExpression>> abbreviations = new ArrayList<>();
 
     /**  add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
       this.booleanSymbols.addAll(other.booleanSymbols);
       this.intSymbols.addAll(other.intSymbols);
       this.functionSymbols.addAll(other.functionSymbols);
-      this.abbreviations.addAll(other.abbreviations);
     }
   }
 }
