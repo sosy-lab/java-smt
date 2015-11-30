@@ -136,7 +136,7 @@ public class FormulaManagerFactory {
 
     if (solver.equals(interpolationSolver)) {
       // If interpolationSolver is not null, we use SeparateInterpolatingProverEnvironment
-      // which copies formula back and forth using strings.
+      // which copies formula from and to the main solver using string serialization.
       // We don't need this if the solvers are the same anyway.
       interpolationSolver = null;
     }
@@ -270,8 +270,7 @@ public class FormulaManagerFactory {
             @SuppressWarnings("unchecked")
             Class<? extends SolverFactory> factoryClass =
                 (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
-            Constructor<? extends SolverFactory> factoryConstructor =
-                factoryClass.getConstructor(new Class<?>[0]);
+            Constructor<? extends SolverFactory> factoryConstructor = factoryClass.getConstructor();
             result = factoryConstructor.newInstance();
             smtInterpolFactory = result;
           } catch (ReflectiveOperationException e) {
@@ -290,7 +289,7 @@ public class FormulaManagerFactory {
       return classLoader;
     }
 
-    // garbage collected or first time we come here
+    // Garbage collected on first entry.
     if (smtInterpolLoadingCount.incrementAndGet() > 1) {
       logger.log(Level.INFO, "Repeated loading of SmtInterpol");
     }

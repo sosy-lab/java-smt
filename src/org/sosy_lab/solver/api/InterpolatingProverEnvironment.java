@@ -26,14 +26,14 @@ import java.util.Set;
 
 /**
  * This class provides an interface to an incremental SMT solver
- * with methods for pushing and popping formulas as well as sat checks.
+ * with methods for pushing and popping formulas as well as SAT checks.
  * Furthermore, interpolants can be generated for an unsatisfiable list of formulas.
  *
  * Instances of this class can be used once for a series of related queries.
  * After that, the {@link #close} method should be called
  * (preferably using the try-with-resources syntax).
  * All methods are expected to throw {@link IllegalStateException}s after
- * close was called.
+ * {@link #close} was called.
  *
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */

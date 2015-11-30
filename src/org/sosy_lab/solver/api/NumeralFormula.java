@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.solver.api;
 
+/**
+ * Formulas of any numeral sort.
+ */
 public interface NumeralFormula extends Formula {
 
   interface IntegerFormula extends NumeralFormula {}

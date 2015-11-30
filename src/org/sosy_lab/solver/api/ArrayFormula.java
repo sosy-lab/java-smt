@@ -19,5 +19,10 @@
  */
 package org.sosy_lab.solver.api;
 
+/**
+ * A formula of the array sort.
+ * @param <TI> Index type.
+ * @param <TE> Element type.
+ */
 @SuppressWarnings("unused")
 public interface ArrayFormula<TI extends Formula, TE extends Formula> extends Formula {}

@@ -19,4 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+/**
+ * An arbitrary SMT formula.
+ */
 public interface Formula {}

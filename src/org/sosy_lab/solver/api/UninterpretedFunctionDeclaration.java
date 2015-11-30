@@ -27,9 +27,9 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * Represents a uninterpreted function.
+ * An uninterpreted function.
  * This not a subclass of {@link Formula} because it does not represent a term
- * (only the <em>application</em> of a uninterpreted function is a formula term,
+ * (only an <em>application</em> of an uninterpreted function is a formula term,
  * not the function itself).
  * @param <T> The type of the return value
  */

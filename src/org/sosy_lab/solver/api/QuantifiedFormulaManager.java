@@ -24,14 +24,14 @@ import org.sosy_lab.solver.SolverException;
 import java.util.List;
 
 /**
- * This interface represents the a theory with quantifiers.
+ * This interface contains methods for working with any theory with quantifiers.
  *
- *    ATTENTION: Not every theory has the quantifier elimination property!
+ * ATTENTION: Not every theory has a quantifier elimination property!
  */
 public interface QuantifiedFormulaManager {
 
   /**
-   * @return An existential quantified formula.
+   * @return An existentially quantified formula.
    *
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
@@ -39,7 +39,7 @@ public interface QuantifiedFormulaManager {
   BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
-   * @return An universal quantified formula.
+   * @return A universally quantified formula.
    *
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.

@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * This interface represents the Numeral-Theory
+ * This interface represents the Numeral Theory.
  *
  * @param <ParamFormulaType> formulaType of the parameters
  * @param <ResultFormulaType> formulaType of arithmetic results

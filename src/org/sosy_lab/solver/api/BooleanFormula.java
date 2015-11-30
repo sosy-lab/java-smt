@@ -19,4 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+/**
+ * A formula of the boolean sort.
+ */
 public interface BooleanFormula extends Formula {}

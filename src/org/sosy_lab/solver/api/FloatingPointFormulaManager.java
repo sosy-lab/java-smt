@@ -23,9 +23,6 @@ import org.sosy_lab.common.rationals.Rational;
 
 import java.math.BigDecimal;
 
-/**
- * This interface represents the floating-point theory
- */
 public interface FloatingPointFormulaManager {
   FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type);
 

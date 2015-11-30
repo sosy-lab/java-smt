@@ -23,12 +23,15 @@ import org.sosy_lab.solver.SolverException;
 
 import java.util.List;
 
+/**
+ * Interpolating prover with assumptions support.
+ */
 public interface InterpolatingProverEnvironmentWithAssumptions<T>
     extends InterpolatingProverEnvironment<T> {
 
   /**
-   * Check whether the conjunction of all formulas on the stack is unsatisfiable,
-   * while regarding the assumptions from the parameter.
+   * Check whether the conjunction of all formulas on the stack is unsatisfiable
+   * with regards to provided assumptions.
    * @throws InterruptedException
    * @throws SolverException
    */

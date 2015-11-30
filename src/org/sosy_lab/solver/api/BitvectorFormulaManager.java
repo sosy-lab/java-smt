@@ -22,7 +22,7 @@ package org.sosy_lab.solver.api;
 import java.math.BigInteger;
 
 /**
- * This interface represents the Bitvector-Theory
+ * Manager for dealing with formulas of the bitvector sort.
  */
 public interface BitvectorFormulaManager {
 

@@ -24,7 +24,6 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
 /**
- * Represents an SMT solver.
  * Instances of this interface provide direct low-level access to an SMT solver.
  */
 public interface FormulaManager {
@@ -33,7 +32,7 @@ public interface FormulaManager {
    * Returns the Integer-Theory.
    * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
    * the Integer- and the RationalFormulaManager both return the same Formulas
-   * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL, etc.
+   * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL and others.
    */
   NumeralFormulaManager<IntegerFormula, IntegerFormula> getIntegerFormulaManager();
 
@@ -113,30 +112,24 @@ public interface FormulaManager {
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
 
   /**
-   * Parse a formula given as a String in a solver-specific file format.
+   * Parse a boolean formula given as a String in an SMT-LIB file format.
    * @return The same formula in the internal representation.
    * @throws IllegalArgumentException If the string cannot be parsed.
    */
-  // TODO: Implement solver independent file format and remove this method from the solver interface
-  // Instead implement the format in the View
   BooleanFormula parse(String s) throws IllegalArgumentException;
 
   /**
-   * Create string representation of a formula in a format which may be dumped
-   * to a file. To get a String, simply call {@link Object#toString()}
+   * @return SMT-LIB formula serialization.
+   *
+   * To get a String, simply call {@link Object#toString()}
    * on the returned object.
-   *
-   * This method is lazy and does not create any huge string until the returned
+   * This method is lazy and does not create an output string until the returned
    * object is actually used.
-   *
-   * @see Appender
    */
-  // TODO: Implement solver independent file format and remove this method from the solver interface
-  // Instead implement the format in the View
   Appender dumpFormula(BooleanFormula pT);
 
   /**
-   * Get some version information of the solver.
+   * Get version information out of the solver.
    */
   String getVersion();
 }

@@ -24,7 +24,7 @@ import org.sosy_lab.solver.SolverException;
 import java.util.List;
 
 /**
- * This class provides an interface to an incremental SMT solver
+ * An interface to an incremental SMT solver
  * with methods for pushing and popping formulas as well as sat checks.
  * Instances of this class can be used once for a series of related queries.
  * After that, the {@link #close} method should be called

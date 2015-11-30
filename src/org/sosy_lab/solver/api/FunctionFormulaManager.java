@@ -22,7 +22,7 @@ package org.sosy_lab.solver.api;
 import java.util.List;
 
 /**
- * This interface represents the Functiontype-Theory
+ * Manager for dealing with UFs.
  */
 public interface FunctionFormulaManager {
 

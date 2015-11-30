@@ -19,4 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+/**
+ * A formula of the bitvector sort.
+ */
 public interface BitvectorFormula extends Formula {}

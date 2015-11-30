@@ -25,6 +25,9 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 
+/**
+ * Interface for optimization modulo SMT.
+ */
 public interface OptEnvironment extends AutoCloseable {
 
   /**

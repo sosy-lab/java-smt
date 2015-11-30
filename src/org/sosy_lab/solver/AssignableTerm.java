@@ -58,7 +58,7 @@ public interface AssignableTerm {
 
     @Override
     public int hashCode() {
-      return 324 + name.hashCode() + type.hashCode();
+      return Objects.hashCode(name, type);
     }
 
     @Override

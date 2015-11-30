@@ -25,7 +25,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
 /**
- * Represents a type of a formula.
+ * Type of a formula.
  * @param <T> the static type of the FormulaType.
  */
 @SuppressWarnings("checkstyle:constantname")

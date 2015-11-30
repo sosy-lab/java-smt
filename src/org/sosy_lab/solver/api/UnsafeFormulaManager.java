@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This interface represents some formula traverse methods
- * which should not be used on higher levels.
+ * This interface contains methods for formula traversal,
+ * which generally should be avoided.
  */
 public interface UnsafeFormulaManager {
 
@@ -141,17 +141,19 @@ public interface UnsafeFormulaManager {
   <T1 extends Formula, T2 extends Formula> T1 substitute(
       T1 f, List<T2> changeFrom, List<T2> changeTo);
 
+  /**
+   * Same as {@link #substitute(Formula, List, List)}, but uses a map.
+   */
   <T1 extends Formula, T2 extends Formula> T1 substitute(T1 f, Map<T2, T2> fromToMapping);
 
   /**
-   * Simplify a given formula (as good as possible).
-   *    Equivalence must be ensured!
+   * Simplifies an input formula, while ensuring equivalence.
    *
-   * A solver that does not provide a simplify method
-   *  might just return the original formula.
+   * For solvers that do not provide a simplification API, an original formula
+   * is returned.
    *
    * @param f The input formula
-   * @return  Simplified version of the formula
+   * @return Simplified version of the formula
    */
   <T extends Formula> T simplify(T f);
 }

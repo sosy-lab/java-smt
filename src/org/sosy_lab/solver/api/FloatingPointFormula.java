@@ -19,4 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+/**
+ * Formula of the floating point sort.
+ */
 public interface FloatingPointFormula extends Formula {}

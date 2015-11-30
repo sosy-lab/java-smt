@@ -22,7 +22,7 @@ package org.sosy_lab.solver.api;
 import java.util.Collection;
 
 /**
- * This interface represents the Boolean-Theory
+ * Manager for dealing with boolean formulas.
  */
 public interface BooleanFormulaManager {
   /**
