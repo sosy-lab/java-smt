@@ -9,10 +9,11 @@
                 outputproperty="version"
                 failonerror="true">
             <arg value="describe"/>
+            <arg value="--always"/>
             <arg value="--dirty"/>
         </exec>
         <condition property="version.publishable">
-            <not><matches string="${version}" pattern="-dirty" /></not>
+            <not><matches string="${version}" pattern="(^[a-z0-9]*$|-dirty)" /></not>
         </condition>
     </target>
 </project>
