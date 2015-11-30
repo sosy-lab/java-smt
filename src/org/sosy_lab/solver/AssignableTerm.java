@@ -23,9 +23,11 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Nullable;
+
 
 public interface AssignableTerm {
   TermType getType();

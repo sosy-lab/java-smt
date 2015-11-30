@@ -36,10 +36,11 @@ import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
+import javax.annotation.Nullable;
+
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
-import javax.annotation.Nullable;
 
 public final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
