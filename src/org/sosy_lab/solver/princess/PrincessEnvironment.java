@@ -19,14 +19,13 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
 import static org.sosy_lab.solver.princess.PrincessUtil.getVarsAndUIFs;
 import static scala.collection.JavaConversions.asJavaIterable;
+import static scala.collection.JavaConversions.mapAsJavaMap;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 import org.sosy_lab.common.Appender;
@@ -46,7 +45,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,6 +65,7 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.SMTLineariser;
+import scala.Tuple2;
 import scala.collection.JavaConversions;
 import scala.collection.mutable.ArrayBuffer;
 
@@ -81,10 +80,6 @@ class PrincessEnvironment {
   private final Map<String, IFormula> boolVariablesCache = new HashMap<>();
   private final Map<String, ITerm> intVariablesCache = new HashMap<>();
 
-  /** The key of this map is the abbreviation, the value is the full expression.*/
-  private final Map<IExpression, IExpression> abbrevCache = new LinkedHashMap<>();
-  /** This map is necessary because of the missing equals implementations on princess expressions */
-  private final Map<String, IExpression> stringToAbbrev = new HashMap<>();
   private final Map<String, IFunction> functionsCache = new HashMap<>();
   private final Map<IFunction, TermType> functionsReturnTypes = new HashMap<>();
 
@@ -144,9 +139,7 @@ class PrincessEnvironment {
     for (IFunction s : functionsCache.values()) {
       stack.addSymbol(s);
     }
-    for (Entry<IExpression, IExpression> e : abbrevCache.entrySet()) {
-      stack.addAbbrev(e.getKey(), e.getValue());
-    }
+
     registeredStacks.add(stack);
     allStacks.add(stack);
     return stack;
@@ -223,7 +216,14 @@ class PrincessEnvironment {
 
   public Appender dumpFormula(IFormula formula) {
     // remove redundant expressions
-    final IExpression lettedFormula = PrincessUtil.let(formula, this);
+    // TODO do we want to remove redundancy completely (as checked in the unit
+    // tests (SolverFormulaIOTest class)) or do we want to remove redundancy up
+    // to the point we do it for formulas that should be asserted
+    Tuple2<IExpression, scala.collection.immutable.Map<IExpression, IExpression>> tuple
+        = api.abbrevSharedExpressionsWithMap(formula, 1);
+    final IExpression lettedFormula = tuple._1();
+    final Map<IExpression, IExpression> abbrevMap = mapAsJavaMap(tuple._2());
+
     return new Appenders.AbstractAppender() {
 
       @Override
@@ -249,8 +249,7 @@ class PrincessEnvironment {
           // the rest is done afterwards
           if (name.startsWith("abbrev_")) {
             todoAbbrevs.add(name);
-            Set<IExpression> varsFromAbbrev =
-                getVarsAndUIFs(singleton(abbrevCache.get(stringToAbbrev.get(name))));
+            Set<IExpression> varsFromAbbrev = getVarsAndUIFs(singleton(abbrevMap.get(var)));
             for (IExpression addVar : Sets.difference(varsFromAbbrev, allVars)) {
               declaredFunctions.push(addVar);
             }
@@ -283,7 +282,7 @@ class PrincessEnvironment {
 
         // now as everything we know from the formula is declared we have to add
         // the abbreviations, too
-        for (Entry<IExpression, IExpression> entry : abbrevCache.entrySet()) {
+        for (Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
           IExpression abbrev = entry.getKey();
           IExpression fullFormula = entry.getValue();
           String name = getName(getOnlyElement(getVarsAndUIFs(singleton(abbrev))));
@@ -423,29 +422,6 @@ class PrincessEnvironment {
     }
 
     return returnFormula;
-  }
-
-  public IExpression abbrev(IExpression expr) {
-    IExpression abbrev;
-    if (expr instanceof IFormula) {
-      abbrev = api.abbrev((IFormula) expr);
-    } else if (expr instanceof ITerm) {
-      abbrev = api.abbrev((ITerm) expr);
-    } else {
-      throw new AssertionError("no possibility to create abbreviation for " + expr.getClass());
-    }
-
-    for (SymbolTrackingPrincessStack stack : allStacks) {
-      stack.addAbbrev(abbrev, expr);
-    }
-
-    stringToAbbrev.put(getName(getOnlyElement(getVarsAndUIFs(singleton(abbrev)))), abbrev);
-    abbrevCache.put(abbrev, expr);
-    return abbrev;
-  }
-
-  public Optional<IExpression> fullVersionOfAbbrev(final IExpression expr) {
-    return fromNullable(abbrevCache.get(expr));
   }
 
   public String getVersion() {
