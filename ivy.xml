@@ -100,10 +100,6 @@
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
 
-        <!-- CUP LALR Parser Generator for Java
-             Used for generating automaton and FQL parsers. -->
-        <dependency org="edu.tum.cs" name="java-cup" rev="11b-20150326" conf="build->build; runtime->runtime"/>
-
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-87-gad58226" conf="runtime->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.7" conf="runtime->solver-mathsat" />
