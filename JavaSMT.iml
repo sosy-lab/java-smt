@@ -5,6 +5,9 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/JUnit-coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/junit" />
+      <excludeFolder url="file://$MODULE_DIR$/repository" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -23,25 +26,6 @@
     </orderEntry>
     <orderEntry type="module-library">
       <library>
-        <CLASSES />
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/common-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/error_prone_annotations-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-testlib-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/truth-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/DeltaDebugger/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/Library-SMTLIB/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/ProoftreeCheck/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpol/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpolSamples/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpolTest/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime/guava.jar!/" />
         </CLASSES>
@@ -53,15 +37,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime/common.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java-benchmark/javax.inject.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
