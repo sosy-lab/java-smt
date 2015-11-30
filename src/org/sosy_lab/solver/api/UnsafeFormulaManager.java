@@ -84,16 +84,14 @@ public interface UnsafeFormulaManager {
   /**
    * Get the body of the given, quantified, formula.
    *
-   * Precondition:
-   *    isQuantification(f) == true
+   * <p>Precondition: {@link #isQuantification(Formula)} returns true for this formula.
    */
   BooleanFormula getQuantifiedBody(Formula pQuantifiedFormula);
 
   /**
    * Replace the body of a quantified formula.
    *
-   * Precondition:
-   *    isQuantification(pF) == true
+   * <p>Precondition: {@link #isQuantification(Formula)} returns true for the first parameter.
    */
   BooleanFormula replaceQuantifiedBody(BooleanFormula pF, BooleanFormula pNewBody);
 
@@ -117,7 +115,7 @@ public interface UnsafeFormulaManager {
    * If the given formula is a numeral (i.e., non-boolean) equality "x = y",
    * return a list {@code x<=y, x>=y}.
    *
-   * Otherwise, return the unchanged formula.
+   * <p>Otherwise, return the unchanged formula.
    * Note:
    *  1) Returned list always has one or two elements.
    *  2) Conjunction over the returned list is equivalent to the input formula.
@@ -128,7 +126,7 @@ public interface UnsafeFormulaManager {
    * Substitute every occurrence of any item from {@code changeFrom}
    * in formula {@code f} to the corresponding occurrence from {@code changeTo}.
    *
-   * E.g. if {@code changeFrom} contains a variable {@code a} and
+   * <p>E.g. if {@code changeFrom} contains a variable {@code a} and
    * {@code changeTo} contains a variable {@code b} all occurrences of {@code a}
    * will be changed to {@code b} in the returned formula.
    *
@@ -149,7 +147,7 @@ public interface UnsafeFormulaManager {
   /**
    * Simplifies an input formula, while ensuring equivalence.
    *
-   * For solvers that do not provide a simplification API, an original formula
+   * <p>For solvers that do not provide a simplification API, an original formula
    * is returned.
    *
    * @param f The input formula

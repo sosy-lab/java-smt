@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * This interface contains methods for working with any theory with quantifiers.
  *
- * ATTENTION: Not every theory has a quantifier elimination property!
+ * <p>ATTENTION: Not every theory has a quantifier elimination property!
  */
 public interface QuantifiedFormulaManager {
 

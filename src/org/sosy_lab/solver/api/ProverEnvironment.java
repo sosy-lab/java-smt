@@ -31,6 +31,15 @@ import java.util.List;
  * (preferably using the try-with-resources syntax).
  * All methods are expected to throw {@link IllegalStateException}s after
  * close was called.
+ *
+ * <p>All solving methods are expected to throw {@link SolverException} if the solver
+ * fails to solve the given query, and {@link InterruptedException} if a thread interrupt
+ * was requested or a shutdown request via the {@link org.sosy_lab.common.ShutdownNotifier} given to
+ * {@link org.sosy_lab.solver.FormulaManagerFactory#FormulaManagerFactory(
+ * org.sosy_lab.common.configuration.Configuration, org.sosy_lab.common.log.LogManager,
+ * org.sosy_lab.common.ShutdownNotifier)}.
+ * It is not guaranteed, though, that solvers respond in a timely manner (or at all)
+ * to shutdown or interrupt requests.
  */
 public interface ProverEnvironment extends BasicProverEnvironment<Void> {
 
@@ -49,7 +58,6 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    * @param important A set of variables appearing in f.
    *     Only these variables will appear in the region.
    * @return A region representing all satisfying models of the formula.
-   * @throws InterruptedException
    */
   <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
@@ -64,8 +72,8 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
   Formula evaluate(Formula f);
 
   /**
-   * Interface for the {@link #allSat} callback, parametrized by the return
-   * value.
+   * Interface for the {@link #allSat} callback.
+   * @param <T> The result type of the callback, passed through by {@link #allSat}.
    */
   interface AllSatCallback<T> {
 

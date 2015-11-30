@@ -38,7 +38,7 @@ import java.util.List;
  * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth
  * (allows to use <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
  *
- * Use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)},
+ * <p>Use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)},
  * or {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and
  * {@link #proverEnvironment()}.
  */

@@ -29,11 +29,8 @@ import java.util.Set;
  * with methods for pushing and popping formulas as well as SAT checks.
  * Furthermore, interpolants can be generated for an unsatisfiable list of formulas.
  *
- * Instances of this class can be used once for a series of related queries.
- * After that, the {@link #close} method should be called
- * (preferably using the try-with-resources syntax).
- * All methods are expected to throw {@link IllegalStateException}s after
- * {@link #close} was called.
+ * @see ProverEnvironment The non-interpolating ProverEnvironment for general notes
+ *     that also apply to this interface.
  *
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */
@@ -51,7 +48,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * This should be called only immediately after an {@link #isUnsat()} call
    * that returned <code>true</code>.
    *
-   * There is no direct guarantee
+   * <p>There is no direct guarantee
    * that the interpolants returned are part of an inductive sequence',
    * however this seems to work for most (all?) solvers as long as the same proof is used,
    * i.e. all interpolants are computed after the same SAT-check.
@@ -68,7 +65,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * Depending on the underlying SMT-solver this method might be faster than N direct calls
    * to getInterpolant().
    *
-   * The stack must contain exactly the partitioned formulas, but any order is allowed.
+   * <p>The stack must contain exactly the partitioned formulas, but any order is allowed.
    * For an input of N partitions we return N-1 interpolants.
    *
    * @return a 'inductive sequence' of interpolants,
@@ -82,8 +79,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * start of the subtree for tree interpolants. For inductive sequences of
    * interpolants use a nesting array completely filled with 0.
    *
-   * Example:
-   *
+   * <p>Example:
+   * <pre>
    * A  D
    * |  |
    * B  E
@@ -97,6 +94,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * arrayIndex     = [0,1,2,3,4,5,6,7]  // only for demonstration, not needed
    * partition      = [A,B,D,E,C,F,H,G]  // post-order of tree
    * startOfSubTree = [0,0,2,2,0,0,6,0]  // index of left-most leaf of the current element
+   * </pre>
    *
    * @param partitionedFormulas of formulas
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.

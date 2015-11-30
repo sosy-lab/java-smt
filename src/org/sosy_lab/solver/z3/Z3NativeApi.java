@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 /** This class contains the native calls for Z3.
  *
- * Z3 uses reference-counting for all objects. If a function returns an
+ * <p>Z3 uses reference-counting for all objects. If a function returns an
  * object and the user wants to use it only once, the reference-counter
  * should not be incremented. The object will be destroyed after next usage.
  * If the user wants to use the object several times, he has to increment
@@ -61,7 +61,7 @@ final class Z3NativeApi {
   /**
    * Create a new optimize context.
    *
-   * User must use {@link #optimize_inc_ref}
+   * <p>User must use {@link #optimize_inc_ref}
    * and {@link #optimize_dec_ref} to manage optimize objects.
    * Even if the context was created using
    * {@link #mk_context} instead of {@link #mk_context_rc}.
@@ -148,7 +148,7 @@ final class Z3NativeApi {
   /**
    * Create a backtracking point.
    *
-   * The optimize solver contains a set of rules, added facts and assertions.
+   * <p>The optimize solver contains a set of rules, added facts and assertions.
    * The set of rules, facts and assertions are restored upon calling {#link #optimize_pop}
    *
    * @param c Z3_context
@@ -1141,7 +1141,7 @@ final class Z3NativeApi {
   /**
    * Enable tracing messages tagged as {@code tag}.
    *
-   * NOTE: Works only if Z3 is compiled in DEBUG mode. No-op otherwise.
+   * <p>NOTE: Works only if Z3 is compiled in DEBUG mode. No-op otherwise.
    */
   static native void enable_trace(String tag);
 
@@ -1264,16 +1264,16 @@ final class Z3NativeApi {
    * of formulas, that can be solved and/or transformed using
    * tactics and solvers.
    *
-   * If {@code models == true}, then model generation is enabled for the new goal.
+   * <p>If {@code models == true}, then model generation is enabled for the new goal.
    *
-   * If {@code unsat_cores == true}, then unsat core generation is enabled for
+   * <p>If {@code unsat_cores == true}, then unsat core generation is enabled for
    * the new goal.
    *
-   * If {@code proofs == true}, then proof generation is enabled for the new
+   * <p>If {@code proofs == true}, then proof generation is enabled for the new
    * goal. Remark, the Z3 context c must have been created with proof
    * generation support.
    *
-   * Reference counting must be used to manage goals, even when the Z3_context was
+   * <p>Reference counting must be used to manage goals, even when the Z3_context was
    * created using {@link #mk_context} instead of {@link #mk_context_rc}.
    */
   static native long mk_goal(long context, boolean models, boolean unsat_cores, boolean proofs);
@@ -1325,7 +1325,7 @@ final class Z3NativeApi {
    * The complete list of tactics may be obtained using the procedures
    * {@link #get_num_tactics} and {@link #get_tactic_name}.
    *
-   * Tactics are the basic building block for creating custom solvers for
+   * <p>Tactics are the basic building block for creating custom solvers for
    * specific problem domains.
    *
    * @param context Z3_context
@@ -1439,7 +1439,7 @@ final class Z3NativeApi {
    * Return one of the subgoals in the {@code Z3_apply_result} object returned
    * by {#link tactic_apply}.
    *
-   * Precondition: {@code i < apply_result_get_num_subgoals(c, r)}
+   * <p>Precondition: {@code i < apply_result_get_num_subgoals(c, r)}
    * @param context Z3_context
    * @param apply_result Z3_apply_result
    * @param i Apply result index
@@ -1554,9 +1554,9 @@ final class Z3NativeApi {
    * interpolants. Formulas can be generated as abstract syntax trees in
    * this context using the Z3 C API.
    *
-   * Interpolants are also generated as AST's in this context.
+   * <p>Interpolants are also generated as AST's in this context.
    *
-   * If cfg is non-null, it will be used as the base configuration
+   * <p>If cfg is non-null, it will be used as the base configuration
    * for the Z3 context. This makes it possible to set Z3 options
    * to be used during interpolation. This feature should be used
    * with some caution however, as it may be that certain Z3 options
@@ -1578,43 +1578,43 @@ final class Z3NativeApi {
    * is phi with sigma(psi) substituted for each subformula psi of phi such that
    * psi in dom(sigma)):
    *
-   * 1) phi sigma implies sigma(phi), and
+   * <p>1) phi sigma implies sigma(phi), and
    *
-   * 2) sigma(phi) is in the common uninterpreted vocabulary between
+   * <p>2) sigma(phi) is in the common uninterpreted vocabulary between
    * the formulas of C occurring in phi and those not occurring in
    * phi
    *
-   * and moreover pat sigma implies false. In the simplest case
+   * <p>and moreover pat sigma implies false. In the simplest case
    * an interpolant for the pattern "(and (interp A) B)" maps A
    * to an interpolant for A /\ B.
    *
-   * The return value is a vector of formulas representing sigma. The
+   * <p>The return value is a vector of formulas representing sigma. The
    * vector contains sigma(phi) for each marked subformula of pat, in
    * pre-order traversal. // TODO documentation wrong? it is POST-ORDER traversal!
    * This means that subformulas of phi occur before phi
    * in the vector. Also, subformulas that occur multiply in pat will
    * occur multiply in the result vector.
    *
-   * In particular, calling this function on a pattern of the
+   * <p>In particular, calling this function on a pattern of the
    * form (interp ... (interp (and (interp A_1) A_2)) ... A_N) will
    * result in a sequence interpolant for A_1, A_2,... A_N.
    *
-   * Neglecting interp markers, the pattern must be a conjunction of
+   * <p>Neglecting interp markers, the pattern must be a conjunction of
    * formulas in C, the set of premises of the proof. Otherwise an
    * error is flagged.
    *
-   * Any premises of the proof not present in the pattern are
+   * <p>Any premises of the proof not present in the pattern are
    * treated as "background theory". Predicate and function symbols
    * occurring in the background theory are treated as interpreted and
    * thus always allowed in the interpolant.
    *
-   * Interpolant may not necessarily be computable from all
+   * <p>Interpolant may not necessarily be computable from all
    * proofs. To be sure an interpolant can be computed, the proof
    * must be generated by an SMT solver for which interpolation is
    * supported, and the premises must be expressed using only
    * theories and operators for which interpolation is supported.
    *
-   * Currently, the only SMT solver that is supported is the legacy
+   * <p>Currently, the only SMT solver that is supported is the legacy
    * SMT solver. Such a solver is available as the default solver in
    * #Z3_context objects produced by {@link #mk_interpolation_context}.
    * Currently, the theories supported are equality with
@@ -1634,19 +1634,19 @@ final class Z3NativeApi {
 
   /** Compute an interpolant for an unsatisfiable conjunction of formulas.
    *
-   * This takes as an argument an interpolation pattern as in
+   * <p>This takes as an argument an interpolation pattern as in
    * {@link #get_interpolant}. This is a conjunction, some subformulas of
    * which are marked with the "interp" operator (see {@link #mk_interpolant}).
    *
-   * The conjunction is first checked for unsatisfiability. The result
+   * <p>The conjunction is first checked for unsatisfiability. The result
    * of this check is returned in the out parameter "status". If the result
    * is unsat, an interpolant is computed from the refutation as in #Z3_get_interpolant
    * and returned as a vector of formulas. Otherwise the return value is
    * an empty formula.
    *
-   * See {@link #get_interpolant} for a discussion of supported theories.
+   * <p>See {@link #get_interpolant} for a discussion of supported theories.
    *
-   * The advantage of this function over {@link #get_interpolant} is that
+   * <p>The advantage of this function over {@link #get_interpolant} is that
    * it is not necessary to create a suitable SMT solver and generate
    * a proof. The disadvantage is that it is not possible to use the
    * solver incrementally.

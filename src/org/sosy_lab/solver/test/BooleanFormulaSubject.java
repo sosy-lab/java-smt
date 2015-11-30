@@ -41,7 +41,7 @@ import java.util.List;
  * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth
  * (allows to use <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
- * Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)},
+ * <p>Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)},
  * or {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and
  * {@link #forSolver(FormulaManager)}.
  */

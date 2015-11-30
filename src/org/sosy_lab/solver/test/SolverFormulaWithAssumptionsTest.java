@@ -58,7 +58,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
 
   /** Generate a prover environment depending on the parameter above.
    * Can be overridden to parameterize the test.
-   * @throws InvalidConfigurationException */
+   * @throws InvalidConfigurationException overriding methods are allowed to throw this */
   @SuppressWarnings({"unchecked", "rawtypes"})
   protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest()
       throws InvalidConfigurationException {

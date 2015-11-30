@@ -218,7 +218,7 @@ public class FormulaManagerFactory {
    * Interface for completely encapsulating all accesses to a solver's package
    * to decouple the solver's package from the rest of the code.
    *
-   * This interface is only meant to be implemented by SMT solvers
+   * <p>This interface is only meant to be implemented by SMT solvers
    * and used by this class, not by other classes.
    */
   public interface SolverFactory {

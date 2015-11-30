@@ -30,7 +30,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * A simple straightforward implementation of FunctionFormulaType<T>
+ * A simple straightforward implementation of {@link UninterpretedFunctionDeclaration}.
  */
 class DefaultUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
     extends UninterpretedFunctionDeclaration<T> {

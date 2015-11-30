@@ -684,7 +684,7 @@ class Mathsat5NativeApi {
    * group identified by a common id label. Assert-soft constraints are ineffective
    * unless the id label is used by an objective that is pushed on the stack
    *
-   * \param e msat_env The environment in which to operate.
+   * <p>\param e msat_env The environment in which to operate.
    * \param term msat_term The term to which a weight is attached.
    * \param weight msat_term The weight of not satisfying this soft-clause.
    * \param upper The MaxSMT sum onto which the weight contribution is added.

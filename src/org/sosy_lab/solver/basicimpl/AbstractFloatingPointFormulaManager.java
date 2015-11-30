@@ -34,7 +34,7 @@ import java.math.BigDecimal;
  * It handles all the unwrapping and wrapping from and to the {@link Formula}
  * instances, such that the concrete class needs to handle only its own internal types.
  *
- * For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and
+ * <p>For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and
  * {@link #divide(FloatingPointFormula, FloatingPointFormula)}
  * this class even offers an implementation based on UFs.
  * Sub-classes are supposed to override them

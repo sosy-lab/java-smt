@@ -53,7 +53,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Theory;
  * All formulas that are asserted (regardless of pop and push commands)
  * are collected and can be retrieved afterwards.
  *
- * The environment represented by the given {@link Script} that this class
+ * <p>The environment represented by the given {@link Script} that this class
  * delegates to is changed only by declaring and defining terms, sorts etc.,
  * so these terms can be used in that environment afterwards.
  */

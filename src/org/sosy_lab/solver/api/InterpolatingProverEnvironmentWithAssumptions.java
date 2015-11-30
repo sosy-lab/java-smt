@@ -32,8 +32,6 @@ public interface InterpolatingProverEnvironmentWithAssumptions<T>
   /**
    * Check whether the conjunction of all formulas on the stack is unsatisfiable
    * with regards to provided assumptions.
-   * @throws InterruptedException
-   * @throws SolverException
    */
   boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;

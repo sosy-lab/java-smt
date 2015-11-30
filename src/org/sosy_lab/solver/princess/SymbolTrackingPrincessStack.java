@@ -47,7 +47,8 @@ import scala.collection.mutable.ArrayBuffer;
  * A stack is always connected with a PrincessEnvironment, because Variables are declared there.
  * One PrincessEnvironment can manage several stacks.
  *
- * This implementation also tracks symbols (boolean or integer variables, uninterpreted functions),
+ * <p>This implementation also tracks symbols
+ * (boolean or integer variables, uninterpreted functions),
  * because in SMTLIB symbols would be deleted after a pop-operation.
  * We track symbols in our own stack and recreate them after the pop-operation. */
 class SymbolTrackingPrincessStack implements PrincessStack {

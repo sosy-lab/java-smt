@@ -547,8 +547,8 @@ class SmtInterpolEnvironment {
    * start of the subtree for tree interpolants. For inductive sequences of
    * interpolants use a nesting array completely filled with 0.
    *
-   * Example:
-   *
+   * <p>Example:
+   * <pre>
    * A  D
    * |  |
    * B  E
@@ -562,6 +562,7 @@ class SmtInterpolEnvironment {
    * arrayIndex     = [0,1,2,3,4,5,6,7]  // only for demonstration, not needed
    * partition      = [A,B,D,E,C,F,H,G]  // post-order of tree
    * startOfSubTree = [0,0,2,2,0,0,6,0]  // index of left-most leaf of the current element
+   * </pre>
    *
    * @param partition The array of formulas (post-order of tree).
    *                  This should contain either top-level names or conjunction of top-level names.

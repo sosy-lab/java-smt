@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 /**
  * Entry point for loading SmtInterpol.
  *
- * Do not access this class directly, it needs to be loaded via
+ * <p>Do not access this class directly, it needs to be loaded via
  * {@link FormulaManagerFactory}
  * because SmtInterpol needs to have it's own class loader.
  */

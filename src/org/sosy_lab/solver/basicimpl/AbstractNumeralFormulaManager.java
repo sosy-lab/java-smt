@@ -40,7 +40,7 @@ import java.util.List;
  * It handles all the unwrapping and wrapping from and to the {@link Formula}
  * instances, such that the concrete class needs to handle only its own internal types.
  *
- * For {@link #multiply(NumeralFormula, NumeralFormula)},
+ * <p>For {@link #multiply(NumeralFormula, NumeralFormula)},
  * {@link #divide(NumeralFormula, NumeralFormula)}, and
  * {@link #modulo(NumeralFormula, NumeralFormula)},
  * this class even offers an implementation based on UFs.
@@ -252,7 +252,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   /** returns DIV when at least one operand is numeric.
    * If the solver or theory does not support this,
-   * we fall back to the UF-encoding of {@link #ufDivide(TFormulaInfo, TFormulaInfo)} */
+   * we fall back to the UF-encoding of {@link #ufDivide(Object, Object)} */
   protected TFormulaInfo linearDivide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     return ufDivide(pParam1, pParam2);
   }
@@ -287,7 +287,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   /** returns MOD when at least one operand is numeric.
    * If the solver or theory does not support this,
-   * we fall back to the UF-encoding of {@link #ufModulo(TFormulaInfo, TFormulaInfo)} */
+   * we fall back to the UF-encoding of {@link #ufModulo(Object, Object)} */
   protected TFormulaInfo linearModulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     return ufModulo(pParam1, pParam2);
   }
@@ -335,7 +335,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   /** returns MULT when at least one operand is numeric.
    * If the solver or theory does not support this,
-   * we fall back to the UF-encoding of {@link #ufMultiply(TFormulaInfo, TFormulaInfo)} */
+   * we fall back to the UF-encoding of {@link #ufMultiply(Object, Object)} */
   protected TFormulaInfo linearMultiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     return ufMultiply(pParam1, pParam2);
   }
