@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.princess;
 
+import static ap.basetypes.IdealInt.ONE;
+import static ap.basetypes.IdealInt.ZERO;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
@@ -53,7 +55,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import ap.SimpleAPI;
-import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
@@ -399,9 +400,8 @@ class PrincessEnvironment {
     final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
     for (IExpression arg : args) {
       ITerm termArg;
-      if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1), TODO why not ITE(t,1,0) ??
-        termArg =
-            new ITermITE((IFormula) arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
+      if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
+        termArg = new ITermITE((IFormula) arg, new IIntLit(ZERO()), new IIntLit(ONE()));
       } else {
         termArg = (ITerm) arg;
       }
@@ -411,7 +411,7 @@ class PrincessEnvironment {
     IExpression returnFormula = new IFunApp(funcDecl, argsBuf.toSeq());
     TermType returnType = getReturnTypeForFunction(funcDecl);
 
-    // boolean term -> build ITE(t > 0, true, false)
+    // boolean term, so we have to use the fun-applier instead of the function itself
     if (returnType == TermType.Boolean) {
       BooleanFunApplier ap = new BooleanFunApplier(funcDecl);
       return ap.apply(argsBuf);
