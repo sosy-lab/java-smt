@@ -166,7 +166,7 @@ typedef jobject jvoid_pointer;
   
 #define STRUCT_RETURN_WITH_CONTEXT \
   if (retval == NULL) { \
-    const char *msg = Z3_get_error_msg(Z3_get_error_code(z3_arg1)); \
+    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
   } \
   return (jlong)((size_t)(retval)); \
@@ -191,7 +191,7 @@ typedef jobject jvoid_pointer;
 
 #define STRING_RETURN_WITH_CONTEXT \
   if (retval == NULL) { \
-    const char *msg = Z3_get_error_msg(Z3_get_error_code(z3_arg1)); \
+    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
     return NULL; \
   } \
@@ -199,7 +199,7 @@ typedef jobject jvoid_pointer;
 
 #define CONST_STRING_RETURN \
   if (retval == NULL) { \
-    const char *msg = Z3_get_error_msg(Z3_get_error_code(z3_arg1)); \
+    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
     return NULL; \
   } \
@@ -212,7 +212,7 @@ typedef jobject jvoid_pointer;
 
 #define FAILURE_CODE_RETURN \
   if (retval != 0) { \
-    const char *msg = Z3_get_error_msg(Z3_get_error_code(z3_arg1)); \
+    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
   } \
 }
