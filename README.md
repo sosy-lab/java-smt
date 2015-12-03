@@ -1,6 +1,6 @@
 # JavaSMT
 
-[![Build Status](https://api.travis-ci.org/dbeyer/java-smt.svg?branch=master "Build Status")](https://travis-ci.org/dbeyer/java-smt)
+[![Build Status](https://api.travis-ci.org/sosy-lab/java-smt.svg?branch=master "Build Status")](https://travis-ci.org/sosy-lab/java-smt)
 
 Unified Java API for SMT solvers.
 
