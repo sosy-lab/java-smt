@@ -4,4 +4,4 @@
 
 Unified Java API for SMT solvers.
 
- - [JavaDoc documentation](http://dbeyer.github.io/java-smt/)
+ - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
