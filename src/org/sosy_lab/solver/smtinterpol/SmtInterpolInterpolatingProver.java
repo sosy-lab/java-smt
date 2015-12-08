@@ -64,9 +64,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   @Override
   public String push(BooleanFormula f) {
     push();
-    String termName = generateTermName();
-    addConstraint(f, termName);
-    return termName;
+    return addConstraint(f);
   }
 
   protected void pushAndAssert(Term annotatedTerm) {
@@ -85,18 +83,16 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
-  public void addConstraint(BooleanFormula f) {
-    addConstraint(f, generateTermName());
-  }
-
-  public void addConstraint(BooleanFormula f, String termName) {
+  public String addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
+    String termName = generateTermName();
     Term t = mgr.extractInfo(f);
     Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
     env.assertTerm(annotatedTerm);
     assertedFormulas.add(termName);
     annotatedTerms.put(termName, t);
     assert assertedFormulas.size() == annotatedTerms.size();
+    return termName;
   }
 
   @Override

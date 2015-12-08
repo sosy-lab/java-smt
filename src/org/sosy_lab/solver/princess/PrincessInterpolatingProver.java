@@ -57,9 +57,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
   public Integer push(BooleanFormula f) {
     Preconditions.checkState(!closed);
     push();
-    int termIndex = counter.getFreshId();
-    addConstraint(f, termIndex);
-    return termIndex;
+    return addConstraint(f);
   }
 
   @Override
@@ -72,20 +70,16 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
   }
 
   @Override
-  public void addConstraint(BooleanFormula f) {
+  public Integer addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     int termIndex = counter.getFreshId();
-    addConstraint(f, termIndex);
-  }
-
-  private void addConstraint(BooleanFormula f, int termIndex) {
-    Preconditions.checkState(!closed);
     IFormula t = (IFormula) mgr.extractInfo(f);
     stack.assertTermInPartition(t, termIndex);
 
     assertedFormulas.add(termIndex);
     annotatedTerms.put(termIndex, t);
     assert assertedFormulas.size() == annotatedTerms.size();
+    return termIndex;
   }
 
   @Override

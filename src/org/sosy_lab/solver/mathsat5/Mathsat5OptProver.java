@@ -71,8 +71,9 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
+  public Void addConstraint(BooleanFormula constraint) {
     msat_assert_formula(curEnv, getMsatTerm(constraint));
+    return null;
   }
 
   @Override

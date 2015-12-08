@@ -61,8 +61,8 @@ public class LoggingInterpolatingProverEnvironment<T>
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
-    wrapped.addConstraint(constraint);
+  public T addConstraint(BooleanFormula constraint) {
+    return wrapped.addConstraint(constraint);
   }
 
   @Override

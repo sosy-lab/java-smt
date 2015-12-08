@@ -118,7 +118,7 @@ class Z3TheoremProver implements ProverEnvironment {
   }
 
   @Override
-  public void addConstraint(BooleanFormula f) {
+  public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     long e = Z3FormulaManager.getZ3Expr(f);
     inc_ref(z3context, e);
@@ -133,6 +133,7 @@ class Z3TheoremProver implements ProverEnvironment {
       solver_assert(z3context, z3solver, e);
     }
     dec_ref(z3context, e);
+    return null;
   }
 
   @Override

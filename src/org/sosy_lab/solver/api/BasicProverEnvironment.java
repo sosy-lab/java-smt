@@ -32,7 +32,8 @@ import javax.annotation.Nullable;
 public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
-   * Add a formula to the environment stack, asserting it.
+   * Push a backtracking point and
+   * add a formula to the environment stack, asserting it.
    * The return value may be used to identify this formula later on
    * in a query (this depends on the sub-type of the environment).
    */
@@ -47,7 +48,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   /**
    * Add constraint to the context.
    */
-  void addConstraint(BooleanFormula constraint);
+  T addConstraint(BooleanFormula constraint);
 
   /**
    * Create backtracking point.

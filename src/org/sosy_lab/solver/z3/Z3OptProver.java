@@ -84,9 +84,11 @@ class Z3OptProver implements OptEnvironment {
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
+  public Void addConstraint(BooleanFormula constraint) {
+    Preconditions.checkState(!closed);
     long z3Constraint = mgr.extractInfo(constraint);
     optimize_assert(z3context, z3optContext, z3Constraint);
+    return null;
   }
 
   @Override

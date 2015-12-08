@@ -71,9 +71,10 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
+  public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     msat_assert_formula(curEnv, getMsatTerm(constraint));
+    return null;
   }
 
   @Override

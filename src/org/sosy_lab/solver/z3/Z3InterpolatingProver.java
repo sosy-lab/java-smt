@@ -89,13 +89,14 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   }
 
   @Override
-  public void addConstraint(BooleanFormula f) {
+  public Long addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     long e = mgr.extractInfo(f);
     inc_ref(z3context, e);
     solver_assert(z3context, z3solver, e);
     assertedFormulas.addLast(e);
     dec_ref(z3context, e);
+    return e;
   }
 
   @Override

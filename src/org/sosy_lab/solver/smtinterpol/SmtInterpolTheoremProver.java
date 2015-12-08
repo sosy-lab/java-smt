@@ -79,11 +79,12 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
+  public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     Term t = mgr.extractInfo(constraint);
     assertedTerms.add(t);
     env.assertTerm(t);
+    return null;
   }
 
   @Override

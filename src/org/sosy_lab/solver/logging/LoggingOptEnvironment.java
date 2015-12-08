@@ -49,9 +49,9 @@ public class LoggingOptEnvironment implements OptEnvironment {
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
+  public Void addConstraint(BooleanFormula constraint) {
     logger.log(Level.FINE, "Asserting: " + constraint);
-    wrapped.addConstraint(constraint);
+    return wrapped.addConstraint(constraint);
   }
 
   @Override

@@ -60,25 +60,21 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
   @Override
   public Integer push(BooleanFormula f) {
     Preconditions.checkState(!closed);
-    long t = mgr.extractInfo(f);
-    if (!useSharedEnv) {
-      t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
-    }
-    int group = msat_create_itp_group(curEnv);
-    msat_push_backtrack_point(curEnv);
-    msat_set_itp_group(curEnv, group);
-    msat_assert_formula(curEnv, t);
-    return group;
+    push();
+    return addConstraint(f);
   }
 
   @Override
-  public void addConstraint(BooleanFormula f) {
+  public Integer addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
+    int group = msat_create_itp_group(curEnv);
+    msat_set_itp_group(curEnv, group);
     long t = mgr.extractInfo(f);
     if (!useSharedEnv) {
       t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
     }
     msat_assert_formula(curEnv, t);
+    return group;
   }
 
   @Override
