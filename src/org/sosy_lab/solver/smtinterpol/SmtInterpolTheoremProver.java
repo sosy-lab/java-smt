@@ -42,8 +42,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 class SmtInterpolTheoremProver implements ProverEnvironment {
 
   private final SmtInterpolFormulaManager mgr;
-  private @Nullable SmtInterpolEnvironment env;
+  private final SmtInterpolEnvironment env;
   private final List<Term> assertedTerms;
+  private boolean closed = false;
 
   private final Function<Term, BooleanFormula> encapsulateBoolean =
       new Function<Term, BooleanFormula>() {
@@ -62,25 +63,26 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
 
   @Override
   public boolean isUnsat() throws InterruptedException {
+    Preconditions.checkState(!closed);
     return !env.checkSat();
   }
 
   @Override
   public Model getModel() {
-    Preconditions.checkNotNull(env);
+    Preconditions.checkState(!closed);
     return SmtInterpolModel.createSmtInterpolModel(env, assertedTerms);
   }
 
   @Override
   public void pop() {
-    Preconditions.checkNotNull(env);
+    Preconditions.checkState(!closed);
     assertedTerms.remove(assertedTerms.size() - 1); // remove last term
     env.pop(1);
   }
 
   @Override
   public Void push(BooleanFormula f) {
-    Preconditions.checkNotNull(env);
+    Preconditions.checkState(!closed);
     final Term t = mgr.extractInfo(f);
     assertedTerms.add(t);
     env.push(1);
@@ -90,17 +92,17 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
 
   @Override
   public void close() {
-    Preconditions.checkNotNull(env);
+    Preconditions.checkState(!closed);
     if (!assertedTerms.isEmpty()) {
       env.pop(assertedTerms.size());
       assertedTerms.clear();
     }
-    env = null;
+    closed = true;
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkNotNull(env);
+    Preconditions.checkState(!closed);
     Term[] terms = env.getUnsatCore();
     return Lists.transform(Arrays.asList(terms), encapsulateBoolean);
   }
@@ -108,6 +110,7 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {
