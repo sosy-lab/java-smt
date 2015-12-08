@@ -101,6 +101,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void>
   }
 
   @Override
+  @Nullable
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     long e = Z3FormulaManager.getZ3Expr(f);

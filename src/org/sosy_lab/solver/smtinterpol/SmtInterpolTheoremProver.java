@@ -35,7 +35,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 
 class SmtInterpolTheoremProver implements ProverEnvironment {
 
@@ -79,6 +82,7 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   }
 
   @Override
+  @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     Term t = mgr.extractInfo(constraint);
@@ -136,7 +140,7 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   }
 
   @Override
-  public Formula evaluate(Formula f) {
+  public <T extends Formula> T evaluate(T f) {
     throw new UnsupportedOperationException("SmtInterpol does not support model " + "evaluation");
   }
 }

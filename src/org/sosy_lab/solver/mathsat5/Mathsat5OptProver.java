@@ -72,6 +72,7 @@ class Mathsat5OptProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
+  @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;

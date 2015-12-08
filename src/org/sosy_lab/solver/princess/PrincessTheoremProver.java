@@ -34,6 +34,8 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
@@ -41,6 +43,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.INot;
 import scala.Option;
+
 
 class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvironment {
 
@@ -66,6 +69,7 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
   }
 
   @Override
+  @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     final IFormula t = castToFormula(mgr.extractInfo(constraint));

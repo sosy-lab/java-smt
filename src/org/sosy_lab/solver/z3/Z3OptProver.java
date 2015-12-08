@@ -58,6 +58,8 @@ import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.logging.Level;
 
+import javax.annotation.Nullable;
+
 class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
 
   private final Z3RationalFormulaManager rfmgr;
@@ -77,6 +79,7 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
   }
 
   @Override
+  @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     long z3Constraint = mgr.extractInfo(constraint);

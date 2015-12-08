@@ -19,17 +19,19 @@
  */
 package org.sosy_lab.solver.z3;
 
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
+
 
 abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final Z3FormulaManager mgr;
