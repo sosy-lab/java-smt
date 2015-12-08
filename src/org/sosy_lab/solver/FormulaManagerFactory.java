@@ -56,10 +56,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Main entry point.
- * Factory class for loading and instantiating SMT solvers.
+ * <p>Factory class for loading and instantiating SMT solvers:
+ * instantiates and loads a {@link FormulaManager} corresponding to the chosen
+ * solver.
+ *
+ * <p>Main entry point.
  */
-@Options(deprecatedPrefix = "cpa.predicate", prefix = "solver")
+@Options(prefix="solver", deprecatedPrefix="cpa.predicate")
 public class FormulaManagerFactory {
 
   @VisibleForTesting
@@ -264,7 +267,7 @@ public class FormulaManagerFactory {
         result = smtInterpolFactory;
         if (result == null) {
           try {
-            ClassLoader classLoader = getClassLoader(logger);
+            ClassLoader classLoader = getClassLoaderForSmtInterpol(logger);
 
             @SuppressWarnings("unchecked")
             Class<? extends SolverFactory> factoryClass =
@@ -282,7 +285,7 @@ public class FormulaManagerFactory {
     return result;
   }
 
-  private static ClassLoader getClassLoader(LogManager logger) {
+  private static ClassLoader getClassLoaderForSmtInterpol(LogManager logger) {
     ClassLoader classLoader = smtInterpolClassLoader.get();
     if (classLoader != null) {
       return classLoader;
