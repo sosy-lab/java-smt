@@ -91,7 +91,7 @@ public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoClosea
    * Evaluate the formula with the previously generated model.
    * Assumes that the previous call was {@link #getModel}.
    */
-  Formula evaluate(Formula f);
+  <T extends Formula> T evaluate(T f);
 
   /**
    * Status of the optimization problem.

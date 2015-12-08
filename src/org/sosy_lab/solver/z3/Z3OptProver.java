@@ -170,7 +170,7 @@ class Z3OptProver implements OptEnvironment {
   }
 
   @Override
-  public Formula evaluate(Formula expr) {
+  public <T extends Formula> T evaluate(T expr) {
     Z3Formula input = (Z3Formula) expr;
     long z3model = optimize_get_model(z3context, z3optContext);
     model_inc_ref(z3context, z3model);
@@ -179,7 +179,7 @@ class Z3OptProver implements OptEnvironment {
     boolean status = model_eval(z3context, z3model, input.getFormulaInfo(), true, out);
     Verify.verify(status, "Error during model evaluation");
 
-    Formula outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(expr), out.value);
+    T outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(expr), out.value);
 
     model_dec_ref(z3context, z3model);
     return outValue;
