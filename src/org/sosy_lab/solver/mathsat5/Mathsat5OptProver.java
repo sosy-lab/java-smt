@@ -119,6 +119,14 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
     stack.add(ImmutableMap.copyOf(objectiveMap));
   }
 
+  @Nullable
+  @Override
+  public Void push(BooleanFormula f) {
+    push();
+    addConstraint(f);
+    return null;
+  }
+
   @Override
   public void pop() {
     msat_pop_backtrack_point(curEnv);

@@ -129,8 +129,20 @@ class Z3OptProver implements OptEnvironment {
   }
 
   @Override
+  public Void push(BooleanFormula f) {
+    push();
+    addConstraint(f);
+    return null;
+  }
+
+  @Override
   public void pop() {
     optimize_pop(z3context, z3optContext);
+  }
+
+  @Override
+  public boolean isUnsat() throws SolverException, InterruptedException {
+    return check() == OptStatus.UNSAT;
   }
 
   @Override

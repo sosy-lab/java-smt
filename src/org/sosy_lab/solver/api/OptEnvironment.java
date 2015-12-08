@@ -28,7 +28,7 @@ import org.sosy_lab.solver.SolverException;
 /**
  * Interface for optimization modulo SMT.
  */
-public interface OptEnvironment extends AutoCloseable {
+public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
 
   /**
    * Add constraint to the context.
