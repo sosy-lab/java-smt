@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-solver-optimathsat">
-        <license name="LGPL" url="http://www.gnu.org/licenses/lgpl-3.0.en.html"/>
+        <license name="For research and evaluation purposes only" url="http://optimathsat.disi.unitn.it/pages/download.html"/>
         <description>
             OptiMathSAT solver and the JavaSMT JNI wrapper.
         </description>
