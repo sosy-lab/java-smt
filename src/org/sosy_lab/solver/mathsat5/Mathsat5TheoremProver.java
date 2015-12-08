@@ -64,15 +64,15 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
 
   @Override
   public @Nullable Void push(BooleanFormula f) {
-    Preconditions.checkState(curEnv != 0);
     msat_push_backtrack_point(curEnv);
     msat_assert_formula(curEnv, getMsatTerm(f));
+    Preconditions.checkState(!closed);
     return null;
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
     long[] terms = msat_get_unsat_core(curEnv);
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {
@@ -84,7 +84,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver implements ProverEnvi
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-
+    Preconditions.checkState(!closed);
     long[] imp = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

@@ -59,9 +59,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
 
   @Override
   public Integer push(BooleanFormula f) {
-    Preconditions.checkState(curEnv != 0);
-    long t = Mathsat5FormulaManager.getMsatTerm(f);
-    //long t = ((Mathsat5Formula)f).getTerm();
+    Preconditions.checkState(!closed);
+    long t = mgr.extractInfo(f);
     if (!useSharedEnv) {
       t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
     }
@@ -74,7 +73,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
 
   @Override
   public BooleanFormula getInterpolant(List<Integer> formulasOfA) throws SolverException {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
 
     int[] groupsOfA = new int[formulasOfA.size()];
     int i = 0;
@@ -124,7 +123,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
   public List<BooleanFormula> getTreeInterpolants(
       List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException(
-        "directly receiving of tree interpolants is not supported."
+        "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");
   }
 }

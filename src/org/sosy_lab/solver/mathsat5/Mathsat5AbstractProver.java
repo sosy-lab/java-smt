@@ -46,11 +46,11 @@ import java.util.List;
 abstract class Mathsat5AbstractProver {
 
   protected final Mathsat5FormulaManager mgr;
-  protected long curEnv;
+  protected final long curEnv;
   private final long curConfig;
   private final boolean useSharedEnv;
-
   private final long terminationTest;
+  protected boolean closed = false;
 
   protected Mathsat5AbstractProver(
       Mathsat5FormulaManager pMgr, long pConfig, boolean pShared, boolean pGhostFilter) {
@@ -62,7 +62,7 @@ abstract class Mathsat5AbstractProver {
   }
 
   public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
     try {
       return !msat_check_sat(curEnv);
     } catch (IllegalStateException e) {
@@ -73,7 +73,7 @@ abstract class Mathsat5AbstractProver {
 
   public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
     try {
       long[] assumptions =
           Longs.toArray(
@@ -108,20 +108,20 @@ abstract class Mathsat5AbstractProver {
   }
 
   public Model getModel() throws SolverException {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
     return Mathsat5Model.createMathsatModel(curEnv);
   }
 
   public void pop() {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
     msat_pop_backtrack_point(curEnv);
   }
 
   public void close() {
-    Preconditions.checkState(curEnv != 0);
+    Preconditions.checkState(!closed);
     msat_destroy_env(curEnv);
-    curEnv = 0;
     msat_free_termination_test(terminationTest);
     msat_destroy_config(curConfig);
+    closed = true;
   }
 }
