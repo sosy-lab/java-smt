@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolTheoremProver implements ProverEnvironment {

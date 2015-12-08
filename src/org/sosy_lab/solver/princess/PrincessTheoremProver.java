@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
 
 import com.google.common.base.Preconditions;
+
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;

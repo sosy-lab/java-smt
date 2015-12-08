@@ -28,12 +28,13 @@ import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import javax.annotation.Nullable;
 
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {

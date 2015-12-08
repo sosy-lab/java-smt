@@ -22,6 +22,7 @@ package org.sosy_lab.solver.princess;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
+
 import org.sosy_lab.solver.Model;
 
 abstract class PrincessAbstractProver {
