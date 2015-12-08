@@ -23,6 +23,7 @@ import static com.google.common.base.Predicates.in;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -55,6 +56,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
   @Override
   public Integer push(BooleanFormula f) {
     IFormula t = (IFormula) mgr.extractInfo(f);
+    Preconditions.checkState(!closed);
     int termIndex = counter.getFreshId();
 
     stack.push(1);
@@ -68,6 +70,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
 
   @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     Integer removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
     annotatedTerms.remove(removed);
     assert assertedFormulas.size() == annotatedTerms.size();
@@ -76,8 +79,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
 
   @Override
   public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) {
-    assert stack != null;
-    assert mgr != null;
+    Preconditions.checkState(!closed);
     Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
@@ -92,6 +94,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> pTermNamesOfA) {
+    Preconditions.checkState(!closed);
 
     // get interpolant of groups
     final List<IFormula> itps = stack.getInterpolants(pTermNamesOfA);
@@ -107,12 +110,13 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
   public List<BooleanFormula> getTreeInterpolants(
       List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException(
-        "directly receiving of tree interpolants is not supported."
+        "Direct generation of tree interpolants is not supported.\n"
             + "Use another solver or another strategy for interpolants.");
   }
 
   @Override
   public Model getModel() {
+    Preconditions.checkState(!closed);
     assert assertedFormulas.size() == annotatedTerms.size();
     final List<IExpression> values = Lists.<IExpression>newArrayList(annotatedTerms.values());
     return PrincessModel.createModel(stack, values);

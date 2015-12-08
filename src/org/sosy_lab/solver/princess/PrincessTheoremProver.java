@@ -22,6 +22,7 @@ package org.sosy_lab.solver.princess;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
 
+import com.google.common.base.Preconditions;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
@@ -52,11 +53,13 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
 
   @Override
   public Model getModel() {
+    Preconditions.checkState(!closed);
     return PrincessModel.createModel(stack, assertedTerms);
   }
 
   @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     assertedTerms.remove(assertedTerms.size() - 1); // remove last term
     stack.pop(1);
   }
@@ -78,6 +81,7 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
   @Override
   public <T> T allSat(ProverEnvironment.AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
 
     // unpack formulas to terms
     List<IFormula> importantFormulas = new ArrayList<>(important.size());
@@ -99,8 +103,6 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
 
           wrappedPartialModel.add(mgr.encapsulateBooleanFormula(newElement));
           newFormula = new IBinFormula(IBinJunctor.And(), newFormula, newElement);
-        } else {
-          // when does this happen? if formula was not asserted?
         }
       }
       callback.apply(wrappedPartialModel);
