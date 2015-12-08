@@ -185,10 +185,10 @@ class PrincessEnvironment {
 
   public List<IExpression> parseStringToTerms(String s) {
 
-    Tuple3<Seq<IFormula>,
-           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
-           scala.collection.immutable.Map<ConstantTerm, SMTType>> triple =
-        api.extractSMTLIBAssertionsSymbols(new StringReader(s));
+    Tuple3<
+            Seq<IFormula>, scala.collection.immutable.Map<IFunction, SMTFunctionType>,
+            scala.collection.immutable.Map<ConstantTerm, SMTType>>
+        triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
 
     List<IExpression> formula = castToExpression(seqAsJavaList(triple._1()));
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());

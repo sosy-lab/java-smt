@@ -238,6 +238,5 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   private static String generateTermName() {
     return PREFIX + termIdGenerator.getFreshId();
-
   }
 }

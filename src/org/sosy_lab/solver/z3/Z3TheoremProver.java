@@ -190,7 +190,7 @@ class Z3TheoremProver implements ProverEnvironment {
       pop();
     }
     solver_dec_ref(z3context, z3solver);
-   
+
     closed = true;
   }
 
