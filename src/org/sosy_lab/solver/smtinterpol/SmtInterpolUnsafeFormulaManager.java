@@ -33,6 +33,8 @@ import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+import javax.annotation.Nullable;
+
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
@@ -69,6 +71,7 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
+  @Nullable
   public Term getArg(Term pT, int pN) {
     return SmtInterpolUtil.getArg(pT, pN);
   }
@@ -125,6 +128,7 @@ class SmtInterpolUnsafeFormulaManager
     if (SmtInterpolUtil.isFunction(pF, "=") && SmtInterpolUtil.getArity(pF) == 2) {
       Term arg0 = SmtInterpolUtil.getArg(pF, 0);
       Term arg1 = SmtInterpolUtil.getArg(pF, 1);
+      assert arg0 != null && arg1 != null;
       assert arg0.getSort().equals(arg1.getSort());
       if (!SmtInterpolUtil.isBoolean(arg0)) {
         return ImmutableList.of(
