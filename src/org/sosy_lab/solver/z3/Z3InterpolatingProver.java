@@ -26,7 +26,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_interpolant;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
-import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
@@ -77,10 +76,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     long e = Z3FormulaManager.getZ3Expr(f);
     solver_push(z3context, z3solver);
 
-    if (mgr.simplifyFormulas) {
-      e = simplify(z3context, e);
-      inc_ref(z3context, e);
-    }
 
     solver_assert(z3context, z3solver, e);
     assertedFormulas.addLast(e);

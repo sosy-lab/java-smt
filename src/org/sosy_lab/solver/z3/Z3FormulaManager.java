@@ -75,9 +75,6 @@ import javax.annotation.Nullable;
 public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     implements AutoCloseable {
 
-  @Option(secure = true, description = "simplify formulas when they are asserted in a solver.")
-  boolean simplifyFormulas = false;
-
   /** Optimization settings */
   @Option(
     secure = true,

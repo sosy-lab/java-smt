@@ -32,7 +32,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert_and_track;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
@@ -106,11 +105,6 @@ class Z3TheoremProver implements ProverEnvironment {
     Preconditions.checkArgument(z3context != 0);
     solver_push(z3context, z3solver);
     long e = Z3FormulaManager.getZ3Expr(f);
-
-    if (mgr.simplifyFormulas) {
-      e = simplify(z3context, e);
-      inc_ref(z3context, e);
-    }
 
     if (storedConstraints != null) { // Unsat core generation is on.
       String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
