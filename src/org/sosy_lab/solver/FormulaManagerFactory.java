@@ -56,7 +56,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * <p>Factory class for loading and instantiating SMT solvers:
+ * Factory class for loading and instantiating SMT solvers:
  * instantiates and loads a {@link FormulaManager} corresponding to the chosen
  * solver.
  *

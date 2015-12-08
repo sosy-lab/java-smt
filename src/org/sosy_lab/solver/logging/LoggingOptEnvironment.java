@@ -31,8 +31,9 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptEnvironment;
 
-import javax.annotation.Nullable;
 import java.util.logging.Level;
+
+import javax.annotation.Nullable;
 
 /**
  * Wrapper for an optimizing solver.
