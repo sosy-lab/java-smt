@@ -39,7 +39,6 @@ import javax.annotation.Nullable;
 
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-
 class SmtInterpolTheoremProver implements ProverEnvironment {
 
   private final SmtInterpolFormulaManager mgr;

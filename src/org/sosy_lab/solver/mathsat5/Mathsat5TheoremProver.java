@@ -41,8 +41,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void>
-    implements ProverEnvironment {
+class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
 
   private static final boolean USE_SHARED_ENV = true;
 

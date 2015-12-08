@@ -32,7 +32,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
-
 abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final Z3FormulaManager mgr;
   protected final long z3context;
@@ -62,9 +61,7 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
     boolean status = model_eval(z3context, z3model, mgr.extractInfo(f), true, out);
     Verify.verify(status, "Error during model evaluation");
 
-    E2 outValue = mgr.getFormulaCreator().encapsulate(
-        mgr.getFormulaType(f),
-        out.value);
+    E2 outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(f), out.value);
 
     model_dec_ref(z3context, z3model);
     return outValue;

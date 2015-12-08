@@ -44,7 +44,6 @@ import ap.parser.IFormula;
 import ap.parser.INot;
 import scala.Option;
 
-
 class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvironment {
 
   private final List<IExpression> assertedTerms = new ArrayList<>();

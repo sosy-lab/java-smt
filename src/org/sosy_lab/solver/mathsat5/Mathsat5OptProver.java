@@ -38,8 +38,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class Mathsat5OptProver extends Mathsat5AbstractProver<Void>
-    implements OptEnvironment {
+class Mathsat5OptProver extends Mathsat5AbstractProver<Void> implements OptEnvironment {
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /**

@@ -136,7 +136,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
 
   @Override
   public <T extends Formula> T evaluate(T f) {
-    throw new UnsupportedOperationException(
-        "Princess does not support term evaluation");
+    throw new UnsupportedOperationException("Princess does not support term evaluation");
   }
 }

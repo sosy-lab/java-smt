@@ -62,8 +62,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class Z3TheoremProver extends Z3AbstractProver<Void>
-    implements ProverEnvironment {
+class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
 
   private final ShutdownNotifier shutdownNotifier;
   private final long z3solver;
@@ -231,5 +230,4 @@ class Z3TheoremProver extends Z3AbstractProver<Void>
     solver_pop(z3context, z3solver, 1);
     return callback.getResult();
   }
-
 }

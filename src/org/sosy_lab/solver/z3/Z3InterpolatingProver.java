@@ -54,7 +54,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
-
 class Z3InterpolatingProver extends Z3AbstractProver<Long>
     implements InterpolatingProverEnvironment<Long> {
 
