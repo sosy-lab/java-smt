@@ -29,6 +29,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_num_scopes;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
@@ -41,7 +43,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
@@ -53,18 +54,18 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
-class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
-  private final Z3FormulaManager mgr;
+class Z3InterpolatingProver extends Z3AbstractProver<Long>
+    implements InterpolatingProverEnvironment<Long> {
+
   private final long z3context;
   private final long z3solver;
-  private boolean closed = false;
 
   private int level = 0;
   private final Deque<Long> assertedFormulas = new ArrayDeque<>();
 
   Z3InterpolatingProver(Z3FormulaManager mgr, long z3params) {
-    this.mgr = mgr;
+    super(mgr);
     this.z3context = mgr.getEnvironment();
     this.z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
@@ -72,16 +73,9 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   }
 
   @Override
-  public Long push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    addConstraint(f);
-    return mgr.extractInfo(f);
-  }
-
-  @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(solver_get_num_scopes(z3context, z3solver) >= 1);
     level--;
 
     assertedFormulas.removeLast();
@@ -240,16 +234,15 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   }
 
   @Override
-  public Model getModel() {
-    Preconditions.checkState(!closed);
-    return Z3Model.createZ3Model(z3context, z3solver);
+  protected long getZ3Model() {
+    return solver_get_model(z3context, z3solver);
   }
 
   @Override
   public void close() {
     Preconditions.checkState(!closed);
 
-    while (level > 0) { // TODO do we need this?
+    while (level > 0) {
       pop();
     }
     assertedFormulas.clear();

@@ -25,9 +25,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_optimize;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_params;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_check;
 import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_dec_ref;
@@ -46,37 +43,33 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.params_set_symbol;
 import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Verify;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
-import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.logging.Level;
 
-class Z3OptProver implements OptEnvironment {
+class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
 
-  private final Z3FormulaManager mgr;
   private final Z3RationalFormulaManager rfmgr;
   private final LogManager logger;
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
-  private long z3context;
-  private long z3optContext;
+  private final long z3optContext;
   private final ShutdownNotifier shutdownNotifier;
+  private boolean closed = false;
 
   Z3OptProver(Z3FormulaManager pMgr, ShutdownNotifier pShutdownNotifier, LogManager pLogger) {
-    mgr = pMgr;
+    super(pMgr);
     rfmgr = (Z3RationalFormulaManager) pMgr.getRationalFormulaManager();
-    z3context = mgr.getEnvironment();
     z3optContext = mk_optimize(z3context);
     optimize_inc_ref(z3context, z3optContext);
     shutdownNotifier = checkNotNull(pShutdownNotifier);
@@ -93,18 +86,21 @@ class Z3OptProver implements OptEnvironment {
 
   @Override
   public int maximize(Formula objective) {
+    Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
     return optimize_maximize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
   public int minimize(Formula objective) {
+    Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
     return optimize_minimize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
     try {
       int status = optimize_check(z3context, z3optContext);
       if (status == Z3_LBOOL.Z3_L_FALSE.status) {
@@ -127,28 +123,25 @@ class Z3OptProver implements OptEnvironment {
 
   @Override
   public void push() {
+    Preconditions.checkState(!closed);
     optimize_push(z3context, z3optContext);
   }
 
   @Override
-  public Void push(BooleanFormula f) {
-    push();
-    addConstraint(f);
-    return null;
-  }
-
-  @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     optimize_pop(z3context, z3optContext);
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
     return check() == OptStatus.UNSAT;
   }
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
+    Preconditions.checkState(!closed);
     long ast = optimize_get_upper(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
       return Optional.absent();
@@ -158,6 +151,7 @@ class Z3OptProver implements OptEnvironment {
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
+    Preconditions.checkState(!closed);
     long ast = optimize_get_lower(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
       return Optional.absent();
@@ -166,25 +160,8 @@ class Z3OptProver implements OptEnvironment {
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    long z3model = optimize_get_model(z3context, z3optContext);
-    return Z3Model.parseZ3Model(z3context, z3model);
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T expr) {
-    Z3Formula input = (Z3Formula) expr;
-    long z3model = optimize_get_model(z3context, z3optContext);
-    model_inc_ref(z3context, z3model);
-
-    PointerToLong out = new PointerToLong();
-    boolean status = model_eval(z3context, z3model, input.getFormulaInfo(), true, out);
-    Verify.verify(status, "Error during model evaluation");
-
-    T outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(expr), out.value);
-
-    model_dec_ref(z3context, z3model);
-    return outValue;
+  protected long getZ3Model() {
+    return optimize_get_model(z3context, z3optContext);
   }
 
   void setParam(String key, String value) {
@@ -201,14 +178,15 @@ class Z3OptProver implements OptEnvironment {
    */
   @Override
   public String toString() {
+    Preconditions.checkState(!closed);
     return optimize_to_string(z3context, z3optContext);
   }
 
   @Override
   public void close() {
+    Preconditions.checkState(!closed);
     optimize_dec_ref(z3context, z3optContext);
-    z3context = 0;
-    z3optContext = 0;
+    closed = true;
   }
 
   private boolean isInfinity(long ast) {
@@ -238,6 +216,7 @@ class Z3OptProver implements OptEnvironment {
 
   @Override
   public String dump() {
+    Preconditions.checkState(!closed);
     return optimize_to_string(z3context, z3optContext);
   }
 }

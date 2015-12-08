@@ -29,10 +29,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert_and_track;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
@@ -48,17 +45,14 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
-import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayList;
@@ -68,11 +62,10 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class Z3TheoremProver implements ProverEnvironment {
+class Z3TheoremProver extends Z3AbstractProver<Void>
+    implements ProverEnvironment {
 
   private final ShutdownNotifier shutdownNotifier;
-  private final Z3FormulaManager mgr;
-  private final long z3context;
   private final long z3solver;
   private int level = 0;
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
@@ -87,8 +80,7 @@ class Z3TheoremProver implements ProverEnvironment {
       long z3params,
       ShutdownNotifier pShutdownNotifier,
       boolean generateUnsatCore) {
-    mgr = pMgr;
-    z3context = mgr.getEnvironment();
+    super(pMgr);
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
@@ -101,19 +93,10 @@ class Z3TheoremProver implements ProverEnvironment {
   }
 
   @Override
-  public Void push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    addConstraint(f);
-    return null;
-  }
-
-  @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(solver_get_num_scopes(z3context, z3solver) >= 1);
     level--;
-
-    Preconditions.checkArgument(solver_get_num_scopes(z3context, z3solver) >= 1);
     solver_pop(z3context, z3solver, 1);
   }
 
@@ -153,9 +136,14 @@ class Z3TheoremProver implements ProverEnvironment {
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  protected long getZ3Model() {
+    return solver_get_model(z3context, z3solver);
+  }
+
+  @Override
+  public Model getModel() {
     Preconditions.checkState(!closed);
-    return Z3Model.createZ3Model(z3context, z3solver);
+    return Z3Model.parseZ3Model(z3context, getZ3Model());
   }
 
   @Override
@@ -187,7 +175,7 @@ class Z3TheoremProver implements ProverEnvironment {
         solver_get_num_scopes(z3context, z3solver) >= 0,
         "a negative number of scopes is not allowed");
 
-    while (level > 0) { // TODO do we need this?
+    while (level > 0) {
       pop();
     }
     solver_dec_ref(z3context, z3solver);
@@ -243,20 +231,4 @@ class Z3TheoremProver implements ProverEnvironment {
     return callback.getResult();
   }
 
-  @Override
-  public Formula evaluate(Formula f) {
-    Preconditions.checkState(!closed);
-    Z3Formula input = (Z3Formula) f;
-    long z3model = solver_get_model(z3context, z3solver);
-    model_inc_ref(z3context, z3model);
-
-    PointerToLong out = new PointerToLong();
-    boolean status = model_eval(z3context, z3model, input.getFormulaInfo(), true, out);
-    Verify.verify(status, "Error during model evaluation");
-
-    Formula outValue = mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(f), out.value);
-
-    model_dec_ref(z3context, z3model);
-    return outValue;
-  }
 }
