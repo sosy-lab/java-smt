@@ -71,14 +71,15 @@ class Z3TheoremProver implements ProverEnvironment {
 
   private final ShutdownNotifier shutdownNotifier;
   private final Z3FormulaManager mgr;
-  private long z3context;
-  private long z3solver;
+  private final long z3context;
+  private final long z3solver;
   private int level = 0;
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
 
   private static final String UNSAT_CORE_TEMP_VARNAME = "UNSAT_CORE_%d";
 
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
+  private boolean closed = false;
 
   Z3TheoremProver(
       Z3FormulaManager pMgr,
@@ -101,6 +102,7 @@ class Z3TheoremProver implements ProverEnvironment {
   @Override
   public Void push(BooleanFormula f) {
     level++;
+    Preconditions.checkState(!closed);
 
     Preconditions.checkArgument(z3context != 0);
     solver_push(z3context, z3solver);
@@ -128,6 +130,7 @@ class Z3TheoremProver implements ProverEnvironment {
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
     int result = solver_check(z3context, z3solver);
     shutdownNotifier.shutdownIfNecessary();
     Preconditions.checkArgument(result != Z3_LBOOL.Z3_L_UNDEF.status);
@@ -136,11 +139,13 @@ class Z3TheoremProver implements ProverEnvironment {
 
   @Override
   public Model getModel() throws SolverException {
+    Preconditions.checkState(!closed);
     return Z3Model.createZ3Model(z3context, z3solver);
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed);
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating"
@@ -162,8 +167,7 @@ class Z3TheoremProver implements ProverEnvironment {
 
   @Override
   public void close() {
-    Preconditions.checkArgument(z3context != 0);
-    Preconditions.checkArgument(z3solver != 0);
+    Preconditions.checkState(!closed);
     Preconditions.checkArgument(
         solver_get_num_scopes(z3context, z3solver) >= 0,
         "a negative number of scopes is not allowed");
@@ -171,17 +175,17 @@ class Z3TheoremProver implements ProverEnvironment {
     while (level > 0) { // TODO do we need this?
       pop();
     }
-
-    //solver_reset(z3context, z3solver);
     solver_dec_ref(z3context, z3solver);
-    z3context = 0;
-    z3solver = 0;
+   
+    closed = true;
   }
 
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    // unpack formulas to terms
+    Preconditions.checkState(!closed);
+
+    // Unpack formulas to terms.
     long[] importantFormulas = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

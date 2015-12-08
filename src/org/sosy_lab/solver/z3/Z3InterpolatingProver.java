@@ -56,8 +56,10 @@ import java.util.Set;
 class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   private final Z3FormulaManager mgr;
-  private long z3context;
-  private long z3solver;
+  private final long z3context;
+  private final long z3solver;
+  private boolean closed = false;
+
   private int level = 0;
   private final Deque<Long> assertedFormulas = new ArrayDeque<>();
 
@@ -79,10 +81,12 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     solver_assert(z3context, z3solver, e);
     assertedFormulas.addLast(e);
     return e;
+    Preconditions.checkState(!closed);
   }
 
   @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     level--;
 
     assertedFormulas.removeLast();
@@ -91,8 +95,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   @Override
   public boolean isUnsat() throws Z3SolverException {
-    Preconditions.checkState(z3context != 0);
-    Preconditions.checkState(z3solver != 0);
+    Preconditions.checkState(!closed);
     int result = solver_check(z3context, z3solver);
 
     Preconditions.checkState(result != Z3_LBOOL.Z3_L_UNDEF.status);
@@ -102,6 +105,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
   public BooleanFormula getInterpolant(final List<Long> formulasOfA) {
+    Preconditions.checkState(!closed);
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     // we have to handle equal formulas on the stack,
@@ -121,6 +125,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas) {
+    Preconditions.checkState(!closed);
     Preconditions.checkArgument(
         partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
 
@@ -131,7 +136,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
   @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<Set<Long>> partitionedFormulas, int[] startOfSubTree) {
-
+    Preconditions.checkState(!closed);
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
     // build conjunction of each partition
@@ -223,13 +228,13 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   @Override
   public Model getModel() {
+    Preconditions.checkState(!closed);
     return Z3Model.createZ3Model(z3context, z3solver);
   }
 
   @Override
   public void close() {
-    Preconditions.checkState(z3context != 0);
-    Preconditions.checkState(z3solver != 0);
+    Preconditions.checkState(!closed);
 
     while (level > 0) { // TODO do we need this?
       pop();
@@ -238,8 +243,7 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     //TODO solver_reset(z3context, z3solver);
     solver_dec_ref(z3context, z3solver);
-    z3context = 0;
-    z3solver = 0;
+    closed = true;
   }
 
   private static class Z3TreeInterpolant {
