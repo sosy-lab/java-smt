@@ -27,6 +27,7 @@ import static java.util.Collections.singleton;
 import static org.sosy_lab.solver.princess.PrincessUtil.getVarsAndUIFs;
 import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
+import static scala.collection.JavaConversions.seqAsJavaList;
 
 import com.google.common.collect.Sets;
 
@@ -66,8 +67,13 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.SMTLineariser;
+import ap.parser.SMTParser2InputAbsy;
+import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
+import ap.parser.SMTParser2InputAbsy.SMTType;
+import ap.terfor.ConstantTerm;
 import scala.Tuple2;
-import scala.collection.JavaConversions;
+import scala.Tuple3;
+import scala.collection.Seq;
 import scala.collection.mutable.ArrayBuffer;
 
 /** This is a Wrapper around Princess.
@@ -178,9 +184,14 @@ class PrincessEnvironment {
   }
 
   public List<IExpression> parseStringToTerms(String s) {
-    List<IExpression> formula =
-        castToExpression(
-            JavaConversions.seqAsJavaList(api.extractSMTLIBAssertions(new StringReader(s))));
+
+    Tuple3<Seq<IFormula>,
+           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
+           scala.collection.immutable.Map<ConstantTerm, SMTType>> triple =
+        api.extractSMTLIBAssertionsSymbols(new StringReader(s));
+
+    List<IExpression> formula = castToExpression(seqAsJavaList(triple._1()));
+    Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
 
     Set<IExpression> declaredfunctions = PrincessUtil.getVarsAndUIFs(formula);
     for (IExpression var : declaredfunctions) {
@@ -197,14 +208,23 @@ class PrincessEnvironment {
       } else if (var instanceof IFunApp) {
         IFunction fun = ((IFunApp) var).fun();
         functionsCache.put(fun.name(), fun);
-        // up to now princess only supports int as return type
-        functionsReturnTypes.put(fun, TermType.Integer);
+
+        functionsReturnTypes.put(fun, convertToTermType(functionTypes.get(fun)));
         for (SymbolTrackingPrincessStack stack : registeredStacks) {
           stack.addSymbol(fun);
         }
       }
     }
     return formula;
+  }
+
+  private TermType convertToTermType(SMTFunctionType type) {
+    SMTType resultType = type.result();
+    if (resultType.equals(SMTParser2InputAbsy.SMTBool$.MODULE$)) {
+      return TermType.Boolean;
+    } else {
+      return TermType.Integer;
+    }
   }
 
   private List<IExpression> castToExpression(List<IFormula> formula) {
