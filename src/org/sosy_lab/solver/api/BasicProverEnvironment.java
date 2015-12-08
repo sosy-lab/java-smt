@@ -45,6 +45,16 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   void pop();
 
   /**
+   * Add constraint to the context.
+   */
+  void addConstraint(BooleanFormula constraint);
+
+  /**
+   * Create backtracking point.
+   */
+  void push();
+
+  /**
    * Check whether the conjunction of all formulas on the stack is unsatisfiable.
    */
   boolean isUnsat() throws SolverException, InterruptedException;

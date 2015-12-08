@@ -52,7 +52,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   private boolean closed = false;
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
-      new UniqueIdGenerator(); // for different termnames // TODO static?
+      new UniqueIdGenerator(); // for different termnames
 
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
     mgr = pMgr;
@@ -63,22 +63,15 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   @Override
   public String push(BooleanFormula f) {
-
-    Term t = mgr.extractInfo(f);
-    //Term t = ((SmtInterpolFormula)f).getTerm();
-
-    String termName = PREFIX + termIdGenerator.getFreshId();
-    Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
-    pushAndAssert(annotatedTerm);
-    assertedFormulas.add(termName);
-    annotatedTerms.put(termName, t);
-    assert assertedFormulas.size() == annotatedTerms.size();
+    push();
+    String termName = generateTermName();
+    addConstraint(f, termName);
     return termName;
   }
 
   protected void pushAndAssert(Term annotatedTerm) {
-    env.push(1);
     Preconditions.checkState(!closed);
+    push();
     env.assertTerm(annotatedTerm);
   }
 
@@ -92,8 +85,29 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
+  public void addConstraint(BooleanFormula f) {
+    addConstraint(f, generateTermName());
+  }
+
+  public void addConstraint(BooleanFormula f, String termName) {
     Preconditions.checkState(!closed);
+    Term t = mgr.extractInfo(f);
+    Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
+    env.assertTerm(annotatedTerm);
+    assertedFormulas.add(termName);
+    annotatedTerms.put(termName, t);
+    assert assertedFormulas.size() == annotatedTerms.size();
+  }
+
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    env.push(1);
+  }
+
+  @Override
   public boolean isUnsat() throws InterruptedException {
+    Preconditions.checkState(!closed);
     return !env.checkSat();
   }
 
@@ -220,5 +234,10 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     assert assertedFormulas.size() == annotatedTerms.size();
 
     return SmtInterpolModel.createSmtInterpolModel(env, annotatedTerms.values());
+  }
+
+  private static String generateTermName() {
+    return PREFIX + termIdGenerator.getFreshId();
+
   }
 }

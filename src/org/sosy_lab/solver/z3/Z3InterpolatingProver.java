@@ -73,15 +73,10 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
   @Override
   public Long push(BooleanFormula f) {
-    level++;
-
-    long e = Z3FormulaManager.getZ3Expr(f);
-    solver_push(z3context, z3solver);
-
-    solver_assert(z3context, z3solver, e);
-    assertedFormulas.addLast(e);
-    return e;
     Preconditions.checkState(!closed);
+    push();
+    addConstraint(f);
+    return mgr.extractInfo(f);
   }
 
   @Override
@@ -91,6 +86,23 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
 
     assertedFormulas.removeLast();
     solver_pop(z3context, z3solver, 1);
+  }
+
+  @Override
+  public void addConstraint(BooleanFormula f) {
+    Preconditions.checkState(!closed);
+    long e = mgr.extractInfo(f);
+    inc_ref(z3context, e);
+    solver_assert(z3context, z3solver, e);
+    assertedFormulas.addLast(e);
+    dec_ref(z3context, e);
+  }
+
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    level++;
+    solver_push(z3context, z3solver);
   }
 
   @Override

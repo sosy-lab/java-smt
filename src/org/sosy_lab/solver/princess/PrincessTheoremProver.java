@@ -65,11 +65,24 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
   }
 
   @Override
-  public Void push(BooleanFormula f) {
-    final IFormula t = castToFormula(mgr.extractInfo(f));
+  public void addConstraint(BooleanFormula constraint) {
+    Preconditions.checkState(!closed);
+    final IFormula t = castToFormula(mgr.extractInfo(constraint));
     assertedTerms.add(t);
-    stack.push(1);
     stack.assertTerm(t);
+  }
+
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    stack.push(1);
+  }
+
+  @Override
+  public Void push(BooleanFormula f) {
+    Preconditions.checkState(!closed);
+    push();
+    addConstraint(f);
     return null;
   }
 

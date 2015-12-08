@@ -59,6 +59,17 @@ public class LoggingProverEnvironment implements ProverEnvironment {
   }
 
   @Override
+  public void addConstraint(BooleanFormula constraint) {
+    wrapped.addConstraint(constraint);
+  }
+
+  @Override
+  public void push() {
+    logger.log(Level.FINE, "up to level " + level++);
+    wrapped.push();
+  }
+
+  @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     boolean result = wrapped.isUnsat();
     logger.log(Level.FINE, "unsat-check returned:", result);

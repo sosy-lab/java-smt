@@ -61,6 +61,17 @@ public class LoggingInterpolatingProverEnvironment<T>
   }
 
   @Override
+  public void addConstraint(BooleanFormula constraint) {
+    wrapped.addConstraint(constraint);
+  }
+
+  @Override
+  public void push() {
+    logger.log(Level.FINER, "up to level " + ++level);
+    wrapped.push();
+  }
+
+  @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     boolean result = wrapped.isUnsat();
     logger.log(Level.FINE, "unsat-check returned:", result);

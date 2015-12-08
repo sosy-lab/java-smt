@@ -23,6 +23,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_get;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_size;
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
@@ -101,12 +102,26 @@ class Z3TheoremProver implements ProverEnvironment {
 
   @Override
   public Void push(BooleanFormula f) {
-    level++;
     Preconditions.checkState(!closed);
+    push();
+    addConstraint(f);
+    return null;
+  }
 
-    Preconditions.checkArgument(z3context != 0);
-    solver_push(z3context, z3solver);
+  @Override
+  public void pop() {
+    Preconditions.checkState(!closed);
+    level--;
+
+    Preconditions.checkArgument(solver_get_num_scopes(z3context, z3solver) >= 1);
+    solver_pop(z3context, z3solver, 1);
+  }
+
+  @Override
+  public void addConstraint(BooleanFormula f) {
+    Preconditions.checkState(!closed);
     long e = Z3FormulaManager.getZ3Expr(f);
+    inc_ref(z3context, e);
 
     if (storedConstraints != null) { // Unsat core generation is on.
       String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
@@ -117,15 +132,14 @@ class Z3TheoremProver implements ProverEnvironment {
     } else {
       solver_assert(z3context, z3solver, e);
     }
-    return null;
+    dec_ref(z3context, e);
   }
 
   @Override
-  public void pop() {
-    level--;
-
-    Preconditions.checkArgument(solver_get_num_scopes(z3context, z3solver) >= 1);
-    solver_pop(z3context, z3solver, 1);
+  public void push() {
+    Preconditions.checkState(!closed);
+    level++;
+    solver_push(z3context, z3solver);
   }
 
   @Override
@@ -230,6 +244,7 @@ class Z3TheoremProver implements ProverEnvironment {
 
   @Override
   public Formula evaluate(Formula f) {
+    Preconditions.checkState(!closed);
     Z3Formula input = (Z3Formula) f;
     long z3model = solver_get_model(z3context, z3solver);
     model_inc_ref(z3context, z3model);

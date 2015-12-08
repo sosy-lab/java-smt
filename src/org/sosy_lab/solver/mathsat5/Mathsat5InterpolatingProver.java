@@ -72,6 +72,22 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver
   }
 
   @Override
+  public void addConstraint(BooleanFormula f) {
+    Preconditions.checkState(!closed);
+    long t = mgr.extractInfo(f);
+    if (!useSharedEnv) {
+      t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
+    }
+    msat_assert_formula(curEnv, t);
+  }
+
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    msat_push_backtrack_point(curEnv);
+  }
+
+  @Override
   public BooleanFormula getInterpolant(List<Integer> formulasOfA) throws SolverException {
     Preconditions.checkState(!closed);
 
