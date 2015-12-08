@@ -28,7 +28,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-
 public interface AssignableTerm {
   TermType getType();
 

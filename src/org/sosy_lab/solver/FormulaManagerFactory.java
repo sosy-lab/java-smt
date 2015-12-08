@@ -62,7 +62,7 @@ import javax.annotation.Nullable;
  *
  * <p>Main entry point.
  */
-@Options(prefix="solver", deprecatedPrefix="cpa.predicate")
+@Options(prefix = "solver", deprecatedPrefix = "cpa.predicate")
 public class FormulaManagerFactory {
 
   @VisibleForTesting

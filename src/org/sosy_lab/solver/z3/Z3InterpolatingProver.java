@@ -76,7 +76,6 @@ class Z3InterpolatingProver implements InterpolatingProverEnvironment<Long> {
     long e = Z3FormulaManager.getZ3Expr(f);
     solver_push(z3context, z3solver);
 
-
     solver_assert(z3context, z3solver, e);
     assertedFormulas.addLast(e);
     return e;

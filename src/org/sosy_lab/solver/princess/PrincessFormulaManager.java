@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
-
 public final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
