@@ -31,6 +31,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptEnvironment;
 
+import javax.annotation.Nullable;
 import java.util.logging.Level;
 
 /**
@@ -74,6 +75,19 @@ public class LoggingOptEnvironment implements OptEnvironment {
   public void push() {
     logger.log(Level.FINE, "Creating backtracking point");
     wrapped.push();
+  }
+
+  @Override
+  public boolean isUnsat() throws SolverException, InterruptedException {
+    logger.log(Level.FINE, "Checking satisfiability");
+    return wrapped.isUnsat();
+  }
+
+  @Nullable
+  @Override
+  public Void push(BooleanFormula f) {
+    logger.log(Level.FINE, "Pushing", f, "and creating a backtracking point");
+    return wrapped.push(f);
   }
 
   @Override
