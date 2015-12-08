@@ -99,6 +99,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       case Z3_APP_AST:
         long decl = get_app_decl(z3context, t);
         return !NON_ATOMIC_OP_TYPES.contains(get_decl_kind(z3context, decl));
+      case Z3_QUANTIFIER_AST:
+        return false;
       default:
         return true;
     }
@@ -106,11 +108,13 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
   @Override
   public int getArity(Long t) {
+    Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
     return get_app_num_args(z3context, t);
   }
 
   @Override
   public Long getArg(Long t, int n) {
+    Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
     return get_app_arg(z3context, t, n);
   }
 

@@ -255,11 +255,6 @@ public class SolverQuantifierTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionForall() {
-    assume()
-        .withFailureMessage("Bug in Z3QuantifiedFormulaManager")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
-
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
     assertThat(qmgr.isQuantifier(forall)).isTrue();
     assertThat(qmgr.isForall(forall)).isTrue();
