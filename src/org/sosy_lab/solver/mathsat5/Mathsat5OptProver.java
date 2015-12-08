@@ -178,7 +178,7 @@ class Mathsat5OptProver extends Mathsat5AbstractProver implements OptEnvironment
   }
 
   @Override
-  public Formula evaluate(Formula f) {
+  public <T extends Formula> T evaluate(T f) {
     throw new UnsupportedOperationException("Mathsat solver does not support evaluation");
   }
 
