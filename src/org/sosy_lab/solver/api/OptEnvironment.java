@@ -22,18 +22,12 @@ package org.sosy_lab.solver.api;
 import com.google.common.base.Optional;
 
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 
 /**
  * Interface for optimization modulo SMT.
  */
 public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
-
-  /**
-   * Add constraint to the context.
-   */
-  void addConstraint(BooleanFormula constraint);
 
   /**
    * Add the maximization <code>objective</code>.
@@ -62,16 +56,6 @@ public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoClosea
   OptStatus check() throws InterruptedException, SolverException;
 
   /**
-   * Create backtracking point.
-   */
-  void push();
-
-  /**
-   * Backtrack one level.
-   */
-  void pop();
-
-  /**
    * @param epsilon Value to substitute for the {@code epsilon}.
    * @return Upper approximation of the optimized value, or
    *  absent optional if the objective is unbounded.
@@ -84,8 +68,6 @@ public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoClosea
    *  absent optional if the objective is unbounded.
    */
   Optional<Rational> lower(int handle, Rational epsilon);
-
-  Model getModel() throws SolverException;
 
   /**
    * Evaluate the formula with the previously generated model.
@@ -103,7 +85,4 @@ public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoClosea
   }
 
   String dump();
-
-  @Override
-  void close();
 }
