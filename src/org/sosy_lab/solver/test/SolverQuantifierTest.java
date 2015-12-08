@@ -20,6 +20,8 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -36,6 +38,7 @@ import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
 @RunWith(Parameterized.class)
 public class SolverQuantifierTest extends SolverBasedTest0 {
@@ -248,5 +251,79 @@ public class SolverQuantifierTest extends SolverBasedTest0 {
     BooleanFormula f2 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
 
     assertThat(f1).isEqualTo(f2);
+  }
+
+  @Test
+  public void testIntrospectionForall() {
+    assume()
+        .withFailureMessage("Bug in Z3QuantifiedFormulaManager")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
+    assertThat(qmgr.isQuantifier(forall)).isTrue();
+    assertThat(qmgr.isForall(forall)).isTrue();
+    assertThat(qmgr.isExists(forall)).isFalse();
+    assertThat(qmgr.isBoundByQuantifier(forall)).isFalse();
+    assertThat(qmgr.numQuantifierBound(forall)).isEqualTo(1);
+
+    UnsafeFormulaManager umgr = mgr.getUnsafeFormulaManager();
+    assertThat(umgr.isQuantification(forall)).isTrue();
+    assertThat(umgr.getQuantifiedBody(forall)).isEqualTo(qmgr.getQuantifierBody(forall));
+    assertThat(umgr.isAtom(forall)).isFalse();
+    assertThat(umgr.isBoundVariable(forall)).isFalse();
+    assertThat(umgr.isFreeVariable(forall)).isFalse();
+    assertThat(umgr.isVariable(forall)).isFalse();
+    assertThat(umgr.isNumber(forall)).isFalse();
+    assertThat(umgr.isUF(forall)).isFalse();
+
+    try {
+      umgr.getArity(forall);
+      fail("getArity for quantifier should fail");
+    } catch (IllegalArgumentException expected) {
+    }
+
+    try {
+      umgr.getName(forall);
+      fail("getName for quantifier should fail");
+    } catch (IllegalArgumentException expected) {
+    }
+  }
+
+  @Test
+  public void testIntrospectionExists() {
+    assume()
+        .withFailureMessage("Bug in Z3QuantifiedFormulaManager")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
+    assertThat(qmgr.isQuantifier(exists)).isTrue();
+    assertThat(qmgr.isForall(exists)).isFalse();
+    assertThat(qmgr.isExists(exists)).isTrue();
+    assertThat(qmgr.isBoundByQuantifier(exists)).isFalse();
+    assertThat(qmgr.numQuantifierBound(exists)).isEqualTo(1);
+
+    UnsafeFormulaManager umgr = mgr.getUnsafeFormulaManager();
+    assertThat(umgr.isQuantification(exists)).isTrue();
+    assertThat(umgr.getQuantifiedBody(exists)).isEqualTo(qmgr.getQuantifierBody(exists));
+    assertThat(umgr.isAtom(exists)).isFalse();
+    assertThat(umgr.isBoundVariable(exists)).isFalse();
+    assertThat(umgr.isFreeVariable(exists)).isFalse();
+    assertThat(umgr.isVariable(exists)).isFalse();
+    assertThat(umgr.isNumber(exists)).isFalse();
+    assertThat(umgr.isUF(exists)).isFalse();
+
+    try {
+      umgr.getArity(exists);
+      fail("getArity for quantifier should fail");
+    } catch (IllegalArgumentException expected) {
+    }
+
+    try {
+      umgr.getName(exists);
+      fail("getName for quantifier should fail");
+    } catch (IllegalArgumentException expected) {
+    }
   }
 }
