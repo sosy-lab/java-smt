@@ -35,7 +35,9 @@ import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 
 import java.util.List;
 
@@ -43,7 +45,7 @@ import java.util.List;
  * Common base class for {@link Mathsat5TheoremProver}
  * and {@link Mathsat5InterpolatingProver}.
  */
-abstract class Mathsat5AbstractProver {
+abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> {
 
   protected final Mathsat5FormulaManager mgr;
   protected final long curEnv;
@@ -123,5 +125,10 @@ abstract class Mathsat5AbstractProver {
     msat_free_termination_test(terminationTest);
     msat_destroy_config(curConfig);
     closed = true;
+  }
+
+  @Override
+  public <E extends Formula> E evaluate(E f) {
+    throw new UnsupportedOperationException("Mathsat does not support evaluation");
   }
 }

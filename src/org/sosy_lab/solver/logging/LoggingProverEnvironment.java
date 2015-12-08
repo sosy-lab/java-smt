@@ -59,8 +59,8 @@ public class LoggingProverEnvironment implements ProverEnvironment {
   }
 
   @Override
-  public void addConstraint(BooleanFormula constraint) {
-    wrapped.addConstraint(constraint);
+  public Void addConstraint(BooleanFormula constraint) {
+    return wrapped.addConstraint(constraint);
   }
 
   @Override
@@ -99,7 +99,7 @@ public class LoggingProverEnvironment implements ProverEnvironment {
   }
 
   @Override
-  public Formula evaluate(Formula f) {
+  public <T extends Formula> T evaluate(T f) {
     return wrapped.evaluate(f);
   }
 

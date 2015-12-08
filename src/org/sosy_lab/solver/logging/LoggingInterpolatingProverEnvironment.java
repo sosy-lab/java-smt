@@ -25,6 +25,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 
 import java.util.List;
@@ -124,5 +125,10 @@ public class LoggingInterpolatingProverEnvironment<T>
   public void close() {
     wrapped.close();
     logger.log(Level.FINER, "closed");
+  }
+
+  @Override
+  public <E extends Formula> E evaluate(E f) {
+    return wrapped.evaluate(f);
   }
 }

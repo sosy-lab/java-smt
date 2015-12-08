@@ -132,7 +132,7 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
   }
 
   @Override
-  public Formula evaluate(Formula f) {
+  public <T extends Formula> T evaluate(T f) {
     throw new UnsupportedOperationException("Princess solver does not support model evaluation");
   }
 }

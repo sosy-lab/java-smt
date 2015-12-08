@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
 import java.util.ArrayList;
@@ -131,5 +132,11 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
     assert assertedFormulas.size() == annotatedTerms.size();
     final List<IExpression> values = Lists.<IExpression>newArrayList(annotatedTerms.values());
     return PrincessModel.createModel(stack, values);
+  }
+
+  @Override
+  public <T extends Formula> T evaluate(T f) {
+    throw new UnsupportedOperationException(
+        "Princess does not support term evaluation");
   }
 }

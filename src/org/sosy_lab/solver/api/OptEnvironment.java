@@ -70,12 +70,6 @@ public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoClosea
   Optional<Rational> lower(int handle, Rational epsilon);
 
   /**
-   * Evaluate the formula with the previously generated model.
-   * Assumes that the previous call was {@link #getModel}.
-   */
-  <T extends Formula> T evaluate(T f);
-
-  /**
    * Status of the optimization problem.
    */
   enum OptStatus {

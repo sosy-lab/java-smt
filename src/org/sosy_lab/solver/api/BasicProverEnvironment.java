@@ -69,4 +69,12 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   @Override
   void close();
+
+  /**
+   * Evaluate the formula with the previously generated model.
+   * Assumes that model generation is enabled, and the previous call was
+   * {@link #getModel}.
+   * // TODO: provide a default for non-Z3 solvers.
+   */
+  <E extends Formula> E evaluate(E f);
 }

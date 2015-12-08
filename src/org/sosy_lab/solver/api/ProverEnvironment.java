@@ -63,15 +63,6 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
       throws InterruptedException, SolverException;
 
   /**
-   * Evaluate the formula with the previously generated model.
-   * Assumes that model generation is enabled, and the previous call was
-   * {@link #getModel}.
-   * // todo: merge this and {@link OptEnvironment#evaluate(Formula)}, provide
-   * // default for non-Z3 solvers.
-   */
-  Formula evaluate(Formula f);
-
-  /**
    * Interface for the {@link #allSat} callback.
    * @param <T> The result type of the callback, passed through by {@link #allSat}.
    */

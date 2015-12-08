@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
 import java.util.ArrayList;
@@ -222,6 +223,11 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
       annotatedTerms.clear();
     }
     closed = true;
+  }
+
+  @Override
+  public Formula evaluate(Formula f) {
+    throw new UnsupportedOperationException("SmtInterpol can't evaluate formulas.");
   }
 
   @Override
