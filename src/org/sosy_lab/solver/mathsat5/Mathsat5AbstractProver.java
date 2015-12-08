@@ -63,6 +63,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     terminationTest = mgr.addTerminationTest(curEnv);
   }
 
+  @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     try {
@@ -109,16 +110,19 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     }
   }
 
+  @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     return Mathsat5Model.createMathsatModel(curEnv);
   }
 
+  @Override
   public void pop() {
     Preconditions.checkState(!closed);
     msat_pop_backtrack_point(curEnv);
   }
 
+  @Override
   public void close() {
     Preconditions.checkState(!closed);
     msat_destroy_env(curEnv);
