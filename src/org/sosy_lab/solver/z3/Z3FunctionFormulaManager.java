@@ -35,7 +35,7 @@ class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long
   private final long z3context;
 
   Z3FunctionFormulaManager(Z3FormulaCreator creator, Z3UnsafeFormulaManager unsafeManager) {
-    super(creator, unsafeManager);
+    super(creator);
     this.z3context = creator.getEnv();
     this.unsafeManager = unsafeManager;
   }

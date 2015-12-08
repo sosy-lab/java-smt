@@ -209,8 +209,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
 
     // Create managers
     Mathsat5UnsafeFormulaManager unsafeManager = new Mathsat5UnsafeFormulaManager(creator);
-    Mathsat5FunctionFormulaManager functionTheory =
-        new Mathsat5FunctionFormulaManager(creator, unsafeManager);
+    Mathsat5FunctionFormulaManager functionTheory = new Mathsat5FunctionFormulaManager(creator);
     Mathsat5BooleanFormulaManager booleanTheory = Mathsat5BooleanFormulaManager.create(creator);
     Mathsat5IntegerFormulaManager integerTheory =
         new Mathsat5IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);

@@ -29,14 +29,6 @@ import java.util.Map;
 public interface UnsafeFormulaManager {
 
   /**
-   * Type a given Formula (Formulas given by the UnsafeFormulaManager do not have to be typed!)
-   * @param type the target type
-   * @param f the formula to type
-   * @return the typed formula
-   */
-  <T extends Formula> T typeFormula(FormulaType<T> type, Formula f);
-
-  /**
    * @return arity of the input formula.
    */
   int getArity(Formula f);

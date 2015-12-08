@@ -45,13 +45,8 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
     implements FunctionFormulaManager {
 
-  private final AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager;
-
-  protected AbstractFunctionFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator,
-      AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager) {
+  protected AbstractFunctionFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
-    this.unsafeManager = unsafeManager;
   }
 
   protected abstract TFunctionDecl declareUninterpretedFunctionImpl(
@@ -92,7 +87,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
     List<TFormulaInfo> list = Lists.transform(pArgs, extractor);
 
     TFormulaInfo formulaInfo = createUninterpretedFunctionCallImpl(pFunc, list);
-    return unsafeManager.typeFormula(retType, formulaInfo);
+    return getFormulaCreator().encapsulate(retType, formulaInfo);
   }
 
   final <T extends Formula> TFormulaInfo createUninterpretedFunctionCallImpl(

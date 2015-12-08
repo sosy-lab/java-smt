@@ -102,8 +102,7 @@ public final class PrincessFormulaManager
 
     // Create managers
     PrincessUnsafeFormulaManager unsafeManager = new PrincessUnsafeFormulaManager(creator);
-    PrincessFunctionFormulaManager functionTheory =
-        new PrincessFunctionFormulaManager(creator, unsafeManager);
+    PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
     PrincessIntegerFormulaManager integerTheory =
         new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);

@@ -33,7 +33,7 @@ class SmtInterpolFunctionFormulaManager
 
   SmtInterpolFunctionFormulaManager(
       SmtInterpolFormulaCreator creator, SmtInterpolUnsafeFormulaManager unsafeManager) {
-    super(creator, unsafeManager);
+    super(creator);
     this.unsafeManager = unsafeManager;
   }
 

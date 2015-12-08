@@ -39,19 +39,8 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   private <T extends Formula> T encapsulateWithTypeOf(T f, TFormulaInfo e) {
-    FormulaType<T> type = getFormulaCreator().getFormulaType(f);
-    return typeFormula(type, e);
-  }
-
-  @Override
-  public <T extends Formula> T typeFormula(FormulaType<T> type, Formula f) {
-    TFormulaInfo formulaInfo = extractInfo(f);
-
-    return typeFormula(type, formulaInfo);
-  }
-
-  final <T extends Formula> T typeFormula(FormulaType<T> type, TFormulaInfo formulaInfo) {
-    return getFormulaCreator().encapsulate(type, formulaInfo);
+    FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator = getFormulaCreator();
+    return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), e);
   }
 
   @Override
@@ -76,7 +65,8 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
         : String.format("index %d out of bounds %d", pN, getArity(pF));
     TFormulaInfo t = extractInfo(pF);
     TFormulaInfo arg = getArg(t, pN);
-    return typeFormula(getFormulaCreator().getFormulaType(arg), arg);
+    FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator = getFormulaCreator();
+    return formulaCreator.encapsulate(formulaCreator.getFormulaType(arg), arg);
   }
 
   protected abstract TFormulaInfo getArg(TFormulaInfo pT, int n);

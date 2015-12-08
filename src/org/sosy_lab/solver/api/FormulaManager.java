@@ -107,7 +107,6 @@ public interface FormulaManager {
 
   /**
    * Returns the type of the given Formula.
-   * Undefined behavior when an untyped Formula from UnsafeFormulaManager is given.
    */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
 

@@ -35,9 +35,8 @@ import ap.parser.IFunction;
 class PrincessFunctionFormulaManager
     extends AbstractFunctionFormulaManager<IExpression, IFunction, TermType, PrincessEnvironment> {
 
-  PrincessFunctionFormulaManager(
-      PrincessFormulaCreator creator, PrincessUnsafeFormulaManager unsafe) {
-    super(creator, unsafe);
+  PrincessFunctionFormulaManager(PrincessFormulaCreator creator) {
+    super(creator);
   }
 
   @Override

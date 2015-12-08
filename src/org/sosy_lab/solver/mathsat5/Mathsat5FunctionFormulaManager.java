@@ -34,9 +34,8 @@ class Mathsat5FunctionFormulaManager
 
   private final long mathsatEnv;
 
-  Mathsat5FunctionFormulaManager(
-      Mathsat5FormulaCreator pCreator, Mathsat5UnsafeFormulaManager unsafeManager) {
-    super(pCreator, unsafeManager);
+  Mathsat5FunctionFormulaManager(Mathsat5FormulaCreator pCreator) {
+    super(pCreator);
     this.mathsatEnv = pCreator.getEnv();
   }
 
