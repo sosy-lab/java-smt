@@ -57,7 +57,6 @@ import java.util.Set;
 class Z3InterpolatingProver extends Z3AbstractProver<Long>
     implements InterpolatingProverEnvironment<Long> {
 
-  private final long z3context;
   private final long z3solver;
 
   private int level = 0;
@@ -65,7 +64,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   Z3InterpolatingProver(Z3FormulaManager mgr, long z3params) {
     super(mgr);
-    this.z3context = mgr.getEnvironment();
     this.z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);

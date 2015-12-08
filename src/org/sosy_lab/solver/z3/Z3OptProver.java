@@ -67,7 +67,6 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final long z3optContext;
   private final ShutdownNotifier shutdownNotifier;
-  private boolean closed = false;
 
   Z3OptProver(Z3FormulaManager pMgr, ShutdownNotifier pShutdownNotifier, LogManager pLogger) {
     super(pMgr);
