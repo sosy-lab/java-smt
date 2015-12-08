@@ -148,6 +148,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   @Override
   protected <TD extends Formula, TR extends Formula> ArrayFormula<TD, TR> encapsulateArray(
       Long pTerm, FormulaType<TD> pIndexType, FormulaType<TR> pElementType) {
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
     cleanupReferences();
     return storePhantomReference(
         new Z3ArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType), pTerm);
@@ -165,6 +166,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
+    assert pType.equals(getFormulaType(pTerm))
+            || (pType.equals(FormulaType.RationalType)
+                && getFormulaType(pTerm).equals(FormulaType.IntegerType))
+        : String.format(
+            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     cleanupReferences();
     if (pType.isBooleanType()) {
       return (T) storePhantomReference(new Z3BooleanFormula(getEnv(), pTerm), pTerm);
@@ -187,12 +193,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
   @Override
   public BooleanFormula encapsulateBoolean(Long pTerm) {
+    assert getFormulaType(pTerm).isBooleanType();
     cleanupReferences();
     return storePhantomReference(new Z3BooleanFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Long pTerm) {
+    assert getFormulaType(pTerm).isBitvectorType();
     cleanupReferences();
     return storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
   }

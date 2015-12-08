@@ -96,24 +96,31 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isBooleanType();
     return new BooleanFormulaImpl<>(pTerm);
   }
 
   protected BitvectorFormula encapsulateBitvector(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isBitvectorType();
     return new BitvectorFormulaImpl<>(pTerm);
   }
 
   protected FloatingPointFormula encapsulateFloatingPoint(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointType();
     return new FloatingPointFormulaImpl<>(pTerm);
   }
 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(FormulaType<T> pType, TFormulaInfo pTerm) {
+    assert pType.equals(getFormulaType(pTerm))
+        : String.format(
+            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BooleanFormulaImpl<>(pTerm);
     } else if (pType.isIntegerType()) {
