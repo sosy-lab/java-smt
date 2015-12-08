@@ -113,7 +113,7 @@ public class LoggingOptEnvironment implements OptEnvironment {
   }
 
   @Override
-  public T evaluate(T f) {
+  public <T extends Formula> T evaluate(T f) {
     return wrapped.evaluate(f);
   }
 
