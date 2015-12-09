@@ -27,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.After;
 import org.junit.Before;
-import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.log.LogManager;
@@ -112,7 +112,7 @@ public abstract class SolverBasedTest0 {
   public final void initSolver() throws Exception {
     config = createTestConfigBuilder().build();
 
-    factory = new FormulaManagerFactory(config, logger, ShutdownNotifier.create());
+    factory = new FormulaManagerFactory(config, logger, ShutdownManager.create().getNotifier());
     mgr = factory.getFormulaManager();
 
     fmgr = mgr.getFunctionFormulaManager();

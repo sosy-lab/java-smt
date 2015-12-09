@@ -21,6 +21,7 @@ package org.sosy_lab.solver;
 
 import com.google.common.testing.AbstractPackageSanityTests;
 
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 
@@ -28,6 +29,6 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDefault(Configuration.class, Configuration.defaultConfiguration());
-    setDefault(ShutdownNotifier.class, ShutdownNotifier.create());
+    setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
   }
 }
