@@ -25,7 +25,6 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
-
 public abstract class BooleanFormulaVisitor<R> {
 
   private final FormulaManager fmgr;
@@ -110,13 +109,21 @@ public abstract class BooleanFormulaVisitor<R> {
   }
 
   protected abstract R visitTrue();
+
   protected abstract R visitFalse();
+
   protected abstract R visitAtom(BooleanFormula atom);
+
   protected abstract R visitNot(BooleanFormula operand);
+
   protected abstract R visitAnd(BooleanFormula... operands);
+
   protected abstract R visitOr(BooleanFormula... operand);
+
   protected abstract R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
+
   protected abstract R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
-  protected abstract R visitIfThenElse(BooleanFormula condition,
-      BooleanFormula thenFormula, BooleanFormula elseFormula);
+
+  protected abstract R visitIfThenElse(
+      BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
 }

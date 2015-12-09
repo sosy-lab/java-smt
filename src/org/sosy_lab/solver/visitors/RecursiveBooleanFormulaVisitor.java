@@ -25,7 +25,6 @@ import org.sosy_lab.solver.api.FormulaManager;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  * Base class for visitors for boolean formulas that traverse recursively
  * through the full formula (at least the boolean part, not inside atoms).
@@ -94,8 +93,8 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  protected Void visitIfThenElse(BooleanFormula pCondition,
-      BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+  protected Void visitIfThenElse(
+      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     visitIfNotSeen(pCondition);
     visitIfNotSeen(pThenFormula);
     visitIfNotSeen(pElseFormula);

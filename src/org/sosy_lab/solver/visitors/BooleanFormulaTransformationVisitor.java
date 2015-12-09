@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Base class for visitors for boolean formulas that traverse recursively
  * through the formula and somehow transform it (i.e., return a boolean formula).
@@ -52,8 +51,8 @@ public abstract class BooleanFormulaTransformationVisitor
 
   private final Map<BooleanFormula, BooleanFormula> cache;
 
-  protected BooleanFormulaTransformationVisitor(FormulaManager pFmgr,
-      Map<BooleanFormula, BooleanFormula> pCache) {
+  protected BooleanFormulaTransformationVisitor(
+      FormulaManager pFmgr, Map<BooleanFormula, BooleanFormula> pCache) {
     super(pFmgr);
     bfmgr = pFmgr.getBooleanFormulaManager();
     cache = pCache;
@@ -117,11 +116,9 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  protected BooleanFormula visitIfThenElse(BooleanFormula pCondition,
-      BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+  protected BooleanFormula visitIfThenElse(
+      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     return bfmgr.ifThenElse(
-        visitIfNotSeen(pCondition),
-        visitIfNotSeen(pThenFormula),
-        visitIfNotSeen(pElseFormula));
+        visitIfNotSeen(pCondition), visitIfNotSeen(pThenFormula), visitIfNotSeen(pElseFormula));
   }
 }

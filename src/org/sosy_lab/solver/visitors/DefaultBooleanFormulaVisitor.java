@@ -22,7 +22,6 @@ package org.sosy_lab.solver.visitors;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 
-
 public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisitor<R> {
 
   protected DefaultBooleanFormulaVisitor(FormulaManager pFmgr) {
@@ -70,8 +69,8 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   }
 
   @Override
-  protected R visitIfThenElse(BooleanFormula pCondition,
-      BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+  protected R visitIfThenElse(
+      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     throw new UnsupportedOperationException();
   }
 }
