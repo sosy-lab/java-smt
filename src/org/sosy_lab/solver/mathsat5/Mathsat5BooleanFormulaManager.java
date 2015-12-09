@@ -181,7 +181,7 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
   }
 
   private BooleanFormula getArg(Long pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(getFormulaCreator().getFormulaType(pF));
+    assert getFormulaCreator().getBoolType().equals(msat_term_get_type(pF));
     return getFormulaCreator().encapsulateBoolean(msat_term_get_arg(pF, index));
   }
 

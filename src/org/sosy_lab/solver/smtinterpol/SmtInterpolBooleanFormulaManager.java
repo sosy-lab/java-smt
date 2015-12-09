@@ -154,7 +154,7 @@ class SmtInterpolBooleanFormulaManager
   }
 
   private BooleanFormula getArg(Term pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(getFormulaCreator().getFormulaType(pF));
+    assert getFormulaCreator().getBoolType().equals(pF.getSort());
     return getFormulaCreator().encapsulateBoolean(SmtInterpolUtil.getArg(pF, index));
   }
 

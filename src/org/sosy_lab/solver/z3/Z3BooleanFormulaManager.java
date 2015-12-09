@@ -209,7 +209,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   // copied from Z3UnsafeFormulaManager
   private BooleanFormula getArg(Long pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(getFormulaCreator().getFormulaType(pF));
+    assert getFormulaCreator().getBoolType().equals(get_sort(z3context, pF));
     return getFormulaCreator().encapsulateBoolean(get_app_arg(z3context, pF, index));
   }
 

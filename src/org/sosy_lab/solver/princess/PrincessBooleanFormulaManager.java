@@ -194,7 +194,7 @@ class PrincessBooleanFormulaManager
   }
 
   private BooleanFormula getArg(IExpression pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(getFormulaCreator().getFormulaType(pF));
+    assert PrincessUtil.isBoolean(pF);
     return getFormulaCreator().encapsulateBoolean(PrincessUtil.getArg(pF, index));
   }
 
