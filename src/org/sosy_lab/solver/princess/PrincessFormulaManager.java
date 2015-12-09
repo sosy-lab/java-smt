@@ -109,8 +109,14 @@ public final class PrincessFormulaManager
         new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
 
-    return new PrincessFormulaManager(creator, unsafeManager, functionTheory, booleanTheory,
-        integerTheory, arrayTheory, pShutdownNotifier);
+    return new PrincessFormulaManager(
+        creator,
+        unsafeManager,
+        functionTheory,
+        booleanTheory,
+        integerTheory,
+        arrayTheory,
+        pShutdownNotifier);
   }
 
   BooleanFormula encapsulateBooleanFormula(IExpression t) {

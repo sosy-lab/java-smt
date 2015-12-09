@@ -373,7 +373,8 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(TermType type, String varname) {
     switch (type) {
-      case Boolean: {
+      case Boolean:
+        {
           if (boolVariablesCache.containsKey(varname)) {
             return boolVariablesCache.get(varname);
           } else {
@@ -386,7 +387,8 @@ class PrincessEnvironment {
           }
         }
 
-      case Integer: {
+      case Integer:
+        {
           if (intVariablesCache.containsKey(varname)) {
             return intVariablesCache.get(varname);
           } else {
@@ -398,7 +400,8 @@ class PrincessEnvironment {
             return var;
           }
         }
-      case Array: {
+      case Array:
+        {
           if (arrayVariablesCache.containsKey(varname)) {
             return arrayVariablesCache.get(varname);
           } else {

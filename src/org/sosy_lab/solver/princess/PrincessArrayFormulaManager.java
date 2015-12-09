@@ -29,7 +29,6 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import ap.parser.IExpression;
 import ap.parser.ITerm;
 
-
 public class PrincessArrayFormulaManager
     extends AbstractArrayFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
@@ -52,8 +51,8 @@ public class PrincessArrayFormulaManager
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> IExpression internalMakeArray(String pName,
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> IExpression internalMakeArray(
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
     // other types in arrays are not supported in princess
     assert pIndexType.isIntegerType() && pElementType.isIntegerType();
@@ -69,5 +68,4 @@ public class PrincessArrayFormulaManager
   protected IExpression equivalence(IExpression pArray1, IExpression pArray2) {
     return ap.parser.IExpression.Eq$.MODULE$.apply((ITerm) pArray1, (ITerm) pArray2);
   }
-
 }
