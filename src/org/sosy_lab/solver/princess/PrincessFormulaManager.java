@@ -65,6 +65,7 @@ public final class PrincessFormulaManager
 
   private final ShutdownNotifier shutdownNotifier;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   private PrincessFormulaManager(
       PrincessFormulaCreator pCreator,
       PrincessUnsafeFormulaManager pUnsafeManager,
@@ -72,6 +73,7 @@ public final class PrincessFormulaManager
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
       PrincessArrayFormulaManager pArrayManager,
+      PrincessQuantifiedFormulaManager pQuantifierManager,
       ShutdownNotifier pShutdownNotifier) {
     super(
         pCreator,
@@ -82,7 +84,7 @@ public final class PrincessFormulaManager
         null,
         null,
         null,
-        null,
+        pQuantifierManager,
         pArrayManager);
     shutdownNotifier = pShutdownNotifier;
   }
@@ -108,6 +110,8 @@ public final class PrincessFormulaManager
     PrincessIntegerFormulaManager integerTheory =
         new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
+    PrincessQuantifiedFormulaManager quantifierTheory =
+        new PrincessQuantifiedFormulaManager(creator);
 
     return new PrincessFormulaManager(
         creator,
@@ -116,6 +120,7 @@ public final class PrincessFormulaManager
         booleanTheory,
         integerTheory,
         arrayTheory,
+        quantifierTheory,
         pShutdownNotifier);
   }
 

@@ -72,6 +72,10 @@ public class SolverQuantifierTest extends SolverBasedTest0 {
   public void setUp() throws Exception {
     requireArrays();
     requireQuantifiers();
+    assume()
+        .withFailureMessage("Quantifier support in Princess is currently not complete.")
+        .that(solverUnderTest)
+        .isNotEqualTo(Solvers.PRINCESS);
 
     x = imgr.makeVariable("x");
     a = amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
