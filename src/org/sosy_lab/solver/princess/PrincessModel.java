@@ -21,6 +21,12 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import ap.SimpleAPI;
+import ap.parser.IAtom;
+import ap.parser.IConstant;
+import ap.parser.IExpression;
+import ap.parser.IFunApp;
+
 import com.google.common.base.Verify;
 
 import org.sosy_lab.solver.AssignableTerm;
@@ -29,16 +35,11 @@ import org.sosy_lab.solver.AssignableTerm.Variable;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.TermType;
 
+import scala.Option;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import ap.SimpleAPI;
-import ap.parser.IAtom;
-import ap.parser.IConstant;
-import ap.parser.IExpression;
-import ap.parser.IFunApp;
-import scala.Option;
 
 class PrincessModel {
   private PrincessModel() {}

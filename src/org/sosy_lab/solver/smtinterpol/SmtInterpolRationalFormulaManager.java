@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
@@ -26,9 +29,6 @@ import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolRationalFormulaManager
     extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula> {

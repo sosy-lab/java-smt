@@ -30,33 +30,6 @@ import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import ap.SimpleAPI;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
@@ -73,10 +46,38 @@ import ap.parser.SMTParser2InputAbsy;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
+
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.Seq;
 import scala.collection.mutable.ArrayBuffer;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 /** This is a Wrapper around Princess.
  * This Wrapper allows to set a logfile for all Smt-Queries (default "princess.###.smt2").

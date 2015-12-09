@@ -22,19 +22,19 @@ package org.sosy_lab.solver.princess;
 import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
 import static org.sosy_lab.solver.princess.PrincessUtil.isNumber;
 
-import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.BitShiftMultiplication;
+
+import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 class PrincessIntegerFormulaManager
     extends org.sosy_lab.solver.princess.PrincessNumeralFormulaManager<

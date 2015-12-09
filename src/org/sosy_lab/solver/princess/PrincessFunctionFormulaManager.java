@@ -22,15 +22,15 @@ package org.sosy_lab.solver.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.FluentIterable.from;
 
+import ap.parser.IExpression;
+import ap.parser.IFunction;
+
 import com.google.common.base.Predicates;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
 import java.util.List;
-
-import ap.parser.IExpression;
-import ap.parser.IFunction;
 
 class PrincessFunctionFormulaManager
     extends AbstractFunctionFormulaManager<IExpression, IFunction, TermType, PrincessEnvironment> {

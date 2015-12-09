@@ -24,16 +24,16 @@ import static org.sosy_lab.solver.smtinterpol.SmtInterpolUtil.toTermArray;
 
 import com.google.common.collect.ImmutableList;
 
+import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {

@@ -23,6 +23,9 @@ import static com.google.common.base.Predicates.in;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
 
+import ap.parser.IExpression;
+import ap.parser.IFormula;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -39,9 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import ap.parser.IExpression;
-import ap.parser.IFormula;
 
 class PrincessInterpolatingProver extends PrincessAbstractProver
     implements InterpolatingProverEnvironment<Integer> {

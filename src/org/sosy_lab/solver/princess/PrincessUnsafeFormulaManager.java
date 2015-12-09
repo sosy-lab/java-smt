@@ -22,13 +22,6 @@ package org.sosy_lab.solver.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
 
-import com.google.common.collect.ImmutableList;
-
-import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
-
-import java.util.List;
-
 import ap.basetypes.IdealInt;
 import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
@@ -38,6 +31,13 @@ import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
 import ap.parser.PartialEvaluator;
+
+import com.google.common.collect.ImmutableList;
+
+import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+
+import java.util.List;
 
 class PrincessUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {

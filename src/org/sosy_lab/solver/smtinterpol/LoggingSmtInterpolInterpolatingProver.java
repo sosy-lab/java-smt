@@ -21,11 +21,11 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 
 import java.io.PrintWriter;
-
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProver {
 

@@ -25,6 +25,9 @@ import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Preconditions;
 
+import de.uni_freiburg.informatik.ultimate.logic.Annotation;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -37,9 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import de.uni_freiburg.informatik.ultimate.logic.Annotation;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<String> {
 

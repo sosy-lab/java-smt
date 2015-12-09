@@ -19,14 +19,14 @@
  */
 package org.sosy_lab.solver.princess;
 
+import ap.parser.IExpression;
+
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-
-import ap.parser.IExpression;
 
 class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, PrincessEnvironment> {
 

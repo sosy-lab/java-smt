@@ -19,12 +19,13 @@
  */
 package org.sosy_lab.solver.princess;
 
-import java.util.List;
-import java.util.Set;
-
 import ap.SimpleAPI;
 import ap.parser.IFormula;
+
 import scala.Option;
+
+import java.util.List;
+import java.util.Set;
 
 /** This is a Interface for the Wrapper around some parts of the PrincessAPI.
  * It allows to have a stack with operations like:

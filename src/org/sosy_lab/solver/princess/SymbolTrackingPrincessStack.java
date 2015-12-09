@@ -23,23 +23,24 @@ import static scala.collection.JavaConversions.asScalaSet;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
+import ap.SimpleAPI;
+import ap.parser.IFormula;
+import ap.parser.IFunction;
+import ap.parser.ITerm;
+
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
+
+import scala.Enumeration.Value;
+import scala.Option;
+import scala.collection.Seq;
+import scala.collection.mutable.ArrayBuffer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
-
-import ap.SimpleAPI;
-import ap.parser.IFormula;
-import ap.parser.IFunction;
-import ap.parser.ITerm;
-import scala.Enumeration.Value;
-import scala.Option;
-import scala.collection.Seq;
-import scala.collection.mutable.ArrayBuffer;
 
 /** This is a Wrapper around some parts of the PrincessAPI.
  * It allows to have a stack with operations like:

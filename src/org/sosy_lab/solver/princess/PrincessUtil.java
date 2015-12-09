@@ -19,13 +19,6 @@
  */
 package org.sosy_lab.solver.princess;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
@@ -41,9 +34,17 @@ import ap.parser.IIntLit;
 import ap.parser.INot;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+
 import scala.Enumeration;
 import scala.collection.Iterator;
 import scala.collection.JavaConversions;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** Static helper functions for Princess. */
 class PrincessUtil {

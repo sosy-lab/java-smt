@@ -19,13 +19,13 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
-
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolArrayFormulaManager
     extends AbstractArrayFormulaManager<Term, Sort, SmtInterpolEnvironment> {

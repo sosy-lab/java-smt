@@ -62,7 +62,7 @@
     </module>
     <module name="ImportOrder">
       <property name="option" value="top"/>
-      <property name="groups" value="com,edu,junit,org,sun,java,javax"/>
+      <property name="groups" value="ap,com,de,edu,junit,org,scala,sun,java,javax"/>
       <property name="separated" value="true"/>
       <property name="sortStaticImportsAlphabetically" value="true"/>
     </module>

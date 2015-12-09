@@ -19,13 +19,13 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 
 import java.math.BigInteger;
-
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 abstract class SmtInterpolNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>

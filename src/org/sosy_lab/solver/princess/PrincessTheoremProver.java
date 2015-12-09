@@ -22,6 +22,13 @@ package org.sosy_lab.solver.princess;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
 
+import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
+import ap.parser.IBoolLit;
+import ap.parser.IExpression;
+import ap.parser.IFormula;
+import ap.parser.INot;
+
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -31,18 +38,12 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
+import scala.Option;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import ap.parser.IBinFormula;
-import ap.parser.IBinJunctor;
-import ap.parser.IBoolLit;
-import ap.parser.IExpression;
-import ap.parser.IFormula;
-import ap.parser.INot;
-import scala.Option;
 
 class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvironment {
 

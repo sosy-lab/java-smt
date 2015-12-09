@@ -21,13 +21,13 @@ package org.sosy_lab.solver.princess;
 
 import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
 
-import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.api.NumeralFormula;
-import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
-
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.ITerm;
+
+import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.NumeralFormula;
+import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 
 abstract class PrincessNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>

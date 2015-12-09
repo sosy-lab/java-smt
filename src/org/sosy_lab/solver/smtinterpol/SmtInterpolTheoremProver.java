@@ -25,6 +25,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -36,8 +38,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolTheoremProver implements ProverEnvironment {
 

@@ -19,12 +19,12 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
 import java.util.List;
-
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolFunctionFormulaManager
     extends AbstractFunctionFormulaManager<Term, String, Sort, SmtInterpolEnvironment> {

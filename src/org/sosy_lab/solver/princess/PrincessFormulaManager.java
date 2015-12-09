@@ -21,6 +21,9 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
+import ap.parser.IExpression;
+import ap.parser.IFormula;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -37,9 +40,6 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
 import javax.annotation.Nullable;
-
-import ap.parser.IExpression;
-import ap.parser.IFormula;
 
 public final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {

@@ -21,6 +21,9 @@ package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Verify;
 
+import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+
 import org.sosy_lab.solver.AssignableTerm;
 import org.sosy_lab.solver.AssignableTerm.Function;
 import org.sosy_lab.solver.AssignableTerm.Variable;
@@ -30,9 +33,6 @@ import org.sosy_lab.solver.TermType;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 class SmtInterpolModel {
   private SmtInterpolModel() {}
