@@ -67,6 +67,10 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   Model getModel() throws SolverException;
 
+  /**
+   * Closes the prover environment.
+   * The object should be discarded, and should not be used after closing.
+   */
   @Override
   void close();
 
