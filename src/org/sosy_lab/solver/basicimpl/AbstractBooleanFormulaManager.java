@@ -141,6 +141,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
+  @Deprecated
   public boolean isNot(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isNot(param);
@@ -149,6 +150,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isNot(TFormulaInfo pParam);
 
   @Override
+  @Deprecated
   public boolean isAnd(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isAnd(param);
@@ -157,6 +159,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isAnd(TFormulaInfo pParam);
 
   @Override
+  @Deprecated
   public boolean isOr(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isOr(param);
@@ -165,6 +168,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isOr(TFormulaInfo pParam);
 
   @Override
+  @Deprecated
   public boolean isXor(BooleanFormula pBits) {
     TFormulaInfo param = extractInfo(pBits);
     return isXor(param);
@@ -238,6 +242,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo ifThenElse(TFormulaInfo cond, TFormulaInfo f1, TFormulaInfo f2);
 
   @Override
+  @Deprecated
   public boolean isEquivalence(BooleanFormula pFormula) {
     return isEquivalence(extractInfo(pFormula));
   }
@@ -245,6 +250,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isEquivalence(TFormulaInfo pBits);
 
   @Override
+  @Deprecated
   public boolean isImplication(BooleanFormula pFormula) {
     return isImplication(extractInfo(pFormula));
   }
@@ -252,6 +258,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isImplication(TFormulaInfo pFormula);
 
   @Override
+  @Deprecated
   public <T extends Formula> boolean isIfThenElse(T pF) {
     return isIfThenElse(extractInfo(pF));
   }
