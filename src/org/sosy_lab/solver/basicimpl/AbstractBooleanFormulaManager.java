@@ -28,6 +28,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.Collection;
 
@@ -266,4 +267,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
     throw new UnsupportedOperationException("Tactics are not supported by the solver");
   }
+
+  @Override
+  public <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula pFormula) {
+    return visit(visitor, extractInfo(pFormula));
+  }
+
+  protected abstract <R> R visit(BooleanFormulaVisitor<R> visitor, TFormulaInfo pFormula);
 }

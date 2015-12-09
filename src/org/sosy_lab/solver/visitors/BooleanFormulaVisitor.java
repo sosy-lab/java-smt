@@ -21,94 +21,24 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BooleanFormulaVisitor<R> {
 
-  private final FormulaManager fmgr;
   private final BooleanFormulaManager bfmgr;
-  private final UnsafeFormulaManager unsafe;
 
   protected BooleanFormulaVisitor(FormulaManager pFmgr) {
-    fmgr = pFmgr;
-    bfmgr = fmgr.getBooleanFormulaManager();
-    unsafe = fmgr.getUnsafeFormulaManager();
+    bfmgr = pFmgr.getBooleanFormulaManager();
   }
 
+  /**
+   * This method is the main entry point for visiting a formula.
+   * It redirects the visit to all sub-formulas, depending on the operation.
+   * */
   public final R visit(BooleanFormula f) {
-    if (bfmgr.isTrue(f)) {
-      assert unsafe.getArity(f) == 0;
-      return visitTrue();
-    }
-
-    if (bfmgr.isFalse(f)) {
-      assert unsafe.getArity(f) == 0;
-      return visitFalse();
-    }
-
-    if (unsafe.isAtom(f)) {
-      return visitAtom(f);
-    }
-
-    if (bfmgr.isNot(f)) {
-      assert unsafe.getArity(f) == 1;
-      return visitNot(getArg(f, 0));
-    }
-
-    if (bfmgr.isAnd(f)) {
-      if (unsafe.getArity(f) == 0) {
-        return visitTrue();
-      } else if (unsafe.getArity(f) == 1) {
-        return visit(getArg(f, 0));
-      }
-      return visitAnd(getAllArgs(f));
-    }
-
-    if (bfmgr.isOr(f)) {
-      if (unsafe.getArity(f) == 0) {
-        return visitFalse();
-      } else if (unsafe.getArity(f) == 1) {
-        return visit(getArg(f, 0));
-      }
-      return visitOr(getAllArgs(f));
-    }
-
-    if (bfmgr.isEquivalence(f)) {
-      assert unsafe.getArity(f) == 2;
-      return visitEquivalence(getArg(f, 0), getArg(f, 1));
-    }
-
-    if (bfmgr.isImplication(f)) {
-      assert unsafe.getArity(f) == 2;
-      return visitImplication(getArg(f, 0), getArg(f, 1));
-    }
-
-    if (bfmgr.isIfThenElse(f)) {
-      assert unsafe.getArity(f) == 3;
-      return visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    }
-
-    throw new UnsupportedOperationException("Unknown boolean operator " + f);
-  }
-
-  private BooleanFormula getArg(BooleanFormula pF, int i) {
-    Formula arg = unsafe.getArg(pF, i);
-    assert fmgr.getFormulaType(arg).isBooleanType();
-    return (BooleanFormula) arg;
-  }
-
-  private List<BooleanFormula> getAllArgs(BooleanFormula pF) {
-    int arity = unsafe.getArity(pF);
-    List<BooleanFormula> args = new ArrayList<>(arity);
-    for (int i = 0; i < arity; i++) {
-      args.add(getArg(pF, i));
-    }
-    return args;
+    return bfmgr.visit(this, f);
   }
 
   public abstract R visitTrue();

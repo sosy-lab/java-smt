@@ -19,13 +19,17 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
-import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
-
-import java.util.Collection;
-
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
+import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 class SmtInterpolBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -143,5 +147,75 @@ class SmtInterpolBooleanFormulaManager
   @Override
   protected boolean isIfThenElse(Term pBits) {
     return SmtInterpolUtil.isIfThenElse(pBits);
+  }
+
+  private int getArity(Term pF) {
+    return SmtInterpolUtil.getArity(pF);
+  }
+
+  private BooleanFormula getArg(Term pF, int index) {
+    assert getFormulaCreator().getBoolType().equals(getFormulaCreator().getFormulaType(pF));
+    return getFormulaCreator().encapsulateBoolean(SmtInterpolUtil.getArg(pF, index));
+  }
+
+  private List<BooleanFormula> getAllArgs(Term pF) {
+    int arity = getArity(pF);
+    List<BooleanFormula> args = new ArrayList<>(arity);
+    for (int i = 0; i < arity; i++) {
+      args.add(getArg(pF, i));
+    }
+    return args;
+  }
+
+  @Override
+  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Term f) {
+    if (isTrue(f)) {
+      assert getArity(f) == 0;
+      return pVisitor.visitTrue();
+    }
+
+    if (isFalse(f)) {
+      assert getArity(f) == 0;
+      return pVisitor.visitFalse();
+    }
+
+    if (isNot(f)) {
+      assert getArity(f) == 1;
+      return pVisitor.visitNot(getArg(f, 0));
+    }
+
+    if (isAnd(f)) {
+      if (getArity(f) == 0) {
+        return pVisitor.visitTrue();
+      } else if (getArity(f) == 1) {
+        return visit(pVisitor, getArg(f, 0));
+      }
+      return pVisitor.visitAnd(getAllArgs(f));
+    }
+
+    if (isOr(f)) {
+      if (getArity(f) == 0) {
+        return pVisitor.visitFalse();
+      } else if (getArity(f) == 1) {
+        return pVisitor.visit(getArg(f, 0));
+      }
+      return pVisitor.visitOr(getAllArgs(f));
+    }
+
+    if (isEquivalence(f)) {
+      assert getArity(f) == 2;
+      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
+    }
+
+    if (isIfThenElse(f)) {
+      assert getArity(f) == 3;
+      return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
+    }
+
+    if (SmtInterpolUtil.isAtom(f)) {
+      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+    }
+
+    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
   }
 }

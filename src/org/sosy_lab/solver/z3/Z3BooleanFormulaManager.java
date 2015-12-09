@@ -20,7 +20,10 @@
 package org.sosy_lab.solver.z3;
 
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
@@ -31,6 +34,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_xor;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
@@ -42,13 +46,19 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
+import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 
@@ -175,5 +185,92 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   @Override
   public Long applyTacticImpl(Long pParam, Tactic tactic) {
     return Z3NativeApiHelpers.applyTactic(z3context, pParam, tactic.getTacticName());
+  }
+
+  // copied from Z3UnsafeFormulaManager
+  private boolean isAtom(Long t) {
+    int astKind = get_ast_kind(z3context, t);
+    switch (astKind) {
+      case Z3_APP_AST:
+        long decl = get_app_decl(z3context, t);
+        return !Z3UnsafeFormulaManager.NON_ATOMIC_OP_TYPES.contains(get_decl_kind(z3context, decl));
+      case Z3_QUANTIFIER_AST:
+        return false;
+      default:
+        return true;
+    }
+  }
+
+  // copied from Z3UnsafeFormulaManager
+  private int getArity(Long t) {
+    Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
+    return get_app_num_args(z3context, t);
+  }
+
+  // copied from Z3UnsafeFormulaManager
+  private BooleanFormula getArg(Long pF, int index) {
+    assert getFormulaCreator().getBoolType().equals(getFormulaCreator().getFormulaType(pF));
+    return getFormulaCreator().encapsulateBoolean(get_app_arg(z3context, pF, index));
+  }
+
+  private List<BooleanFormula> getAllArgs(Long pF) {
+    int arity = getArity(pF);
+    List<BooleanFormula> args = new ArrayList<>(arity);
+    for (int i = 0; i < arity; i++) {
+      args.add(getArg(pF, i));
+    }
+    return args;
+  }
+
+  @Override
+  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Long f) {
+    if (isTrue(f)) {
+      assert getArity(f) == 0;
+      return pVisitor.visitTrue();
+    }
+
+    if (isFalse(f)) {
+      assert getArity(f) == 0;
+      return pVisitor.visitFalse();
+    }
+
+    if (isNot(f)) {
+      assert getArity(f) == 1;
+      return pVisitor.visitNot(getArg(f, 0));
+    }
+
+    if (isAnd(f)) {
+      if (getArity(f) == 0) {
+        return pVisitor.visitTrue();
+      } else if (getArity(f) == 1) {
+        return visit(pVisitor, getArg(f, 0));
+      }
+      return pVisitor.visitAnd(getAllArgs(f));
+    }
+
+    if (isOr(f)) {
+      if (getArity(f) == 0) {
+        return pVisitor.visitFalse();
+      } else if (getArity(f) == 1) {
+        return pVisitor.visit(getArg(f, 0));
+      }
+      return pVisitor.visitOr(getAllArgs(f));
+    }
+
+    if (isEquivalence(f)) {
+      assert getArity(f) == 2;
+      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
+    }
+
+    if (isIfThenElse(f)) {
+      assert getArity(f) == 3;
+      return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
+    }
+
+    if (isAtom(f)) {
+      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+    }
+
+    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
   }
 }

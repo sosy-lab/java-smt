@@ -89,7 +89,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     this.z3context = pCreator.getEnv();
   }
 
-  private final static ImmutableSet<Integer> NON_ATOMIC_OP_TYPES =
+  final static ImmutableSet<Integer> NON_ATOMIC_OP_TYPES =
       ImmutableSet.of(Z3_OP_AND, Z3_OP_OR, Z3_OP_IMPLIES, Z3_OP_ITE, Z3_OP_NOT);
 
   @Override

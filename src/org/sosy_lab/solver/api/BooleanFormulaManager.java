@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+
 import java.util.Collection;
 
 /**
@@ -164,4 +166,7 @@ public interface BooleanFormulaManager {
       return description;
     }
   }
+
+  /** Visit the formula with the given visitor. */
+  <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula formula);
 }
