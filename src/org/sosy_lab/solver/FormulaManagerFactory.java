@@ -123,8 +123,6 @@ public class FormulaManagerFactory {
   private final FormulaManager fmgr;
   private final FormulaManager itpFmgr;
 
-  private volatile @Nullable SolverFactory smtInterpolFactory = null;
-
   public FormulaManagerFactory(
       Configuration config, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
@@ -158,6 +156,9 @@ public class FormulaManagerFactory {
     try {
       switch (solverToCreate) {
         case SMTINTERPOL:
+
+          // Loading SmtInterpol is difficult as it requires it's own class
+          // loader.
           return loadSmtInterpol()
               .create(
                   config,
@@ -239,9 +240,8 @@ public class FormulaManagerFactory {
   // ------------------------- SmtInterpol -------------------------
   // For SmtInterpol we need a separate class loader
   // because it needs it's own (modified) version of the Java CUP runtime
-  // and we already have the normal (unmodified) version of Java CUP
+  // and we might already have the normal (unmodified) version of Java CUP
   // on the class path of the normal class loader.
-
   private static final Pattern SMTINTERPOL_CLASSES =
       Pattern.compile(
           "^("
@@ -259,30 +259,17 @@ public class FormulaManagerFactory {
   private static final AtomicInteger smtInterpolLoadingCount = new AtomicInteger(0);
 
   private SolverFactory loadSmtInterpol() {
-    // Double-checked locking is used here, be careful when changing something.
-    SolverFactory result = smtInterpolFactory;
+    try {
+      ClassLoader classLoader = getClassLoaderForSmtInterpol(logger);
 
-    if (result == null) {
-      synchronized (this) {
-        result = smtInterpolFactory;
-        if (result == null) {
-          try {
-            ClassLoader classLoader = getClassLoaderForSmtInterpol(logger);
-
-            @SuppressWarnings("unchecked")
-            Class<? extends SolverFactory> factoryClass =
-                (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
-            Constructor<? extends SolverFactory> factoryConstructor = factoryClass.getConstructor();
-            result = factoryConstructor.newInstance();
-            smtInterpolFactory = result;
-          } catch (ReflectiveOperationException e) {
-            throw new Classes.UnexpectedCheckedException("Failed to load SmtInterpol", e);
-          }
-        }
-      }
+      @SuppressWarnings("unchecked")
+      Class<? extends SolverFactory> factoryClass =
+          (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
+      Constructor<? extends SolverFactory> factoryConstructor = factoryClass.getConstructor();
+      return factoryConstructor.newInstance();
+    } catch (ReflectiveOperationException e) {
+      throw new Classes.UnexpectedCheckedException("Failed to load SmtInterpol", e);
     }
-
-    return result;
   }
 
   private static ClassLoader getClassLoaderForSmtInterpol(LogManager logger) {
