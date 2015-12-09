@@ -23,6 +23,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -56,7 +57,7 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
     return null;
   }
 
-  private Void visitMulti(BooleanFormula... pOperands) {
+  private Void visitMulti(List<BooleanFormula> pOperands) {
     for (BooleanFormula operand : pOperands) {
       visitIfNotSeen(operand);
     }
@@ -69,12 +70,12 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  protected Void visitAnd(BooleanFormula... pOperands) {
+  protected Void visitAnd(List<BooleanFormula> pOperands) {
     return visitMulti(pOperands);
   }
 
   @Override
-  protected Void visitOr(BooleanFormula... pOperands) {
+  protected Void visitOr(List<BooleanFormula> pOperands) {
     return visitMulti(pOperands);
   }
 

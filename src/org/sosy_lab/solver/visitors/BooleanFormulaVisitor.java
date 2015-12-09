@@ -25,6 +25,9 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class BooleanFormulaVisitor<R> {
 
   private final FormulaManager fmgr;
@@ -99,11 +102,11 @@ public abstract class BooleanFormulaVisitor<R> {
     return (BooleanFormula) arg;
   }
 
-  private BooleanFormula[] getAllArgs(BooleanFormula pF) {
+  private List<BooleanFormula> getAllArgs(BooleanFormula pF) {
     int arity = unsafe.getArity(pF);
-    BooleanFormula[] args = new BooleanFormula[arity];
+    List<BooleanFormula> args = new ArrayList<>(arity);
     for (int i = 0; i < arity; i++) {
-      args[i] = getArg(pF, i);
+      args.add(getArg(pF, i));
     }
     return args;
   }
@@ -116,9 +119,9 @@ public abstract class BooleanFormulaVisitor<R> {
 
   protected abstract R visitNot(BooleanFormula operand);
 
-  protected abstract R visitAnd(BooleanFormula... operands);
+  protected abstract R visitAnd(List<BooleanFormula> operands);
 
-  protected abstract R visitOr(BooleanFormula... operand);
+  protected abstract R visitOr(List<BooleanFormula> operand);
 
   protected abstract R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
 

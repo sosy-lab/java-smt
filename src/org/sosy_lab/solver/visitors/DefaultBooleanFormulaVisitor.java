@@ -22,6 +22,8 @@ package org.sosy_lab.solver.visitors;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 
+import java.util.List;
+
 public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisitor<R> {
 
   protected DefaultBooleanFormulaVisitor(FormulaManager pFmgr) {
@@ -49,12 +51,12 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   }
 
   @Override
-  protected R visitAnd(BooleanFormula... pOperands) {
+  protected R visitAnd(List<BooleanFormula> pOperands) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitOr(BooleanFormula... pOperands) {
+  protected R visitOr(List<BooleanFormula> pOperands) {
     throw new UnsupportedOperationException();
   }
 

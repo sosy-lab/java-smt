@@ -34,7 +34,7 @@ import java.util.Map;
  * is visited only once to avoid the exponential explosion.
  * When a subclass wants to traverse into a subtree of the formula,
  * it needs to call {@link #visitIfNotSeen(BooleanFormula)} or
- * {@link #visitIfNotSeen(BooleanFormula...)} to ensure this.
+ * {@link #visitIfNotSeen(List)} to ensure this.
  *
  * <p>
  * By default this class implements the identity function.
@@ -67,8 +67,8 @@ public abstract class BooleanFormulaTransformationVisitor
     return out;
   }
 
-  protected final List<BooleanFormula> visitIfNotSeen(BooleanFormula... pOperands) {
-    List<BooleanFormula> args = new ArrayList<>(pOperands.length);
+  protected final List<BooleanFormula> visitIfNotSeen(List<BooleanFormula> pOperands) {
+    List<BooleanFormula> args = new ArrayList<>(pOperands.size());
     for (BooleanFormula arg : pOperands) {
       args.add(visitIfNotSeen(arg));
     }
@@ -96,12 +96,12 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  protected BooleanFormula visitAnd(BooleanFormula... pOperands) {
+  protected BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
     return bfmgr.and(visitIfNotSeen(pOperands));
   }
 
   @Override
-  protected BooleanFormula visitOr(BooleanFormula... pOperands) {
+  protected BooleanFormula visitOr(List<BooleanFormula> pOperands) {
     return bfmgr.or(visitIfNotSeen(pOperands));
   }
 
