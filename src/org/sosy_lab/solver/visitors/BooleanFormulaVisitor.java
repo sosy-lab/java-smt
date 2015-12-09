@@ -97,7 +97,7 @@ public abstract class BooleanFormulaVisitor<R> {
   private BooleanFormula getArg(BooleanFormula pF, int i) {
     Formula arg = unsafe.getArg(pF, i);
     assert fmgr.getFormulaType(arg).isBooleanType();
-    return (BooleanFormula)arg;
+    return (BooleanFormula) arg;
   }
 
   private BooleanFormula[] getAllArgs(BooleanFormula pF) {
@@ -117,5 +117,6 @@ public abstract class BooleanFormulaVisitor<R> {
   protected abstract R visitOr(BooleanFormula... operand);
   protected abstract R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
   protected abstract R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
-  protected abstract R visitIfThenElse(BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
+  protected abstract R visitIfThenElse(BooleanFormula condition,
+      BooleanFormula thenFormula, BooleanFormula elseFormula);
 }

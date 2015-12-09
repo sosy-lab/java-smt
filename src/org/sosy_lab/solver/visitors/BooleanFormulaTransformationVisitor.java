@@ -37,11 +37,16 @@ import java.util.Map;
  * it needs to call {@link #visitIfNotSeen(BooleanFormula)} or
  * {@link #visitIfNotSeen(BooleanFormula...)} to ensure this.
  *
+ * <p>
  * By default this class implements the identity function.
+ * </p>
  *
+ * <p>
  * No guarantee on iteration order is made.
+ * </p>
  */
-public abstract class BooleanFormulaTransformationVisitor extends BooleanFormulaVisitor<BooleanFormula> {
+public abstract class BooleanFormulaTransformationVisitor
+    extends BooleanFormulaVisitor<BooleanFormula> {
 
   private final BooleanFormulaManager bfmgr;
 

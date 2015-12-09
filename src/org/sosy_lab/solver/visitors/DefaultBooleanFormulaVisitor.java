@@ -70,7 +70,8 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   }
 
   @Override
-  protected R visitIfThenElse(BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+  protected R visitIfThenElse(BooleanFormula pCondition,
+      BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     throw new UnsupportedOperationException();
   }
 }

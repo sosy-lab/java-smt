@@ -32,11 +32,15 @@ import java.util.Set;
  * This class ensures that each identical subtree of the formula
  * is visited only once to avoid the exponential explosion.
  *
+ * <p>
  * Subclasses of this class should call super.visit...() to ensure recursive
  * traversal. If such a call is omitted, the respective part of the formula
  * is not visited.
+ * </p>
  *
+ * <p>
  * No guarantee on iteration order is made.
+ * </p>
  */
 public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisitor<Void> {
 
@@ -90,7 +94,8 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  protected Void visitIfThenElse(BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+  protected Void visitIfThenElse(BooleanFormula pCondition,
+      BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     visitIfNotSeen(pCondition);
     visitIfNotSeen(pThenFormula);
     visitIfNotSeen(pElseFormula);
