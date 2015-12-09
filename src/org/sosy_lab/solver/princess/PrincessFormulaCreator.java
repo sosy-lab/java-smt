@@ -20,7 +20,10 @@
 package org.sosy_lab.solver.princess;
 
 import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.ArrayFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import ap.parser.IExpression;
@@ -33,7 +36,9 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
 
   @Override
   public FormulaType<?> getFormulaType(IExpression pFormula) {
-    if (PrincessUtil.isBoolean(pFormula)) {
+    if (getEnv().hasArrayType(pFormula)) {
+      return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
+    } else if (PrincessUtil.isBoolean(pFormula)) {
       return FormulaType.BooleanType;
     } else if (PrincessUtil.hasIntegerType(pFormula)) {
       return FormulaType.IntegerType;
@@ -58,6 +63,20 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
 
   @Override
   public TermType getArrayType(TermType pIndexType, TermType pElementType) {
-    throw new IllegalArgumentException("Princess.getArrayType(): Implement me!");
+    // no special cases here, princess does only support int arrays with int indexes
+    return TermType.Array;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Formula> FormulaType<T> getFormulaType(final T pFormula) {
+    if (pFormula instanceof ArrayFormula<?, ?>) {
+      final FormulaType<?> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<?, ?>) pFormula);
+      final FormulaType<?> arrayElementType =
+          getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
+      return (FormulaType<T>) new ArrayFormulaType<>(arrayIndexType, arrayElementType);
+    }
+
+    return super.getFormulaType(pFormula);
   }
 }

@@ -669,6 +669,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     if (solver == Solvers.MATHSAT5) {
       // Mathsat5 has a different internal representation of the formula
       assertThat(_b_at_i_plus_1.toString()).isEqualTo("(`read_int_int` b (`+_int` i 1))");
+    } else if (solver == Solvers.PRINCESS) {
+      assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
     } else {
       assertThat(_b_at_i_plus_1.toString())
           .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed

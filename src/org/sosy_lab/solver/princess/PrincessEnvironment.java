@@ -26,9 +26,11 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
 import static org.sosy_lab.solver.princess.PrincessUtil.getVarsAndUIFs;
 import static scala.collection.JavaConversions.asJavaIterable;
+import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import org.sosy_lab.common.Appender;
@@ -86,6 +88,7 @@ class PrincessEnvironment {
    * so we need to have the same objects. */
   private final Map<String, IFormula> boolVariablesCache = new HashMap<>();
   private final Map<String, ITerm> intVariablesCache = new HashMap<>();
+  private final Map<String, ITerm> arrayVariablesCache = new HashMap<>();
 
   private final Map<String, IFunction> functionsCache = new HashMap<>();
   private final Map<IFunction, TermType> functionsReturnTypes = new HashMap<>();
@@ -143,6 +146,9 @@ class PrincessEnvironment {
     for (ITerm s : intVariablesCache.values()) {
       stack.addSymbol(s);
     }
+    for (ITerm s : arrayVariablesCache.values()) {
+      stack.addSymbol(s);
+    }
     for (IFunction s : functionsCache.values()) {
       stack.addSymbol(s);
     }
@@ -192,14 +198,22 @@ class PrincessEnvironment {
 
     List<IExpression> formula = castToExpression(seqAsJavaList(triple._1()));
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
+    Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
     Set<IExpression> declaredfunctions = PrincessUtil.getVarsAndUIFs(formula);
     for (IExpression var : declaredfunctions) {
       if (var instanceof IConstant) {
-        intVariablesCache.put(var.toString(), (ITerm) var);
+        SMTType type = constantTypes.get(((IConstant) var).c());
+        if (type instanceof SMTParser2InputAbsy.SMTArray) {
+          arrayVariablesCache.put(var.toString(), (ITerm) var);
+        } else {
+          intVariablesCache.put(var.toString(), (ITerm) var);
+        }
+
         for (SymbolTrackingPrincessStack stack : registeredStacks) {
           stack.addSymbol((IConstant) var);
         }
+
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
         for (SymbolTrackingPrincessStack stack : registeredStacks) {
@@ -359,8 +373,7 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(TermType type, String varname) {
     switch (type) {
-      case Boolean:
-        {
+      case Boolean: {
           if (boolVariablesCache.containsKey(varname)) {
             return boolVariablesCache.get(varname);
           } else {
@@ -373,8 +386,7 @@ class PrincessEnvironment {
           }
         }
 
-      case Integer:
-        {
+      case Integer: {
           if (intVariablesCache.containsKey(varname)) {
             return intVariablesCache.get(varname);
           } else {
@@ -383,6 +395,18 @@ class PrincessEnvironment {
               stack.addSymbol(var);
             }
             intVariablesCache.put(varname, var);
+            return var;
+          }
+        }
+      case Array: {
+          if (arrayVariablesCache.containsKey(varname)) {
+            return arrayVariablesCache.get(varname);
+          } else {
+            ITerm var = api.createConstant(varname);
+            for (SymbolTrackingPrincessStack stack : allStacks) {
+              stack.addSymbol(var);
+            }
+            arrayVariablesCache.put(varname, var);
             return var;
           }
         }
@@ -442,6 +466,20 @@ class PrincessEnvironment {
     }
 
     return returnFormula;
+  }
+
+  public ITerm makeSelect(ITerm array, ITerm index) {
+    List<ITerm> args = Lists.newArrayList(array, index);
+    return api.select(iterableAsScalaIterable(args).toSeq());
+  }
+
+  public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
+    List<ITerm> args = Lists.newArrayList(array, index, value);
+    return api.select(iterableAsScalaIterable(args).toSeq());
+  }
+
+  public boolean hasArrayType(IExpression exp) {
+    return arrayVariablesCache.containsValue(exp);
   }
 
   public String getVersion() {

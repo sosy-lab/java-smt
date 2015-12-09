@@ -71,6 +71,7 @@ public final class PrincessFormulaManager
       PrincessFunctionFormulaManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
+      PrincessArrayFormulaManager pArrayManager,
       ShutdownNotifier pShutdownNotifier) {
     super(
         pCreator,
@@ -82,7 +83,7 @@ public final class PrincessFormulaManager
         null,
         null,
         null,
-        null);
+        pArrayManager);
     shutdownNotifier = pShutdownNotifier;
   }
 
@@ -106,9 +107,10 @@ public final class PrincessFormulaManager
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
     PrincessIntegerFormulaManager integerTheory =
         new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
 
-    return new PrincessFormulaManager(
-        creator, unsafeManager, functionTheory, booleanTheory, integerTheory, pShutdownNotifier);
+    return new PrincessFormulaManager(creator, unsafeManager, functionTheory, booleanTheory,
+        integerTheory, arrayTheory, pShutdownNotifier);
   }
 
   BooleanFormula encapsulateBooleanFormula(IExpression t) {
