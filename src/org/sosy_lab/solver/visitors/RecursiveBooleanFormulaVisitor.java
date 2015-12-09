@@ -65,36 +65,36 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  protected Void visitNot(BooleanFormula pOperand) {
+  public Void visitNot(BooleanFormula pOperand) {
     return visitIfNotSeen(pOperand);
   }
 
   @Override
-  protected Void visitAnd(List<BooleanFormula> pOperands) {
+  public Void visitAnd(List<BooleanFormula> pOperands) {
     return visitMulti(pOperands);
   }
 
   @Override
-  protected Void visitOr(List<BooleanFormula> pOperands) {
+  public Void visitOr(List<BooleanFormula> pOperands) {
     return visitMulti(pOperands);
   }
 
   @Override
-  protected Void visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public Void visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     visitIfNotSeen(pOperand1);
     visitIfNotSeen(pOperand2);
     return null;
   }
 
   @Override
-  protected Void visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public Void visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     visitIfNotSeen(pOperand1);
     visitIfNotSeen(pOperand2);
     return null;
   }
 
   @Override
-  protected Void visitIfThenElse(
+  public Void visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     visitIfNotSeen(pCondition);
     visitIfNotSeen(pThenFormula);

@@ -76,47 +76,47 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  protected BooleanFormula visitTrue() {
+  public BooleanFormula visitTrue() {
     return bfmgr.makeBoolean(true);
   }
 
   @Override
-  protected BooleanFormula visitFalse() {
+  public BooleanFormula visitFalse() {
     return bfmgr.makeBoolean(false);
   }
 
   @Override
-  protected BooleanFormula visitAtom(BooleanFormula pAtom) {
+  public BooleanFormula visitAtom(BooleanFormula pAtom) {
     return pAtom;
   }
 
   @Override
-  protected BooleanFormula visitNot(BooleanFormula pOperand) {
+  public BooleanFormula visitNot(BooleanFormula pOperand) {
     return bfmgr.not(visitIfNotSeen(pOperand));
   }
 
   @Override
-  protected BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
+  public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
     return bfmgr.and(visitIfNotSeen(pOperands));
   }
 
   @Override
-  protected BooleanFormula visitOr(List<BooleanFormula> pOperands) {
+  public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
     return bfmgr.or(visitIfNotSeen(pOperands));
   }
 
   @Override
-  protected BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     return bfmgr.equivalence(visitIfNotSeen(pOperand1), visitIfNotSeen(pOperand2));
   }
 
   @Override
-  protected BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     return bfmgr.implication(visitIfNotSeen(pOperand1), visitIfNotSeen(pOperand2));
   }
 
   @Override
-  protected BooleanFormula visitIfThenElse(
+  public BooleanFormula visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     return bfmgr.ifThenElse(
         visitIfNotSeen(pCondition), visitIfNotSeen(pThenFormula), visitIfNotSeen(pElseFormula));

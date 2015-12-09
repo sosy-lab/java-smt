@@ -31,47 +31,47 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   }
 
   @Override
-  protected R visitTrue() {
+  public R visitTrue() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitFalse() {
+  public R visitFalse() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitAtom(BooleanFormula pAtom) {
+  public R visitAtom(BooleanFormula pAtom) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitNot(BooleanFormula pOperand) {
+  public R visitNot(BooleanFormula pOperand) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitAnd(List<BooleanFormula> pOperands) {
+  public R visitAnd(List<BooleanFormula> pOperands) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitOr(List<BooleanFormula> pOperands) {
+  public R visitOr(List<BooleanFormula> pOperands) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public R visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public R visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected R visitIfThenElse(
+  public R visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     throw new UnsupportedOperationException();
   }

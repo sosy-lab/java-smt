@@ -111,22 +111,22 @@ public abstract class BooleanFormulaVisitor<R> {
     return args;
   }
 
-  protected abstract R visitTrue();
+  public abstract R visitTrue();
 
-  protected abstract R visitFalse();
+  public abstract R visitFalse();
 
-  protected abstract R visitAtom(BooleanFormula atom);
+  public abstract R visitAtom(BooleanFormula atom);
 
-  protected abstract R visitNot(BooleanFormula operand);
+  public abstract R visitNot(BooleanFormula operand);
 
-  protected abstract R visitAnd(List<BooleanFormula> operands);
+  public abstract R visitAnd(List<BooleanFormula> operands);
 
-  protected abstract R visitOr(List<BooleanFormula> operand);
+  public abstract R visitOr(List<BooleanFormula> operand);
 
-  protected abstract R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
+  public abstract R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
 
-  protected abstract R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
+  public abstract R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
 
-  protected abstract R visitIfThenElse(
+  public abstract R visitIfThenElse(
       BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
 }
