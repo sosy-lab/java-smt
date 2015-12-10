@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.HashSet;
@@ -100,5 +101,15 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
     visitIfNotSeen(pThenFormula);
     visitIfNotSeen(pElseFormula);
     return null;
+  }
+
+  @Override
+  public Void visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+    return visitIfNotSeen(body);
+  }
+
+  @Override
+  public Void visitExistsQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+    return visitIfNotSeen(body);
   }
 }

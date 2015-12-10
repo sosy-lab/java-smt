@@ -21,7 +21,9 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +50,7 @@ public abstract class BooleanFormulaTransformationVisitor
     extends BooleanFormulaVisitor<BooleanFormula> {
 
   private final BooleanFormulaManager bfmgr;
+  private final QuantifiedFormulaManager qfmgr;
 
   private final Map<BooleanFormula, BooleanFormula> cache;
 
@@ -55,6 +58,16 @@ public abstract class BooleanFormulaTransformationVisitor
       FormulaManager pFmgr, Map<BooleanFormula, BooleanFormula> pCache) {
     super(pFmgr);
     bfmgr = pFmgr.getBooleanFormulaManager();
+
+    QuantifiedFormulaManager qantiFmgr = null;
+    try {
+      qantiFmgr = pFmgr.getQuantifiedFormulaManager();
+    } catch (UnsupportedOperationException ignore) {
+      // ignore, some solvers do not support quantifiers and thus
+      // we delay the exception until the QuantifiedFormulaManager is accessed.
+    }
+    qfmgr = qantiFmgr;
+
     cache = pCache;
   }
 
@@ -120,5 +133,22 @@ public abstract class BooleanFormulaTransformationVisitor
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
     return bfmgr.ifThenElse(
         visitIfNotSeen(pCondition), visitIfNotSeen(pThenFormula), visitIfNotSeen(pElseFormula));
+  }
+
+  @Override
+  public BooleanFormula visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+    if (null == qfmgr) {
+      throw new UnsupportedOperationException();
+    }
+    return qfmgr.forall(variables, visitIfNotSeen(body));
+  }
+
+  @Override
+  public BooleanFormula visitExistsQuantifier(
+      List<? extends Formula> variables, BooleanFormula body) {
+    if (null == qfmgr) {
+      throw new UnsupportedOperationException();
+    }
+    return qfmgr.exists(variables, visitIfNotSeen(body));
   }
 }

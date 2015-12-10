@@ -21,6 +21,7 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.List;
@@ -59,4 +60,8 @@ public abstract class BooleanFormulaVisitor<R> {
 
   public abstract R visitIfThenElse(
       BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
+
+  public abstract R visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body);
+
+  public abstract R visitExistsQuantifier(List<? extends Formula> variables, BooleanFormula body);
 }

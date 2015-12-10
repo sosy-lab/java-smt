@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.List;
@@ -73,6 +74,16 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   @Override
   public R visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public R visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public R visitExistsQuantifier(List<? extends Formula> variables, BooleanFormula body) {
     throw new UnsupportedOperationException();
   }
 }
