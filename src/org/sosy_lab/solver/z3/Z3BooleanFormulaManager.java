@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
@@ -262,6 +263,11 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
       return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
     }
 
+    if (isImplication(f)) {
+      assert getArity(f) == 2;
+      return pVisitor.visitImplication(getArg(f, 0), getArg(f, 1));
+    }
+
     if (isIfThenElse(f)) {
       assert getArity(f) == 3;
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
@@ -271,6 +277,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
 
-    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
+    throw new UnsupportedOperationException(
+        "Unknown or unsupported boolean operator " + ast_to_string(z3context, f));
   }
 }
