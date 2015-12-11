@@ -315,6 +315,12 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
+  public Long applyTacticImpl(Long input, Tactic tactic) {
+    return Z3NativeApiHelpers.applyTactic(
+        getFormulaCreator().getEnv(), input, tactic.getTacticName());
+  }
+
+  @Override
   public Appender dumpFormula(final Long expr) {
     assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";

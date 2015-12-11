@@ -208,4 +208,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   public final TFormulaInfo extractInfo(Formula f) {
     return formulaCreator.extractInfo(f);
   }
+
+  @Override
+  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) {
+    return formulaCreator.encapsulateBoolean(applyTacticImpl(extractInfo(f), tactic));
+  }
+
+  protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
+    throw new UnsupportedOperationException("Tactics are not supported by the solver");
+  }
 }

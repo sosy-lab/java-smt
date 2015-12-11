@@ -179,15 +179,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
     return isOP(z3context, pParam, Z3_OP_ITE);
   }
 
-  /**
-   * @param pParam Z3_ast
-   * @return Z3_ast with the tactic applied.
-   */
-  @Override
-  public Long applyTacticImpl(Long pParam, Tactic tactic) {
-    return Z3NativeApiHelpers.applyTactic(z3context, pParam, tactic.getTacticName());
-  }
-
   // copied from Z3UnsafeFormulaManager
   private boolean isAtom(Long t) {
     int astKind = get_ast_kind(z3context, t);
