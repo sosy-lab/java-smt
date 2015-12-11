@@ -33,8 +33,9 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.basicimpl.tactics.NNFVisitor;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
+
+import javax.annotation.Nullable;
 
 /**
  * Simplifies building a solver from the specific theories.
@@ -220,7 +221,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     if (tactic == Tactic.NNF) {
 
       // Default implementation of NNF tactic.
-      BooleanFormula out = new NNFVisitor(this, new HashMap<BooleanFormula, BooleanFormula>()).visit(
+      BooleanFormula out = new NNFVisitor(this,
+            new HashMap<BooleanFormula, BooleanFormula>()).visit(
           formulaCreator.encapsulateBoolean(f)
       );
       return extractInfo(out);

@@ -32,8 +32,10 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.Collection;
 
+
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+    implements BooleanFormulaManager {
 
   protected AbstractBooleanFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
