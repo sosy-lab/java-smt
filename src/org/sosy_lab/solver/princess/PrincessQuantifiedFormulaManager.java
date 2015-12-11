@@ -20,11 +20,14 @@
 package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
+import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IQuantified;
-import ap.parser.ITerm;
+import ap.parser.IVariable;
+import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier;
 
 import com.google.common.base.Preconditions;
@@ -35,9 +38,7 @@ import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class PrincessQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<IExpression, TermType, PrincessEnvironment> {
@@ -53,26 +54,27 @@ public class PrincessQuantifiedFormulaManager
   @Override
   protected IExpression exists(List<IExpression> pVariables, IExpression pBody) {
     checkArgument(pBody instanceof IFormula);
-    Set<IExpression> vars = PrincessUtil.getVarsAndUIFs(Collections.singleton(pBody));
-    List<ITerm> normalVariables = new ArrayList<>();
-    for (IExpression var : vars) {
-      if (var instanceof ITerm && !pVariables.contains(var)) {
-        normalVariables.add((ITerm) var);
-      }
-    }
-    return env.makeExists(normalVariables, (IFormula) pBody);
+
+    return IExpression.quanConsts(
+        Quantifier.EX$.MODULE$,
+        iterableAsScalaIterable(toConstantTerm(pVariables)),
+        (IFormula) pBody);
   }
 
   @Override
   protected IExpression forall(List<IExpression> pVariables, IExpression pBody) {
     checkArgument(pBody instanceof IFormula);
-    return env.makeForAll(castToITerm(pVariables), (IFormula) pBody);
+
+    return IExpression.quanConsts(
+        Quantifier.ALL$.MODULE$,
+        iterableAsScalaIterable(toConstantTerm(pVariables)),
+        (IFormula) pBody);
   }
 
-  private List<ITerm> castToITerm(List<IExpression> lst) {
-    List<ITerm> retVal = new ArrayList<>(lst.size());
+  private List<ConstantTerm> toConstantTerm(List<IExpression> lst) {
+    List<ConstantTerm> retVal = new ArrayList<>(lst.size());
     for (IExpression f : lst) {
-      retVal.add((ITerm) f);
+      retVal.add(((IConstant) f).c());
     }
     return retVal;
   }
@@ -103,8 +105,9 @@ public class PrincessQuantifiedFormulaManager
 
   @Override
   protected int numQuantifierBound(IExpression pExtractInfo) {
-    // TODO implement
-    throw new UnsupportedOperationException("Currently not implemented");
+    // in Princess a quantifier binds exactly one variable
+    // so returning 1 here is correct
+    return 1;
   }
 
   @Override
@@ -115,7 +118,6 @@ public class PrincessQuantifiedFormulaManager
 
   @Override
   public boolean isBoundByQuantifier(IExpression pF) {
-    // TODO implement
-    throw new UnsupportedOperationException("Currently not implemented");
+    return pF instanceof IVariable;
   }
 }

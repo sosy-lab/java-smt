@@ -486,14 +486,6 @@ class PrincessEnvironment {
     return arrayVariablesCache.containsValue(exp);
   }
 
-  public IFormula makeExists(List<ITerm> pVariables, IFormula pBody) {
-    return api.projectEx(pBody, iterableAsScalaIterable(pVariables));
-  }
-
-  public IFormula makeForAll(List<ITerm> pVariables, IFormula pBody) {
-    return api.projectAll(pBody, iterableAsScalaIterable(pVariables));
-  }
-
   public IFormula elimQuantifiers(IFormula formula) {
     return api.simplify(formula);
   }
