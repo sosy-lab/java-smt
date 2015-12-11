@@ -43,22 +43,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
 
   @Override
   public FormulaType<?> getFormulaType(final Term pFormula) {
-    if (SmtInterpolUtil.isBoolean(pFormula)) {
-      return FormulaType.BooleanType;
-    } else if (SmtInterpolUtil.hasIntegerType(pFormula)) {
-      return FormulaType.IntegerType;
-    } else if (SmtInterpolUtil.hasRationalType(pFormula)) {
-      return FormulaType.RationalType;
-    } else if (SmtInterpolUtil.hasArrayType(pFormula)) {
-      Sort[] argumentSorts = pFormula.getSort().getArguments();
-      assert argumentSorts.length == 2
-          : "Array sort has to have two arguments,"
-              + " one for index type and one for element type!";
-
-      return new FormulaType.ArrayFormulaType<>(
-          getFormulaTypeOfSort(argumentSorts[0]), getFormulaTypeOfSort(argumentSorts[1]));
-    }
-    throw new IllegalArgumentException("Unknown formula type");
+    return getFormulaTypeOfSort(pFormula.getSort());
   }
 
   private FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
@@ -68,8 +53,13 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
       return FormulaType.RationalType;
     } else if (pSort == booleanSort) {
       return FormulaType.BooleanType;
+    } else if (pSort.isArraySort()) {
+      return new FormulaType.ArrayFormulaType<>(
+          getFormulaTypeOfSort(pSort.getArguments()[0]),
+          getFormulaTypeOfSort(pSort.getArguments()[1])
+      );
     } else {
-      throw new IllegalArgumentException("Unknown formula type");
+      throw new IllegalArgumentException("Unknown formula type for sort: " + pSort);
     }
   }
 
