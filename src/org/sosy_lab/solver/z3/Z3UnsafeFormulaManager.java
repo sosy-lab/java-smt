@@ -108,7 +108,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
   @Override
   public int getArity(Long t) {
-    // TODO too strict for now: Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
+    // TODO too strict for now:
+    // Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
     Preconditions.checkArgument(get_ast_kind(z3context, t) != Z3_QUANTIFIER_AST);
     return get_app_num_args(z3context, t);
   }
