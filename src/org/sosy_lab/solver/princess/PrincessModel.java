@@ -33,6 +33,7 @@ import org.sosy_lab.solver.AssignableTerm;
 import org.sosy_lab.solver.AssignableTerm.Function;
 import org.sosy_lab.solver.AssignableTerm.Variable;
 import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.TermType;
 
 import scala.Option;
@@ -111,7 +112,8 @@ class PrincessModel {
     }
   }
 
-  static Model createModel(PrincessStack stack, Collection<IExpression> assertedFormulas) {
+  static Model createModel(PrincessStack stack, Collection<IExpression> assertedFormulas)
+      throws SolverException {
     Map<AssignableTerm, Object> model = new LinkedHashMap<>();
 
     checkArgument(stack.checkSat(), "model is only available for SAT environments");

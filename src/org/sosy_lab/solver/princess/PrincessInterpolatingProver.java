@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
@@ -127,7 +128,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
   }
 
   @Override
-  public Model getModel() {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     assert assertedFormulas.size() == annotatedTerms.size();
     final List<IExpression> values = Lists.<IExpression>newArrayList(annotatedTerms.values());

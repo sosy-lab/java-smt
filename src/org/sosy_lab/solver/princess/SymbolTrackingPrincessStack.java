@@ -29,6 +29,7 @@ import ap.parser.IFunction;
 import ap.parser.ITerm;
 
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
 
 import scala.Enumeration.Value;
@@ -134,14 +135,14 @@ class SymbolTrackingPrincessStack implements PrincessStack {
    * if their conjunction is SAT or UNSAT.
    */
   @Override
-  public boolean checkSat() {
+  public boolean checkSat() throws SolverException {
     final Value result = api.checkSat(true);
     if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
       return true;
     } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
       return false;
     } else {
-      throw new AssertionError("checkSat returned " + result);
+      throw new SolverException("Princess' checkSat call returned " + result);
     }
   }
 

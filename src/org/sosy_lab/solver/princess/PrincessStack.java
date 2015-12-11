@@ -22,6 +22,8 @@ package org.sosy_lab.solver.princess;
 import ap.SimpleAPI;
 import ap.parser.IFormula;
 
+import org.sosy_lab.solver.SolverException;
+
 import scala.Option;
 
 import java.util.List;
@@ -42,7 +44,7 @@ interface PrincessStack {
 
   void assertTermInPartition(IFormula booleanFormula, int index);
 
-  boolean checkSat();
+  boolean checkSat() throws SolverException;
 
   SimpleAPI.PartialModel getPartialModel();
 

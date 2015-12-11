@@ -56,7 +56,7 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
   }
 
   @Override
-  public Model getModel() {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     return PrincessModel.createModel(stack, assertedTerms);
   }

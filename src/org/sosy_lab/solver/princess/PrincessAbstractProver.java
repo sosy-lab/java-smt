@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverException;
 
 abstract class PrincessAbstractProver {
 
@@ -39,14 +40,14 @@ abstract class PrincessAbstractProver {
   /** This function causes the SatSolver to check all the terms on the stack,
    * if their conjunction is SAT or UNSAT.
    */
-  public boolean isUnsat() {
+  public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
     return !stack.checkSat();
   }
 
   public abstract void pop();
 
-  public abstract Model getModel();
+  public abstract Model getModel() throws SolverException;
 
   public void close() {
     checkNotNull(stack);
