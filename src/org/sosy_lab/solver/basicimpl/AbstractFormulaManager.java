@@ -31,8 +31,10 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.basicimpl.tactics.NNFVisitor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Simplifies building a solver from the specific theories.
@@ -215,6 +217,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
+    if (tactic == Tactic.NNF) {
+
+      // Default implementation of NNF tactic.
+      BooleanFormula out = new NNFVisitor(this, new HashMap<BooleanFormula, BooleanFormula>()).visit(
+          formulaCreator.encapsulateBoolean(f)
+      );
+      return extractInfo(out);
+    }
     throw new UnsupportedOperationException("Tactics are not supported by the solver");
   }
 }
