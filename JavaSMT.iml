@@ -95,7 +95,14 @@
           <root url="jar://$MODULE_DIR$/lib/java/runtime/smtinterpol-comp.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/DeltaDebugger/src" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/Library-SMTLIB/src" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/ProoftreeCheck/src" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpol/src" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpolSamples/src" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpolTest/src" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
