@@ -26,11 +26,8 @@ import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IQuantified;
-import ap.parser.IVariable;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier;
-
-import com.google.common.base.Preconditions;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.TermType;
@@ -88,7 +85,7 @@ public class PrincessQuantifiedFormulaManager
 
   @Override
   protected boolean isQuantifier(IExpression pExtractInfo) {
-    return pExtractInfo instanceof IQuantified;
+    return PrincessUtil.isQuantifier(pExtractInfo);
   }
 
   @Override
@@ -112,12 +109,11 @@ public class PrincessQuantifiedFormulaManager
 
   @Override
   protected IExpression getQuantifierBody(IExpression pExtractInfo) {
-    Preconditions.checkState(isQuantifier(pExtractInfo));
-    return ((IQuantified) pExtractInfo).subformula();
+    return PrincessUtil.getQuantifierBody(pExtractInfo);
   }
 
   @Override
   public boolean isBoundByQuantifier(IExpression pF) {
-    return pF instanceof IVariable;
+    return PrincessUtil.isBoundByQuantifier(pF);
   }
 }

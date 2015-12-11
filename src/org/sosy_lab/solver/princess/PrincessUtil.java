@@ -32,8 +32,12 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.INot;
+import ap.parser.IQuantified;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+import ap.parser.IVariable;
+
+import com.google.common.base.Preconditions;
 
 import scala.Enumeration;
 import scala.collection.Iterator;
@@ -72,13 +76,28 @@ class PrincessUtil {
   }
 
   public static boolean isUIF(IExpression t) {
-    return (t instanceof IFunApp);
+    return (t instanceof IFunApp)
+        && !((IFunApp) t).fun().name().equals("select")
+        && !((IFunApp) t).fun().name().equals("store");
   }
 
   /** check for ConstantTerm with Number or
    * ApplicationTerm with negative Number */
   public static boolean isNumber(IExpression t) {
     return t instanceof IIntLit;
+  }
+
+  public static boolean isQuantifier(IExpression t) {
+    return t instanceof IQuantified;
+  }
+
+  public static boolean isBoundByQuantifier(IExpression t) {
+    return t instanceof IVariable;
+  }
+
+  public static IExpression getQuantifierBody(IExpression t) {
+    Preconditions.checkState(isQuantifier(t));
+    return ((IQuantified) t).subformula();
   }
 
   /** converts a term to a number,

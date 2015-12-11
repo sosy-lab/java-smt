@@ -20,7 +20,9 @@
 package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.singleton;
 import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
+import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.basetypes.IdealInt;
 import ap.parser.BooleanCompactifier;
@@ -32,6 +34,7 @@ import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
 import ap.parser.PartialEvaluator;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
@@ -92,6 +95,12 @@ class PrincessUnsafeFormulaManager
 
     if (isVariable(t)) {
       checkArgument(newArgs.isEmpty());
+
+      // when no new name is given we need to use the old variable
+      if (t.toString().equals(pNewName)) {
+        return t;
+      }
+
       return getFormulaCreator()
           .makeVariable(isBoolean(t) ? TermType.Boolean : TermType.Integer, pNewName);
 
@@ -140,17 +149,18 @@ class PrincessUnsafeFormulaManager
 
   @Override
   protected boolean isQuantification(IExpression pT) {
-    return false;
+    return PrincessUtil.isQuantifier(pT);
   }
 
   @Override
   protected IExpression getQuantifiedBody(IExpression pT) {
-    throw new UnsupportedOperationException();
+    return PrincessUtil.getQuantifierBody(pT);
   }
 
   @Override
   protected IExpression replaceQuantifiedBody(IExpression pF, IExpression pBody) {
-    throw new UnsupportedOperationException();
+    Preconditions.checkArgument(isQuantification(pF));
+    return pF.update(iterableAsScalaIterable(singleton(pBody)).toSeq());
   }
 
   @Override
@@ -160,6 +170,6 @@ class PrincessUnsafeFormulaManager
 
   @Override
   protected boolean isBoundVariable(IExpression pT) {
-    return false;
+    return PrincessUtil.isBoundByQuantifier(pT);
   }
 }
