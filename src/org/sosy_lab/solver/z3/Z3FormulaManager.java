@@ -360,4 +360,9 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
     params_dec_ref(context, z3params);
     del_context(context);
   }
+
+  @Override
+  protected Long simplify(Long pF) {
+    return Z3NativeApi.simplify(getFormulaCreator().getEnv(), pF);
+  }
 }

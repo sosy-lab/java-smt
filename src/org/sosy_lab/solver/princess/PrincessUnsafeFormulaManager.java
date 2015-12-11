@@ -25,14 +25,11 @@ import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.basetypes.IdealInt;
-import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
-import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
-import ap.parser.PartialEvaluator;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -136,15 +133,6 @@ class PrincessUnsafeFormulaManager
   protected IExpression substitute(
       IExpression expr, List<IExpression> substituteFrom, List<IExpression> substituteTo) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected IExpression simplify(IExpression f) {
-    // TODO this method is not tested, check it!
-    if (f instanceof IFormula) {
-      f = BooleanCompactifier.apply((IFormula) f);
-    }
-    return PartialEvaluator.apply(f);
   }
 
   @Override

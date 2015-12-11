@@ -135,15 +135,4 @@ public interface UnsafeFormulaManager {
    * Same as {@link #substitute(Formula, List, List)}, but uses a map.
    */
   <T1 extends Formula, T2 extends Formula> T1 substitute(T1 f, Map<T2, T2> fromToMapping);
-
-  /**
-   * Simplifies an input formula, while ensuring equivalence.
-   *
-   * <p>For solvers that do not provide a simplification API, an original formula
-   * is returned.
-   *
-   * @param f The input formula
-   * @return Simplified version of the formula
-   */
-  <T extends Formula> T simplify(T f);
 }

@@ -21,9 +21,11 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
+import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
+import ap.parser.PartialEvaluator;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -159,5 +161,14 @@ public final class PrincessFormulaManager
   @Override
   public String getVersion() {
     return getEnvironment().getVersion();
+  }
+
+  @Override
+  protected IExpression simplify(IExpression f) {
+    // TODO this method is not tested, check it!
+    if (f instanceof IFormula) {
+      f = BooleanCompactifier.apply((IFormula) f);
+    }
+    return PartialEvaluator.apply(f);
   }
 }

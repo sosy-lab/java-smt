@@ -221,4 +221,10 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
   SmtInterpolEnvironment createEnvironment() {
     return getEnvironment();
   }
+
+  @Override
+  public Term simplify(Term pF) {
+    return getFormulaCreator().getEnv().simplify(pF);
+  }
+
 }

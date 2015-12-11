@@ -135,6 +135,17 @@ public interface FormulaManager {
   /** Apply a tactic which performs formula transformation */
   BooleanFormula applyTactic(BooleanFormula input, Tactic tactic);
 
+  /**
+   * Simplifies an input formula, while ensuring equivalence.
+   *
+   * <p>For solvers that do not provide a simplification API, an original formula
+   * is returned.
+   *
+   * @param input The input formula
+   * @return Simplified version of the formula
+   */
+  <T extends Formula> T simplify(T input);
+
   /** Strategies for transforming the formula AST. */
   enum Tactic {
     NNF("nnf", "Convert the formula to NNF"),

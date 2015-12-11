@@ -270,11 +270,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   }
 
   @Override
-  protected Long simplify(Long pF) {
-    return Z3NativeApi.simplify(z3context, pF);
-  }
-
-  @Override
   protected boolean isQuantification(Long pT) {
     return Z3_QUANTIFIER_AST == get_ast_kind(z3context, pT);
   }

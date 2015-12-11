@@ -229,4 +229,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     }
     throw new UnsupportedOperationException("Tactics are not supported by the solver");
   }
+
+  @Override
+  public <T extends Formula> T simplify(T f) {
+    return formulaCreator.encapsulate(
+        formulaCreator.getFormulaType(f),
+        simplify(extractInfo(f)));
+  }
+
+  protected TFormulaInfo simplify(TFormulaInfo f) {
+    return f;
+  }
 }

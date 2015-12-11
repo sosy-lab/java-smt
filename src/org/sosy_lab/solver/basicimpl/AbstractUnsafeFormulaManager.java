@@ -210,13 +210,4 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo substitute(
       TFormulaInfo expr, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo);
-
-  @Override
-  public <T extends Formula> T simplify(T f) {
-    return encapsulateWithTypeOf(f, simplify(extractInfo(f)));
-  }
-
-  protected TFormulaInfo simplify(TFormulaInfo f) {
-    return f;
-  }
 }

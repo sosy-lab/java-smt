@@ -156,11 +156,6 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  public Term simplify(Term pF) {
-    return getFormulaCreator().getEnv().simplify(pF);
-  }
-
-  @Override
   protected boolean isQuantification(Term pT) {
     return false;
   }
