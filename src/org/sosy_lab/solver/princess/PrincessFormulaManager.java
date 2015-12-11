@@ -26,6 +26,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 
 import ap.parser.PartialEvaluator;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
