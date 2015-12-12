@@ -20,26 +20,18 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-
-import java.util.List;
 
 /**
  * Common base class for {@link Mathsat5TheoremProver}
@@ -50,7 +42,6 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   protected final Mathsat5FormulaManager mgr;
   protected final long curEnv;
   private final long curConfig;
-  private final boolean useSharedEnv;
   private final long terminationTest;
   protected boolean closed = false;
 
@@ -58,7 +49,6 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
       Mathsat5FormulaManager pMgr, long pConfig, boolean pShared, boolean pGhostFilter) {
     mgr = pMgr;
     curConfig = pConfig;
-    useSharedEnv = pShared;
     curEnv = mgr.createEnvironment(pConfig, pShared, pGhostFilter);
     terminationTest = mgr.addTerminationTest(curEnv);
   }
@@ -74,32 +64,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     }
   }
 
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    try {
-      long[] assumptions =
-          Longs.toArray(
-              Lists.transform(
-                  pAssumptions,
-                  new Function<BooleanFormula, Long>() {
-                    @Override
-                    public Long apply(BooleanFormula pInput) {
-                      long t = Mathsat5FormulaManager.getMsatTerm(pInput);
-                      if (!useSharedEnv) {
-                        t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
-                      }
-                      return t;
-                    }
-                  }));
-      return !msat_check_sat_with_assumptions(curEnv, assumptions);
-    } catch (IllegalStateException e) {
-      handleSolverExceptionInUnsatCheck(e);
-      throw e;
-    }
-  }
-
-  private void handleSolverExceptionInUnsatCheck(IllegalStateException e) throws SolverException {
+  protected void handleSolverExceptionInUnsatCheck(IllegalStateException e) throws SolverException {
     String msg = Strings.nullToEmpty(e.getMessage());
     if (msg.contains("too many iterations")
         || msg.contains("impossible to build a suitable congruence graph!")

@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
@@ -28,8 +29,11 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -81,6 +85,32 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public void push() {
     Preconditions.checkState(!closed);
     msat_push_backtrack_point(curEnv);
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    try {
+      long[] assumptions =
+          Longs.toArray(
+              Lists.transform(
+                  pAssumptions,
+                  new Function<BooleanFormula, Long>() {
+                    @Override
+                    public Long apply(BooleanFormula pInput) {
+                      long t = Mathsat5FormulaManager.getMsatTerm(pInput);
+                      if (!useSharedEnv) {
+                        t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
+                      }
+                      return t;
+                    }
+                  }));
+      return !msat_check_sat_with_assumptions(curEnv, assumptions);
+    } catch (IllegalStateException e) {
+      handleSolverExceptionInUnsatCheck(e);
+      throw e;
+    }
   }
 
   @Override
