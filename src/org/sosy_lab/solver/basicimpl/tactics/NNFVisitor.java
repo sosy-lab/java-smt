@@ -7,6 +7,7 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class NNFVisitor extends BooleanFormulaTransformationVisitor {
@@ -22,6 +23,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   @Override
   public BooleanFormula visitTrue() {
     if (insideNot) {
+      insideNot = false; // consume not
       return bfmgr.makeBoolean(false);
     } else {
       return bfmgr.makeBoolean(true);
@@ -31,6 +33,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   @Override
   public BooleanFormula visitFalse() {
     if (insideNot) {
+      insideNot = false; // consume not
       return bfmgr.makeBoolean(true);
     } else {
       return bfmgr.makeBoolean(false);
@@ -40,6 +43,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   @Override
   public BooleanFormula visitAtom(BooleanFormula pAtom) {
     if (insideNot) {
+      insideNot = false; // consume not
       return bfmgr.not(pAtom);
     } else {
       return pAtom;
@@ -48,70 +52,92 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   @Override
   public BooleanFormula visitNot(BooleanFormula pOperand) {
-    boolean savedState = insideNot;
-    insideNot = !insideNot;
-    BooleanFormula out = visitIfNotSeen(visitIfNotSeen(pOperand));
-
-    // Restore the state on leaving the traversal.
-    insideNot = savedState;
-    return out;
+    insideNot = !insideNot; // consume / set not
+    return visit(pOperand);
   }
 
   @Override
   public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
+    boolean tmp = insideNot;
+    List<BooleanFormula> newOperands = new ArrayList<>();
+    for (BooleanFormula f : pOperands) {
+      newOperands.add(visit(f));
+      insideNot = tmp; // not is consumed in every iteration so we need to reset it
+    }
+
     if (insideNot) {
-      return bfmgr.or(visitIfNotSeen(pOperands));
+      insideNot = false; // consume not
+      return bfmgr.or(newOperands);
     } else {
-      return bfmgr.and(visitIfNotSeen(pOperands));
+      return bfmgr.and(newOperands);
     }
   }
 
   @Override
   public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
+    boolean tmp = insideNot;
+    List<BooleanFormula> newOperands = new ArrayList<>();
+    for (BooleanFormula f : pOperands) {
+      newOperands.add(visit(f));
+      insideNot = tmp; // not is consumed in every iteration so we need to reset it
+    }
+
     if (insideNot) {
-      return bfmgr.and(visitIfNotSeen(pOperands));
+      insideNot = false; // consume not
+      return bfmgr.and(newOperands);
     } else {
-      return bfmgr.or(visitIfNotSeen(pOperands));
+      return bfmgr.or(newOperands);
     }
   }
 
   @Override
   public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    if (insideNot) {
-      BooleanFormula p1 = visitIfNotSeen(pOperand1);
-      BooleanFormula p2 = visitIfNotSeen(pOperand2);
-      return bfmgr.or(
-          bfmgr.and(p1, bfmgr.not(p2)),
-          bfmgr.and(bfmgr.not(p1), p2));
+    boolean oldInsideNot = insideNot;
+    insideNot = false; // consume not
+    BooleanFormula p1 = visit(pOperand1);
+    BooleanFormula p2 = visit(pOperand2);
+    BooleanFormula p1Not = visit(bfmgr.not(pOperand1));
+    BooleanFormula p2Not = visit(bfmgr.not(pOperand2));
+
+    if (oldInsideNot) {
+      return bfmgr.and(bfmgr.or(p1Not, p2Not), bfmgr.or(p1, p2));
+
     } else {
-      return super.visitEquivalence(pOperand1, pOperand2);
+      return bfmgr.or(bfmgr.and(p1, p2), bfmgr.and(p1Not, p2Not));
     }
   }
 
   @Override
   public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     if (insideNot) {
-      BooleanFormula p1 = visitIfNotSeen(pOperand1);
-      BooleanFormula p2 = visitIfNotSeen(pOperand2);
-      return bfmgr.and(p1, bfmgr.not(p2));
+      insideNot = false; // consume not
+      BooleanFormula p1 = visit(pOperand1);
+      BooleanFormula p2 = visit(bfmgr.not(pOperand2));
+      return bfmgr.and(p1, p2);
     } else {
-      return super.visitImplication(pOperand1, pOperand2);
+      BooleanFormula p1 = visit(bfmgr.not(pOperand1));
+      BooleanFormula p2 = visit(pOperand2);
+      return bfmgr.or(p1, p2);
     }
   }
 
   @Override
   public BooleanFormula visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-    if (insideNot) {
-      BooleanFormula pC = visitIfNotSeen(pCondition);
-      BooleanFormula pT = visitIfNotSeen(pThenFormula);
-      BooleanFormula pE = visitIfNotSeen(pElseFormula);
-      return bfmgr.and(
-          bfmgr.or(bfmgr.not(pC), bfmgr.not(pT)),
-          bfmgr.or(pC, pE)
-      );
+    boolean oldInsideNot = insideNot;
+    insideNot = false; // consume not
+    BooleanFormula pC = visit(pCondition);
+    BooleanFormula pCNot = visit(bfmgr.not(pCondition));
+
+    if (oldInsideNot) {
+      BooleanFormula pTNot = visit(bfmgr.not(pThenFormula));
+      BooleanFormula pENot = visit(bfmgr.not(pElseFormula));
+      return bfmgr.and(bfmgr.or(pCNot, pTNot), bfmgr.or(pC, pENot));
+
     } else {
-      return super.visitIfThenElse(pCondition, pThenFormula, pElseFormula);
+      BooleanFormula pT = visit(pThenFormula);
+      BooleanFormula pE = visit(pElseFormula);
+      return bfmgr.or(bfmgr.and(pC, pT), bfmgr.and(pCNot, pE));
     }
   }
 }

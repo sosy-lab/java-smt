@@ -23,7 +23,10 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 
 public enum Tactic {
-  NNF("nnf", "Convert the formula to NNF") {
+  NNF(
+      "nnf",
+      "Convert the formula to NNF. Equivalence, ITE and implications are resolved"
+          + " by replacing them with appropriate formulas consisting of and/or/not") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       return new NNFVisitor(pFmgr).visit(pF);
