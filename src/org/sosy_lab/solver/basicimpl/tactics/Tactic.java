@@ -32,7 +32,14 @@ public enum Tactic {
       return new NNFVisitor(pFmgr).visit(pF);
     }
   },
-  CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding") {
+  CNF("cnf", "Convert the formula to CNF") {
+    @Override
+    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
+      BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);
+      return new CNFVisitor(pFmgr).visit(nnf);
+    }
+  },
+  TSEITIN_CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       throw new UnsupportedOperationException("This tactic has no default implementation.");
