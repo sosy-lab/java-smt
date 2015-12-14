@@ -1,21 +1,21 @@
 package org.sosy_lab.solver.basicimpl.tactics;
 
+import com.google.common.collect.Maps;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.List;
-import java.util.Map;
 
 public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   boolean insideNot = false;
 
   private final BooleanFormulaManager bfmgr;
 
-  public NNFVisitor(FormulaManager pFmgr,
-                       Map<BooleanFormula, BooleanFormula> pCache) {
-    super(pFmgr, pCache);
+  public NNFVisitor(FormulaManager pFmgr) {
+    super(pFmgr, Maps.<BooleanFormula, BooleanFormula>newHashMap());
     bfmgr = pFmgr.getBooleanFormulaManager();
   }
 
