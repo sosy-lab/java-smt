@@ -31,7 +31,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.solver.basicimpl.tactics.NNFVisitor;
+import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
 import javax.annotation.Nullable;
 
@@ -216,11 +216,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
-    if (tactic == Tactic.NNF) {
-      // Default implementation of NNF tactic.
-      return extractInfo(new NNFVisitor(this).visit(formulaCreator.encapsulateBoolean(f)));
+    try {
+      return extractInfo(tactic.applyDefault(this, formulaCreator.encapsulateBoolean(f)));
+    } catch (UnsupportedOperationException e) {
+      throw new UnsupportedOperationException(
+          "No default, or solver specific"
+              + " tactic implementation available please use a different solver,"
+              + " which supports "
+              + tactic.getTacticName());
     }
-    throw new UnsupportedOperationException("Tactics are not supported by the solver");
   }
 
   @Override

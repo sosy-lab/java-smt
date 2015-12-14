@@ -22,6 +22,7 @@ package org.sosy_lab.solver.api;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
 /**
  * Instances of this interface provide direct low-level access to an SMT solver.
@@ -132,7 +133,11 @@ public interface FormulaManager {
    */
   String getVersion();
 
-  /** Apply a tactic which performs formula transformation */
+  /** Apply a tactic which performs formula transformation. The available tactics
+   * depend on the used solver. For some tactics we have solver-independent
+   * implementations which can be used via
+   * {@code Tactic#applyDefault(FormulaManager, BooleanFormula)}
+   */
   BooleanFormula applyTactic(BooleanFormula input, Tactic tactic);
 
   /**
@@ -146,27 +151,4 @@ public interface FormulaManager {
    */
   <T extends Formula> T simplify(T input);
 
-  /** Strategies for transforming the formula AST. */
-  enum Tactic {
-    NNF("nnf", "Convert the formula to NNF"),
-    CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding"),
-    QE_LIGHT("qe-light", "Perform light quantifier elimination"),
-    QE("qe", "Perform quantifier elimination");
-
-    private final String name;
-    private final String description;
-
-    Tactic(String pName, String pDescription) {
-      name = pName;
-      description = pDescription;
-    }
-
-    public String getTacticName() {
-      return name;
-    }
-
-    public String getDescription() {
-      return description;
-    }
-  }
 }

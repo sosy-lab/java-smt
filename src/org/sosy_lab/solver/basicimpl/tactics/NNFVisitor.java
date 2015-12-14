@@ -9,12 +9,12 @@ import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.List;
 
-public class NNFVisitor extends BooleanFormulaTransformationVisitor {
+class NNFVisitor extends BooleanFormulaTransformationVisitor {
   boolean insideNot = false;
 
   private final BooleanFormulaManager bfmgr;
 
-  public NNFVisitor(FormulaManager pFmgr) {
+  NNFVisitor(FormulaManager pFmgr) {
     super(pFmgr, Maps.<BooleanFormula, BooleanFormula>newHashMap());
     bfmgr = pFmgr.getBooleanFormulaManager();
   }
