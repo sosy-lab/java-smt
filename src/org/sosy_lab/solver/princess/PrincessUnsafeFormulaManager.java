@@ -130,12 +130,6 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  protected IExpression substitute(
-      IExpression expr, List<IExpression> substituteFrom, List<IExpression> substituteTo) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   protected boolean isQuantification(IExpression pT) {
     return PrincessUtil.isQuantifier(pT);
   }

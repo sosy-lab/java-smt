@@ -28,8 +28,11 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements UnsafeFormulaManager {
@@ -202,12 +205,40 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
 
   @Override
   public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
-    List<T2> fromList = Lists.newArrayList(pFromToMapping.keySet());
-    List<T2> toList = Lists.newArrayList(pFromToMapping.values());
-
+    List<T2> fromList = new ArrayList<>(pFromToMapping.size());
+    List<T2> toList = new ArrayList<>(pFromToMapping.size());
+    for (Entry<T2, T2> e : pFromToMapping.entrySet()) {
+      fromList.add(e.getKey());
+      toList.add(e.getValue());
+    }
     return substitute(pF, fromList, toList);
   }
 
-  protected abstract TFormulaInfo substitute(
-      TFormulaInfo expr, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo);
+  protected TFormulaInfo substitute(TFormulaInfo expr, List<TFormulaInfo> substituteFrom,
+                                    List<TFormulaInfo> substituteTo) {
+    Preconditions.checkArgument(substituteFrom.size() == substituteTo.size());
+    Map<TFormulaInfo, TFormulaInfo> replacements = new HashMap<>();
+    for (int i = 0; i < substituteFrom.size(); i++) {
+      replacements.put(substituteFrom.get(i), substituteTo.get(i));
+    }
+    return recSubstitute(expr, replacements);
+  }
+
+  private TFormulaInfo recSubstitute(TFormulaInfo expr,
+                                     Map<TFormulaInfo, TFormulaInfo> memoization) {
+    TFormulaInfo out = memoization.get(expr);
+
+    if (out == null) {
+      int arity = getArity(expr);
+      List<TFormulaInfo> updatedChildren = new ArrayList<>(arity);
+      for (int childIdx = 0; childIdx < arity; childIdx++) {
+        TFormulaInfo child = getArg(expr, childIdx);
+        updatedChildren.add(recSubstitute(child, memoization));
+      }
+      out = replaceArgs(expr, updatedChildren);
+      memoization.put(expr, out);
+    }
+
+    return out;
+  }
 }

@@ -151,11 +151,6 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  protected Term substitute(Term expr, List<Term> substituteFrom, List<Term> substituteTo) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   protected boolean isQuantification(Term pT) {
     return false;
   }

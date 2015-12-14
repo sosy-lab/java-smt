@@ -51,9 +51,7 @@ import com.google.common.primitives.Longs;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
@@ -163,37 +161,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   @Override
   public boolean isNumber(Long pT) {
     return msat_term_is_number(msatEnv, pT);
-  }
-
-  @Override
-  protected Long substitute(Long expr, List<Long> substituteFrom, List<Long> substituteTo) {
-    checkArgument(substituteFrom.size() == substituteTo.size());
-    Map<Long, Long> replacements = new HashMap<>();
-    for (int i = 0; i < substituteFrom.size(); i++) {
-      replacements.put(substituteFrom.get(i), substituteTo.get(i));
-    }
-    return recSubstitute(expr, replacements);
-  }
-
-  private long recSubstitute(Long expr, Map<Long, Long> memoization) {
-
-    Long out = memoization.get(expr);
-
-    if (out == null) {
-      int arity = getArity(expr);
-      long[] updatedChildren = new long[arity];
-      for (int childIdx = 0; childIdx < arity; childIdx++) {
-        long child = getArg(expr, childIdx);
-        updatedChildren[childIdx] = recSubstitute(child, memoization);
-      }
-
-      long decl = msat_term_get_decl(expr);
-      out = msat_make_term(msatEnv, decl, updatedChildren);
-
-      memoization.put(expr, out);
-    }
-
-    return out;
   }
 
   @Override

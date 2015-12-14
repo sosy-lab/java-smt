@@ -200,12 +200,10 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       long newFunc = mk_func_decl(z3context, symbol, sorts, retSort);
       inc_ref(z3context, newFunc);
 
-      //      creator.getSmtLogger().logDeclaration(newFunc, retSort, sorts); // TODO necessary???
-
       long uif = createUIFCallImpl(newFunc, Longs.toArray(newArgs));
 
-      for (int i = 0; i < sorts.length; i++) {
-        dec_ref(z3context, sorts[i]);
+      for (long sort : sorts) {
+        dec_ref(z3context, sort);
       }
       return uif;
 
