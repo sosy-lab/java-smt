@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 class CNFVisitor extends BooleanFormulaTransformationVisitor {
 
   private final BooleanFormulaManager bfmgr;
@@ -156,7 +158,7 @@ class CNFVisitor extends BooleanFormulaTransformationVisitor {
     public static final Predicate<Set<BooleanFormula>> IS_EMPTY =
         new Predicate<Set<BooleanFormula>>() {
           @Override
-          public boolean apply(Set<BooleanFormula> pInput) {
+          public boolean apply(@Nonnull Set<BooleanFormula> pInput) {
             return pInput.isEmpty();
           }
         };
@@ -164,7 +166,7 @@ class CNFVisitor extends BooleanFormulaTransformationVisitor {
     public static final Function<OperandWithConjuncts, BooleanFormula> GET_OPERAND =
         new Function<OperandWithConjuncts, BooleanFormula>() {
           @Override
-          public BooleanFormula apply(OperandWithConjuncts pInput) {
+          public BooleanFormula apply(@Nonnull OperandWithConjuncts pInput) {
             return pInput.operand;
           }
         };
@@ -172,7 +174,7 @@ class CNFVisitor extends BooleanFormulaTransformationVisitor {
     public static final Function<OperandWithConjuncts, Set<BooleanFormula>> GET_CONJUNCTS =
         new Function<OperandWithConjuncts, Set<BooleanFormula>>() {
           @Override
-          public Set<BooleanFormula> apply(OperandWithConjuncts pInput) {
+          public Set<BooleanFormula> apply(@Nonnull OperandWithConjuncts pInput) {
             return pInput.conjuncts;
           }
         };
