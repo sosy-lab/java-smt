@@ -59,17 +59,18 @@ public interface UnsafeFormulaManager {
   boolean isBoundVariable(Formula f);
 
   /**
-   * @return whether if the given Formula is a Number.
+   * @return whether the given Formula is a number.
    */
   boolean isNumber(Formula pTt);
+
   /**
-   * @return whether if the given Formula is an uninterpreted function call.
+   * @return whether the given Formula is an uninterpreted function call.
    */
   boolean isUF(Formula f);
 
   /**
-   * @return whether if the given Formula is quantified
-   * (either FORALL ..., or EXISTS ...).
+   * @return whether the given Formula is quantified,
+   * either with universal or existential quantification.
    */
   boolean isQuantification(Formula f);
 

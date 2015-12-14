@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.z3;
 
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_func_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
 
@@ -42,8 +43,7 @@ class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long
 
   @Override
   protected Long createUninterpretedFunctionCallImpl(Long funcDecl, List<Long> pArgs) {
-    long[] args = Longs.toArray(pArgs);
-    return unsafeManager.createUIFCallImpl(funcDecl, args);
+    return mk_app(z3context, funcDecl, Longs.toArray(pArgs));
   }
 
   @Override

@@ -368,6 +368,10 @@ final class Z3NativeApi {
       long[] accessors);
 
   // CONSTANTS AND APPLICATIONS
+
+  /**
+   * @return Z3_func_decl
+   */
   private static native long mk_func_decl(
       long context, long symbol, int len, long[] sorts, long sort);
 
@@ -718,6 +722,10 @@ final class Z3NativeApi {
 
   static native long get_decl_name(long context, long a1);
 
+  /**
+   * @param a1 Z3_func_decl
+   * @return Z3_decl_kind
+   */
   static native int get_decl_kind(long context, long a1);
 
   static native int get_domain_size(long context, long a1);
@@ -770,6 +778,9 @@ final class Z3NativeApi {
 
   static native int get_bool_value(long context, long a1);
 
+  /**
+   * @return Z3_ast_kind
+   */
   static native int get_ast_kind(long context, long a1);
 
   static native boolean is_app(long context, long a1);
@@ -780,6 +791,10 @@ final class Z3NativeApi {
 
   static native long to_app(long context, long a1);
 
+  /**
+   * @param a1 Z3_ast
+   * @return Z3_func_decl
+   */
   static native long to_func_decl(long context, long a1);
 
   static native String get_numeral_string(long context, long a1);

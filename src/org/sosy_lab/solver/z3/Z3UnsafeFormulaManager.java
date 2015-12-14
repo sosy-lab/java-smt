@@ -22,6 +22,7 @@ package org.sosy_lab.solver.z3;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_decl_to_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
@@ -62,6 +63,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
@@ -75,13 +77,10 @@ import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
-  private final Set<Long> uifs = new HashSet<>(); // contains used declarations of UIFs
   private final long z3context;
 
   Z3UnsafeFormulaManager(Z3FormulaCreator pCreator) {
@@ -108,8 +107,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
   @Override
   public int getArity(Long t) {
-    // TODO too strict for now:
-    // Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
     Preconditions.checkArgument(get_ast_kind(z3context, t) != Z3_QUANTIFIER_AST);
     return get_app_num_args(z3context, t);
   }
@@ -127,6 +124,10 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     }
     int astKind = get_ast_kind(z3context, t);
     return (astKind == Z3_VAR_AST) || ((astKind == Z3_APP_AST) && (getArity(t) == 0));
+  }
+
+  private boolean isFunctionApplication(long t) {
+    return get_ast_kind(z3context, t) == Z3_APP_AST;
   }
 
   @Override
@@ -147,7 +148,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
   @Override
   public boolean isUF(Long t) {
-    return is_app(z3context, t) && uifs.contains(get_app_decl(z3context, t));
+    return is_app(z3context, t)
+        && get_decl_kind(z3context, get_app_decl(z3context, t)) == Z3_OP_UNINTERPRETED;
   }
 
   @Override
@@ -185,9 +187,10 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       long sort = get_sort(z3context, t);
       return getFormulaCreator().makeVariable(sort, pNewName);
 
-    } else if (isUF(t)) {
+    } else if (isFunctionApplication(t)) {
       int n = get_app_num_args(z3context, t);
       long[] sorts = new long[n];
+
       for (int i = 0; i < sorts.length; i++) {
         long arg = get_app_arg(z3context, t, i);
         inc_ref(z3context, arg);
@@ -198,14 +201,15 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       long symbol = mk_string_symbol(z3context, pNewName);
       long retSort = get_sort(z3context, t);
       long newFunc = mk_func_decl(z3context, symbol, sorts, retSort);
-      inc_ref(z3context, newFunc);
+      inc_ref(z3context, func_decl_to_ast(z3context, newFunc));
 
-      long uif = createUIFCallImpl(newFunc, Longs.toArray(newArgs));
+      long out = mk_app(z3context, newFunc, Longs.toArray(newArgs));
 
       for (long sort : sorts) {
         dec_ref(z3context, sort);
       }
-      return uif;
+      dec_ref(z3context, func_decl_to_ast(z3context, newFunc));
+      return out;
 
     } else {
       throw new IllegalArgumentException(
@@ -246,12 +250,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       }
     }
     return ImmutableList.of(pF);
-  }
-
-  public long createUIFCallImpl(long pNewFunc, long[] args) {
-    long ufc = mk_app(z3context, pNewFunc, args);
-    uifs.add(pNewFunc);
-    return ufc;
   }
 
   @Override
