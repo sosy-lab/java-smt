@@ -32,7 +32,9 @@ public enum Tactic {
       return new NNFVisitor(pFmgr).visit(pF);
     }
   },
-  CNF("cnf", "Convert the formula to CNF") {
+  CNF("cnf", "Convert the formula to CNF. This tactic creates a formula which is"
+      + " in some cases exponentially bigger. E.g. (x ^ y) v (z ^ w) will have"
+      + " 2^n clauses in CNF afterwards.") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);

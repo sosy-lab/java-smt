@@ -29,6 +29,7 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SolverTacticsTest extends SolverBasedTest0 {
@@ -98,6 +99,29 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     assertThatFormula(cnf_not_ITE_a_b_c).isEquivalentTo(not_ITE_a_b_c);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_ITE_a_b_c);
+    assertThat(checker.isInCNF()).isTrue();
+  }
+
+  @Test
+  public void cnfTacticDefaultTest3() throws SolverException, InterruptedException {
+    // testcase that shows the exponential explosion of clauses when creating a cnf
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula z = bmgr.makeVariable("z");
+    BooleanFormula w = bmgr.makeVariable("w");
+    BooleanFormula u = bmgr.makeVariable("u");
+    BooleanFormula v = bmgr.makeVariable("v");
+    List<BooleanFormula> disjuncts = new ArrayList<>();
+    disjuncts.add(bmgr.and(x, y));
+    disjuncts.add(bmgr.and(z, w));
+    disjuncts.add(bmgr.and(u, v));
+    BooleanFormula f = bmgr.or(disjuncts);
+
+    BooleanFormula cnf = Tactic.CNF.applyDefault(mgr, f);
+    assertThatFormula(cnf).isEquivalentTo(f);
+    System.out.println(cnf.toString());
+    CNFChecker checker = new CNFChecker(mgr);
+    checker.visit(cnf);
     assertThat(checker.isInCNF()).isTrue();
   }
 
