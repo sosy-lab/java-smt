@@ -214,8 +214,8 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     return substitute(pF, fromList, toList);
   }
 
-  protected TFormulaInfo substitute(TFormulaInfo expr, List<TFormulaInfo> substituteFrom,
-                                    List<TFormulaInfo> substituteTo) {
+  protected TFormulaInfo substitute(
+      TFormulaInfo expr, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
     Preconditions.checkArgument(substituteFrom.size() == substituteTo.size());
     Map<TFormulaInfo, TFormulaInfo> replacements = new HashMap<>();
     for (int i = 0; i < substituteFrom.size(); i++) {
@@ -224,8 +224,8 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     return recSubstitute(expr, replacements);
   }
 
-  private TFormulaInfo recSubstitute(TFormulaInfo expr,
-                                     Map<TFormulaInfo, TFormulaInfo> memoization) {
+  private TFormulaInfo recSubstitute(
+      TFormulaInfo expr, Map<TFormulaInfo, TFormulaInfo> memoization) {
     TFormulaInfo out = memoization.get(expr);
 
     if (out == null) {

@@ -150,5 +150,4 @@ public interface FormulaManager {
    * @return Simplified version of the formula
    */
   <T extends Formula> T simplify(T input);
-
 }

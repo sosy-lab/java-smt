@@ -56,8 +56,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     } else if (pSort.isArraySort()) {
       return new FormulaType.ArrayFormulaType<>(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
-          getFormulaTypeOfSort(pSort.getArguments()[1])
-      );
+          getFormulaTypeOfSort(pSort.getArguments()[1]));
     } else {
       throw new IllegalArgumentException("Unknown formula type for sort: " + pSort);
     }

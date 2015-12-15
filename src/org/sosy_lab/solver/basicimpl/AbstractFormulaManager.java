@@ -229,9 +229,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   @Override
   public <T extends Formula> T simplify(T f) {
-    return formulaCreator.encapsulate(
-        formulaCreator.getFormulaType(f),
-        simplify(extractInfo(f)));
+    return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), simplify(extractInfo(f)));
   }
 
   protected TFormulaInfo simplify(TFormulaInfo f) {
