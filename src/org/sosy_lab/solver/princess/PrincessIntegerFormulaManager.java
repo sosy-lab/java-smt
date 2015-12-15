@@ -40,11 +40,8 @@ class PrincessIntegerFormulaManager
     extends org.sosy_lab.solver.princess.PrincessNumeralFormulaManager<
         IntegerFormula, IntegerFormula> {
 
-  PrincessIntegerFormulaManager(
-      PrincessFormulaCreator pCreator,
-      PrincessFunctionFormulaManager pFunctionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, useNonLinearArithmetic);
+  PrincessIntegerFormulaManager(PrincessFormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override
@@ -96,27 +93,17 @@ class PrincessIntegerFormulaManager
   }
 
   @Override
-  public IExpression linearDivide(IExpression pNumber1, IExpression pNumber2) {
-    return nonLinearDivide(pNumber1, pNumber2);
-  }
-
-  @Override
-  public IExpression nonLinearDivide(IExpression pNumber1, IExpression pNumber2) {
+  public IExpression divide(IExpression pNumber1, IExpression pNumber2) {
     return BitShiftMultiplication.eDiv(castToTerm(pNumber1), castToTerm(pNumber2));
   }
 
   @Override
-  public IExpression linearModulo(IExpression pNumber1, IExpression pNumber2) {
-    return nonLinearModulo(pNumber1, pNumber2);
-  }
-
-  @Override
-  public IExpression nonLinearModulo(IExpression pNumber1, IExpression pNumber2) {
+  public IExpression modulo(IExpression pNumber1, IExpression pNumber2) {
     return BitShiftMultiplication.eMod(castToTerm(pNumber1), castToTerm(pNumber2));
   }
 
   @Override
-  public IExpression linearMultiply(IExpression pNumber1, IExpression pNumber2) {
+  public IExpression multiply(IExpression pNumber1, IExpression pNumber2) {
     return castToTerm(pNumber1).$times(castToTerm(pNumber2));
   }
 

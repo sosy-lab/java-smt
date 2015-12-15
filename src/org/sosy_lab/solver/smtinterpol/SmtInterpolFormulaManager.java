@@ -81,9 +81,7 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
       LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate smtLogfile,
-      long randomSeed,
-      boolean pUseNonLinearIntegerArithmetic,
-      boolean pUseNonLinearRationalArithmetic)
+      long randomSeed)
       throws InvalidConfigurationException {
 
     SmtInterpolEnvironment env =
@@ -96,12 +94,9 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
         new SmtInterpolFunctionFormulaManager(creator, unsafeManager);
     SmtInterpolBooleanFormulaManager booleanTheory =
         new SmtInterpolBooleanFormulaManager(creator, env.getTheory());
-    SmtInterpolIntegerFormulaManager integerTheory =
-        new SmtInterpolIntegerFormulaManager(
-            creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    SmtInterpolIntegerFormulaManager integerTheory = new SmtInterpolIntegerFormulaManager(creator);
     SmtInterpolRationalFormulaManager rationalTheory =
-        new SmtInterpolRationalFormulaManager(
-            creator, functionTheory, pUseNonLinearRationalArithmetic);
+        new SmtInterpolRationalFormulaManager(creator);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
 
     return new SmtInterpolFormulaManager(
@@ -226,5 +221,4 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
   public Term simplify(Term pF) {
     return getFormulaCreator().getEnv().simplify(pF);
   }
-
 }

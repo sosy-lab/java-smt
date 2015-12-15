@@ -34,11 +34,8 @@ abstract class SmtInterpolNumeralFormulaManager<
 
   private final SmtInterpolEnvironment env;
 
-  SmtInterpolNumeralFormulaManager(
-      SmtInterpolFormulaCreator pCreator,
-      SmtInterpolFunctionFormulaManager pFunctionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, useNonLinearArithmetic);
+  SmtInterpolNumeralFormulaManager(SmtInterpolFormulaCreator pCreator) {
+    super(pCreator);
     env = pCreator.getEnv();
   }
 
@@ -63,9 +60,12 @@ abstract class SmtInterpolNumeralFormulaManager<
   }
 
   @Override
-  public Term linearMultiply(Term pNumber1, Term pNumber2) {
-    assert isNumeral(pNumber1) || isNumeral(pNumber2);
-    return env.term("*", pNumber1, pNumber2);
+  public Term multiply(Term pNumber1, Term pNumber2) {
+    if (isNumeral(pNumber1) || isNumeral(pNumber2)) {
+      return env.term("*", pNumber1, pNumber2);
+    } else {
+      return super.multiply(pNumber1, pNumber2);
+    }
   }
 
   @Override

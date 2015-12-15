@@ -24,7 +24,6 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-
 import ap.parser.PartialEvaluator;
 
 import org.sosy_lab.common.Appender;
@@ -95,8 +94,7 @@ public final class PrincessFormulaManager
   public static PrincessFormulaManager create(
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate pLogfileTemplate,
-      boolean pUseNonLinearIntegerArithmetic)
+      @Nullable PathCounterTemplate pLogfileTemplate)
       throws InvalidConfigurationException {
 
     PrincessOptions options = new PrincessOptions(config);
@@ -110,8 +108,7 @@ public final class PrincessFormulaManager
     PrincessUnsafeFormulaManager unsafeManager = new PrincessUnsafeFormulaManager(creator);
     PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
-    PrincessIntegerFormulaManager integerTheory =
-        new PrincessIntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
+    PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
         new PrincessQuantifiedFormulaManager(creator);

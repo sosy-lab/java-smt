@@ -19,16 +19,13 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -39,15 +36,6 @@ import java.util.List;
  * this class serves as a helper for implementing {@link NumeralFormulaManager}.
  * It handles all the unwrapping and wrapping from and to the {@link Formula}
  * instances, such that the concrete class needs to handle only its own internal types.
- *
- * <p>For {@link #multiply(NumeralFormula, NumeralFormula)},
- * {@link #divide(NumeralFormula, NumeralFormula)}, and
- * {@link #modulo(NumeralFormula, NumeralFormula)},
- * this class even offers an implementation based on UFs.
- * Sub-classes are supposed to override them
- * if they can implement these operations more precisely
- * (for example multiplication with constants should be supported by all solvers
- * and implemented by all sub-classes).
  */
 public abstract class AbstractNumeralFormulaManager<
         TFormulaInfo, TType, TEnv, ParamFormulaType extends NumeralFormula,
@@ -55,43 +43,8 @@ public abstract class AbstractNumeralFormulaManager<
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
 
-  private static final String UF_MULTIPLY_NAME = "_*_";
-  private static final String UF_DIVIDE_NAME = "_/_";
-  private static final String UF_MODULO_NAME = "_%_";
-
-  private final AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager;
-
-  private final UninterpretedFunctionDeclaration<ResultFormulaType> multUfDecl;
-  private final UninterpretedFunctionDeclaration<ResultFormulaType> divUfDecl;
-  private final UninterpretedFunctionDeclaration<ResultFormulaType> modUfDecl;
-
-  private final boolean useNonLinearArithmetic;
-  private static final String NON_LINEAR_MSG =
-      "the used solver does not support non-linear arithmetic.";
-
-  protected AbstractNumeralFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator,
-      AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> pFunctionManager,
-      boolean pUseNonLinearArithmetic) {
+  protected AbstractNumeralFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
-    functionManager = pFunctionManager;
-    useNonLinearArithmetic = pUseNonLinearArithmetic;
-
-    FormulaType<ResultFormulaType> resultType = getFormulaType();
-    multUfDecl =
-        functionManager.declareUninterpretedFunction(
-            resultType + "_" + UF_MULTIPLY_NAME, resultType, resultType, resultType);
-    divUfDecl =
-        functionManager.declareUninterpretedFunction(
-            resultType + "_" + UF_DIVIDE_NAME, resultType, resultType, resultType);
-    modUfDecl =
-        functionManager.declareUninterpretedFunction(
-            resultType + "_" + UF_MODULO_NAME, resultType, resultType, resultType);
-  }
-
-  private TFormulaInfo makeUf(
-      UninterpretedFunctionDeclaration<?> decl, TFormulaInfo t1, TFormulaInfo t2) {
-    return functionManager.createUninterpretedFunctionCallImpl(decl, ImmutableList.of(t1, t2));
   }
 
   protected ResultFormulaType wrap(TFormulaInfo pTerm) {
@@ -147,7 +100,7 @@ public abstract class AbstractNumeralFormulaManager<
   /**
    * This method tries to represent a BigDecimal using only BigInteger.
    * It can be used for implementing {@link #makeNumber(BigDecimal)}
-   * when the current theory supports only integers.
+   * when the current theory supports only integers and division by constants.
    */
   protected final TFormulaInfo decimalAsInteger(BigDecimal val) {
     if (val.scale() <= 0) {
@@ -165,7 +118,7 @@ public abstract class AbstractNumeralFormulaManager<
       BigInteger denominator = convertBigDecimalToBigInteger(d);
       assert denominator.signum() > 0;
 
-      return linearDivide(makeNumberImpl(numerator), makeNumberImpl(denominator));
+      return divide(makeNumberImpl(numerator), makeNumberImpl(denominator));
     }
   }
 
@@ -233,70 +186,22 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType divide(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    final TFormulaInfo result;
-    if (isNumeral(param2)) {
-      result = linearDivide(param1, param2);
-    } else if (useNonLinearArithmetic) {
-      result = nonLinearDivide(param1, param2);
-    } else {
-      result = ufDivide(param1, param2);
-    }
-    return wrap(result);
+    return wrap(divide(param1, param2));
   }
 
-  /** returns DIV encoded as uninterpreted function. */
-  protected TFormulaInfo ufDivide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return makeUf(divUfDecl, pParam1, pParam2);
-  }
-
-  /** returns DIV when at least one operand is numeric.
-   * If the solver or theory does not support this,
-   * we fall back to the UF-encoding of {@link #ufDivide(Object, Object)} */
-  protected TFormulaInfo linearDivide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return ufDivide(pParam1, pParam2);
-  }
-
-  /** returns DIV for two non-numeric operands.
-   * If the solver or theory does not support this, an exception is thrown. */
-  @SuppressWarnings("unused")
-  protected TFormulaInfo nonLinearDivide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    throw new UnsupportedOperationException(NON_LINEAR_MSG);
+  protected TFormulaInfo divide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public ResultFormulaType modulo(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    final TFormulaInfo result;
-    if (isNumeral(param2)) {
-      result = linearModulo(param1, param2);
-    } else if (useNonLinearArithmetic) {
-      result = nonLinearModulo(param1, param2);
-    } else {
-      result = ufModulo(param1, param2);
-    }
-    return wrap(result);
+    return wrap(modulo(param1, param2));
   }
 
-  /** returns MOD encoded as uninterpreted function. */
-  protected TFormulaInfo ufModulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return makeUf(modUfDecl, pParam1, pParam2);
-  }
-
-  /** returns MOD when at least one operand is numeric.
-   * If the solver or theory does not support this,
-   * we fall back to the UF-encoding of {@link #ufModulo(Object, Object)} */
-  protected TFormulaInfo linearModulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return ufModulo(pParam1, pParam2);
-  }
-
-  /** returns MOD for two non-numeric operands.
-   * If the solver or theory does not support this, an exception is thrown. */
-  @SuppressWarnings("unused")
-  protected TFormulaInfo nonLinearModulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    throw new UnsupportedOperationException(NON_LINEAR_MSG);
+  protected TFormulaInfo modulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -315,36 +220,11 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType multiply(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    final TFormulaInfo result;
-    if (isNumeral(param1) || isNumeral(param2)) {
-      result = linearMultiply(param1, param2);
-    } else if (useNonLinearArithmetic) {
-      result = nonLinearMultiply(param1, param2);
-    } else {
-      result = ufMultiply(param1, param2);
-    }
-
-    return wrap(result);
+    return wrap(multiply(param1, param2));
   }
 
-  /** returns MULT encoded as uninterpreted function. */
-  protected TFormulaInfo ufMultiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return makeUf(multUfDecl, pParam1, pParam2);
-  }
-
-  /** returns MULT when at least one operand is numeric.
-   * If the solver or theory does not support this,
-   * we fall back to the UF-encoding of {@link #ufMultiply(Object, Object)} */
-  protected TFormulaInfo linearMultiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return ufMultiply(pParam1, pParam2);
-  }
-
-  /** returns MULT for two non-numeric operands.
-   * If the solver or theory does not support this, an exception is thrown. */
-  @SuppressWarnings("unused")
-  protected TFormulaInfo nonLinearMultiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    throw new UnsupportedOperationException(NON_LINEAR_MSG);
+  protected TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

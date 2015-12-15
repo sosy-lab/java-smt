@@ -31,11 +31,8 @@ import java.math.BigInteger;
 class SmtInterpolIntegerFormulaManager
     extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
-  SmtInterpolIntegerFormulaManager(
-      SmtInterpolFormulaCreator pCreator,
-      SmtInterpolFunctionFormulaManager pFunctionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, useNonLinearArithmetic);
+  SmtInterpolIntegerFormulaManager(SmtInterpolFormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override
@@ -75,18 +72,24 @@ class SmtInterpolIntegerFormulaManager
   }
 
   @Override
-  public Term linearDivide(Term pNumber1, Term pNumber2) {
-    assert isNumeral(pNumber2);
-    Sort intSort = pNumber1.getTheory().getNumericSort();
-    assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
-    return getFormulaCreator().getEnv().term("div", pNumber1, pNumber2);
+  public Term divide(Term pNumber1, Term pNumber2) {
+    if (isNumeral(pNumber2)) {
+      Sort intSort = pNumber1.getTheory().getNumericSort();
+      assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
+      return getFormulaCreator().getEnv().term("div", pNumber1, pNumber2);
+    } else {
+      return super.divide(pNumber1, pNumber2);
+    }
   }
 
   @Override
-  protected Term linearModulo(Term pNumber1, Term pNumber2) {
-    assert isNumeral(pNumber2);
-    Sort intSort = pNumber1.getTheory().getNumericSort();
-    assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
-    return getFormulaCreator().getEnv().term("mod", pNumber1, pNumber2);
+  protected Term modulo(Term pNumber1, Term pNumber2) {
+    if (isNumeral(pNumber2)) {
+      Sort intSort = pNumber1.getTheory().getNumericSort();
+      assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
+      return getFormulaCreator().getEnv().term("mod", pNumber1, pNumber2);
+    } else {
+      return super.modulo(pNumber1, pNumber2);
+    }
   }
 }

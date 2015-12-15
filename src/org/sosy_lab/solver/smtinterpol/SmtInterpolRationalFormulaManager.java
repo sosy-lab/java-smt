@@ -33,11 +33,8 @@ import java.math.BigInteger;
 class SmtInterpolRationalFormulaManager
     extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula> {
 
-  SmtInterpolRationalFormulaManager(
-      SmtInterpolFormulaCreator pCreator,
-      SmtInterpolFunctionFormulaManager pFunctionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, useNonLinearArithmetic);
+  SmtInterpolRationalFormulaManager(SmtInterpolFormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override
@@ -82,7 +79,7 @@ class SmtInterpolRationalFormulaManager
   }
 
   @Override
-  public Term linearDivide(Term pNumber1, Term pNumber2) {
+  public Term divide(Term pNumber1, Term pNumber2) {
     Sort intSort = pNumber1.getTheory().getNumericSort();
     Sort realSort = pNumber1.getTheory().getRealSort();
     assert intSort.equals(pNumber1.getSort()) || realSort.equals(pNumber1.getSort());

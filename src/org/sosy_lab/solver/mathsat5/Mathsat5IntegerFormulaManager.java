@@ -33,11 +33,8 @@ import java.math.BigDecimal;
 class Mathsat5IntegerFormulaManager
     extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
-  Mathsat5IntegerFormulaManager(
-      Mathsat5FormulaCreator pCreator,
-      Mathsat5FunctionFormulaManager functionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, functionManager, useNonLinearArithmetic);
+  Mathsat5IntegerFormulaManager(Mathsat5FormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override
@@ -61,8 +58,10 @@ class Mathsat5IntegerFormulaManager
   }
 
   @Override
-  public Long linearDivide(Long pNumber1, Long pNumber2) {
-    assert isNumeral(pNumber2);
+  public Long divide(Long pNumber1, Long pNumber2) {
+    if (!isNumeral(pNumber2)) {
+      return super.divide(pNumber1, pNumber2);
+    }
     long mathsatEnv = getFormulaCreator().getEnv();
     long t1 = pNumber1;
     long t2 = pNumber2;
@@ -75,7 +74,7 @@ class Mathsat5IntegerFormulaManager
     String[] frac = n.split("/");
     if (frac.length == 1) {
       // cannot multiply with term 1/n because the result will have type rat instead of int
-      return super.linearDivide(pNumber1, pNumber2);
+      return super.divide(pNumber1, pNumber2);
     } else {
       assert (frac.length == 2);
       n = frac[1] + "/" + frac[0];

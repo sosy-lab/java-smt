@@ -49,12 +49,8 @@ abstract class Z3NumeralFormulaManager<
 
   protected final long z3context;
 
-  Z3NumeralFormulaManager(
-      Z3FormulaCreator pCreator,
-      Z3FunctionFormulaManager functionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, functionManager, useNonLinearArithmetic);
-
+  Z3NumeralFormulaManager(Z3FormulaCreator pCreator) {
+    super(pCreator);
     this.z3context = pCreator.getEnv();
   }
 
@@ -111,24 +107,12 @@ abstract class Z3NumeralFormulaManager<
   }
 
   @Override
-  public Long linearDivide(Long pNumber1, Long pNumber2) {
-    assert isNumeral(pNumber2);
-    return nonLinearDivide(pNumber1, pNumber2);
-  }
-
-  @Override
-  public Long nonLinearDivide(Long pNumber1, Long pNumber2) {
+  public Long divide(Long pNumber1, Long pNumber2) {
     return mk_div(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long linearMultiply(Long pNumber1, Long pNumber2) {
-    assert isNumeral(pNumber1) || isNumeral(pNumber2);
-    return nonLinearMultiply(pNumber1, pNumber2);
-  }
-
-  @Override
-  public Long nonLinearMultiply(Long pNumber1, Long pNumber2) {
+  public Long multiply(Long pNumber1, Long pNumber2) {
     return mk_mul(z3context, pNumber1, pNumber2);
   }
 

@@ -159,9 +159,7 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed,
-      boolean pUseNonLinearIntegerArithmetic,
-      boolean pUseNonLinearRationalArithmetic)
+      long randomSeed)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -233,10 +231,8 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
     Z3UnsafeFormulaManager unsafeManager = new Z3UnsafeFormulaManager(creator);
     Z3FunctionFormulaManager functionTheory = new Z3FunctionFormulaManager(creator, unsafeManager);
     Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
-    Z3IntegerFormulaManager integerTheory =
-        new Z3IntegerFormulaManager(creator, functionTheory, pUseNonLinearIntegerArithmetic);
-    Z3RationalFormulaManager rationalTheory =
-        new Z3RationalFormulaManager(creator, functionTheory, pUseNonLinearRationalArithmetic);
+    Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
+    Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);

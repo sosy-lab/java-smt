@@ -34,11 +34,8 @@ abstract class PrincessNumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         IExpression, TermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType> {
 
-  PrincessNumeralFormulaManager(
-      PrincessFormulaCreator pCreator,
-      PrincessFunctionFormulaManager pFunctionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, useNonLinearArithmetic);
+  PrincessNumeralFormulaManager(PrincessFormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override

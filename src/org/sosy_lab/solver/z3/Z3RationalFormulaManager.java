@@ -27,11 +27,8 @@ import java.math.BigDecimal;
 
 class Z3RationalFormulaManager extends Z3NumeralFormulaManager<NumeralFormula, RationalFormula> {
 
-  Z3RationalFormulaManager(
-      Z3FormulaCreator pCreator,
-      Z3FunctionFormulaManager pFunctionManager,
-      boolean useNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, useNonLinearArithmetic);
+  Z3RationalFormulaManager(Z3FormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override
