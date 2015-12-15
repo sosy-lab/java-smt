@@ -104,7 +104,7 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  public Void visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+  public Void visitForallQuantifier(List<? extends Formula> variables, BooleanFormula body) {
     return visitIfNotSeen(body);
   }
 

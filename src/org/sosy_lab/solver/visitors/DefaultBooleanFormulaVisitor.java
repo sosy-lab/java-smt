@@ -78,7 +78,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   }
 
   @Override
-  public R visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+  public R visitForallQuantifier(List<? extends Formula> variables, BooleanFormula body) {
     throw new UnsupportedOperationException();
   }
 

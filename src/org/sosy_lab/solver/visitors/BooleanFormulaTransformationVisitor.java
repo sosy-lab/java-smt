@@ -136,7 +136,8 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitAllQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+  public BooleanFormula visitForallQuantifier(
+      List<? extends Formula> variables, BooleanFormula body) {
     if (null == qfmgr) {
       throw new UnsupportedOperationException();
     }
