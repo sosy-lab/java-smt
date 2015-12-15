@@ -94,7 +94,7 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
 
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(boolean pShared) {
-    return new CVC4InterpolatingProver(this);
+    throw new UnsupportedOperationException("CVC4 does not support interpolation.");
   }
 
   @Override

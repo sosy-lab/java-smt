@@ -27,6 +27,8 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
 
   protected CVC4TheoremProver(CVC4FormulaManager pMgr) {
@@ -37,11 +39,11 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
   public Void push(BooleanFormula pF) {
     Preconditions.checkState(!closed);
     smtEngine.push();
-    smtEngine.assertFormula(mgr.extractInfo(pF));
-    return null;
+    return addConstraint(pF);
   }
 
   @Override
+  @Nullable
   public Void addConstraint(BooleanFormula pF) {
     Preconditions.checkState(!closed);
     smtEngine.assertFormula(mgr.extractInfo(pF));
@@ -70,7 +72,6 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
   @Override
   public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
-    // TODO
-    return null;
+    throw new UnsupportedOperationException("Not implemented");
   }
 }

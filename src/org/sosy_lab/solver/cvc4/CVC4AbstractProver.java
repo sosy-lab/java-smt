@@ -30,8 +30,7 @@ import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.Formula;
 
 /**
- * Common base class for {@link CVC4TheoremProver}
- * and {@link CVC4InterpolatingProver}.
+ * Common base class for {@link CVC4TheoremProver}.
  */
 abstract class CVC4AbstractProver<T2> implements BasicProverEnvironment<T2> {
 
@@ -66,7 +65,7 @@ abstract class CVC4AbstractProver<T2> implements BasicProverEnvironment<T2> {
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return null; // TODO
+    throw new UnsupportedOperationException("Not implemented");
   }
 
   @Override
@@ -84,6 +83,6 @@ abstract class CVC4AbstractProver<T2> implements BasicProverEnvironment<T2> {
 
   @Override
   public <E extends Formula> E evaluate(E f) {
-    throw new UnsupportedOperationException("Mathsat does not support evaluation");
+    throw new UnsupportedOperationException("CVC4 does not support evaluation");
   }
 }

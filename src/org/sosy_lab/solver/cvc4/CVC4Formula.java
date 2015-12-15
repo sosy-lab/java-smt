@@ -45,10 +45,10 @@ public class CVC4Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof Expr)) {
+    if (!(o instanceof CVC4Formula)) {
       return false;
     }
-    return cvc4term.equals((Expr) o);
+    return cvc4term.equals(((CVC4Formula) o).cvc4term);
   }
 
   @Override
