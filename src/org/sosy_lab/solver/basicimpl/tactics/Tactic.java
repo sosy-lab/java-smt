@@ -22,7 +22,19 @@ package org.sosy_lab.solver.basicimpl.tactics;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 
+/**
+ * Enum that holds all the values for tactics that are either supported with a
+ * default implementation in java-smt or with a solver-specific version e.g.
+ * via z3.
+ */
 public enum Tactic {
+
+  /**
+   * Convert the formula to NNF. Equivalence, ITE and implications are resolved"
+   * by replacing them with appropriate formulas consisting of and/or/not.
+   *
+   * <p>This tactic has a default implementation.</p>
+   */
   NNF(
       "nnf",
       "Convert the formula to NNF. Equivalence, ITE and implications are resolved"
@@ -32,27 +44,55 @@ public enum Tactic {
       return new NNFVisitor(pFmgr).visit(pF);
     }
   },
-  CNF("cnf", "Convert the formula to CNF. This tactic creates a formula which is"
-      + " in some cases exponentially bigger. E.g. (x ^ y) v (z ^ w) will have"
-      + " 2^n clauses in CNF afterwards.") {
+
+  /**
+   * Convert the formula to CNF. This tactic creates a formula which is
+   * in some cases exponentially bigger. E.g. (x ^ y) v (z ^ w) will have
+   * 2^n clauses in CNF afterwards.
+   *
+   * <p>This tactic has a default implementation.</p>
+   */
+  CNF(
+      "cnf",
+      "Convert the formula to CNF. This tactic creates a formula which is"
+          + " in some cases exponentially bigger. E.g. (x ^ y) v (z ^ w) will have"
+          + " 2^n clauses in CNF afterwards.") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);
       return new CNFVisitor(pFmgr).visit(nnf);
     }
   },
+
+  /**
+   * Convert the formula to CNF using Tseitin encoding.
+   *
+   * <p>This tactic has no default implementation.</p>
+   */
   TSEITIN_CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       throw new UnsupportedOperationException("This tactic has no default implementation.");
     }
   },
+
+  /**
+   * Perform light quantifier elimination.
+   *
+   * <p>This tactic has no default implementation.</p>
+   */
   QE_LIGHT("qe-light", "Perform light quantifier elimination") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       throw new UnsupportedOperationException("This tactic has no default implementation.");
     }
   },
+
+  /**
+   * Perform quantifier elimination.
+   *
+   * <p>This tactic has no default implementation.</p>
+   */
   QE("qe", "Perform quantifier elimination") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
