@@ -44,7 +44,9 @@ public class CVC4IntegerFormulaManager
     return FormulaType.IntegerType;
   }
 
+
   @Override
+  @SuppressWarnings("checkstyle:IllegalInstantiation")
   public Expr makeNumberImpl(long pI) {
     return exprManager.mkConst(new Rational(new Integer(pI)));
   }

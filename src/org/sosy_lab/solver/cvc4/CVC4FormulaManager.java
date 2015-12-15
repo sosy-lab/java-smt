@@ -19,10 +19,6 @@
  */
 package org.sosy_lab.solver.cvc4;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Splitter.MapSplitter;
-import com.google.common.collect.ImmutableMap;
-
 import edu.nyu.acsys.CVC4.CVC4JNI;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Type;
@@ -32,8 +28,6 @@ import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
-import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -51,49 +45,6 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
     NativeLibraries.loadLibrary("cvc4jni");
   }
 
-  @Options(prefix = "solver.cvc4")
-  private static class CVC4Settings {
-
-    @Option(
-      secure = true,
-      description =
-          "Further options that will be passed to CVC4 in addition to the default options. "
-              + "Format is 'key1=value1,key2=value2'"
-    )
-    private String furtherOptions = "";
-
-    private final @Nullable PathCounterTemplate logfile;
-
-    private final ImmutableMap<String, String> furtherOptionsMap;
-
-    private CVC4Settings(Configuration config, @Nullable PathCounterTemplate pLogfile)
-        throws InvalidConfigurationException {
-      config.inject(this);
-      logfile = pLogfile;
-
-      MapSplitter optionSplitter =
-          Splitter.on(',')
-              .trimResults()
-              .omitEmptyStrings()
-              .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
-
-      try {
-        furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(furtherOptions));
-      } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException(
-            "Invalid CVC4 option in \"" + furtherOptions + "\": " + e.getMessage(), e);
-      }
-    }
-  }
-
-  private final LogManager logger;
-  private final edu.nyu.acsys.CVC4.Options cvc4Config;
-  private final CVC4Settings settings;
-  private final long randomSeed;
-
-  private final ShutdownNotifier shutdownNotifier;
-
-  @SuppressWarnings("checkstyle:parameternumber")
   private CVC4FormulaManager(
       FormulaCreator<Expr, Type, CVC4Environment> pFormulaCreator,
       CVC4UnsafeFormulaManager pUfmgr,
@@ -101,13 +52,9 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr) {
     super(pFormulaCreator, pUfmgr, pFfmgr, pBfmgr, pIfmgr, null, null, null, null, null);
-    logger = null;
-    cvc4Config = null;
-    settings = null;
-    randomSeed = 0;
-    shutdownNotifier = null;
   }
 
+  @SuppressWarnings("unused")
   public static CVC4FormulaManager create(
       LogManager logger,
       Configuration config,
@@ -119,7 +66,6 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
       throws InvalidConfigurationException {
 
     // Init CVC4
-    CVC4Settings settings = new CVC4Settings(config, solverLogFile);
 
     edu.nyu.acsys.CVC4.Options cvc4options = new edu.nyu.acsys.CVC4.Options();
     // TODO set randomseed, furtherOptions

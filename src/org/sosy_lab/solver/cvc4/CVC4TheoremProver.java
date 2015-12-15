@@ -21,14 +21,10 @@ package org.sosy_lab.solver.cvc4;
 
 import com.google.common.base.Preconditions;
 
-import edu.nyu.acsys.CVC4.UnsatCore;
-
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
@@ -61,13 +57,14 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
-    List<BooleanFormula> converted = new ArrayList<>();
-    UnsatCore core = smtEngine.getUnsatCore();
-    Iterator<?> it = core.iterator();
-    while (it.hasNext()) {
-      Object term = it.next();
-    }
-    return converted;
+    throw new UnsupportedOperationException("Not implemented");
+    //    List<BooleanFormula> converted = new ArrayList<>();
+    //    UnsatCore core = smtEngine.getUnsatCore();
+    //    Iterator<?> it = core.iterator();
+    //    while (it.hasNext()) {
+    //      Object term = it.next();
+    //    }
+    //    return converted;
   }
 
   @Override
