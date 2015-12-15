@@ -41,10 +41,6 @@ import javax.annotation.Nullable;
 
 public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environment> {
 
-  static {
-    NativeLibraries.loadLibrary("cvc4jni");
-  }
-
   private CVC4FormulaManager(
       FormulaCreator<Expr, Type, CVC4Environment> pFormulaCreator,
       CVC4UnsafeFormulaManager pUfmgr,
@@ -64,6 +60,7 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
       throws InvalidConfigurationException {
 
     // Init CVC4
+    NativeLibraries.loadLibrary("cvc4jni");
 
     edu.nyu.acsys.CVC4.Options cvc4options = new edu.nyu.acsys.CVC4.Options();
     // TODO set randomseed, furtherOptions
