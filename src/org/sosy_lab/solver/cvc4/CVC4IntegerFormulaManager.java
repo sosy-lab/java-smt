@@ -41,7 +41,6 @@ public class CVC4IntegerFormulaManager
     return FormulaType.IntegerType;
   }
 
-
   @Override
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
