@@ -32,11 +32,8 @@ import java.math.BigInteger;
 public class CVC4IntegerFormulaManager
     extends CVC4NumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
-  protected CVC4IntegerFormulaManager(
-      CVC4FormulaCreator pCreator,
-      CVC4FunctionFormulaManager pFunctionManager,
-      boolean pUseNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, pUseNonLinearArithmetic);
+  protected CVC4IntegerFormulaManager(CVC4FormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override
@@ -59,11 +56,6 @@ public class CVC4IntegerFormulaManager
   @Override
   protected Expr makeNumberImpl(BigDecimal pNumber) {
     return decimalAsInteger(pNumber);
-  }
-
-  @Override
-  public Expr linearDivide(Expr pNumber1, Expr pNumber2) {
-    throw new UnsupportedOperationException();
   }
 
   @Override

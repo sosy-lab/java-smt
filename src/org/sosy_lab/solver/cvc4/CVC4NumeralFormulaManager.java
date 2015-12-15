@@ -25,9 +25,7 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.solver.api.NumeralFormula;
-import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 public abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
@@ -36,11 +34,8 @@ public abstract class CVC4NumeralFormulaManager<
 
   protected final ExprManager exprManager;
 
-  protected CVC4NumeralFormulaManager(
-      FormulaCreator<Expr, Type, CVC4Environment> pCreator,
-      AbstractFunctionFormulaManager<Expr, ?, Type, CVC4Environment> pFunctionManager,
-      boolean pUseNonLinearArithmetic) {
-    super(pCreator, pFunctionManager, pUseNonLinearArithmetic);
+  protected CVC4NumeralFormulaManager(CVC4FormulaCreator pCreator) {
+    super(pCreator);
     exprManager = getFormulaCreator().getEnv().getExprManager();
   }
 

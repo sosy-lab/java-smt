@@ -60,9 +60,7 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogFile,
-      long randomSeed,
-      boolean pUseNonLinearIntegerArithmetic,
-      boolean pUseNonLinearRationalArithmetic)
+      long randomSeed)
       throws InvalidConfigurationException {
 
     // Init CVC4
@@ -79,8 +77,7 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
     CVC4UnsafeFormulaManager ufmgr = new CVC4UnsafeFormulaManager(creator);
     CVC4FunctionFormulaManager ffmgr = new CVC4FunctionFormulaManager(creator);
     CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator);
-    CVC4IntegerFormulaManager ifmgr =
-        new CVC4IntegerFormulaManager(creator, ffmgr, pUseNonLinearIntegerArithmetic);
+    CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
 
     return new CVC4FormulaManager(creator, ufmgr, ffmgr, bfmgr, ifmgr);
   }
