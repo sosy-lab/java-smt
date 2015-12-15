@@ -189,6 +189,10 @@ public abstract class AbstractNumeralFormulaManager<
     return wrap(divide(param1, param2));
   }
 
+  /**
+   * If a solver does not support this operation, e.g. because of missing
+   * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   */
   protected TFormulaInfo divide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException();
   }
@@ -200,6 +204,10 @@ public abstract class AbstractNumeralFormulaManager<
     return wrap(modulo(param1, param2));
   }
 
+  /**
+   * If a solver does not support this operation, e.g. because of missing
+   * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   */
   protected TFormulaInfo modulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException();
   }
@@ -223,6 +231,10 @@ public abstract class AbstractNumeralFormulaManager<
     return wrap(multiply(param1, param2));
   }
 
+  /**
+   * If a solver does not support this operation, e.g. because of missing
+   * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   */
   protected TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException();
   }
