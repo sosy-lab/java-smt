@@ -21,24 +21,40 @@ package org.sosy_lab.solver.cvc4;
 
 import com.google.common.base.Preconditions;
 
+import edu.nyu.acsys.CVC4.Result;
+import edu.nyu.acsys.CVC4.SmtEngine;
+
+import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
+public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEnvironment {
+
+  private final CVC4FormulaManager mgr;
+  private final SmtEngine smtEngine;
+  private boolean closed = false;
 
   protected CVC4TheoremProver(CVC4FormulaManager pMgr) {
-    super(pMgr);
+    mgr = pMgr;
+    smtEngine = pMgr.getEnvironment().newSMTEngine();
+  }
+
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    smtEngine.push();
   }
 
   @Override
   public Void push(BooleanFormula pF) {
-    Preconditions.checkState(!closed);
-    smtEngine.push();
+    push();
     return addConstraint(pF);
   }
 
@@ -51,9 +67,28 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
   }
 
   @Override
-  public void push() {
+  public void pop() {
     Preconditions.checkState(!closed);
-    smtEngine.push();
+    smtEngine.pop();
+  }
+
+  @Override
+  public boolean isUnsat() throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
+    Result result = smtEngine.checkSat();
+
+    if (result.isNull() || result.isUnknown()) {
+      throw new SolverException(
+          "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
+    } else {
+      if (result.isSat() == Result.Sat.SAT) {
+        return false;
+      } else if (result.isSat() == Result.Sat.UNSAT) {
+        return true;
+      } else {
+        throw new SolverException("CVC4 returned unknown on sat check");
+      }
+    }
   }
 
   @Override
@@ -67,6 +102,24 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
     //      Object term = it.next();
     //    }
     //    return converted;
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    Preconditions.checkState(!closed);
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
+  @Override
+  public void close() {
+    Preconditions.checkState(!closed);
+    smtEngine.delete();
+    closed = true;
+  }
+
+  @Override
+  public <E extends Formula> E evaluate(E f) {
+    throw new UnsupportedOperationException("CVC4 does not support evaluation");
   }
 
   @Override
