@@ -180,20 +180,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   }
 
   // copied from Z3UnsafeFormulaManager
-  private boolean isAtom(Long t) {
-    int astKind = get_ast_kind(z3context, t);
-    switch (astKind) {
-      case Z3_APP_AST:
-        long decl = get_app_decl(z3context, t);
-        return !Z3UnsafeFormulaManager.NON_ATOMIC_OP_TYPES.contains(get_decl_kind(z3context, decl));
-      case Z3_QUANTIFIER_AST:
-        return false;
-      default:
-        return true;
-    }
-  }
-
-  // copied from Z3UnsafeFormulaManager
   private int getArity(Long t) {
     Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
     return get_app_num_args(z3context, t);
@@ -216,59 +202,72 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Long f) {
-    if (isTrue(f)) {
-      assert getArity(f) == 0;
-      return pVisitor.visitTrue();
-    }
+    switch (get_ast_kind(z3context, f)) {
+      case Z3_APP_AST:
+        return visitAppAst(pVisitor, f);
 
-    if (isFalse(f)) {
-      assert getArity(f) == 0;
-      return pVisitor.visitFalse();
-    }
+      case Z3_QUANTIFIER_AST:
+        throw new UnsupportedOperationException("needs to be implemented");
 
-    if (isNot(f)) {
-      assert getArity(f) == 1;
-      return pVisitor.visitNot(getArg(f, 0));
+      default:
+        throw new UnsupportedOperationException(
+            "Unknown or unsupported boolean operator " + ast_to_string(z3context, f));
     }
+  }
 
-    if (isAnd(f)) {
-      if (getArity(f) == 0) {
+  private <R> R visitAppAst(BooleanFormulaVisitor<R> pVisitor, Long f)
+      throws UnsupportedOperationException {
+    final int arity = get_app_num_args(z3context, f);
+
+    switch (get_decl_kind(z3context, get_app_decl(z3context, f))) {
+      case Z3_OP_TRUE:
+        assert arity == 0;
         return pVisitor.visitTrue();
-      } else if (getArity(f) == 1) {
-        return visit(pVisitor, getArg(f, 0));
-      }
-      return pVisitor.visitAnd(getAllArgs(f));
-    }
 
-    if (isOr(f)) {
-      if (getArity(f) == 0) {
+      case Z3_OP_FALSE:
+        assert arity == 0;
         return pVisitor.visitFalse();
-      } else if (getArity(f) == 1) {
-        return pVisitor.visit(getArg(f, 0));
-      }
-      return pVisitor.visitOr(getAllArgs(f));
-    }
 
-    if (isEquivalence(f)) {
-      assert getArity(f) == 2;
-      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    }
+      case Z3_OP_NOT:
+        assert arity == 1;
+        return pVisitor.visitNot(getArg(f, 0));
 
-    if (isImplication(f)) {
-      assert getArity(f) == 2;
-      return pVisitor.visitImplication(getArg(f, 0), getArg(f, 1));
-    }
+      case Z3_OP_AND:
+        if (arity == 0) {
+          return pVisitor.visitTrue();
+        } else if (arity == 1) {
+          return visit(pVisitor, getArg(f, 0));
+        }
+        return pVisitor.visitAnd(getAllArgs(f));
 
-    if (isIfThenElse(f)) {
-      assert getArity(f) == 3;
-      return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    }
+      case Z3_OP_OR:
+        if (arity == 0) {
+          return pVisitor.visitFalse();
+        } else if (arity == 1) {
+          return pVisitor.visit(getArg(f, 0));
+        }
+        return pVisitor.visitOr(getAllArgs(f));
 
-    if (isAtom(f)) {
-      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-    }
+      case Z3_OP_IMPLIES:
+        assert arity == 2;
+        return pVisitor.visitImplication(getArg(f, 0), getArg(f, 1));
 
-    throw new UnsupportedOperationException(
-        "Unknown or unsupported boolean operator " + ast_to_string(z3context, f));
+      case Z3_OP_ITE:
+        assert arity == 3;
+        return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
+
+      case Z3_OP_IFF:
+      case Z3_OP_EQ:
+        if (get_app_num_args(z3context, f) == 2
+            && get_sort(z3context, get_app_arg(z3context, f, 0)) == Z3_BOOL_SORT
+            && get_sort(z3context, get_app_arg(z3context, f, 1)) == Z3_BOOL_SORT) {
+          assert arity == 2;
+          return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
+        }
+        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+
+      default:
+        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+    }
   }
 }
