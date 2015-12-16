@@ -25,65 +25,72 @@ import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.List;
 
+/**
+ * A formula visitor which allows for the default implementation.
+ *
+ * @param <R> Return type for each traversal operation.
+ */
 public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisitor<R> {
 
   protected DefaultBooleanFormulaVisitor(FormulaManager pFmgr) {
     super(pFmgr);
   }
 
+  public abstract R visitDefault();
+
   @Override
   public R visitTrue() {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitFalse() {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitAtom(BooleanFormula pAtom) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitNot(BooleanFormula pOperand) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitAnd(List<BooleanFormula> pOperands) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitOr(List<BooleanFormula> pOperands) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitForallQuantifier(List<? extends Formula> variables, BooleanFormula body) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 
   @Override
   public R visitExistsQuantifier(List<? extends Formula> variables, BooleanFormula body) {
-    throw new UnsupportedOperationException();
+    return visitDefault();
   }
 }
