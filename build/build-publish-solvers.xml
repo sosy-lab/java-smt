@@ -129,16 +129,8 @@
                path has to be specified.
            </fail>
 
-           <fail unless="gmp.path">
-               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
-               The path has to point to the root GMP folder.
-               Note that shell substitutions do not work and a full absolute
-               path has to be specified.
-           </fail>
-
            <exec executable="lib/native/source/libmathsat5j/compile.sh">
                <arg value="${mathsat.path}" />
-               <arg value="${gmp.path}" />
                <arg value="-@{flag}" />
            </exec>
 
