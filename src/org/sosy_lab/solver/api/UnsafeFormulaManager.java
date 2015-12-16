@@ -39,6 +39,11 @@ public interface UnsafeFormulaManager {
   Formula getArg(Formula f, int n);
 
   /**
+   * @return all arguments of the given function application
+   */
+  List<Formula> getAllArgs(Formula f);
+
+  /**
    * @return whether the given Formula is an atom.
    */
   boolean isAtom(Formula f);

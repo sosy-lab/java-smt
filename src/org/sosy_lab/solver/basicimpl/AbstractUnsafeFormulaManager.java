@@ -75,6 +75,16 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo getArg(TFormulaInfo pT, int n);
 
   @Override
+  public List<Formula> getAllArgs(Formula pF) {
+    int arity = getArity(pF);
+    List<Formula> args = new ArrayList<>(arity);
+    for (int i = 0; i < arity; i++) {
+      args.add(getArg(pF, i));
+    }
+    return args;
+  }
+
+  @Override
   public boolean isVariable(Formula pF) {
     TFormulaInfo t = extractInfo(pF);
     return isVariable(t);
