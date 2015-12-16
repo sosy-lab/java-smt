@@ -31,12 +31,18 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.Collection;
+import java.util.List;
 
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
 
-  protected AbstractBooleanFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  private final AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ufmgr;
+
+  protected AbstractBooleanFormulaManager(
+      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator,
+      AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ufmgr) {
     super(pCreator);
+    this.ufmgr = ufmgr;
   }
 
   @Override
@@ -271,4 +277,17 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract <R> R visit(BooleanFormulaVisitor<R> visitor, TFormulaInfo pFormula);
+
+  /**
+   * Syntax sugar for type casting.
+   */
+  protected final BooleanFormula getArg(TFormulaInfo pF, int index) {
+    return getFormulaCreator().encapsulateBoolean(ufmgr.getArg(pF, index));
+  }
+
+  protected final List<BooleanFormula> getAllArgs(TFormulaInfo pF) {
+    @SuppressWarnings("unchecked")
+    List<BooleanFormula> out = (List) ufmgr.getAllArgs(getFormulaCreator().encapsulateBoolean(pF));
+    return out;
+  }
 }

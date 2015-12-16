@@ -39,24 +39,19 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_or;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_term_ite;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 
   private final long mathsatEnv;
+  private final Mathsat5UnsafeFormulaManager ufmgr;
 
-  protected Mathsat5BooleanFormulaManager(Mathsat5FormulaCreator pCreator) {
-    super(pCreator);
+  protected Mathsat5BooleanFormulaManager(
+      Mathsat5FormulaCreator pCreator, Mathsat5UnsafeFormulaManager ufmgr) {
+    super(pCreator, ufmgr);
     this.mathsatEnv = pCreator.getEnv();
-  }
-
-  public static Mathsat5BooleanFormulaManager create(Mathsat5FormulaCreator creator) {
-    return new Mathsat5BooleanFormulaManager(creator);
+    this.ufmgr = ufmgr;
   }
 
   @Override
@@ -180,66 +175,38 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
     return msat_term_arity(pF);
   }
 
-  private BooleanFormula getArg(Long pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(msat_term_get_type(pF));
-    return getFormulaCreator().encapsulateBoolean(msat_term_get_arg(pF, index));
-  }
-
-  private List<BooleanFormula> getAllArgs(Long pF) {
-    int arity = getArity(pF);
-    List<BooleanFormula> args = new ArrayList<>(arity);
-    for (int i = 0; i < arity; i++) {
-      args.add(getArg(pF, i));
-    }
-    return args;
-  }
-
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Long f) {
     if (isTrue(f)) {
       assert getArity(f) == 0;
       return pVisitor.visitTrue();
-    }
-
-    if (isFalse(f)) {
+    } else if (isFalse(f)) {
       assert getArity(f) == 0;
       return pVisitor.visitFalse();
-    }
-
-    if (isNot(f)) {
+    } else if (isNot(f)) {
       assert getArity(f) == 1;
       return pVisitor.visitNot(getArg(f, 0));
-    }
-
-    if (isAnd(f)) {
+    } else if (isAnd(f)) {
       if (getArity(f) == 0) {
         return pVisitor.visitTrue();
       } else if (getArity(f) == 1) {
         return visit(pVisitor, getArg(f, 0));
       }
       return pVisitor.visitAnd(getAllArgs(f));
-    }
-
-    if (isOr(f)) {
+    } else if (isOr(f)) {
       if (getArity(f) == 0) {
         return pVisitor.visitFalse();
       } else if (getArity(f) == 1) {
         return pVisitor.visit(getArg(f, 0));
       }
       return pVisitor.visitOr(getAllArgs(f));
-    }
-
-    if (isEquivalence(f)) {
+    } else if (isEquivalence(f)) {
       assert getArity(f) == 2;
       return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    }
-
-    if (isIfThenElse(f)) {
+    } else if (isIfThenElse(f)) {
       assert getArity(f) == 3;
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    }
-
-    if (isAtom(f)) {
+    } else if (isAtom(f)) {
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
 

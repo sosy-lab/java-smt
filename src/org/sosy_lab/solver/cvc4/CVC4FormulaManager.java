@@ -73,7 +73,7 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
     // Create managers
     CVC4UnsafeFormulaManager ufmgr = new CVC4UnsafeFormulaManager(creator);
     CVC4FunctionFormulaManager ffmgr = new CVC4FunctionFormulaManager(creator);
-    CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator);
+    CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator, ufmgr);
     CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
 
     return new CVC4FormulaManager(creator, ufmgr, ffmgr, bfmgr, ifmgr);

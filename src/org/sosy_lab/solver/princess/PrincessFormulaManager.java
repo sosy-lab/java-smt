@@ -107,7 +107,8 @@ public final class PrincessFormulaManager
     // Create managers
     PrincessUnsafeFormulaManager unsafeManager = new PrincessUnsafeFormulaManager(creator);
     PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
-    PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
+    PrincessBooleanFormulaManager booleanTheory =
+        new PrincessBooleanFormulaManager(creator, unsafeManager);
     PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =

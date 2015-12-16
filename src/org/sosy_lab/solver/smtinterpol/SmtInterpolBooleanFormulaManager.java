@@ -23,13 +23,10 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 class SmtInterpolBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -37,10 +34,13 @@ class SmtInterpolBooleanFormulaManager
   // We use the Theory directly here because the methods there perform simplifications
   // that we could not use otherwise.
   private final Theory theory;
+  private final SmtInterpolUnsafeFormulaManager ufmgr;
 
-  SmtInterpolBooleanFormulaManager(SmtInterpolFormulaCreator creator, Theory pTheory) {
-    super(creator);
+  SmtInterpolBooleanFormulaManager(
+      SmtInterpolFormulaCreator creator, Theory pTheory, SmtInterpolUnsafeFormulaManager ufmgr) {
+    super(creator, ufmgr);
     theory = pTheory;
+    this.ufmgr = ufmgr;
   }
 
   @Override
@@ -149,70 +149,38 @@ class SmtInterpolBooleanFormulaManager
     return SmtInterpolUtil.isIfThenElse(pBits);
   }
 
-  private int getArity(Term pF) {
-    return SmtInterpolUtil.getArity(pF);
-  }
-
-  private BooleanFormula getArg(Term pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(pF.getSort());
-    return getFormulaCreator().encapsulateBoolean(SmtInterpolUtil.getArg(pF, index));
-  }
-
-  private List<BooleanFormula> getAllArgs(Term pF) {
-    int arity = getArity(pF);
-    List<BooleanFormula> args = new ArrayList<>(arity);
-    for (int i = 0; i < arity; i++) {
-      args.add(getArg(pF, i));
-    }
-    return args;
-  }
-
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Term f) {
     if (isTrue(f)) {
-      assert getArity(f) == 0;
+      assert ufmgr.getArity(f) == 0;
       return pVisitor.visitTrue();
-    }
-
-    if (isFalse(f)) {
-      assert getArity(f) == 0;
+    } else if (isFalse(f)) {
+      assert ufmgr.getArity(f) == 0;
       return pVisitor.visitFalse();
-    }
-
-    if (isNot(f)) {
-      assert getArity(f) == 1;
+    } else if (isNot(f)) {
+      assert ufmgr.getArity(f) == 1;
       return pVisitor.visitNot(getArg(f, 0));
-    }
-
-    if (isAnd(f)) {
-      if (getArity(f) == 0) {
+    } else if (isAnd(f)) {
+      if (ufmgr.getArity(f) == 0) {
         return pVisitor.visitTrue();
-      } else if (getArity(f) == 1) {
-        return visit(pVisitor, getArg(f, 0));
+      } else if (ufmgr.getArity(f) == 1) {
+        return visit(pVisitor, ufmgr.getArg(f, 0));
       }
       return pVisitor.visitAnd(getAllArgs(f));
-    }
-
-    if (isOr(f)) {
-      if (getArity(f) == 0) {
+    } else if (isOr(f)) {
+      if (ufmgr.getArity(f) == 0) {
         return pVisitor.visitFalse();
-      } else if (getArity(f) == 1) {
+      } else if (ufmgr.getArity(f) == 1) {
         return pVisitor.visit(getArg(f, 0));
       }
       return pVisitor.visitOr(getAllArgs(f));
-    }
-
-    if (isEquivalence(f)) {
-      assert getArity(f) == 2;
+    } else if (isEquivalence(f)) {
+      assert ufmgr.getArity(f) == 2;
       return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    }
-
-    if (isIfThenElse(f)) {
-      assert getArity(f) == 3;
+    } else if (isIfThenElse(f)) {
+      assert ufmgr.getArity(f) == 3;
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    }
-
-    if (SmtInterpolUtil.isAtom(f)) {
+    } else if (SmtInterpolUtil.isAtom(f)) {
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
 

@@ -50,24 +50,24 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 
   private final long z3context;
+  private final Z3UnsafeFormulaManager ufmgr;
+  private final Z3FormulaCreator creator;
 
-  Z3BooleanFormulaManager(Z3FormulaCreator creator) {
-    super(creator);
-    this.z3context = creator.getEnv();
+  Z3BooleanFormulaManager(Z3FormulaCreator creator, Z3UnsafeFormulaManager ufmgr) {
+    super(creator, ufmgr);
+    z3context = creator.getEnv();
+    this.creator = creator;
+    this.ufmgr = ufmgr;
   }
 
   @Override
@@ -179,27 +179,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
     return isOP(z3context, pParam, Z3_OP_ITE);
   }
 
-  // copied from Z3UnsafeFormulaManager
-  private int getArity(Long t) {
-    Preconditions.checkArgument(get_ast_kind(z3context, t) == Z3_APP_AST);
-    return get_app_num_args(z3context, t);
-  }
-
-  // copied from Z3UnsafeFormulaManager
-  private BooleanFormula getArg(Long pF, int index) {
-    assert getFormulaCreator().getBoolType().equals(get_sort(z3context, pF));
-    return getFormulaCreator().encapsulateBoolean(get_app_arg(z3context, pF, index));
-  }
-
-  private List<BooleanFormula> getAllArgs(Long pF) {
-    int arity = getArity(pF);
-    List<BooleanFormula> args = new ArrayList<>(arity);
-    for (int i = 0; i < arity; i++) {
-      args.add(getArg(pF, i));
-    }
-    return args;
-  }
-
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Long f) {
     switch (get_ast_kind(z3context, f)) {
@@ -244,7 +223,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
         if (arity == 0) {
           return pVisitor.visitFalse();
         } else if (arity == 1) {
-          return pVisitor.visit(getArg(f, 0));
+          return pVisitor.visit(creator.encapsulateBoolean(ufmgr.getArg(f, 0)));
         }
         return pVisitor.visitOr(getAllArgs(f));
 

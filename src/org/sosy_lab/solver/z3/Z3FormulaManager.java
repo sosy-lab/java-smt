@@ -230,7 +230,7 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
     // Create managers
     Z3UnsafeFormulaManager unsafeManager = new Z3UnsafeFormulaManager(creator);
     Z3FunctionFormulaManager functionTheory = new Z3FunctionFormulaManager(creator, unsafeManager);
-    Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
+    Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator, unsafeManager);
     Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
     Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);

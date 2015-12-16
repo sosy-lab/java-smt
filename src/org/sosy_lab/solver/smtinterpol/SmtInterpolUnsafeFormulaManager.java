@@ -22,6 +22,7 @@ package org.sosy_lab.solver.smtinterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.smtinterpol.SmtInterpolUtil.toTermArray;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -32,8 +33,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -71,9 +70,9 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  @Nullable
   public Term getArg(Term pT, int pN) {
-    return SmtInterpolUtil.getArg(pT, pN);
+    Preconditions.checkState(pT instanceof ApplicationTerm);
+    return ((ApplicationTerm) pT).getParameters()[pN];
   }
 
   @Override

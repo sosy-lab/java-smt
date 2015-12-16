@@ -23,24 +23,22 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
-import edu.nyu.acsys.CVC4.vectorExpr;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment> {
 
   private final ExprManager exprManager;
+  private final CVC4FormulaCreator creator;
+  private final CVC4UnsafeFormulaManager ufmgr;
 
-  protected CVC4BooleanFormulaManager(FormulaCreator<Expr, Type, CVC4Environment> pCreator) {
-    super(pCreator);
+  protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator, CVC4UnsafeFormulaManager ufmgr) {
+    super(pCreator, ufmgr);
     exprManager = pCreator.getEnv().getExprManager();
+    this.ufmgr = ufmgr;
+    this.creator = pCreator;
   }
 
   @Override
@@ -129,23 +127,6 @@ public class CVC4BooleanFormulaManager
     return pBits.getKind() == Kind.ITE;
   }
 
-  private int getArity(Expr pF) {
-    return (int) pF.getNumChildren();
-  }
-
-  private BooleanFormula getArg(Expr pF, int pI) {
-    return (BooleanFormula) pF.getChild(pI);
-  }
-
-  private List<BooleanFormula> getAllArgs(Expr pF) {
-    vectorExpr children = pF.getChildren();
-    List<BooleanFormula> converted = new ArrayList<>();
-    for (int i = 0; i < children.size(); i++) {
-      converted.add((BooleanFormula) children.get(i));
-    }
-    return converted;
-  }
-
   private boolean isAtom(Expr pF) {
     return pF.isConst() || pF.isVariable(); // TODO is this correct?
   }
@@ -153,52 +134,37 @@ public class CVC4BooleanFormulaManager
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Expr f) {
     if (isTrue(f)) {
-      assert getArity(f) == 0;
+      assert ufmgr.getArity(f) == 0;
       return pVisitor.visitTrue();
-    }
-
-    if (isFalse(f)) {
-      assert getArity(f) == 0;
+    } else if (isFalse(f)) {
+      assert ufmgr.getArity(f) == 0;
       return pVisitor.visitFalse();
-    }
-
-    if (isNot(f)) {
-      assert getArity(f) == 1;
+    } else if (isNot(f)) {
+      assert ufmgr.getArity(f) == 1;
       return pVisitor.visitNot(getArg(f, 0));
-    }
-
-    if (isAnd(f)) {
-      if (getArity(f) == 0) {
+    } else if (isAnd(f)) {
+      if (ufmgr.getArity(f) == 0) {
         return pVisitor.visitTrue();
-      } else if (getArity(f) == 1) {
-        return visit(pVisitor, getArg(f, 0));
+      } else if (ufmgr.getArity(f) == 1) {
+        return visit(pVisitor, ufmgr.getArg(f, 0));
       }
       return pVisitor.visitAnd(getAllArgs(f));
-    }
-
-    if (isOr(f)) {
-      if (getArity(f) == 0) {
+    } else if (isOr(f)) {
+      if (ufmgr.getArity(f) == 0) {
         return pVisitor.visitFalse();
-      } else if (getArity(f) == 1) {
+      } else if (ufmgr.getArity(f) == 1) {
         return pVisitor.visit(getArg(f, 0));
       }
       return pVisitor.visitOr(getAllArgs(f));
-    }
-
-    if (isEquivalence(f)) {
-      assert getArity(f) == 2;
+    } else if (isEquivalence(f)) {
+      assert ufmgr.getArity(f) == 2;
       return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    }
-
-    if (isIfThenElse(f)) {
-      assert getArity(f) == 3;
+    } else if (isIfThenElse(f)) {
+      assert ufmgr.getArity(f) == 3;
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    }
-
-    if (isAtom(f)) {
+    } else if (isAtom(f)) {
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
-
     throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
   }
 }
