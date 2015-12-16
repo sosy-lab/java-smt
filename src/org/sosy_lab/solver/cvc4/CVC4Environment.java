@@ -23,13 +23,7 @@ import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Options;
 import edu.nyu.acsys.CVC4.SmtEngine;
 
-import org.sosy_lab.common.NativeLibraries;
-
 public class CVC4Environment {
-
-  static {
-    NativeLibraries.loadLibrary("cvc4jni");
-  }
 
   private final ExprManager exprManager;
   private final Options options;
