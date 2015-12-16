@@ -115,7 +115,8 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected boolean isEquivalence(Expr pBits) {
-    return pBits.getKind() == Kind.EQUAL;
+    // TODO is there a relevant difference that needs to be handled here?
+    return pBits.getKind() == Kind.EQUAL || pBits.getKind() == Kind.IFF;
   }
 
   @Override
@@ -125,7 +126,7 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected boolean isIfThenElse(Expr pBits) {
-    return pBits.getKind() == Kind.IFF; // TODO is this correct
+    return pBits.getKind() == Kind.ITE;
   }
 
   private int getArity(Expr pF) {
