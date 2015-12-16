@@ -8,9 +8,15 @@
 # For building libmathsat5j.so, there are two dependencies:
 # - The static Mathsat5 library as can be downloaded from http://mathsat.fbk.eu/download.html
 # - The static GMP library compiled with the "-fPIC" option.
-#   To create this, download GMP from http://gmplib.org/ and run
+#   The version 5.0.5 (this is the last version that could successfully be used with
+#   all CPU models. It makes sense to try from time to time if newer version do again
+#   work with all CPU models we need (consider running java-smt with CPAchecker in the cloud)
+#
+#   To create a new version, download GMP from http://gmplib.org/ and run
 #   ./configure --enable-cxx --with-pic --disable-shared
 #   make
+#   The so created libgmp.a libgmpxx.a and the gmp.h then have to be added to the
+#   ./gmp directory
 
 # For building liboptimathsat5.so, OptiMathSat5 can be downloaded from
 # http://optimathsat.disi.unitn.it/.
@@ -56,8 +62,8 @@ if [ ! -f "$1/lib/libmathsat.a" ]; then
 fi
 MSAT_SRC_DIR="$1"/include
 MSAT_LIB_DIR="$1"/lib
-GMP_LIB_DIR="$2"/.libs
-GMP_HEADER_DIR="$2"
+GMP_LIB_DIR=./gmp
+GMP_HEADER_DIR=./gmp
 
 if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
 	echo "You need to specify the GMP directory on the command line!"
@@ -67,7 +73,7 @@ fi
 SRC_FILES="org_sosy_1lab_solver_mathsat5_Mathsat5NativeApi.c versions.c"
 OBJ_FILES="org_sosy_1lab_solver_mathsat5_Mathsat5NativeApi.o"
 
-if [ "$3" = "-optimathsat" ]; then
+if [ "$2" = "-optimathsat" ]; then
     echo "Compiling bindings to OptiMathSAT"
     SRC_FILES="$SRC_FILES optimization.c"
     OBJ_FILES="$OBJ_FILES optimization.o"
@@ -101,7 +107,7 @@ fi
 MISSING_SYMBOLS="$(readelf -Ws $OUT_FILE | grep NOTYPE | grep GLOBAL | grep UND)"
 if [ ! -z "$MISSING_SYMBOLS" ]; then
 	echo "Warning: There are the following unresolved dependencies in libmathsat5j.so:"
-	readelf -Ws $OBJ_FILES | grep NOTYPE | grep GLOBAL | grep UND
+	readelf -Ws $OUT_FILE | grep NOTYPE | grep GLOBAL | grep UND
 	exit 1
 fi
 
