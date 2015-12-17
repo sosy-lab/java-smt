@@ -256,6 +256,11 @@ typedef jlong jjconf;
 typedef jlong jjterm;
 #define TERM_ARG(num) STRUCT_ARG(msat_term, num)
 #define TERM_RETURN STRUCT_RETURN_WITH_ENV
+
+typedef jlong jjmodel;
+#define MODEL_ARG(num) STRUCT_ARG(msat_model, num)
+#define MODEL_RETURN STRUCT_RETURN_WITH_ENV
+
 typedef jlongArray jjtermArray;
 #define TERM_ARRAY_ARG(num) STRUCT_ARRAY_ARG(msat_term, num)
 #define FREE_TERM_ARRAY_ARG(num) FREE_STRUCT_ARRAY_ARG(num)

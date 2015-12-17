@@ -993,17 +993,43 @@ out:
 FREE_TERM_ARRAY_ARG(2)
 INT_RETURN
 
+DEFINE_FUNC(jterm, 1_apply_1substitution) WITH_FIVE_ARGS(jenv, jterm, int, jtermArray, jtermArray)
+ENV_ARG(1)
+TERM_ARG(2)
+SIMPLE_ARG(int, 3)
+TERM_ARRAY_ARG(4)
+TERM_ARRAY_ARG(5)
+CALL5(msat_term, apply_substitution)
+FREE_TERM_ARRAY_ARG(5)
+FREE_TERM_ARRAY_ARG(4)
+STRUCT_RETURN_WITH_ENV
+
 DEFINE_FUNC(jterm, 1get_1model_1value) WITH_TWO_ARGS(jenv, jterm)
 ENV_ARG(1)
 TERM_ARG(2)
 CALL2(msat_term, get_model_value)
 STRUCT_RETURN_WITH_ENV
 
+DEFINE_FUNC(jmodel, 1get_1model) WITH_ONE_ARG(jenv)
+ENV_ARG(1)
+CALL1(msat_model, get_model)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jterm, 1model_1eval) WITH_TWO_ARGS(jmodel, jterm)
+MODEL_ARG(1)
+TERM_ARG(2)
+CALL2(msat_term, model_eval)
+STRUCT_RETURN
+
+DEFINE_FUNC(jmodel_iterator, 1model_1create_1iterator) WITH_ONE_ARG(jmodel)
+MODEL_ARG(1)
+CALL1(msat_model_iterator, model_create_iterator)
+STRUCT_RETURN
+
 DEFINE_FUNC(jmodel_iterator, 1create_1model_1iterator) WITH_ONE_ARG(jenv)
 ENV_ARG(1)
 CALL1(msat_model_iterator, create_model_iterator)
 MODEL_ITERATOR_RETURN
-
 
 DEFINE_FUNC(jboolean, 1model_1iterator_1has_1next) WITH_ONE_ARG(jmodel_iterator)
 MODEL_ITERATOR_ARG(1)
