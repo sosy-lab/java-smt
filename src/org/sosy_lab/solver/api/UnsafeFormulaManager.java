@@ -46,6 +46,7 @@ public interface UnsafeFormulaManager {
   /**
    * @return whether the given Formula is an atom.
    */
+  @Deprecated
   boolean isAtom(Formula f);
 
   /**
@@ -77,6 +78,7 @@ public interface UnsafeFormulaManager {
    * @return whether the given Formula is quantified,
    * either with universal or existential quantification.
    */
+  @Deprecated
   boolean isQuantification(Formula f);
 
   /**

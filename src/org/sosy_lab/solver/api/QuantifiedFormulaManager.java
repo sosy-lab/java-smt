@@ -58,26 +58,31 @@ public interface QuantifiedFormulaManager {
   /**
    * @return Whether {@code pF} is a quantifier.
    */
+  @Deprecated
   boolean isQuantifier(BooleanFormula pF);
 
   /**
    * @return Whether {@code pF} is a forall-quantifier.
    */
+  @Deprecated
   boolean isForall(BooleanFormula pF);
 
   /**
    * @return Whether {@code pF} is an exists-quantifier.
    */
+  @Deprecated
   boolean isExists(BooleanFormula pF);
 
   /**
    * @return Number of variables bound by the quantifier.
    */
+  @Deprecated
   int numQuantifierBound(BooleanFormula pF);
 
   /**
    * @return Body of the quantifier.
    */
+  @Deprecated
   BooleanFormula getQuantifierBody(BooleanFormula pF);
 
   /**
