@@ -1010,6 +1010,10 @@ TERM_ARG(2)
 CALL2(msat_term, get_model_value)
 STRUCT_RETURN_WITH_ENV
 
+DEFINE_FUNC(void, 1destroy_1model) WITH_ONE_ARG(jmodel)
+MODEL_ARG(1)
+VOID_CALL1(void, destroy_model)
+
 DEFINE_FUNC(jmodel, 1get_1model) WITH_ONE_ARG(jenv)
 ENV_ARG(1)
 CALL1(msat_model, get_model)
