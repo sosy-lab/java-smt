@@ -366,7 +366,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     // in the newest version mathsat has some linebreaks in the dump
     // so we just check if there is exactly one assert
     if (solverToUse() == Solvers.MATHSAT5) {
-      assertThat(of(lines.split("\n")).filter(containsPattern("\\(assert.*\\)")).size()).isEqualTo(1);
+      assertThat(of(lines.split("\n")).filter(containsPattern("\\(assert.*\\)")).size())
+          .isEqualTo(1);
     } else {
       assertThat(getLast(Splitter.on('\n').split(lines)))
           .named("last line of <\n" + lines + ">")

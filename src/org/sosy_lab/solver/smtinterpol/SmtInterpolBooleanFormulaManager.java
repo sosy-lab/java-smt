@@ -160,7 +160,6 @@ class SmtInterpolBooleanFormulaManager
     return SmtInterpolUtil.isIfThenElse(pBits);
   }
 
-
   private BooleanFormula getArg(ApplicationTerm pF, int index) {
     return formulaCreator.encapsulateBoolean(pF.getParameters()[index]);
   }
