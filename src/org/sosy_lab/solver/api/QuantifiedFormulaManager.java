@@ -87,6 +87,8 @@ public interface QuantifiedFormulaManager {
 
   /**
    * @return Whether a symbol {@code pF} is bound by a quantifier.
+   * @deprecated use {@link UnsafeFormulaManager#isBoundVariable(Formula)} instead.
    */
+  @Deprecated
   boolean isBoundByQuantifier(Formula pF);
 }
