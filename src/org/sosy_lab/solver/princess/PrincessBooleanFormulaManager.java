@@ -19,19 +19,26 @@
  */
 package org.sosy_lab.solver.princess;
 
+import static com.google.common.base.Verify.verify;
 import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
 import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
 
+import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
+import ap.parser.IIntFormula;
 import ap.parser.INot;
+import ap.parser.IQuantified;
 import ap.parser.ITermITE;
 
+import com.google.common.collect.ImmutableList;
+
 import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -40,12 +47,9 @@ import scala.Enumeration;
 class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
-  private final PrincessUnsafeFormulaManager ufmgr;
-
   PrincessBooleanFormulaManager(
       PrincessFormulaCreator creator, PrincessUnsafeFormulaManager ufmgr) {
     super(creator, ufmgr);
-    this.ufmgr = ufmgr;
   }
 
   @Override
@@ -189,41 +193,69 @@ class PrincessBooleanFormulaManager
     return PrincessUtil.isIfThenElse(pBits);
   }
 
+  private BooleanFormula getArg(IFormula f, int i) {
+    return getFormulaCreator().encapsulateBoolean(f.apply(i));
+  }
+
   @Override
-  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, IExpression f) {
-    if (isTrue(f)) {
-      assert ufmgr.getArity(f) == 0;
-      return pVisitor.visitTrue();
-    } else if (isFalse(f)) {
-      assert ufmgr.getArity(f) == 0;
-      return pVisitor.visitFalse();
-    } else if (isNot(f)) {
-      assert ufmgr.getArity(f) == 1;
-      return pVisitor.visitNot(getArg(f, 0));
-    } else if (isAnd(f)) {
-      if (ufmgr.getArity(f) == 0) {
+  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, IExpression pF) {
+    verify(
+        pF instanceof IFormula,
+        "Unexpected boolean formula of class %s",
+        pF.getClass().getSimpleName());
+    final IFormula f = (IFormula) pF;
+
+    if (f instanceof IBoolLit) {
+      if (((IBoolLit) f).value()) {
         return pVisitor.visitTrue();
-      } else if (ufmgr.getArity(f) == 1) {
-        return visit(pVisitor, getArg(f, 0));
-      }
-      return pVisitor.visitAnd(getAllArgs(f));
-    } else if (isOr(f)) {
-      if (ufmgr.getArity(f) == 0) {
+      } else {
         return pVisitor.visitFalse();
-      } else if (ufmgr.getArity(f) == 1) {
-        return pVisitor.visit(getArg(f, 0));
       }
-      return pVisitor.visitOr(getAllArgs(f));
-    } else if (isEquivalence(f)) {
-      assert ufmgr.getArity(f) == 2;
-      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    } else if (isIfThenElse(f)) {
-      assert ufmgr.getArity(f) == 3;
+
+    } else if (f instanceof INot) {
+      return pVisitor.visitNot(getArg(f, 0));
+
+    } else if (f instanceof IBinFormula) {
+      final IBinFormula bin = (IBinFormula) f;
+
+      if (IBinJunctor.And() == bin.j()) {
+        return pVisitor.visitAnd(ImmutableList.of(getArg(f, 0), getArg(f, 1)));
+
+      } else if (IBinJunctor.Or() == bin.j()) {
+        return pVisitor.visitOr(ImmutableList.of(getArg(f, 0), getArg(f, 1)));
+
+      } else if (IBinJunctor.Eqv() == bin.j()) {
+        return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
+
+      } else {
+        throw new UnsupportedOperationException(
+            "Unknown or unsupported boolean operator " + bin.j());
+      }
+
+    } else if (f instanceof IFormulaITE) {
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    } else if (PrincessUtil.isAtom(f)) {
+
+    } else if (f instanceof IQuantified) {
+      throw new UnsupportedOperationException("Quantifier for Princess not supported");
+      /* TODO: need to get quantified variable
+      Quantifier q = ((IQuantified) f).quan();
+      if (q == Quantifier.ALL$.MODULE$) {
+        return pVisitor.visitForallQuantifier(, getArg(f, 0));
+      } else if (q == Quantifier.EX$.MODULE$) {
+        return pVisitor.visitExistsQuantifier(, getArg(f, 0));
+      } else {
+        throw new UnsupportedOperationException("Unknown quantifier " + f);
+      }
+      */
+
+    } else if (f instanceof IAtom || f instanceof IIntFormula) {
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
 
-    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
+    throw new UnsupportedOperationException(
+        String.format(
+            "Unknown or unsupported boolean operator of class %s: %s",
+            f.getClass().getSimpleName(),
+            f));
   }
 }
