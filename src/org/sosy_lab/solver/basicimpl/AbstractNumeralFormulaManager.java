@@ -192,6 +192,9 @@ public abstract class AbstractNumeralFormulaManager<
   /**
    * If a solver does not support this operation, e.g. because of missing
    * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   *
+   * @param pParam1 the dividend
+   * @param pParam2 the divisor
    */
   protected TFormulaInfo divide(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException();
@@ -207,6 +210,9 @@ public abstract class AbstractNumeralFormulaManager<
   /**
    * If a solver does not support this operation, e.g. because of missing
    * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   *
+   * @param pParam1 the dividend
+   * @param pParam2 the divisor
    */
   protected TFormulaInfo modulo(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException();
@@ -234,6 +240,9 @@ public abstract class AbstractNumeralFormulaManager<
   /**
    * If a solver does not support this operation, e.g. because of missing
    * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   *
+   * @param pParam1 first factor
+   * @param pParam2 second factor
    */
   protected TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2) {
     throw new UnsupportedOperationException();

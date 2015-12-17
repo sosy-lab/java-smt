@@ -30,6 +30,7 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -286,8 +287,19 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected final List<BooleanFormula> getAllArgs(TFormulaInfo pF) {
-    @SuppressWarnings("unchecked")
-    List<BooleanFormula> out = (List) ufmgr.getAllArgs(getFormulaCreator().encapsulateBoolean(pF));
-    return out;
+    return checkedCast(ufmgr.getAllArgs(getFormulaCreator().encapsulateBoolean(pF)));
+  }
+
+  private static List<BooleanFormula> checkedCast(List<Formula> list) {
+    List<BooleanFormula> ret = new ArrayList<>(list.size());
+    for (Formula f : list) {
+      if (f instanceof BooleanFormula) {
+        ret.add((BooleanFormula) list);
+      } else {
+        throw new IllegalStateException(
+            "Non-boolean formula where only boolean formulas should occur");
+      }
+    }
+    return ret;
   }
 }

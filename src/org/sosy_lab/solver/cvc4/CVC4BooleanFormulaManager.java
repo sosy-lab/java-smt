@@ -31,14 +31,12 @@ public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment> {
 
   private final ExprManager exprManager;
-  private final CVC4FormulaCreator creator;
   private final CVC4UnsafeFormulaManager ufmgr;
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator, CVC4UnsafeFormulaManager ufmgr) {
     super(pCreator, ufmgr);
     exprManager = pCreator.getEnv().getExprManager();
     this.ufmgr = ufmgr;
-    this.creator = pCreator;
   }
 
   @Override

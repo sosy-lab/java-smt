@@ -32,13 +32,11 @@ import java.util.List;
 
 class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {
 
-  private final Z3UnsafeFormulaManager unsafeManager;
   private final long z3context;
 
-  Z3FunctionFormulaManager(Z3FormulaCreator creator, Z3UnsafeFormulaManager unsafeManager) {
+  Z3FunctionFormulaManager(Z3FormulaCreator creator) {
     super(creator);
     this.z3context = creator.getEnv();
-    this.unsafeManager = unsafeManager;
   }
 
   @Override

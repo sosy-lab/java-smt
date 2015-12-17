@@ -45,13 +45,11 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 
   private final long mathsatEnv;
-  private final Mathsat5UnsafeFormulaManager ufmgr;
 
   protected Mathsat5BooleanFormulaManager(
       Mathsat5FormulaCreator pCreator, Mathsat5UnsafeFormulaManager ufmgr) {
     super(pCreator, ufmgr);
     this.mathsatEnv = pCreator.getEnv();
-    this.ufmgr = ufmgr;
   }
 
   @Override
