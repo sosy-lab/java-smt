@@ -47,6 +47,7 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   @Override
+  @Deprecated
   public boolean isAtom(Formula pF) {
     TFormulaInfo t = extractInfo(pF);
     return isAtom(t);
@@ -109,6 +110,7 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isBoundVariable(TFormulaInfo pT);
 
   @Override
+  @Deprecated
   public boolean isQuantification(Formula pF) {
     TFormulaInfo t = extractInfo(pF);
     return isQuantification(t);
@@ -117,6 +119,7 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isQuantification(TFormulaInfo pT);
 
   @Override
+  @Deprecated
   public BooleanFormula getQuantifiedBody(Formula pQuantifiedFormula) {
     Preconditions.checkArgument(isQuantification(pQuantifiedFormula));
 

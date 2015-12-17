@@ -47,6 +47,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   @Override
+  @Deprecated
   public boolean isBoolean(Formula f) {
     return f instanceof BooleanFormula;
   }
