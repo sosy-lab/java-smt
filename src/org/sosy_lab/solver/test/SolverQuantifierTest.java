@@ -257,6 +257,7 @@ public class SolverQuantifierTest extends SolverBasedTest0 {
     assertThat(f1).isEqualTo(f2);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testIntrospectionForall() {
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
@@ -289,6 +290,7 @@ public class SolverQuantifierTest extends SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testIntrospectionExists() {
     assume()
