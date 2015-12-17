@@ -19,10 +19,14 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
+import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_model;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 
 import com.google.common.base.Preconditions;
@@ -98,6 +102,11 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   @Override
   public <E extends Formula> E evaluate(E f) {
-    throw new UnsupportedOperationException("Mathsat does not support evaluation");
+    long evalTerm = getMsatTerm(f);
+    Preconditions.checkState(!closed);
+    long model = msat_get_model(curEnv);
+    long term = msat_model_eval(model, evalTerm);
+    msat_destroy_model(model);
+    return mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(f), term);
   }
 }

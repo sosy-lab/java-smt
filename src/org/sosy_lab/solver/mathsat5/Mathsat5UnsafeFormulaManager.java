@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
@@ -45,6 +46,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 
@@ -118,6 +120,15 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   public Long replaceArgs(Long t, List<Long> newArgs) {
     long tDecl = msat_term_get_decl(t);
     return msat_make_term(msatEnv, tDecl, Longs.toArray(newArgs));
+  }
+
+  @Override
+  protected Long substitute(Long t, List<Long> changeFrom, List<Long> changeTo) {
+    long size = changeFrom.size();
+    Preconditions.checkState(size == changeTo.size());
+
+    return msat_apply_substitution(
+        msatEnv, t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
   }
 
   @Override
