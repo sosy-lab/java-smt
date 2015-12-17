@@ -19,14 +19,25 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Verify.verify;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
+import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 class SmtInterpolBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -34,18 +45,18 @@ class SmtInterpolBooleanFormulaManager
   // We use the Theory directly here because the methods there perform simplifications
   // that we could not use otherwise.
   private final Theory theory;
-  private final SmtInterpolUnsafeFormulaManager ufmgr;
+  private final SmtInterpolFormulaCreator formulaCreator;
 
   SmtInterpolBooleanFormulaManager(
       SmtInterpolFormulaCreator creator, Theory pTheory, SmtInterpolUnsafeFormulaManager ufmgr) {
     super(creator, ufmgr);
     theory = pTheory;
-    this.ufmgr = ufmgr;
+    formulaCreator = creator;
   }
 
   @Override
   public Term makeVariableImpl(String varName) {
-    return getFormulaCreator().makeVariable(getFormulaCreator().getBoolType(), varName);
+    return formulaCreator.makeVariable(formulaCreator.getBoolType(), varName);
   }
 
   @Override
@@ -149,41 +160,99 @@ class SmtInterpolBooleanFormulaManager
     return SmtInterpolUtil.isIfThenElse(pBits);
   }
 
+
+  private BooleanFormula getArg(ApplicationTerm pF, int index) {
+    return formulaCreator.encapsulateBoolean(pF.getParameters()[index]);
+  }
+
+  private List<BooleanFormula> getAllArgs(final ApplicationTerm pF) {
+    return Lists.transform(
+        Arrays.asList(pF.getParameters()),
+        new Function<Term, BooleanFormula>() {
+          @Override
+          public BooleanFormula apply(Term pInput) {
+            return formulaCreator.encapsulateBoolean(pInput);
+          }
+        });
+  }
+
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Term f) {
-    if (isTrue(f)) {
-      assert ufmgr.getArity(f) == 0;
+    checkArgument(
+        f.getTheory().equals(theory),
+        "Given term belongs to a different instance of SMTInterpol: %s",
+        f);
+    verify(
+        f instanceof ApplicationTerm,
+        "Unexpected boolean formula of class %s",
+        f.getClass().getSimpleName());
+
+    final ApplicationTerm app = (ApplicationTerm) f;
+    final int arity = app.getParameters().length;
+    final FunctionSymbol func = app.getFunction();
+
+    if (theory.mTrue.equals(app)) {
+      assert arity == 0;
       return pVisitor.visitTrue();
-    } else if (isFalse(f)) {
-      assert ufmgr.getArity(f) == 0;
+
+    } else if (theory.mFalse.equals(app)) {
+      assert arity == 0;
       return pVisitor.visitFalse();
-    } else if (isNot(f)) {
-      assert ufmgr.getArity(f) == 1;
-      return pVisitor.visitNot(getArg(f, 0));
-    } else if (isAnd(f)) {
-      if (ufmgr.getArity(f) == 0) {
+
+    } else if (theory.mNot.equals(func)) {
+      assert arity == 1;
+      return pVisitor.visitNot(getArg(app, 0));
+
+    } else if (theory.mAnd.equals(func)) {
+      if (arity == 0) {
         return pVisitor.visitTrue();
-      } else if (ufmgr.getArity(f) == 1) {
-        return visit(pVisitor, ufmgr.getArg(f, 0));
+      } else if (arity == 1) {
+        return visit(pVisitor, getArg(app, 0));
       }
-      return pVisitor.visitAnd(getAllArgs(f));
-    } else if (isOr(f)) {
-      if (ufmgr.getArity(f) == 0) {
+      return pVisitor.visitAnd(getAllArgs(app));
+
+    } else if (theory.mOr.equals(func)) {
+      if (arity == 0) {
         return pVisitor.visitFalse();
-      } else if (ufmgr.getArity(f) == 1) {
-        return pVisitor.visit(getArg(f, 0));
+      } else if (arity == 1) {
+        return pVisitor.visit(getArg(app, 0));
       }
-      return pVisitor.visitOr(getAllArgs(f));
-    } else if (isEquivalence(f)) {
-      assert ufmgr.getArity(f) == 2;
-      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    } else if (isIfThenElse(f)) {
-      assert ufmgr.getArity(f) == 3;
-      return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    } else if (SmtInterpolUtil.isAtom(f)) {
-      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+      return pVisitor.visitOr(getAllArgs(app));
+
+    } else if (theory.mImplies.equals(func)) {
+      assert arity == 2;
+      return pVisitor.visitImplication(getArg(app, 0), getArg(app, 1));
+
+    } else if (theory.mXor.equals(func)) {
+      assert arity == 2;
+      throw new UnsupportedOperationException("Unsupported SMT operator 'xor'");
     }
 
-    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
+    switch (func.getName()) {
+      case "ite":
+        assert arity == 3;
+        return pVisitor.visitIfThenElse(getArg(app, 0), getArg(app, 1), getArg(app, 2));
+
+      case "=":
+        if (isBinaryBooleanOperator(func)) {
+          return pVisitor.visitEquivalence(getArg(app, 0), getArg(app, 1));
+        }
+        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+
+      case "distinct":
+        if (isBinaryBooleanOperator(func)) {
+          throw new UnsupportedOperationException("Unsupported SMT operator 'distinct'");
+        }
+        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+
+      default:
+        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+    }
+  }
+
+  private boolean isBinaryBooleanOperator(final FunctionSymbol func) {
+    return func.getParameterSorts().length == 2
+        && theory.getBooleanSort().equals(func.getParameterSorts()[0])
+        && theory.getBooleanSort().equals(func.getParameterSorts()[1]);
   }
 }
