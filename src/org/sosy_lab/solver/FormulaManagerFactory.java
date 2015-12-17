@@ -135,7 +135,7 @@ public class FormulaManagerFactory {
       switch (solverToCreate) {
         case SMTINTERPOL:
 
-          // Loading SmtInterpol is difficult as it requires it's own class
+          // Loading SmtInterpol is difficult as it requires its own class
           // loader.
           return loadSmtInterpol().create(config, logger, shutdownNotifier, logfile, randomSeed);
 
@@ -164,6 +164,21 @@ public class FormulaManagerFactory {
               e.getMessage()),
           e);
     }
+  }
+
+  /**
+   * Shortcut for getting a {@link FormulaManager}.
+   *
+   * <p>See
+   * {@link #FormulaManagerFactory(Configuration, LogManager, ShutdownNotifier)}
+   * for documentation of accepted parameters.
+   */
+  public static FormulaManager createFormulaManager(
+      Configuration config,
+      LogManager logger,
+      ShutdownNotifier shutdownNotifier) throws InvalidConfigurationException {
+    return new FormulaManagerFactory(
+        config, logger, shutdownNotifier).getFormulaManager();
   }
 
   public FormulaManager getFormulaManager() {
