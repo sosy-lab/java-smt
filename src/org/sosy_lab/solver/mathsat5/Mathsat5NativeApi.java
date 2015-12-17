@@ -105,8 +105,12 @@ class Mathsat5NativeApi {
     }
   }
 
-  public static ModelIterator msat_create_ModelIterator(long e) {
+  public static ModelIterator msat_create_ModelIteratorFromEnv(long e) {
     return new ModelIterator(msat_create_model_iterator(e));
+  }
+
+  public static ModelIterator msat_create_ModelIteratorFromModel(long model) {
+    return new ModelIterator(msat_model_create_iterator(model));
   }
 
   static class NamedTermsWrapper {
@@ -413,6 +417,8 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_copy_from(long e, long t, long src);
 
+  public static native long msat_apply_substitution(long e, long t, long s, long[] from, long[] to);
+
   /*
    * Term access and navigation
    */
@@ -596,6 +602,14 @@ class Mathsat5NativeApi {
    * Model computation
    */
   public static native long msat_get_model_value(long e, long term);
+
+  public static native long msat_get_model(long e);
+
+  public static native void msat_destroy_model(long model);
+
+  private static native long msat_model_create_iterator(long model);
+
+  public static native long msat_model_eval(long model, long term);
 
   private static native long msat_create_model_iterator(long e);
 

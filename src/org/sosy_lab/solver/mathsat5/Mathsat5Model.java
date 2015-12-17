@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_ModelIterator;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_ModelIteratorFromEnv;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_return_type;
@@ -154,7 +154,7 @@ class Mathsat5Model {
 
     ModelIterator lModelIterator;
     try {
-      lModelIterator = msat_create_ModelIterator(sourceEnvironment);
+      lModelIterator = msat_create_ModelIteratorFromEnv(sourceEnvironment);
     } catch (IllegalArgumentException e) {
       // creating the iterator may fail,
       // for example if some theories were disabled in the solver but are needed
