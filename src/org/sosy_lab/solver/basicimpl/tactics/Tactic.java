@@ -47,7 +47,7 @@ public enum Tactic {
 
   /**
    * Convert the formula to CNF. This tactic creates a formula which is
-   * in some cases exponentially bigger. E.g. (x ^ y) v (z ^ w) will have
+   * in some cases exponentially bigger. E.g. (x /\ y) \/ (z /\ w) will have
    * 2^n clauses in CNF afterwards.
    *
    * <p>This tactic has a default implementation.</p>
@@ -55,7 +55,7 @@ public enum Tactic {
   CNF(
       "cnf",
       "Convert the formula to CNF. This tactic creates a formula which is"
-          + " in some cases exponentially bigger. E.g. (x ^ y) v (z ^ w) will have"
+          + " in some cases exponentially bigger. E.g. (x /\\ y) \\/ (z /\\ w) will have"
           + " 2^n clauses in CNF afterwards.") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
@@ -117,7 +117,7 @@ public enum Tactic {
   }
 
   /**
-   * Applys the default implementation for the tactic on the given Formula
+   * Applies the default implementation for the tactic on the given Formula
    * and returns the result. Note that this may lead to different results and
    * may be not as efficient as using solver-specific tactic implementations by
    * calling {@code FormulaManager#applyTactic(BooleanFormula, Tactic)}
