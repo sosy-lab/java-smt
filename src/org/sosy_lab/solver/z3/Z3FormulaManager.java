@@ -43,6 +43,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.set_param_value;
 import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_ast;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -311,10 +312,23 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
     return "Z3 " + major.value + "." + minor.value + "." + build.value + "." + revision.value;
   }
 
+  private static final ImmutableMap<Tactic, String> Z3_TACTICS =
+      ImmutableMap.<Tactic, String>builder()
+          .put(Tactic.NNF, "nnf")
+          .put(Tactic.CNF, "cnf")
+          .put(Tactic.TSEITIN_CNF, "tseitin-cnf")
+          .put(Tactic.QE, "qe")
+          .put(Tactic.QE_LIGHT, "qe-light")
+          .build();
+
   @Override
-  public Long applyTacticImpl(Long input, Tactic tactic) {
-    return Z3NativeApiHelpers.applyTactic(
-        getFormulaCreator().getEnv(), input, tactic.getTacticName());
+  protected Long applyTacticImpl(Long input, Tactic tactic) {
+    String z3TacticName = Z3_TACTICS.get(tactic);
+    if (z3TacticName != null) {
+      return Z3NativeApiHelpers.applyTactic(getFormulaCreator().getEnv(), input, z3TacticName);
+    } else {
+      return super.applyTacticImpl(input, tactic);
+    }
   }
 
   @Override
