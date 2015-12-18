@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 class NNFVisitor extends BooleanFormulaTransformationVisitor {
-  boolean insideNot = false;
-
   private final NNFInsideNotVisitor insideNotVisitor;
   private final BooleanFormulaManager bfmgr;
 
