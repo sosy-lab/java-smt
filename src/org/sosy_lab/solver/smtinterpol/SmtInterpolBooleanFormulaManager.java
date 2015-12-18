@@ -190,19 +190,19 @@ class SmtInterpolBooleanFormulaManager
     final int arity = app.getParameters().length;
     final FunctionSymbol func = app.getFunction();
 
-    if (theory.mTrue.equals(app)) {
+    if (app.equals(theory.mTrue)) {
       assert arity == 0;
       return pVisitor.visitTrue();
 
-    } else if (theory.mFalse.equals(app)) {
+    } else if (app.equals(theory.mFalse)) {
       assert arity == 0;
       return pVisitor.visitFalse();
 
-    } else if (theory.mNot.equals(func)) {
+    } else if (func.equals(theory.mNot)) {
       assert arity == 1;
       return pVisitor.visitNot(getArg(app, 0));
 
-    } else if (theory.mAnd.equals(func)) {
+    } else if (func.equals(theory.mAnd)) {
       if (arity == 0) {
         return pVisitor.visitTrue();
       } else if (arity == 1) {
@@ -210,7 +210,7 @@ class SmtInterpolBooleanFormulaManager
       }
       return pVisitor.visitAnd(getAllArgs(app));
 
-    } else if (theory.mOr.equals(func)) {
+    } else if (func.equals(theory.mOr)) {
       if (arity == 0) {
         return pVisitor.visitFalse();
       } else if (arity == 1) {
@@ -218,11 +218,11 @@ class SmtInterpolBooleanFormulaManager
       }
       return pVisitor.visitOr(getAllArgs(app));
 
-    } else if (theory.mImplies.equals(func)) {
+    } else if (func.equals(theory.mImplies)) {
       assert arity == 2;
       return pVisitor.visitImplication(getArg(app, 0), getArg(app, 1));
 
-    } else if (theory.mXor.equals(func)) {
+    } else if (func.equals(theory.mXor)) {
       assert arity == 2;
       throw new UnsupportedOperationException("Unsupported SMT operator 'xor'");
     }
@@ -251,7 +251,7 @@ class SmtInterpolBooleanFormulaManager
 
   private boolean isBinaryBooleanOperator(final FunctionSymbol func) {
     return func.getParameterSorts().length == 2
-        && theory.getBooleanSort().equals(func.getParameterSorts()[0])
-        && theory.getBooleanSort().equals(func.getParameterSorts()[1]);
+        && (func.getParameterSorts()[0]).equals(theory.getBooleanSort())
+        && (func.getParameterSorts()[1]).equals(theory.getBooleanSort());
   }
 }
