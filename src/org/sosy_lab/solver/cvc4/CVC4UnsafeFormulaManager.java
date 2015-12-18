@@ -112,7 +112,7 @@ public class CVC4UnsafeFormulaManager
   }
 
   @Override
-  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
     return substituteUsingMap(pF, pFromToMapping);
   }
 }

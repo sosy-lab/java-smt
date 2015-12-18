@@ -124,7 +124,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   }
 
   @Override
-  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
     return substituteUsingLists(pF, pFromToMapping);
   }
 

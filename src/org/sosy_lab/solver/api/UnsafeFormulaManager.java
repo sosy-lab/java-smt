@@ -134,5 +134,5 @@ public interface UnsafeFormulaManager {
    * @param fromToMapping Mapping of old and new formula parts.
    * @return Formula with parts replaced.
    */
-  <T1 extends Formula, T2 extends Formula> T1 substitute(T1 f, Map<T2, T2> fromToMapping);
+  Formula substitute(Formula f, Map<Formula, Formula> fromToMapping);
 }

@@ -204,9 +204,12 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
     Z3Formula epsFormula = (Z3Formula) rfmgr.makeVariable("epsilon");
 
     Z3Formula out =
-        mgr.getUnsafeFormulaManager()
-            .substitute(
-                z, ImmutableMap.of(epsFormula, (Z3Formula) rfmgr.makeNumber(newValue.toString())));
+        (Z3Formula)
+            mgr.getUnsafeFormulaManager()
+                .substitute(
+                    z,
+                    ImmutableMap.<Formula, Formula>of(
+                        epsFormula, rfmgr.makeNumber(newValue.toString())));
     return simplify(z3context, out.getFormulaInfo());
   }
 
