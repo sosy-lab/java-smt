@@ -44,7 +44,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
@@ -206,9 +206,7 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
     Z3Formula out =
         mgr.getUnsafeFormulaManager()
             .substitute(
-                z,
-                ImmutableList.of(epsFormula),
-                ImmutableList.of((Z3Formula) rfmgr.makeNumber(newValue.toString())));
+                z, ImmutableMap.of(epsFormula, (Z3Formula) rfmgr.makeNumber(newValue.toString())));
     return simplify(z3context, out.getFormulaInfo());
   }
 

@@ -30,9 +30,11 @@ import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
+import java.util.Map;
 
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -120,6 +122,11 @@ class SmtInterpolUnsafeFormulaManager
     } else {
       throw new IllegalArgumentException("The Term " + t + " has no name!");
     }
+  }
+
+  @Override
+  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+    return substituteUsingMap(pF, pFromToMapping);
   }
 
   @Override

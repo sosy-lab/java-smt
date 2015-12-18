@@ -75,9 +75,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
+import java.util.Map;
 
 class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
@@ -258,7 +260,12 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   }
 
   @Override
-  protected Long substitute(Long t, List<Long> changeFrom, List<Long> changeTo) {
+  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+    return substituteUsingLists(pF, pFromToMapping);
+  }
+
+  @Override
+  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
     int size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
     return Z3NativeApi.substitute(

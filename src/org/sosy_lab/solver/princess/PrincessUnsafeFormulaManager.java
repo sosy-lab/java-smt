@@ -35,9 +35,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
+import java.util.Map;
 
 class PrincessUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
@@ -110,6 +112,11 @@ class PrincessUnsafeFormulaManager
     } else {
       throw new IllegalArgumentException("The Term " + t + " has no name!");
     }
+  }
+
+  @Override
+  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+    return substituteUsingMap(pF, pFromToMapping);
   }
 
   @Override

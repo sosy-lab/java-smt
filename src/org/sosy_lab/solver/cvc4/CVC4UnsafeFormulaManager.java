@@ -22,10 +22,12 @@ package org.sosy_lab.solver.cvc4;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Type;
 
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import java.util.List;
+import java.util.Map;
 
 public class CVC4UnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Expr, Type, CVC4Environment> {
@@ -110,7 +112,7 @@ public class CVC4UnsafeFormulaManager
   }
 
   @Override
-  protected Expr substitute(Expr pExpr, List<Expr> pSubstituteFrom, List<Expr> pSubstituteTo) {
-    throw new UnsupportedOperationException("Not implemented");
+  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+    return substituteUsingMap(pF, pFromToMapping);
   }
 }

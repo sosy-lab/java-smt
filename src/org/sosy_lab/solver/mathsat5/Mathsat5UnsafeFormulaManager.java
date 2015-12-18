@@ -54,6 +54,7 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 
 import java.util.List;
+import java.util.Map;
 
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
@@ -123,7 +124,12 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   }
 
   @Override
-  protected Long substitute(Long t, List<Long> changeFrom, List<Long> changeTo) {
+  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
+    return substituteUsingLists(pF, pFromToMapping);
+  }
+
+  @Override
+  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
     long size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
 

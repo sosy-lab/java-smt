@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements UnsafeFormulaManager {
@@ -188,21 +187,6 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo replaceArgs(TFormulaInfo pT, List<TFormulaInfo> newArgs);
 
   @Override
-  public <ResultFormulaType extends Formula, ParamFormulaType extends Formula>
-      ResultFormulaType substitute(
-          ResultFormulaType f, List<ParamFormulaType> changeFrom, List<ParamFormulaType> changeTo) {
-
-    TFormulaInfo newExpression =
-        substitute(
-            getFormulaCreator().extractInfo(f),
-            Lists.transform(changeFrom, extractor),
-            Lists.transform(changeTo, extractor));
-
-    FormulaType<ResultFormulaType> type = getFormulaCreator().getFormulaType(f);
-    return getFormulaCreator().encapsulate(type, newExpression);
-  }
-
-  @Override
   public <T extends Formula> List<T> splitNumeralEqualityIfPossible(final T pF) {
     return Lists.transform(
         splitNumeralEqualityIfPossible(extractInfo(pF)),
@@ -216,28 +200,22 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
 
-  @Override
-  public <T1 extends Formula, T2 extends Formula> T1 substitute(T1 pF, Map<T2, T2> pFromToMapping) {
-    List<T2> fromList = new ArrayList<>(pFromToMapping.size());
-    List<T2> toList = new ArrayList<>(pFromToMapping.size());
-    for (Entry<T2, T2> e : pFromToMapping.entrySet()) {
-      fromList.add(e.getKey());
-      toList.add(e.getValue());
+  /**
+   * Default implementation for {@link #substitute(Formula, Map)}.
+   */
+  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingMap(
+      T1 pF, Map<T2, T2> pFromToMapping) {
+    Map<TFormulaInfo, TFormulaInfo> mapping = new HashMap<>(pFromToMapping.size());
+    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
+      mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
     }
-    return substitute(pF, fromList, toList);
+
+    TFormulaInfo result = substituteUsingMapImpl(extractInfo(pF), mapping);
+    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
+    return getFormulaCreator().encapsulate(type, result);
   }
 
-  protected TFormulaInfo substitute(
-      TFormulaInfo expr, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
-    Preconditions.checkArgument(substituteFrom.size() == substituteTo.size());
-    Map<TFormulaInfo, TFormulaInfo> replacements = new HashMap<>();
-    for (int i = 0; i < substituteFrom.size(); i++) {
-      replacements.put(substituteFrom.get(i), substituteTo.get(i));
-    }
-    return recSubstitute(expr, replacements);
-  }
-
-  private TFormulaInfo recSubstitute(
+  protected TFormulaInfo substituteUsingMapImpl(
       TFormulaInfo expr, Map<TFormulaInfo, TFormulaInfo> memoization) {
     TFormulaInfo out = memoization.get(expr);
 
@@ -246,12 +224,44 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
       List<TFormulaInfo> updatedChildren = new ArrayList<>(arity);
       for (int childIdx = 0; childIdx < arity; childIdx++) {
         TFormulaInfo child = getArg(expr, childIdx);
-        updatedChildren.add(recSubstitute(child, memoization));
+        updatedChildren.add(substituteUsingMapImpl(child, memoization));
       }
       out = replaceArgs(expr, updatedChildren);
       memoization.put(expr, out);
     }
 
     return out;
+  }
+
+  /**
+   * Default implementation for {@link #substitute(Formula, Map)} for solvers that provide
+   * an internal substitute operation that takes two lists instead of a map.
+   *
+   * <p>If this is called, one needs to overwrite {@link #substituteUsingLists(Formula, Map)}.
+   */
+  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingLists(
+      T1 pF, Map<T2, T2> pFromToMapping) {
+    List<TFormulaInfo> substituteFrom = new ArrayList<>(pFromToMapping.size());
+    List<TFormulaInfo> substituteTo = new ArrayList<>(pFromToMapping.size());
+    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
+      substituteFrom.add(extractInfo(entry.getKey()));
+      substituteTo.add(extractInfo(entry.getValue()));
+    }
+
+    TFormulaInfo result = substituteUsingListsImpl(extractInfo(pF), substituteFrom, substituteTo);
+    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
+    return getFormulaCreator().encapsulate(type, result);
+  }
+
+  /**
+   * Backend for {@link #substituteUsingLists(Formula, Map)}.
+   * @param pF The formula to change.
+   * @param substituteFrom The list of parts that should be replaced.
+   * @param substituteTo The list of replacement parts, in same order.
+   * @return The formula with th replacements applied.
+   */
+  protected TFormulaInfo substituteUsingListsImpl(
+      TFormulaInfo pF, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
+    throw new UnsupportedOperationException();
   }
 }

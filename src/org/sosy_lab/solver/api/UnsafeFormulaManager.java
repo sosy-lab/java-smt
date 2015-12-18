@@ -130,17 +130,9 @@ public interface UnsafeFormulaManager {
    * {@code changeTo} contains a variable {@code b} all occurrences of {@code a}
    * will be changed to {@code b} in the returned formula.
    *
-   * @param f Formula to change
-   * @param changeFrom List of things to change from.
-   * @param changeTo List of things to change to.
-   * @return Formula with variables being replaced.
-   *
-   */
-  <T1 extends Formula, T2 extends Formula> T1 substitute(
-      T1 f, List<T2> changeFrom, List<T2> changeTo);
-
-  /**
-   * Same as {@link #substitute(Formula, List, List)}, but uses a map.
+   * @param f Formula to change.
+   * @param fromToMapping Mapping of old and new formula parts.
+   * @return Formula with parts replaced.
    */
   <T1 extends Formula, T2 extends Formula> T1 substitute(T1 f, Map<T2, T2> fromToMapping);
 }
