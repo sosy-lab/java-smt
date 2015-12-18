@@ -133,10 +133,9 @@ public interface FormulaManager {
    */
   String getVersion();
 
-  /** Apply a tactic which performs formula transformation. The available tactics
-   * depend on the used solver. For some tactics we have solver-independent
-   * implementations which can be used via
-   * {@code Tactic#applyDefault(FormulaManager, BooleanFormula)}
+  /**
+   * Apply a tactic which performs formula transformation. The available tactics
+   * depend on the used solver.
    */
   BooleanFormula applyTactic(BooleanFormula input, Tactic tactic);
 

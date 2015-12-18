@@ -69,36 +69,21 @@ public enum Tactic {
    *
    * <p>This tactic has no default implementation.</p>
    */
-  TSEITIN_CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding") {
-    @Override
-    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      throw new UnsupportedOperationException("This tactic has no default implementation.");
-    }
-  },
+  TSEITIN_CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding"),
 
   /**
    * Perform light quantifier elimination.
    *
    * <p>This tactic has no default implementation.</p>
    */
-  QE_LIGHT("qe-light", "Perform light quantifier elimination") {
-    @Override
-    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      throw new UnsupportedOperationException("This tactic has no default implementation.");
-    }
-  },
+  QE_LIGHT("qe-light", "Perform light quantifier elimination"),
 
   /**
    * Perform quantifier elimination.
    *
    * <p>This tactic has no default implementation.</p>
    */
-  QE("qe", "Perform quantifier elimination") {
-    @Override
-    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      throw new UnsupportedOperationException("This tactic has no default implementation.");
-    }
-  };
+  QE("qe", "Perform quantifier elimination");
 
   private final String name;
   private final String description;
@@ -120,7 +105,17 @@ public enum Tactic {
    * Applies the default implementation for the tactic on the given Formula
    * and returns the result. Note that this may lead to different results and
    * may be not as efficient as using solver-specific tactic implementations by
-   * calling {@code FormulaManager#applyTactic(BooleanFormula, Tactic)}
+   * calling {@code FormulaManager#applyTactic(BooleanFormula, Tactic)}.
+   *
+   * <p>Thus calling this method is discouraged.
+   *
+   * @param pFmgr The formula manager that created the given formula.
+   * @param pF The formula to rewrite.
    */
-  public abstract BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF);
+  public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
+    throw new UnsupportedOperationException(
+        String.format(
+            "The tactic %s is not supported by the current solver has no default implementation.",
+            getTacticName()));
+  }
 }

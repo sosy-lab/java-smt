@@ -216,15 +216,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
-    try {
-      return extractInfo(tactic.applyDefault(this, formulaCreator.encapsulateBoolean(f)));
-    } catch (UnsupportedOperationException e) {
-      throw new UnsupportedOperationException(
-          "No default, or solver specific"
-              + " tactic implementation available please use a different solver,"
-              + " which supports "
-              + tactic.getTacticName());
-    }
+    return extractInfo(tactic.applyDefault(this, formulaCreator.encapsulateBoolean(f)));
   }
 
   @Override
