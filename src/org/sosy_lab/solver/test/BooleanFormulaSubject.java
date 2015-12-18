@@ -129,7 +129,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   /**
    * Check that the subject is equivalent to a given formula,
-   * i.e. <code>subject <=> expected</code> always holds.
+   * i.e. {@code subject <=> expected} always holds.
    * Will show a counterexample on failure.
    */
   public void isEquivalentTo(final BooleanFormula expected)
@@ -145,7 +145,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   /**
    * Check that the subject implies a given formula,
-   * i.e. <code>subject => expected</code> always holds.
+   * i.e. {@code subject => expected} always holds.
    * Will show a counterexample on failure.
    */
   public void implies(final BooleanFormula expected) throws SolverException, InterruptedException {

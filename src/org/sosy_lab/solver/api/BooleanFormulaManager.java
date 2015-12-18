@@ -60,11 +60,11 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula implication(BooleanFormula formula1, BooleanFormula formula2);
 
-  /** Check, if the formula is of the form "a==b" with two boolean args. */
+  /** Check, if the formula is of the form {@code a==b} with two boolean args. */
   @Deprecated
   boolean isEquivalence(BooleanFormula formula);
 
-  /** Check, if the formula is of the form "a=>b" with two boolean args. */
+  /** Check, if the formula is of the form {@code a=>b} with two boolean args. */
   @Deprecated
   boolean isImplication(BooleanFormula formula);
 
@@ -91,7 +91,7 @@ public interface BooleanFormulaManager {
   boolean isFalse(BooleanFormula formula);
 
   /**
-   * Creates a formula representing "IF cond THEN f1 ELSE f2"
+   * Creates a formula representing {@code IF cond THEN f1 ELSE f2}
    * @param cond a Formula
    * @param f1 a Formula
    * @param f2 a Formula
@@ -99,7 +99,7 @@ public interface BooleanFormulaManager {
    */
   <T extends Formula> T ifThenElse(BooleanFormula cond, T f1, T f2);
 
-  /** Check, if the formula matches ITE(cond,t1,t2) with three args. */
+  /** Check, if the formula matches {@code ITE(cond,t1,t2)} with three args. */
   @Deprecated
   <T extends Formula> boolean isIfThenElse(T f);
 

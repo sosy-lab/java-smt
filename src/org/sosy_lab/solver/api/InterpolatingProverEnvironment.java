@@ -69,7 +69,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * For an input of N partitions we return N-1 interpolants.
    *
    * @return a 'inductive sequence' of interpolants,
-   *         such that the implication   AND(I_i, P_i) => I_(i+1)   is satisfied for all i,
+   *         such that the implication {@code AND(I_i, P_i) => I_(i+1)} is satisfied for all i,
    *         where P_i is the conjunction of all formulas in partition i.
    */
   List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas);
