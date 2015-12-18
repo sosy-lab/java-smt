@@ -31,12 +31,10 @@ public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment> {
 
   private final ExprManager exprManager;
-  private final CVC4UnsafeFormulaManager ufmgr;
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator, CVC4UnsafeFormulaManager ufmgr) {
     super(pCreator, ufmgr);
     exprManager = pCreator.getEnv().getExprManager();
-    this.ufmgr = ufmgr;
   }
 
   @Override
@@ -125,42 +123,53 @@ public class CVC4BooleanFormulaManager
     return pBits.getKind() == Kind.ITE;
   }
 
-  private boolean isAtom(Expr pF) {
-    return pF.isConst() || pF.isVariable(); // TODO is this correct?
-  }
-
   @Override
   protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Expr f) {
-    if (isTrue(f)) {
-      assert ufmgr.getArity(f) == 0;
-      return pVisitor.visitTrue();
-    } else if (isFalse(f)) {
-      assert ufmgr.getArity(f) == 0;
-      return pVisitor.visitFalse();
-    } else if (isNot(f)) {
-      assert ufmgr.getArity(f) == 1;
-      return pVisitor.visitNot(getArg(f, 0));
-    } else if (isAnd(f)) {
-      if (ufmgr.getArity(f) == 0) {
+    final long arity = f.getNumChildren();
+
+    if (f.isConst()) {
+      assert arity == 0;
+      if (f.getConstBoolean()) {
         return pVisitor.visitTrue();
-      } else if (ufmgr.getArity(f) == 1) {
-        return visit(pVisitor, ufmgr.getArg(f, 0));
+      } else {
+        return pVisitor.visitFalse();
+      }
+
+    } else if (f.getKind() == Kind.NOT) {
+      assert arity == 1;
+      return pVisitor.visitNot(getArg(f, 0));
+
+    } else if (f.getKind() == Kind.AND) {
+      if (arity == 0) {
+        return pVisitor.visitTrue();
+      } else if (arity == 1) {
+        return visit(pVisitor, getArg(f, 0));
       }
       return pVisitor.visitAnd(getAllArgs(f));
-    } else if (isOr(f)) {
-      if (ufmgr.getArity(f) == 0) {
+
+    } else if (f.getKind() == Kind.OR) {
+      if (arity == 0) {
         return pVisitor.visitFalse();
-      } else if (ufmgr.getArity(f) == 1) {
+      } else if (arity == 1) {
         return pVisitor.visit(getArg(f, 0));
       }
       return pVisitor.visitOr(getAllArgs(f));
-    } else if (isEquivalence(f)) {
-      assert ufmgr.getArity(f) == 2;
+
+    } else if (f.getKind() == Kind.EQUAL || f.getKind() == Kind.IFF) {
+      // TODO is there a relevant difference that needs to be handled here?
+      assert arity == 2;
       return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    } else if (isIfThenElse(f)) {
-      assert ufmgr.getArity(f) == 3;
+
+    } else if (f.getKind() == Kind.IMPLIES) {
+      assert arity == 2;
+      return pVisitor.visitImplication(getArg(f, 0), getArg(f, 1));
+
+    } else if (f.getKind() == Kind.ITE) {
+      assert arity == 3;
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    } else if (isAtom(f)) {
+
+    } else if (f.isConst() || f.isVariable()) {
+      // TODO this is probably wrong, atoms are more than constants and variables
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
     throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
