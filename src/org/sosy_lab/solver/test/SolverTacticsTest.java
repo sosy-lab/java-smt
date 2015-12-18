@@ -22,6 +22,11 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
@@ -32,7 +37,16 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
+@RunWith(Parameterized.class)
 public class SolverTacticsTest extends SolverBasedTest0 {
+
+  @Parameters(name = "{0}")
+  public static Object[] getAllSolvers() {
+    return Solvers.values();
+  }
+
+  @Parameter(0)
+  public Solvers solver;
 
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
@@ -40,7 +54,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula not_a_b = bmgr.not(bmgr.equivalence(a, b));
 
-    BooleanFormula nnf = Tactic.NNF.applyDefault(mgr, not_a_b);
+    BooleanFormula nnf = mgr.applyTactic(not_a_b, Tactic.NNF);
     assertThatFormula(nnf).isEquivalentTo(not_a_b);
     NNFChecker checker = new NNFChecker(mgr);
     checker.visit(nnf);
@@ -54,7 +68,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula c = bmgr.makeVariable("c");
     BooleanFormula not_ITE_a_b_c = bmgr.not(bmgr.ifThenElse(a, b, c));
 
-    BooleanFormula nnf = Tactic.NNF.applyDefault(mgr, not_ITE_a_b_c);
+    BooleanFormula nnf = mgr.applyTactic(not_ITE_a_b_c, Tactic.NNF);
     assertThatFormula(nnf).isEquivalentTo(not_ITE_a_b_c);
     NNFChecker checker = new NNFChecker(mgr);
     checker.visit(nnf);
@@ -68,13 +82,14 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula equiv_a_b = bmgr.equivalence(a, b);
     BooleanFormula not_equiv_a_b = bmgr.not(equiv_a_b);
 
-    BooleanFormula cnf_equiv_a_b = Tactic.CNF.applyDefault(mgr, equiv_a_b);
+    BooleanFormula cnf_equiv_a_b = mgr.applyTactic(equiv_a_b, Tactic.CNF);
     assertThatFormula(cnf_equiv_a_b).isEquivalentTo(equiv_a_b);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf_equiv_a_b);
     assertThat(checker.isInCNF()).isTrue();
 
-    BooleanFormula cnf_not_equiv_a_b = Tactic.CNF.applyDefault(mgr, not_equiv_a_b);
+    BooleanFormula cnf_not_equiv_a_b = mgr.applyTactic(not_equiv_a_b,
+        Tactic.CNF);
     assertThatFormula(cnf_not_equiv_a_b).isEquivalentTo(not_equiv_a_b);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_equiv_a_b);
@@ -89,13 +104,14 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula ITE_a_b_c = bmgr.ifThenElse(a, b, c);
     BooleanFormula not_ITE_a_b_c = bmgr.not(bmgr.ifThenElse(a, b, c));
 
-    BooleanFormula cnf_ITE_a_b_c = Tactic.CNF.applyDefault(mgr, ITE_a_b_c);
+    BooleanFormula cnf_ITE_a_b_c = mgr.applyTactic(ITE_a_b_c, Tactic.CNF);
     assertThatFormula(cnf_ITE_a_b_c).isEquivalentTo(ITE_a_b_c);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf_ITE_a_b_c);
     assertThat(checker.isInCNF()).isTrue();
 
-    BooleanFormula cnf_not_ITE_a_b_c = Tactic.CNF.applyDefault(mgr, not_ITE_a_b_c);
+    BooleanFormula cnf_not_ITE_a_b_c = mgr.applyTactic(not_ITE_a_b_c, Tactic.CNF);
+
     assertThatFormula(cnf_not_ITE_a_b_c).isEquivalentTo(not_ITE_a_b_c);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_ITE_a_b_c);
@@ -117,7 +133,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     disjuncts.add(bmgr.and(u, v));
     BooleanFormula f = bmgr.or(disjuncts);
 
-    BooleanFormula cnf = Tactic.CNF.applyDefault(mgr, f);
+    BooleanFormula cnf = mgr.applyTactic(f, Tactic.CNF);
     assertThatFormula(cnf).isEquivalentTo(f);
     System.out.println(cnf.toString());
     CNFChecker checker = new CNFChecker(mgr);
