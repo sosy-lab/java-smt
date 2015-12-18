@@ -36,7 +36,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
     super(pFmgr);
   }
 
-  public abstract R visitDefault();
+  protected abstract R visitDefault();
 
   @Override
   public R visitTrue() {
