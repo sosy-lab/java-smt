@@ -271,7 +271,19 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
         new Object() {
           @Override
           public String toString() {
-            return msat_to_smtlib2(getEnvironment(), f);
+            String msatString = msat_to_smtlib2(getEnvironment(), f);
+            StringBuilder smtString = new StringBuilder();
+            boolean needsLinebreak = true;
+            for (String part : msatString.split("\n")) {
+              smtString.append(part);
+              if (part.startsWith("(assert")) {
+                needsLinebreak = false;
+              }
+              if (needsLinebreak) {
+                smtString.append("\n");
+              }
+            }
+            return smtString.toString();
           }
         });
   }

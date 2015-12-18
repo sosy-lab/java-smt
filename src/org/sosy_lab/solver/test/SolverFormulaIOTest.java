@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.solver.test;
 
-import static com.google.common.base.Predicates.containsPattern;
-import static com.google.common.collect.FluentIterable.of;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
@@ -362,17 +360,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private void checkThatAssertIsInLastLine(String lines) {
     lines = lines.trim();
-
-    // in the newest version mathsat has some linebreaks in the dump
-    // so we just check if there is exactly one assert
-    if (solverToUse() == Solvers.MATHSAT5) {
-      assertThat(of(lines.split("\n")).filter(containsPattern("\\(assert.*\\)")).size())
-          .isEqualTo(1);
-    } else {
-      assertThat(getLast(Splitter.on('\n').split(lines)))
-          .named("last line of <\n" + lines + ">")
-          .startsWith("(assert ");
-    }
+    assertThat(getLast(Splitter.on('\n').split(lines)))
+        .named("last line of <\n" + lines + ">")
+        .startsWith("(assert ");
   }
 
   private void checkThatDumpIsParseable(String dump) {
