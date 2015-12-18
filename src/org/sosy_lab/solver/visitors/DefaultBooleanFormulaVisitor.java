@@ -85,12 +85,12 @@ public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisi
   }
 
   @Override
-  public R visitForallQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+  public R visitForallQuantifier(List<Formula> variables, BooleanFormula body) {
     return visitDefault();
   }
 
   @Override
-  public R visitExistsQuantifier(List<? extends Formula> variables, BooleanFormula body) {
+  public R visitExistsQuantifier(List<Formula> variables, BooleanFormula body) {
     return visitDefault();
   }
 }

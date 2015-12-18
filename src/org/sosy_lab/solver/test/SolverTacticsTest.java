@@ -217,7 +217,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitExistsQuantifier(List<? extends Formula> pVariables, BooleanFormula pBody) {
+    public Void visitExistsQuantifier(List<Formula> pVariables, BooleanFormula pBody) {
       if (started) {
         visit(pBody);
       }
@@ -225,7 +225,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitForallQuantifier(List<? extends Formula> pVariables, BooleanFormula pBody) {
+    public Void visitForallQuantifier(List<Formula> pVariables, BooleanFormula pBody) {
       if (started) {
         visit(pBody);
       }
@@ -330,7 +330,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitForallQuantifier(List<? extends Formula> pVariables, BooleanFormula pBody) {
+    public Void visitForallQuantifier(List<Formula> pVariables, BooleanFormula pBody) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {
@@ -340,7 +340,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitExistsQuantifier(List<? extends Formula> pVariables, BooleanFormula pBody) {
+    public Void visitExistsQuantifier(List<Formula> pVariables, BooleanFormula pBody) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {
