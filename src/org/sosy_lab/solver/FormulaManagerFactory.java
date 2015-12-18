@@ -174,11 +174,9 @@ public class FormulaManagerFactory {
    * for documentation of accepted parameters.
    */
   public static FormulaManager createFormulaManager(
-      Configuration config,
-      LogManager logger,
-      ShutdownNotifier shutdownNotifier) throws InvalidConfigurationException {
-    return new FormulaManagerFactory(
-        config, logger, shutdownNotifier).getFormulaManager();
+      Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
+      throws InvalidConfigurationException {
+    return new FormulaManagerFactory(config, logger, shutdownNotifier).getFormulaManager();
   }
 
   public FormulaManager getFormulaManager() {
