@@ -135,7 +135,6 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     BooleanFormula cnf = mgr.applyTactic(f, Tactic.CNF);
     assertThatFormula(cnf).isEquivalentTo(f);
-    System.out.println(cnf.toString());
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf);
     assertThat(checker.isInCNF()).isTrue();
