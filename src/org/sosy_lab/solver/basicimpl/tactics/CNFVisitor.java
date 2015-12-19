@@ -1,59 +1,78 @@
 package org.sosy_lab.solver.basicimpl.tactics;
 
 import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.collect.Iterables.concat;
+import static java.util.Collections.singletonList;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Maps;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
+import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.annotation.Nonnull;
-
-class CNFVisitor extends BooleanFormulaTransformationVisitor {
+class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
 
   private final BooleanFormulaManager bfmgr;
-  private final Set<BooleanFormula> lastConjuncts = new HashSet<>();
+  private final int maxDepth;
+  private int currentDepth = 0;
 
-  CNFVisitor(FormulaManager pFmgr) {
-    super(pFmgr, Maps.<BooleanFormula, BooleanFormula>newHashMap());
+  /**
+   * Create a Visitor that creates a CNF (if pMaxDepth is -1) or an approximation
+   * of a CNF, that uses a heuristic to decide when to stop creating conjuncts.
+   *
+   * @param pFmgr the FormulaManager to use
+   * @param pMaxDepth the depth up to which point conjuncts should be created,
+   *                  -1 is for infinitely deep
+   */
+  CNFVisitor(FormulaManager pFmgr, int pMaxDepth) {
+    super(pFmgr);
     bfmgr = pFmgr.getBooleanFormulaManager();
+    maxDepth = pMaxDepth;
   }
 
   @Override
-  public BooleanFormula visitTrue() {
-    return bfmgr.makeBoolean(true);
+  public List<BooleanFormula> visitTrue() {
+    return singletonList(bfmgr.makeBoolean(true));
   }
 
   @Override
-  public BooleanFormula visitFalse() {
-    return bfmgr.makeBoolean(false);
+  public List<BooleanFormula> visitFalse() {
+    return singletonList(bfmgr.makeBoolean(false));
   }
 
   @Override
-  public BooleanFormula visitAtom(BooleanFormula pAtom) {
-    return pAtom;
+  public List<BooleanFormula> visitAtom(BooleanFormula pAtom) {
+    return singletonList(pAtom);
   }
 
   @Override
-  public BooleanFormula visitNot(BooleanFormula pOperand) {
+  public List<BooleanFormula> visitNot(BooleanFormula pOperand) {
     // the traversed formula is assumed to be in NNF so just return the operand
-    return bfmgr.not(pOperand);
+    return singletonList(bfmgr.not(pOperand));
+  }
+
+  private List<List<BooleanFormula>> visitAll(List<BooleanFormula> pOperands) {
+    List<List<BooleanFormula>> args = new ArrayList<>(pOperands.size());
+    for (BooleanFormula arg : pOperands) {
+      args.add(visit(arg));
+    }
+    return args;
   }
 
   @Override
-  public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
-    FluentIterable<BooleanFormula> operands = from(visitIfNotSeen(pOperands));
+  public List<BooleanFormula> visitAnd(List<BooleanFormula> pOperands) {
+    if (maxDepth >= 0 && currentDepth > maxDepth) {
+      return singletonList(bfmgr.and(pOperands));
+    }
+
+    currentDepth++;
+    FluentIterable<BooleanFormula> operands = from(concat(visitAll(pOperands)));
 
     // if any of the operands of a conjunction is false we can replace the
     // whole conjunction with FALSE, TODO should we do that or do we want to
@@ -65,43 +84,31 @@ class CNFVisitor extends BooleanFormulaTransformationVisitor {
             return bfmgr.isFalse(pInput);
           }
         })) {
-      lastConjuncts.clear();
-      return bfmgr.makeBoolean(false);
+      return singletonList(bfmgr.makeBoolean(false));
     }
 
-    lastConjuncts.addAll(operands.toList());
-
-    return bfmgr.and(lastConjuncts);
+    currentDepth--;
+    return operands.toList();
   }
 
   @Override
-  public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
-    // previous content is interesting after this method but not in here
-    // so we save it for later use
-    Set<BooleanFormula> lastConjunctsSaved = new HashSet<>(lastConjuncts);
-    lastConjuncts.clear();
-
-    List<OperandWithConjuncts> operands = new ArrayList<>();
-    for (BooleanFormula f : pOperands) {
-      BooleanFormula conv = visitIfNotSeen(f);
-      operands.add(new OperandWithConjuncts(conv, new HashSet<>(lastConjuncts)));
-      lastConjuncts.clear();
+  public List<BooleanFormula> visitOr(List<BooleanFormula> pOperands) {
+    if (maxDepth >= 0 && currentDepth > maxDepth) {
+      return singletonList(bfmgr.or(pOperands));
     }
 
+    currentDepth++;
+    FluentIterable<List<BooleanFormula>> operands = from(visitAll(pOperands));
+
     List<BooleanFormula> newConjuncts = new ArrayList<>();
-    for (OperandWithConjuncts op : operands) {
+    for (List<BooleanFormula> op : operands) {
       // first iteration
       if (newConjuncts.isEmpty()) {
-        if (op.conjuncts.isEmpty()) {
-          newConjuncts.add(op.operand);
-        } else {
-          newConjuncts.addAll(op.conjuncts);
-        }
+        newConjuncts.addAll(op);
 
       } else {
-
         List<BooleanFormula> tmpConjuncts = new ArrayList<>();
-        for (BooleanFormula nextF : op.conjunctsOrOperand()) {
+        for (BooleanFormula nextF : op) {
           for (BooleanFormula oldF : newConjuncts) {
             tmpConjuncts.add(bfmgr.or(nextF, oldF));
           }
@@ -109,74 +116,49 @@ class CNFVisitor extends BooleanFormulaTransformationVisitor {
         newConjuncts = tmpConjuncts;
       }
     }
+    currentDepth--;
 
-    lastConjuncts.addAll(lastConjunctsSaved);
-    lastConjuncts.addAll(newConjuncts);
-
-    return bfmgr.and(lastConjuncts);
+    return newConjuncts;
   }
 
   @Override
-  public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public List<BooleanFormula> visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     // the traversed formula is assumed to be in NNF without equivalences
     // so we can throw an exception here
     throw new IllegalStateException("Traversed formula is not in NNF without equivalences");
   }
 
   @Override
-  public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public List<BooleanFormula> visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     // the traversed formula is assumed to be in NNF without implications
     // so we can throw an exception here
     throw new IllegalStateException("Traversed formula is not in NNF without implications");
   }
 
   @Override
-  public BooleanFormula visitIfThenElse(
-      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+  public List<BooleanFormula> visitIfThenElse(
+      BooleanFormula pCondition,
+      BooleanFormula pThtmpConjunctsenFormula,
+      BooleanFormula pElseFormula) {
     // the traversed formula is assumed to be in NNF without ITEs
     // so we can throw an exception here
     throw new IllegalStateException("Traversed formula is not in NNF without ITEs");
   }
 
-  static class OperandWithConjuncts {
-    private BooleanFormula operand;
-    private Set<BooleanFormula> conjuncts;
-
-    private OperandWithConjuncts(BooleanFormula op, Set<BooleanFormula> conj) {
-      operand = op;
-      conjuncts = conj;
-    }
-
-    public Set<BooleanFormula> conjunctsOrOperand() {
-      if (conjuncts.isEmpty()) {
-        return Collections.singleton(operand);
-      } else {
-        return conjuncts;
-      }
-    }
-
-    public static final Predicate<Set<BooleanFormula>> IS_EMPTY =
-        new Predicate<Set<BooleanFormula>>() {
-          @Override
-          public boolean apply(@Nonnull Set<BooleanFormula> pInput) {
-            return pInput.isEmpty();
-          }
-        };
-
-    public static final Function<OperandWithConjuncts, BooleanFormula> GET_OPERAND =
-        new Function<OperandWithConjuncts, BooleanFormula>() {
-          @Override
-          public BooleanFormula apply(@Nonnull OperandWithConjuncts pInput) {
-            return pInput.operand;
-          }
-        };
-
-    public static final Function<OperandWithConjuncts, Set<BooleanFormula>> GET_CONJUNCTS =
-        new Function<OperandWithConjuncts, Set<BooleanFormula>>() {
-          @Override
-          public Set<BooleanFormula> apply(@Nonnull OperandWithConjuncts pInput) {
-            return pInput.conjuncts;
-          }
-        };
+  @Override
+  public List<BooleanFormula> visitForallQuantifier(
+      List<Formula> pVariables, BooleanFormula pBody) {
+    // the traversed formula is assumed to be in NNF without ITEs
+    // so we can throw an exception here
+    throw new IllegalStateException("Traversed formula is not in NNF without Quantifiers");
   }
+
+  @Override
+  public List<BooleanFormula> visitExistsQuantifier(
+      List<Formula> pVariables, BooleanFormula pBody) {
+    // the traversed formula is assumed to be in NNF without ITEs
+    // so we can throw an exception here
+    throw new IllegalStateException("Traversed formula is not in NNF without Quantifiers");
+  }
+
 }

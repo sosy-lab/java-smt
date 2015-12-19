@@ -19,8 +19,12 @@
  */
 package org.sosy_lab.solver.basicimpl.tactics;
 
+import com.google.common.collect.Iterables;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
+
+import java.util.List;
 
 /**
  * Enum that holds all the values for tactics that are either supported with a
@@ -60,7 +64,12 @@ public enum Tactic {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
       BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);
-      return new CNFVisitor(pFmgr).visit(nnf);
+      List<BooleanFormula> conjuncts = new CNFVisitor(pFmgr, -1).visit(nnf);
+      if (conjuncts.size() == 1) {
+        return Iterables.getOnlyElement(conjuncts);
+      } else {
+        return pFmgr.getBooleanFormulaManager().and(conjuncts);
+      }
     }
   },
 
