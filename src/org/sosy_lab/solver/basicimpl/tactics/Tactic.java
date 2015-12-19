@@ -50,6 +50,31 @@ public enum Tactic {
   },
 
   /**
+   * Convert the formula to an approximated CNF. This tactic creates a CNF formula
+   * but still may have some 'ands' which are deeper stacked in the formula and
+   * thus would create too much conjuncts when creating a full CNF.
+   *
+   * <p>This tactic has a default implementation.</p>
+   */
+  CNF_LIGHT(
+      "cnf",
+      "Convert the formula to an approximated CNF. This tactic creates a CNF formula"
+          + " but still may have some 'ands' which are deeper stacked in the formula and"
+          + " thus would create too much conjuncts when creating a full CNF.") {
+    @Override
+    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
+      BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);
+      // TODO make the maximum depth configurable
+      List<BooleanFormula> conjuncts = new CNFVisitor(pFmgr, 3).visit(nnf);
+      if (conjuncts.size() == 1) {
+        return Iterables.getOnlyElement(conjuncts);
+      } else {
+        return pFmgr.getBooleanFormulaManager().and(conjuncts);
+      }
+    }
+  },
+
+  /**
    * Convert the formula to CNF. This tactic creates a formula which is
    * in some cases exponentially bigger. E.g. (x /\ y) \/ (z /\ w) will have
    * 2^n clauses in CNF afterwards.
