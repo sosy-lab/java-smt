@@ -65,11 +65,15 @@ public enum Tactic {
   },
 
   /**
-   * Convert the formula to CNF using Tseitin encoding.
+   * Convert the formula to CNF using Tseitin encoding. Note that the resulting
+   * formula is not equivalent but only equisatisfiable.
    *
    * <p>This tactic has no default implementation.</p>
    */
-  TSEITIN_CNF("tseitin-cnf", "Convert the formula to CNF using Tseitin encoding"),
+  TSEITIN_CNF(
+      "tseitin-cnf",
+      "Convert the formula to CNF using Tseitin encoding. Note that the resulting"
+          + " formula is not equivalent but only equisatisfiable."),
 
   /**
    * Perform light quantifier elimination.
