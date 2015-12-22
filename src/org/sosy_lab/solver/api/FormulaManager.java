@@ -113,18 +113,22 @@ public interface FormulaManager {
 
   /**
    * Parse a boolean formula given as a String in an SMT-LIB file format.
+   *
    * @return The same formula in the internal representation.
    * @throws IllegalArgumentException If the string cannot be parsed.
    */
   BooleanFormula parse(String s) throws IllegalArgumentException;
 
   /**
-   * @return SMT-LIB formula serialization.
+   * Serialize an input formula to an SMT-LIB format.
+   * Very useful when passing formulas between different solvers.
    *
-   * To get a String, simply call {@link Object#toString()}
+   * <p>To get a String, simply call {@link Object#toString()}
    * on the returned object.
    * This method is lazy and does not create an output string until the returned
    * object is actually used.
+   *
+   * @return SMT-LIB formula serialization.
    */
   Appender dumpFormula(BooleanFormula pT);
 
@@ -140,7 +144,7 @@ public interface FormulaManager {
   BooleanFormula applyTactic(BooleanFormula input, Tactic tactic);
 
   /**
-   * Simplifies an input formula, while ensuring equivalence.
+   * Simplify an input formula, while ensuring equivalence.
    *
    * <p>For solvers that do not provide a simplification API, an original formula
    * is returned.
