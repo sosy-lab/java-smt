@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionFormulaManager;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +53,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       String pName, TType pReturnType, List<TType> pArgTypes);
 
   @Override
-  public final <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
+  public final <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkArgument(
         !pArgTypes.contains(FormulaType.BooleanType),
@@ -64,14 +64,14 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       argTypes.add(toSolverType(argtype));
     }
 
-    return new DefaultUninterpretedFunctionDeclaration<>(
+    return new UfDeclarationImpl<>(
         pReturnType,
         declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes),
         pArgTypes);
   }
 
   @Override
-  public <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
+  public <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
 
     return declareUninterpretedFunction(pName, pReturnType, Arrays.asList(pArgs));
@@ -82,7 +82,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
 
   @Override
   public final <T extends Formula> T callUninterpretedFunction(
-      UninterpretedFunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
+      UfDeclaration<T> pFunc, List<? extends Formula> pArgs) {
     FormulaType<T> retType = pFunc.getReturnType();
     List<TFormulaInfo> list = Lists.transform(pArgs, extractor);
 
@@ -91,10 +91,10 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
   }
 
   final <T extends Formula> TFormulaInfo createUninterpretedFunctionCallImpl(
-      UninterpretedFunctionDeclaration<T> pFunc, List<TFormulaInfo> pArgs) {
+      UfDeclaration<T> pFunc, List<TFormulaInfo> pArgs) {
     @SuppressWarnings("unchecked")
-    DefaultUninterpretedFunctionDeclaration<T, TFunctionDecl> func =
-        (DefaultUninterpretedFunctionDeclaration<T, TFunctionDecl>) pFunc;
+    UfDeclarationImpl<T, TFunctionDecl> func =
+        (UfDeclarationImpl<T, TFunctionDecl>) pFunc;
 
     return createUninterpretedFunctionCallImpl(func.getFuncDecl(), pArgs);
   }

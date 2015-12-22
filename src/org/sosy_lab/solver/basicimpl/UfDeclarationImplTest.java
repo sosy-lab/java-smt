@@ -21,7 +21,7 @@ package org.sosy_lab.solver.basicimpl;
 
 import org.junit.Test;
 
-public class DefaultUninterpretedFunctionDeclarationTest {
+public class UfDeclarationImplTest {
 
   @Test
   public void testEquals() {

@@ -41,7 +41,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.NumeralType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+import org.sosy_lab.solver.api.UfDeclaration;
 
 @RunWith(Parameterized.class)
 public class SolverTheoriesTest extends SolverBasedTest0 {
@@ -543,7 +543,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testUfWithBoolType() throws SolverException, InterruptedException {
-    UninterpretedFunctionDeclaration<BooleanFormula> uf =
+    UfDeclaration<BooleanFormula> uf =
         fmgr.declareUninterpretedFunction(
             "fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula uf0 = fmgr.callUninterpretedFunction(uf, ImmutableList.of(imgr.makeNumber(0)));
@@ -568,7 +568,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     // We can simulate this with "uf(ite(p,0,1))", but currently we do not need this.
     // Thus this test is disabled and the following is enabled.
 
-    UninterpretedFunctionDeclaration<IntegerFormula> uf =
+    UfDeclaration<IntegerFormula> uf =
         fmgr.declareUninterpretedFunction(
             "fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
     IntegerFormula ufTrue =

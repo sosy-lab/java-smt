@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -53,7 +53,7 @@ public class SolverBasicTest extends SolverBasedTest0 {
 
   @Test
   public void formulaEqualsAndHashCode() {
-    UninterpretedFunctionDeclaration<IntegerFormula> f_b =
+    UfDeclaration<IntegerFormula> f_b =
         fmgr.declareUninterpretedFunction("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
 
     new EqualsTester()

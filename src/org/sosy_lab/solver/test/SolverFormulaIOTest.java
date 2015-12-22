@@ -40,7 +40,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.util.Iterator;
 import java.util.List;
@@ -179,7 +179,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula var = imgr.makeVariable("var_a");
     List<IntegerFormula> args1 = ImmutableList.of(int1, var);
 
-    UninterpretedFunctionDeclaration<IntegerFormula> funA =
+    UfDeclaration<IntegerFormula> funA =
         fmgr.declareUninterpretedFunction(
             "fun_a", FormulaType.IntegerType, FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, args1);
@@ -277,10 +277,10 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
-    UninterpretedFunctionDeclaration<IntegerFormula> funA =
+    UfDeclaration<IntegerFormula> funA =
         fmgr.declareUninterpretedFunction(
             "fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
-    UninterpretedFunctionDeclaration<IntegerFormula> funB =
+    UfDeclaration<IntegerFormula> funB =
         fmgr.declareUninterpretedFunction(
             "fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(int1));
@@ -300,7 +300,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
-    UninterpretedFunctionDeclaration<IntegerFormula> funA =
+    UfDeclaration<IntegerFormula> funA =
         fmgr.declareUninterpretedFunction(
             "fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(int1));
@@ -409,7 +409,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private BooleanFormula functionExprGen() {
     IntegerFormula arg = imgr.makeNumber(1);
-    UninterpretedFunctionDeclaration<BooleanFormula> funA =
+    UfDeclaration<BooleanFormula> funA =
         fmgr.declareUninterpretedFunction(
             "fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula res1 = fmgr.callUninterpretedFunction(funA, ImmutableList.of(arg));

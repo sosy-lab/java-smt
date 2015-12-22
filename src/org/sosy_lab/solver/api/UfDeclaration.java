@@ -33,12 +33,12 @@ import java.util.List;
  * not the function itself).
  * @param <T> The type of the return value
  */
-public abstract class UninterpretedFunctionDeclaration<T extends Formula> {
+public abstract class UfDeclaration<T extends Formula> {
 
   private final FormulaType<T> returnType;
   private final List<FormulaType<?>> argumentTypes;
 
-  protected UninterpretedFunctionDeclaration(
+  protected UfDeclaration(
       FormulaType<T> pReturnType, List<FormulaType<?>> pArgumentTypes) {
     returnType = checkNotNull(pReturnType);
     argumentTypes = ImmutableList.copyOf(pArgumentTypes);

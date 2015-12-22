@@ -44,7 +44,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -345,7 +345,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       IntegerFormula varB = imgr.makeVariable("b");
       stack.push(imgr.equal(varA, zero));
       stack.push(imgr.equal(varB, zero));
-      UninterpretedFunctionDeclaration<IntegerFormula> uf =
+      UfDeclaration<IntegerFormula> uf =
           fmgr.declareUninterpretedFunction("uf", FormulaType.IntegerType, FormulaType.IntegerType);
       stack.push(imgr.equal(fmgr.callUninterpretedFunction(uf, ImmutableList.of(varA)), zero));
       stack.push(imgr.equal(fmgr.callUninterpretedFunction(uf, ImmutableList.of(varB)), zero));

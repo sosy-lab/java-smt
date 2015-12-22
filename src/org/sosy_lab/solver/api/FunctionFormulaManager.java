@@ -29,10 +29,10 @@ public interface FunctionFormulaManager {
   /**
    * Declares an uninterpreted function.
    */
-  <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
+  <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args);
 
-  <T extends Formula> UninterpretedFunctionDeclaration<T> declareUninterpretedFunction(
+  <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
       String name, FormulaType<T> returnType, FormulaType<?>... args);
 
   /**
@@ -43,5 +43,5 @@ public interface FunctionFormulaManager {
    * @return Instantiated function call.
    */
   <T extends Formula> T callUninterpretedFunction(
-      UninterpretedFunctionDeclaration<T> funcType, List<? extends Formula> args);
+      UfDeclaration<T> funcType, List<? extends Formula> args);
 }

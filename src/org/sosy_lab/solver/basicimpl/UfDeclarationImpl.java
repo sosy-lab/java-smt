@@ -23,21 +23,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.UninterpretedFunctionDeclaration;
+import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 /**
- * A simple straightforward implementation of {@link UninterpretedFunctionDeclaration}.
+ * A simple straightforward implementation of {@link UfDeclaration}.
  */
-class DefaultUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
-    extends UninterpretedFunctionDeclaration<T> {
+class UfDeclarationImpl<T extends Formula, TFuncDecl>
+    extends UfDeclaration<T> {
 
   private final TFuncDecl funcDecl;
 
-  DefaultUninterpretedFunctionDeclaration(
+  UfDeclarationImpl(
       FormulaType<T> returnType, TFuncDecl funcDecl, List<FormulaType<?>> argumentTypes) {
     super(returnType, argumentTypes);
     this.funcDecl = checkNotNull(funcDecl);
@@ -57,11 +57,11 @@ class DefaultUninterpretedFunctionDeclaration<T extends Formula, TFuncDecl>
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof DefaultUninterpretedFunctionDeclaration)) {
+    if (!(obj instanceof UfDeclarationImpl)) {
       return false;
     }
-    DefaultUninterpretedFunctionDeclaration<?, ?> other =
-        (DefaultUninterpretedFunctionDeclaration<?, ?>) obj;
+    UfDeclarationImpl<?, ?> other =
+        (UfDeclarationImpl<?, ?>) obj;
 
     return funcDecl.equals(other.funcDecl);
   }
