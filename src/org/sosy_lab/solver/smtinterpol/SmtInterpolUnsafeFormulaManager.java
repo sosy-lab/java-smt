@@ -49,14 +49,6 @@ class SmtInterpolUnsafeFormulaManager
     return s.replace("|", "");
   }
 
-  /** ApplicationTerms can be wrapped with "|".
-   * This function replaces those chars with "\"". */
-  // TODO: Check where this was used in the past.
-  @SuppressWarnings("unused")
-  private static String convertQuotes(String s) {
-    return s.replace("|", "\"");
-  }
-
   @Override
   public boolean isAtom(Term t) {
     return SmtInterpolUtil.isAtom(t);
