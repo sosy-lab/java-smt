@@ -45,6 +45,8 @@ public interface UnsafeFormulaManager {
 
   /**
    * @return whether the given Formula is an atom.
+   *
+   * @deprecated Use the {@link #visit(FormulaVisitor, Formula)} instead.
    */
   @Deprecated
   boolean isAtom(Formula f);
@@ -77,6 +79,8 @@ public interface UnsafeFormulaManager {
   /**
    * @return whether the given Formula is quantified,
    * either with universal or existential quantification.
+   *
+   * @deprecated Use {@link #visit(FormulaVisitor, Formula)} instead.
    */
   @Deprecated
   boolean isQuantification(Formula f);
