@@ -38,11 +38,13 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -204,6 +206,11 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
         out.append(")");
       }
     };
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
+    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
   }
 
   @Override

@@ -37,6 +37,7 @@ import com.google.common.collect.ImmutableList;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 import java.util.Map;
@@ -160,5 +161,10 @@ class PrincessUnsafeFormulaManager
   @Override
   protected boolean isBoundVariable(IExpression pT) {
     return PrincessUtil.isBoundByQuantifier(pT);
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula f) {
+    throw new UnsupportedOperationException("Not implemented");
   }
 }

@@ -52,6 +52,7 @@ import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,11 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       return new Mathsat5Formula(arg) {};
     }
     return super.getArg(pF, pN);
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula f) {
+    throw new UnsupportedOperationException("Not implemented");
   }
 
   @Override

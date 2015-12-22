@@ -34,6 +34,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_pattern_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
@@ -53,8 +54,10 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_le;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FUNC_DECL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SYMBOL;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
@@ -66,28 +69,37 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_SORT_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
   private final long z3context;
+  private final Z3FormulaCreator formulaCreator;
 
   Z3UnsafeFormulaManager(Z3FormulaCreator pCreator) {
     super(pCreator);
     this.z3context = pCreator.getEnv();
+    formulaCreator = pCreator;
   }
 
   final static ImmutableSet<Integer> NON_ATOMIC_OP_TYPES =
@@ -302,6 +314,82 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     } else {
       return Z3NativeApi.mk_exists_const(
           z3context, 0, boundCount, boundVars, 0, new long[0], pBody);
+    }
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula input)  {
+    final long f = formulaCreator.extractInfo(input);
+    String name = getName(f);
+    switch (get_ast_kind(z3context, f)) {
+      case Z3_NUMERAL_AST:
+        return visitor.visitNumeral(
+            ast_to_string(z3context, f),
+            getFormulaCreator().getFormulaType(f)
+        );
+      case Z3_APP_AST:
+        final FormulaType<?> type = getFormulaCreator().getFormulaType(f);
+        int arity = getArity(f);
+
+        if (arity == 0) {
+
+          // Variable.
+          return visitor.visitFreeVariable(name, type);
+        }
+
+        List<Formula> args = new ArrayList<>(arity);
+        List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
+        for (int i=0; i<arity; i++) {
+          long arg = getArg(f, i);
+          FormulaType<?> argumentType = getFormulaCreator().getFormulaType(arg);
+          formulaTypes.add(argumentType);
+          args.add(formulaCreator.encapsulate(argumentType, arg));
+        }
+
+        if (isUF(f)) {
+          // Special casing for UFs.
+          return visitor.visitUF(name,
+              formulaCreator.createUfDeclaration(
+                  type, get_app_decl(z3context, f), formulaTypes),
+              args);
+        } else {
+          // Any function application.
+          Function<List<Formula>, Formula> constructor =
+              new Function<List<Formula>, Formula>() {
+            @Override
+            public Formula apply(List<Formula> formulas) {
+              return replaceArgs(getFormulaCreator().encapsulate(type, f),
+                  formulas);
+            }
+          };
+          return visitor.visitFunction(
+              name, args, type, constructor);
+        }
+      case Z3_VAR_AST:
+        return visitor.visitBoundVariable(name,
+            getFormulaCreator().getFormulaType(f));
+      case Z3_QUANTIFIER_AST:
+        BooleanFormula body = getFormulaCreator().encapsulateBoolean(
+                  get_quantifier_body(z3context, f));
+        List<Formula> qargs = new ArrayList<>();
+        for (int i=0; i<get_quantifier_num_bound(z3context, f); i++) {
+          long arg = get_quantifier_pattern_ast(z3context, f, i);
+          FormulaType<?> argumentType = getFormulaCreator().getFormulaType(arg);
+          qargs.add(getFormulaCreator().encapsulate(argumentType, arg));
+        }
+
+        if (is_quantifier_forall(z3context, f)) {
+          return visitor.visitForAll(qargs, body);
+        } else {
+          return visitor.visitExists(qargs, body);
+        }
+
+      case Z3_SORT_AST:
+      case Z3_FUNC_DECL_AST:
+      case Z3_UNKNOWN_AST:
+      default:
+        throw new UnsupportedOperationException("Input should be a formula AST, " +
+            "got unexpected type instead");
     }
   }
 }

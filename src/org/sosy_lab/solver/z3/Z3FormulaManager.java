@@ -66,6 +66,7 @@ import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
 import java.io.IOException;
@@ -375,5 +376,10 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
   @Override
   protected Long simplify(Long pF) {
     return Z3NativeApi.simplify(getFormulaCreator().getEnv(), pF);
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
+    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
   }
 }

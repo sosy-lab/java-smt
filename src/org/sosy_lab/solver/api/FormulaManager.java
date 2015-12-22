@@ -23,6 +23,7 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 /**
  * Instances of this interface provide direct low-level access to an SMT solver.
@@ -153,4 +154,9 @@ public interface FormulaManager {
    * @return Simplified version of the formula
    */
   <T extends Formula> T simplify(T input);
+
+  /**
+   * Visit the formula with a given visitor.
+   */
+  <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f);
 }

@@ -32,6 +32,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 import java.util.Map;
@@ -171,5 +172,10 @@ class SmtInterpolUnsafeFormulaManager
   @Override
   protected boolean isBoundVariable(Term pT) {
     return false;
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula f) {
+    throw new UnsupportedOperationException("Not implemented");
   }
 }

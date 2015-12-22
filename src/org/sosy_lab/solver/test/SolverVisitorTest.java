@@ -21,6 +21,7 @@ package org.sosy_lab.solver.test;
 
 import com.google.common.collect.Lists;
 
+import com.google.common.collect.Sets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,12 +31,20 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.RecursiveFormulaVisitor;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
@@ -109,5 +118,41 @@ public class SolverVisitorTest extends SolverBasedTest0 {
       BooleanFormula bf = imgr.equal(n12, f);
       assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
     }
+  }
+
+  /**
+   * A very basic test for the formula visitor, defines a visitor
+   * which gathers all found free variables.
+   */
+  @Test
+  public void testFormulaVisitor() {
+    // Currently only Z3 has a working visitor implementation.
+    assume().that(solverToUse()).isEqualTo(Solvers.Z3);
+
+    IntegerFormula x, y, z;
+    x = imgr.makeVariable("x");
+    y = imgr.makeVariable("y");
+    z = imgr.makeVariable("z");
+
+    BooleanFormula f = bmgr.or(
+        imgr.equal(
+            z, imgr.add(x, y)
+        ),
+        imgr.equal(
+            x, imgr.add(z, y)
+        )
+    );
+
+    final Set<String> usedVariables = new HashSet<>();
+
+    FormulaVisitor<Void> nameExtractor = new RecursiveFormulaVisitor(mgr) {
+      @Override
+      public Void visitFreeVariable(String name, FormulaType<?> type) {
+        usedVariables.add(name);
+        return null;
+      }
+    };
+    mgr.visit(nameExtractor, f);
+    assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
   }
 }

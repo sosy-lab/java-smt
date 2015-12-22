@@ -35,11 +35,13 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import javax.annotation.Nullable;
 
@@ -160,6 +162,11 @@ public final class PrincessFormulaManager
   @Override
   public String getVersion() {
     return getEnvironment().getVersion();
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
+    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
   }
 
   @Override

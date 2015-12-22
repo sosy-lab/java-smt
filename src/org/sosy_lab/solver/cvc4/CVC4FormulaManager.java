@@ -31,11 +31,13 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import javax.annotation.Nullable;
 
@@ -107,6 +109,11 @@ public class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4E
   @Override
   public String getVersion() {
     return "CVC4 " + CVC4JNI.Configuration_getVersionString();
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
+    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
   }
 
   @Override

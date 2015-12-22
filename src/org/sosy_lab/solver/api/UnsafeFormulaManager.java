@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import org.sosy_lab.solver.visitors.FormulaVisitor;
+
 import java.util.List;
 import java.util.Map;
 
@@ -139,4 +141,6 @@ public interface UnsafeFormulaManager {
    * @return Formula with parts replaced.
    */
   Formula substitute(Formula f, Map<Formula, Formula> fromToMapping);
+
+  <R> R visit(FormulaVisitor<R> visitor, Formula f);
 }

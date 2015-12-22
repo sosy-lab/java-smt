@@ -31,6 +31,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_che
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_termination_test;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
@@ -55,6 +56,7 @@ import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.io.IOException;
 import java.util.Map;
@@ -331,6 +333,11 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
 
   long addTerminationTest(long env) {
     return msat_set_termination_test(env, terminationTest);
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
+    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
   }
 
   @Override
