@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.visitors;
 
 import com.google.common.base.Function;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
@@ -39,8 +40,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
     return visitDefault();
   }
 
-  public R visitBoundVariable(String name, FormulaType<?> type,
-                                       Formula boundingAST) {
+  public R visitBoundVariable(String name, FormulaType<?> type, Formula boundingAST) {
     return visitDefault();
   }
 
@@ -48,10 +48,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
     return visitDefault();
   }
 
-  public R visitUF(
-      String functionName,
-      UfDeclaration<?> declaration,
-      List<Formula> args) {
+  public R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args) {
     return visitDefault();
   }
 

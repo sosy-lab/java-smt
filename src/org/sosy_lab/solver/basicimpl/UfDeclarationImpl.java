@@ -32,8 +32,7 @@ import javax.annotation.Nullable;
 /**
  * A simple straightforward implementation of {@link UfDeclaration}.
  */
-class UfDeclarationImpl<T extends Formula, TFuncDecl>
-    extends UfDeclaration<T> {
+class UfDeclarationImpl<T extends Formula, TFuncDecl> extends UfDeclaration<T> {
 
   private final TFuncDecl funcDecl;
 
@@ -60,8 +59,7 @@ class UfDeclarationImpl<T extends Formula, TFuncDecl>
     if (!(obj instanceof UfDeclarationImpl)) {
       return false;
     }
-    UfDeclarationImpl<?, ?> other =
-        (UfDeclarationImpl<?, ?>) obj;
+    UfDeclarationImpl<?, ?> other = (UfDeclarationImpl<?, ?>) obj;
 
     return funcDecl.equals(other.funcDecl);
   }

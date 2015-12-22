@@ -88,8 +88,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     checker.visit(cnf_equiv_a_b);
     assertThat(checker.isInCNF()).isTrue();
 
-    BooleanFormula cnf_not_equiv_a_b = mgr.applyTactic(not_equiv_a_b,
-        Tactic.CNF);
+    BooleanFormula cnf_not_equiv_a_b = mgr.applyTactic(not_equiv_a_b, Tactic.CNF);
     assertThatFormula(cnf_not_equiv_a_b).isEquivalentTo(not_equiv_a_b);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_equiv_a_b);

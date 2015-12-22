@@ -21,14 +21,13 @@ package org.sosy_lab.solver.visitors;
 
 import com.google.common.base.Function;
 
-import java.util.List;
-
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UfDeclaration;
 
+import java.util.List;
 
 /**
  * Visitor iterating through entire formula.
@@ -45,17 +44,20 @@ public abstract class FormulaVisitor<R> {
   }
 
   public abstract R visitFreeVariable(String name, FormulaType<?> type);
+
   public abstract R visitBoundVariable(String name, FormulaType<?> type);
+
   public abstract R visitNumeral(String numeral, FormulaType<?> type);
-  public abstract R visitUF(
-      String functionName,
-      UfDeclaration<?> declaration,
-      List<Formula> args);
+
+  public abstract R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args);
+
   public abstract R visitFunction(
       String functionName,
       List<Formula> args,
       FormulaType<?> type,
       Function<List<Formula>, Formula> newApplicationConstructor);
+
   public abstract R visitForAll(List<Formula> variables, BooleanFormula body);
+
   public abstract R visitExists(List<Formula> variables, BooleanFormula body);
 }

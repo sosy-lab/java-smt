@@ -38,8 +38,7 @@ public abstract class UfDeclaration<T extends Formula> {
   private final FormulaType<T> returnType;
   private final List<FormulaType<?>> argumentTypes;
 
-  protected UfDeclaration(
-      FormulaType<T> pReturnType, List<FormulaType<?>> pArgumentTypes) {
+  protected UfDeclaration(FormulaType<T> pReturnType, List<FormulaType<?>> pArgumentTypes) {
     returnType = checkNotNull(pReturnType);
     argumentTypes = ImmutableList.copyOf(pArgumentTypes);
   }

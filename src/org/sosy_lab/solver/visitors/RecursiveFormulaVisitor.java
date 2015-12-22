@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.visitors;
 
 import com.google.common.base.Function;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
@@ -33,7 +34,7 @@ import java.util.Set;
 /**
  * Formula visitor which visits every element exactly once.
  *
- * Allows to traverse DAG-like formulas without an exponential explosion.
+ * <p>Allows to traverse DAG-like formulas without an exponential explosion.
  */
 public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   private final Set<Formula> seen = new HashSet<>();

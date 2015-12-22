@@ -28,6 +28,7 @@ import org.sosy_lab.solver.api.FloatingPointFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.UfDeclaration;
@@ -38,8 +39,9 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
 
-import javax.annotation.Nullable;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * This is a helper class with several methods that are commonly used
@@ -91,7 +93,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
 
   public abstract TType getBitvectorType(int bitwidth);
 
-  public abstract TType getFloatingPointType(FormulaType.FloatingPointType type);
+  public abstract TType getFloatingPointType(FloatingPointType type);
 
   public abstract TType getArrayType(TType indexType, TType elementType);
 
@@ -190,10 +192,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
 
-  public <T extends Formula, TFuncDecl> UfDeclaration<T> createUfDeclaration(
-      FormulaType<T> returnType,
-      TFuncDecl funcDecl,
-      List<FormulaType<?>> argumentTypes) {
+  public <T extends Formula, TF> UfDeclaration<T> createUfDeclaration(
+      FormulaType<T> returnType, TF funcDecl, List<FormulaType<?>> argumentTypes) {
     return new UfDeclarationImpl<>(returnType, funcDecl, argumentTypes);
   }
 }

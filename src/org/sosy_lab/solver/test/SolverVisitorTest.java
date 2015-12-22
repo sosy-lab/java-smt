@@ -19,9 +19,12 @@
  */
 package org.sosy_lab.solver.test;
 
-import com.google.common.collect.Lists;
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +45,6 @@ import org.sosy_lab.solver.visitors.RecursiveFormulaVisitor;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
@@ -134,24 +134,18 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     y = imgr.makeVariable("y");
     z = imgr.makeVariable("z");
 
-    BooleanFormula f = bmgr.or(
-        imgr.equal(
-            z, imgr.add(x, y)
-        ),
-        imgr.equal(
-            x, imgr.add(z, y)
-        )
-    );
+    BooleanFormula f = bmgr.or(imgr.equal(z, imgr.add(x, y)), imgr.equal(x, imgr.add(z, y)));
 
     final Set<String> usedVariables = new HashSet<>();
 
-    FormulaVisitor<Void> nameExtractor = new RecursiveFormulaVisitor(mgr) {
-      @Override
-      public Void visitFreeVariable(String name, FormulaType<?> type) {
-        usedVariables.add(name);
-        return null;
-      }
-    };
+    FormulaVisitor<Void> nameExtractor =
+        new RecursiveFormulaVisitor(mgr) {
+          @Override
+          public Void visitFreeVariable(String name, FormulaType<?> type) {
+            usedVariables.add(name);
+            return null;
+          }
+        };
     mgr.visit(nameExtractor, f);
     assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
   }

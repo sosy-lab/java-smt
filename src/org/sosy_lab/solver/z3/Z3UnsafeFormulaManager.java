@@ -318,15 +318,13 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula input)  {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
     final long f = formulaCreator.extractInfo(input);
     String name = getName(f);
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
         return visitor.visitNumeral(
-            ast_to_string(z3context, f),
-            getFormulaCreator().getFormulaType(f)
-        );
+            ast_to_string(z3context, f), getFormulaCreator().getFormulaType(f));
       case Z3_APP_AST:
         final FormulaType<?> type = getFormulaCreator().getFormulaType(f);
         int arity = getArity(f);
@@ -339,7 +337,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
         List<Formula> args = new ArrayList<>(arity);
         List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
-        for (int i=0; i<arity; i++) {
+        for (int i = 0; i < arity; i++) {
           long arg = getArg(f, i);
           FormulaType<?> argumentType = getFormulaCreator().getFormulaType(arg);
           formulaTypes.add(argumentType);
@@ -348,31 +346,28 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
         if (isUF(f)) {
           // Special casing for UFs.
-          return visitor.visitUF(name,
-              formulaCreator.createUfDeclaration(
-                  type, get_app_decl(z3context, f), formulaTypes),
+          return visitor.visitUF(
+              name,
+              formulaCreator.createUfDeclaration(type, get_app_decl(z3context, f), formulaTypes),
               args);
         } else {
           // Any function application.
           Function<List<Formula>, Formula> constructor =
               new Function<List<Formula>, Formula>() {
-            @Override
-            public Formula apply(List<Formula> formulas) {
-              return replaceArgs(getFormulaCreator().encapsulate(type, f),
-                  formulas);
-            }
-          };
-          return visitor.visitFunction(
-              name, args, type, constructor);
+                @Override
+                public Formula apply(List<Formula> formulas) {
+                  return replaceArgs(getFormulaCreator().encapsulate(type, f), formulas);
+                }
+              };
+          return visitor.visitFunction(name, args, type, constructor);
         }
       case Z3_VAR_AST:
-        return visitor.visitBoundVariable(name,
-            getFormulaCreator().getFormulaType(f));
+        return visitor.visitBoundVariable(name, getFormulaCreator().getFormulaType(f));
       case Z3_QUANTIFIER_AST:
-        BooleanFormula body = getFormulaCreator().encapsulateBoolean(
-                  get_quantifier_body(z3context, f));
+        BooleanFormula body =
+            getFormulaCreator().encapsulateBoolean(get_quantifier_body(z3context, f));
         List<Formula> qargs = new ArrayList<>();
-        for (int i=0; i<get_quantifier_num_bound(z3context, f); i++) {
+        for (int i = 0; i < get_quantifier_num_bound(z3context, f); i++) {
           long arg = get_quantifier_pattern_ast(z3context, f, i);
           FormulaType<?> argumentType = getFormulaCreator().getFormulaType(arg);
           qargs.add(getFormulaCreator().encapsulate(argumentType, arg));
@@ -388,8 +383,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       case Z3_FUNC_DECL_AST:
       case Z3_UNKNOWN_AST:
       default:
-        throw new UnsupportedOperationException("Input should be a formula AST, " +
-            "got unexpected type instead");
+        throw new UnsupportedOperationException(
+            "Input should be a formula AST, " + "got unexpected type instead");
     }
   }
 }

@@ -93,8 +93,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
   final <T extends Formula> TFormulaInfo createUninterpretedFunctionCallImpl(
       UfDeclaration<T> pFunc, List<TFormulaInfo> pArgs) {
     @SuppressWarnings("unchecked")
-    UfDeclarationImpl<T, TFunctionDecl> func =
-        (UfDeclarationImpl<T, TFunctionDecl>) pFunc;
+    UfDeclarationImpl<T, TFunctionDecl> func = (UfDeclarationImpl<T, TFunctionDecl>) pFunc;
 
     return createUninterpretedFunctionCallImpl(func.getFuncDecl(), pArgs);
   }

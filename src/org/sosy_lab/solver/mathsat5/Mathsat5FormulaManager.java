@@ -31,7 +31,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_che
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_termination_test;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
