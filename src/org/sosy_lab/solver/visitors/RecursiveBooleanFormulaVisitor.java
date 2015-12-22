@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  * Base class for visitors for boolean formulas that traverse recursively
- * through the full formula (at least the boolean part, not inside atoms).
+ * through the boolean part of the formula.
  * This class ensures that each identical subtree of the formula
  * is visited only once to avoid the exponential explosion.
  *
@@ -104,12 +104,12 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  public Void visitForallQuantifier(List<Formula> variables, BooleanFormula body) {
+  public Void visitForAll(List<Formula> variables, BooleanFormula body) {
     return visitIfNotSeen(body);
   }
 
   @Override
-  public Void visitExistsQuantifier(List<Formula> variables, BooleanFormula body) {
+  public Void visitExists(List<Formula> variables, BooleanFormula body) {
     return visitIfNotSeen(body);
   }
 }

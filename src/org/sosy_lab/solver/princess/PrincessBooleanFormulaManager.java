@@ -240,9 +240,9 @@ class PrincessBooleanFormulaManager
       /* TODO: need to get quantified variable
       Quantifier q = ((IQuantified) f).quan();
       if (q == Quantifier.ALL$.MODULE$) {
-        return pVisitor.visitForallQuantifier(, getArg(f, 0));
+        return pVisitor.visitForAll(, getArg(f, 0));
       } else if (q == Quantifier.EX$.MODULE$) {
-        return pVisitor.visitExistsQuantifier(, getArg(f, 0));
+        return pVisitor.visitExists(, getArg(f, 0));
       } else {
         throw new UnsupportedOperationException("Unknown quantifier " + f);
       }

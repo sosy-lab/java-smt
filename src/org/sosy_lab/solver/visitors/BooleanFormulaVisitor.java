@@ -61,7 +61,7 @@ public abstract class BooleanFormulaVisitor<R> {
   public abstract R visitIfThenElse(
       BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
 
-  public abstract R visitForallQuantifier(List<Formula> variables, BooleanFormula body);
+  public abstract R visitForAll(List<Formula> variables, BooleanFormula body);
 
-  public abstract R visitExistsQuantifier(List<Formula> variables, BooleanFormula body);
+  public abstract R visitExists(List<Formula> variables, BooleanFormula body);
 }
