@@ -30,6 +30,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.api.UfDeclaration;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.ArrayFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.BitvectorFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.BooleanFormulaImpl;
@@ -38,6 +39,7 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * This is a helper class with several methods that are commonly used
@@ -187,4 +189,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   }
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
+
+  public <T extends Formula, TFuncDecl> UfDeclaration<T> createUfDeclaration(
+      FormulaType<T> returnType,
+      TFuncDecl funcDecl,
+      List<FormulaType<?>> argumentTypes) {
+    return new UfDeclarationImpl<>(returnType, funcDecl, argumentTypes);
+  }
 }
