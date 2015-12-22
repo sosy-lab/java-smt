@@ -146,7 +146,7 @@ class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitForallQuantifier(
+  public List<BooleanFormula> visitForAll(
       List<Formula> pVariables, BooleanFormula pBody) {
     // the traversed formula is assumed to be in NNF without ITEs
     // so we can throw an exception here
@@ -154,7 +154,7 @@ class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitExistsQuantifier(
+  public List<BooleanFormula> visitExists(
       List<Formula> pVariables, BooleanFormula pBody) {
     // the traversed formula is assumed to be in NNF without ITEs
     // so we can throw an exception here
