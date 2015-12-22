@@ -318,15 +318,13 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
-    final long f = formulaCreator.extractInfo(input);
+  public <R> R visit(FormulaVisitor<R> visitor, final Long f) {
     String name = getName(f);
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
-        return visitor.visitNumeral(
-            ast_to_string(z3context, f), getFormulaCreator().getFormulaType(f));
+        return visitor.visitNumeral(ast_to_string(z3context, f), formulaCreator.getFormulaType(f));
       case Z3_APP_AST:
-        final FormulaType<?> type = getFormulaCreator().getFormulaType(f);
+        final FormulaType<?> type = formulaCreator.getFormulaType(f);
         int arity = getArity(f);
 
         if (arity == 0) {
@@ -339,7 +337,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
         List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
         for (int i = 0; i < arity; i++) {
           long arg = getArg(f, i);
-          FormulaType<?> argumentType = getFormulaCreator().getFormulaType(arg);
+          FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
           formulaTypes.add(argumentType);
           args.add(formulaCreator.encapsulate(argumentType, arg));
         }
@@ -356,21 +354,20 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
               new Function<List<Formula>, Formula>() {
                 @Override
                 public Formula apply(List<Formula> formulas) {
-                  return replaceArgs(getFormulaCreator().encapsulate(type, f), formulas);
+                  return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
                 }
               };
           return visitor.visitFunction(name, args, type, constructor);
         }
       case Z3_VAR_AST:
-        return visitor.visitBoundVariable(name, getFormulaCreator().getFormulaType(f));
+        return visitor.visitBoundVariable(name, formulaCreator.getFormulaType(f));
       case Z3_QUANTIFIER_AST:
-        BooleanFormula body =
-            getFormulaCreator().encapsulateBoolean(get_quantifier_body(z3context, f));
+        BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         List<Formula> qargs = new ArrayList<>();
         for (int i = 0; i < get_quantifier_num_bound(z3context, f); i++) {
           long arg = get_quantifier_pattern_ast(z3context, f, i);
-          FormulaType<?> argumentType = getFormulaCreator().getFormulaType(arg);
-          qargs.add(getFormulaCreator().encapsulate(argumentType, arg));
+          FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
+          qargs.add(formulaCreator.encapsulate(argumentType, arg));
         }
 
         if (is_quantifier_forall(z3context, f)) {

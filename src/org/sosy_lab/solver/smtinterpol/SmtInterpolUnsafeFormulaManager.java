@@ -22,6 +22,7 @@ package org.sosy_lab.solver.smtinterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.smtinterpol.SmtInterpolUtil.toTermArray;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -31,17 +32,22 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
+  private final SmtInterpolFormulaCreator formulaCreator;
+
   SmtInterpolUnsafeFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);
+    formulaCreator = pCreator;
   }
 
   /** ApplicationTerms can be wrapped with "|".
@@ -82,12 +88,10 @@ class SmtInterpolUnsafeFormulaManager
 
   @Override
   public String getName(Term t) {
-    if (isVariable(t)) {
-      return dequote(t.toString());
-    } else if (isUF(t)) {
+    if (isUF(t)) {
       return ((ApplicationTerm) t).getFunction().getName();
     } else {
-      throw new IllegalArgumentException("The Term " + t + " has no name!");
+      return dequote(t.toString());
     }
   }
 
@@ -175,7 +179,44 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula f) {
-    throw new UnsupportedOperationException("Not implemented");
+  public <R> R visit(FormulaVisitor<R> visitor, final Term input) {
+    if (isNumber(input)) {
+      return visitor.visitNumeral(input.toString(), formulaCreator.getFormulaType(input));
+    } else if (isQuantification(input)) {
+      // TODO: quantifier support.
+      throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");
+    } else if (isBoundVariable(input)) {
+      return visitor.visitBoundVariable(getName(input), formulaCreator.getFormulaType(input));
+    } else if (isVariable(input)) {
+      return visitor.visitFreeVariable(getName(input), formulaCreator.getFormulaType(input));
+    } else {
+      int arity = getArity(input);
+      String name = getName(input);
+      final FormulaType<?> type = formulaCreator.getFormulaType(input);
+      List<Formula> args = new ArrayList<>(arity);
+      List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
+      for (int i = 0; i < arity; i++) {
+        Term arg = getArg(input, i);
+        FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
+        formulaTypes.add(argumentType);
+        args.add(formulaCreator.encapsulate(argumentType, arg));
+      }
+      if (isUF(input)) {
+        // Special casing for UFs.
+        return visitor.visitUF(
+            name, formulaCreator.createUfDeclaration(type, input.getSort(), formulaTypes), args);
+      } else {
+
+        // Any function application.
+        Function<List<Formula>, Formula> constructor =
+            new Function<List<Formula>, Formula>() {
+              @Override
+              public Formula apply(List<Formula> formulas) {
+                return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
+              }
+            };
+        return visitor.visitFunction(name, args, type, constructor);
+      }
+    }
   }
 }

@@ -46,26 +46,29 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
   private final long msatEnv;
-  private final Mathsat5FormulaCreator creator;
+  private final Mathsat5FormulaCreator formulaCreator;
 
   Mathsat5UnsafeFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.msatEnv = pCreator.getEnv();
-    this.creator = pCreator;
+    this.formulaCreator = pCreator;
   }
 
   @Override
@@ -93,8 +96,45 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula f) {
-    throw new UnsupportedOperationException("Not implemented");
+  public <R> R visit(FormulaVisitor<R> visitor, final Long f) {
+    int arity = getArity(f);
+    if (msat_term_is_number(msatEnv, f)) {
+      return visitor.visitNumeral(msat_term_repr(f), formulaCreator.getFormulaType(f));
+    } else if (isVariable(f)) {
+      return visitor.visitFreeVariable(getName(f), formulaCreator.getFormulaType(f));
+    } else {
+
+      List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
+      List<Formula> args = new ArrayList<>(arity);
+      for (int i = 0; i < arity; i++) {
+        long arg = getArg(f, i);
+        FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
+        formulaTypes.add(argumentType);
+        args.add(formulaCreator.encapsulate(argumentType, arg));
+      }
+
+      final FormulaType<?> type = formulaCreator.getFormulaType(f);
+      String name = getName(f);
+
+      if (isUF(f)) {
+        return visitor.visitUF(
+            name,
+            formulaCreator.createUfDeclaration(
+                formulaCreator.getFormulaType(f), msat_term_get_decl(f), formulaTypes),
+            args);
+      } else {
+
+        // Any function application.
+        Function<List<Formula>, Formula> constructor =
+            new Function<List<Formula>, Formula>() {
+              @Override
+              public Formula apply(List<Formula> formulas) {
+                return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
+              }
+            };
+        return visitor.visitFunction(name, args, type, constructor);
+      }
+    }
   }
 
   @Override
@@ -114,12 +154,10 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
 
   @Override
   public String getName(Long t) {
-    if (isUF(t)) {
-      return msat_decl_get_name(msat_term_get_decl(t));
-    } else if (isVariable(t)) {
+    if (isVariable(t)) {
       return msat_term_repr(t);
     } else {
-      throw new IllegalArgumentException("Can't get the name from the given formula!");
+      return msat_decl_get_name(msat_term_get_decl(t));
     }
   }
 
@@ -158,7 +196,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       return msat_make_uf(msatEnv, funcDecl, Longs.toArray(newArgs));
     } else if (isVariable(t)) {
       checkArgument(newArgs.isEmpty());
-      return creator.makeVariable(msat_term_get_type(t), newName);
+      return formulaCreator.makeVariable(msat_term_get_type(t), newName);
     } else {
       throw new IllegalArgumentException("Can't set the name from the given formula!");
     }

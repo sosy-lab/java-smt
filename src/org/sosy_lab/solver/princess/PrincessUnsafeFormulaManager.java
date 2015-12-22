@@ -31,22 +31,28 @@ import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 class PrincessUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
+  private final PrincessFormulaCreator formulaCreator;
+
   PrincessUnsafeFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);
+    formulaCreator = pCreator;
   }
 
   @Override
@@ -76,18 +82,20 @@ class PrincessUnsafeFormulaManager
 
   @Override
   public String getName(IExpression t) {
-    if (isVariable(t)) {
-      return t.toString();
-    } else if (isUF(t)) {
+    if (isUF(t)) {
       return ((IFunApp) t).fun().name();
     } else {
-      throw new IllegalArgumentException("The Term " + t + " has no name!");
+      return t.toString();
     }
   }
 
   @Override
   public IExpression replaceArgs(IExpression pT, List<IExpression> newArgs) {
     return PrincessUtil.replaceArgs(pT, newArgs);
+  }
+
+  TermType getType(IExpression t) {
+    return isBoolean(t) ? TermType.Boolean : TermType.Integer;
   }
 
   @Override
@@ -101,8 +109,7 @@ class PrincessUnsafeFormulaManager
         return t;
       }
 
-      return getFormulaCreator()
-          .makeVariable(isBoolean(t) ? TermType.Boolean : TermType.Integer, pNewName);
+      return getFormulaCreator().makeVariable(getType(t), pNewName);
 
     } else if (isUF(t)) {
       IFunApp fun = (IFunApp) t;
@@ -164,7 +171,44 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula f) {
-    throw new UnsupportedOperationException("Not implemented");
+  public <R> R visit(FormulaVisitor<R> visitor, final IExpression input) {
+    if (isNumber(input)) {
+      return visitor.visitNumeral(input.toString(), formulaCreator.getFormulaType(input));
+    } else if (isQuantification(input)) {
+      // TODO: quantifier support.
+      throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");
+    } else if (isBoundVariable(input)) {
+      return visitor.visitBoundVariable(getName(input), formulaCreator.getFormulaType(input));
+    } else if (isVariable(input)) {
+      return visitor.visitFreeVariable(getName(input), formulaCreator.getFormulaType(input));
+    } else {
+      int arity = getArity(input);
+      String name = getName(input);
+      final FormulaType<?> type = formulaCreator.getFormulaType(input);
+      List<Formula> args = new ArrayList<>(arity);
+      List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
+      for (int i = 0; i < arity; i++) {
+        IExpression arg = getArg(input, i);
+        FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
+        formulaTypes.add(argumentType);
+        args.add(formulaCreator.encapsulate(argumentType, arg));
+      }
+      if (isUF(input)) {
+        // Special casing for UFs.
+        return visitor.visitUF(
+            name, formulaCreator.createUfDeclaration(type, getType(input), formulaTypes), args);
+      } else {
+
+        // Any function application.
+        Function<List<Formula>, Formula> constructor =
+            new Function<List<Formula>, Formula>() {
+              @Override
+              public Formula apply(List<Formula> formulas) {
+                return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
+              }
+            };
+        return visitor.visitFunction(name, args, type, constructor);
+      }
+    }
   }
 }

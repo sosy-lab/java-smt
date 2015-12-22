@@ -27,6 +27,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -264,4 +265,10 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
       TFormulaInfo pF, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
     throw new UnsupportedOperationException();
   }
+
+  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
+    return visit(visitor, getFormulaCreator().extractInfo(input));
+  }
+
+  protected abstract <R> R visit(FormulaVisitor<R> visitor, TFormulaInfo f);
 }

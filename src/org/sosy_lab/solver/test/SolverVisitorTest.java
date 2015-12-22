@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -126,9 +125,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
    */
   @Test
   public void testFormulaVisitor() {
-    // Currently only Z3 has a working visitor implementation.
-    assume().that(solverToUse()).isEqualTo(Solvers.Z3);
-
     IntegerFormula x, y, z;
     x = imgr.makeVariable("x");
     y = imgr.makeVariable("y");
