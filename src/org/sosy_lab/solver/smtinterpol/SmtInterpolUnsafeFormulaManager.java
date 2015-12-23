@@ -191,7 +191,9 @@ class SmtInterpolUnsafeFormulaManager
     final FormulaType<?> formulaType = formulaCreator.getFormulaType(input);
 
     if (SmtInterpolUtil.isNumber(input)) {
-      return visitor.visitConstant(SmtInterpolUtil.toNumber(input).toString(), formulaType);
+      final Object value = SmtInterpolUtil.toNumber(input);
+      assert value instanceof Number;
+      return visitor.visitConstant(value, formulaType);
 
     } else if (input instanceof ApplicationTerm) {
       final ApplicationTerm app = (ApplicationTerm) input;
@@ -199,9 +201,10 @@ class SmtInterpolUnsafeFormulaManager
       final FunctionSymbol func = app.getFunction();
 
       if (arity == 0) {
-        if (app.equals(theory.mTrue) || app.equals(theory.mFalse)) {
-          // TODO true and false
-          throw new UnsupportedOperationException();
+        if (app.equals(theory.mTrue)) {
+          return visitor.visitConstant(Boolean.TRUE, formulaType);
+        } else if (app.equals(theory.mFalse)) {
+          return visitor.visitConstant(Boolean.FALSE, formulaType);
         } else if (func.getDefinition() == null) {
           return visitor.visitFreeVariable(dequote(input.toString()), formulaType);
         } else {

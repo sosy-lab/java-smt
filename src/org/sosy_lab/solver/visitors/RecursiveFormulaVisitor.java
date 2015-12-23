@@ -69,7 +69,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitConstant(String value, FormulaType<?> type) {
+  public Void visitConstant(Object value, FormulaType<?> type) {
     return null;
   }
 

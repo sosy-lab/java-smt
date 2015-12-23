@@ -322,6 +322,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     String name = getName(f);
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
+        // TODO extract logic from Z3Model for conversion from string to number and use it here
         return visitor.visitConstant(ast_to_string(z3context, f), formulaCreator.getFormulaType(f));
       case Z3_APP_AST:
         final FormulaType<?> type = formulaCreator.getFormulaType(f);
