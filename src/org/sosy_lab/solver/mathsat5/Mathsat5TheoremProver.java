@@ -22,13 +22,12 @@ package org.sosy_lab.solver.mathsat5;
 import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_all_sat;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -38,6 +37,7 @@ import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -48,15 +48,12 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     super(pMgr, createConfig(generateModels, generateUnsatCore));
   }
 
-  private static long createConfig(boolean generateModels, boolean generateUnsatCore) {
-    long cfg = msat_create_config();
-    if (generateModels) {
-      msat_set_option_checked(cfg, "model_generation", "true");
-    }
-    if (generateUnsatCore) {
-      msat_set_option_checked(cfg, "unsat_core_generation", "1");
-    }
-    return cfg;
+  private static Map<String, String> createConfig(
+      boolean generateModels, boolean generateUnsatCore) {
+    return ImmutableMap.<String, String>builder()
+        .put("model_generation", generateModels ? "true" : "false")
+        .put("unsat_core_generation", generateUnsatCore ? "1" : "0")
+        .build();
   }
 
   @Override

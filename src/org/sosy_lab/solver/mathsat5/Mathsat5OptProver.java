@@ -4,7 +4,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_OPTIMUM;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_objective_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_objective_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_objective_iterator_has_next;
@@ -16,7 +15,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_maximize;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_minimize;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_model;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -64,10 +62,8 @@ class Mathsat5OptProver extends Mathsat5AbstractProver<Void> implements OptEnvir
     stack = new ArrayDeque<>();
   }
 
-  private static long createConfig() {
-    long cfg = msat_create_config();
-    msat_set_option_checked(cfg, "model_generation", "true");
-    return cfg;
+  private static Map<String, String> createConfig() {
+    return ImmutableMap.<String, String>builder().put("model_generation", "true").build();
   }
 
   @Override

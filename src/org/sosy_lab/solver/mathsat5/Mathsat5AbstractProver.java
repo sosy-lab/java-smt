@@ -21,6 +21,7 @@ package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
@@ -28,6 +29,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_free_terminati
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -36,6 +38,9 @@ import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.Formula;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Common base class for {@link Mathsat5TheoremProver}
@@ -49,12 +54,19 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   private final long terminationTest;
   protected boolean closed = false;
 
-  protected Mathsat5AbstractProver(
-      Mathsat5FormulaManager pMgr, long pConfig) {
+  protected Mathsat5AbstractProver(Mathsat5FormulaManager pMgr, Map<String, String> pConfig) {
     mgr = pMgr;
-    curConfig = pConfig;
-    curEnv = mgr.createEnvironment(pConfig);
+    curConfig = buildConfig(pConfig);
+    curEnv = mgr.createEnvironment(curConfig);
     terminationTest = mgr.addTerminationTest(curEnv);
+  }
+
+  private long buildConfig(Map<String, String> pConfig) {
+    long cfg = msat_create_config();
+    for (Entry<String, String> entry : pConfig.entrySet()) {
+      msat_set_option_checked(cfg, entry.getKey(), entry.getValue());
+    }
+    return cfg;
   }
 
   @Override

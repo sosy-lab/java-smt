@@ -21,17 +21,15 @@ package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 
@@ -40,6 +38,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
@@ -49,13 +48,12 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     super(pMgr, createConfig());
   }
 
-  private static long createConfig() {
-    long cfg = msat_create_config();
-    msat_set_option_checked(cfg, "interpolation", "true");
-    msat_set_option_checked(cfg, "model_generation", "true");
-    msat_set_option_checked(cfg, "theory.bv.eager", "false");
-
-    return cfg;
+  private static Map<String, String> createConfig() {
+    return ImmutableMap.<String, String>builder()
+        .put("interpolation", "true")
+        .put("model_generation", "true")
+        .put("theory.bv.eager", "false")
+        .build();
   }
 
   @Override
