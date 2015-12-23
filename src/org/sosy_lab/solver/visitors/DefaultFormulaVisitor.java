@@ -36,6 +36,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
 
   protected abstract R visitDefault();
 
+  @Override
   public R visitFreeVariable(String name, FormulaType<?> type) {
     return visitDefault();
   }
@@ -44,14 +45,17 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
     return visitDefault();
   }
 
+  @Override
   public R visitNumeral(String numeral, FormulaType<?> type) {
     return visitDefault();
   }
 
+  @Override
   public R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args) {
     return visitDefault();
   }
 
+  @Override
   public R visitFunction(
       String functionName,
       List<Formula> args,
@@ -60,10 +64,12 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
     return visitDefault();
   }
 
+  @Override
   public R visitForAll(List<Formula> variables, BooleanFormula body) {
     return visitDefault();
   }
 
+  @Override
   public R visitExists(List<Formula> variables, BooleanFormula body) {
     return visitDefault();
   }

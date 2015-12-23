@@ -266,6 +266,7 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
     return visit(visitor, getFormulaCreator().extractInfo(input));
   }
