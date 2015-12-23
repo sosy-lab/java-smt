@@ -39,7 +39,7 @@ public abstract class FormulaVisitor<R> {
     fmgr = pFmgr;
   }
 
-  public final R visit(Formula f) {
+  public R visit(Formula f) {
     return fmgr.visit(this, f);
   }
 

@@ -142,7 +142,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             return null;
           }
         };
-    mgr.visit(nameExtractor, f);
+    nameExtractor.visit(f);
     assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
   }
 }

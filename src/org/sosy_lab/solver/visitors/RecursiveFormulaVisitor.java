@@ -27,7 +27,9 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UfDeclaration;
 
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,14 +40,20 @@ import java.util.Set;
  */
 public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   private final Set<Formula> seen = new HashSet<>();
+  private final Deque<Formula> toVisit = new LinkedList<>();
 
   protected RecursiveFormulaVisitor(FormulaManager pFmgr) {
     super(pFmgr);
   }
 
-  private Void visitIfNotSeen(Formula f) {
-    if (seen.add(f)) {
-      return visit(f);
+  @Override
+  public final Void visit(Formula f) {
+    toVisit.add(f);
+    while (!toVisit.isEmpty()) {
+      Formula c = toVisit.pop();
+      if (seen.add(c)) {
+        super.visit(c);
+      }
     }
     return null;
   }
@@ -68,7 +76,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   @Override
   public Void visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args) {
     for (Formula arg : args) {
-      visitIfNotSeen(arg);
+      toVisit.add(arg);
     }
     return null;
   }
@@ -80,18 +88,20 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
       FormulaType<?> type,
       Function<List<Formula>, Formula> newApplicationConstructor) {
     for (Formula arg : args) {
-      visitIfNotSeen(arg);
+      toVisit.add(arg);
     }
     return null;
   }
 
   @Override
   public Void visitForAll(List<Formula> variables, BooleanFormula body) {
-    return visitIfNotSeen(body);
+    toVisit.add(body);
+    return null;
   }
 
   @Override
   public Void visitExists(List<Formula> variables, BooleanFormula body) {
-    return visitIfNotSeen(body);
+    toVisit.add(body);
+    return null;
   }
 }
