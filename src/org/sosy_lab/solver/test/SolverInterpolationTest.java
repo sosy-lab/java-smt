@@ -39,7 +39,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -52,8 +51,8 @@ import java.util.Set;
 public class SolverInterpolationTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
-  public static ArrayList<Solvers> getAllCombinations() {
-    return Lists.newArrayList(Solvers.values());
+  public static Solvers[] getAllCombinations() {
+    return Solvers.values();
   }
 
   @Parameter(0)
