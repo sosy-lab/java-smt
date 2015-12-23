@@ -62,7 +62,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   @SuppressWarnings({"unchecked", "rawtypes"})
   protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest()
       throws InvalidConfigurationException {
-    InterpolatingProverEnvironment<?> env = mgr.newProverEnvironmentWithInterpolation(false);
+    InterpolatingProverEnvironment<?> env = mgr.newProverEnvironmentWithInterpolation();
     assume()
         .withFailureMessage(
             "Solver " + solverToUse() + " does not support solving under assumptions")

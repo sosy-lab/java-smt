@@ -267,7 +267,7 @@ public final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
-  public Z3InterpolatingProver newProverEnvironmentWithInterpolation(boolean pShared) {
+  public Z3InterpolatingProver newProverEnvironmentWithInterpolation() {
     return new Z3InterpolatingProver(this, z3params);
   }
 

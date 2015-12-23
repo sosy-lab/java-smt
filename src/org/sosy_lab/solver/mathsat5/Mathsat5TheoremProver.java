@@ -43,11 +43,9 @@ import javax.annotation.Nullable;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
 
-  private static final boolean USE_SHARED_ENV = true;
-
   Mathsat5TheoremProver(
       Mathsat5FormulaManager pMgr, boolean generateModels, boolean generateUnsatCore) {
-    super(pMgr, createConfig(generateModels, generateUnsatCore), USE_SHARED_ENV, true);
+    super(pMgr, createConfig(generateModels, generateUnsatCore));
   }
 
   private static long createConfig(boolean generateModels, boolean generateUnsatCore) {

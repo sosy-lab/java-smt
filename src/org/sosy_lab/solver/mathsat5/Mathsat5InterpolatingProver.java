@@ -45,11 +45,8 @@ import java.util.Set;
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     implements InterpolatingProverEnvironmentWithAssumptions<Integer> {
 
-  private final boolean useSharedEnv;
-
-  Mathsat5InterpolatingProver(Mathsat5FormulaManager pMgr, boolean shared) {
-    super(pMgr, createConfig(), shared, false);
-    useSharedEnv = shared;
+  Mathsat5InterpolatingProver(Mathsat5FormulaManager pMgr) {
+    super(pMgr, createConfig());
   }
 
   private static long createConfig() {
@@ -74,9 +71,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     int group = msat_create_itp_group(curEnv);
     msat_set_itp_group(curEnv, group);
     long t = mgr.extractInfo(f);
-    if (!useSharedEnv) {
-      t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
-    }
     msat_assert_formula(curEnv, t);
     return group;
   }
@@ -99,11 +93,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
                   new Function<BooleanFormula, Long>() {
                     @Override
                     public Long apply(BooleanFormula pInput) {
-                      long t = Mathsat5FormulaManager.getMsatTerm(pInput);
-                      if (!useSharedEnv) {
-                        t = msat_make_copy_from(curEnv, t, mgr.getEnvironment());
-                      }
-                      return t;
+                      return Mathsat5FormulaManager.getMsatTerm(pInput);
                     }
                   }));
       return !msat_check_sat_with_assumptions(curEnv, assumptions);
@@ -137,10 +127,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
         throw new SolverException(e.getMessage(), e);
       }
       throw e;
-    }
-
-    if (!useSharedEnv) {
-      itp = msat_make_copy_from(mgr.getEnvironment(), itp, curEnv);
     }
     return mgr.encapsulateBooleanFormula(itp);
   }

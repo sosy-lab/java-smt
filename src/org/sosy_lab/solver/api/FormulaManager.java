@@ -97,9 +97,8 @@ public interface FormulaManager {
    * If the SMT solver is able to handle satisfiability tests with assumptions please consider
    * implementing the {@link InterpolatingProverEnvironmentWithAssumptions} interface, and return
    * an Object of this type here.
-   * @param shared Whether the solver should share as much as possible with other environments.
    */
-  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(boolean shared);
+  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation();
 
   /**
    * Create a fresh new {@link OptEnvironment} which encapsulates an assertion stack

@@ -51,14 +51,9 @@ import java.util.Set;
 @SuppressWarnings("resource")
 public class SolverInterpolationTest extends SolverBasedTest0 {
 
-  @Parameters(name = "{0} (shared={1})")
-  public static List<Object[]> getAllCombinations() {
-    List<Object[]> result = new ArrayList<>();
-    for (Solvers solver : Solvers.values()) {
-      result.add(new Object[] {solver, false});
-      result.add(new Object[] {solver, true});
-    }
-    return result;
+  @Parameters(name = "{0}")
+  public static ArrayList<Solvers> getAllCombinations() {
+    return Lists.newArrayList(Solvers.values());
   }
 
   @Parameter(0)
@@ -69,13 +64,10 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     return solver;
   }
 
-  @Parameter(1)
-  public boolean shared;
-
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    return (InterpolatingProverEnvironment<T>) mgr.newProverEnvironmentWithInterpolation(shared);
+    return (InterpolatingProverEnvironment<T>) mgr.newProverEnvironmentWithInterpolation();
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names

@@ -119,7 +119,7 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(boolean pShared) {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
     return getEnvironment().getInterpolator(this);
   }
 

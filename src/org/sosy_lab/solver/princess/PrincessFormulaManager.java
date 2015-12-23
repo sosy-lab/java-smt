@@ -138,7 +138,7 @@ public final class PrincessFormulaManager
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(boolean pShared) {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
     return new PrincessInterpolatingProver(this);
   }
 

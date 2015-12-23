@@ -81,7 +81,7 @@ public class SolverStackTest extends SolverBasedTest0 {
    */
   private BasicProverEnvironment<?> newEnvironmentForTest(boolean generateUnsatCore) {
     if (useInterpolatingEnvironment) {
-      return mgr.newProverEnvironmentWithInterpolation(false);
+      return mgr.newProverEnvironmentWithInterpolation();
     } else {
       return mgr.newProverEnvironment(true, generateUnsatCore);
     }

@@ -50,10 +50,10 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   protected boolean closed = false;
 
   protected Mathsat5AbstractProver(
-      Mathsat5FormulaManager pMgr, long pConfig, boolean pShared, boolean pGhostFilter) {
+      Mathsat5FormulaManager pMgr, long pConfig) {
     mgr = pMgr;
     curConfig = pConfig;
-    curEnv = mgr.createEnvironment(pConfig, pShared, pGhostFilter);
+    curEnv = mgr.createEnvironment(pConfig);
     terminationTest = mgr.addTerminationTest(curEnv);
   }
 

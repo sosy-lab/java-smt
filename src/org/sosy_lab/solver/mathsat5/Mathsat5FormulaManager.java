@@ -101,6 +101,9 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
     }
   }
 
+  private static final boolean USE_SHARED_ENV = true;
+  private static final boolean USE_GHOST_FILTER = true;
+
   private final LogManager logger;
   private final long mathsatConfig;
   private final Mathsat5Settings settings;
@@ -247,8 +250,8 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(boolean pShared) {
-    return new Mathsat5InterpolatingProver(this, pShared);
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+    return new Mathsat5InterpolatingProver(this);
   }
 
   @Override
@@ -294,10 +297,10 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
     return msat_get_version();
   }
 
-  long createEnvironment(long cfg, boolean shared, boolean ghostFilter) {
+  long createEnvironment(long cfg) {
     long env;
 
-    if (ghostFilter) {
+    if (USE_GHOST_FILTER) {
       msat_set_option_checked(cfg, "dpll.ghost_filtering", "true");
     }
 
@@ -321,7 +324,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
           cfg, "debug.api_call_trace_filename", filename.toAbsolutePath().toString());
     }
 
-    if (shared) {
+    if (USE_SHARED_ENV) {
       env = msat_create_shared_env(cfg, this.getEnvironment());
     } else {
       env = msat_create_env(cfg);
