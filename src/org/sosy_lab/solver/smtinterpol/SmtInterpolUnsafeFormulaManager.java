@@ -234,7 +234,7 @@ class SmtInterpolUnsafeFormulaManager
                   return replaceArgs(formulaCreator.encapsulate(formulaType, input), formulas);
                 }
               };
-          return visitor.visitFunction(name, args, formulaType, constructor);
+          return visitor.visitOperator(name, args, formulaType, constructor);
         }
       }
 

@@ -132,7 +132,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
                 return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
               }
             };
-        return visitor.visitFunction(name, args, type, constructor);
+        return visitor.visitOperator(name, args, type, constructor);
       }
     }
   }

@@ -57,7 +57,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitFunction(
+  public R visitOperator(
       String functionName,
       List<Formula> args,
       FormulaType<?> type,

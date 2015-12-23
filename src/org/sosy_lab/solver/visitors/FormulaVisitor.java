@@ -51,7 +51,7 @@ public abstract class FormulaVisitor<R> {
 
   public abstract R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args);
 
-  public abstract R visitFunction(
+  public abstract R visitOperator(
       String functionName,
       List<Formula> args,
       FormulaType<?> type,

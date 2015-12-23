@@ -207,7 +207,7 @@ class PrincessUnsafeFormulaManager
                 return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
               }
             };
-        return visitor.visitFunction(name, args, type, constructor);
+        return visitor.visitOperator(name, args, type, constructor);
       }
     }
   }

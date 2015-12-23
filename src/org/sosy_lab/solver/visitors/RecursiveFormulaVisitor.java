@@ -82,7 +82,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitFunction(
+  public Void visitOperator(
       String functionName,
       List<Formula> args,
       FormulaType<?> type,

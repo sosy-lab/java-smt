@@ -357,7 +357,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
                   return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
                 }
               };
-          return visitor.visitFunction(name, args, type, constructor);
+          return visitor.visitOperator(name, args, type, constructor);
         }
       case Z3_VAR_AST:
         return visitor.visitBoundVariable(name, formulaCreator.getFormulaType(f));
