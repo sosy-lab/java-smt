@@ -173,7 +173,7 @@ class PrincessUnsafeFormulaManager
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final IExpression input) {
     if (isNumber(input)) {
-      return visitor.visitNumeral(input.toString(), formulaCreator.getFormulaType(input));
+      return visitor.visitConstant(input.toString(), formulaCreator.getFormulaType(input));
     } else if (isQuantification(input)) {
       // TODO: quantifier support.
       throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");

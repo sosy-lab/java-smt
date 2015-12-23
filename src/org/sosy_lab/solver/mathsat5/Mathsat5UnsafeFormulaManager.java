@@ -99,7 +99,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   public <R> R visit(FormulaVisitor<R> visitor, final Long f) {
     int arity = getArity(f);
     if (msat_term_is_number(msatEnv, f)) {
-      return visitor.visitNumeral(msat_term_repr(f), formulaCreator.getFormulaType(f));
+      return visitor.visitConstant(msat_term_repr(f), formulaCreator.getFormulaType(f));
     } else if (isVariable(f)) {
       return visitor.visitFreeVariable(getName(f), formulaCreator.getFormulaType(f));
     } else {

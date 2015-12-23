@@ -47,7 +47,7 @@ public abstract class FormulaVisitor<R> {
 
   public abstract R visitBoundVariable(String name, FormulaType<?> type);
 
-  public abstract R visitNumeral(String numeral, FormulaType<?> type);
+  public abstract R visitConstant(String value, FormulaType<?> type);
 
   public abstract R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args);
 

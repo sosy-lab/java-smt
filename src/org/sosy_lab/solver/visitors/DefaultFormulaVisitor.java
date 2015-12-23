@@ -47,7 +47,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitNumeral(String numeral, FormulaType<?> type) {
+  public R visitConstant(String value, FormulaType<?> type) {
     return visitDefault();
   }
 

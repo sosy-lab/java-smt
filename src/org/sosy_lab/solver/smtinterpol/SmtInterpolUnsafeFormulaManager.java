@@ -191,7 +191,7 @@ class SmtInterpolUnsafeFormulaManager
     final FormulaType<?> formulaType = formulaCreator.getFormulaType(input);
 
     if (SmtInterpolUtil.isNumber(input)) {
-      return visitor.visitNumeral(SmtInterpolUtil.toNumber(input).toString(), formulaType);
+      return visitor.visitConstant(SmtInterpolUtil.toNumber(input).toString(), formulaType);
 
     } else if (input instanceof ApplicationTerm) {
       final ApplicationTerm app = (ApplicationTerm) input;
