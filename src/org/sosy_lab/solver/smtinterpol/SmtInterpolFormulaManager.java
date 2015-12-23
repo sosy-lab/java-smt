@@ -91,7 +91,8 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
     SmtInterpolFormulaCreator creator = new SmtInterpolFormulaCreator(env);
 
     // Create managers
-    SmtInterpolUnsafeFormulaManager unsafeManager = new SmtInterpolUnsafeFormulaManager(creator);
+    SmtInterpolUnsafeFormulaManager unsafeManager =
+        new SmtInterpolUnsafeFormulaManager(creator, env.getTheory());
     SmtInterpolFunctionFormulaManager functionTheory =
         new SmtInterpolFunctionFormulaManager(creator, unsafeManager);
     SmtInterpolBooleanFormulaManager booleanTheory =

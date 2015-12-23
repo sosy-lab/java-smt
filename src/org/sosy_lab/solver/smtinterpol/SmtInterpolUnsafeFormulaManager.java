@@ -27,9 +27,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -44,10 +46,12 @@ class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
   private final SmtInterpolFormulaCreator formulaCreator;
+  private final Theory theory;
 
-  SmtInterpolUnsafeFormulaManager(SmtInterpolFormulaCreator pCreator) {
+  SmtInterpolUnsafeFormulaManager(SmtInterpolFormulaCreator pCreator, Theory pTheory) {
     super(pCreator);
     formulaCreator = pCreator;
+    theory = pTheory;
   }
 
   /** ApplicationTerms can be wrapped with "|".
@@ -180,43 +184,68 @@ class SmtInterpolUnsafeFormulaManager
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Term input) {
-    if (isNumber(input)) {
-      return visitor.visitNumeral(input.toString(), formulaCreator.getFormulaType(input));
-    } else if (isQuantification(input)) {
-      // TODO: quantifier support.
-      throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");
-    } else if (isBoundVariable(input)) {
-      return visitor.visitBoundVariable(getName(input), formulaCreator.getFormulaType(input));
-    } else if (isVariable(input)) {
-      return visitor.visitFreeVariable(getName(input), formulaCreator.getFormulaType(input));
-    } else {
-      int arity = getArity(input);
-      String name = getName(input);
-      final FormulaType<?> type = formulaCreator.getFormulaType(input);
-      List<Formula> args = new ArrayList<>(arity);
-      List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
-      for (int i = 0; i < arity; i++) {
-        Term arg = getArg(input, i);
-        FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-        formulaTypes.add(argumentType);
-        args.add(formulaCreator.encapsulate(argumentType, arg));
-      }
-      if (isUF(input)) {
-        // Special casing for UFs.
-        return visitor.visitUF(
-            name, formulaCreator.createUfDeclaration(type, input.getSort(), formulaTypes), args);
-      } else {
+    checkArgument(
+        input.getTheory().equals(theory),
+        "Given term belongs to a different instance of SMTInterpol: %s",
+        input);
+    final FormulaType<?> formulaType = formulaCreator.getFormulaType(input);
 
-        // Any function application.
-        Function<List<Formula>, Formula> constructor =
-            new Function<List<Formula>, Formula>() {
-              @Override
-              public Formula apply(List<Formula> formulas) {
-                return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
-              }
-            };
-        return visitor.visitFunction(name, args, type, constructor);
+    if (SmtInterpolUtil.isNumber(input)) {
+      return visitor.visitNumeral(SmtInterpolUtil.toNumber(input).toString(), formulaType);
+
+    } else if (input instanceof ApplicationTerm) {
+      final ApplicationTerm app = (ApplicationTerm) input;
+      final int arity = app.getParameters().length;
+      final FunctionSymbol func = app.getFunction();
+
+      if (arity == 0) {
+        if (app.equals(theory.mTrue) || app.equals(theory.mFalse)) {
+          // TODO true and false
+          throw new UnsupportedOperationException();
+        } else if (func.getDefinition() == null) {
+          return visitor.visitFreeVariable(dequote(input.toString()), formulaType);
+        } else {
+          throw new UnsupportedOperationException("Unexpected nullary function " + input);
+        }
+
+      } else {
+        final String name = func.getName();
+        List<Formula> args = new ArrayList<>(arity);
+        List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
+        for (int i = 0; i < arity; i++) {
+          Term arg = app.getParameters()[i];
+          FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
+          formulaTypes.add(argumentType);
+          args.add(formulaCreator.encapsulate(argumentType, arg));
+        }
+
+        if (!func.isIntern() && !func.isInterpreted()) {
+          return visitor.visitUF(
+              name,
+              formulaCreator.createUfDeclaration(formulaType, input.getSort(), formulaTypes),
+              args);
+        } else {
+
+          // Any function application.
+          Function<List<Formula>, Formula> constructor =
+              new Function<List<Formula>, Formula>() {
+                @Override
+                public Formula apply(List<Formula> formulas) {
+                  return replaceArgs(formulaCreator.encapsulate(formulaType, input), formulas);
+                }
+              };
+          return visitor.visitFunction(name, args, formulaType, constructor);
+        }
       }
+
+    } else {
+      // TODO: support for quantifiers and bound variables
+
+      throw new UnsupportedOperationException(
+          String.format(
+              "Unexpected SMTInterpol formula of type %s: %s",
+              input.getClass().getSimpleName(),
+              input));
     }
   }
 }
