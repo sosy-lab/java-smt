@@ -41,7 +41,8 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
     return visitDefault();
   }
 
-  public R visitBoundVariable(String name, FormulaType<?> type, Formula boundingAST) {
+  @Override
+  public R visitBoundVariable(String name, FormulaType<?> type) {
     return visitDefault();
   }
 
