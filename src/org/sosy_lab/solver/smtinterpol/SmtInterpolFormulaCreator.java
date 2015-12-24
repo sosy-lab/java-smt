@@ -27,6 +27,9 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.ObjectArrayBackedList;
+
+import java.util.List;
 
 class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEnvironment> {
 
@@ -97,5 +100,14 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   @Override
   public Sort getArrayType(final Sort pIndexType, final Sort pElementType) {
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
+  }
+
+  List<Formula> encapsulate(Term[] terms) {
+    return new ObjectArrayBackedList<Term, Formula>(terms) {
+      @Override
+      protected Formula convert(Term pInput) {
+        return encapsulate(getFormulaType(pInput), pInput);
+      }
+    };
   }
 }

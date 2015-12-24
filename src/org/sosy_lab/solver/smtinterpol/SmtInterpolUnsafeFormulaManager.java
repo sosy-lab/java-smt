@@ -38,7 +38,6 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -219,12 +218,7 @@ class SmtInterpolUnsafeFormulaManager
 
       } else {
         final String name = func.getName();
-        List<Formula> args = new ArrayList<>(arity);
-        for (int i = 0; i < arity; i++) {
-          Term arg = app.getParameters()[i];
-          FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-          args.add(formulaCreator.encapsulate(argumentType, arg));
-        }
+        final List<Formula> args = formulaCreator.encapsulate(app.getParameters());
 
         if (!func.isIntern() && !func.isInterpreted()) {
           return visitor.visitUF(f, args, name);
