@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.visitors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Function;
 
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -37,21 +39,21 @@ import java.util.Set;
  *
  * <p>Allows to traverse DAG-like formulas without an exponential explosion.
  */
-public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
+public abstract class RecursiveFormulaVisitor implements FormulaVisitor<Void> {
+  private final FormulaManager fmgr;
   private final Set<Formula> seen = new HashSet<>();
   private final Deque<Formula> toVisit = new LinkedList<>();
 
   protected RecursiveFormulaVisitor(FormulaManager pFmgr) {
-    super(pFmgr);
+    fmgr = checkNotNull(pFmgr);
   }
 
-  @Override
   public final Void visit(Formula f) {
     toVisit.add(f);
     while (!toVisit.isEmpty()) {
       Formula c = toVisit.pop();
       if (seen.add(c)) {
-        super.visit(c);
+        fmgr.visit(this, c);
       }
     }
     return null;

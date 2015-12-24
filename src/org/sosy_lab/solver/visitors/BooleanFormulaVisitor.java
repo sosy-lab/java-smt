@@ -21,50 +21,37 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
 
 /**
  * Visitor iterating through the boolean part of the formula.
+ * Use {@link BooleanFormulaManager#visit(BooleanFormulaVisitor, BooleanFormula)}
+ * for visiting formulas.
  *
  * @param <R> Desired return type.
  */
-public abstract class BooleanFormulaVisitor<R> {
+public interface BooleanFormulaVisitor<R> {
 
-  private final BooleanFormulaManager bfmgr;
+  R visitTrue();
 
-  protected BooleanFormulaVisitor(FormulaManager pFmgr) {
-    bfmgr = pFmgr.getBooleanFormulaManager();
-  }
+  R visitFalse();
 
-  /**
-   * This method is the main entry point for visiting a formula.
-   * It redirects the visit to all sub-formulas, depending on the operation.
-   * */
-  public final R visit(BooleanFormula f) {
-    return bfmgr.visit(this, f);
-  }
+  R visitAtom(BooleanFormula atom);
 
-  public abstract R visitTrue();
+  R visitNot(BooleanFormula operand);
 
-  public abstract R visitFalse();
+  R visitAnd(List<BooleanFormula> operands);
 
-  public abstract R visitAtom(BooleanFormula atom);
+  R visitOr(List<BooleanFormula> operand);
 
-  public abstract R visitNot(BooleanFormula operand);
+  R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
 
-  public abstract R visitAnd(List<BooleanFormula> operands);
+  R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
 
-  public abstract R visitOr(List<BooleanFormula> operand);
-
-  public abstract R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
-
-  public abstract R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
-
-  public abstract R visitIfThenElse(
+  R visitIfThenElse(
       BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
 
-  public abstract R visitQuantifier(Quantifier quantifier, BooleanFormula body);
+  R visitQuantifier(Quantifier quantifier, BooleanFormula body);
 }

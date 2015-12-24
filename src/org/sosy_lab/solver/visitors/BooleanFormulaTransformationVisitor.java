@@ -48,7 +48,7 @@ import java.util.Map;
  * </p>
  */
 public abstract class BooleanFormulaTransformationVisitor
-    extends BooleanFormulaVisitor<BooleanFormula> {
+    implements BooleanFormulaVisitor<BooleanFormula> {
 
   private final BooleanFormulaManager bfmgr;
   private final FormulaManager manager;
@@ -57,7 +57,6 @@ public abstract class BooleanFormulaTransformationVisitor
 
   protected BooleanFormulaTransformationVisitor(
       FormulaManager pFmgr, Map<BooleanFormula, BooleanFormula> pCache) {
-    super(pFmgr);
     bfmgr = pFmgr.getBooleanFormulaManager();
     manager = pFmgr;
 
@@ -67,7 +66,7 @@ public abstract class BooleanFormulaTransformationVisitor
   protected final BooleanFormula visitIfNotSeen(BooleanFormula f) {
     BooleanFormula out = cache.get(f);
     if (out == null) {
-      out = super.visit(f);
+      out = bfmgr.visit(this, f);
       cache.put(f, out);
     }
     return out;

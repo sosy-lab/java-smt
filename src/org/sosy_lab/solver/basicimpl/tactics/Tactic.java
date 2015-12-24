@@ -22,6 +22,7 @@ package org.sosy_lab.solver.basicimpl.tactics;
 import com.google.common.collect.Iterables;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public enum Tactic {
           + " by replacing them with appropriate formulas consisting of and/or/not") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      return new NNFVisitor(pFmgr).visit(pF);
+      return pFmgr.getBooleanFormulaManager().visit(new NNFVisitor(pFmgr), pF);
     }
   },
 
@@ -63,9 +64,10 @@ public enum Tactic {
           + " thus would create too much conjuncts when creating a full CNF.") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);
+      BooleanFormulaManager bfmgr = pFmgr.getBooleanFormulaManager();
+      BooleanFormula nnf = bfmgr.visit(new NNFVisitor(pFmgr), pF);
       // TODO make the maximum depth configurable
-      List<BooleanFormula> conjuncts = new CNFVisitor(pFmgr, 3).visit(nnf);
+      List<BooleanFormula> conjuncts = bfmgr.visit(new CNFVisitor(bfmgr, 3), nnf);
       if (conjuncts.size() == 1) {
         return Iterables.getOnlyElement(conjuncts);
       } else {
@@ -88,8 +90,9 @@ public enum Tactic {
           + " 2^n clauses in CNF afterwards.") {
     @Override
     public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      BooleanFormula nnf = new NNFVisitor(pFmgr).visit(pF);
-      List<BooleanFormula> conjuncts = new CNFVisitor(pFmgr, -1).visit(nnf);
+      BooleanFormulaManager bfmgr = pFmgr.getBooleanFormulaManager();
+      BooleanFormula nnf = bfmgr.visit(new NNFVisitor(pFmgr), pF);
+      List<BooleanFormula> conjuncts = bfmgr.visit(new CNFVisitor(bfmgr, -1), nnf);
       if (conjuncts.size() == 1) {
         return Iterables.getOnlyElement(conjuncts);
       } else {

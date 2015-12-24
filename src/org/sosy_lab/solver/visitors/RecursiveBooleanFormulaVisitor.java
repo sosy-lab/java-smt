@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
@@ -43,17 +44,18 @@ import java.util.Set;
  * No guarantee on iteration order is made.
  * </p>
  */
-public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisitor<Void> {
+public abstract class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Void> {
 
+  private final BooleanFormulaManager bfmgr;
   private final Set<BooleanFormula> seen = new HashSet<>();
 
   protected RecursiveBooleanFormulaVisitor(FormulaManager pFmgr) {
-    super(pFmgr);
+    bfmgr = pFmgr.getBooleanFormulaManager();
   }
 
   private Void visitIfNotSeen(BooleanFormula f) {
     if (seen.add(f)) {
-      return visit(f);
+      return bfmgr.visit(this, f);
     }
     return null;
   }

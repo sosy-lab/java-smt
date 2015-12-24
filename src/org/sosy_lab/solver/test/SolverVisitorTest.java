@@ -40,7 +40,6 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
-import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.RecursiveFormulaVisitor;
 
 import java.util.HashMap;
@@ -136,7 +135,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     final Set<String> usedVariables = new HashSet<>();
 
-    FormulaVisitor<Void> nameExtractor =
+    RecursiveFormulaVisitor nameExtractor =
         new RecursiveFormulaVisitor(mgr) {
           @Override
           public Void visitFreeVariable(Formula f, String name) {
@@ -163,8 +162,10 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
-        new BooleanFormulaTransformationVisitor(
-            mgr, new HashMap<BooleanFormula, BooleanFormula>()) {}.visit(constraint);
+        bmgr.visit(
+            new BooleanFormulaTransformationVisitor(
+                mgr, new HashMap<BooleanFormula, BooleanFormula>()) {},
+            constraint);
     assertThatFormula(newConstraint).isUnsatisfiable();
   }
 }

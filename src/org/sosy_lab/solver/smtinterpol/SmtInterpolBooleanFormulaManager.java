@@ -214,7 +214,7 @@ class SmtInterpolBooleanFormulaManager
       if (arity == 0) {
         return pVisitor.visitFalse();
       } else if (arity == 1) {
-        return pVisitor.visit(getArg(app, 0));
+        return visit(pVisitor, getArg(app, 0));
       }
       return pVisitor.visitOr(getAllArgs(app));
 

@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
@@ -30,11 +29,7 @@ import java.util.List;
  *
  * @param <R> Return type for each traversal operation.
  */
-public abstract class DefaultBooleanFormulaVisitor<R> extends BooleanFormulaVisitor<R> {
-
-  protected DefaultBooleanFormulaVisitor(FormulaManager pFmgr) {
-    super(pFmgr);
-  }
+public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaVisitor<R> {
 
   protected abstract R visitDefault();
 

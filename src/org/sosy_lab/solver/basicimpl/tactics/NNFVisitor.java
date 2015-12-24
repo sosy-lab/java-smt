@@ -25,14 +25,15 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   @Override
   public BooleanFormula visitNot(BooleanFormula pOperand) {
-    return insideNotVisitor.visit(pOperand);
+    return bfmgr.visit(insideNotVisitor, pOperand);
   }
 
   @Override
   public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
 
     // Rewrite using primitives.
-    return visit(
+    return bfmgr.visit(
+        this,
         bfmgr.or(
             bfmgr.and(pOperand1, pOperand2),
             bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2))));
@@ -42,7 +43,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
 
     // Rewrite using primitives.
-    return visit(bfmgr.or(bfmgr.not(pOperand1), pOperand2));
+    return bfmgr.visit(this, bfmgr.or(bfmgr.not(pOperand1), pOperand2));
   }
 
   @Override
@@ -50,7 +51,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
 
     // Rewrite ITE using primitives.
-    return visit(
+    return bfmgr.visit(
+        this,
         bfmgr.or(
             bfmgr.and(pCondition, pThenFormula), bfmgr.and(bfmgr.not(pCondition), pElseFormula)));
   }
@@ -79,14 +81,14 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
     @Override
     public BooleanFormula visitNot(BooleanFormula pOperand) {
-      return NNFVisitor.this.visit(pOperand);
+      return bfmgr.visit(NNFVisitor.this, pOperand);
     }
 
     @Override
     public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
       List<BooleanFormula> newOperands = new ArrayList<>();
       for (BooleanFormula f : pOperands) {
-        newOperands.add(visit(f));
+        newOperands.add(bfmgr.visit(this, f));
       }
 
       return bfmgr.or(newOperands);
@@ -96,7 +98,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
       List<BooleanFormula> newOperands = new ArrayList<>();
       for (BooleanFormula f : pOperands) {
-        newOperands.add(visit(f));
+        newOperands.add(bfmgr.visit(this, f));
       }
 
       return bfmgr.and(newOperands);
@@ -106,7 +108,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
 
       // Rewrite using primitives.
-      return visit(
+      return bfmgr.visit(
+          this,
           bfmgr.or(
               bfmgr.and(pOperand1, pOperand2),
               bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2))));
@@ -116,7 +119,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
 
       // Rewrite using primitives.
-      return visit(bfmgr.or(bfmgr.not(pOperand1), pOperand2));
+      return bfmgr.visit(this, bfmgr.or(bfmgr.not(pOperand1), pOperand2));
     }
 
     @Override
@@ -124,7 +127,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
         BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
 
       // Rewrite ITE using primitives.
-      return visit(
+      return bfmgr.visit(
+          this,
           bfmgr.or(
               bfmgr.and(pCondition, pThenFormula), bfmgr.and(bfmgr.not(pCondition), pElseFormula)));
     }

@@ -29,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
@@ -57,7 +58,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula nnf = mgr.applyTactic(not_a_b, Tactic.NNF);
     assertThatFormula(nnf).isEquivalentTo(not_a_b);
     NNFChecker checker = new NNFChecker(mgr);
-    checker.visit(nnf);
+    bmgr.visit(checker, nnf);
     assertThat(checker.isInNNF()).isTrue();
   }
 
@@ -139,14 +140,21 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     assertThat(checker.isInCNF()).isTrue();
   }
 
-  private static class CNFChecker extends BooleanFormulaVisitor<Void> {
+  private static class CNFChecker implements BooleanFormulaVisitor<Void> {
+
+    private final BooleanFormulaManager bfmgr;
 
     boolean startsWithAnd = false;
     boolean containsMoreAnd = false;
     boolean started = false;
 
     protected CNFChecker(FormulaManager pFmgr) {
-      super(pFmgr);
+      bfmgr = pFmgr.getBooleanFormulaManager();
+    }
+
+    Void visit(BooleanFormula f) {
+      // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
+      return bfmgr.visit(this, f);
     }
 
     public boolean isInCNF() {
@@ -239,13 +247,20 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
   }
 
-  private static class NNFChecker extends BooleanFormulaVisitor<Void> {
+  private static class NNFChecker implements BooleanFormulaVisitor<Void> {
+
+    private final BooleanFormulaManager bfmgr;
 
     boolean wasLastVisitNot = false;
     boolean notOnlyAtAtoms = true;
 
     protected NNFChecker(FormulaManager pFmgr) {
-      super(pFmgr);
+      bfmgr = pFmgr.getBooleanFormulaManager();
+    }
+
+    Void visit(BooleanFormula f) {
+      // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
+      return bfmgr.visit(this, f);
     }
 
     public boolean isInNNF() {

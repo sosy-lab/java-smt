@@ -33,23 +33,11 @@ import java.util.List;
 
 /**
  * Visitor iterating through entire formula.
+ * Use {@link FormulaManager#visit(FormulaVisitor, Formula)} for visiting formulas.
  *
  * @param <R> Desired return type.
  */
-public abstract class FormulaVisitor<R> {
-  private final FormulaManager fmgr;
-
-  protected FormulaVisitor(FormulaManager pFmgr) {
-    fmgr = pFmgr;
-  }
-
-  /**
-   * Designated entry point.
-   * Normally should not be overridden by the client code.
-   */
-  public R visit(Formula f) {
-    return fmgr.visit(this, f);
-  }
+public interface FormulaVisitor<R> {
 
   /**
    * Visit a free variable (such as "x", "y" or "z"), not bound by a quantifier.
@@ -58,7 +46,7 @@ public abstract class FormulaVisitor<R> {
    * @param f Formula representing the variable.
    * @param name Variable name.
    */
-  public abstract R visitFreeVariable(Formula f, String name);
+  R visitFreeVariable(Formula f, String name);
 
   /**
    * Visit a variable bound by a quantifier.
@@ -69,7 +57,7 @@ public abstract class FormulaVisitor<R> {
    * @param deBruijnIdx de-Bruijn index of the bound variable, which can be used
    *                    to find the matching quantifier.
    */
-  public abstract R visitBoundVariable(Formula f, String name, int deBruijnIdx);
+  R visitBoundVariable(Formula f, String name, int deBruijnIdx);
 
   /**
    * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".
@@ -81,7 +69,7 @@ public abstract class FormulaVisitor<R> {
    *
    * @return An arbitrary return value that is be passed to the caller.
    */
-  public abstract R visitConstant(Formula f, Object value);
+  R visitConstant(Formula f, Object value);
 
   /**
    * Visit an arbitrary, potentially uninterpreted function.
@@ -93,7 +81,7 @@ public abstract class FormulaVisitor<R> {
    *                                  with the new arguments as given.
    * @param isUninterpreted Special flag for UFs.
    */
-  public abstract R visitFunction(
+  R visitFunction(
       Formula f,
       List<Formula> args,
       String functionName,
@@ -108,7 +96,7 @@ public abstract class FormulaVisitor<R> {
    * @param body Body of the quantifier.
    * @param newBodyConstructor Constructor to replace a quantified body.
    */
-  public abstract R visitQuantifier(
+  R visitQuantifier(
       BooleanFormula f,
       Quantifier quantifier,
       BooleanFormula body,

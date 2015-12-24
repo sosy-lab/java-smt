@@ -9,14 +9,13 @@ import com.google.common.collect.FluentIterable;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
+class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
 
   private final BooleanFormulaManager bfmgr;
   private final int maxDepth;
@@ -26,13 +25,12 @@ class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
    * Create a Visitor that creates a CNF (if pMaxDepth is -1) or an approximation
    * of a CNF, that uses a heuristic to decide when to stop creating conjuncts.
    *
-   * @param pFmgr the FormulaManager to use
+   * @param pBfmgr the FormulaManager to use
    * @param pMaxDepth the depth up to which point conjuncts should be created,
    *                  -1 is for infinitely deep
    */
-  CNFVisitor(FormulaManager pFmgr, int pMaxDepth) {
-    super(pFmgr);
-    bfmgr = pFmgr.getBooleanFormulaManager();
+  CNFVisitor(BooleanFormulaManager pBfmgr, int pMaxDepth) {
+    bfmgr = pBfmgr;
     maxDepth = pMaxDepth;
   }
 
@@ -60,7 +58,7 @@ class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
   private List<List<BooleanFormula>> visitAll(List<BooleanFormula> pOperands) {
     List<List<BooleanFormula>> args = new ArrayList<>(pOperands.size());
     for (BooleanFormula arg : pOperands) {
-      args.add(visit(arg));
+      args.add(bfmgr.visit(this, arg));
     }
     return args;
   }

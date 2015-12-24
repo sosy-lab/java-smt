@@ -151,7 +151,7 @@ public class CVC4BooleanFormulaManager
       if (arity == 0) {
         return pVisitor.visitFalse();
       } else if (arity == 1) {
-        return pVisitor.visit(getArg(f, 0));
+        return visit(pVisitor, getArg(f, 0));
       }
       return pVisitor.visitOr(getAllArgs(f));
 
