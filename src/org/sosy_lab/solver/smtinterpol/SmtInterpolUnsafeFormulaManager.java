@@ -54,10 +54,16 @@ class SmtInterpolUnsafeFormulaManager
     theory = pTheory;
   }
 
-  /** ApplicationTerms can be wrapped with "|".
-   * This function removes those chars. */
+  /**
+   * ApplicationTerms can be wrapped with "|".
+   * This function removes those chars.
+   **/
   static String dequote(String s) {
-    return s.replace("|", "");
+    int l = s.length();
+    if (s.charAt(0) == '|' && s.charAt(l-1) == '|') {
+      return s.substring(1, l-1);
+    }
+    return s;
   }
 
   @Override
