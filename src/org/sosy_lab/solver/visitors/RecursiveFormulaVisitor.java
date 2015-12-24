@@ -25,7 +25,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.util.Deque;
 import java.util.HashSet;
@@ -59,12 +58,12 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitFreeVariable(String name, FormulaType<?> type) {
+  public Void visitFreeVariable(Formula f, String name) {
     return null;
   }
 
   @Override
-  public Void visitBoundVariable(String name, FormulaType<?> type) {
+  public Void visitBoundVariable(Formula f, String name) {
     return null;
   }
 
@@ -74,7 +73,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args) {
+  public Void visitUF(Formula f, List<Formula> args, String functionName ) {
     for (Formula arg : args) {
       toVisit.add(arg);
     }
@@ -83,9 +82,9 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
 
   @Override
   public Void visitOperator(
-      String functionName,
+      Formula f,
       List<Formula> args,
-      FormulaType<?> type,
+      String functionName,
       Function<List<Formula>, Formula> newApplicationConstructor) {
     for (Formula arg : args) {
       toVisit.add(arg);

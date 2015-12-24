@@ -268,8 +268,8 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
-    return visit(visitor, getFormulaCreator().extractInfo(input));
+    return visit(visitor, input, getFormulaCreator().extractInfo(input));
   }
 
-  protected abstract <R> R visit(FormulaVisitor<R> visitor, TFormulaInfo f);
+  protected abstract <R> R visit(FormulaVisitor<R> visitor, Formula input, TFormulaInfo f);
 }

@@ -46,9 +46,9 @@ public abstract class FormulaVisitor<R> {
     return fmgr.visit(this, f);
   }
 
-  public abstract R visitFreeVariable(String name, FormulaType<?> type);
+  public abstract R visitFreeVariable(Formula f, String name);
 
-  public abstract R visitBoundVariable(String name, FormulaType<?> type);
+  public abstract R visitBoundVariable(Formula f, String name);
 
   /**
    * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".
@@ -60,15 +60,15 @@ public abstract class FormulaVisitor<R> {
    */
   public abstract R visitConstant(Object value, FormulaType<?> type);
 
-  public abstract R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args);
+  public abstract R visitUF(Formula f, List<Formula> args, String functionName);
 
   public abstract R visitOperator(
-      String functionName,
+      Formula f,
       List<Formula> args,
-      FormulaType<?> type,
+      String functionName,
       Function<List<Formula>, Formula> newApplicationConstructor);
 
-  public abstract R visitForAll(List<Formula> variables, BooleanFormula body);
+  public abstract R visitForAll(List<Formula> bound, BooleanFormula body);
 
-  public abstract R visitExists(List<Formula> variables, BooleanFormula body);
+  public abstract R visitExists(List<Formula> bound, BooleanFormula body);
 }

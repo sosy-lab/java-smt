@@ -171,7 +171,7 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final IExpression input) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
       return visitor.visitConstant(value.bigIntValue(), formulaCreator.getFormulaType(input));
@@ -179,25 +179,22 @@ class PrincessUnsafeFormulaManager
       // TODO: quantifier support.
       throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");
     } else if (isBoundVariable(input)) {
-      return visitor.visitBoundVariable(getName(input), formulaCreator.getFormulaType(input));
+      return visitor.visitBoundVariable(f, getName(input));
     } else if (isVariable(input)) {
-      return visitor.visitFreeVariable(getName(input), formulaCreator.getFormulaType(input));
+      return visitor.visitFreeVariable(f, getName(input));
     } else {
       int arity = getArity(input);
       String name = getName(input);
       final FormulaType<?> type = formulaCreator.getFormulaType(input);
       List<Formula> args = new ArrayList<>(arity);
-      List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {
         IExpression arg = getArg(input, i);
         FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-        formulaTypes.add(argumentType);
         args.add(formulaCreator.encapsulate(argumentType, arg));
       }
       if (isUF(input)) {
         // Special casing for UFs.
-        return visitor.visitUF(
-            name, formulaCreator.createUfDeclaration(type, getType(input), formulaTypes), args);
+        return visitor.visitUF(f, args, name);
       } else {
 
         // Any function application.
@@ -208,7 +205,7 @@ class PrincessUnsafeFormulaManager
                 return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
               }
             };
-        return visitor.visitOperator(name, args, type, constructor);
+        return visitor.visitOperator(f, args, name, constructor);
       }
     }
   }

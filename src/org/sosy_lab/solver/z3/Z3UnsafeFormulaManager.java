@@ -318,7 +318,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final Long f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
     String name = getName(f);
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
@@ -331,24 +331,19 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
         if (arity == 0) {
 
           // Variable.
-          return visitor.visitFreeVariable(name, type);
+          return visitor.visitFreeVariable(formula, name);
         }
 
         List<Formula> args = new ArrayList<>(arity);
-        List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
         for (int i = 0; i < arity; i++) {
           long arg = getArg(f, i);
           FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-          formulaTypes.add(argumentType);
           args.add(formulaCreator.encapsulate(argumentType, arg));
         }
 
         if (isUF(f)) {
           // Special casing for UFs.
-          return visitor.visitUF(
-              name,
-              formulaCreator.createUfDeclaration(type, get_app_decl(z3context, f), formulaTypes),
-              args);
+          return visitor.visitUF(formula, args, name);
         } else {
           // Any function application.
           Function<List<Formula>, Formula> constructor =
@@ -358,10 +353,10 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
                   return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
                 }
               };
-          return visitor.visitOperator(name, args, type, constructor);
+          return visitor.visitOperator(formula, args, name, constructor);
         }
       case Z3_VAR_AST:
-        return visitor.visitBoundVariable(name, formulaCreator.getFormulaType(f));
+        return visitor.visitBoundVariable(formula, name);
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         List<Formula> qargs = new ArrayList<>();

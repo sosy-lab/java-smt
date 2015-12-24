@@ -118,7 +118,7 @@ public class CVC4UnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Expr f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Expr f) {
     throw new UnsupportedOperationException("Not implemented");
   }
 }

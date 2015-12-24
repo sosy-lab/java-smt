@@ -189,7 +189,7 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final Term input) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) {
     checkArgument(
         input.getTheory().equals(theory),
         "Given term belongs to a different instance of SMTInterpol: %s",
@@ -212,7 +212,7 @@ class SmtInterpolUnsafeFormulaManager
         } else if (app.equals(theory.mFalse)) {
           return visitor.visitConstant(Boolean.FALSE, formulaType);
         } else if (func.getDefinition() == null) {
-          return visitor.visitFreeVariable(dequote(input.toString()), formulaType);
+          return visitor.visitFreeVariable(f, dequote(input.toString()));
         } else {
           throw new UnsupportedOperationException("Unexpected nullary function " + input);
         }
@@ -220,19 +220,14 @@ class SmtInterpolUnsafeFormulaManager
       } else {
         final String name = func.getName();
         List<Formula> args = new ArrayList<>(arity);
-        List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
         for (int i = 0; i < arity; i++) {
           Term arg = app.getParameters()[i];
           FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-          formulaTypes.add(argumentType);
           args.add(formulaCreator.encapsulate(argumentType, arg));
         }
 
         if (!func.isIntern() && !func.isInterpreted()) {
-          return visitor.visitUF(
-              name,
-              formulaCreator.createUfDeclaration(formulaType, input.getSort(), formulaTypes),
-              args);
+          return visitor.visitUF(f, args, name);
         } else {
 
           // Any function application.
@@ -243,7 +238,7 @@ class SmtInterpolUnsafeFormulaManager
                   return replaceArgs(formulaCreator.encapsulate(formulaType, input), formulas);
                 }
               };
-          return visitor.visitOperator(name, args, formulaType, constructor);
+          return visitor.visitOperator(f, args, name, constructor);
         }
       }
 

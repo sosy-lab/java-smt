@@ -33,7 +33,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
@@ -137,7 +137,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     FormulaVisitor<Void> nameExtractor =
         new RecursiveFormulaVisitor(mgr) {
           @Override
-          public Void visitFreeVariable(String name, FormulaType<?> type) {
+          public Void visitFreeVariable(Formula f, String name) {
             usedVariables.add(name);
             return null;
           }

@@ -96,21 +96,19 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final Long f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
     int arity = getArity(f);
     if (msat_term_is_number(msatEnv, f)) {
       // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
       return visitor.visitConstant(msat_term_repr(f), formulaCreator.getFormulaType(f));
     } else if (isVariable(f)) {
-      return visitor.visitFreeVariable(getName(f), formulaCreator.getFormulaType(f));
+      return visitor.visitFreeVariable(formula, getName(f));
     } else {
 
-      List<FormulaType<?>> formulaTypes = new ArrayList<>(arity);
       List<Formula> args = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {
         long arg = getArg(f, i);
         FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-        formulaTypes.add(argumentType);
         args.add(formulaCreator.encapsulate(argumentType, arg));
       }
 
@@ -118,11 +116,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       String name = getName(f);
 
       if (isUF(f)) {
-        return visitor.visitUF(
-            name,
-            formulaCreator.createUfDeclaration(
-                formulaCreator.getFormulaType(f), msat_term_get_decl(f), formulaTypes),
-            args);
+        return visitor.visitUF(formula, args, name);
       } else {
 
         // Any function application.
@@ -133,7 +127,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
                 return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
               }
             };
-        return visitor.visitOperator(name, args, type, constructor);
+        return visitor.visitOperator(formula, args, name, constructor);
       }
     }
   }

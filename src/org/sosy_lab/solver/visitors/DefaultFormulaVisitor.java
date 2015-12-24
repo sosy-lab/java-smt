@@ -25,7 +25,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.util.List;
 
@@ -37,12 +36,12 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   protected abstract R visitDefault();
 
   @Override
-  public R visitFreeVariable(String name, FormulaType<?> type) {
+  public R visitFreeVariable(Formula f, String name) {
     return visitDefault();
   }
 
   @Override
-  public R visitBoundVariable(String name, FormulaType<?> type) {
+  public R visitBoundVariable(Formula f, String name) {
     return visitDefault();
   }
 
@@ -52,15 +51,13 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitUF(String functionName, UfDeclaration<?> declaration, List<Formula> args) {
+  public R visitUF(Formula f, List<Formula> args, String functionName) {
     return visitDefault();
   }
 
   @Override
-  public R visitOperator(
+  public R visitOperator(Formula f, List<Formula> args,
       String functionName,
-      List<Formula> args,
-      FormulaType<?> type,
       Function<List<Formula>, Formula> newApplicationConstructor) {
     return visitDefault();
   }
