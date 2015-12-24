@@ -31,6 +31,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import javax.annotation.Nullable;
 
@@ -213,5 +215,17 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   protected TFormulaInfo simplify(TFormulaInfo f) {
     return f;
+  }
+
+  @Override
+  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
+    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
+    recVisitor.addToQueue(pF);
+    while (!recVisitor.isQueueEmpty()) {
+      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
   }
 }

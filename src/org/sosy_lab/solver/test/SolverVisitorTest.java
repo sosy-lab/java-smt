@@ -40,7 +40,9 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
-import org.sosy_lab.solver.visitors.RecursiveFormulaVisitor;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -135,15 +137,20 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     final Set<String> usedVariables = new HashSet<>();
 
-    RecursiveFormulaVisitor nameExtractor =
-        new RecursiveFormulaVisitor(mgr) {
+    FormulaVisitor<TraversalProcess> nameExtractor =
+        new DefaultFormulaVisitor<TraversalProcess>() {
           @Override
-          public Void visitFreeVariable(Formula f, String name) {
+          protected TraversalProcess visitDefault() {
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFreeVariable(Formula f, String name) {
             usedVariables.add(name);
-            return null;
+            return TraversalProcess.CONTINUE;
           }
         };
-    nameExtractor.visit(f);
+    mgr.visitRecursively(nameExtractor, f);
     assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
   }
 

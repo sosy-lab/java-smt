@@ -22,6 +22,7 @@ package org.sosy_lab.solver.api;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 /**
  * Instances of this interface provide access to an SMT solver.
@@ -163,4 +164,15 @@ public interface FormulaManager {
    * Visit the formula with a given visitor.
    */
   <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f);
+
+  /**
+   * Visit the formula recursively with a given {@link FormulaVisitor}.
+   *
+   * <p>This method guarantees that the traversal is done iteratively,
+   * without using Java recursion, and thus is not prone to StackOverflowErrors.
+   *
+   * <p>Furthermore, this method also guarantees that every equal part of the formula
+   * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   */
+  void visitRecursively(FormulaVisitor<TraversalProcess> rFormulaVisitor, Formula f);
 }
