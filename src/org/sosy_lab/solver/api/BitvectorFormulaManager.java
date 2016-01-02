@@ -36,12 +36,11 @@ public interface BitvectorFormulaManager {
 
   // Numeric Operations
 
-  BitvectorFormula negate(BitvectorFormula number, boolean resultSigned);
+  BitvectorFormula negate(BitvectorFormula number);
 
-  BitvectorFormula add(BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
+  BitvectorFormula add(BitvectorFormula number1, BitvectorFormula number2);
 
-  BitvectorFormula subtract(
-      BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
+  BitvectorFormula subtract(BitvectorFormula number1, BitvectorFormula number2);
 
   BitvectorFormula divide(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
@@ -50,8 +49,7 @@ public interface BitvectorFormulaManager {
   BooleanFormula modularCongruence(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, long pModulo);
 
-  BitvectorFormula multiply(
-      BitvectorFormula number1, BitvectorFormula number2, boolean resultSigned);
+  BitvectorFormula multiply(BitvectorFormula number1, BitvectorFormula number2);
 
   // ----------------- Numeric relations -----------------
 

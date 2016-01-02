@@ -53,7 +53,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   @Override
-  public BitvectorFormula negate(BitvectorFormula pNumber, boolean signed) {
+  public BitvectorFormula negate(BitvectorFormula pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
     return wrap(negate(param1));
   }
@@ -61,8 +61,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
 
   @Override
-  public BitvectorFormula add(
-      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula add(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkSameSize(pNumber1, pNumber2, "add");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -73,8 +72,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public BitvectorFormula subtract(
-      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula subtract(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkSameSize(pNumber1, pNumber2, "subtract");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -123,8 +121,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
       TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
 
   @Override
-  public BitvectorFormula multiply(
-      BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
+  public BitvectorFormula multiply(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkSameSize(pNumber1, pNumber2, "modulo");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
