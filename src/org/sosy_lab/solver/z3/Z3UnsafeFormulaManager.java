@@ -320,12 +320,12 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
-    String name = getName(f);
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
         // TODO extract logic from Z3Model for conversion from string to number and use it here
         return visitor.visitConstant(formula, ast_to_string(z3context, f));
       case Z3_APP_AST:
+        String name = getName(f);
         final FormulaType<?> type = formulaCreator.getFormulaType(f);
         int arity = getArity(f);
 
@@ -352,7 +352,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
             };
         return visitor.visitFunction(formula, args, name, constructor, isUF(f));
       case Z3_VAR_AST:
-        return visitor.visitBoundVariable(formula, name);
+        return visitor.visitBoundVariable(formula, getName(f));
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         List<Formula> qargs = new ArrayList<>();
