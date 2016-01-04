@@ -852,9 +852,19 @@ final class Z3NativeApi {
    */
   static native int get_quantifier_num_bound(long context, long a1);
 
-  static native long get_quantifier_bound_name(long context, long a1, int a2);
+  /**
+   * Return symbol of the i'th bound variable.
+   *
+   * @return Z3_symbol
+   */
+  static native long get_quantifier_bound_name(long context, long a1, int i);
 
-  static native long get_quantifier_bound_sort(long context, long a1, int a2);
+  /**
+   * Returns sort of the i'th bound variable.
+   *
+   * @return Z3_sort
+   */
+  static native long get_quantifier_bound_sort(long context, long a1, int i);
 
   static native long get_quantifier_body(long context, long a1);
 

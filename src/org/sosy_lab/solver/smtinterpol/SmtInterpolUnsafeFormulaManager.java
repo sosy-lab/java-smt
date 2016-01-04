@@ -228,8 +228,8 @@ class SmtInterpolUnsafeFormulaManager
                 return replaceArgs(formulaCreator.encapsulate(formulaType, input), formulas);
               }
             };
-        return visitor.visitFunction(f, args, name, constructor,
-            !(func.isIntern() || func.isInterpreted()));
+        return visitor.visitFunction(
+            f, args, name, constructor, !(func.isIntern() || func.isInterpreted()));
       }
 
     } else {

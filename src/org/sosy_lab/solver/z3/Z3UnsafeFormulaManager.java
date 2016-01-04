@@ -34,7 +34,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_pattern_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
@@ -357,9 +356,12 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         List<Formula> qargs = new ArrayList<>();
         for (int i = 0; i < get_quantifier_num_bound(z3context, f); i++) {
-          long arg = get_quantifier_pattern_ast(z3context, f, i);
-          FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
-          qargs.add(formulaCreator.encapsulate(argumentType, arg));
+          long varName = get_quantifier_bound_name(z3context, f, i);
+          long varSort = get_quantifier_bound_sort(z3context, f, i);
+          long ast = mk_const(z3context, varName, varSort);
+          Formula arg =
+              formulaCreator.encapsulate(formulaCreator.getFormulaTypeFromSort(varSort), ast);
+          qargs.add(arg);
         }
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
         return visitor.visitQuantifier(formula, q, qargs, body);
