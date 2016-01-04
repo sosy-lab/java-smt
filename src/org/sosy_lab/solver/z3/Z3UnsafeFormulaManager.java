@@ -324,7 +324,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
         // TODO extract logic from Z3Model for conversion from string to number and use it here
-        return visitor.visitConstant(ast_to_string(z3context, f), formulaCreator.getFormulaType(f));
+        return visitor.visitConstant(formula, ast_to_string(z3context, f));
       case Z3_APP_AST:
         final FormulaType<?> type = formulaCreator.getFormulaType(f);
         int arity = getArity(f);
@@ -366,9 +366,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
           qargs.add(formulaCreator.encapsulate(argumentType, arg));
         }
-        Quantifier q = is_quantifier_forall(z3context, f)
-            ? Quantifier.FORALL : Quantifier.EXISTS;
-        return visitor.visitQuantifier(q, qargs, body);
+        Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
+        return visitor.visitQuantifier(formula, q, qargs, body);
 
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:

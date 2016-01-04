@@ -24,7 +24,6 @@ import com.google.common.base.Function;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitConstant(Object value, FormulaType<?> type) {
+  public R visitConstant(Formula f, Object value) {
     return visitDefault();
   }
 
@@ -57,14 +56,16 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitOperator(Formula f, List<Formula> args,
+  public R visitOperator(
+      Formula f,
+      List<Formula> args,
       String functionName,
       Function<List<Formula>, Formula> newApplicationConstructor) {
     return visitDefault();
   }
 
   @Override
-  public R visitQuantifier(Quantifier q, List<Formula> variables, BooleanFormula body) {
+  public R visitQuantifier(Formula f, Quantifier q, List<Formula> variables, BooleanFormula body) {
     return visitDefault();
   }
 }

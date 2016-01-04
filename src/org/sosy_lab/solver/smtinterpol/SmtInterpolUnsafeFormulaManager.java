@@ -198,7 +198,7 @@ class SmtInterpolUnsafeFormulaManager
     if (SmtInterpolUtil.isNumber(input)) {
       final Object value = SmtInterpolUtil.toNumber(input);
       assert value instanceof Number;
-      return visitor.visitConstant(value, formulaType);
+      return visitor.visitConstant(f, value);
 
     } else if (input instanceof ApplicationTerm) {
       final ApplicationTerm app = (ApplicationTerm) input;
@@ -207,9 +207,9 @@ class SmtInterpolUnsafeFormulaManager
 
       if (arity == 0) {
         if (app.equals(theory.mTrue)) {
-          return visitor.visitConstant(Boolean.TRUE, formulaType);
+          return visitor.visitConstant(f, Boolean.TRUE);
         } else if (app.equals(theory.mFalse)) {
-          return visitor.visitConstant(Boolean.FALSE, formulaType);
+          return visitor.visitConstant(f, Boolean.FALSE);
         } else if (func.getDefinition() == null) {
           return visitor.visitFreeVariable(f, dequote(input.toString()));
         } else {

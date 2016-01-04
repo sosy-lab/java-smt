@@ -174,7 +174,7 @@ class PrincessUnsafeFormulaManager
   public <R> R visit(FormulaVisitor<R> visitor, Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
-      return visitor.visitConstant(value.bigIntValue(), formulaCreator.getFormulaType(input));
+      return visitor.visitConstant(f, value.bigIntValue());
     } else if (isQuantification(input)) {
       // TODO: quantifier support.
       throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");

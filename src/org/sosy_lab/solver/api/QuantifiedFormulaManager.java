@@ -31,7 +31,8 @@ import java.util.List;
 public interface QuantifiedFormulaManager {
 
   enum Quantifier {
-    FORALL, EXISTS
+    FORALL,
+    EXISTS
   }
 
   /**

@@ -25,7 +25,6 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.math.BigDecimal;
@@ -56,13 +55,13 @@ public abstract class FormulaVisitor<R> {
   /**
    * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".
    *
+   * @param f Formula representing the constant.
    * @param value The value of the constant. It is either of type {@link Boolean} or of a subtype
    *     of {@link Number}, in most cases a {@link BigInteger}, {@link BigDecimal},
    *     or {@link Rational}.
-   * @param type The formula type of the constant.
    * @return An arbitrary return value that is be passed to the caller.
    */
-  public abstract R visitConstant(Object value, FormulaType<?> type);
+  public abstract R visitConstant(Formula f, Object value);
 
   public abstract R visitUF(Formula f, List<Formula> args, String functionName);
 
@@ -77,5 +76,5 @@ public abstract class FormulaVisitor<R> {
       Function<List<Formula>, Formula> newApplicationConstructor);
 
   public abstract R visitQuantifier(
-      Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);
+      Formula f, Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);
 }

@@ -90,15 +90,17 @@ public class PrincessQuantifiedFormulaManager
   @Override
   protected boolean isForall(IExpression pExtractInfo) {
     return isQuantifier(pExtractInfo)
-        && ((IQuantified) pExtractInfo).quan().equals(
-          ap.terfor.conjunctions.Quantifier.apply(true));
+        && ((IQuantified) pExtractInfo)
+            .quan()
+            .equals(ap.terfor.conjunctions.Quantifier.apply(true));
   }
 
   @Override
   protected boolean isExists(IExpression pExtractInfo) {
     return isQuantifier(pExtractInfo)
-        && ((IQuantified) pExtractInfo).quan().equals(
-          ap.terfor.conjunctions.Quantifier.apply(false));
+        && ((IQuantified) pExtractInfo)
+            .quan()
+            .equals(ap.terfor.conjunctions.Quantifier.apply(false));
   }
 
   @Override

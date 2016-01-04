@@ -24,7 +24,6 @@ import com.google.common.base.Function;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.Deque;
@@ -69,7 +68,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitConstant(Object value, FormulaType<?> type) {
+  public Void visitConstant(Formula f, Object value) {
     return null;
   }
 
@@ -94,7 +93,8 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitQuantifier(Quantifier q, List<Formula> variables, BooleanFormula body) {
+  public Void visitQuantifier(
+      Formula f, Quantifier q, List<Formula> variables, BooleanFormula body) {
     toVisit.add(body);
     return null;
   }

@@ -100,7 +100,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
     int arity = getArity(f);
     if (msat_term_is_number(msatEnv, f)) {
       // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
-      return visitor.visitConstant(msat_term_repr(f), formulaCreator.getFormulaType(f));
+      return visitor.visitConstant(formula, msat_term_repr(f));
     } else if (isVariable(f)) {
       return visitor.visitFreeVariable(formula, getName(f));
     } else {
