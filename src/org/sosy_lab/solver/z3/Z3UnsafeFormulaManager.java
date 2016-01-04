@@ -365,7 +365,9 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
         }
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
         return visitor.visitQuantifier(
-            (BooleanFormula) formula, q, body,
+            (BooleanFormula) formula,
+            q,
+            body,
             new Function<BooleanFormula, BooleanFormula>() {
               @Override
               public BooleanFormula apply(BooleanFormula booleanFormula) {

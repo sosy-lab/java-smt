@@ -97,9 +97,7 @@ class PrincessUtil {
 
   public static boolean isForall(IExpression t) {
     return isQuantifier(t)
-        && ((IQuantified) t)
-        .quan()
-        .equals(ap.terfor.conjunctions.Quantifier.apply(true));
+        && ((IQuantified) t).quan().equals(ap.terfor.conjunctions.Quantifier.apply(true));
   }
 
   /**

@@ -232,13 +232,13 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitQuantifier(List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
+    public Void visitQuantifier(
+        List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
       if (started) {
         visit(pBody);
       }
       return null;
     }
-
   }
 
   private static class NNFChecker extends BooleanFormulaVisitor<Void> {
@@ -338,7 +338,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitQuantifier(List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
+    public Void visitQuantifier(
+        List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {

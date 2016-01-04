@@ -179,8 +179,7 @@ class PrincessUnsafeFormulaManager
       return visitor.visitConstant(f, value.bigIntValue());
     } else if (isQuantification(input)) {
       IExpression body = PrincessUtil.getQuantifierBody(input);
-      Quantifier q = PrincessUtil.isForall(input)
-          ? Quantifier.FORALL : Quantifier.EXISTS;
+      Quantifier q = PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS;
       return visitor.visitQuantifier(
           (BooleanFormula) f,
           q,
@@ -190,8 +189,7 @@ class PrincessUnsafeFormulaManager
             public BooleanFormula apply(BooleanFormula booleanFormula) {
               return replaceQuantifiedBody((BooleanFormula) f, booleanFormula);
             }
-          }
-      );
+          });
     } else if (isBoundVariable(input)) {
       return visitor.visitBoundVariable(f, getName(input), PrincessUtil.getIndex(input));
     } else if (isVariable(input)) {
