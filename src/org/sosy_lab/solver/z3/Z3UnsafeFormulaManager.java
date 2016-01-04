@@ -354,15 +354,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
         return visitor.visitBoundVariable(formula, getName(f), get_index_value(z3context, f));
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
-        List<Formula> qargs = new ArrayList<>();
-        for (int i = 0; i < get_quantifier_num_bound(z3context, f); i++) {
-          long varName = get_quantifier_bound_name(z3context, f, i);
-          long varSort = get_quantifier_bound_sort(z3context, f, i);
-          long ast = mk_const(z3context, varName, varSort);
-          Formula arg =
-              formulaCreator.encapsulate(formulaCreator.getFormulaTypeFromSort(varSort), ast);
-          qargs.add(arg);
-        }
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
         return visitor.visitQuantifier(
             (BooleanFormula) formula,
