@@ -24,6 +24,7 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,18 +137,15 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitForAll(List<Formula> variables, BooleanFormula body) {
-    if (null == qfmgr) {
+  public BooleanFormula visitQuantifier(
+      List<Formula> variables, BooleanFormula body, Quantifier quantifier) {
+    if (qfmgr == null) {
       throw new UnsupportedOperationException();
     }
-    return qfmgr.forall(variables, visitIfNotSeen(body));
-  }
-
-  @Override
-  public BooleanFormula visitExists(List<Formula> variables, BooleanFormula body) {
-    if (null == qfmgr) {
-      throw new UnsupportedOperationException();
+    if (quantifier == Quantifier.FORALL) {
+      return qfmgr.forall(variables, visitIfNotSeen(body));
+    } else {
+      return qfmgr.exists(variables, visitIfNotSeen(body));
     }
-    return qfmgr.exists(variables, visitIfNotSeen(body));
   }
 }

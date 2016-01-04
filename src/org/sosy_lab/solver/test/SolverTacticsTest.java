@@ -31,6 +31,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -231,20 +232,13 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitExists(List<Formula> pVariables, BooleanFormula pBody) {
+    public Void visitQuantifier(List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
       if (started) {
         visit(pBody);
       }
       return null;
     }
 
-    @Override
-    public Void visitForAll(List<Formula> pVariables, BooleanFormula pBody) {
-      if (started) {
-        visit(pBody);
-      }
-      return null;
-    }
   }
 
   private static class NNFChecker extends BooleanFormulaVisitor<Void> {
@@ -344,17 +338,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitForAll(List<Formula> pVariables, BooleanFormula pBody) {
-      if (wasLastVisitNot) {
-        notOnlyAtAtoms = false;
-      } else {
-        visit(pBody);
-      }
-      return null;
-    }
-
-    @Override
-    public Void visitExists(List<Formula> pVariables, BooleanFormula pBody) {
+    public Void visitQuantifier(List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {

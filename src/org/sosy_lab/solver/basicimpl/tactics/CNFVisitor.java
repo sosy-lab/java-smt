@@ -11,6 +11,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.ArrayList;
@@ -146,16 +147,8 @@ class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitForAll(List<Formula> pVariables, BooleanFormula pBody) {
-    // the traversed formula is assumed to be in NNF without ITEs
-    // so we can throw an exception here
-    throw new IllegalStateException("Traversed formula is not in NNF without Quantifiers");
-  }
-
-  @Override
-  public List<BooleanFormula> visitExists(List<Formula> pVariables, BooleanFormula pBody) {
-    // the traversed formula is assumed to be in NNF without ITEs
-    // so we can throw an exception here
-    throw new IllegalStateException("Traversed formula is not in NNF without Quantifiers");
+  public List<BooleanFormula> visitQuantifier(
+      List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
+    throw new IllegalStateException("Traversed formula is not in NNF if quantifiers are present");
   }
 }
