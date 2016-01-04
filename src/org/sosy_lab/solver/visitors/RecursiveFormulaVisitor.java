@@ -25,6 +25,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.Deque;
 import java.util.HashSet;
@@ -93,13 +94,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitForAll(List<Formula> variables, BooleanFormula body) {
-    toVisit.add(body);
-    return null;
-  }
-
-  @Override
-  public Void visitExists(List<Formula> variables, BooleanFormula body) {
+  public Void visitQuantifier(Quantifier q, List<Formula> variables, BooleanFormula body) {
     toVisit.add(body);
     return null;
   }

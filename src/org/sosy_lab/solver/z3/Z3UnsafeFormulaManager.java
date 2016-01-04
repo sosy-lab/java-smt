@@ -84,6 +84,7 @@ import com.google.common.primitives.Longs;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
@@ -365,12 +366,9 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
           qargs.add(formulaCreator.encapsulate(argumentType, arg));
         }
-
-        if (is_quantifier_forall(z3context, f)) {
-          return visitor.visitForAll(qargs, body);
-        } else {
-          return visitor.visitExists(qargs, body);
-        }
+        Quantifier q = is_quantifier_forall(z3context, f)
+            ? Quantifier.FORALL : Quantifier.EXISTS;
+        return visitor.visitQuantifier(q, qargs, body);
 
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:

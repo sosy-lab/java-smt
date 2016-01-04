@@ -26,6 +26,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -47,10 +48,14 @@ public abstract class FormulaVisitor<R> {
 
   public abstract R visitFreeVariable(Formula f, String name);
 
+  /**
+   * Visit a variable bound by a quantifier.
+   */
   public abstract R visitBoundVariable(Formula f, String name);
 
   /**
    * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".
+   *
    * @param value The value of the constant. It is either of type {@link Boolean} or of a subtype
    *     of {@link Number}, in most cases a {@link BigInteger}, {@link BigDecimal},
    *     or {@link Rational}.
@@ -61,13 +66,16 @@ public abstract class FormulaVisitor<R> {
 
   public abstract R visitUF(Formula f, List<Formula> args, String functionName);
 
+  /**
+   * Visit any function application, except for uninterpreted functions
+   * (which is handled by {@link #visitUF}).
+   */
   public abstract R visitOperator(
       Formula f,
       List<Formula> args,
       String functionName,
       Function<List<Formula>, Formula> newApplicationConstructor);
 
-  public abstract R visitForAll(List<Formula> bound, BooleanFormula body);
-
-  public abstract R visitExists(List<Formula> bound, BooleanFormula body);
+  public abstract R visitQuantifier(
+      Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);
 }

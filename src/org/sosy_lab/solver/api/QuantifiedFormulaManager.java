@@ -30,6 +30,10 @@ import java.util.List;
  */
 public interface QuantifiedFormulaManager {
 
+  enum Quantifier {
+    FORALL, EXISTS
+  }
+
   /**
    * @return An existentially quantified formula.
    *

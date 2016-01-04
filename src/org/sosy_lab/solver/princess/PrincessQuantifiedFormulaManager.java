@@ -27,7 +27,6 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IQuantified;
 import ap.terfor.ConstantTerm;
-import ap.terfor.conjunctions.Quantifier;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.TermType;
@@ -53,7 +52,7 @@ public class PrincessQuantifiedFormulaManager
     checkArgument(pBody instanceof IFormula);
 
     return IExpression.quanConsts(
-        Quantifier.EX$.MODULE$,
+        ap.terfor.conjunctions.Quantifier.EX$.MODULE$,
         iterableAsScalaIterable(toConstantTerm(pVariables)),
         (IFormula) pBody);
   }
@@ -63,7 +62,7 @@ public class PrincessQuantifiedFormulaManager
     checkArgument(pBody instanceof IFormula);
 
     return IExpression.quanConsts(
-        Quantifier.ALL$.MODULE$,
+        ap.terfor.conjunctions.Quantifier.ALL$.MODULE$,
         iterableAsScalaIterable(toConstantTerm(pVariables)),
         (IFormula) pBody);
   }
@@ -91,13 +90,15 @@ public class PrincessQuantifiedFormulaManager
   @Override
   protected boolean isForall(IExpression pExtractInfo) {
     return isQuantifier(pExtractInfo)
-        && ((IQuantified) pExtractInfo).quan().equals(Quantifier.apply(true));
+        && ((IQuantified) pExtractInfo).quan().equals(
+          ap.terfor.conjunctions.Quantifier.apply(true));
   }
 
   @Override
   protected boolean isExists(IExpression pExtractInfo) {
     return isQuantifier(pExtractInfo)
-        && ((IQuantified) pExtractInfo).quan().equals(Quantifier.apply(false));
+        && ((IQuantified) pExtractInfo).quan().equals(
+          ap.terfor.conjunctions.Quantifier.apply(false));
   }
 
   @Override
