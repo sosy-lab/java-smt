@@ -63,7 +63,7 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitBoundVariable(Formula f, String name) {
+  public Void visitBoundVariable(Formula f, String name, int deBruijnIdx) {
     return null;
   }
 
@@ -87,7 +87,10 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
 
   @Override
   public Void visitQuantifier(
-      Formula f, Quantifier q, List<Formula> variables, BooleanFormula body) {
+      BooleanFormula f,
+      Quantifier q,
+      BooleanFormula body,
+      Function<BooleanFormula, BooleanFormula> newBodyConstructor) {
     toVisit.add(body);
     return null;
   }

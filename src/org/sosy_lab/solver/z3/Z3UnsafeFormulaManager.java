@@ -318,7 +318,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
+  public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (get_ast_kind(z3context, f)) {
       case Z3_NUMERAL_AST:
         // TODO extract logic from Z3Model for conversion from string to number and use it here
@@ -351,7 +351,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
             };
         return visitor.visitFunction(formula, args, name, constructor, isUF(f));
       case Z3_VAR_AST:
-        return visitor.visitBoundVariable(formula, getName(f));
+        return visitor.visitBoundVariable(formula, getName(f), get_index_value(z3context, f));
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         List<Formula> qargs = new ArrayList<>();
@@ -364,7 +364,14 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           qargs.add(arg);
         }
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        return visitor.visitQuantifier(formula, q, qargs, body);
+        return visitor.visitQuantifier(
+            (BooleanFormula) formula, q, body,
+            new Function<BooleanFormula, BooleanFormula>() {
+              @Override
+              public BooleanFormula apply(BooleanFormula booleanFormula) {
+                return replaceQuantifiedBody((BooleanFormula) formula, booleanFormula);
+              }
+            });
 
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:

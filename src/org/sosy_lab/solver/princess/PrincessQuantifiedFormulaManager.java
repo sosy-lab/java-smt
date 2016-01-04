@@ -89,10 +89,7 @@ public class PrincessQuantifiedFormulaManager
 
   @Override
   protected boolean isForall(IExpression pExtractInfo) {
-    return isQuantifier(pExtractInfo)
-        && ((IQuantified) pExtractInfo)
-            .quan()
-            .equals(ap.terfor.conjunctions.Quantifier.apply(true));
+    return PrincessUtil.isForall(pExtractInfo);
   }
 
   @Override

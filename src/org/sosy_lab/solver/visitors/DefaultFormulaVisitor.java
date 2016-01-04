@@ -41,7 +41,7 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitBoundVariable(Formula f, String name) {
+  public R visitBoundVariable(Formula f, String name, int deBruijnIdx) {
     return visitDefault();
   }
 
@@ -61,7 +61,11 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitQuantifier(Formula f, Quantifier q, List<Formula> variables, BooleanFormula body) {
+  public R visitQuantifier(
+      BooleanFormula f,
+      Quantifier q,
+      BooleanFormula body,
+      Function<BooleanFormula, BooleanFormula> bodyTransformer) {
     return visitDefault();
   }
 }

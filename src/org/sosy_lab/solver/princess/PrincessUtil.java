@@ -95,6 +95,22 @@ class PrincessUtil {
     return t instanceof IVariable;
   }
 
+  public static boolean isForall(IExpression t) {
+    return isQuantifier(t)
+        && ((IQuantified) t)
+        .quan()
+        .equals(ap.terfor.conjunctions.Quantifier.apply(true));
+  }
+
+  /**
+   * Returns de-Bruijn index for a quantified variable.
+   */
+  public static int getIndex(IExpression t) {
+    Preconditions.checkState(isBoundByQuantifier(t));
+    IVariable v = (IVariable) t;
+    return v.index();
+  }
+
   public static IExpression getQuantifierBody(IExpression t) {
     Preconditions.checkState(isQuantifier(t));
     return ((IQuantified) t).subformula();

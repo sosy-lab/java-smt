@@ -50,7 +50,7 @@ public abstract class FormulaVisitor<R> {
   /**
    * Visit a variable bound by a quantifier.
    */
-  public abstract R visitBoundVariable(Formula f, String name);
+  public abstract R visitBoundVariable(Formula f, String name, int deBruijnIdx);
 
   /**
    * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".
@@ -59,10 +59,17 @@ public abstract class FormulaVisitor<R> {
    * @param value The value of the constant. It is either of type {@link Boolean} or of a subtype
    *     of {@link Number}, in most cases a {@link BigInteger}, {@link BigDecimal},
    *     or {@link Rational}.
+   *
    * @return An arbitrary return value that is be passed to the caller.
    */
   public abstract R visitConstant(Formula f, Object value);
 
+  /**
+   * Visit an arbitrary, potentially uninterpreted function.
+   *
+   * @param newApplicationConstructor Construct a new function of the same type,
+   *                                  with the new arguments as given.
+   */
   public abstract R visitFunction(
       Formula f,
       List<Formula> args,
@@ -70,6 +77,14 @@ public abstract class FormulaVisitor<R> {
       Function<List<Formula>, Formula> newApplicationConstructor,
       boolean isUninterpreted);
 
+  /**
+   * Visit a quantified node.
+   *
+   * @param newBodyConstructor Constructor to replace a quantified body.
+   */
   public abstract R visitQuantifier(
-      Formula f, Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);
+      BooleanFormula f,
+      Quantifier quantifier,
+      BooleanFormula body,
+      Function<BooleanFormula, BooleanFormula> newBodyConstructor);
 }

@@ -36,8 +36,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
@@ -171,15 +173,27 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula f, final IExpression input) {
+  public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
       return visitor.visitConstant(f, value.bigIntValue());
     } else if (isQuantification(input)) {
-      // TODO: quantifier support.
-      throw new UnsupportedOperationException("Quantifiers " + "for Princess not supported");
+      IExpression body = PrincessUtil.getQuantifierBody(input);
+      Quantifier q = PrincessUtil.isForall(input)
+          ? Quantifier.FORALL : Quantifier.EXISTS;
+      return visitor.visitQuantifier(
+          (BooleanFormula) f,
+          q,
+          formulaCreator.encapsulateBoolean(body),
+          new Function<BooleanFormula, BooleanFormula>() {
+            @Override
+            public BooleanFormula apply(BooleanFormula booleanFormula) {
+              return replaceQuantifiedBody((BooleanFormula) f, booleanFormula);
+            }
+          }
+      );
     } else if (isBoundVariable(input)) {
-      return visitor.visitBoundVariable(f, getName(input));
+      return visitor.visitBoundVariable(f, getName(input), PrincessUtil.getIndex(input));
     } else if (isVariable(input)) {
       return visitor.visitFreeVariable(f, getName(input));
     } else {
