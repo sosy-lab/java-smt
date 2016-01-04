@@ -51,16 +51,12 @@ public abstract class DefaultFormulaVisitor<R> extends FormulaVisitor<R> {
   }
 
   @Override
-  public R visitUF(Formula f, List<Formula> args, String functionName) {
-    return visitDefault();
-  }
-
-  @Override
-  public R visitOperator(
+  public R visitFunction(
       Formula f,
       List<Formula> args,
       String functionName,
-      Function<List<Formula>, Formula> newApplicationConstructor) {
+      Function<List<Formula>, Formula> newApplicationConstructor,
+      boolean isUF) {
     return visitDefault();
   }
 

@@ -73,19 +73,12 @@ public abstract class RecursiveFormulaVisitor extends FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitUF(Formula f, List<Formula> args, String functionName) {
-    for (Formula arg : args) {
-      toVisit.add(arg);
-    }
-    return null;
-  }
-
-  @Override
-  public Void visitOperator(
+  public Void visitFunction(
       Formula f,
       List<Formula> args,
       String functionName,
-      Function<List<Formula>, Formula> newApplicationConstructor) {
+      Function<List<Formula>, Formula> newApplicationConstructor,
+      boolean isUninterpreted) {
     for (Formula arg : args) {
       toVisit.add(arg);
     }

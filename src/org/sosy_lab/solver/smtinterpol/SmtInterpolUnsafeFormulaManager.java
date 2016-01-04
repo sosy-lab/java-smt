@@ -220,20 +220,16 @@ class SmtInterpolUnsafeFormulaManager
         final String name = func.getName();
         final List<Formula> args = formulaCreator.encapsulate(app.getParameters());
 
-        if (!func.isIntern() && !func.isInterpreted()) {
-          return visitor.visitUF(f, args, name);
-        } else {
-
-          // Any function application.
-          Function<List<Formula>, Formula> constructor =
-              new Function<List<Formula>, Formula>() {
-                @Override
-                public Formula apply(List<Formula> formulas) {
-                  return replaceArgs(formulaCreator.encapsulate(formulaType, input), formulas);
-                }
-              };
-          return visitor.visitOperator(f, args, name, constructor);
-        }
+        // Any function application.
+        Function<List<Formula>, Formula> constructor =
+            new Function<List<Formula>, Formula>() {
+              @Override
+              public Formula apply(List<Formula> formulas) {
+                return replaceArgs(formulaCreator.encapsulate(formulaType, input), formulas);
+              }
+            };
+        return visitor.visitFunction(f, args, name, constructor,
+            !(func.isIntern() || func.isInterpreted()));
       }
 
     } else {

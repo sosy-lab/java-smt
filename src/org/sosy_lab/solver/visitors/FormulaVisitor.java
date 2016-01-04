@@ -63,17 +63,12 @@ public abstract class FormulaVisitor<R> {
    */
   public abstract R visitConstant(Formula f, Object value);
 
-  public abstract R visitUF(Formula f, List<Formula> args, String functionName);
-
-  /**
-   * Visit any function application, except for uninterpreted functions
-   * (which is handled by {@link #visitUF}).
-   */
-  public abstract R visitOperator(
+  public abstract R visitFunction(
       Formula f,
       List<Formula> args,
       String functionName,
-      Function<List<Formula>, Formula> newApplicationConstructor);
+      Function<List<Formula>, Formula> newApplicationConstructor,
+      boolean isUninterpreted);
 
   public abstract R visitQuantifier(
       Formula f, Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);

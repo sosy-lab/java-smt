@@ -342,20 +342,15 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           args.add(formulaCreator.encapsulate(argumentType, arg));
         }
 
-        if (isUF(f)) {
-          // Special casing for UFs.
-          return visitor.visitUF(formula, args, name);
-        } else {
-          // Any function application.
-          Function<List<Formula>, Formula> constructor =
-              new Function<List<Formula>, Formula>() {
-                @Override
-                public Formula apply(List<Formula> formulas) {
-                  return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
-                }
-              };
-          return visitor.visitOperator(formula, args, name, constructor);
-        }
+        // Any function application.
+        Function<List<Formula>, Formula> constructor =
+            new Function<List<Formula>, Formula>() {
+              @Override
+              public Formula apply(List<Formula> formulas) {
+                return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
+              }
+            };
+        return visitor.visitFunction(formula, args, name, constructor, isUF(f));
       case Z3_VAR_AST:
         return visitor.visitBoundVariable(formula, name);
       case Z3_QUANTIFIER_AST:

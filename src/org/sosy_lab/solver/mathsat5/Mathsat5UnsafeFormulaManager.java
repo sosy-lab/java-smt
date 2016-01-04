@@ -115,20 +115,15 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       final FormulaType<?> type = formulaCreator.getFormulaType(f);
       String name = getName(f);
 
-      if (isUF(f)) {
-        return visitor.visitUF(formula, args, name);
-      } else {
-
-        // Any function application.
-        Function<List<Formula>, Formula> constructor =
-            new Function<List<Formula>, Formula>() {
-              @Override
-              public Formula apply(List<Formula> formulas) {
-                return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
-              }
-            };
-        return visitor.visitOperator(formula, args, name, constructor);
-      }
+      // Any function application.
+      Function<List<Formula>, Formula> constructor =
+          new Function<List<Formula>, Formula>() {
+            @Override
+            public Formula apply(List<Formula> formulas) {
+              return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
+            }
+          };
+      return visitor.visitFunction(formula, args, name, constructor, isUF(f));
     }
   }
 
