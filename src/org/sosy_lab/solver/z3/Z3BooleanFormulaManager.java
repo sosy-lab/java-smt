@@ -25,7 +25,9 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_false;
@@ -48,10 +50,13 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.primitives.Longs;
 
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -186,9 +191,13 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
         return visitAppAst(pVisitor, f);
 
       case Z3_QUANTIFIER_AST:
+        BooleanFormula body = creator.encapsulateBoolean(get_quantifier_body(z3context, f));
+        Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
+        return pVisitor.visitQuantifier(q, body);
 
-        // todo: duplication of code with FormulaVisitor.
-        throw new UnsupportedOperationException("needs to be implemented");
+      case Z3_VAR_AST:
+        // todo: do we need a special case for bound variables?
+        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
 
       default:
         throw new UnsupportedOperationException(

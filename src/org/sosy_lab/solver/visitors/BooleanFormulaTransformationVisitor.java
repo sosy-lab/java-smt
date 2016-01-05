@@ -51,7 +51,7 @@ public abstract class BooleanFormulaTransformationVisitor
     extends BooleanFormulaVisitor<BooleanFormula> {
 
   private final BooleanFormulaManager bfmgr;
-  private final QuantifiedFormulaManager qfmgr;
+  private final FormulaManager manager;
 
   private final Map<BooleanFormula, BooleanFormula> cache;
 
@@ -59,15 +59,7 @@ public abstract class BooleanFormulaTransformationVisitor
       FormulaManager pFmgr, Map<BooleanFormula, BooleanFormula> pCache) {
     super(pFmgr);
     bfmgr = pFmgr.getBooleanFormulaManager();
-
-    QuantifiedFormulaManager qantiFmgr = null;
-    try {
-      qantiFmgr = pFmgr.getQuantifiedFormulaManager();
-    } catch (UnsupportedOperationException ignore) {
-      // ignore, some solvers do not support quantifiers and thus
-      // we delay the exception until the QuantifiedFormulaManager is accessed.
-    }
-    qfmgr = qantiFmgr;
+    manager = pFmgr;
 
     cache = pCache;
   }
@@ -137,15 +129,14 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitQuantifier(
-      List<Formula> variables, BooleanFormula body, Quantifier quantifier) {
-    if (qfmgr == null) {
-      throw new UnsupportedOperationException();
-    }
+  public BooleanFormula visitQuantifier(Quantifier quantifier, BooleanFormula body) {
+    QuantifiedFormulaManager qfmgr = manager.getQuantifiedFormulaManager();
     if (quantifier == Quantifier.FORALL) {
-      return qfmgr.forall(variables, visitIfNotSeen(body));
+
+      // Bound variables are already quantified inside the body!
+      return qfmgr.forall(new ArrayList<Formula>(), visitIfNotSeen(body));
     } else {
-      return qfmgr.exists(variables, visitIfNotSeen(body));
+      return qfmgr.exists(new ArrayList<Formula>(), visitIfNotSeen(body));
     }
   }
 }

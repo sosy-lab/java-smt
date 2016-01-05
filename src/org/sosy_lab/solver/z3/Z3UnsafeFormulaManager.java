@@ -340,7 +340,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
             // TODO: assert that.
             return visitor.visitFreeVariable(formula, name);
           }
-
         }
 
         List<Formula> args = new ArrayList<>(arity);

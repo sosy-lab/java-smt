@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
@@ -105,7 +104,7 @@ public abstract class RecursiveBooleanFormulaVisitor extends BooleanFormulaVisit
   }
 
   @Override
-  public Void visitQuantifier(List<Formula> variables, BooleanFormula body, Quantifier quantifier) {
+  public Void visitQuantifier(Quantifier quantifier, BooleanFormula body) {
     return visitIfNotSeen(body);
   }
 }

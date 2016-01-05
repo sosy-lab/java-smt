@@ -20,7 +20,9 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -144,5 +146,20 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         };
     nameExtractor.visit(f);
     assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
+  }
+
+  @Test
+  public void testBooleanFormulaQuantifierHandling() throws Exception {
+    requireQuantifiers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+
+    assert qmgr != null;
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
+    BooleanFormula newConstraint =
+        new BooleanFormulaTransformationVisitor(
+            mgr, new HashMap<BooleanFormula, BooleanFormula>()) {}.visit(constraint);
+    assertThatFormula(constraint).isUnsatisfiable();
   }
 }

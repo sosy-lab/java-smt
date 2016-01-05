@@ -9,7 +9,6 @@ import com.google.common.collect.FluentIterable;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
@@ -147,8 +146,7 @@ class CNFVisitor extends BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitQuantifier(
-      List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
+  public List<BooleanFormula> visitQuantifier(Quantifier quantifier, BooleanFormula pBody) {
     throw new IllegalStateException("Traversed formula is not in NNF if quantifiers are present");
   }
 }

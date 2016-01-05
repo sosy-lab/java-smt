@@ -624,16 +624,16 @@ final class Z3NativeApi {
   /**
    * Create a pattern for quantifier instantiation.
    *
-   * Z3 uses pattern matching to instantiate quantifiers.
+   * <p>Z3 uses pattern matching to instantiate quantifiers.
    * If a pattern is not provided for a quantifier, then Z3 will
    * automatically compute a set of patterns for it. However, for
    * optimal performance, the user should provide the patterns.
    *
-   * Patterns comprise a list of terms. The list should be
+   * <p>Patterns comprise a list of terms. The list should be
    * non-empty.  If the list comprises of more than one term, it is
    * a called a multi-pattern.
    *
-   * In general, one can pass in a list of (multi-)patterns in the
+   * <p>In general, one can pass in a list of (multi-)patterns in the
    * quantifier constructor.
    *
    * @param context Z3_context
@@ -645,20 +645,20 @@ final class Z3NativeApi {
   /**
    * Create a bound variable.
    *
-   * Bound variables are indexed by de-Bruijn indices. It is perhaps easiest to explain
+   * <p>Bound variables are indexed by de-Bruijn indices. It is perhaps easiest to explain
    * the meaning of de-Bruijn indices by indicating the compilation process from
    * non-de-Bruijn formulas to de-Bruijn format.
    *
    * {@code
-   abs(forall (x1) phi) = forall (x1) abs1(phi, x1, 0)
-   abs(forall (x1, x2) phi) = abs(forall (x1) abs(forall (x2) phi))
-   abs1(x, x, n) = b_n
-   abs1(y, x, n) = y
-   abs1(f(t1,...,tn), x, n) = f(abs1(t1,x,n), ..., abs1(tn,x,n))
-   abs1(forall (x1) phi, x, n) = forall (x1) (abs1(phi, x, n+1))
-   }
-
-   * The last line is significant: the index of a bound variable is different depending
+   * abs(forall (x1) phi) = forall (x1) abs1(phi, x1, 0)
+   * abs(forall (x1, x2) phi) = abs(forall (x1) abs(forall (x2) phi))
+   * abs1(x, x, n) = b_n
+   * abs1(y, x, n) = y
+   * abs1(f(t1,...,tn), x, n) = f(abs1(t1,x,n), ..., abs1(tn,x,n))
+   * abs1(forall (x1) phi, x, n) = forall (x1) (abs1(phi, x, n+1))
+   * }
+   *
+   * <p>The last line is significant: the index of a bound variable is different depending
    * on the scope in which it appears. The deeper x appears, the higher is its
    * index.
    *
@@ -678,7 +678,7 @@ final class Z3NativeApi {
    * The array {@code decl_names} contains the names that the quantified formula
    * used for the bound variables.
    *
-   * Z3 applies the convention that the last element in the {@code decl_names}
+   * <p>Z3 applies the convention that the last element in the {@code decl_names}
    * and {@code sorts} array refers to the variable with index 0,
    * the second to last element of {@code decl_names} and
    * {@code sorts} refers to the variable with index 1, etc.
@@ -703,8 +703,7 @@ final class Z3NativeApi {
       int num_decls,
       long[] sorts,
       long[] decl_names,
-      long body
-  );
+      long body);
 
   /**
    * Create an EXISTS-formula. Similar to {@link #mk_forall}.
@@ -743,8 +742,7 @@ final class Z3NativeApi {
       int num_decls,
       long[] sorts,
       long[] decl_names,
-      long body
-  );
+      long body);
 
   /**
    * Create a quantifier - universal or existential, with pattern hints,
@@ -791,8 +789,7 @@ final class Z3NativeApi {
       long[] bound,
       int num_patterns,
       long[] patterns,
-      long body
-  );
+      long body);
 
   static native long mk_exists_const(
       long context,
@@ -801,8 +798,7 @@ final class Z3NativeApi {
       long[] bound,
       int num_patterns,
       long[] patterns,
-      long body
-  );
+      long body);
 
   static native long mk_quantifier_const(
       long context,
@@ -812,8 +808,7 @@ final class Z3NativeApi {
       long[] bound,
       int num_patterns,
       long[] patterns,
-      long body
-  );
+      long body);
 
   static native long mk_quantifier_const_ex(
       long context,

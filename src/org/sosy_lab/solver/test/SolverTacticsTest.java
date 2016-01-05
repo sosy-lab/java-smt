@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
@@ -232,8 +231,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitQuantifier(
-        List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
+    public Void visitQuantifier(Quantifier quantifier, BooleanFormula pBody) {
       if (started) {
         visit(pBody);
       }
@@ -338,8 +336,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitQuantifier(
-        List<Formula> pVariables, BooleanFormula pBody, Quantifier quantifier) {
+    public Void visitQuantifier(Quantifier quantifier, BooleanFormula pBody) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {

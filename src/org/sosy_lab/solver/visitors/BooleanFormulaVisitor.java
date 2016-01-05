@@ -21,12 +21,16 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
 
+/**
+ * Visitor iterating through the boolean part of the formula.
+ *
+ * @param <R> Desired return type.
+ */
 public abstract class BooleanFormulaVisitor<R> {
 
   private final BooleanFormulaManager bfmgr;
@@ -62,6 +66,5 @@ public abstract class BooleanFormulaVisitor<R> {
   public abstract R visitIfThenElse(
       BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
 
-  public abstract R visitQuantifier(
-      List<Formula> variables, BooleanFormula body, Quantifier quantifier);
+  public abstract R visitQuantifier(Quantifier quantifier, BooleanFormula body);
 }

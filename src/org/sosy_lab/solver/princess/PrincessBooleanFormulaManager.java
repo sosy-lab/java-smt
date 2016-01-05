@@ -34,11 +34,13 @@ import ap.parser.IIntFormula;
 import ap.parser.INot;
 import ap.parser.IQuantified;
 import ap.parser.ITermITE;
+import ap.terfor.conjunctions.Quantifier.ALL$;
 
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -236,17 +238,13 @@ class PrincessBooleanFormulaManager
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
 
     } else if (f instanceof IQuantified) {
-      throw new UnsupportedOperationException("Quantifier for Princess not supported");
-      /* TODO: need to get quantified variable
-      Quantifier q = ((IQuantified) f).quan();
-      if (q == Quantifier.ALL$.MODULE$) {
-        return pVisitor.visitForAll(, getArg(f, 0));
-      } else if (q == Quantifier.EX$.MODULE$) {
-        return pVisitor.visitExists(, getArg(f, 0));
-      } else {
-        throw new UnsupportedOperationException("Unknown quantifier " + f);
-      }
-      */
+      IQuantified q = (IQuantified) f;
+      QuantifiedFormulaManager.Quantifier t =
+          (q.quan() == ALL$.MODULE$)
+              ? QuantifiedFormulaManager.Quantifier.FORALL
+              : QuantifiedFormulaManager.Quantifier.EXISTS;
+      return pVisitor.visitQuantifier(
+          t, getFormulaCreator().encapsulateBoolean(PrincessUtil.getQuantifierBody(q)));
 
     } else if (f instanceof IAtom || f instanceof IIntFormula) {
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
