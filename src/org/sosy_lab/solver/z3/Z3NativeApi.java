@@ -620,56 +620,214 @@ final class Z3NativeApi {
   static native long mk_unsigned_int64(long context, long v, long sort);
 
   // QUANTIFIERS
-  static native long mk_pattern(long context, int a1, long[] a2);
 
-  static native long mk_bound(long context, int a1, long a2);
+  /**
+   * Create a pattern for quantifier instantiation.
+   *
+   * Z3 uses pattern matching to instantiate quantifiers.
+   * If a pattern is not provided for a quantifier, then Z3 will
+   * automatically compute a set of patterns for it. However, for
+   * optimal performance, the user should provide the patterns.
+   *
+   * Patterns comprise a list of terms. The list should be
+   * non-empty.  If the list comprises of more than one term, it is
+   * a called a multi-pattern.
+   *
+   * In general, one can pass in a list of (multi-)patterns in the
+   * quantifier constructor.
+   *
+   * @param context Z3_context
+   * @param terms Z3_ast[]
+   * @return Z3_pattern
+   */
+  static native long mk_pattern(long context, int num_patterns, long[] terms);
 
+  /**
+   * Create a bound variable.
+   *
+   * Bound variables are indexed by de-Bruijn indices. It is perhaps easiest to explain
+   * the meaning of de-Bruijn indices by indicating the compilation process from
+   * non-de-Bruijn formulas to de-Bruijn format.
+   *
+   * {@code
+   abs(forall (x1) phi) = forall (x1) abs1(phi, x1, 0)
+   abs(forall (x1, x2) phi) = abs(forall (x1) abs(forall (x2) phi))
+   abs1(x, x, n) = b_n
+   abs1(y, x, n) = y
+   abs1(f(t1,...,tn), x, n) = f(abs1(t1,x,n), ..., abs1(tn,x,n))
+   abs1(forall (x1) phi, x, n) = forall (x1) (abs1(phi, x, n+1))
+   }
+
+   * The last line is significant: the index of a bound variable is different depending
+   * on the scope in which it appears. The deeper x appears, the higher is its
+   * index.
+   *
+   * @param context Z3_context
+   * @param index de-Bruijn index
+   * @param ty Sort of the bound variable
+   * @return Z3_ast
+   */
+  static native long mk_bound(long context, int index, long ty);
+
+  /**
+   * Create a forall formula.
+   * It takes an expression {@code body} that contains bound variables
+   * of the same sorts as the sorts listed in the array {@code sorts}.
+   * The bound variables are de-Bruijn indices created
+   * using {@link #mk_bound}.
+   * The array {@code decl_names} contains the names that the quantified formula
+   * used for the bound variables.
+   *
+   * Z3 applies the convention that the last element in the {@code decl_names}
+   * and {@code sorts} array refers to the variable with index 0,
+   * the second to last element of {@code decl_names} and
+   * {@code sorts} refers to the variable with index 1, etc.
+   *
+   * @param context Z3_context logical context
+   * @param weight Weight quantifiers are associated with weights indicating
+   *               the importance of using the quantifier during instantiation.
+   *               By default, pass the weight 0.
+   * @param num_patterns Number of patterns.
+   * @param patterns Z3_pattern[] array containing the patterns created using
+   *               {@link #mk_pattern}.
+   * @param num_decls number of variables to be bound.
+   * @param sorts Z3_sort[] the sorts of the bound variables.
+   * @param decl_names Z3_symbol[] names of the bound variables.
+   * @param body the body of the quantifier.
+   */
   static native long mk_forall(
-      long context, int a1, int a2, long[] a3, int a4, long[] a5, long[] a6, long a7);
+      long context,
+      int weight,
+      int num_patterns,
+      long[] patterns,
+      int num_decls,
+      long[] sorts,
+      long[] decl_names,
+      long body
+  );
 
+  /**
+   * Create an EXISTS-formula. Similar to {@link #mk_forall}.
+   */
   static native long mk_exists(
-      long context, int a1, int a2, long[] a3, int a4, long[] a5, long[] a6, long a7);
+      long context,
+      int weight,
+      int num_patterns,
+      long[] patterns,
+      int num_decls,
+      long[] sorts,
+      long[] decl_names,
+      long body);
 
+  /**
+   * Create a quantifier - universal or existential, with pattern hints.
+   * See the documentation for {@link #mk_forall} for an explanation of the
+   * parameters.
+   *
+   * @param context Z3_context
+   * @param weight quantifiers are associated with weights indicating the
+   *               importance of using the quantifier during instantiation.
+   *               By default, pass the weight 0.
+   * @param patterns Z3_pattern[] array containing the patterns created using
+   *  {@link #mk_pattern}.
+   * @param sorts Z3_sort[] Array of sorts of the bound variables.
+   * @param decl_names Z3_symbol[] Names of the bound variables.
+   * @param body Body of the quantifier
+   */
   static native long mk_quantifier(
-      long context, boolean a1, int a2, int a3, long[] a4, int a5, long[] a6, long[] a7, long a8);
+      long context,
+      boolean is_forall,
+      int weight,
+      int num_patterns,
+      long[] patterns,
+      int num_decls,
+      long[] sorts,
+      long[] decl_names,
+      long body
+  );
 
+  /**
+   * Create a quantifier - universal or existential, with pattern hints,
+   * no patterns, and attributes.
+   *
+   * @param context Z3_context
+   * @param quantifier_id Z3_symbol identifier to identify a quantifier.
+   * @param skolem_id Z3_symbol identifier to identify skolem constants
+   *                  introduced by quantifier.
+   * @param patterns Z3_pattern[]
+   * @param sorts Z3_sort[]
+   * @param decl_names Z3_symbol[]
+   */
   static native long mk_quantifier_ex(
       long context,
-      boolean a1,
-      int a2,
-      long a3,
-      long a4,
-      int a5,
-      long[] a6,
-      int a7,
-      long[] a8,
-      int a9,
-      long[] a10,
-      long[] a11,
-      long a12);
+      boolean is_forall,
+      int weight,
+      long quantifier_id,
+      long skolem_id,
+      int num_patterns,
+      long[] patterns,
+      int num_no_patterns,
+      long[] no_patterns,
+      int num_decls,
+      long[] sorts,
+      long[] decl_names,
+      long body);
 
+  /**
+   * @param context Z3_context
+   * @param weight quantifiers are associated with weights indicating the
+   *               importance of using
+   *               the quantifier during instantiation. By default, pass the weight 0.
+   * @param num_bound number of constants to be abstracted into bound variables.
+   * @param bound Z3_app[] array of constants to be abstracted into
+   *              bound variables.
+   * @param num_patterns number of patterns.
+   * @param patterns Z3_pattern[]
+   */
   static native long mk_forall_const(
-      long context, int a1, int a2, long[] a3, int a4, long[] a5, long a6);
+      long context,
+      int weight,
+      int num_bound,
+      long[] bound,
+      int num_patterns,
+      long[] patterns,
+      long body
+  );
 
   static native long mk_exists_const(
-      long context, int a1, int a2, long[] a3, int a4, long[] a5, long a6);
+      long context,
+      int weight,
+      int num_bound,
+      long[] bound,
+      int num_patterns,
+      long[] patterns,
+      long body
+  );
 
   static native long mk_quantifier_const(
-      long context, boolean a1, int a2, int a3, long[] a4, int a5, long[] a6, long a7);
+      long context,
+      boolean is_forall,
+      int weight,
+      int num_bound,
+      long[] bound,
+      int num_patterns,
+      long[] patterns,
+      long body
+  );
 
   static native long mk_quantifier_const_ex(
       long context,
-      boolean a1,
-      int a2,
-      long a3,
-      long a4,
-      int a5,
-      long[] a6,
-      int a7,
-      long[] a8,
-      int a9,
-      long[] a10,
-      long a11);
+      boolean is_forall,
+      int weight,
+      long quantifier_id,
+      long skolem_id,
+      int num_bound,
+      long[] bound,
+      int num_patterns,
+      long[] patterns,
+      int num_no_patterns,
+      long[] no_patterns,
+      long body);
 
   // ACCESSORS
   static native int get_symbol_kind(long context, long a1);
