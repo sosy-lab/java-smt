@@ -330,7 +330,14 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
 
         if (arity == 0) {
 
-          // Variable.
+          // true/false.
+          long declKind = get_decl_kind(z3context, get_app_decl(z3context, f));
+          if (declKind == Z3_OP_TRUE || declKind == Z3_OP_FALSE) {
+            visitor.visitConstant(formula, ast_to_string(z3context, f));
+          }
+
+          // Has to be a variable otherwise.
+          // TODO: double-check.
           return visitor.visitFreeVariable(formula, name);
         }
 

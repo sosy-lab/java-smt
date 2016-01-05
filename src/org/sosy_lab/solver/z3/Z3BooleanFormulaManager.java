@@ -186,6 +186,8 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
         return visitAppAst(pVisitor, f);
 
       case Z3_QUANTIFIER_AST:
+
+        // todo: duplication of code with FormulaVisitor.
         throw new UnsupportedOperationException("needs to be implemented");
 
       default:
@@ -223,7 +225,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
         if (arity == 0) {
           return pVisitor.visitFalse();
         } else if (arity == 1) {
-          return pVisitor.visit(creator.encapsulateBoolean(ufmgr.getArg(f, 0)));
+          return visit(pVisitor, getArg(f, 0));
         }
         return pVisitor.visitOr(getAllArgs(f));
 

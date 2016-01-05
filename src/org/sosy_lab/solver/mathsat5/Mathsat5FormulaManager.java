@@ -66,7 +66,7 @@ import javax.annotation.Nullable;
 public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long>
     implements AutoCloseable {
 
-  @Options(deprecatedPrefix = "cpa.predicate.solver.mathsat5", prefix = "solver.mathsat5")
+  @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
   private static class Mathsat5Settings {
 
     @Option(
@@ -112,12 +112,9 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
   private final ShutdownNotifier shutdownNotifier;
   private final TerminationTest terminationTest;
 
-  @Options(deprecatedPrefix = "cpa.predicate.solver.mathsat5", prefix = "solver.mathsat5")
+  @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
   private static class ExtraOptions {
-    @Option(
-      secure = true,
-      description = "Load less stable optimizing version of" + " mathsat5 solver."
-    )
+    @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
     boolean loadOptimathsat5 = false;
   }
 
