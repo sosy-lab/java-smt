@@ -737,7 +737,7 @@ class Mathsat5NativeApi {
    * @param lower The string representing the value of an initial lower bound.
    * @param upper The string representing the value of an initial upper bound.
    */
-  public static native void msat_push_minimize(
+  public static native long msat_push_minimize(
       long e, long term, @Nullable String lower, @Nullable String upper);
 
   /**
@@ -749,7 +749,7 @@ class Mathsat5NativeApi {
    * @param lower The string representing the value of an initial lower bound.
    * @param upper The string representing the value of an initial upper bound.
    */
-  public static native void msat_push_maximize(
+  public static native long msat_push_maximize(
       long e, long term, @Nullable String lower, @Nullable String upper);
 
   /**
@@ -762,7 +762,7 @@ class Mathsat5NativeApi {
    * @param lower The string representing the value of an initial lower bound.
    * @param upper The string representing the value of an initial upper bound.
    */
-  public static native void msat_push_minmax(
+  public static native long msat_push_minmax(
       long e, int len, long[] terms, @Nullable String lower, @Nullable String upper);
 
   /**
@@ -775,7 +775,7 @@ class Mathsat5NativeApi {
    * @param lower The string representing the value of an initial lower bound.
    * @param upper The string representing the value of an initial upper bound.
    */
-  public static native void msat_push_maxmin(
+  public static native long msat_push_maxmin(
       long e, int len, long[] terms, @Nullable String lower, @Nullable String upper);
 
   /**
