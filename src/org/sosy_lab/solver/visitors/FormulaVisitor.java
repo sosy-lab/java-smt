@@ -33,6 +33,8 @@ import java.util.List;
 
 /**
  * Visitor iterating through entire formula.
+ *
+ * @param <R> Desired return type.
  */
 public abstract class FormulaVisitor<R> {
   private final FormulaManager fmgr;
@@ -41,14 +43,31 @@ public abstract class FormulaVisitor<R> {
     fmgr = pFmgr;
   }
 
+  /**
+   * Designated entry point.
+   * Normally should not be overridden by the client code.
+   */
   public R visit(Formula f) {
     return fmgr.visit(this, f);
   }
 
+  /**
+   * Visit a free variable (such as "x", "y" or "z"), not bound by a quantifier.
+   * The variable can have any sort (both boolean and non-boolean).
+   *
+   * @param f Formula representing the variable.
+   * @param name Variable name.
+   */
   public abstract R visitFreeVariable(Formula f, String name);
 
   /**
    * Visit a variable bound by a quantifier.
+   * The variable can have any sort (both boolean and non-boolean).
+   *
+   * @param f Formula representing the variable.
+   * @param name Variable name
+   * @param deBruijnIdx de-Bruijn index of the bound variable, which can be used
+   *                    to find the matching quantifier.
    */
   public abstract R visitBoundVariable(Formula f, String name, int deBruijnIdx);
 
@@ -67,8 +86,12 @@ public abstract class FormulaVisitor<R> {
   /**
    * Visit an arbitrary, potentially uninterpreted function.
    *
+   * @param f Input function.
+   * @param args List of arguments
+   * @param functionName Name of the function (such as "and" or "or")
    * @param newApplicationConstructor Construct a new function of the same type,
    *                                  with the new arguments as given.
+   * @param isUninterpreted Special flag for UFs.
    */
   public abstract R visitFunction(
       Formula f,
@@ -80,6 +103,9 @@ public abstract class FormulaVisitor<R> {
   /**
    * Visit a quantified node.
    *
+   * @param f Quantifier
+   * @param quantifier Quantifier type: either {@code FORALL} or {@code EXISTS}.
+   * @param body Body of the quantifier.
    * @param newBodyConstructor Constructor to replace a quantified body.
    */
   public abstract R visitQuantifier(
