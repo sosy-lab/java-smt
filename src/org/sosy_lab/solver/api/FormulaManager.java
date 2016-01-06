@@ -20,8 +20,6 @@
 package org.sosy_lab.solver.api;
 
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 

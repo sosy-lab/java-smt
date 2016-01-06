@@ -1090,7 +1090,7 @@ final class Z3NativeApi {
    * context {@code contextTarget}.
    * AST {@code a} must have been created using context {@code contextSource}.
    *
-   * Precondition: {@code contextSource != contextTarget}
+   * <p>Precondition: {@code contextSource != contextTarget}
    *
    * @param contextSource Z3_context
    * @param a Z3_ast

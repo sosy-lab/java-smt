@@ -5,7 +5,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 /**
  * Interface which operates over {@link IntegerFormula}s.
  *
- * Integer formulas always take integral formulas as arguments.
+ * <p>Integer formulas always take integral formulas as arguments.
  */
 public interface IntegerFormulaManager
   extends NumeralFormulaManager<IntegerFormula, IntegerFormula> {
