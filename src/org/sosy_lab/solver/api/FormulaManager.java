@@ -26,7 +26,14 @@ import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 /**
- * Instances of this interface provide direct low-level access to an SMT solver.
+ * Instances of this interface provide access to an SMT solver.
+ * A single formula manager encapsulates a single solver context, and thus
+ * should be used only from a single thread.
+ *
+ * <p>If you wish to use multiple contexts (even for the same solver),
+ * create one formula manager per each.
+ * Formulas can be transferred between different formula managers using
+ * {@link #dumpFormula(BooleanFormula)} and {@link #parse(String)} functions.
  */
 public interface FormulaManager {
 
