@@ -746,7 +746,7 @@ final class Z3NativeApi {
 
   /**
    * Create a quantifier - universal or existential, with pattern hints,
-   * no patterns, and attributes.
+   * number of patterns, and attributes.
    *
    * @param context Z3_context
    * @param quantifier_id Z3_symbol identifier to identify a quantifier.
@@ -772,6 +772,9 @@ final class Z3NativeApi {
       long body);
 
   /**
+   * Create a universal quantifier using a list of constants that
+   * will form the set of bound variables.
+   *
    * @param context Z3_context
    * @param weight quantifiers are associated with weights indicating the
    *               importance of using
@@ -791,6 +794,10 @@ final class Z3NativeApi {
       long[] patterns,
       long body);
 
+
+  /**
+   * See {@link #mk_forall_const(long, int, int, long[], int, long[], long)};
+   */
   static native long mk_exists_const(
       long context,
       int weight,
@@ -1030,7 +1037,19 @@ final class Z3NativeApi {
   static native long simplify_get_param_descrs(long context);
 
   // MODIFIERS
-  static native long update_term(long context, long a1, int a2, long[] a3);
+
+  /**
+   * Update the arguments of term {@code a} using the arguments {@code args}.
+   * The number of arguments \c num_args should coincide
+   * with the number of arguments to \c a.
+   * If \c a is a quantifier, then num_args has to be 1.
+   *
+   * @param a1 Z3_ast
+   * @param args Z3_ast[]
+   *
+   * @return Z3_ast
+   */
+  static native long update_term(long context, long a1, int num_exprs, long[] args);
 
   /**
    * Substitute every occurrence of <code>from[i]</code> in <code>a</code>
@@ -1066,6 +1085,18 @@ final class Z3NativeApi {
    */
   static native long substitute_vars(long context, long a, int num_exprs, long[] to);
 
+  /**
+   * Translate/Copy the AST {@code a} from context {@code contextSource} to
+   * context {@code contextTarget}.
+   * AST {@code a} must have been created using context {@code contextSource}.
+   *
+   * Precondition: {@code contextSource != contextTarget}
+   *
+   * @param contextSource Z3_context
+   * @param a Z3_ast
+   * @param contextTarget Z3_context
+   * @return Z3_ast
+   */
   static native long translate(long contextSource, long a, long contextTarget);
 
   // MODELS
