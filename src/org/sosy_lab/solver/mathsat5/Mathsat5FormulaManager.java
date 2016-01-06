@@ -243,7 +243,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
   @Override
   public ProverEnvironment newProverEnvironment(
       boolean pGenerateModels, boolean pGenerateUnsatCore) {
-    return new Mathsat5TheoremProver(this, pGenerateModels, pGenerateUnsatCore);
+    return new Mathsat5TheoremProver(this, pGenerateModels, pGenerateUnsatCore, shutdownNotifier);
   }
 
   @Override
