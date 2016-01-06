@@ -29,6 +29,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
@@ -43,9 +44,14 @@ import javax.annotation.Nullable;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
 
+  private final ShutdownNotifier shutdownNotifier;
+
   Mathsat5TheoremProver(
-      Mathsat5FormulaManager pMgr, boolean generateModels, boolean generateUnsatCore) {
-    super(pMgr, createConfig(generateModels, generateUnsatCore));
+      Mathsat5FormulaManager pMgr, boolean pGenerateModels, boolean pGenerateUnsatCore,
+      ShutdownNotifier pShutdownNotifier) {
+
+    super(pMgr, createConfig(pGenerateModels, pGenerateUnsatCore));
+    shutdownNotifier = pShutdownNotifier;
   }
 
   private static Map<String, String> createConfig(
@@ -120,6 +126,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
     @Override
     public void callback(long[] model) throws InterruptedException {
+      shutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(
           new LongArrayBackedList<BooleanFormula>(model) {
             @Override
