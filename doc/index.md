@@ -38,54 +38,67 @@ dependency:
 Alternatively, JARs for JavaSMT and its dependencies can be downloaded from our
 [Ivy Repository](IvyRepository) manually.
 
-## Using Solver Binaries
+## Binaries for Native Solvers (MathSAT and Z3)
 
-Solver binaries for native solvers (currently CVC4, Z3, MathSAT5 and
-OptiMathSAT5) are downloaded automatically by Ivy.
-We supply only one version of binaries: for 64-bit linux platforms
+Solver binaries for native solvers are downloaded automatically by Ivy.
+We supply binaries only for 64-bit linux platforms
 (tested on Ubuntu latest LTS).
-To use the supplied binaries, they should either be copied or symlinked to
-`lib/native/x86_64-linux` folder.
+If you have this architecture, then (hopefully) everything should work as is after
+installation.
 
-For other architectures, the binaries have to be copied to the architecture-specific
-folder, see [NativeLibraries](NativeLibraries) documentation for details.
+If you require native solvers on a different platform, then you can copy the
+`.so` binaries manually to the folder in `lib/native` corresponding to your
+architecture.
+See [NativeLibraries](NativeLibraries) documentation for more details.
 
-Note that solvers which run directly on JDK (currently Princess and SMTInterpol)
+Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any such configuration and work out of the box.
 
 # Usage
 
-## Getting Started
+## Initialization
 
-This is a small example to get started:
+Below is a small example showing how to initialize the library:
 
 ```java
 int main(String[] args) {
 
-    // SMT solvers often expose many different flags.
-    // We populate them using the Configuration object,
-    // which can be created either from .properties file or from
-    // a command line.
     Configuration config = Configuration.fromCommandLine(args);
-
-    // All interaction with the solver can be logged.
     LogManager logger = new LogManager();
-
-    // Satisfiability queries often take a very long time.
-    // For "graceful" interrupts we provide a shutdown notifier,
-    // which can be used to either implement a timeout on a query,
-    // or gracefully respond to Ctrl-C requests.
     ShutdownNotifier notifier = new ShutdownNotifier();
 
     // FormulaManager is a class wrapping a solver context.
     // All interactions with a solver are normally done through this class.
     FormulaManager manager = FormulaManagerFactory.createFormulaManager
         config, logger, notifier);
-
-    Formula a = manager.createVariable(FormulaType.INTEGER, "a");
-
 }
 ```
+
+JavaSMT relies on three dependencies from the SoSy-Lab [common](common) library.
+These dependencies are:
+
+ - [Configuration](Configuration) - SMT solvers expose many different
+    configuration options, and using the configuration object they can be
+    easily populated by the client, either from the command line or from 
+    `.properties` file.
+ - [LogManager](LogManager) 
+
+As shown above, [Configuration](Configuration), [LogManager](LogManager)
+
+
+## Usage
+
+Once the formula manager is initialized, we can start posing queries to the
+solver.
+
+```java
+// Assume we have a FormulaManager instance.
+BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
+
+BooleanFormula constraint = 
+
+```
+
 
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
