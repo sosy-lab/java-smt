@@ -35,6 +35,7 @@
             encoding="utf-8"
             windowtitle="${ant.project.name}"
             failonerror="true"
+            overview="doc/javadoc_overview.html"
             >
 
             <fileset dir="${source.dir}" defaultexcludes="yes">
