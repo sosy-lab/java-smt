@@ -221,7 +221,7 @@ public class FormulaManagerFactory {
       "org.sosy_lab.solver.smtinterpol.SmtInterpolSolverFactory";
 
   // We keep the class loader for SmtInterpol around
-  // in case someone creates a seconds instance of FormulaManagerFactory
+  // in case someone creates a second instance of FormulaManagerFactory
   private static WeakReference<ClassLoader> smtInterpolClassLoader = new WeakReference<>(null);
   private static final AtomicInteger smtInterpolLoadingCount = new AtomicInteger(0);
 
