@@ -28,9 +28,8 @@ import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.NumeralFormula;
-import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.api.IntegerFormulaManager;
+import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
 import javax.annotation.Nullable;
@@ -45,13 +44,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager;
 
-  private final @Nullable AbstractNumeralFormulaManager<
-          TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula>
-      integerManager;
+  private final @Nullable IntegerFormulaManager integerManager;
 
-  private final @Nullable AbstractNumeralFormulaManager<
-          TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula>
-      rationalManager;
+  private final @Nullable RationalFormulaManager rationalManager;
 
   private final @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
       bitvectorManager;
@@ -83,12 +78,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager,
       AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager,
-      @Nullable
-      AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula>
-          pIntegerManager,
-      @Nullable
-      AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula>
-          pRationalManager,
+      @Nullable IntegerFormulaManager pIntegerManager,
+      @Nullable RationalFormulaManager pRationalManager,
       @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> bitvectorManager,
       @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv> floatingPointManager,
       @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> quantifiedManager,
@@ -108,8 +99,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     if (booleanManager.getFormulaCreator() != formulaCreator
         || unsafeManager.getFormulaCreator() != formulaCreator
         || functionManager.getFormulaCreator() != formulaCreator
-        || (integerManager != null && integerManager.getFormulaCreator() != formulaCreator)
-        || (rationalManager != null && rationalManager.getFormulaCreator() != formulaCreator)
         || (bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
         || (floatingPointManager != null
             && floatingPointManager.getFormulaCreator() != formulaCreator)) {
@@ -122,8 +111,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, IntegerFormula, IntegerFormula>
-      getIntegerFormulaManager() {
+  public IntegerFormulaManager getIntegerFormulaManager() {
     if (integerManager == null) {
       // TODO fallback to rationalManager?
       throw new UnsupportedOperationException();
@@ -132,8 +120,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public AbstractNumeralFormulaManager<TFormulaInfo, TType, TEnv, NumeralFormula, RationalFormula>
-      getRationalFormulaManager() {
+  public RationalFormulaManager getRationalFormulaManager() {
     if (rationalManager == null) {
       // TODO fallback to integerManager?
       throw new UnsupportedOperationException();

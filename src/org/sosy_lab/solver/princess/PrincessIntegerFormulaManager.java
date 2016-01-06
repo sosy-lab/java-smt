@@ -31,6 +31,7 @@ import ap.theories.BitShiftMultiplication;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
@@ -38,7 +39,8 @@ import java.math.BigInteger;
 
 class PrincessIntegerFormulaManager
     extends org.sosy_lab.solver.princess.PrincessNumeralFormulaManager<
-        IntegerFormula, IntegerFormula> {
+        IntegerFormula, IntegerFormula>
+    implements IntegerFormulaManager {
 
   PrincessIntegerFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);

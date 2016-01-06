@@ -23,13 +23,15 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 class SmtInterpolIntegerFormulaManager
-    extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula> {
+    extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula>
+    implements IntegerFormulaManager{
 
   SmtInterpolIntegerFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);

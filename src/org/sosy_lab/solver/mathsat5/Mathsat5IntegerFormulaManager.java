@@ -26,12 +26,14 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
 
 class Mathsat5IntegerFormulaManager
-    extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula> {
+    extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula>
+    implements IntegerFormulaManager {
 
   Mathsat5IntegerFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);

@@ -36,7 +36,7 @@ public interface FormulaManager {
    * the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL and others.
    */
-  NumeralFormulaManager<IntegerFormula, IntegerFormula> getIntegerFormulaManager();
+  IntegerFormulaManager getIntegerFormulaManager();
 
   /**
    * Returns the Rational-Theory.
@@ -44,7 +44,7 @@ public interface FormulaManager {
    * the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL, etc.
    */
-  NumeralFormulaManager<NumeralFormula, RationalFormula> getRationalFormulaManager();
+  RationalFormulaManager getRationalFormulaManager();
 
   /**
    * Returns the Boolean-Theory.

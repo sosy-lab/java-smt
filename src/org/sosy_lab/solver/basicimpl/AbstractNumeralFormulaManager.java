@@ -34,8 +34,9 @@ import java.util.List;
 /**
  * Similar to the other Abstract*FormulaManager classes in this package,
  * this class serves as a helper for implementing {@link NumeralFormulaManager}.
- * It handles all the unwrapping and wrapping from and to the {@link Formula}
- * instances, such that the concrete class needs to handle only its own internal types.
+ * It handles all the unwrapping and wrapping from {@link Formula}
+ * instances to solver-specific formula representations,
+ * such that the concrete class needs to handle only its own internal types.
  */
 public abstract class AbstractNumeralFormulaManager<
         TFormulaInfo, TType, TEnv, ParamFormulaType extends NumeralFormula,

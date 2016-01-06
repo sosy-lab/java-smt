@@ -24,13 +24,15 @@ import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Rational;
 
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class CVC4IntegerFormulaManager
-    extends CVC4NumeralFormulaManager<IntegerFormula, IntegerFormula> {
+    extends CVC4NumeralFormulaManager<IntegerFormula, IntegerFormula>
+    implements IntegerFormulaManager {
 
   protected CVC4IntegerFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);

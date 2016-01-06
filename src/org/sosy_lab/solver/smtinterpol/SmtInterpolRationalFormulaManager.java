@@ -26,12 +26,14 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.api.RationalFormulaManager;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 class SmtInterpolRationalFormulaManager
-    extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula> {
+    extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula>
+    implements RationalFormulaManager {
 
   SmtInterpolRationalFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);

@@ -27,11 +27,13 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.api.RationalFormulaManager;
 
 import java.math.BigDecimal;
 
 class Mathsat5RationalFormulaManager
-    extends Mathsat5NumeralFormulaManager<NumeralFormula, RationalFormula> {
+    extends Mathsat5NumeralFormulaManager<NumeralFormula, RationalFormula>
+    implements RationalFormulaManager {
 
   Mathsat5RationalFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
