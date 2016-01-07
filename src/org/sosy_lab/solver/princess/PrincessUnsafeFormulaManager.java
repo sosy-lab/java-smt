@@ -25,6 +25,7 @@ import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.basetypes.IdealInt;
+import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
 import ap.parser.IIntFormula;
@@ -177,6 +178,9 @@ class PrincessUnsafeFormulaManager
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
       return visitor.visitConstant(f, value.bigIntValue());
+    } else if (input instanceof IBoolLit) {
+      IBoolLit literal = (IBoolLit) input;
+      return visitor.visitConstant(f, literal.value());
     } else if (isQuantification(input)) {
       IExpression body = PrincessUtil.getQuantifierBody(input);
       Quantifier q = PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS;

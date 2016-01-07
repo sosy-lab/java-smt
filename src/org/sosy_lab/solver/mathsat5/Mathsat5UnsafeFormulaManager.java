@@ -42,7 +42,9 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_atom;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_equal;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
@@ -98,7 +100,9 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
     int arity = getArity(f);
-    if (msat_term_is_number(msatEnv, f)) {
+    if (msat_term_is_number(msatEnv, f)
+        || msat_term_is_true(msatEnv, f)
+        || msat_term_is_false(msatEnv, f)) {
       // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
       return visitor.visitConstant(formula, msat_term_repr(f));
     } else if (isVariable(f)) {
