@@ -140,7 +140,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     FormulaVisitor<TraversalProcess> nameExtractor =
         new DefaultFormulaVisitor<TraversalProcess>() {
           @Override
-          protected TraversalProcess visitDefault() {
+          protected TraversalProcess visitDefault(Formula f) {
             return TraversalProcess.CONTINUE;
           }
 

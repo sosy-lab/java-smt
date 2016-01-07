@@ -29,21 +29,26 @@ import java.util.List;
 
 public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
 
-  protected abstract R visitDefault();
+  /**
+   * Method for default case, is called by all methods from this class if they are not overridden.
+   * @param f Formula for the currently visited node.
+   * @return An arbitrary value, will be passed through to the caller.
+   */
+  protected abstract R visitDefault(Formula f);
 
   @Override
   public R visitFreeVariable(Formula f, String name) {
-    return visitDefault();
+    return visitDefault(f);
   }
 
   @Override
   public R visitBoundVariable(Formula f, String name, int deBruijnIdx) {
-    return visitDefault();
+    return visitDefault(f);
   }
 
   @Override
   public R visitConstant(Formula f, Object value) {
-    return visitDefault();
+    return visitDefault(f);
   }
 
   @Override
@@ -53,7 +58,7 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
       String functionName,
       Function<List<Formula>, Formula> newApplicationConstructor,
       boolean isUF) {
-    return visitDefault();
+    return visitDefault(f);
   }
 
   @Override
@@ -62,6 +67,6 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
       Quantifier q,
       BooleanFormula body,
       Function<BooleanFormula, BooleanFormula> bodyTransformer) {
-    return visitDefault();
+    return visitDefault(f);
   }
 }
