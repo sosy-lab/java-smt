@@ -794,7 +794,6 @@ final class Z3NativeApi {
       long[] patterns,
       long body);
 
-
   /**
    * See {@link #mk_forall_const(long, int, int, long[], int, long[], long)};
    */

@@ -32,7 +32,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import java.math.BigDecimal;
 
 class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, IntegerFormula>
-  implements IntegerFormulaManager {
+    implements IntegerFormulaManager {
 
   Z3IntegerFormulaManager(Z3FormulaCreator pCreator) {
     super(pCreator);

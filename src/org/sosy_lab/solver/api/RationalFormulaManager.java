@@ -7,6 +7,5 @@ import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
  *
  * <p>Rational formulas may take both integral and rational formulas as arguments.
  */
-public interface RationalFormulaManager extends
-  NumeralFormulaManager<NumeralFormula, RationalFormula> {
-}
+public interface RationalFormulaManager
+    extends NumeralFormulaManager<NumeralFormula, RationalFormula> {}

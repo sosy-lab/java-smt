@@ -47,7 +47,9 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   private final ShutdownNotifier shutdownNotifier;
 
   Mathsat5TheoremProver(
-      Mathsat5FormulaManager pMgr, boolean pGenerateModels, boolean pGenerateUnsatCore,
+      Mathsat5FormulaManager pMgr,
+      boolean pGenerateModels,
+      boolean pGenerateUnsatCore,
       ShutdownNotifier pShutdownNotifier) {
 
     super(pMgr, createConfig(pGenerateModels, pGenerateUnsatCore));

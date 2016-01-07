@@ -31,7 +31,7 @@ import java.math.BigInteger;
 
 class SmtInterpolIntegerFormulaManager
     extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula>
-    implements IntegerFormulaManager{
+    implements IntegerFormulaManager {
 
   SmtInterpolIntegerFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);
