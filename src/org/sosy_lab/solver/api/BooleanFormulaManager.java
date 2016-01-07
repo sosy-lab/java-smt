@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.api;
 
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.Collection;
 
@@ -150,4 +151,15 @@ public interface BooleanFormulaManager {
 
   /** Visit the formula with the given visitor. */
   <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula formula);
+
+  /**
+   * Visit the formula recursively with a given {@link BooleanFormulaVisitor}.
+   *
+   * <p>This method guarantees that the traversal is done iteratively,
+   * without using Java recursion, and thus is not prone to StackOverflowErrors.
+   *
+   * <p>Furthermore, this method also guarantees that every equal part of the formula
+   * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   */
+  void visitRecursively(BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor, BooleanFormula f);
 }

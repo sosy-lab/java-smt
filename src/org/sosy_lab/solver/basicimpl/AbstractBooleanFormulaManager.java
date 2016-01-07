@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -29,6 +30,7 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -279,6 +281,19 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract <R> R visit(BooleanFormulaVisitor<R> visitor, TFormulaInfo pFormula);
+
+  @Override
+  public void visitRecursively(
+      BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor, BooleanFormula pF) {
+    RecursiveBooleanFormulaVisitor recVisitor = new RecursiveBooleanFormulaVisitor(pFormulaVisitor);
+    recVisitor.addToQueue(pF);
+    while (!recVisitor.isQueueEmpty()) {
+      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
+  }
 
   /**
    * Syntax sugar for type casting.
