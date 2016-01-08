@@ -333,7 +333,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
           // true/false.
           long declKind = get_decl_kind(z3context, get_app_decl(z3context, f));
           if (declKind == Z3_OP_TRUE || declKind == Z3_OP_FALSE) {
-            return visitor.visitConstant(formula, ast_to_string(z3context, f));
+            return visitor.visitConstant(formula, declKind == Z3_OP_TRUE);
           } else {
 
             // Has to be a variable otherwise.
