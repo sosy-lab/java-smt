@@ -21,6 +21,8 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Function;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -31,8 +33,14 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -227,5 +235,63 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
         return;
       }
     }
+  }
+
+  /**
+   * Extract names of all free variables in a formula.
+   *
+   * @param f   The input formula
+   * @return    Set of variable names.
+   */
+  public Set<String> extractVariableNames(Formula f) {
+    return myExtractSubformulas(f, false).keySet();
+  }
+
+  /**
+   * Extract the names of all free variables and UFs in a formula.
+   *
+   * @param f   The input formula
+   * @return    Set of variable names.
+   */
+  public Set<String> extractFunctionNames(Formula f) {
+    return myExtractSubformulas(f, true).keySet();
+  }
+
+  /**
+   * Extract all free variables from the formula, optionally including UFs.
+   */
+  protected Map<String, Formula> myExtractSubformulas(
+      final Formula pFormula,
+      final boolean extractUF) {
+
+    final Map<String, Formula> found = new HashMap<>();
+    visitRecursively(new DefaultFormulaVisitor<TraversalProcess>() {
+
+      @Override
+      protected TraversalProcess visitDefault(Formula f) {
+        return TraversalProcess.CONTINUE;
+      }
+
+      @Override
+      public TraversalProcess visitFunction(
+          Formula f,
+          List<Formula> args,
+          String functionName,
+          Function<List<Formula>, Formula> constructor,
+          boolean isUninterpreted) {
+
+        if (isUninterpreted && extractUF) {
+          found.put(functionName, f);
+        }
+        return TraversalProcess.CONTINUE;
+      }
+
+      @Override
+      public TraversalProcess visitFreeVariable(Formula f, String name) {
+        found.put(name, f);
+        return TraversalProcess.CONTINUE;
+      }
+    }, pFormula);
+    return found;
   }
 }

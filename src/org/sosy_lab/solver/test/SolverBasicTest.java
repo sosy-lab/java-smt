@@ -28,12 +28,16 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(Parameterized.class)
 public class SolverBasicTest extends SolverBasedTest0 {
@@ -105,5 +109,56 @@ public class SolverBasicTest extends SolverBasedTest0 {
             fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))),
             fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))))
         .testEquals();
+  }
+
+  @Test
+  public void variableNameExtractorTest() throws Exception {
+    BooleanFormula constr = bmgr.or(
+      imgr.equal(
+        imgr.subtract(
+          imgr.add(
+              imgr.makeVariable("x"),
+              imgr.makeVariable("z")
+          ),
+          imgr.makeNumber(10)
+        ),
+        imgr.makeVariable("y")
+      ),
+      imgr.equal(
+          imgr.makeVariable("xx"),
+          imgr.makeVariable("zz")
+      )
+    );
+    assertThat(mgr.extractVariableNames(constr)).containsExactly(
+        "x", "y", "z", "xx", "zz"
+    );
+    assertThat(mgr.extractFunctionNames(constr)).isEqualTo(
+        mgr.extractVariableNames(constr)
+    );
+  }
+
+  @Test
+  public void UFNameExtractorTest() throws Exception {
+    BooleanFormula constraint = imgr.equal(
+      fmgr.declareAndCallUninterpretedFunction(
+          "uf1",
+          FormulaType.IntegerType,
+          ImmutableList.<Formula>of(imgr.makeVariable("x"))
+      ),
+      fmgr.declareAndCallUninterpretedFunction(
+          "uf2",
+          FormulaType.IntegerType,
+          ImmutableList.<Formula>of(imgr.makeVariable("y"))
+      )
+    );
+
+    assertThat(mgr.extractFunctionNames(constraint)).containsExactly(
+        "uf1", "uf2", "x", "y"
+    );
+
+    assertThat(mgr.extractVariableNames(constraint)).containsExactly(
+        "x", "y"
+    );
+
   }
 }

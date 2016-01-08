@@ -24,6 +24,8 @@ import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
+import java.util.Set;
+
 /**
  * FormulaManager class contains all operations which can be performed on
  * formulas.
@@ -139,4 +141,20 @@ public interface FormulaManager {
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
   void visitRecursively(FormulaVisitor<TraversalProcess> rFormulaVisitor, Formula f);
+
+  /**
+   * Extract the names of all free variables and UFs in a formula.
+   *
+   * @param f   The input formula
+   * @return    Set of variable names.
+   */
+  Set<String> extractVariableNames(Formula f);
+
+  /**
+   * Extract the names of all free variables and UFs in a formula.
+   *
+   * @param f   The input formula
+   * @return    Set of variable names.
+   */
+  Set<String> extractFunctionNames(Formula f);
 }
