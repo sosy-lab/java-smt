@@ -20,7 +20,9 @@
 package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.FluentIterable.from;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.api.Formula;
@@ -96,5 +98,20 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
     UfDeclarationImpl<T, TFunctionDecl> func = (UfDeclarationImpl<T, TFunctionDecl>) pFunc;
 
     return createUninterpretedFunctionCallImpl(func.getFuncDecl(), pArgs);
+  }
+
+  @Override
+  public <T extends Formula> T declareAndCallUninterpretedFunction(
+      String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
+
+    List<FormulaType<?>> argTypes = from(pArgs).
+        transform(
+            new Function<Formula, FormulaType<?>>() {
+              @Override
+              public FormulaType<?> apply(Formula pArg0) {
+                return getFormulaCreator().getFormulaType(pArg0);
+              }}).toList();
+    UfDeclaration<T> func = declareUninterpretedFunction(name, pReturnType, argTypes);
+    return callUninterpretedFunction(func, pArgs);
   }
 }

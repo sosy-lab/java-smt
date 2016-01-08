@@ -27,16 +27,19 @@ import java.util.List;
 public interface FunctionFormulaManager {
 
   /**
-   * Declares an uninterpreted function.
+   * Declare an uninterpreted function.
    */
   <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args);
 
+  /**
+   * Declare an uninterpreted function.
+   */
   <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
       String name, FormulaType<T> returnType, FormulaType<?>... args);
 
   /**
-   * Creates an uninterpreted function call.
+   * Create an uninterpreted function call.
    *
    * @param funcType Declaration of the function to call.
    * @param args Arguments of the function.
@@ -44,4 +47,10 @@ public interface FunctionFormulaManager {
    */
   <T extends Formula> T callUninterpretedFunction(
       UfDeclaration<T> funcType, List<? extends Formula> args);
+
+  /**
+   * Declares and calls an uninterpreted function.
+   */
+  <T extends Formula> T declareAndCallUninterpretedFunction(
+      String name, FormulaType<T> pReturnType, List<Formula> pArgs);
 }
