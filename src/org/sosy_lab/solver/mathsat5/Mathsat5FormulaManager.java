@@ -19,109 +19,23 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_env;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_version;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_termination_test;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
-
-import com.google.common.base.Splitter;
-import com.google.common.base.Splitter.MapSplitter;
-import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.NativeLibraries;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
-import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
-import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment;
-import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
 
-import javax.annotation.Nullable;
-
-public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long>
-    implements AutoCloseable {
-
-  @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
-  private static class Mathsat5Settings {
-
-    @Option(
-      secure = true,
-      description =
-          "Further options that will be passed to Mathsat in addition to the default options. "
-              + "Format is 'key1=value1,key2=value2'"
-    )
-    private String furtherOptions = "";
-
-    private final @Nullable PathCounterTemplate logfile;
-
-    private final ImmutableMap<String, String> furtherOptionsMap;
-
-    private Mathsat5Settings(Configuration config, @Nullable PathCounterTemplate pLogfile)
-        throws InvalidConfigurationException {
-      config.inject(this);
-      logfile = pLogfile;
-
-      MapSplitter optionSplitter =
-          Splitter.on(',')
-              .trimResults()
-              .omitEmptyStrings()
-              .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
-
-      try {
-        furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(furtherOptions));
-      } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException(
-            "Invalid Mathsat option in \"" + furtherOptions + "\": " + e.getMessage(), e);
-      }
-    }
-  }
-
-  private static final boolean USE_SHARED_ENV = true;
-  private static final boolean USE_GHOST_FILTER = true;
-
-  private final LogManager logger;
-  private final long mathsatConfig;
-  private final Mathsat5Settings settings;
-  private final long randomSeed;
-
-  private final ShutdownNotifier shutdownNotifier;
-  private final TerminationTest terminationTest;
-
-  @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
-  private static class ExtraOptions {
-    @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
-    boolean loadOptimathsat5 = false;
-  }
+final class Mathsat5FormulaManager
+    extends AbstractFormulaManager<Long, Long, Long> {
 
   @SuppressWarnings("checkstyle:parameternumber")
-  private Mathsat5FormulaManager(
-      LogManager pLogger,
-      long pMathsatConfig,
+  Mathsat5FormulaManager(
       Mathsat5FormulaCreator creator,
       Mathsat5UnsafeFormulaManager unsafeManager,
       Mathsat5FunctionFormulaManager pFunctionManager,
@@ -130,10 +44,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
       Mathsat5RationalFormulaManager pRationalManager,
       Mathsat5BitvectorFormulaManager pBitpreciseManager,
       Mathsat5FloatingPointFormulaManager pFloatingPointManager,
-      Mathsat5ArrayFormulaManager pArrayManager,
-      Mathsat5Settings pSettings,
-      long pRandomSeed,
-      final ShutdownNotifier pShutdownNotifier) {
+      Mathsat5ArrayFormulaManager pArrayManager) {
     super(
         creator,
         unsafeManager,
@@ -145,116 +56,16 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
         pFloatingPointManager,
         null,
         pArrayManager);
-
-    mathsatConfig = pMathsatConfig;
-    settings = pSettings;
-    randomSeed = pRandomSeed;
-    logger = checkNotNull(pLogger);
-
-    shutdownNotifier = checkNotNull(pShutdownNotifier);
-    terminationTest =
-        new TerminationTest() {
-          @Override
-          public boolean shouldTerminate() throws InterruptedException {
-            pShutdownNotifier.shutdownIfNecessary();
-            return false;
-          }
-        };
-  }
-
-  ShutdownNotifier getShutdownNotifier() {
-    return shutdownNotifier;
   }
 
   static long getMsatTerm(Formula pT) {
     return ((Mathsat5Formula) pT).getTerm();
   }
 
-  public static Mathsat5FormulaManager create(
-      LogManager logger,
-      Configuration config,
-      ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate solverLogFile,
-      long randomSeed)
-      throws InvalidConfigurationException {
-
-    ExtraOptions extraOptions = new ExtraOptions();
-    config.inject(extraOptions);
-    if (extraOptions.loadOptimathsat5) {
-      NativeLibraries.loadLibrary("optimathsat5j");
-    } else {
-      NativeLibraries.loadLibrary("mathsat5j");
-    }
-
-    // Init Msat
-    Mathsat5Settings settings = new Mathsat5Settings(config, solverLogFile);
-
-    long msatConf = msat_create_config();
-    msat_set_option_checked(msatConf, "theory.la.split_rat_eq", "false");
-    msat_set_option_checked(msatConf, "random_seed", Long.toString(randomSeed));
-
-    for (Map.Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
-      try {
-        msat_set_option_checked(msatConf, option.getKey(), option.getValue());
-      } catch (IllegalArgumentException e) {
-        throw new InvalidConfigurationException(e.getMessage(), e);
-      }
-    }
-
-    final long msatEnv = msat_create_env(msatConf);
-
-    // Create Mathsat5FormulaCreator
-    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
-
-    // Create managers
-    Mathsat5UnsafeFormulaManager unsafeManager = new Mathsat5UnsafeFormulaManager(creator);
-    Mathsat5FunctionFormulaManager functionTheory = new Mathsat5FunctionFormulaManager(creator);
-    Mathsat5BooleanFormulaManager booleanTheory =
-        new Mathsat5BooleanFormulaManager(creator, unsafeManager);
-    Mathsat5IntegerFormulaManager integerTheory = new Mathsat5IntegerFormulaManager(creator);
-    Mathsat5RationalFormulaManager rationalTheory = new Mathsat5RationalFormulaManager(creator);
-    Mathsat5BitvectorFormulaManager bitvectorTheory =
-        Mathsat5BitvectorFormulaManager.create(creator);
-    Mathsat5FloatingPointFormulaManager floatingPointTheory =
-        new Mathsat5FloatingPointFormulaManager(creator, functionTheory);
-    Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
-
-    return new Mathsat5FormulaManager(
-        logger,
-        msatConf,
-        creator,
-        unsafeManager,
-        functionTheory,
-        booleanTheory,
-        integerTheory,
-        rationalTheory,
-        bitvectorTheory,
-        floatingPointTheory,
-        arrayTheory,
-        settings,
-        randomSeed,
-        pShutdownNotifier);
-  }
-
   BooleanFormula encapsulateBooleanFormula(long t) {
     return getFormulaCreator().encapsulateBoolean(t);
   }
 
-  @Override
-  public ProverEnvironment newProverEnvironment(
-      boolean pGenerateModels, boolean pGenerateUnsatCore) {
-    return new Mathsat5TheoremProver(this, pGenerateModels, pGenerateUnsatCore, shutdownNotifier);
-  }
-
-  @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
-    return new Mathsat5InterpolatingProver(this);
-  }
-
-  @Override
-  public OptEnvironment newOptEnvironment() {
-    return new Mathsat5OptProver(this);
-  }
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
@@ -290,59 +101,7 @@ public final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, L
   }
 
   @Override
-  public String getVersion() {
-    return msat_get_version();
-  }
-
-  long createEnvironment(long cfg) {
-    long env;
-
-    if (USE_GHOST_FILTER) {
-      msat_set_option_checked(cfg, "dpll.ghost_filtering", "true");
-    }
-
-    msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
-    msat_set_option_checked(cfg, "random_seed", Long.toString(randomSeed));
-
-    for (Map.Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
-      msat_set_option_checked(cfg, option.getKey(), option.getValue());
-    }
-
-    if (settings.logfile != null) {
-      Path filename = settings.logfile.getFreshPath();
-      try {
-        Files.createParentDirs(filename);
-      } catch (IOException e) {
-        logger.logException(Level.WARNING, e, "Cannot create directory for MathSAT logfile");
-      }
-
-      msat_set_option_checked(cfg, "debug.api_call_trace", "1");
-      msat_set_option_checked(
-          cfg, "debug.api_call_trace_filename", filename.toAbsolutePath().toString());
-    }
-
-    if (USE_SHARED_ENV) {
-      env = msat_create_shared_env(cfg, this.getEnvironment());
-    } else {
-      env = msat_create_env(cfg);
-    }
-
-    return env;
-  }
-
-  long addTerminationTest(long env) {
-    return msat_set_termination_test(env, terminationTest);
-  }
-
-  @Override
   public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
     return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
-  }
-
-  @Override
-  public void close() {
-    logger.log(Level.FINER, "Freeing Mathsat environment");
-    msat_destroy_env(getEnvironment());
-    msat_destroy_config(mathsatConfig);
   }
 }

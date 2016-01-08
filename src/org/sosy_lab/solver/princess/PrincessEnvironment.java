@@ -56,7 +56,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
+import org.sosy_lab.solver.princess.PrincessSolverContext.PrincessOptions;
 
 import scala.Tuple2;
 import scala.Tuple3;

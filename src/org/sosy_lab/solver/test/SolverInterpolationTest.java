@@ -32,7 +32,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -66,7 +66,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    return (InterpolatingProverEnvironment<T>) mgr.newProverEnvironmentWithInterpolation();
+    return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names

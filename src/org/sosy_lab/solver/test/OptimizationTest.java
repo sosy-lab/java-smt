@@ -7,20 +7,21 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
+
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment.OptStatus;
+import org.sosy_lab.solver.api.OptEnvironment;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -54,7 +55,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnbounded() throws Exception {
     requireRationals();
-    try (OptEnvironment prover = mgr.newOptEnvironment()) {
+    try (OptEnvironment prover = context.newOptEnvironment()) {
       RationalFormula x, obj;
       x = rmgr.makeVariable("x");
       obj = rmgr.makeVariable("obj");
@@ -70,7 +71,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnfeasible() throws Exception {
     requireRationals();
-    try (OptEnvironment prover = mgr.newOptEnvironment()) {
+    try (OptEnvironment prover = context.newOptEnvironment()) {
       RationalFormula x, y;
       x = rmgr.makeVariable("x");
       y = rmgr.makeVariable("y");
@@ -85,7 +86,7 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   public void testOptimal() throws Exception {
-    try (OptEnvironment prover = mgr.newOptEnvironment()) {
+    try (OptEnvironment prover = context.newOptEnvironment()) {
 
       IntegerFormula x, y, obj;
       x = imgr.makeVariable("x");
@@ -130,7 +131,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testSwitchingObjectives() throws Exception {
     requireRationals();
-    try (OptEnvironment prover = mgr.newOptEnvironment()) {
+    try (OptEnvironment prover = context.newOptEnvironment()) {
       RationalFormula x, y, obj;
       x = rmgr.makeVariable("x");
       y = rmgr.makeVariable("y");

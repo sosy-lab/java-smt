@@ -34,10 +34,7 @@ import java.util.List;
  *
  * <p>All solving methods are expected to throw {@link SolverException} if the solver
  * fails to solve the given query, and {@link InterruptedException} if a thread interrupt
- * was requested or a shutdown request via the {@link org.sosy_lab.common.ShutdownNotifier} given to
- * {@link org.sosy_lab.solver.FormulaManagerFactory#FormulaManagerFactory(
- * org.sosy_lab.common.configuration.Configuration, org.sosy_lab.common.log.LogManager,
- * org.sosy_lab.common.ShutdownNotifier)}.
+ * was requested or a shutdown request via the {@link org.sosy_lab.common.ShutdownNotifier}.
  * It is not guaranteed, though, that solvers respond in a timely manner (or at all)
  * to shutdown or interrupt requests.
  */

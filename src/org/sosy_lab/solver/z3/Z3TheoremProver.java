@@ -51,6 +51,7 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
@@ -68,17 +69,20 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   private final long z3solver;
   private int level = 0;
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
+  private final FormulaManager mgr;
 
   private static final String UNSAT_CORE_TEMP_VARNAME = "UNSAT_CORE_%d";
 
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3TheoremProver(
+      Z3FormulaCreator creator,
       Z3FormulaManager pMgr,
       long z3params,
       ShutdownNotifier pShutdownNotifier,
       boolean generateUnsatCore) {
-    super(pMgr);
+    super(creator);
+    mgr = pMgr;
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
@@ -109,7 +113,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
       BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
-      solver_assert_and_track(z3context, z3solver, e, mgr.extractInfo(t));
+      solver_assert_and_track(z3context, z3solver, e, creator.extractInfo(t));
       storedConstraints.put(varName, f);
     } else {
       solver_assert(z3context, z3solver, e);
@@ -159,7 +163,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     ast_vector_inc_ref(z3context, unsatCore);
     for (int i = 0; i < ast_vector_size(z3context, unsatCore); i++) {
       long ast = ast_vector_get(z3context, unsatCore, i);
-      BooleanFormula f = mgr.encapsulateBooleanFormula(ast);
+      BooleanFormula f = creator.encapsulateBoolean(ast);
 
       constraints.add(storedConstraints.get(mgr.getUnsafeFormulaManager().getName(f)));
     }
@@ -216,7 +220,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
           new LongArrayBackedList<BooleanFormula>(valuesOfModel) {
             @Override
             protected BooleanFormula convert(long pE) {
-              return mgr.encapsulateBooleanFormula(pE);
+              return creator.encapsulateBoolean(pE);
             }
           });
 

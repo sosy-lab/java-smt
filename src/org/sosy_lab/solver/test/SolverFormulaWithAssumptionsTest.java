@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
@@ -57,12 +57,12 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   }
 
   /** Generate a prover environment depending on the parameter above.
-   * Can be overridden to parameterize the test.
+   * Can be overridden to parametrize the test.
    * @throws InvalidConfigurationException overriding methods are allowed to throw this */
   @SuppressWarnings({"unchecked", "rawtypes"})
   protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest()
       throws InvalidConfigurationException {
-    InterpolatingProverEnvironment<?> env = mgr.newProverEnvironmentWithInterpolation();
+    InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation();
     assume()
         .withFailureMessage(
             "Solver " + solverToUse() + " does not support solving under assumptions")

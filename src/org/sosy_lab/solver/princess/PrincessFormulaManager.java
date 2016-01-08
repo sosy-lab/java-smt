@@ -27,58 +27,26 @@ import ap.parser.IFormula;
 import ap.parser.PartialEvaluator;
 
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
-import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment;
-import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
-import javax.annotation.Nullable;
 
-public final class PrincessFormulaManager
+final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
-  @Options(prefix = "solver.princess")
-  static class PrincessOptions {
-    @Option(
-      secure = true,
-      description =
-          "The number of atoms a term has to have before"
-              + " it gets abbreviated if there are more identical terms."
-    )
-    private int minAtomsForAbbreviation = 100;
-
-    PrincessOptions(Configuration config) throws InvalidConfigurationException {
-      config.inject(this);
-    }
-
-    public int getMinAtomsForAbbreviation() {
-      return minAtomsForAbbreviation;
-    }
-  }
-
-  private final ShutdownNotifier shutdownNotifier;
-
   @SuppressWarnings("checkstyle:parameternumber")
-  private PrincessFormulaManager(
+  PrincessFormulaManager(
       PrincessFormulaCreator pCreator,
       PrincessUnsafeFormulaManager pUnsafeManager,
       PrincessFunctionFormulaManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
       PrincessArrayFormulaManager pArrayManager,
-      PrincessQuantifiedFormulaManager pQuantifierManager,
-      ShutdownNotifier pShutdownNotifier) {
+      PrincessQuantifiedFormulaManager pQuantifierManager) {
     super(
         pCreator,
         pUnsafeManager,
@@ -90,62 +58,12 @@ public final class PrincessFormulaManager
         null,
         pQuantifierManager,
         pArrayManager);
-    shutdownNotifier = pShutdownNotifier;
-  }
-
-  public static PrincessFormulaManager create(
-      Configuration config,
-      ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate pLogfileTemplate)
-      throws InvalidConfigurationException {
-
-    PrincessOptions options = new PrincessOptions(config);
-
-    PrincessEnvironment env = new PrincessEnvironment(pLogfileTemplate, pShutdownNotifier, options);
-
-    PrincessFormulaCreator creator =
-        new PrincessFormulaCreator(env, TermType.Boolean, TermType.Integer);
-
-    // Create managers
-    PrincessUnsafeFormulaManager unsafeManager = new PrincessUnsafeFormulaManager(creator);
-    PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
-    PrincessBooleanFormulaManager booleanTheory =
-        new PrincessBooleanFormulaManager(creator, unsafeManager);
-    PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
-    PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
-    PrincessQuantifiedFormulaManager quantifierTheory =
-        new PrincessQuantifiedFormulaManager(creator);
-
-    return new PrincessFormulaManager(
-        creator,
-        unsafeManager,
-        functionTheory,
-        booleanTheory,
-        integerTheory,
-        arrayTheory,
-        quantifierTheory,
-        pShutdownNotifier);
   }
 
   BooleanFormula encapsulateBooleanFormula(IExpression t) {
     return getFormulaCreator().encapsulateBoolean(t);
   }
 
-  @Override
-  public ProverEnvironment newProverEnvironment(
-      boolean pGenerateModels, boolean pGenerateUnsatCore) {
-    return new PrincessTheoremProver(this, shutdownNotifier);
-  }
-
-  @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
-    return new PrincessInterpolatingProver(this);
-  }
-
-  @Override
-  public OptEnvironment newOptEnvironment() {
-    throw new UnsupportedOperationException("Princess does not support optimization");
-  }
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
@@ -157,11 +75,6 @@ public final class PrincessFormulaManager
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     return getEnvironment().dumpFormula((IFormula) formula);
-  }
-
-  @Override
-  public String getVersion() {
-    return getEnvironment().getVersion();
   }
 
   @Override

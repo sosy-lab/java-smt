@@ -41,10 +41,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     implements InterpolatingProverEnvironmentWithAssumptions<Integer> {
 
-  Mathsat5InterpolatingProver(Mathsat5FormulaManager pMgr) {
+  Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr) {
     super(pMgr, createConfig());
   }
 
@@ -68,7 +69,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     Preconditions.checkState(!closed);
     int group = msat_create_itp_group(curEnv);
     msat_set_itp_group(curEnv, group);
-    long t = mgr.extractInfo(f);
+    long t = context.getFormulaManager().extractInfo(f);
     msat_assert_formula(curEnv, t);
     return group;
   }
@@ -126,7 +127,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
       }
       throw e;
     }
-    return mgr.encapsulateBooleanFormula(itp);
+    return context.getFormulaManager().encapsulateBooleanFormula(itp);
   }
 
   @Override

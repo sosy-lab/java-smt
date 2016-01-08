@@ -32,8 +32,8 @@ import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.api.SolverContext;
 
 import java.util.List;
 
@@ -43,17 +43,17 @@ import java.util.List;
  *
  * <p>Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)},
  * or {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and
- * {@link #forSolver(FormulaManager)}.
+ * {@link #forSolver(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {
 
-  private final FormulaManager mgr;
+  private final SolverContext context;
 
   private BooleanFormulaSubject(
-      FailureStrategy pFailureStrategy, BooleanFormula pFormula, FormulaManager pMgr) {
+      FailureStrategy pFailureStrategy, BooleanFormula pFormula, SolverContext pMgr) {
     super(pFailureStrategy, pFormula);
-    mgr = checkNotNull(pMgr);
+    context = checkNotNull(pMgr);
   }
 
   /**
@@ -62,18 +62,18 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * <code>assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula).is...()</code>.
    */
   public static SubjectFactory<BooleanFormulaSubject, BooleanFormula> forSolver(
-      final FormulaManager mgr) {
+      final SolverContext context) {
     return new SubjectFactory<BooleanFormulaSubject, BooleanFormula>() {
       @Override
       public BooleanFormulaSubject getSubject(FailureStrategy pFs, BooleanFormula pFormula) {
-        return new BooleanFormulaSubject(pFs, pFormula, mgr);
+        return new BooleanFormulaSubject(pFs, pFormula, context);
       }
     };
   }
 
   private void checkIsUnsat(final BooleanFormula subject, final String verb, final Object expected)
       throws SolverException, InterruptedException {
-    try (final ProverEnvironment prover = mgr.newProverEnvironment(true, false)) {
+    try (final ProverEnvironment prover = context.newProverEnvironment(true, false)) {
       prover.push(subject);
       if (prover.isUnsat()) {
         return; // success
@@ -94,7 +94,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * Will show a model (satisfying assignment) on failure.
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
-    if (mgr.getBooleanFormulaManager().isTrue(getSubject())) {
+    if (context.getFormulaManager().getBooleanFormulaManager().isTrue(getSubject())) {
       failWithBadResults("is", "unsatisfiable", "is", "trivially satisfiable");
     }
 
@@ -106,11 +106,11 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * Will show an unsat core on failure.
    */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    if (mgr.getBooleanFormulaManager().isFalse(getSubject())) {
+    if (context.getFormulaManager().getBooleanFormulaManager().isFalse(getSubject())) {
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
-    try (ProverEnvironment prover = mgr.newProverEnvironment(false, true)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(false, true)) {
       prover.push(getSubject());
       if (!prover.isUnsat()) {
         return; // success
@@ -138,7 +138,8 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       return;
     }
 
-    final BooleanFormula f = mgr.getBooleanFormulaManager().xor(getSubject(), expected);
+    final BooleanFormula f = context.getFormulaManager()
+        .getBooleanFormulaManager().xor(getSubject(), expected);
 
     checkIsUnsat(f, "is equivalent to", expected);
   }
@@ -153,7 +154,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       return;
     }
 
-    final BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     final BooleanFormula implication = bmgr.or(bmgr.not(getSubject()), expected);
 
     checkIsUnsat(bmgr.not(implication), "implies", expected);

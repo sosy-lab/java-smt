@@ -28,21 +28,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.AssignableTerm.Function;
 import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
 import org.sosy_lab.solver.Model;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.UfDeclaration;
 
@@ -81,9 +81,9 @@ public class SolverStackTest extends SolverBasedTest0 {
    */
   private BasicProverEnvironment<?> newEnvironmentForTest(boolean generateUnsatCore) {
     if (useInterpolatingEnvironment) {
-      return mgr.newProverEnvironmentWithInterpolation();
+      return context.newProverEnvironmentWithInterpolation();
     } else {
-      return mgr.newProverEnvironment(true, generateUnsatCore);
+      return context.newProverEnvironment(true, generateUnsatCore);
     }
   }
 

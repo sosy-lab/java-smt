@@ -39,9 +39,10 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager;
-import org.sosy_lab.solver.princess.PrincessFormulaManager;
-import org.sosy_lab.solver.z3.Z3FormulaManager;
+import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
+import org.sosy_lab.solver.princess.PrincessSolverContext;
+import org.sosy_lab.solver.z3.Z3SolverContext;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -57,13 +58,13 @@ import javax.annotation.Nullable;
 
 /**
  * Factory class for loading and instantiating SMT solvers:
- * instantiates and loads a {@link FormulaManager} corresponding to the chosen
+ * instantiates and loads a {@link SolverContext} corresponding to the chosen
  * solver.
  *
  * <p>Main entry point.
  */
 @Options(prefix = "solver", deprecatedPrefix = "cpa.predicate")
-public class FormulaManagerFactory {
+public class SolverContextFactory {
 
   @VisibleForTesting
   public enum Solvers {
@@ -98,10 +99,10 @@ public class FormulaManagerFactory {
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
 
-  private final FormulaManager fmgr;
-  private final FormulaManager itpFmgr;
+  private final SolverContext context;
+  private final SolverContext itpContext;
 
-  public FormulaManagerFactory(
+  public SolverContextFactory(
       Configuration config, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
     config.inject(this);
@@ -119,17 +120,17 @@ public class FormulaManagerFactory {
       interpolationSolver = null;
     }
 
-    fmgr = instantiateSolver(solver, config);
+    context = instantiateSolver(solver, config);
 
     // Instantiate another SMT solver for interpolation if requested.
     if (interpolationSolver != null) {
-      itpFmgr = instantiateSolver(interpolationSolver, config);
+      itpContext = instantiateSolver(interpolationSolver, config);
     } else {
-      itpFmgr = fmgr;
+      itpContext = context;
     }
   }
 
-  private FormulaManager instantiateSolver(Solvers solverToCreate, Configuration config)
+  private SolverContext instantiateSolver(Solvers solverToCreate, Configuration config)
       throws InvalidConfigurationException {
     try {
       switch (solverToCreate) {
@@ -140,15 +141,15 @@ public class FormulaManagerFactory {
           return loadSmtInterpol().create(config, logger, shutdownNotifier, logfile, randomSeed);
 
         case MATHSAT5:
-          return Mathsat5FormulaManager.create(
+          return Mathsat5SolverContext.create(
               logger, config, shutdownNotifier, logfile, randomSeed);
 
         case Z3:
-          return Z3FormulaManager.create(logger, config, shutdownNotifier, logfile, randomSeed);
+          return Z3SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
 
         case PRINCESS:
           // TODO: pass randomSeed to Princess
-          return PrincessFormulaManager.create(config, shutdownNotifier, logfile);
+          return PrincessSolverContext.create(config, logger, shutdownNotifier, logfile);
 
         default:
           throw new AssertionError("no solver selected");
@@ -170,21 +171,21 @@ public class FormulaManagerFactory {
    * Shortcut for getting a {@link FormulaManager}.
    *
    * <p>See
-   * {@link #FormulaManagerFactory(Configuration, LogManager, ShutdownNotifier)}
+   * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
    * for documentation of accepted parameters.
    */
-  public static FormulaManager createFormulaManager(
+  public static SolverContext createFormulaManager(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
       throws InvalidConfigurationException {
-    return new FormulaManagerFactory(config, logger, shutdownNotifier).getFormulaManager();
+    return new SolverContextFactory(config, logger, shutdownNotifier).getSolverContext();
   }
 
-  public FormulaManager getFormulaManager() {
-    return fmgr;
+  public SolverContext getSolverContext() {
+    return context;
   }
 
-  public FormulaManager getFormulaManagerForInterpolation() {
-    return itpFmgr;
+  public SolverContext getSolverContextForInterpolation() {
+    return itpContext;
   }
 
   /**
@@ -195,7 +196,7 @@ public class FormulaManagerFactory {
    * and used by this class, not by other classes.
    */
   public interface SolverFactory {
-    FormulaManager create(
+    SolverContext create(
         Configuration config,
         LogManager logger,
         ShutdownNotifier pShutdownNotifier,
@@ -250,7 +251,7 @@ public class FormulaManagerFactory {
       logger.log(Level.INFO, "Repeated loading of SmtInterpol");
     }
 
-    classLoader = FormulaManagerFactory.class.getClassLoader();
+    classLoader = SolverContextFactory.class.getClassLoader();
     if (classLoader instanceof URLClassLoader) {
 
       // Filter out java-cup-runtime.jar from the class path,

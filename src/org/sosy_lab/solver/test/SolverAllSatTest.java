@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -61,7 +61,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Before
   public void setupEnvironment() {
-    env = mgr.newProverEnvironment(false, false);
+    env = context.newProverEnvironment(false, false);
   }
 
   @After

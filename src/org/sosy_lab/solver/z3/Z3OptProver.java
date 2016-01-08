@@ -52,7 +52,9 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
@@ -62,15 +64,20 @@ import javax.annotation.Nullable;
 
 class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
 
-  private final Z3RationalFormulaManager rfmgr;
+  private final FormulaManager mgr;
+  private final RationalFormulaManager rfmgr;
   private final LogManager logger;
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final long z3optContext;
   private final ShutdownNotifier shutdownNotifier;
 
-  Z3OptProver(Z3FormulaManager pMgr, ShutdownNotifier pShutdownNotifier, LogManager pLogger) {
-    super(pMgr);
-    rfmgr = (Z3RationalFormulaManager) pMgr.getRationalFormulaManager();
+  Z3OptProver(FormulaManager mgr,
+              Z3FormulaCreator creator,
+              ShutdownNotifier pShutdownNotifier,
+              LogManager pLogger) {
+    super(creator);
+    this.mgr = mgr;
+    rfmgr = mgr.getRationalFormulaManager();
     z3optContext = mk_optimize(z3context);
     optimize_inc_ref(z3context, z3optContext);
     shutdownNotifier = checkNotNull(pShutdownNotifier);
@@ -81,7 +88,7 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
-    long z3Constraint = mgr.extractInfo(constraint);
+    long z3Constraint = creator.extractInfo(constraint);
     optimize_assert(z3context, z3optContext, z3Constraint);
     return null;
   }

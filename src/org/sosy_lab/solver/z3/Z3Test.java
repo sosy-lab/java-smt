@@ -20,7 +20,7 @@
 package org.sosy_lab.solver.z3;
 
 import org.junit.Test;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.test.SolverBasedTest0;
 
 public class Z3Test extends SolverBasedTest0 {

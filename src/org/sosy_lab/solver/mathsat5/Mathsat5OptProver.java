@@ -56,7 +56,7 @@ class Mathsat5OptProver extends Mathsat5AbstractProver<Void> implements OptEnvir
    */
   private final Deque<ImmutableMap<Integer, Integer>> stack;
 
-  Mathsat5OptProver(Mathsat5FormulaManager pMgr) {
+  Mathsat5OptProver(Mathsat5SolverContext pMgr) {
     super(pMgr, createConfig());
     objectiveMap = new HashMap<>();
     stack = new ArrayDeque<>();

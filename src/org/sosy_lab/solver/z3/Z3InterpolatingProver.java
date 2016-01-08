@@ -62,8 +62,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   private int level = 0;
   private final Deque<Long> assertedFormulas = new ArrayDeque<>();
 
-  Z3InterpolatingProver(Z3FormulaManager mgr, long z3params) {
-    super(mgr);
+  Z3InterpolatingProver(Z3FormulaCreator creator, Z3FormulaManager mgr, long z3params) {
+    super(creator);
     this.z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
@@ -82,7 +82,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   @Override
   public Long addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
-    long e = mgr.extractInfo(f);
+    long e = creator.extractInfo(f);
     inc_ref(z3context, e);
     solver_assert(z3context, z3solver, e);
     assertedFormulas.addLast(e);
@@ -216,7 +216,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // so we only need to copy them
     final List<BooleanFormula> result = new ArrayList<>();
     for (int i = 0; i < partitionedFormulas.size() - 1; i++) {
-      result.add(mgr.encapsulateBooleanFormula(ast_vector_get(z3context, interpolant.value, i)));
+      result.add(creator.encapsulateBoolean(ast_vector_get(z3context, interpolant.value, i)));
     }
 
     // cleanup

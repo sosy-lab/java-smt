@@ -25,14 +25,8 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
 /**
- * Instances of this interface provide access to an SMT solver.
- * A single formula manager encapsulates a single solver context, and thus
- * should be used only from a single thread.
- *
- * <p>If you wish to use multiple contexts (even for the same solver),
- * create one formula manager per each.
- * Formulas can be transferred between different formula managers using
- * {@link #dumpFormula(BooleanFormula)} and {@link #parse(String)} functions.
+ * FormulaManager class contains all operations which can be performed on
+ * formulas.
  */
 public interface FormulaManager {
 
@@ -88,31 +82,6 @@ public interface FormulaManager {
   QuantifiedFormulaManager getQuantifiedFormulaManager();
 
   /**
-   * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack
-   * and can be used to check formulas for unsatisfiability.
-   * @param generateModels Whether the solver should generate models (i.e., satisfying assignments)
-   *     for satisfiable formulas.
-   * @param generateUnsatCore Whether the solver should generate an unsat core
-   *     for unsatisfiable formulas.
-   */
-  ProverEnvironment newProverEnvironment(boolean generateModels, boolean generateUnsatCore);
-
-  /**
-   * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
-   * and allows to generate and retrieve interpolants for unsatisfiable formulas.
-   * If the SMT solver is able to handle satisfiability tests with assumptions please consider
-   * implementing the {@link InterpolatingProverEnvironmentWithAssumptions} interface, and return
-   * an Object of this type here.
-   */
-  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation();
-
-  /**
-   * Create a fresh new {@link OptEnvironment} which encapsulates an assertion stack
-   * and allows to solve optimization queries.
-   */
-  OptEnvironment newOptEnvironment();
-
-  /**
    * Returns the type of the given Formula.
    */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
@@ -137,11 +106,6 @@ public interface FormulaManager {
    * @return SMT-LIB formula serialization.
    */
   Appender dumpFormula(BooleanFormula pT);
-
-  /**
-   * Get version information out of the solver.
-   */
-  String getVersion();
 
   /**
    * Apply a tactic which performs formula transformation. The available tactics

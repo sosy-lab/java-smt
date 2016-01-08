@@ -32,8 +32,8 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.log.TestLogManager;
-import org.sosy_lab.solver.FormulaManagerFactory;
-import org.sosy_lab.solver.FormulaManagerFactory.Solvers;
+import org.sosy_lab.solver.SolverContextFactory;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BitvectorFormulaManager;
@@ -44,6 +44,7 @@ import org.sosy_lab.solver.api.FunctionFormulaManager;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
+import org.sosy_lab.solver.api.SolverContext;
 
 import javax.annotation.Nullable;
 
@@ -83,7 +84,8 @@ public abstract class SolverBasedTest0 {
   protected Configuration config;
   protected final LogManager logger = TestLogManager.getInstance();
 
-  protected FormulaManagerFactory factory;
+  protected SolverContextFactory factory;
+  protected SolverContext context;
   protected FormulaManager mgr;
   protected BooleanFormulaManager bmgr;
   protected FunctionFormulaManager fmgr;
@@ -110,8 +112,9 @@ public abstract class SolverBasedTest0 {
   public final void initSolver() throws Exception {
     config = createTestConfigBuilder().build();
 
-    factory = new FormulaManagerFactory(config, logger, ShutdownManager.create().getNotifier());
-    mgr = factory.getFormulaManager();
+    factory = new SolverContextFactory(config, logger, ShutdownManager.create().getNotifier());
+    context = factory.getSolverContext();
+    mgr = context.getFormulaManager();
 
     fmgr = mgr.getFunctionFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();
@@ -190,7 +193,7 @@ public abstract class SolverBasedTest0 {
    */
   protected final void requireOptimization() {
     try {
-      mgr.newOptEnvironment().close();
+      context.newOptEnvironment().close();
     } catch (UnsupportedOperationException e) {
       assume()
           .withFailureMessage("Solver " + solverToUse() + " does not support optimization")
@@ -204,7 +207,7 @@ public abstract class SolverBasedTest0 {
    * <code>assertThatFormula(formula).is...()</code>.
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
-    return assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula);
+    return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
   }
 
   /**

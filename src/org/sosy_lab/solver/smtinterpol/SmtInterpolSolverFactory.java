@@ -24,9 +24,9 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.FormulaManagerFactory;
-import org.sosy_lab.solver.FormulaManagerFactory.SolverFactory;
-import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.SolverContextFactory;
+import org.sosy_lab.solver.SolverContextFactory.SolverFactory;
+import org.sosy_lab.solver.api.SolverContext;
 
 import javax.annotation.Nullable;
 
@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
  * Entry point for loading SmtInterpol.
  *
  * <p>Do not access this class directly, it needs to be loaded via
- * {@link FormulaManagerFactory}
+ * {@link SolverContextFactory}
  * because SmtInterpol needs to have it's own class loader.
  */
 public class SmtInterpolSolverFactory implements SolverFactory {
@@ -43,7 +43,7 @@ public class SmtInterpolSolverFactory implements SolverFactory {
   // calls it reflectively
 
   @Override
-  public FormulaManager create(
+  public SolverContext create(
       Configuration pConfig,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
@@ -54,7 +54,7 @@ public class SmtInterpolSolverFactory implements SolverFactory {
     final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
     try {
       currentThread.setContextClassLoader(SmtInterpolSolverFactory.class.getClassLoader());
-      return SmtInterpolFormulaManager.create(
+      return SmtInterpolSolverContext.create(
           pConfig, pLogger, pShutdownNotifier, solverLogfile, randomSeed);
     } finally {
       currentThread.setContextClassLoader(contextClassLoader);

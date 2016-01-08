@@ -30,7 +30,7 @@ import ap.parser.ITerm;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.princess.PrincessFormulaManager.PrincessOptions;
+import org.sosy_lab.solver.princess.PrincessSolverContext.PrincessOptions;
 
 import scala.Enumeration.Value;
 import scala.Option;

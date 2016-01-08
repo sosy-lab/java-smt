@@ -47,7 +47,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   private final ShutdownNotifier shutdownNotifier;
 
   Mathsat5TheoremProver(
-      Mathsat5FormulaManager pMgr,
+      Mathsat5SolverContext pMgr,
       boolean pGenerateModels,
       boolean pGenerateUnsatCore,
       ShutdownNotifier pShutdownNotifier) {
@@ -92,7 +92,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     long[] terms = msat_get_unsat_core(curEnv);
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {
-      result.add(mgr.encapsulateBooleanFormula(t));
+      result.add(context.getFormulaManager().encapsulateBooleanFormula(t));
     }
     return result;
   }
@@ -133,7 +133,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
           new LongArrayBackedList<BooleanFormula>(model) {
             @Override
             protected BooleanFormula convert(long pE) {
-              return mgr.encapsulateBooleanFormula(pE);
+              return context.getFormulaManager().encapsulateBooleanFormula(pE);
             }
           });
     }

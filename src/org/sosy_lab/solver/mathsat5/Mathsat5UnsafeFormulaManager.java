@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
   private final long msatEnv;
@@ -100,11 +101,14 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
     int arity = getArity(f);
-    if (msat_term_is_number(msatEnv, f)
-        || msat_term_is_true(msatEnv, f)
-        || msat_term_is_false(msatEnv, f)) {
+    if (msat_term_is_number(msatEnv, f)) {
+
       // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
       return visitor.visitConstant(formula, msat_term_repr(f));
+    } else if (msat_term_is_true(msatEnv, f)) {
+      return visitor.visitConstant(formula, true);
+    } else if (msat_term_is_false(msatEnv, f)) {
+      return visitor.visitConstant(formula, false);
     } else if (isVariable(f)) {
       return visitor.visitFreeVariable(formula, getName(f));
     } else {

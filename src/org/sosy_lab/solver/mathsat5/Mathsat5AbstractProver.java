@@ -48,17 +48,18 @@ import java.util.Map.Entry;
  */
 abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> {
 
-  protected final Mathsat5FormulaManager mgr;
+  protected final Mathsat5SolverContext context;
   protected final long curEnv;
   private final long curConfig;
   private final long terminationTest;
   protected boolean closed = false;
 
-  protected Mathsat5AbstractProver(Mathsat5FormulaManager pMgr, Map<String, String> pConfig) {
-    mgr = pMgr;
+  protected Mathsat5AbstractProver(Mathsat5SolverContext pContext,
+                                   Map<String, String> pConfig) {
+    context = pContext;
     curConfig = buildConfig(pConfig);
-    curEnv = mgr.createEnvironment(curConfig);
-    terminationTest = mgr.addTerminationTest(curEnv);
+    curEnv = context.createEnvironment(curConfig);
+    terminationTest = context.addTerminationTest(curEnv);
   }
 
   private long buildConfig(Map<String, String> pConfig) {
@@ -119,6 +120,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     long model = msat_get_model(curEnv);
     long term = msat_model_eval(model, evalTerm);
     msat_destroy_model(model);
-    return mgr.getFormulaCreator().encapsulate(mgr.getFormulaType(f), term);
+    return context.getFormulaManager().getFormulaCreator().encapsulate(
+        context.getFormulaManager().getFormulaType(f), term);
   }
 }
