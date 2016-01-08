@@ -154,6 +154,8 @@ class SmtInterpolUtil {
         is = true;
       } else if ("select".equals(at.getFunction().getName())) {
         is = true;
+      } else if (at.getFunction().getReturnSort().isArraySort()) {
+        is = true;
       }
     }
 
