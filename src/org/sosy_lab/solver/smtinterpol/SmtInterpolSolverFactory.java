@@ -25,7 +25,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverContextFactory;
-import org.sosy_lab.solver.SolverContextFactory.SolverFactory;
+import org.sosy_lab.solver.SolverContextFactory.InnerUtilFactory;
 import org.sosy_lab.solver.api.SolverContext;
 
 import javax.annotation.Nullable;
@@ -37,7 +37,7 @@ import javax.annotation.Nullable;
  * {@link SolverContextFactory}
  * because SmtInterpol needs to have it's own class loader.
  */
-public class SmtInterpolSolverFactory implements SolverFactory {
+public class SmtInterpolSolverFactory implements InnerUtilFactory {
 
   // Needs to have default constructor because FormulaManagerFactory
   // calls it reflectively

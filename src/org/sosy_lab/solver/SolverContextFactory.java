@@ -195,7 +195,7 @@ public class SolverContextFactory {
    * <p>This interface is only meant to be implemented by SMT solvers
    * and used by this class, not by other classes.
    */
-  public interface SolverFactory {
+  public interface InnerUtilFactory {
     SolverContext create(
         Configuration config,
         LogManager logger,
@@ -226,14 +226,14 @@ public class SolverContextFactory {
   private static WeakReference<ClassLoader> smtInterpolClassLoader = new WeakReference<>(null);
   private static final AtomicInteger smtInterpolLoadingCount = new AtomicInteger(0);
 
-  private SolverFactory loadSmtInterpol() {
+  private InnerUtilFactory loadSmtInterpol() {
     try {
       ClassLoader classLoader = getClassLoaderForSmtInterpol(logger);
 
       @SuppressWarnings("unchecked")
-      Class<? extends SolverFactory> factoryClass =
-          (Class<? extends SolverFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
-      Constructor<? extends SolverFactory> factoryConstructor = factoryClass.getConstructor();
+      Class<? extends InnerUtilFactory> factoryClass =
+          (Class<? extends InnerUtilFactory>) classLoader.loadClass(SMTINTERPOL_FACTORY_CLASS);
+      Constructor<? extends InnerUtilFactory> factoryConstructor = factoryClass.getConstructor();
       return factoryConstructor.newInstance();
     } catch (ReflectiveOperationException e) {
       throw new Classes.UnexpectedCheckedException("Failed to load SmtInterpol", e);
