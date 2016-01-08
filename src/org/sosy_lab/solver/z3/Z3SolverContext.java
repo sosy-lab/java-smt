@@ -38,7 +38,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ import java.util.logging.Level;
 import javax.annotation.Nullable;
 
 @Options(prefix = "solver.z3", deprecatedPrefix = "cpa.predicate.solver.z3")
-public final class Z3SolverContext implements SolverContext {
+public final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings */
   @Option(
@@ -106,8 +106,10 @@ public final class Z3SolverContext implements SolverContext {
       long pZ3params,
       ShutdownRequestListener pInterruptListener,
       ShutdownNotifier pShutdownNotifier,
-      LogManager pLogger)
+      LogManager pLogger,
+      Z3FormulaManager pManager)
       throws InvalidConfigurationException {
+    super(config, pLogger, pManager);
 
     formulaCreator = pFormulaCreator;
     creator = pFormulaCreator;
@@ -117,20 +119,7 @@ public final class Z3SolverContext implements SolverContext {
     pShutdownNotifier.register(interruptListener);
     shutdownNotifier = pShutdownNotifier;
     logger = pLogger;
-    manager =
-        new Z3FormulaManager(
-            pFormulaCreator,
-            pUnsafeManager,
-            pFunctionManager,
-            pBooleanManager,
-            pIntegerManager,
-            pRationalManager,
-            pBitpreciseManager,
-            pQuantifiedManager,
-            pArrayManager,
-            pInterruptListener,
-            pShutdownNotifier,
-            pLogger);
+    manager = pManager;
   }
 
   public static synchronized Z3SolverContext create(
@@ -220,6 +209,21 @@ public final class Z3SolverContext implements SolverContext {
     // which will throw java Exception
     // instead of exit(1).
     setInternalErrorHandler(context);
+
+    Z3FormulaManager manager =
+        new Z3FormulaManager(
+            creator,
+            unsafeManager,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            bitvectorTheory,
+            quantifierManager,
+            arrayManager,
+            interruptListener,
+            pShutdownNotifier,
+            logger);
     return new Z3SolverContext(
         creator,
         unsafeManager,
@@ -234,7 +238,8 @@ public final class Z3SolverContext implements SolverContext {
         z3params,
         interruptListener,
         pShutdownNotifier,
-        logger);
+        logger,
+        manager);
   }
 
   @Override
@@ -243,12 +248,13 @@ public final class Z3SolverContext implements SolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(boolean generateModels, boolean generateUnsatCore) {
+  public ProverEnvironment newProverEnvironment0(
+      boolean generateModels, boolean generateUnsatCore) {
     return new Z3TheoremProver(creator, manager, z3params, shutdownNotifier, generateUnsatCore);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new Z3InterpolatingProver(creator, manager, z3params);
   }
 

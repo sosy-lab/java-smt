@@ -261,37 +261,38 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    * Extract all free variables from the formula, optionally including UFs.
    */
   protected Map<String, Formula> myExtractSubformulas(
-      final Formula pFormula,
-      final boolean extractUF) {
+      final Formula pFormula, final boolean extractUF) {
 
     final Map<String, Formula> found = new HashMap<>();
-    visitRecursively(new DefaultFormulaVisitor<TraversalProcess>() {
+    visitRecursively(
+        new DefaultFormulaVisitor<TraversalProcess>() {
 
-      @Override
-      protected TraversalProcess visitDefault(Formula f) {
-        return TraversalProcess.CONTINUE;
-      }
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            return TraversalProcess.CONTINUE;
+          }
 
-      @Override
-      public TraversalProcess visitFunction(
-          Formula f,
-          List<Formula> args,
-          String functionName,
-          Function<List<Formula>, Formula> constructor,
-          boolean isUninterpreted) {
+          @Override
+          public TraversalProcess visitFunction(
+              Formula f,
+              List<Formula> args,
+              String functionName,
+              Function<List<Formula>, Formula> constructor,
+              boolean isUninterpreted) {
 
-        if (isUninterpreted && extractUF) {
-          found.put(functionName, f);
-        }
-        return TraversalProcess.CONTINUE;
-      }
+            if (isUninterpreted && extractUF) {
+              found.put(functionName, f);
+            }
+            return TraversalProcess.CONTINUE;
+          }
 
-      @Override
-      public TraversalProcess visitFreeVariable(Formula f, String name) {
-        found.put(name, f);
-        return TraversalProcess.CONTINUE;
-      }
-    }, pFormula);
+          @Override
+          public TraversalProcess visitFreeVariable(Formula f, String name) {
+            found.put(name, f);
+            return TraversalProcess.CONTINUE;
+          }
+        },
+        pFormula);
     return found;
   }
 }

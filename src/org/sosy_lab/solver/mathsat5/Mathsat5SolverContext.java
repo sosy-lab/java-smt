@@ -26,7 +26,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-public final class Mathsat5SolverContext implements SolverContext {
+public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
   private static class Mathsat5Settings {
@@ -88,14 +88,18 @@ public final class Mathsat5SolverContext implements SolverContext {
   private final Mathsat5FormulaManager manager;
   private final Mathsat5FormulaCreator creator;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   public Mathsat5SolverContext(
+      Configuration config,
       LogManager logger,
       long mathsatConfig,
       Mathsat5Settings settings,
       long randomSeed,
       final ShutdownNotifier shutdownNotifier,
       Mathsat5FormulaManager manager,
-      Mathsat5FormulaCreator creator) {
+      Mathsat5FormulaCreator creator)
+      throws InvalidConfigurationException {
+    super(config, logger, manager);
     this.logger = logger;
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
@@ -172,7 +176,7 @@ public final class Mathsat5SolverContext implements SolverContext {
             floatingPointTheory,
             arrayTheory);
     return new Mathsat5SolverContext(
-        logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
+        config, logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }
 
   long createEnvironment(long cfg) {
@@ -216,13 +220,13 @@ public final class Mathsat5SolverContext implements SolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(
+  public ProverEnvironment newProverEnvironment0(
       boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return new Mathsat5TheoremProver(this, pGenerateModels, pGenerateUnsatCore, shutdownNotifier);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new Mathsat5InterpolatingProver(this);
   }
 

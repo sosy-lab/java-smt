@@ -1,7 +1,6 @@
 package org.sosy_lab.solver.cvc4;
 
 import edu.nyu.acsys.CVC4.CVC4JNI;
-import edu.nyu.acsys.CVC4.Configuration;
 
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -13,19 +12,25 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
 import javax.annotation.Nullable;
 
-class CVC4SolverContext implements SolverContext {
+class CVC4SolverContext extends AbstractSolverContext {
   private final CVC4FormulaManager manager;
 
-  private CVC4SolverContext(CVC4FormulaManager manager) {
+  private CVC4SolverContext(
+      org.sosy_lab.common.configuration.Configuration config,
+      LogManager logger,
+      CVC4FormulaManager manager)
+      throws InvalidConfigurationException {
+    super(config, logger, manager);
     this.manager = manager;
   }
 
   public static SolverContext create(
       LogManager logger,
-      Configuration config,
+      org.sosy_lab.common.configuration.Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogFile,
       long randomSeed)
@@ -49,7 +54,7 @@ class CVC4SolverContext implements SolverContext {
     CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
 
     CVC4FormulaManager manager = new CVC4FormulaManager(creator, ufmgr, ffmgr, bfmgr, ifmgr);
-    return new CVC4SolverContext(manager);
+    return new CVC4SolverContext(config, logger, manager);
   }
 
   @Override
@@ -58,13 +63,13 @@ class CVC4SolverContext implements SolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(
+  public ProverEnvironment newProverEnvironment0(
       boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return new CVC4TheoremProver(manager);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     throw new UnsupportedOperationException("CVC4 does not support interpolation.");
   }
 

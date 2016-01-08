@@ -13,10 +13,11 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
 import javax.annotation.Nullable;
 
-public final class PrincessSolverContext implements SolverContext {
+public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.princess")
   static class PrincessOptions {
@@ -42,9 +43,13 @@ public final class PrincessSolverContext implements SolverContext {
   private final PrincessFormulaCreator creator;
 
   private PrincessSolverContext(
+      Configuration config,
+      LogManager logger,
       ShutdownNotifier shutdownNotifier,
       PrincessFormulaManager manager,
-      PrincessFormulaCreator creator) {
+      PrincessFormulaCreator creator)
+      throws InvalidConfigurationException {
+    super(config, logger, manager);
     this.shutdownNotifier = shutdownNotifier;
     this.manager = manager;
     this.creator = creator;
@@ -79,7 +84,7 @@ public final class PrincessSolverContext implements SolverContext {
             integerTheory,
             arrayTheory,
             quantifierTheory);
-    return new PrincessSolverContext(pShutdownNotifier, manager, creator);
+    return new PrincessSolverContext(config, logger, pShutdownNotifier, manager, creator);
   }
 
   @Override
@@ -88,13 +93,13 @@ public final class PrincessSolverContext implements SolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(
+  public ProverEnvironment newProverEnvironment0(
       boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return new PrincessTheoremProver(manager, shutdownNotifier);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new PrincessInterpolatingProver(manager);
   }
 

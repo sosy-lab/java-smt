@@ -9,18 +9,23 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
 import javax.annotation.Nullable;
 
-class SmtInterpolSolverContext implements SolverContext {
+class SmtInterpolSolverContext extends AbstractSolverContext {
 
   private final SmtInterpolEnvironment environment;
   private final SmtInterpolFormulaManager manager;
   private final SmtInterpolFormulaCreator formulaCreator;
 
   private SmtInterpolSolverContext(
-      SmtInterpolFormulaCreator pFormulaCreator, SmtInterpolFormulaManager pManager) {
+      Configuration configuration,
+      LogManager logger,
+      SmtInterpolFormulaCreator pFormulaCreator,
+      SmtInterpolFormulaManager pManager)
+      throws InvalidConfigurationException {
+    super(configuration, logger, pManager);
     formulaCreator = pFormulaCreator;
     environment = pFormulaCreator.getEnv();
     manager = pManager;
@@ -55,17 +60,17 @@ class SmtInterpolSolverContext implements SolverContext {
             integerTheory,
             rationalTheory,
             arrayTheory);
-    return new SmtInterpolSolverContext(creator, manager);
+    return new SmtInterpolSolverContext(config, logger, creator, manager);
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment(
+  public ProverEnvironment newProverEnvironment0(
       boolean pGenerateModels, boolean pGenerateUnsatCore) {
     return environment.createProver(manager);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return environment.getInterpolator(manager);
   }
 

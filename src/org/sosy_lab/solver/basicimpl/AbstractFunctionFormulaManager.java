@@ -104,13 +104,16 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
   public <T extends Formula> T declareAndCallUninterpretedFunction(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
 
-    List<FormulaType<?>> argTypes = from(pArgs).
-        transform(
-            new Function<Formula, FormulaType<?>>() {
-              @Override
-              public FormulaType<?> apply(Formula pArg0) {
-                return getFormulaCreator().getFormulaType(pArg0);
-              }}).toList();
+    List<FormulaType<?>> argTypes =
+        from(pArgs)
+            .transform(
+                new Function<Formula, FormulaType<?>>() {
+                  @Override
+                  public FormulaType<?> apply(Formula pArg0) {
+                    return getFormulaCreator().getFormulaType(pArg0);
+                  }
+                })
+            .toList();
     UfDeclaration<T> func = declareUninterpretedFunction(name, pReturnType, argTypes);
     return callUninterpretedFunction(func, pArgs);
   }
