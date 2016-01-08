@@ -45,9 +45,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
-
-class SmtInterpolFormulaManager
-    extends AbstractFormulaManager<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtInterpolEnvironment> {
 
   SmtInterpolFormulaManager(
       SmtInterpolFormulaCreator pCreator,

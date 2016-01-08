@@ -29,7 +29,6 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
-
 class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environment> {
 
   CVC4FormulaManager(

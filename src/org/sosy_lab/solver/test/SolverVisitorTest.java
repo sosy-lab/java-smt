@@ -184,20 +184,22 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     // Check that "true" is correctly treated as a constant.
     BooleanFormula t = bmgr.makeBoolean(true);
     final List<Boolean> containsTrue = new ArrayList<>();
-    mgr.visitRecursively(new DefaultFormulaVisitor<TraversalProcess>() {
-      @Override
-      protected TraversalProcess visitDefault(Formula f) {
-        return TraversalProcess.CONTINUE;
-      }
+    mgr.visitRecursively(
+        new DefaultFormulaVisitor<TraversalProcess>() {
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            return TraversalProcess.CONTINUE;
+          }
 
-      @Override
-      public TraversalProcess visitConstant(Formula f, Object o) {
-        if (f.equals(bmgr.makeBoolean(true))) {
-          containsTrue.add(true);
-        }
-        return TraversalProcess.CONTINUE;
-      }
-    }, t);
+          @Override
+          public TraversalProcess visitConstant(Formula f, Object o) {
+            if (f.equals(bmgr.makeBoolean(true))) {
+              containsTrue.add(true);
+            }
+            return TraversalProcess.CONTINUE;
+          }
+        },
+        t);
     assertThat(containsTrue).isNotEmpty();
   }
 }

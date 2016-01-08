@@ -54,8 +54,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   private final long terminationTest;
   protected boolean closed = false;
 
-  protected Mathsat5AbstractProver(Mathsat5SolverContext pContext,
-                                   Map<String, String> pConfig) {
+  protected Mathsat5AbstractProver(Mathsat5SolverContext pContext, Map<String, String> pConfig) {
     context = pContext;
     curConfig = buildConfig(pConfig);
     curEnv = context.createEnvironment(curConfig);
@@ -120,7 +119,9 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     long model = msat_get_model(curEnv);
     long term = msat_model_eval(model, evalTerm);
     msat_destroy_model(model);
-    return context.getFormulaManager().getFormulaCreator().encapsulate(
-        context.getFormulaManager().getFormulaType(f), term);
+    return context
+        .getFormulaManager()
+        .getFormulaCreator()
+        .encapsulate(context.getFormulaManager().getFormulaType(f), term);
   }
 }

@@ -20,8 +20,7 @@ class SmtInterpolSolverContext implements SolverContext {
   private final SmtInterpolFormulaCreator formulaCreator;
 
   private SmtInterpolSolverContext(
-      SmtInterpolFormulaCreator pFormulaCreator,
-      SmtInterpolFormulaManager pManager) {
+      SmtInterpolFormulaCreator pFormulaCreator, SmtInterpolFormulaManager pManager) {
     formulaCreator = pFormulaCreator;
     environment = pFormulaCreator.getEnv();
     manager = pManager;
@@ -47,17 +46,17 @@ class SmtInterpolSolverContext implements SolverContext {
     SmtInterpolRationalFormulaManager rationalTheory =
         new SmtInterpolRationalFormulaManager(creator);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
-    SmtInterpolFormulaManager manager = new SmtInterpolFormulaManager(
-        creator,
-        unsafeManager,
-        functionTheory,
-        booleanTheory,
-        integerTheory,
-        rationalTheory,
-        arrayTheory);
+    SmtInterpolFormulaManager manager =
+        new SmtInterpolFormulaManager(
+            creator,
+            unsafeManager,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            arrayTheory);
     return new SmtInterpolSolverContext(creator, manager);
   }
-
 
   @Override
   public ProverEnvironment newProverEnvironment(
@@ -86,7 +85,5 @@ class SmtInterpolSolverContext implements SolverContext {
   }
 
   @Override
-  public void close() {
-
-  }
+  public void close() {}
 }

@@ -35,17 +35,16 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-
 public final class Mathsat5SolverContext implements SolverContext {
 
   @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
   private static class Mathsat5Settings {
 
     @Option(
-        secure = true,
-        description =
-            "Further options that will be passed to Mathsat in addition to the default options. "
-                + "Format is 'key1=value1,key2=value2'"
+      secure = true,
+      description =
+          "Further options that will be passed to Mathsat in addition to the default options. "
+              + "Format is 'key1=value1,key2=value2'"
     )
     private String furtherOptions = "";
 
@@ -89,13 +88,14 @@ public final class Mathsat5SolverContext implements SolverContext {
   private final Mathsat5FormulaManager manager;
   private final Mathsat5FormulaCreator creator;
 
-  public Mathsat5SolverContext(LogManager logger,
-                               long mathsatConfig,
-                               Mathsat5Settings settings,
-                               long randomSeed,
-                               final ShutdownNotifier shutdownNotifier,
-                               Mathsat5FormulaManager manager,
-                               Mathsat5FormulaCreator creator) {
+  public Mathsat5SolverContext(
+      LogManager logger,
+      long mathsatConfig,
+      Mathsat5Settings settings,
+      long randomSeed,
+      final ShutdownNotifier shutdownNotifier,
+      Mathsat5FormulaManager manager,
+      Mathsat5FormulaCreator creator) {
     this.logger = logger;
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
@@ -131,7 +131,6 @@ public final class Mathsat5SolverContext implements SolverContext {
       NativeLibraries.loadLibrary("mathsat5j");
     }
 
-
     long msatConf = msat_create_config();
     msat_set_option_checked(msatConf, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(msatConf, "random_seed", Long.toString(randomSeed));
@@ -161,9 +160,17 @@ public final class Mathsat5SolverContext implements SolverContext {
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, functionTheory);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
-    Mathsat5FormulaManager manager = new Mathsat5FormulaManager(
-        creator, unsafeManager, functionTheory, booleanTheory, integerTheory,
-        rationalTheory, bitvectorTheory, floatingPointTheory, arrayTheory);
+    Mathsat5FormulaManager manager =
+        new Mathsat5FormulaManager(
+            creator,
+            unsafeManager,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            bitvectorTheory,
+            floatingPointTheory,
+            arrayTheory);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }

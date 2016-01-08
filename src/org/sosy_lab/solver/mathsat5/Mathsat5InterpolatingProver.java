@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     implements InterpolatingProverEnvironmentWithAssumptions<Integer> {
 

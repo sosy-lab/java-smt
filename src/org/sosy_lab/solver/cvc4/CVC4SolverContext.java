@@ -16,7 +16,7 @@ import org.sosy_lab.solver.api.SolverContext;
 
 import javax.annotation.Nullable;
 
-class CVC4SolverContext implements SolverContext{
+class CVC4SolverContext implements SolverContext {
   private final CVC4FormulaManager manager;
 
   private CVC4SolverContext(CVC4FormulaManager manager) {
@@ -48,10 +48,8 @@ class CVC4SolverContext implements SolverContext{
     CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator, ufmgr);
     CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
 
-    CVC4FormulaManager manager =
-        new CVC4FormulaManager(creator, ufmgr, ffmgr, bfmgr, ifmgr);
+    CVC4FormulaManager manager = new CVC4FormulaManager(creator, ufmgr, ffmgr, bfmgr, ifmgr);
     return new CVC4SolverContext(manager);
-
   }
 
   @Override

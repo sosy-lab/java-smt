@@ -30,9 +30,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
-
-final class Mathsat5FormulaManager
-    extends AbstractFormulaManager<Long, Long, Long> {
+final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
 
   @SuppressWarnings("checkstyle:parameternumber")
   Mathsat5FormulaManager(
@@ -65,7 +63,6 @@ final class Mathsat5FormulaManager
   BooleanFormula encapsulateBooleanFormula(long t) {
     return getFormulaCreator().encapsulateBoolean(t);
   }
-
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {

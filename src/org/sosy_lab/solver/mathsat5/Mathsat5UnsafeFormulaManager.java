@@ -62,7 +62,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
   private final long msatEnv;

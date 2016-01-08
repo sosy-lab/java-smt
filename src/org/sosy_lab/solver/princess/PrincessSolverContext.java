@@ -21,10 +21,10 @@ public final class PrincessSolverContext implements SolverContext {
   @Options(prefix = "solver.princess")
   static class PrincessOptions {
     @Option(
-        secure = true,
-        description =
-            "The number of atoms a term has to have before"
-                + " it gets abbreviated if there are more identical terms."
+      secure = true,
+      description =
+          "The number of atoms a term has to have before"
+              + " it gets abbreviated if there are more identical terms."
     )
     private int minAtomsForAbbreviation = 100;
 
@@ -50,17 +50,14 @@ public final class PrincessSolverContext implements SolverContext {
     this.creator = creator;
   }
 
-  public static SolverContext create(Configuration config,
-                                     LogManager logger,
-                                     ShutdownNotifier pShutdownNotifier,
-                                     @Nullable PathCounterTemplate pLogfileTemplate)
-
-        throws InvalidConfigurationException {
+  public static SolverContext create(
+      Configuration config,
+      LogManager logger,
+      ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate pLogfileTemplate)
+      throws InvalidConfigurationException {
     PrincessOptions options = new PrincessOptions(config);
-    PrincessEnvironment env = new PrincessEnvironment(
-        pLogfileTemplate,
-        pShutdownNotifier,
-        options);
+    PrincessEnvironment env = new PrincessEnvironment(pLogfileTemplate, pShutdownNotifier, options);
     PrincessFormulaCreator creator =
         new PrincessFormulaCreator(env, TermType.Boolean, TermType.Integer);
 
@@ -73,15 +70,15 @@ public final class PrincessSolverContext implements SolverContext {
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
         new PrincessQuantifiedFormulaManager(creator);
-    PrincessFormulaManager manager = new PrincessFormulaManager(
-        creator,
-        unsafeManager,
-        functionTheory,
-        booleanTheory,
-        integerTheory,
-        arrayTheory,
-        quantifierTheory
-    );
+    PrincessFormulaManager manager =
+        new PrincessFormulaManager(
+            creator,
+            unsafeManager,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            arrayTheory,
+            quantifierTheory);
     return new PrincessSolverContext(pShutdownNotifier, manager, creator);
   }
 
@@ -112,7 +109,5 @@ public final class PrincessSolverContext implements SolverContext {
   }
 
   @Override
-  public void close() {
-
-  }
+  public void close() {}
 }

@@ -71,10 +71,11 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
   private final long z3optContext;
   private final ShutdownNotifier shutdownNotifier;
 
-  Z3OptProver(FormulaManager mgr,
-              Z3FormulaCreator creator,
-              ShutdownNotifier pShutdownNotifier,
-              LogManager pLogger) {
+  Z3OptProver(
+      FormulaManager mgr,
+      Z3FormulaCreator creator,
+      ShutdownNotifier pShutdownNotifier,
+      LogManager pLogger) {
     super(creator);
     this.mgr = mgr;
     rfmgr = mgr.getRationalFormulaManager();

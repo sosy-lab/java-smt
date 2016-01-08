@@ -46,22 +46,21 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-
 @Options(prefix = "solver.z3", deprecatedPrefix = "cpa.predicate.solver.z3")
 public final class Z3SolverContext implements SolverContext {
 
   /** Optimization settings */
   @Option(
-      secure = true,
-      description = "Engine to use for the optimization",
-      values = {"basic", "farkas", "symba"}
+    secure = true,
+    description = "Engine to use for the optimization",
+    values = {"basic", "farkas", "symba"}
   )
   String optimizationEngine = "basic";
 
   @Option(
-      secure = true,
-      description = "Ordering for objectives in the optimization" + " context",
-      values = {"lex", "pareto", "box"}
+    secure = true,
+    description = "Ordering for objectives in the optimization" + " context",
+    values = {"lex", "pareto", "box"}
   )
   String objectivePrioritizationMode = "box";
 
@@ -82,10 +81,10 @@ public final class Z3SolverContext implements SolverContext {
     boolean requireProofs = true;
 
     @Option(
-        secure = true,
-        description =
-            "Activate replayable logging in Z3."
-                + " The log can be given as an input to the solver and replayed."
+      secure = true,
+      description =
+          "Activate replayable logging in Z3."
+              + " The log can be given as an input to the solver and replayed."
     )
     @FileOption(Type.OUTPUT_FILE)
     @Nullable
@@ -118,19 +117,20 @@ public final class Z3SolverContext implements SolverContext {
     pShutdownNotifier.register(interruptListener);
     shutdownNotifier = pShutdownNotifier;
     logger = pLogger;
-    manager = new Z3FormulaManager(
-        pFormulaCreator,
-        pUnsafeManager,
-        pFunctionManager,
-        pBooleanManager,
-        pIntegerManager,
-        pRationalManager,
-        pBitpreciseManager,
-        pQuantifiedManager,
-        pArrayManager,
-        pInterruptListener,
-        pShutdownNotifier,
-        pLogger);
+    manager =
+        new Z3FormulaManager(
+            pFormulaCreator,
+            pUnsafeManager,
+            pFunctionManager,
+            pBooleanManager,
+            pIntegerManager,
+            pRationalManager,
+            pBitpreciseManager,
+            pQuantifiedManager,
+            pArrayManager,
+            pInterruptListener,
+            pShutdownNotifier,
+            pLogger);
   }
 
   public static synchronized Z3SolverContext create(
@@ -254,10 +254,7 @@ public final class Z3SolverContext implements SolverContext {
 
   @Override
   public OptEnvironment newOptEnvironment() {
-    Z3OptProver out = new Z3OptProver(
-        getFormulaManager(),
-        creator,
-        shutdownNotifier, logger);
+    Z3OptProver out = new Z3OptProver(getFormulaManager(), creator, shutdownNotifier, logger);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;

@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
-
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.AssignableTerm.Variable;

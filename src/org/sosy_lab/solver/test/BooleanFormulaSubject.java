@@ -138,8 +138,8 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       return;
     }
 
-    final BooleanFormula f = context.getFormulaManager()
-        .getBooleanFormulaManager().xor(getSubject(), expected);
+    final BooleanFormula f =
+        context.getFormulaManager().getBooleanFormulaManager().xor(getSubject(), expected);
 
     checkIsUnsat(f, "is equivalent to", expected);
   }
