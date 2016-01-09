@@ -698,4 +698,51 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
           .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
     }
   }
+
+  @Test
+  public void testNestedRationalArray() {
+    requireArrays();
+    requireRationals();
+
+    IntegerFormula _i = imgr.makeVariable("i");
+    ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, RationalFormula>> multi =
+        amgr.makeArray(
+            "multi",
+            NumeralType.IntegerType,
+            FormulaType.getArrayType(NumeralType.IntegerType, NumeralType.RationalType));
+
+    RationalFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
+
+    if (solver == Solvers.MATHSAT5) {
+      assertThat(valueInMulti.toString())
+          .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+    } else {
+      assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    }
+  }
+
+  @Test
+  public void testNestedBitVectorArray() {
+    requireArrays();
+    requireBitvectors();
+
+    IntegerFormula _i = imgr.makeVariable("i");
+    ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, BitvectorFormula>> multi =
+        amgr.makeArray(
+            "multi",
+            NumeralType.IntegerType,
+            FormulaType.getArrayType(
+                NumeralType.IntegerType, FormulaType.getBitvectorTypeWithSize(32)));
+
+    BitvectorFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
+
+    if (solver == Solvers.MATHSAT5) {
+      assertThat(valueInMulti.toString())
+          .isEqualTo(
+              "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, "
+                  + ">` multi i) i)");
+    } else {
+      assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    }
+  }
 }
