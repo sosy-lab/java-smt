@@ -25,9 +25,21 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 
+import org.sosy_lab.solver.api.ArrayFormula;
+import org.sosy_lab.solver.api.BitvectorFormula;
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.FloatingPointFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4ArrayFormula;
+import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4BitvectorFormula;
+import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4BooleanFormula;
+import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4FloatingPointFormula;
+import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4IntegerFormula;
+import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4RationalFormula;
 
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environment> {
 
@@ -59,6 +71,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
   }
 
   @Override
+  public Expr extractInfo(Formula pT) {
+    return CVC4FormulaManager.getCVC4Expr(pT);
+  }
+
+  @Override
   public FormulaType<?> getFormulaType(Expr pFormula) {
     Type t = pFormula.getType();
     if (t.isArray()) {
@@ -83,5 +100,55 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     } else {
       throw new AssertionError("Unhandled type " + t.getClass());
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Formula> T encapsulate(FormulaType<T> pType, Expr pTerm) {
+    assert pType.equals(getFormulaType(pTerm))
+            || (pType.equals(FormulaType.RationalType)
+                && getFormulaType(pTerm).equals(FormulaType.IntegerType))
+        : String.format(
+            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+    if (pType.isBooleanType()) {
+      return (T) new CVC4BooleanFormula(pTerm);
+    } else if (pType.isIntegerType()) {
+      return (T) new CVC4IntegerFormula(pTerm);
+    } else if (pType.isRationalType()) {
+      return (T) new CVC4RationalFormula(pTerm);
+    } else if (pType.isArrayType()) {
+      ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
+      return (T) new CVC4ArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType());
+    } else if (pType.isBitvectorType()) {
+      return (T) new CVC4BitvectorFormula(pTerm);
+    } else if (pType.isFloatingPointType()) {
+      return (T) new CVC4FloatingPointFormula(pTerm);
+    }
+    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
+  }
+
+  @Override
+  public BooleanFormula encapsulateBoolean(Expr pTerm) {
+    assert getFormulaType(pTerm).isBooleanType();
+    return new CVC4BooleanFormula(pTerm);
+  }
+
+  @Override
+  public BitvectorFormula encapsulateBitvector(Expr pTerm) {
+    assert getFormulaType(pTerm).isBitvectorType();
+    return new CVC4BitvectorFormula(pTerm);
+  }
+
+  @Override
+  protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointType();
+    return new CVC4FloatingPointFormula(pTerm);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
+    return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 }

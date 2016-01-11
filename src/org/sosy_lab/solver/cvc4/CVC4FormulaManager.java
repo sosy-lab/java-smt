@@ -40,6 +40,14 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
     super(pFormulaCreator, pUfmgr, pFfmgr, pBfmgr, pIfmgr, null, null, null, null, null);
   }
 
+  static Expr getCVC4Expr(Formula pT) {
+    if (pT instanceof CVC4Formula) {
+      return ((CVC4Formula) pT).getTerm();
+    }
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+  }
+
   BooleanFormula encapsulateBooleanFormula(Expr t) {
     return getFormulaCreator().encapsulateBoolean(t);
   }
