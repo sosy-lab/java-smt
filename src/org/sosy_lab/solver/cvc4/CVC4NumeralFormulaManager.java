@@ -50,7 +50,7 @@ public abstract class CVC4NumeralFormulaManager<
 
   @Override
   protected Expr negate(Expr pParam1) {
-    return exprManager.mkExpr(Kind.MINUS, pParam1);
+    return exprManager.mkExpr(Kind.UMINUS, pParam1);
   }
 
   @Override
