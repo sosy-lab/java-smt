@@ -202,6 +202,17 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  protected final void requireInterpolation() {
+    try {
+      context.newProverEnvironmentWithInterpolation().close();
+    }  catch (UnsupportedOperationException e) {
+      assume()
+      .withFailureMessage("Solver " + solverToUse() + " does not support interpolation")
+      .that(e)
+      .isNull();
+    }
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth:
    * <code>assertThatFormula(formula).is...()</code>.

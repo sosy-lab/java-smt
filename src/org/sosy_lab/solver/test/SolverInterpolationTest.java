@@ -73,6 +73,8 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
   @Test
   public <T> void simpleInterpolation() throws Exception {
+    requireInterpolation();
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x, y, z;
       x = imgr.makeVariable("x");
@@ -93,6 +95,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
+    requireInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -133,6 +136,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   private void requireSequentialItp() {
+    requireInterpolation();
     assume()
         .withFailureMessage("Solver does not support sequential interpolation.")
         .that(solver)
@@ -140,6 +144,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   private void requireTreeItp() {
+    requireInterpolation();
     assume()
         .withFailureMessage("Solver does not support tree-interpolation.")
         .that(solver)

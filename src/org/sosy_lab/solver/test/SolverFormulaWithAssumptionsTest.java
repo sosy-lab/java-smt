@@ -74,6 +74,8 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   @Test
   public <T> void basicAssumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException {
+    requireInterpolation();
+
     IntegerFormula v1 = imgr.makeVariable("v1");
     IntegerFormula v2 = imgr.makeVariable("v2");
 
