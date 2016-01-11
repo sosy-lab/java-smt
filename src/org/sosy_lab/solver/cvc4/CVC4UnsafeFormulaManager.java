@@ -19,22 +19,27 @@
  */
 package org.sosy_lab.solver.cvc4;
 
+import com.google.common.base.Function;
+
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CVC4UnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Expr, Type, CVC4Environment> {
 
-  protected CVC4UnsafeFormulaManager(FormulaCreator<Expr, Type, CVC4Environment> pCreator) {
+  private final CVC4FormulaCreator formulaCreator;
+
+  CVC4UnsafeFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
+    formulaCreator = pCreator;
   }
 
   @Override
@@ -118,7 +123,44 @@ public class CVC4UnsafeFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Expr f) {
-    throw new UnsupportedOperationException("Not implemented");
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
+
+    Type type = f.getType();
+
+    if (f.isConst()) {
+      if (type.isBoolean()) {
+        return visitor.visitConstant(formula, f.getConstBoolean());
+      } else if (type.isInteger() || type.isFloatingPoint()) {
+        return visitor.visitConstant(formula, f.getConstRational());
+      } else if (type.isBitVector()) {
+        // TODO is this correct?
+        return visitor.visitConstant(formula, f.getConstBitVector().getValue());
+      } else {
+        throw new UnsupportedOperationException("Unhandled constant kind");
+      }
+
+    } else if (f.isVariable()) {
+      return visitor.visitFreeVariable(formula, getName(f));
+
+    } else {
+      String name = getName(f);
+      int arity = getArity(f);
+
+      List<Formula> args = new ArrayList<>(arity);
+      for (int i = 0; i < arity; i++) {
+        Expr arg = getArg(f, i);
+        args.add(formulaCreator.encapsulate(formulaCreator.getFormulaType(arg), arg));
+      }
+
+      // Any function application.
+      Function<List<Formula>, Formula> constructor =
+          new Function<List<Formula>, Formula>() {
+            @Override
+            public Formula apply(List<Formula> formulas) {
+              return replaceArgs(formulaCreator.encapsulate(formulaCreator.getFormulaType(f), f), formulas);
+            }
+          };
+      return visitor.visitFunction(formula, args, name, constructor, isUF(f));
+    }
   }
 }
