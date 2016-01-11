@@ -157,7 +157,8 @@ public class CVC4UnsafeFormulaManager
           new Function<List<Formula>, Formula>() {
             @Override
             public Formula apply(List<Formula> formulas) {
-              return replaceArgs(formulaCreator.encapsulate(formulaCreator.getFormulaType(f), f), formulas);
+              return replaceArgs(
+                  formulaCreator.encapsulate(formulaCreator.getFormulaType(f), f), formulas);
             }
           };
       return visitor.visitFunction(formula, args, name, constructor, isUF(f));

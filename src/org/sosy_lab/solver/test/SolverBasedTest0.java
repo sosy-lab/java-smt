@@ -205,11 +205,11 @@ public abstract class SolverBasedTest0 {
   protected final void requireInterpolation() {
     try {
       context.newProverEnvironmentWithInterpolation().close();
-    }  catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException e) {
       assume()
-      .withFailureMessage("Solver " + solverToUse() + " does not support interpolation")
-      .that(e)
-      .isNull();
+          .withFailureMessage("Solver " + solverToUse() + " does not support interpolation")
+          .that(e)
+          .isNull();
     }
   }
 
