@@ -23,9 +23,12 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
+import edu.nyu.acsys.CVC4.vectorExpr;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+
+import java.util.Collection;
 
 public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment> {
@@ -60,8 +63,26 @@ public class CVC4BooleanFormulaManager
   }
 
   @Override
+  protected Expr andImpl(Collection<Expr> pParams) {
+    vectorExpr vExpr = new vectorExpr();
+    for (Expr e : pParams) {
+      vExpr.add(e);
+    }
+    return exprManager.mkExpr(Kind.AND, vExpr);
+  }
+
+  @Override
   protected Expr or(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.OR, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr orImpl(Collection<Expr> pParams) {
+    vectorExpr vExpr = new vectorExpr();
+    for (Expr e : pParams) {
+      vExpr.add(e);
+    }
+    return exprManager.mkExpr(Kind.OR, vExpr);
   }
 
   @Override
