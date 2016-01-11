@@ -44,10 +44,12 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
+import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @RunWith(Parameterized.class)
@@ -83,7 +85,11 @@ public class SolverStackTest extends SolverBasedTest0 {
     if (useInterpolatingEnvironment) {
       return context.newProverEnvironmentWithInterpolation();
     } else {
-      return context.newProverEnvironment(true, generateUnsatCore);
+      EnumSet<ProverOptions> options = EnumSet.of(ProverOptions.GENERATE_MODELS);
+      if (generateUnsatCore) {
+        options.add(ProverOptions.GENERATE_UNSAT_CORE);
+      }
+      return context.newProverEnvironment(options);
     }
   }
 
@@ -161,6 +167,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void singleStackTestRational() throws Exception {
     requireRationals();
+    assert rmgr != null;
 
     BasicProverEnvironment<?> env = newEnvironmentForTest(true);
     simpleStackTestNum(rmgr, env);

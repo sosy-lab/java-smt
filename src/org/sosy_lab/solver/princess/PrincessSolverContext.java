@@ -15,6 +15,8 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
+import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 public final class PrincessSolverContext extends AbstractSolverContext {
@@ -93,8 +95,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(
-      boolean pGenerateModels, boolean pGenerateUnsatCore) {
+  public ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options) {
     return new PrincessTheoremProver(manager, shutdownNotifier);
   }
 

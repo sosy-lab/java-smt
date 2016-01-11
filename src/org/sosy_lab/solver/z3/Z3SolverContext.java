@@ -42,6 +42,7 @@ import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -248,9 +249,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(
-      boolean generateModels, boolean generateUnsatCore) {
-    return new Z3TheoremProver(creator, manager, z3params, shutdownNotifier, generateUnsatCore);
+  public ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options) {
+    return new Z3TheoremProver(creator, manager, z3params, shutdownNotifier, options);
   }
 
   @Override

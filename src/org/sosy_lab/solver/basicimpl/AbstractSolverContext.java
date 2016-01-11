@@ -13,6 +13,8 @@ import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.logging.LoggingInterpolatingProverEnvironment;
 import org.sosy_lab.solver.logging.LoggingProverEnvironment;
 
+import java.util.EnumSet;
+
 @Options(prefix = "solver")
 public abstract class AbstractSolverContext implements SolverContext {
 
@@ -30,35 +32,35 @@ public abstract class AbstractSolverContext implements SolverContext {
   }
 
   @Override
-  public final ProverEnvironment newProverEnvironment(
-      boolean generateModels, boolean generateUnsatCore) {
-    ProverEnvironment pe = newProverEnvironment0(generateModels, generateUnsatCore);
+  public final ProverEnvironment newProverEnvironment(EnumSet<ProverOptions> options) {
+    ProverEnvironment pe = newProverEnvironment0(options);
     if (useLogger) {
       pe = new LoggingProverEnvironment(logger, pe);
     }
     return pe;
   }
 
-  public abstract ProverEnvironment newProverEnvironment0(
-      boolean generateModels, boolean generateUnsatCore);
+  public abstract ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options);
 
   @Override
-  public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public final InterpolatingProverEnvironmentWithAssumptions<?>
+      newProverEnvironmentWithInterpolation() {
     InterpolatingProverEnvironment<?> ipe = newProverEnvironmentWithInterpolation0();
 
     // In the case we do not already have a prover environment with assumptions
     // we add a wrapper to it
+    InterpolatingProverEnvironmentWithAssumptions<?> out;
     if (!(ipe instanceof InterpolatingProverEnvironmentWithAssumptions)) {
-      ipe = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
+      out = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
+    } else {
+      out = (InterpolatingProverEnvironmentWithAssumptions) ipe;
     }
 
     if (useLogger) {
-      ipe =
-          new LoggingInterpolatingProverEnvironment<>(
-              logger, (InterpolatingProverEnvironmentWithAssumptions<?>) ipe);
+      out = new LoggingInterpolatingProverEnvironment<>(logger, out);
     }
 
-    return ipe;
+    return out;
   }
 
   public abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();

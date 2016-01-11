@@ -33,10 +33,12 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -48,11 +50,14 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   Mathsat5TheoremProver(
       Mathsat5SolverContext pMgr,
-      boolean pGenerateModels,
-      boolean pGenerateUnsatCore,
+      EnumSet<ProverOptions> options,
       ShutdownNotifier pShutdownNotifier) {
 
-    super(pMgr, createConfig(pGenerateModels, pGenerateUnsatCore));
+    super(
+        pMgr,
+        createConfig(
+            options.contains(ProverOptions.GENERATE_MODELS),
+            options.contains(ProverOptions.GENERATE_UNSAT_CORE)));
     shutdownNotifier = pShutdownNotifier;
   }
 

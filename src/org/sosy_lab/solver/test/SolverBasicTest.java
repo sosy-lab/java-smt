@@ -39,7 +39,6 @@ import org.sosy_lab.solver.api.UfDeclaration;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 @RunWith(Parameterized.class)
 public class SolverBasicTest extends SolverBasedTest0 {
 

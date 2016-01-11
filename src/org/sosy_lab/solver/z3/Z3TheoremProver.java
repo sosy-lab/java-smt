@@ -53,10 +53,12 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,13 +82,13 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Z3FormulaManager pMgr,
       long z3params,
       ShutdownNotifier pShutdownNotifier,
-      boolean generateUnsatCore) {
+      EnumSet<ProverOptions> options) {
     super(creator);
     mgr = pMgr;
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
-    if (generateUnsatCore) {
+    if (options.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {
       storedConstraints = null;

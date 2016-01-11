@@ -30,6 +30,7 @@ import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
@@ -220,9 +221,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(
-      boolean pGenerateModels, boolean pGenerateUnsatCore) {
-    return new Mathsat5TheoremProver(this, pGenerateModels, pGenerateUnsatCore, shutdownNotifier);
+  public ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options) {
+    return new Mathsat5TheoremProver(this, options, shutdownNotifier);
   }
 
   @Override
