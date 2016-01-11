@@ -28,7 +28,6 @@ import edu.nyu.acsys.CVC4.vectorExpr;
 import edu.nyu.acsys.CVC4.vectorType;
 
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import java.util.List;
 
@@ -36,10 +35,12 @@ public class CVC4FunctionFormulaManager
     extends AbstractFunctionFormulaManager<Expr, Expr, Type, CVC4Environment> {
 
   private final ExprManager exprManager;
+  private final CVC4Environment env;
 
-  protected CVC4FunctionFormulaManager(FormulaCreator<Expr, Type, CVC4Environment> pCreator) {
+  protected CVC4FunctionFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getEnv().getExprManager();
+    env = pCreator.getEnv();
+    exprManager = env.getExprManager();
   }
 
   @Override
@@ -50,7 +51,7 @@ public class CVC4FunctionFormulaManager
       argTypes.add(t);
     }
     FunctionType functionType = exprManager.mkFunctionType(argTypes, pReturnType);
-    return exprManager.mkVar(pName, functionType);
+    return env.makeVariable(pName, functionType);
   }
 
   @Override

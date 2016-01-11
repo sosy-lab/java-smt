@@ -19,14 +19,21 @@
  */
 package org.sosy_lab.solver.cvc4;
 
+import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Options;
 import edu.nyu.acsys.CVC4.SmtEngine;
+import edu.nyu.acsys.CVC4.Type;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CVC4Environment {
 
   private final ExprManager exprManager;
   private final Options options;
+
+  private final Map<String, Expr> variablesCache = new HashMap<>();
 
   public CVC4Environment(Options pCvc4options) {
     options = pCvc4options;
@@ -41,5 +48,17 @@ public class CVC4Environment {
 
   public ExprManager getExprManager() {
     return exprManager;
+  }
+
+  public Expr makeVariable(String name, Type type) {
+    if (variablesCache.containsKey(name)) {
+      Expr oldExp = variablesCache.get(name);
+      assert type.equals(oldExp.getType());
+      return oldExp;
+    }
+
+    Expr exp = exprManager.mkVar(name, type);
+    variablesCache.put(name, exp);
+    return exp;
   }
 }

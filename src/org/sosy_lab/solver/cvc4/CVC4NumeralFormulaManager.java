@@ -33,10 +33,12 @@ public abstract class CVC4NumeralFormulaManager<
         Expr, Type, CVC4Environment, ParamFormulaType, ResultFormulaType> {
 
   protected final ExprManager exprManager;
+  protected final CVC4Environment env;
 
   protected CVC4NumeralFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = getFormulaCreator().getEnv().getExprManager();
+    env = pCreator.getEnv();
+    exprManager = env.getExprManager();
   }
 
   @Override

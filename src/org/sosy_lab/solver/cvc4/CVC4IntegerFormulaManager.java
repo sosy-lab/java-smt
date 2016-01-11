@@ -76,6 +76,6 @@ public class CVC4IntegerFormulaManager
 
   @Override
   protected Expr makeVariableImpl(String pI) {
-    return exprManager.mkVar(pI, getFormulaCreator().getIntegerType());
+    return env.makeVariable(pI, getFormulaCreator().getIntegerType());
   }
 }
