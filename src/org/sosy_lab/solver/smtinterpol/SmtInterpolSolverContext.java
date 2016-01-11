@@ -11,8 +11,6 @@ import org.sosy_lab.solver.api.OptEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
-import java.util.EnumSet;
-
 import javax.annotation.Nullable;
 
 class SmtInterpolSolverContext extends AbstractSolverContext {
@@ -66,7 +64,7 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options) {
+  public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
     return environment.createProver(manager);
   }
 

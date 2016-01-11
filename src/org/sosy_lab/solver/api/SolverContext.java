@@ -36,10 +36,6 @@ public interface SolverContext extends AutoCloseable {
      * for unsatisfiable formulas.
      */
     GENERATE_UNSAT_CORE;
-
-    public static EnumSet<ProverOptions> empty() {
-      return EnumSet.noneOf(ProverOptions.class);
-    }
   }
 
   /**
@@ -50,7 +46,7 @@ public interface SolverContext extends AutoCloseable {
    *                All of the options specified in {@link ProverOptions}
    *                are turned off by default.
    */
-  ProverEnvironment newProverEnvironment(EnumSet<ProverOptions> options);
+  ProverEnvironment newProverEnvironment(ProverOptions... options);
 
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack

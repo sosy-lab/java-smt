@@ -28,6 +28,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
@@ -38,9 +39,9 @@ import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -50,22 +51,18 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   Mathsat5TheoremProver(
       Mathsat5SolverContext pMgr,
-      EnumSet<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      ProverOptions... options) {
 
-    super(
-        pMgr,
-        createConfig(
-            options.contains(ProverOptions.GENERATE_MODELS),
-            options.contains(ProverOptions.GENERATE_UNSAT_CORE)));
+    super(pMgr, createConfig(options));
     shutdownNotifier = pShutdownNotifier;
   }
 
-  private static Map<String, String> createConfig(
-      boolean generateModels, boolean generateUnsatCore) {
+  private static Map<String, String> createConfig(ProverOptions... options) {
+    Set<ProverOptions> opts = Sets.newHashSet(options);
     return ImmutableMap.<String, String>builder()
-        .put("model_generation", generateModels ? "true" : "false")
-        .put("unsat_core_generation", generateUnsatCore ? "1" : "0")
+        .put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false")
+        .put("unsat_core_generation", opts.contains(ProverOptions.GENERATE_UNSAT_CORE) ? "1" : "0")
         .build();
   }
 

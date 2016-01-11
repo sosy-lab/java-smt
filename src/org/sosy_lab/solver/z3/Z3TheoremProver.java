@@ -45,6 +45,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -58,10 +59,10 @@ import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -82,13 +83,14 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Z3FormulaManager pMgr,
       long z3params,
       ShutdownNotifier pShutdownNotifier,
-      EnumSet<ProverOptions> options) {
+      ProverOptions... options) {
     super(creator);
     mgr = pMgr;
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
-    if (options.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
+    Set<ProverOptions> opts = Sets.newHashSet(options);
+    if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {
       storedConstraints = null;

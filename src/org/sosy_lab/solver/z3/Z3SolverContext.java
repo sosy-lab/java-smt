@@ -249,7 +249,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options) {
+  public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
     return new Z3TheoremProver(creator, manager, z3params, shutdownNotifier, options);
   }
 

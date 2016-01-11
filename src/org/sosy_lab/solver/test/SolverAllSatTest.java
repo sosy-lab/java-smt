@@ -37,7 +37,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment.AllSatCallback;
-import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Before
   public void setupEnvironment() {
-    env = context.newProverEnvironment(ProverOptions.empty());
+    env = context.newProverEnvironment();
   }
 
   @After

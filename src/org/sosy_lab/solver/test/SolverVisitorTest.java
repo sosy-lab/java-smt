@@ -38,7 +38,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
@@ -71,7 +70,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
   @Before
   public void setupEnvironment() {
-    env = context.newProverEnvironment(ProverOptions.empty());
+    env = context.newProverEnvironment();
   }
 
   @After

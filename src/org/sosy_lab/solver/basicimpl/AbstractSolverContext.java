@@ -13,8 +13,6 @@ import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.logging.LoggingInterpolatingProverEnvironment;
 import org.sosy_lab.solver.logging.LoggingProverEnvironment;
 
-import java.util.EnumSet;
-
 @Options(prefix = "solver")
 public abstract class AbstractSolverContext implements SolverContext {
 
@@ -32,7 +30,7 @@ public abstract class AbstractSolverContext implements SolverContext {
   }
 
   @Override
-  public final ProverEnvironment newProverEnvironment(EnumSet<ProverOptions> options) {
+  public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
     ProverEnvironment pe = newProverEnvironment0(options);
     if (useLogger) {
       pe = new LoggingProverEnvironment(logger, pe);
@@ -40,7 +38,7 @@ public abstract class AbstractSolverContext implements SolverContext {
     return pe;
   }
 
-  public abstract ProverEnvironment newProverEnvironment0(EnumSet<ProverOptions> options);
+  public abstract ProverEnvironment newProverEnvironment0(ProverOptions... options);
 
   @Override
   public final InterpolatingProverEnvironmentWithAssumptions<?>
