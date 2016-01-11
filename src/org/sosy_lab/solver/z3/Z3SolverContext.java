@@ -42,7 +42,6 @@ import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;

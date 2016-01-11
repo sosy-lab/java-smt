@@ -1,7 +1,5 @@
 package org.sosy_lab.solver.api;
 
-import java.util.EnumSet;
-
 /**
  * Instances of this interface provide access to an SMT solver.
  * A single formula manager encapsulates a single solver context, and thus

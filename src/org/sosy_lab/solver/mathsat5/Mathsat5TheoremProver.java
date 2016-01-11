@@ -50,9 +50,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   private final ShutdownNotifier shutdownNotifier;
 
   Mathsat5TheoremProver(
-      Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
-      ProverOptions... options) {
+      Mathsat5SolverContext pMgr, ShutdownNotifier pShutdownNotifier, ProverOptions... options) {
 
     super(pMgr, createConfig(options));
     shutdownNotifier = pShutdownNotifier;
