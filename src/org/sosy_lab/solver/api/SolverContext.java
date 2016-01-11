@@ -33,7 +33,7 @@ public interface SolverContext extends AutoCloseable {
      * Whether the solver should generate an unsat core
      * for unsatisfiable formulas.
      */
-    GENERATE_UNSAT_CORE;
+    GENERATE_UNSAT_CORE
   }
 
   /**
