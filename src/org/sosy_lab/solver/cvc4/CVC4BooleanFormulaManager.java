@@ -181,7 +181,12 @@ public class CVC4BooleanFormulaManager
     } else if (f.getKind() == Kind.EQUAL || f.getKind() == Kind.IFF) {
       // TODO is there a relevant difference that needs to be handled here?
       assert arity == 2;
-      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
+
+      if (f.getChild(0).getType().isBoolean() && f.getChild(1).getType().isBoolean()) {
+        return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
+      }
+
+      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
 
     } else if (f.getKind() == Kind.IMPLIES) {
       assert arity == 2;
