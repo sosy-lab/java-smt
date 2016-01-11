@@ -16,7 +16,6 @@ import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +26,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   private final List<BooleanFormula> solverAssumptionsAsFormula;
   private final InterpolatingProverEnvironment<T> delegate;
   private final FormulaManager fmgr;
+  private final BooleanFormulaManager bmgr;
 
   public InterpolatingProverWithAssumptionsWrapper(
       InterpolatingProverEnvironment<T> pDelegate, FormulaManager pFmgr) {
@@ -34,6 +34,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     solverAssumptionsFromPush = new ArrayList<>();
     solverAssumptionsAsFormula = new ArrayList<>();
     fmgr = checkNotNull(pFmgr);
+    bmgr = fmgr.getBooleanFormulaManager();
   }
 
   @Override
@@ -50,9 +51,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
     // remove assumption variables from the rawInterpolant if necessary
     if (!solverAssumptionsAsFormula.isEmpty()) {
-      interpolant =
-          fmgr.getBooleanFormulaManager()
-              .visit(new RemoveAssumptionsFromFormulaVisitor(), interpolant);
+      interpolant = bmgr.visit(new RemoveAssumptionsFromFormulaVisitor(), interpolant);
     }
 
     return interpolant;
@@ -137,12 +136,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
   class RemoveAssumptionsFromFormulaVisitor extends BooleanFormulaTransformationVisitor {
 
-    private final Set<BooleanFormula> seen = new HashSet<>();
-    private final BooleanFormulaManager bmgr;
-
     private RemoveAssumptionsFromFormulaVisitor() {
       super(fmgr, new HashMap<BooleanFormula, BooleanFormula>());
-      bmgr = fmgr.getBooleanFormulaManager();
     }
 
     @Override
