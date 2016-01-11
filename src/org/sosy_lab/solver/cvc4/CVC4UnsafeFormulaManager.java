@@ -20,8 +20,10 @@
 package org.sosy_lab.solver.cvc4;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.solver.api.Formula;
@@ -94,12 +96,24 @@ public class CVC4UnsafeFormulaManager
 
   @Override
   protected boolean isUF(Expr pT) {
-    return pT.getType().isFunction();
+    Preconditions.checkState(!pT.isNull());
+
+    if (pT.isConst() || pT.isVariable()) {
+      return false;
+    }
+
+    return pT.getKind().equals(Kind.APPLY_UF);
   }
 
   @Override
   protected String getName(Expr pT) {
-    return pT.toString();
+    Preconditions.checkState(!pT.isNull());
+
+    if (pT.isConst() || pT.isVariable()) {
+      return pT.toString();
+    } else {
+      return pT.toString().split("\\(")[0];
+    }
   }
 
   @Override
@@ -124,6 +138,7 @@ public class CVC4UnsafeFormulaManager
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
+    Preconditions.checkState(!f.isNull());
 
     Type type = f.getType();
 
