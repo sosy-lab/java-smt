@@ -16,7 +16,7 @@ import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
 import javax.annotation.Nullable;
 
-class CVC4SolverContext extends AbstractSolverContext {
+public final class CVC4SolverContext extends AbstractSolverContext {
   private final CVC4FormulaManager manager;
 
   private CVC4SolverContext(
