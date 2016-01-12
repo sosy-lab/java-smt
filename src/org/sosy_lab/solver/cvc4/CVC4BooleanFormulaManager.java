@@ -112,7 +112,7 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr equivalence(Expr pBits1, Expr pBits2) {
-    return exprManager.mkExpr(Kind.EQUAL, pBits1, pBits2);
+    return exprManager.mkExpr(Kind.IFF, pBits1, pBits2);
   }
 
   @Override
