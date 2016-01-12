@@ -41,7 +41,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 
 @RunWith(Parameterized.class)
-public class SolverQuantifierTest extends SolverBasedTest0 {
+public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -240,12 +240,22 @@ public class SolverQuantifierTest extends SolverBasedTest0 {
   @Test
   public void testSimple() throws SolverException, InterruptedException {
     // forall x . x+2 = x+1+1  is SAT
+    assert qmgr != null;
     BooleanFormula f =
         qmgr.forall(
             ImmutableList.of(x),
             imgr.equal(
                 imgr.add(x, imgr.makeNumber(2)),
                 imgr.add(imgr.add(x, imgr.makeNumber(1)), imgr.makeNumber(1))));
+    assertThatFormula(f).isSatisfiable();
+  }
+
+  @Test
+  public void testBlah() throws Exception {
+    IntegerFormula z = imgr.makeVariable("x"), y = imgr.makeVariable("y");
+    assert qmgr != null;
+    BooleanFormula f =
+        qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), imgr.equal(z, y)));
     assertThatFormula(f).isSatisfiable();
   }
 
