@@ -131,6 +131,9 @@ public interface BooleanFormulaManager {
 
   BooleanFormula or(Collection<BooleanFormula> bits);
 
+  /**
+   * Creates a formula representing XOR of the two arguments.
+   */
   BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2);
 
   /** Check, if the formula matches NOT(f) with one boolean arg. */
