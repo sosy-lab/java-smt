@@ -16,8 +16,9 @@
     </configurations>
 
     <publications defaultconf="solver-cvc4">
-      <!--        <artifact name="libcvc4jni" conf="solver-cvc4" type="shared-object" ext="so" />
-        <artifact name="libcvc4" conf="solver-cvc4" type="shared-object" ext="so"/>-->
+        <artifact name="libcvc4jni" conf="solver-cvc4" type="shared-object" ext="so" />
+        <artifact name="libcvc4.so" conf="solver-cvc4" type="shared-object" ext="3"/>
+        <artifact name="libcvc4parser.so" conf="solver-cvc4" type="shared-object" ext="3"/>
         <artifact name="CVC4" conf="solver-cvc4" />
     </publications>
 
