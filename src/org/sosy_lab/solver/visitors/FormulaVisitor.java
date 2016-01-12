@@ -39,6 +39,64 @@ import java.util.List;
  */
 public interface FormulaVisitor<R> {
 
+  enum DeclarationKind {
+
+    // Boolean operations
+    AND,
+    NOT,
+    OR,
+    IFF,
+    ITE,
+    XOR,
+    IMPLIES,
+    DISTINCT,
+
+    // Simple arithmetic,
+    // they work across integers and rationals.
+    SUB,
+    ADD,
+    DIV,
+    MUL,
+    MODULO,
+    UF,
+
+    // Simple comparison,
+    // work across integers and rationals.
+    LT,
+    LTE,
+    GT,
+    GTE,
+    EQ,
+
+    /**
+     * Solvers support a lot of different built-in theories.
+     * We enforce standardization only across a small subset.
+     */
+    OTHER
+  }
+
+  class Declaration {
+    private final String name;
+    private final DeclarationKind kind;
+
+    private Declaration(String name, DeclarationKind kind) {
+      this.name = name;
+      this.kind = kind;
+    }
+
+    public static Declaration of(String name, DeclarationKind kind) {
+      return new Declaration(name, kind);
+    }
+
+    public DeclarationKind getKind() {
+      return kind;
+    }
+
+    public String getName() {
+      return name;
+    }
+  }
+
   /**
    * Visit a free variable (such as "x", "y" or "z"), not bound by a quantifier.
    * The variable can have any sort (both boolean and non-boolean).
@@ -53,7 +111,7 @@ public interface FormulaVisitor<R> {
    * The variable can have any sort (both boolean and non-boolean).
    *
    * @param f Formula representing the variable.
-   * @param name Variable name
+   * @param name Variable name.
    * @param deBruijnIdx de-Bruijn index of the bound variable, which can be used
    *                    to find the matching quantifier.
    */
@@ -73,32 +131,28 @@ public interface FormulaVisitor<R> {
 
   /**
    * Visit an arbitrary, potentially uninterpreted function.
+   * The function can have any sort.
    *
    * @param f Input function.
    * @param args List of arguments
-   * @param functionName Name of the function (such as "and" or "or")
+   * @param functionDeclaration Function declaration
    * @param newApplicationConstructor Construct a new function of the same type,
    *                                  with the new arguments as given.
-   * @param isUninterpreted Special flag for UFs.
    */
   R visitFunction(
       Formula f,
       List<Formula> args,
-      String functionName,
-      Function<List<Formula>, Formula> newApplicationConstructor,
-      boolean isUninterpreted);
+      Declaration functionDeclaration,
+      Function<List<Formula>, Formula> newApplicationConstructor);
 
   /**
    * Visit a quantified node.
    *
-   * @param f Quantifier
+   * @param f Quantifier formula.
    * @param quantifier Quantifier type: either {@code FORALL} or {@code EXISTS}.
+   * @param boundVariables Variables bound by the quantifier
    * @param body Body of the quantifier.
-   * @param newBodyConstructor Constructor to replace a quantified body.
    */
   R visitQuantifier(
-      BooleanFormula f,
-      Quantifier quantifier,
-      BooleanFormula body,
-      Function<BooleanFormula, BooleanFormula> newBodyConstructor);
+      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body);
 }

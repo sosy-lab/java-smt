@@ -57,15 +57,27 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FUNC_DECL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SYMBOL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ADD;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_DISTINCT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_DIV;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IFF;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IMPLIES;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_LE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_LT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_MOD;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_MUL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_SUB;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_SORT_AST;
@@ -86,6 +98,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
+import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -308,13 +322,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       inc_ref(z3context, var);
     }
 
-    if (isForall) {
-      return Z3NativeApi.mk_forall_const(
-          z3context, 0, boundCount, boundVars, 0, new long[0], pBody);
-    } else {
-      return Z3NativeApi.mk_exists_const(
-          z3context, 0, boundCount, boundVars, 0, new long[0], pBody);
-    }
+    return Z3NativeApi.mk_quantifier_const(
+        z3context, isForall, 0, boundCount, boundVars, 0, new long[0], pBody);
   }
 
   @Override
@@ -357,22 +366,28 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
                 return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
               }
             };
-        return visitor.visitFunction(formula, args, name, constructor, isUF(f));
+        return visitor.visitFunction(
+            formula, args, Declaration.of(name, getDeclarationKind(f)), constructor);
       case Z3_VAR_AST:
-        return visitor.visitBoundVariable(formula, getName(f), get_index_value(z3context, f));
+        int deBruijnIdx = get_index_value(z3context, f);
+        return visitor.visitBoundVariable(
+            formula,
+            get_symbol_string(z3context, get_quantifier_bound_name(z3context, f, deBruijnIdx)),
+            deBruijnIdx);
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        return visitor.visitQuantifier(
-            (BooleanFormula) formula,
-            q,
-            body,
-            new Function<BooleanFormula, BooleanFormula>() {
-              @Override
-              public BooleanFormula apply(BooleanFormula booleanFormula) {
-                return replaceQuantifiedBody((BooleanFormula) formula, booleanFormula);
-              }
-            });
+        int numBound = get_quantifier_num_bound(z3context, f);
+        List<Formula> boundVars = new ArrayList<>(numBound);
+        for (int i = 0; i < numBound; i++) {
+          long varName = get_quantifier_bound_name(z3context, f, i);
+          long varSort = get_quantifier_bound_sort(z3context, f, i);
+          Formula c =
+              formulaCreator.encapsulate(
+                  formulaCreator.getFormulaTypeFromSort(varSort),
+                  mk_const(z3context, varName, varSort));
+        }
+        return visitor.visitQuantifier((BooleanFormula) formula, q, boundVars, body);
 
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:
@@ -380,6 +395,55 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       default:
         throw new UnsupportedOperationException(
             "Input should be a formula AST, " + "got unexpected type instead");
+    }
+  }
+
+  private DeclarationKind getDeclarationKind(long f) {
+    int decl = get_decl_kind(z3context, get_app_decl(z3context, f));
+    DeclarationKind kind;
+    switch (decl) {
+      case Z3_OP_AND:
+        return DeclarationKind.AND;
+      case Z3_OP_NOT:
+        return DeclarationKind.NOT;
+      case Z3_OP_OR:
+        return DeclarationKind.OR;
+      case Z3_OP_IFF:
+        return DeclarationKind.IFF;
+      case Z3_OP_ITE:
+        return DeclarationKind.ITE;
+      case Z3_OP_XOR:
+        return DeclarationKind.XOR;
+      case Z3_OP_DISTINCT:
+        return DeclarationKind.DISTINCT;
+
+      case Z3_OP_SUB:
+        return DeclarationKind.SUB;
+      case Z3_OP_ADD:
+        return DeclarationKind.ADD;
+      case Z3_OP_DIV:
+        return DeclarationKind.DIV;
+      case Z3_OP_MUL:
+        return DeclarationKind.MUL;
+      case Z3_OP_MOD:
+        return DeclarationKind.MODULO;
+
+      case Z3_OP_UNINTERPRETED:
+        return DeclarationKind.UF;
+
+      case Z3_OP_LT:
+        return DeclarationKind.LT;
+      case Z3_OP_LE:
+        return DeclarationKind.LTE;
+      case Z3_OP_GT:
+        return DeclarationKind.GT;
+      case Z3_OP_GE:
+        return DeclarationKind.GTE;
+      case Z3_OP_EQ:
+        return DeclarationKind.EQ;
+
+      default:
+        return DeclarationKind.OTHER;
     }
   }
 }

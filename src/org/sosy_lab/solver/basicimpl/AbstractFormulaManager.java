@@ -276,12 +276,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
           public TraversalProcess visitFunction(
               Formula f,
               List<Formula> args,
-              String functionName,
-              Function<List<Formula>, Formula> constructor,
-              boolean isUninterpreted) {
+              Declaration functionDeclaration,
+              Function<List<Formula>, Formula> constructor) {
 
-            if (isUninterpreted && extractUF) {
-              found.put(functionName, f);
+            if (functionDeclaration.getKind() == DeclarationKind.UF && extractUF) {
+              found.put(functionDeclaration.getName(), f);
             }
             return TraversalProcess.CONTINUE;
           }

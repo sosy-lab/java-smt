@@ -79,12 +79,10 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   public TraversalProcess visitFunction(
       Formula pF,
       List<Formula> pArgs,
-      String pFunctionName,
-      Function<List<Formula>, Formula> pNewApplicationConstructor,
-      boolean pIsUninterpreted) {
+      Declaration pFunctionDeclaration,
+      Function<List<Formula>, Formula> pNewApplicationConstructor) {
     TraversalProcess result =
-        delegate.visitFunction(
-            pF, pArgs, pFunctionName, pNewApplicationConstructor, pIsUninterpreted);
+        delegate.visitFunction(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
     if (result == TraversalProcess.CONTINUE) {
       for (Formula arg : pArgs) {
         addToQueue(arg);
@@ -95,11 +93,8 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
 
   @Override
   public TraversalProcess visitQuantifier(
-      BooleanFormula pF,
-      Quantifier pQuantifier,
-      BooleanFormula pBody,
-      Function<BooleanFormula, BooleanFormula> pNewBodyConstructor) {
-    TraversalProcess result = delegate.visitQuantifier(pF, pQuantifier, pBody, pNewBodyConstructor);
+      BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
+    TraversalProcess result = delegate.visitQuantifier(pF, pQuantifier, boundVars, pBody);
     if (result == TraversalProcess.CONTINUE) {
       addToQueue(pBody);
     }

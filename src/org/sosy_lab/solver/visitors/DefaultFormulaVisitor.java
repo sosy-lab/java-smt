@@ -55,18 +55,14 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
   public R visitFunction(
       Formula f,
       List<Formula> args,
-      String functionName,
-      Function<List<Formula>, Formula> newApplicationConstructor,
-      boolean isUF) {
+      Declaration functionDeclaration,
+      Function<List<Formula>, Formula> newApplicationConstructor) {
     return visitDefault(f);
   }
 
   @Override
   public R visitQuantifier(
-      BooleanFormula f,
-      Quantifier q,
-      BooleanFormula body,
-      Function<BooleanFormula, BooleanFormula> bodyTransformer) {
+      BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
     return visitDefault(f);
   }
 }

@@ -215,9 +215,9 @@ public abstract class SolverBasedTest0 {
 
   protected final void requireDumpingAndParsing() {
     assume()
-    .withFailureMessage("Solver " + solverToUse() + " does not support dumping and parsing")
-    .that(solverToUse())
-    .isNotEqualTo(Solvers.CVC4);
+        .withFailureMessage("Solver " + solverToUse() + " does not support dumping and parsing")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
   }
 
   /**

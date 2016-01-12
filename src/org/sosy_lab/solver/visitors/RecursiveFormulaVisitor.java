@@ -78,9 +78,8 @@ public abstract class RecursiveFormulaVisitor implements FormulaVisitor<Void> {
   public Void visitFunction(
       Formula f,
       List<Formula> args,
-      String functionName,
-      Function<List<Formula>, Formula> newApplicationConstructor,
-      boolean isUninterpreted) {
+      Declaration functionDeclaration,
+      Function<List<Formula>, Formula> newApplicationConstructor) {
     for (Formula arg : args) {
       toVisit.add(arg);
     }
@@ -89,10 +88,7 @@ public abstract class RecursiveFormulaVisitor implements FormulaVisitor<Void> {
 
   @Override
   public Void visitQuantifier(
-      BooleanFormula f,
-      Quantifier q,
-      BooleanFormula body,
-      Function<BooleanFormula, BooleanFormula> newBodyConstructor) {
+      BooleanFormula f, Quantifier q, List<Formula> boundVars, BooleanFormula body) {
     toVisit.add(body);
     return null;
   }

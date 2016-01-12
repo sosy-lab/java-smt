@@ -43,6 +43,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
+import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,13 +189,9 @@ class PrincessUnsafeFormulaManager
       return visitor.visitQuantifier(
           (BooleanFormula) f,
           q,
-          formulaCreator.encapsulateBoolean(body),
-          new Function<BooleanFormula, BooleanFormula>() {
-            @Override
-            public BooleanFormula apply(BooleanFormula booleanFormula) {
-              return replaceQuantifiedBody((BooleanFormula) f, booleanFormula);
-            }
-          });
+          new ArrayList<Formula>(), // TODO: getting the bound
+          // variables for princess.
+          formulaCreator.encapsulateBoolean(body));
     } else if (isBoundVariable(input)) {
       return visitor.visitBoundVariable(f, getName(input), PrincessUtil.getIndex(input));
     } else if (isVariable(input)) {
@@ -217,7 +215,26 @@ class PrincessUnsafeFormulaManager
               return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
             }
           };
-      return visitor.visitFunction(f, args, name, constructor, isUF(input));
+      return visitor.visitFunction(
+          f, args, Declaration.of(name, getDeclarationKind(input)), constructor);
+    }
+  }
+
+  private DeclarationKind getDeclarationKind(IExpression input) {
+    if (PrincessUtil.isIfThenElse(input)) {
+      return DeclarationKind.ITE;
+    } else if (PrincessUtil.isUIF(input)) {
+      return DeclarationKind.UF;
+    } else if (PrincessUtil.isAnd(input)) {
+      return DeclarationKind.AND;
+    } else if (PrincessUtil.isNot(input)) {
+      return DeclarationKind.NOT;
+    } else if (PrincessUtil.isEquivalence(input)) {
+      return DeclarationKind.EQ;
+    } else {
+
+      // TODO: other cases!!!
+      return DeclarationKind.OTHER;
     }
   }
 }

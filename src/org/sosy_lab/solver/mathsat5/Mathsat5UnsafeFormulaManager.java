@@ -20,11 +20,20 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_return_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_function_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
@@ -57,6 +66,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
+import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +141,8 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
               return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
             }
           };
-      return visitor.visitFunction(formula, args, name, constructor, isUF(f));
+      return visitor.visitFunction(
+          formula, args, Declaration.of(name, getDeclarationKind(f)), constructor);
     }
   }
 
@@ -244,5 +256,35 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   @Override
   protected Long replaceQuantifiedBody(Long pF, Long pBody) {
     throw new UnsupportedOperationException();
+  }
+
+  private DeclarationKind getDeclarationKind(long pF) {
+    if (msat_term_is_uf(msatEnv, pF)) {
+      return DeclarationKind.UF;
+    }
+    long decl = msat_term_get_decl(pF);
+    int tag = msat_decl_get_tag(msatEnv, decl);
+    switch (tag) {
+      case MSAT_TAG_AND:
+        return DeclarationKind.AND;
+      case MSAT_TAG_NOT:
+        return DeclarationKind.NOT;
+      case MSAT_TAG_OR:
+        return DeclarationKind.OR;
+      case MSAT_TAG_IFF:
+        return DeclarationKind.IFF;
+      case MSAT_TAG_ITE:
+        return DeclarationKind.ITE;
+
+      case MSAT_TAG_PLUS:
+        return DeclarationKind.ADD;
+        // todo: UF??
+      case MSAT_TAG_LEQ:
+        return DeclarationKind.LTE;
+      case MSAT_TAG_EQ:
+        return DeclarationKind.EQ;
+      default:
+        return DeclarationKind.OTHER;
+    }
   }
 }

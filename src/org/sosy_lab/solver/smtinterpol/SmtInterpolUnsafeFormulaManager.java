@@ -37,6 +37,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
+import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
 
 import java.util.List;
 import java.util.Map;
@@ -229,7 +231,7 @@ class SmtInterpolUnsafeFormulaManager
               }
             };
         return visitor.visitFunction(
-            f, args, name, constructor, !(func.isIntern() || func.isInterpreted()));
+            f, args, Declaration.of(name, getDeclarationKind(app)), constructor);
       }
 
     } else {
@@ -240,6 +242,36 @@ class SmtInterpolUnsafeFormulaManager
               "Unexpected SMTInterpol formula of type %s: %s",
               input.getClass().getSimpleName(),
               input));
+    }
+  }
+
+  private DeclarationKind getDeclarationKind(ApplicationTerm input) {
+    FunctionSymbol symbol = input.getFunction();
+    Theory t = input.getTheory();
+    if (SmtInterpolUtil.isUIF(input)) {
+      return DeclarationKind.UF;
+    } else if (symbol == t.mAnd) {
+      return DeclarationKind.AND;
+    } else if (symbol == t.mOr) {
+      return DeclarationKind.OR;
+    } else if (symbol == t.mNot) {
+      return DeclarationKind.NOT;
+    } else if (symbol == t.mImplies) {
+      return DeclarationKind.IMPLIES;
+    } else if (symbol == t.mXor) {
+      return DeclarationKind.XOR;
+
+      // Polymorphic function symbols are more difficult.
+    } else if (symbol.getName().equals("=")) {
+      return DeclarationKind.EQ;
+    } else if (symbol.getName().equals("distinct")) {
+      return DeclarationKind.DISTINCT;
+    } else if (symbol.getName().equals("ite")) {
+      return DeclarationKind.ITE;
+    } else {
+
+      // TODO: other declaration kinds!
+      return DeclarationKind.OTHER;
     }
   }
 }

@@ -29,6 +29,8 @@ import edu.nyu.acsys.CVC4.Type;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
+import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,7 +178,51 @@ public class CVC4UnsafeFormulaManager
                   formulaCreator.encapsulate(formulaCreator.getFormulaType(f), f), formulas);
             }
           };
-      return visitor.visitFunction(formula, args, name, constructor, isUF(f));
+      return visitor.visitFunction(
+          formula, args, Declaration.of(name, getDeclarationKind(f)), constructor);
+    }
+  }
+
+  private DeclarationKind getDeclarationKind(Expr f) {
+    Kind kind = f.getKind();
+    if (kind == Kind.EQUAL) {
+      return DeclarationKind.EQ;
+    } else if (kind == Kind.DISTINCT) {
+      return DeclarationKind.DISTINCT;
+    } else if (kind == Kind.NOT) {
+      return DeclarationKind.NOT;
+    } else if (kind == Kind.AND) {
+      return DeclarationKind.AND;
+    } else if (kind == Kind.IFF) {
+      return DeclarationKind.IFF;
+    } else if (kind == Kind.IMPLIES) {
+      return DeclarationKind.IMPLIES;
+    } else if (kind == Kind.OR) {
+      return DeclarationKind.OR;
+    } else if (kind == Kind.XOR) {
+      return DeclarationKind.XOR;
+    } else if (kind == Kind.ITE) {
+      return DeclarationKind.ITE;
+    } else if (kind == Kind.APPLY_UF) {
+      return DeclarationKind.UF;
+    } else if (kind == Kind.PLUS) {
+      return DeclarationKind.ADD;
+    } else if (kind == Kind.MULT) {
+      return DeclarationKind.MUL;
+    } else if (kind == Kind.MINUS) {
+      return DeclarationKind.SUB;
+    } else if (kind == Kind.DIVISION) {
+      return DeclarationKind.DIV;
+    } else if (kind == Kind.LT) {
+      return DeclarationKind.LT;
+    } else if (kind == Kind.LEQ) {
+      return DeclarationKind.LTE;
+    } else if (kind == Kind.GT) {
+      return DeclarationKind.GT;
+    } else if (kind == Kind.GEQ) {
+      return DeclarationKind.GTE;
+    } else {
+      return DeclarationKind.OTHER;
     }
   }
 }
