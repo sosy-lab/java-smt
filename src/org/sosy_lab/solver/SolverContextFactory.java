@@ -40,7 +40,6 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
-import org.sosy_lab.solver.cvc4.CVC4SolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.solver.princess.PrincessSolverContext;
 import org.sosy_lab.solver.z3.Z3SolverContext;
@@ -72,8 +71,8 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
-    PRINCESS,
-    CVC4
+    PRINCESS
+//    CVC4
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -153,9 +152,9 @@ public class SolverContextFactory {
           // TODO: pass randomSeed to Princess
           return PrincessSolverContext.create(config, logger, shutdownNotifier, logfile);
 
-        case CVC4:
-          return CVC4SolverContext.create(
-              logger, config, shutdownNotifier, logfile, (int) randomSeed);
+//        case CVC4:
+//          return CVC4SolverContext.create(
+//              logger, config, shutdownNotifier, logfile, (int) randomSeed);
 
         default:
           throw new AssertionError("no solver selected");
