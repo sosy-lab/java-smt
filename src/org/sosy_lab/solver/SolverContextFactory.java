@@ -152,9 +152,9 @@ public class SolverContextFactory {
           // TODO: pass randomSeed to Princess
           return PrincessSolverContext.create(config, logger, shutdownNotifier, logfile);
 
-//        case CVC4:
-//          return CVC4SolverContext.create(
-//              logger, config, shutdownNotifier, logfile, (int) randomSeed);
+        //case CVC4:
+        //  return CVC4SolverContext.create(
+        //      logger, config, shutdownNotifier, logfile, (int) randomSeed);
 
         default:
           throw new AssertionError("no solver selected");
