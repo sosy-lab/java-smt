@@ -132,7 +132,7 @@ class CVC4Model {
       // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
       // leading to two entries for "uf(1)" (if value is 1).
-      Object existingValue = model.get(lKeyTerm);
+      Object existingValue = model.get(lKeyTerm.toString());
       Verify.verify(
           existingValue == null || lValue.equals(existingValue),
           "Duplicate values for model entry %s: %s and %s",
