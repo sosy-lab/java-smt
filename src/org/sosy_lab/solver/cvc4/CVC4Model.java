@@ -121,4 +121,26 @@ class CVC4Model {
 
     return new Model(model);
   }
+
+  static Map<String, Object> createAllsatModel(
+      SmtEngine smtEngine, Collection<Expr> assertedFormulas) {
+    Map<String, Object> model = new LinkedHashMap<>();
+    for (Expr lKeyTerm : CVC4Util.getVarsAndUIFs(assertedFormulas)) {
+      Expr lValueTerm = smtEngine.getValue(lKeyTerm);
+      Object lValue = getValue(lValueTerm);
+
+      // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
+      // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
+      // leading to two entries for "uf(1)" (if value is 1).
+      Object existingValue = model.get(lKeyTerm);
+      Verify.verify(
+          existingValue == null || lValue.equals(existingValue),
+          "Duplicate values for model entry %s: %s and %s",
+          lKeyTerm,
+          existingValue,
+          lValue);
+      model.put(lKeyTerm.toString(), lValue);
+    }
+    return model;
+  }
 }
