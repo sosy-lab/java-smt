@@ -110,4 +110,13 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   public abstract boolean isBoundByQuantifier(TFormulaInfo pF);
+
+  @Override
+  public BooleanFormula mkQuantifier(
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
+    return wrap(mkQuantifier(q, Lists.transform(pVariables, extractor), extractInfo(pBody)));
+  }
+
+  public abstract TFormulaInfo mkQuantifier(
+      Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
 }

@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 
@@ -40,14 +41,25 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
 
   @Override
   protected Long exists(List<Long> pVariables, Long pBody) {
-    return Z3NativeApi.mk_exists_const(
-        z3context, 0, pVariables.size(), Longs.toArray(pVariables), 0, new long[0], pBody);
+    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
   }
 
   @Override
   protected Long forall(List<Long> pVariables, Long pBody) {
-    return Z3NativeApi.mk_forall_const(
-        z3context, 0, pVariables.size(), Longs.toArray(pVariables), 0, new long[0], pBody);
+    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
+  }
+
+  @Override
+  public Long mkQuantifier(Quantifier q, List<Long> pVariables, Long pBody) {
+    return Z3NativeApi.mk_quantifier_const(
+        z3context,
+        q == Quantifier.FORALL,
+        0,
+        pVariables.size(),
+        Longs.toArray(pVariables),
+        0,
+        new long[0],
+        pBody);
   }
 
   @Override
@@ -67,7 +79,7 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
 
   @Override
   protected int numQuantifierBound(Long pExtractInfo) {
-    return Z3NativeApi.get_quantifier_num_bound(z3context, pExtractInfo);
+    return get_quantifier_num_bound(z3context, pExtractInfo);
   }
 
   @Override

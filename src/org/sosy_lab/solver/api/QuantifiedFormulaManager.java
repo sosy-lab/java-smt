@@ -52,6 +52,16 @@ public interface QuantifiedFormulaManager {
   BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
+   * @return A quantified formula
+   *
+   * @param q           Quantifier type
+   * @param pVariables  The variables that will get bound (variables) by the quantification.
+   * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
+   */
+  BooleanFormula mkQuantifier(
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody);
+
+  /**
    * Eliminate the quantifiers for a given formula.
    *
    * @param pF Formula with quantifiers.

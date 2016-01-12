@@ -27,6 +27,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IQuantified;
 import ap.terfor.ConstantTerm;
+import ap.terfor.conjunctions.Quantifier.EX$;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.TermType;
@@ -49,22 +50,21 @@ public class PrincessQuantifiedFormulaManager
 
   @Override
   protected IExpression exists(List<IExpression> pVariables, IExpression pBody) {
-    checkArgument(pBody instanceof IFormula);
-
-    return IExpression.quanConsts(
-        ap.terfor.conjunctions.Quantifier.EX$.MODULE$,
-        iterableAsScalaIterable(toConstantTerm(pVariables)),
-        (IFormula) pBody);
+    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
   }
 
   @Override
   protected IExpression forall(List<IExpression> pVariables, IExpression pBody) {
-    checkArgument(pBody instanceof IFormula);
+    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
+  }
 
+  @Override
+  public IExpression mkQuantifier(Quantifier q, List<IExpression> vars, IExpression body) {
+    checkArgument(body instanceof IFormula);
     return IExpression.quanConsts(
-        ap.terfor.conjunctions.Quantifier.ALL$.MODULE$,
-        iterableAsScalaIterable(toConstantTerm(pVariables)),
-        (IFormula) pBody);
+        q == Quantifier.FORALL ? ap.terfor.conjunctions.Quantifier.ALL$.MODULE$ : EX$.MODULE$,
+        iterableAsScalaIterable(toConstantTerm(vars)),
+        (IFormula) body);
   }
 
   private List<ConstantTerm> toConstantTerm(List<IExpression> lst) {
