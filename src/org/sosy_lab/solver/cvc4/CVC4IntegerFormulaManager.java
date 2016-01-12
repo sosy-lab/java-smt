@@ -21,6 +21,7 @@ package org.sosy_lab.solver.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Integer;
+import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 
 import org.sosy_lab.solver.api.FormulaType;
@@ -46,7 +47,10 @@ public class CVC4IntegerFormulaManager
   @Override
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
-    return exprManager.mkConst(new Rational(new Integer(pI)));
+    if (pI > java.lang.Integer.MAX_VALUE) {
+      throw new UnsupportedOperationException("CVC4 can only handle ints");
+    }
+    return exprManager.mkConst(new Rational(new Integer((int) pI)));
   }
 
   @Override
@@ -60,8 +64,29 @@ public class CVC4IntegerFormulaManager
   }
 
   @Override
+  protected Expr divide(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr multiply(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr modulo(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.INTS_MODULUS, pParam1, pParam2);
+  }
+
+  @Override
   protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
-    throw new UnsupportedOperationException();
+    // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
+    if (pModulo > 0) {
+      Expr n = makeNumberImpl(pModulo);
+      Expr x = subtract(pNumber1, pNumber2);
+      return exprManager.mkExpr(Kind.EQUAL, x, exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x ,n)));
+    }
+    return exprManager.mkConst(true);
   }
 
   @Override
