@@ -49,8 +49,7 @@ class CVC4Model {
       return TermType.FloatingPoint;
     }
 
-    throw new IllegalArgumentException(
-        "Given sort cannot be converted to a TermType: " + type);
+    throw new IllegalArgumentException("Given sort cannot be converted to a TermType: " + type);
   }
 
   private static AssignableTerm toVariable(Expr t) {
@@ -73,7 +72,6 @@ class CVC4Model {
 
     return new Function(lName, lType, lArguments);
   }
-
 
   private static Object getValue(Expr value) {
     if (value.getType().isBoolean()) {

@@ -84,7 +84,10 @@ public class CVC4IntegerFormulaManager
     if (pModulo > 0) {
       Expr n = makeNumberImpl(pModulo);
       Expr x = subtract(pNumber1, pNumber2);
-      return exprManager.mkExpr(Kind.EQUAL, x, exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x ,n)));
+      return exprManager.mkExpr(
+          Kind.EQUAL,
+          x,
+          exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x, n)));
     }
     return exprManager.mkConst(true);
   }
