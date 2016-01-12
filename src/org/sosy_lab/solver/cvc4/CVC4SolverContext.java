@@ -33,16 +33,13 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       org.sosy_lab.common.configuration.Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogFile,
-      long randomSeed)
+      int randomSeed)
       throws InvalidConfigurationException {
 
     // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
 
-    edu.nyu.acsys.CVC4.Options cvc4options = new edu.nyu.acsys.CVC4.Options();
-    // TODO set randomseed, furtherOptions
-
-    final CVC4Environment env = new CVC4Environment(cvc4options);
+    final CVC4Environment env = new CVC4Environment(randomSeed);
 
     // Create CVC4FormulaCreator
     CVC4FormulaCreator creator = new CVC4FormulaCreator(env);

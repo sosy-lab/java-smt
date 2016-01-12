@@ -21,7 +21,7 @@ package org.sosy_lab.solver.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.Options;
+import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 
@@ -31,18 +31,24 @@ import java.util.Map;
 public class CVC4Environment {
 
   private final ExprManager exprManager;
-  private final Options options;
+  private final int randomSeed;
 
   private final Map<String, Expr> variablesCache = new HashMap<>();
 
-  public CVC4Environment(Options pCvc4options) {
-    options = pCvc4options;
-    exprManager = new ExprManager(options);
+  public CVC4Environment(int pRandomSeed) {
+    randomSeed = pRandomSeed;
+    exprManager = new ExprManager();
   }
 
   public SmtEngine newSMTEngine() {
     SmtEngine smtEngine = new SmtEngine(exprManager);
-    // TODO set options
+    smtEngine.setOption("incremental", new SExpr(true));
+    smtEngine.setOption("produce-models", new SExpr(true));
+    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+    smtEngine.setOption("output-language", new SExpr("smt2"));
+    smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    smtEngine.setLogic("QF_UFLIRA");
+    // TODO logging
     return smtEngine;
   }
 
