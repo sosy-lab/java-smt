@@ -21,8 +21,10 @@ package org.sosy_lab.solver.cvc4;
 
 import com.google.common.base.Preconditions;
 
+import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Result;
 import edu.nyu.acsys.CVC4.SmtEngine;
+import edu.nyu.acsys.CVC4.UnsatCore;
 
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
@@ -31,6 +33,8 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -40,6 +44,7 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
   private final CVC4FormulaManager mgr;
   private final SmtEngine smtEngine;
   private boolean closed = false;
+  private final List<Expr> assertedFormulas = new ArrayList<>();
 
   protected CVC4TheoremProver(CVC4FormulaManager pMgr) {
     mgr = pMgr;
@@ -62,13 +67,16 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
   @Nullable
   public Void addConstraint(BooleanFormula pF) {
     Preconditions.checkState(!closed);
-    smtEngine.assertFormula(mgr.extractInfo(pF));
+    Expr exp = mgr.extractInfo(pF);
+    smtEngine.assertFormula(exp);
+    assertedFormulas.add(exp);
     return null;
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    assertedFormulas.remove(assertedFormulas.size() - 1);
     smtEngine.pop();
   }
 
@@ -94,20 +102,19 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
-    throw new UnsupportedOperationException("Not implemented");
-    //    List<BooleanFormula> converted = new ArrayList<>();
-    //    UnsatCore core = smtEngine.getUnsatCore();
-    //    Iterator<?> it = core.iterator();
-    //    while (it.hasNext()) {
-    //      Object term = it.next();
-    //    }
-    //    return converted;
+    List<BooleanFormula> converted = new ArrayList<>();
+    UnsatCore core = smtEngine.getUnsatCore();
+    Iterator<Expr> it = core.iterator();
+    while (it.hasNext()) {
+      converted.add(mgr.encapsulateBooleanFormula(it.next()));
+    }
+    return converted;
   }
 
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    throw new UnsupportedOperationException("Not implemented");
+    return CVC4Model.createCVC4Model(smtEngine, assertedFormulas);
   }
 
   @Override
