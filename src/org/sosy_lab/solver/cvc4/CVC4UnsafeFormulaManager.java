@@ -112,7 +112,7 @@ public class CVC4UnsafeFormulaManager
     if (pT.isConst() || pT.isVariable()) {
       return pT.toString();
     } else {
-      return pT.toString().split("\\(")[0];
+      return pT.getOperator().toString();
     }
   }
 
