@@ -40,11 +40,14 @@ import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import scala.Enumeration;
+
+import java.util.ArrayList;
 
 class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
@@ -244,9 +247,16 @@ class PrincessBooleanFormulaManager
               ? QuantifiedFormulaManager.Quantifier.FORALL
               : QuantifiedFormulaManager.Quantifier.EXISTS;
       return pVisitor.visitQuantifier(
-          t, getFormulaCreator().encapsulateBoolean(PrincessUtil.getQuantifierBody(q)));
+          t,
+
+          // TODO: getting bound variables.
+          new ArrayList<Formula>(),
+          getFormulaCreator().encapsulateBoolean(PrincessUtil.getQuantifierBody(q)));
 
     } else if (f instanceof IAtom || f instanceof IIntFormula) {
+      if (PrincessUtil.isVariable(f)) {
+        return pVisitor.visitBoolVar(f.toString());
+      }
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
 

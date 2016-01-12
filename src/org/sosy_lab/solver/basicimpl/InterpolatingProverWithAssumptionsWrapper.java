@@ -141,23 +141,17 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     }
 
     @Override
-    public BooleanFormula visitAtom(BooleanFormula pAtom) {
-      if (solverAssumptionsContainEqualVariable(pAtom)) {
+    public BooleanFormula visitBoolVar(String varName) {
+      if (solverAssumptionsContainsVar(varName)) {
         return bmgr.makeBoolean(true);
+      } else {
+        return bmgr.makeVariable(varName);
       }
-      return pAtom;
     }
 
-    private boolean solverAssumptionsContainEqualVariable(BooleanFormula variable) {
-      Set<String> variableName = fmgr.extractVariableNames(variable);
-
-      // this is no boolean variable atom, but there may be another formula inside
-      if (variableName.size() > 1) {
-        return false;
-      }
-
+    private boolean solverAssumptionsContainsVar(String variableName) {
       for (BooleanFormula solverVar : solverAssumptionsAsFormula) {
-        if (variableName.containsAll(fmgr.extractVariableNames(solverVar))) {
+        if (fmgr.extractVariableNames(solverVar).contains(variableName)) {
           return true;
         }
       }

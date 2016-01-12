@@ -29,32 +29,46 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   }
 
   @Override
-  public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+  public BooleanFormula visitXor(BooleanFormula operand1, BooleanFormula operand2) {
+    return bfmgr.visit(this, rewriteXor(operand1, operand2));
+  }
 
-    // Rewrite using primitives.
-    return bfmgr.visit(
-        this,
-        bfmgr.or(
-            bfmgr.and(pOperand1, pOperand2),
-            bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2))));
+  private BooleanFormula rewriteXor(BooleanFormula operand1, BooleanFormula operand2) {
+    return bfmgr.or(
+        bfmgr.and(operand1, bfmgr.not(operand2)), bfmgr.and(bfmgr.not(operand1), operand2));
+  }
+
+  @Override
+  public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+    return bfmgr.visit(this, rewriteEquivalence(pOperand1, pOperand2));
+  }
+
+  private BooleanFormula rewriteEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+    return bfmgr.or(
+        bfmgr.and(pOperand1, pOperand2),
+        bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2))
+    );
   }
 
   @Override
   public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+    return bfmgr.visit(this, rewriteImplication(pOperand1, pOperand2));
+  }
 
-    // Rewrite using primitives.
-    return bfmgr.visit(this, bfmgr.or(bfmgr.not(pOperand1), pOperand2));
+  private BooleanFormula rewriteImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+    return bfmgr.or(bfmgr.not(pOperand1), pOperand2);
   }
 
   @Override
   public BooleanFormula visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+    return bfmgr.visit(this, rewriteIfThenElse(pCondition, pThenFormula, pElseFormula));
+  }
 
-    // Rewrite ITE using primitives.
-    return bfmgr.visit(
-        this,
-        bfmgr.or(
-            bfmgr.and(pCondition, pThenFormula), bfmgr.and(bfmgr.not(pCondition), pElseFormula)));
+  private BooleanFormula rewriteIfThenElse(
+      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
+    return bfmgr.or(
+        bfmgr.and(pCondition, pThenFormula), bfmgr.and(bfmgr.not(pCondition), pElseFormula));
   }
 
   private class NNFInsideNotVisitor extends BooleanFormulaTransformationVisitor {
@@ -77,6 +91,11 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     @Override
     public BooleanFormula visitAtom(BooleanFormula pAtom) {
       return bfmgr.not(pAtom);
+    }
+
+    @Override
+    public BooleanFormula visitBoolVar(String name) {
+      return bfmgr.not(bfmgr.makeVariable(name));
     }
 
     @Override
@@ -105,14 +124,15 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+    public BooleanFormula visitXor(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+      return bfmgr.visit(this, rewriteXor(pOperand1, pOperand2));
+    }
 
-      // Rewrite using primitives.
-      return bfmgr.visit(
-          this,
-          bfmgr.or(
-              bfmgr.and(pOperand1, pOperand2),
-              bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2))));
+    @Override
+    public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+      return bfmgr.visit(this,
+          rewriteEquivalence(pOperand1, pOperand2)
+      );
     }
 
     @Override
@@ -125,12 +145,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     @Override
     public BooleanFormula visitIfThenElse(
         BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-
-      // Rewrite ITE using primitives.
-      return bfmgr.visit(
-          this,
-          bfmgr.or(
-              bfmgr.and(pCondition, pThenFormula), bfmgr.and(bfmgr.not(pCondition), pElseFormula)));
+      return bfmgr.visit(this, rewriteIfThenElse(pCondition, pThenFormula, pElseFormula));
     }
   }
 }

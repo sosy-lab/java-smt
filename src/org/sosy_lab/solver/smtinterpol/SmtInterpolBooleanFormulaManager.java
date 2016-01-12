@@ -21,6 +21,7 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Verify.verify;
+import static org.sosy_lab.solver.smtinterpol.SmtInterpolUnsafeFormulaManager.dequote;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -224,7 +225,7 @@ class SmtInterpolBooleanFormulaManager
 
     } else if (func.equals(theory.mXor)) {
       assert arity == 2;
-      throw new UnsupportedOperationException("Unsupported SMT operator 'xor'");
+      return pVisitor.visitXor(getArg(app, 0), getArg(app, 1));
     }
 
     switch (func.getName()) {
@@ -245,6 +246,9 @@ class SmtInterpolBooleanFormulaManager
         return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
 
       default:
+        if (arity == 0) {
+          return pVisitor.visitBoolVar(dequote(app.toString()));
+        }
         return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
   }

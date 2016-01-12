@@ -30,6 +30,7 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
@@ -174,6 +175,12 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
+    public Void visitBoolVar(String varName) {
+      started = true;
+      return null;
+    }
+
+    @Override
     public Void visitAtom(BooleanFormula pAtom) {
       started = true;
       return null;
@@ -210,6 +217,12 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
+    public Void visitXor(BooleanFormula operand1, BooleanFormula operand2) {
+      started = true;
+      return null;
+    }
+
+    @Override
     public Void visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
       if (started) {
         visit(pOperand1);
@@ -239,7 +252,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitQuantifier(Quantifier quantifier, BooleanFormula pBody) {
+    public Void visitQuantifier(
+        Quantifier quantifier, List<Formula> boundVars, BooleanFormula pBody) {
       if (started) {
         visit(pBody);
       }
@@ -275,6 +289,12 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     @Override
     public Void visitFalse() {
+      wasLastVisitNot = false;
+      return null;
+    }
+
+    @Override
+    public Void visitBoolVar(String varName) {
       wasLastVisitNot = false;
       return null;
     }
@@ -316,6 +336,11 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
+    public Void visitXor(BooleanFormula operand1, BooleanFormula operand2) {
+      return null;
+    }
+
+    @Override
     public Void visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
@@ -351,7 +376,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitQuantifier(Quantifier quantifier, BooleanFormula pBody) {
+    public Void visitQuantifier(
+        Quantifier quantifier, List<Formula> boundVars, BooleanFormula pBody) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {

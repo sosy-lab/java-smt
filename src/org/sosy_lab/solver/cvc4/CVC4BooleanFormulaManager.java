@@ -169,7 +169,10 @@ public class CVC4BooleanFormulaManager
         return visit(pVisitor, getArg(f, 0));
       }
       return pVisitor.visitAnd(getAllArgs(f));
+    } else if (f.getKind() == Kind.XOR) {
 
+      assert arity == 2;
+      return pVisitor.visitXor(getArg(f, 0), getArg(f, 1));
     } else if (f.getKind() == Kind.OR) {
       if (arity == 0) {
         return pVisitor.visitFalse();
@@ -195,11 +198,11 @@ public class CVC4BooleanFormulaManager
     } else if (f.getKind() == Kind.ITE) {
       assert arity == 3;
       return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-
-    } else if (f.isConst() || f.isVariable()) {
+    } else if (f.isConst()) {
+      return pVisitor.visitBoolVar(f.toString());
+    } else {
       // TODO this is probably wrong, atoms are more than constants and variables
       return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
     }
-    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
   }
 }

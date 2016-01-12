@@ -21,6 +21,8 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
@@ -34,24 +36,95 @@ import java.util.List;
  */
 public interface BooleanFormulaVisitor<R> {
 
+  /**
+   * Visit a constant {@code true}.
+   *
+   * @see BooleanFormulaManager#makeBoolean
+   */
   R visitTrue();
 
+  /**
+   * Visit a constant {@code false}.
+   *
+   * @see BooleanFormulaManager#makeBoolean
+   */
   R visitFalse();
 
-  R visitAtom(BooleanFormula atom);
+  /**
+   * Visit a variable with a boolean sort.
+   *
+   * @param varName Variable name.
+   *
+   * @see BooleanFormulaManager#makeVariable
+   */
+  R visitBoolVar(String varName);
 
+  /**
+   * Visit a NOT-expression.
+   *
+   * @param operand Negated term.
+   *
+   * @see BooleanFormulaManager#not
+   */
   R visitNot(BooleanFormula operand);
 
+  /**
+   * Visit an AND-expression.
+   *
+   * @see BooleanFormulaManager#and
+   */
   R visitAnd(List<BooleanFormula> operands);
 
-  R visitOr(List<BooleanFormula> operand);
+  /**
+   * Visit an OR-expression.
+   *
+   * @see BooleanFormulaManager#or
+   */
+  R visitOr(List<BooleanFormula> operands);
 
+  /**
+   * Visit a XOR-expression.
+   *
+   * @see BooleanFormulaManager#xor
+   */
+  R visitXor(BooleanFormula operand1, BooleanFormula operand2);
+
+  /**
+   * Visit an equivalence between two formulas of boolean sort:
+   * {@code operand1 = operand2}
+   *
+   * @see BooleanFormulaManager#equivalence
+   */
   R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2);
 
+  /**
+   * Visit an implication.
+   *
+   * @see BooleanFormulaManager#implication
+   */
   R visitImplication(BooleanFormula operand1, BooleanFormula operand2);
 
+  /**
+   * Visit an if-then-else expression.
+   *
+   * @see BooleanFormulaManager#ifThenElse
+   */
   R visitIfThenElse(
       BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula);
 
-  R visitQuantifier(Quantifier quantifier, BooleanFormula body);
+  /**
+   * Visit a quantifier: forall- or exists-.
+   *
+   * @see QuantifiedFormulaManager#mkQuantifier
+   * @see QuantifiedFormulaManager#forall
+   * @see QuantifiedFormulaManager#exists
+   */
+  R visitQuantifier(Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);
+
+  /**
+   * Visit an SMT atom.
+   * This is anything with a boolean sort which is not covered by the cases
+   * above.
+   */
+  R visitAtom(BooleanFormula atom);
 }

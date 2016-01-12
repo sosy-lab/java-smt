@@ -91,6 +91,11 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
+  public BooleanFormula visitBoolVar(String varName) {
+    return bfmgr.makeVariable(varName);
+  }
+
+  @Override
   public BooleanFormula visitAtom(BooleanFormula pAtom) {
     return pAtom;
   }
@@ -111,6 +116,11 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
+  public BooleanFormula visitXor(BooleanFormula operand1, BooleanFormula operand2) {
+    return bfmgr.xor(operand1, operand2);
+  }
+
+  @Override
   public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     return bfmgr.equivalence(visitIfNotSeen(pOperand1), visitIfNotSeen(pOperand2));
   }
@@ -128,7 +138,8 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitQuantifier(Quantifier quantifier, BooleanFormula body) {
+  public BooleanFormula visitQuantifier(
+      Quantifier quantifier, List<Formula> boundVars, BooleanFormula body) {
     QuantifiedFormulaManager qfmgr = manager.getQuantifiedFormulaManager();
     if (quantifier == Quantifier.FORALL) {
 

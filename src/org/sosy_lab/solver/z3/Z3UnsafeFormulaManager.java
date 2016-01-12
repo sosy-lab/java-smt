@@ -314,11 +314,14 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     final int boundCount = get_quantifier_num_bound(z3context, pF);
     long[] boundVars = new long[boundCount];
 
+    // todo: duplication with visitor code.
     for (int b = 0; b < boundCount; b++) {
       long varName = get_quantifier_bound_name(z3context, pF, b);
       long varSort = get_quantifier_bound_sort(z3context, pF, b);
       long var = mk_const(z3context, varName, varSort);
       boundVars[b] = var;
+
+      // todo: memory leak, Z3Formula never has the chance to release it.
       inc_ref(z3context, var);
     }
 
@@ -377,17 +380,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        int numBound = get_quantifier_num_bound(z3context, f);
-        List<Formula> boundVars = new ArrayList<>(numBound);
-        for (int i = 0; i < numBound; i++) {
-          long varName = get_quantifier_bound_name(z3context, f, i);
-          long varSort = get_quantifier_bound_sort(z3context, f, i);
-          Formula c =
-              formulaCreator.encapsulate(
-                  formulaCreator.getFormulaTypeFromSort(varSort),
-                  mk_const(z3context, varName, varSort));
-        }
-        return visitor.visitQuantifier((BooleanFormula) formula, q, boundVars, body);
+        return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(f), body);
 
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:
@@ -396,6 +389,20 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
         throw new UnsupportedOperationException(
             "Input should be a formula AST, " + "got unexpected type instead");
     }
+  }
+
+  List<Formula> getBoundVars(long f) {
+    int numBound = get_quantifier_num_bound(z3context, f);
+    List<Formula> boundVars = new ArrayList<>(numBound);
+    for (int i = 0; i < numBound; i++) {
+      long varName = get_quantifier_bound_name(z3context, f, i);
+      long varSort = get_quantifier_bound_sort(z3context, f, i);
+      Formula c =
+          formulaCreator.encapsulate(
+              formulaCreator.getFormulaTypeFromSort(varSort),
+              mk_const(z3context, varName, varSort));
+    }
+    return boundVars;
   }
 
   private DeclarationKind getDeclarationKind(long f) {

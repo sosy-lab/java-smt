@@ -21,7 +21,10 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
@@ -84,6 +87,11 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
   }
 
   @Override
+  public TraversalProcess visitBoolVar(String varName) {
+    return delegate.visitBoolVar(varName);
+  }
+
+  @Override
   public TraversalProcess visitAtom(BooleanFormula pAtom) {
     return delegate.visitAtom(pAtom);
   }
@@ -108,6 +116,13 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
   public TraversalProcess visitOr(List<BooleanFormula> pOperands) {
     TraversalProcess result = delegate.visitOr(pOperands);
     addToQueueIfNecessary(result, pOperands);
+    return result;
+  }
+
+  @Override
+  public TraversalProcess visitXor(BooleanFormula operand1, BooleanFormula operand2) {
+    TraversalProcess result = delegate.visitXor(operand1, operand2);
+    addToQueueIfNecessary(result, ImmutableList.of(operand1, operand2));
     return result;
   }
 
@@ -138,8 +153,9 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
   }
 
   @Override
-  public TraversalProcess visitQuantifier(Quantifier pQuantifier, BooleanFormula pBody) {
-    TraversalProcess result = delegate.visitQuantifier(pQuantifier, pBody);
+  public TraversalProcess visitQuantifier(
+      Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
+    TraversalProcess result = delegate.visitQuantifier(pQuantifier, boundVars, pBody);
     if (result == TraversalProcess.CONTINUE) {
       addToQueue(pBody);
     }

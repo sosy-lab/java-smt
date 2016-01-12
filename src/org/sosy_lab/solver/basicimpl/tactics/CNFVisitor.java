@@ -9,6 +9,7 @@ import com.google.common.collect.FluentIterable;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -42,6 +43,11 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   @Override
   public List<BooleanFormula> visitFalse() {
     return singletonList(bfmgr.makeBoolean(false));
+  }
+
+  @Override
+  public List<BooleanFormula> visitBoolVar(String varName) {
+    return singletonList(bfmgr.makeVariable(varName));
   }
 
   @Override
@@ -120,17 +126,18 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
+  public List<BooleanFormula> visitXor(BooleanFormula operand1, BooleanFormula operand2) {
+    throw new IllegalStateException("Traversed formula is not in NNF if XOR is present");
+  }
+
+  @Override
   public List<BooleanFormula> visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    // the traversed formula is assumed to be in NNF without equivalences
-    // so we can throw an exception here
-    throw new IllegalStateException("Traversed formula is not in NNF without equivalences");
+    throw new IllegalStateException("Traversed formula is not in NNF if equivalence is present");
   }
 
   @Override
   public List<BooleanFormula> visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    // the traversed formula is assumed to be in NNF without implications
-    // so we can throw an exception here
-    throw new IllegalStateException("Traversed formula is not in NNF without implications");
+    throw new IllegalStateException("Traversed formula is not in NNF if implication is present");
   }
 
   @Override
@@ -144,7 +151,8 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitQuantifier(Quantifier quantifier, BooleanFormula pBody) {
+  public List<BooleanFormula> visitQuantifier(
+      Quantifier quantifier, List<Formula> boundVars, BooleanFormula pBody) {
     throw new IllegalStateException("Traversed formula is not in NNF if quantifiers are present");
   }
 }

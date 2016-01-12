@@ -193,7 +193,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = creator.encapsulateBoolean(get_quantifier_body(z3context, f));
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        return pVisitor.visitQuantifier(q, body);
+        return pVisitor.visitQuantifier(q, ufmgr.getBoundVars(f), body);
 
       case Z3_VAR_AST:
         // todo: do we need a special case for bound variables?
@@ -255,9 +255,15 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
           return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
         }
         return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+      case Z3_OP_XOR:
+        return pVisitor.visitXor(getArg(f, 0), getArg(f, 1));
 
       default:
-        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+        if (arity == 0) {
+          return pVisitor.visitBoolVar(ufmgr.getName(f));
+        } else {
+          return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
+        }
     }
   }
 }

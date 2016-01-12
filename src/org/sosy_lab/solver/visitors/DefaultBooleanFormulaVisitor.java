@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
@@ -80,7 +81,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaV
   }
 
   @Override
-  public R visitQuantifier(Quantifier quantifier, BooleanFormula body) {
+  public R visitQuantifier(Quantifier quantifier, List<Formula> boundVars, BooleanFormula body) {
     return visitDefault();
   }
 }
