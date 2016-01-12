@@ -32,6 +32,7 @@ import org.sosy_lab.solver.AssignableTerm.Variable;
 import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.TermType;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -57,7 +58,7 @@ class CVC4Model {
   }
 
   private static Function toFunction(Expr t, SmtEngine smtEngine) {
-    String lName = t.toString(); // TODO perhaps we have to split of the arguments?
+    String lName = t.getOperator().toString();
     TermType lType = getType(t);
 
     int lArity = (int) t.getNumChildren();
@@ -79,9 +80,11 @@ class CVC4Model {
     } else if (value.getType().isInteger() || value.getType().isFloatingPoint()) {
       Rational rat = value.getConstRational();
       if (rat.isIntegral()) {
-        return rat.getNumerator().getLong();
+        return new BigInteger(rat.getNumerator().toString());
       } else {
-        return rat.getDouble();
+        return org.sosy_lab.common.rationals.Rational.of(
+            new BigInteger(rat.getNumerator().toString()),
+            new BigInteger(rat.getDenominator().toString()));
       }
     }
 

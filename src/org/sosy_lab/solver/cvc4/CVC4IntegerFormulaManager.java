@@ -47,10 +47,11 @@ public class CVC4IntegerFormulaManager
   @Override
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
-    if (pI > java.lang.Integer.MAX_VALUE) {
-      throw new UnsupportedOperationException("CVC4 can only handle ints");
+    if (pI < 0) {
+      // TODO fix this bug
+      return exprManager.mkConst(new Rational(new Integer((int) pI)));
     }
-    return exprManager.mkConst(new Rational(new Integer((int) pI)));
+    return exprManager.mkConst(new Rational(new Integer(pI)));
   }
 
   @Override
@@ -94,12 +95,12 @@ public class CVC4IntegerFormulaManager
 
   @Override
   protected Expr makeNumberImpl(BigInteger pI) {
-    return makeNumberImpl(pI.longValue());
+    return makeNumberImpl(pI.toString());
   }
 
   @Override
   protected Expr makeNumberImpl(String pI) {
-    return makeNumberImpl(Long.parseLong(pI));
+    return exprManager.mkConst(new Rational(pI));
   }
 
   @Override
