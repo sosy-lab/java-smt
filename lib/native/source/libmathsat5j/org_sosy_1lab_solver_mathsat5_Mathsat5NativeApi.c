@@ -338,6 +338,12 @@ TYPE_ARG(1)
 CALL1(char *, type_repr)
 PLAIN_STRING_RETURN
 
+DEFINE_FUNC(int, 1decl_1get_1tag) WITH_TWO_ARGS(jenv, jdecl)
+ENV_ARG(1)
+DECL_ARG(2)
+CALL2(msat_symbol_tag, decl_get_tag)
+INT_RETURN
+
 /*
  * msat_decl msat_declare_function(msat_env e, const char *name, msat_type type);
  */
@@ -1012,7 +1018,7 @@ STRUCT_RETURN_WITH_ENV
 
 DEFINE_FUNC(void, 1destroy_1model) WITH_ONE_ARG(jmodel)
 MODEL_ARG(1)
-VOID_CALL1(void, destroy_model)
+VOID_CALL1(destroy_model)
 
 DEFINE_FUNC(jmodel, 1get_1model) WITH_ONE_ARG(jenv)
 ENV_ARG(1)
