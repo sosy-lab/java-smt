@@ -46,7 +46,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaV
   }
 
   @Override
-  public R visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
+  public R visitBoundVar(BooleanFormula var, int deBruijnIdx) {
     return visitDefault();
   }
 

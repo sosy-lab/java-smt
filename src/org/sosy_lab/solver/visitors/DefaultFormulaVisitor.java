@@ -43,7 +43,7 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
   }
 
   @Override
-  public R visitBoundVariable(Formula f, String name, int deBruijnIdx) {
+  public R visitBoundVariable(Formula f, int deBruijnIdx) {
     return visitDefault(f);
   }
 

@@ -92,7 +92,7 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
+  public BooleanFormula visitBoundVar(BooleanFormula var, int deBruijnIdx) {
     return var;
   }
 

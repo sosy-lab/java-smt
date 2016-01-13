@@ -54,7 +54,7 @@ public interface BooleanFormulaVisitor<R> {
   /**
    * Visit a boolean variable bound by a quantifier.
    */
-  R visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx);
+  R visitBoundVar(BooleanFormula var, int deBruijnIdx);
 
   /**
    * Visit a NOT-expression.

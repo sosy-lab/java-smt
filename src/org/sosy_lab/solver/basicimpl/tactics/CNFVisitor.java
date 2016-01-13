@@ -47,7 +47,7 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
+  public List<BooleanFormula> visitBoundVar(BooleanFormula var, int deBruijnIdx) {
     throw new IllegalStateException("Traversed formula is not in NNF if quantifiers are present");
   }
 

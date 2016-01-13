@@ -67,8 +67,8 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   }
 
   @Override
-  public TraversalProcess visitBoundVariable(Formula pF, String pName, int pDeBruijnIdx) {
-    return delegate.visitBoundVariable(pF, pName, pDeBruijnIdx);
+  public TraversalProcess visitBoundVariable(Formula pF, int pDeBruijnIdx) {
+    return delegate.visitBoundVariable(pF, pDeBruijnIdx);
   }
 
   @Override

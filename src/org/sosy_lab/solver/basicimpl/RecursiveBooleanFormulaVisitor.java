@@ -88,8 +88,8 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
   }
 
   @Override
-  public TraversalProcess visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
-    return delegate.visitBoundVar(var, varName, deBruijnIdx);
+  public TraversalProcess visitBoundVar(BooleanFormula var, int deBruijnIdx) {
+    return delegate.visitBoundVar(var, deBruijnIdx);
   }
 
   @Override

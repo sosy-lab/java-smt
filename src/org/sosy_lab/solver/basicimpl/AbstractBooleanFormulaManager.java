@@ -302,11 +302,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     }
 
     @Override
-    public R visitBoundVariable(Formula f, String name, int deBruijnIdx) {
+    public R visitBoundVariable(Formula f, int deBruijnIdx) {
 
       // Only boolean formulas can appear here.
       assert f instanceof BooleanFormula;
-      return delegate.visitBoundVar((BooleanFormula) f, name, deBruijnIdx);
+      return delegate.visitBoundVar((BooleanFormula) f, deBruijnIdx);
     }
 
     @Override

@@ -54,11 +54,10 @@ public interface FormulaVisitor<R> {
    * The variable can have any sort (both boolean and non-boolean).
    *
    * @param f Formula representing the variable.
-   * @param name Variable name.
    * @param deBruijnIdx de-Bruijn index of the bound variable, which can be used
    *                    to find the matching quantifier.
    */
-  R visitBoundVariable(Formula f, String name, int deBruijnIdx);
+  R visitBoundVariable(Formula f, int deBruijnIdx);
 
   /**
    * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".

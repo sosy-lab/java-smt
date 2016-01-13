@@ -193,7 +193,7 @@ class PrincessUnsafeFormulaManager
           // variables for princess.
           formulaCreator.encapsulateBoolean(body));
     } else if (isBoundVariable(input)) {
-      return visitor.visitBoundVariable(f, getName(input), PrincessUtil.getIndex(input));
+      return visitor.visitBoundVariable(f, PrincessUtil.getIndex(input));
     } else if (isVariable(input)) {
       return visitor.visitFreeVariable(f, getName(input));
     } else {

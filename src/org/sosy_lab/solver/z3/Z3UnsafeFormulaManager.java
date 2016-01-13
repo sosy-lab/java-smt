@@ -374,10 +374,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
             formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(z3context, f);
-        return visitor.visitBoundVariable(
-            formula,
-            get_symbol_string(z3context, get_quantifier_bound_name(z3context, f, deBruijnIdx)),
-            deBruijnIdx);
+        return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = formulaCreator.encapsulateBoolean(get_quantifier_body(z3context, f));
         Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;

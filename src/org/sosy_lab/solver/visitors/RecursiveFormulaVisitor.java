@@ -66,7 +66,7 @@ public abstract class RecursiveFormulaVisitor implements FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitBoundVariable(Formula f, String name, int deBruijnIdx) {
+  public Void visitBoundVariable(Formula f, int deBruijnIdx) {
     return null;
   }
 

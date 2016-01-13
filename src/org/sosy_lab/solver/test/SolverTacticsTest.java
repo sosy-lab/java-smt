@@ -176,7 +176,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitBoundVar(BooleanFormula f, String varName, int deBruijnIdx) {
+    public Void visitBoundVar(BooleanFormula f, int deBruijnIdx) {
       started = true;
       return null;
     }
@@ -295,7 +295,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
+    public Void visitBoundVar(BooleanFormula var, int deBruijnIdx) {
       wasLastVisitNot = false;
       return null;
     }
