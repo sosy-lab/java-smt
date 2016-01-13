@@ -44,11 +44,15 @@ import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class PrincessUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
@@ -184,14 +188,23 @@ class PrincessUnsafeFormulaManager
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
     } else if (isQuantification(input)) {
-      IExpression body = PrincessUtil.getQuantifierBody(input);
+      BooleanFormula body = formulaCreator.encapsulateBoolean(
+          PrincessUtil.getQuantifierBody(input)
+      );
       Quantifier q = PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS;
+      BoundVariablesSearcher v = new BoundVariablesSearcher();
+
+      // I've heard you like visitors, so you can visit while you visit...
+      // This addresses princess deficiency of not exposing bound variables
+      // associated with a quantifier.
+      visitRecursively(v, body);
+
       return visitor.visitQuantifier(
           (BooleanFormula) f,
           q,
-          new ArrayList<Formula>(), // TODO: getting the bound
+          new ArrayList<>(v.foundBoundVars),
           // variables for princess.
-          formulaCreator.encapsulateBoolean(body));
+          body);
     } else if (isBoundVariable(input)) {
       return visitor.visitBoundVariable(f, PrincessUtil.getIndex(input));
     } else if (isVariable(input)) {
@@ -217,6 +230,27 @@ class PrincessUnsafeFormulaManager
           };
       return visitor.visitFuncApp(
           f, args, FuncDecl.of(name, getDeclarationKind(input)), constructor);
+    }
+  }
+
+  private class BoundVariablesSearcher extends DefaultFormulaVisitor<TraversalProcess> {
+    private final Set<Formula> foundBoundVars = new HashSet<>();
+
+    @Override
+    protected TraversalProcess visitDefault(Formula f) {
+      return TraversalProcess.CONTINUE;
+    }
+
+    public TraversalProcess visitBoundVariable(Formula f, int deBruijnIdx) {
+      foundBoundVars.add(f);
+      return TraversalProcess.CONTINUE;
+    }
+
+    public TraversalProcess visitQuantifier(BooleanFormula f, Quantifier q,
+                                            List<Formula> boundVars,
+                                            BooleanFormula body) {
+      // Do not go into other quantifiers.
+      return TraversalProcess.SKIP;
     }
   }
 

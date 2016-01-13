@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -28,6 +30,7 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -272,4 +275,15 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract <R> R visit(FormulaVisitor<R> visitor, Formula input, TFormulaInfo f);
+
+  protected void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
+    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
+    recVisitor.addToQueue(pF);
+    while (!recVisitor.isQueueEmpty()) {
+      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
+  }
 }

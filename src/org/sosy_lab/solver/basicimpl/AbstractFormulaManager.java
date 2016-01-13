@@ -229,14 +229,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   @Override
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
-    recVisitor.addToQueue(pF);
-    while (!recVisitor.isQueueEmpty()) {
-      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
-      if (process == TraversalProcess.ABORT) {
-        return;
-      }
-    }
+    unsafeManager.visitRecursively(pFormulaVisitor, pF);
   }
 
   /**
