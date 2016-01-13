@@ -26,6 +26,8 @@ import com.google.common.base.Function;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Declaration;
+import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;

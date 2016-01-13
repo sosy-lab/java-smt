@@ -22,6 +22,7 @@ package org.sosy_lab.solver.visitors;
 import com.google.common.base.Function;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Declaration;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 

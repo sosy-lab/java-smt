@@ -98,8 +98,8 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
-import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
-import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
+import org.sosy_lab.solver.api.Declaration;
+import org.sosy_lab.solver.api.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;

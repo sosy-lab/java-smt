@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Declaration;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
@@ -38,64 +39,6 @@ import java.util.List;
  * @param <R> Desired return type.
  */
 public interface FormulaVisitor<R> {
-
-  enum DeclarationKind {
-
-    // Boolean operations
-    AND,
-    NOT,
-    OR,
-    IFF,
-    ITE,
-    XOR,
-    IMPLIES,
-    DISTINCT,
-
-    // Simple arithmetic,
-    // they work across integers and rationals.
-    SUB,
-    ADD,
-    DIV,
-    MUL,
-    MODULO,
-    UF,
-
-    // Simple comparison,
-    // work across integers and rationals.
-    LT,
-    LTE,
-    GT,
-    GTE,
-    EQ,
-
-    /**
-     * Solvers support a lot of different built-in theories.
-     * We enforce standardization only across a small subset.
-     */
-    OTHER
-  }
-
-  class Declaration {
-    private final String name;
-    private final DeclarationKind kind;
-
-    private Declaration(String name, DeclarationKind kind) {
-      this.name = name;
-      this.kind = kind;
-    }
-
-    public static Declaration of(String name, DeclarationKind kind) {
-      return new Declaration(name, kind);
-    }
-
-    public DeclarationKind getKind() {
-      return kind;
-    }
-
-    public String getName() {
-      return name;
-    }
-  }
 
   /**
    * Visit a free variable (such as "x", "y" or "z"), not bound by a quantifier.

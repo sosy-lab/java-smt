@@ -29,8 +29,8 @@ import edu.nyu.acsys.CVC4.Type;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
-import org.sosy_lab.solver.visitors.FormulaVisitor.Declaration;
-import org.sosy_lab.solver.visitors.FormulaVisitor.DeclarationKind;
+import org.sosy_lab.solver.api.Declaration;
+import org.sosy_lab.solver.api.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;
