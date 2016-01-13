@@ -19,10 +19,6 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Verify.verify;
-import static org.sosy_lab.solver.smtinterpol.SmtInterpolUnsafeFormulaManager.dequote;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
@@ -34,7 +30,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -174,83 +169,6 @@ class SmtInterpolBooleanFormulaManager
             return formulaCreator.encapsulateBoolean(pInput);
           }
         });
-  }
-
-  @Override
-  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Term f) {
-    checkArgument(
-        f.getTheory().equals(theory),
-        "Given term belongs to a different instance of SMTInterpol: %s",
-        f);
-    verify(
-        f instanceof ApplicationTerm,
-        "Unexpected boolean formula of class %s",
-        f.getClass().getSimpleName());
-
-    final ApplicationTerm app = (ApplicationTerm) f;
-    final int arity = app.getParameters().length;
-    final FunctionSymbol func = app.getFunction();
-
-    if (app.equals(theory.mTrue)) {
-      assert arity == 0;
-      return pVisitor.visitTrue();
-
-    } else if (app.equals(theory.mFalse)) {
-      assert arity == 0;
-      return pVisitor.visitFalse();
-
-    } else if (func.equals(theory.mNot)) {
-      assert arity == 1;
-      return pVisitor.visitNot(getArg(app, 0));
-
-    } else if (func.equals(theory.mAnd)) {
-      if (arity == 0) {
-        return pVisitor.visitTrue();
-      } else if (arity == 1) {
-        return visit(pVisitor, getArg(app, 0));
-      }
-      return pVisitor.visitAnd(getAllArgs(app));
-
-    } else if (func.equals(theory.mOr)) {
-      if (arity == 0) {
-        return pVisitor.visitFalse();
-      } else if (arity == 1) {
-        return visit(pVisitor, getArg(app, 0));
-      }
-      return pVisitor.visitOr(getAllArgs(app));
-
-    } else if (func.equals(theory.mImplies)) {
-      assert arity == 2;
-      return pVisitor.visitImplication(getArg(app, 0), getArg(app, 1));
-
-    } else if (func.equals(theory.mXor)) {
-      assert arity == 2;
-      return pVisitor.visitXor(getArg(app, 0), getArg(app, 1));
-    }
-
-    switch (func.getName()) {
-      case "ite":
-        assert arity == 3;
-        return pVisitor.visitIfThenElse(getArg(app, 0), getArg(app, 1), getArg(app, 2));
-
-      case "=":
-        if (isBinaryBooleanOperator(func)) {
-          return pVisitor.visitEquivalence(getArg(app, 0), getArg(app, 1));
-        }
-        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-
-      case "distinct":
-        if (isBinaryBooleanOperator(func)) {
-          throw new UnsupportedOperationException("Unsupported SMT operator 'distinct'");
-        }
-        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-
-      default:
-        if (arity == 0) {
-          return pVisitor.visitBoolVar(dequote(app.toString()));
-        }
-        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-    }
   }
 
   private boolean isBinaryBooleanOperator(final FunctionSymbol func) {

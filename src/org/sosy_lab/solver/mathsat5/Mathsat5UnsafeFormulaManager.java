@@ -62,10 +62,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
@@ -141,8 +141,8 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
               return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
             }
           };
-      return visitor.visitFunction(
-          formula, args, Declaration.of(name, getDeclarationKind(f)), constructor);
+      return visitor.visitFuncApp(
+          formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
     }
   }
 
@@ -258,33 +258,36 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
     throw new UnsupportedOperationException();
   }
 
-  private DeclarationKind getDeclarationKind(long pF) {
+  private FuncDeclKind getDeclarationKind(long pF) {
     if (msat_term_is_uf(msatEnv, pF)) {
-      return DeclarationKind.UF;
+      return FuncDeclKind.UF;
+    } else if (msat_term_is_constant(msatEnv, pF)) {
+      return FuncDeclKind.VAR;
     }
+
     long decl = msat_term_get_decl(pF);
     int tag = msat_decl_get_tag(msatEnv, decl);
     switch (tag) {
       case MSAT_TAG_AND:
-        return DeclarationKind.AND;
+        return FuncDeclKind.AND;
       case MSAT_TAG_NOT:
-        return DeclarationKind.NOT;
+        return FuncDeclKind.NOT;
       case MSAT_TAG_OR:
-        return DeclarationKind.OR;
+        return FuncDeclKind.OR;
       case MSAT_TAG_IFF:
-        return DeclarationKind.IFF;
+        return FuncDeclKind.IFF;
       case MSAT_TAG_ITE:
-        return DeclarationKind.ITE;
+        return FuncDeclKind.ITE;
 
       case MSAT_TAG_PLUS:
-        return DeclarationKind.ADD;
+        return FuncDeclKind.ADD;
         // todo: UF??
       case MSAT_TAG_LEQ:
-        return DeclarationKind.LTE;
+        return FuncDeclKind.LTE;
       case MSAT_TAG_EQ:
-        return DeclarationKind.EQ;
+        return FuncDeclKind.EQ;
       default:
-        return DeclarationKind.OTHER;
+        return FuncDeclKind.OTHER;
     }
   }
 }

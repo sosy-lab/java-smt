@@ -22,6 +22,7 @@ package org.sosy_lab.solver.visitors;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
@@ -51,13 +52,9 @@ public interface BooleanFormulaVisitor<R> {
   R visitFalse();
 
   /**
-   * Visit a variable with a boolean sort.
-   *
-   * @param varName Variable name.
-   *
-   * @see BooleanFormulaManager#makeVariable
+   * Visit a boolean variable bound by a quantifier.
    */
-  R visitBoolVar(String varName);
+  R visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx);
 
   /**
    * Visit a NOT-expression.
@@ -126,5 +123,5 @@ public interface BooleanFormulaVisitor<R> {
    * This is anything with a boolean sort which is not covered by the cases
    * above.
    */
-  R visitAtom(BooleanFormula atom);
+  R visitAtom(BooleanFormula atom, FuncDecl funcDecl);
 }

@@ -23,6 +23,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
@@ -91,12 +92,12 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitBoolVar(String varName) {
-    return bfmgr.makeVariable(varName);
+  public BooleanFormula visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
+    return var;
   }
 
   @Override
-  public BooleanFormula visitAtom(BooleanFormula pAtom) {
+  public BooleanFormula visitAtom(BooleanFormula pAtom, FuncDecl decl) {
     return pAtom;
   }
 

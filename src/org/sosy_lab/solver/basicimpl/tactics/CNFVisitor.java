@@ -10,6 +10,7 @@ import com.google.common.collect.FluentIterable;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -46,12 +47,12 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitBoolVar(String varName) {
-    return singletonList(bfmgr.makeVariable(varName));
+  public List<BooleanFormula> visitBoundVar(BooleanFormula var, String varName, int deBruijnIdx) {
+    throw new IllegalStateException("Traversed formula is not in NNF if quantifiers are present");
   }
 
   @Override
-  public List<BooleanFormula> visitAtom(BooleanFormula pAtom) {
+  public List<BooleanFormula> visitAtom(BooleanFormula pAtom, FuncDecl decl) {
     return singletonList(pAtom);
   }
 

@@ -21,14 +21,14 @@ package org.sosy_lab.solver.basicimpl;
 
 import com.google.common.testing.AbstractPackageSanityTests;
 
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
-    setDefault(Declaration.class, Declaration.of("F", DeclarationKind.UF));
+    setDefault(FuncDecl.class, FuncDecl.of("F", FuncDeclKind.UF));
   }
 }

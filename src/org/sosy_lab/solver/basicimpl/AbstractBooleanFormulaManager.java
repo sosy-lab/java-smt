@@ -22,6 +22,8 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 
@@ -29,7 +31,11 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.ArrayList;
@@ -277,10 +283,113 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   @Override
   public <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula pFormula) {
-    return visit(visitor, extractInfo(pFormula));
+    return ufmgr.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
   }
 
-  protected abstract <R> R visit(BooleanFormulaVisitor<R> visitor, TFormulaInfo pFormula);
+  private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
+    private final BooleanFormulaVisitor<R> delegate;
+
+    DelegatingFormulaVisitor(BooleanFormulaVisitor<R> pDelegate) {
+      delegate = pDelegate;
+    }
+
+    @Override
+    public R visitFreeVariable(Formula f, String name) {
+
+      // Only boolean formulas can appear here.
+      assert f instanceof BooleanFormula;
+      return delegate.visitAtom((BooleanFormula) f, FuncDecl.of(name, FuncDeclKind.VAR));
+    }
+
+    @Override
+    public R visitBoundVariable(Formula f, String name, int deBruijnIdx) {
+
+      // Only boolean formulas can appear here.
+      assert f instanceof BooleanFormula;
+      return delegate.visitBoundVar((BooleanFormula) f, name, deBruijnIdx);
+    }
+
+    @Override
+    public R visitConstant(Formula f, Object value) {
+      Preconditions.checkState(value instanceof Boolean);
+      boolean v = (Boolean) value;
+      if (v) {
+        return delegate.visitTrue();
+      } else {
+        return delegate.visitFalse();
+      }
+    }
+
+    @Override
+    public R visitFuncApp(
+        Formula f,
+        List<Formula> args,
+        FuncDecl functionDeclaration,
+        Function<List<Formula>, Formula> newApplicationConstructor) {
+      switch (functionDeclaration.getKind()) {
+        case AND:
+          Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
+          @SuppressWarnings("unchecked")
+          R out = delegate.visitAnd((List) args);
+          return out;
+        case NOT:
+          Preconditions.checkState(args.size() == 1);
+          Formula arg = args.get(0);
+
+          Preconditions.checkArgument(arg instanceof BooleanFormula);
+          return delegate.visitNot((BooleanFormula) arg);
+        case OR:
+          Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
+
+          // Unchecked cast to avoid creating a new array.
+          @SuppressWarnings("unchecked")
+          R out2 = delegate.visitOr((List) args);
+          return out2;
+        case IFF:
+          Preconditions.checkState(args.size() == 2);
+          Formula a = args.get(0);
+          Formula b = args.get(1);
+          Preconditions.checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
+          @SuppressWarnings("unchecked")
+          R out3 = delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
+          return out3;
+        case ITE:
+          Preconditions.checkArgument(args.size() == 3);
+          Formula ifC = args.get(0);
+          Formula then = args.get(1);
+          Formula elseC = args.get(2);
+          Preconditions.checkState(
+              ifC instanceof BooleanFormula
+                  && then instanceof BooleanFormula
+                  && elseC instanceof BooleanFormula);
+          return delegate.visitIfThenElse(
+              (BooleanFormula) ifC, (BooleanFormula) then, (BooleanFormula) elseC);
+        case XOR:
+          Preconditions.checkArgument(args.size() == 2);
+          Formula a1 = args.get(0);
+          Formula a2 = args.get(1);
+          Preconditions.checkState(a1 instanceof BooleanFormula && a2 instanceof BooleanFormula);
+          return delegate.visitXor((BooleanFormula) a1, (BooleanFormula) a2);
+        case IMPLIES:
+          Preconditions.checkArgument(args.size() == 2);
+          Formula b1 = args.get(0);
+          Formula b2 = args.get(1);
+          Preconditions.checkArgument(b1 instanceof BooleanFormula && b2 instanceof BooleanFormula);
+          return delegate.visitImplication((BooleanFormula) b1, (BooleanFormula) b2);
+        default:
+          return delegate.visitAtom((BooleanFormula) f, functionDeclaration);
+      }
+    }
+
+    @Override
+    public R visitQuantifier(
+        BooleanFormula f,
+        Quantifier quantifier,
+        List<Formula> boundVariables,
+        BooleanFormula body) {
+      return delegate.visitQuantifier(quantifier, boundVariables, body);
+    }
+  }
 
   @Override
   public void visitRecursively(

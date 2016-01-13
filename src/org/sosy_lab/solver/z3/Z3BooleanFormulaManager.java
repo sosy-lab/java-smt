@@ -19,15 +19,9 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_false;
@@ -37,7 +31,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_xor;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
@@ -49,16 +42,11 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.Collection;
 
@@ -182,88 +170,5 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   @Override
   protected boolean isIfThenElse(Long pParam) {
     return isOP(z3context, pParam, Z3_OP_ITE);
-  }
-
-  @Override
-  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Long f) {
-    switch (get_ast_kind(z3context, f)) {
-      case Z3_APP_AST:
-        return visitAppAst(pVisitor, f);
-
-      case Z3_QUANTIFIER_AST:
-        BooleanFormula body = creator.encapsulateBoolean(get_quantifier_body(z3context, f));
-        Quantifier q = is_quantifier_forall(z3context, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        return pVisitor.visitQuantifier(q, ufmgr.getBoundVars(f), body);
-
-      case Z3_VAR_AST:
-        // todo: do we need a special case for bound variables?
-        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-
-      default:
-        throw new UnsupportedOperationException(
-            "Unknown or unsupported boolean operator " + ast_to_string(z3context, f));
-    }
-  }
-
-  private <R> R visitAppAst(BooleanFormulaVisitor<R> pVisitor, Long f)
-      throws UnsupportedOperationException {
-    final int arity = get_app_num_args(z3context, f);
-
-    switch (get_decl_kind(z3context, get_app_decl(z3context, f))) {
-      case Z3_OP_TRUE:
-        assert arity == 0;
-        return pVisitor.visitTrue();
-
-      case Z3_OP_FALSE:
-        assert arity == 0;
-        return pVisitor.visitFalse();
-
-      case Z3_OP_NOT:
-        assert arity == 1;
-        return pVisitor.visitNot(getArg(f, 0));
-
-      case Z3_OP_AND:
-        if (arity == 0) {
-          return pVisitor.visitTrue();
-        } else if (arity == 1) {
-          return visit(pVisitor, getArg(f, 0));
-        }
-        return pVisitor.visitAnd(getAllArgs(f));
-
-      case Z3_OP_OR:
-        if (arity == 0) {
-          return pVisitor.visitFalse();
-        } else if (arity == 1) {
-          return visit(pVisitor, getArg(f, 0));
-        }
-        return pVisitor.visitOr(getAllArgs(f));
-
-      case Z3_OP_IMPLIES:
-        assert arity == 2;
-        return pVisitor.visitImplication(getArg(f, 0), getArg(f, 1));
-
-      case Z3_OP_ITE:
-        assert arity == 3;
-        return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-
-      case Z3_OP_IFF:
-      case Z3_OP_EQ:
-        if (get_app_num_args(z3context, f) == 2
-            && get_sort(z3context, get_app_arg(z3context, f, 0)) == Z3_BOOL_SORT
-            && get_sort(z3context, get_app_arg(z3context, f, 1)) == Z3_BOOL_SORT) {
-          assert arity == 2;
-          return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-        }
-        return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-      case Z3_OP_XOR:
-        return pVisitor.visitXor(getArg(f, 0), getArg(f, 1));
-
-      default:
-        if (arity == 0) {
-          return pVisitor.visitBoolVar(ufmgr.getName(f));
-        } else {
-          return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-        }
-    }
   }
 }

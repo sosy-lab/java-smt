@@ -26,12 +26,12 @@ import com.google.common.base.Function;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
@@ -275,13 +275,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
           }
 
           @Override
-          public TraversalProcess visitFunction(
+          public TraversalProcess visitFuncApp(
               Formula f,
               List<Formula> args,
-              Declaration functionDeclaration,
+              FuncDecl functionDeclaration,
               Function<List<Formula>, Formula> constructor) {
 
-            if (functionDeclaration.getKind() == DeclarationKind.UF && extractUF) {
+            if (functionDeclaration.getKind() == FuncDeclKind.UF && extractUF) {
               found.put(functionDeclaration.getName(), f);
             }
             return TraversalProcess.CONTINUE;

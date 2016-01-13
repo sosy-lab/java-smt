@@ -27,24 +27,17 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_or;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term_ite;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_and;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_atom;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_iff;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_not;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_or;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_term_ite;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
-
-import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 
@@ -167,45 +160,5 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
   @Override
   public boolean isIfThenElse(Long pBits) {
     return msat_term_is_term_ite(mathsatEnv, pBits);
-  }
-
-  @Override
-  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Long f) {
-    final int arity = msat_term_arity(f);
-
-    if (msat_term_is_true(mathsatEnv, f)) {
-      assert arity == 0;
-      return pVisitor.visitTrue();
-
-    } else if (msat_term_is_false(mathsatEnv, f)) {
-      assert arity == 0;
-      return pVisitor.visitFalse();
-
-    } else if (msat_term_is_not(mathsatEnv, f)) {
-      assert arity == 1;
-      return pVisitor.visitNot(getArg(f, 0));
-
-    } else if (msat_term_is_and(mathsatEnv, f)) {
-      assert arity == 2;
-      return pVisitor.visitAnd(ImmutableList.of(getArg(f, 0), getArg(f, 1)));
-
-    } else if (msat_term_is_or(mathsatEnv, f)) {
-      assert arity == 2;
-      return pVisitor.visitOr(ImmutableList.of(getArg(f, 0), getArg(f, 1)));
-
-    } else if (msat_term_is_iff(mathsatEnv, f)) {
-      assert arity == 2;
-      return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-    } else if (msat_term_is_constant(mathsatEnv, f)) {
-      return pVisitor.visitBoolVar(msat_term_repr(f));
-    } else if (msat_term_is_atom(mathsatEnv, f)) {
-      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-    }
-
-    // msat_term_is_term_ite is not used for boolean arguments.
-    // MathSAT does not have implication, xor, and  disctinct operators.
-    // MathSAT does not have quantifiers.
-
-    throw new UnsupportedOperationException("Unknown or unsupported boolean operator " + f);
   }
 }

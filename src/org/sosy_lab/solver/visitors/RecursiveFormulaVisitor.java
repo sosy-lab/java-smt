@@ -24,9 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Function;
 
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Declaration;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.Deque;
@@ -76,10 +76,10 @@ public abstract class RecursiveFormulaVisitor implements FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitFunction(
+  public Void visitFuncApp(
       Formula f,
       List<Formula> args,
-      Declaration functionDeclaration,
+      FuncDecl functionDeclaration,
       Function<List<Formula>, Formula> newApplicationConstructor) {
     for (Formula arg : args) {
       toVisit.add(arg);

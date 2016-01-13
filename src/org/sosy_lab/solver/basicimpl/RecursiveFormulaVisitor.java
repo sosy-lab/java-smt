@@ -24,8 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Function;
 
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Declaration;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
@@ -77,13 +77,13 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   }
 
   @Override
-  public TraversalProcess visitFunction(
+  public TraversalProcess visitFuncApp(
       Formula pF,
       List<Formula> pArgs,
-      Declaration pFunctionDeclaration,
+      FuncDecl pFunctionDeclaration,
       Function<List<Formula>, Formula> pNewApplicationConstructor) {
     TraversalProcess result =
-        delegate.visitFunction(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
+        delegate.visitFuncApp(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
     if (result == TraversalProcess.CONTINUE) {
       for (Formula arg : pArgs) {
         addToQueue(arg);

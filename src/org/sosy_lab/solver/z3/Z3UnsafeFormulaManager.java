@@ -26,6 +26,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.func_decl_to_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
@@ -93,10 +94,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -369,8 +370,8 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
                 return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
               }
             };
-        return visitor.visitFunction(
-            formula, args, Declaration.of(name, getDeclarationKind(f)), constructor);
+        return visitor.visitFuncApp(
+            formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(z3context, f);
         return visitor.visitBoundVariable(
@@ -405,52 +406,57 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     return boundVars;
   }
 
-  private DeclarationKind getDeclarationKind(long f) {
+  private FuncDeclKind getDeclarationKind(long f) {
     int decl = get_decl_kind(z3context, get_app_decl(z3context, f));
-    DeclarationKind kind;
+    FuncDeclKind kind;
+
+    if (get_arity(z3context, f) == 0) {
+      return FuncDeclKind.VAR;
+    }
+
     switch (decl) {
       case Z3_OP_AND:
-        return DeclarationKind.AND;
+        return FuncDeclKind.AND;
       case Z3_OP_NOT:
-        return DeclarationKind.NOT;
+        return FuncDeclKind.NOT;
       case Z3_OP_OR:
-        return DeclarationKind.OR;
+        return FuncDeclKind.OR;
       case Z3_OP_IFF:
-        return DeclarationKind.IFF;
+        return FuncDeclKind.IFF;
       case Z3_OP_ITE:
-        return DeclarationKind.ITE;
+        return FuncDeclKind.ITE;
       case Z3_OP_XOR:
-        return DeclarationKind.XOR;
+        return FuncDeclKind.XOR;
       case Z3_OP_DISTINCT:
-        return DeclarationKind.DISTINCT;
+        return FuncDeclKind.DISTINCT;
 
       case Z3_OP_SUB:
-        return DeclarationKind.SUB;
+        return FuncDeclKind.SUB;
       case Z3_OP_ADD:
-        return DeclarationKind.ADD;
+        return FuncDeclKind.ADD;
       case Z3_OP_DIV:
-        return DeclarationKind.DIV;
+        return FuncDeclKind.DIV;
       case Z3_OP_MUL:
-        return DeclarationKind.MUL;
+        return FuncDeclKind.MUL;
       case Z3_OP_MOD:
-        return DeclarationKind.MODULO;
+        return FuncDeclKind.MODULO;
 
       case Z3_OP_UNINTERPRETED:
-        return DeclarationKind.UF;
+        return FuncDeclKind.UF;
 
       case Z3_OP_LT:
-        return DeclarationKind.LT;
+        return FuncDeclKind.LT;
       case Z3_OP_LE:
-        return DeclarationKind.LTE;
+        return FuncDeclKind.LTE;
       case Z3_OP_GT:
-        return DeclarationKind.GT;
+        return FuncDeclKind.GT;
       case Z3_OP_GE:
-        return DeclarationKind.GTE;
+        return FuncDeclKind.GTE;
       case Z3_OP_EQ:
-        return DeclarationKind.EQ;
+        return FuncDeclKind.EQ;
 
       default:
-        return DeclarationKind.OTHER;
+        return FuncDeclKind.OTHER;
     }
   }
 }

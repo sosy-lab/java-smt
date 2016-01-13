@@ -23,9 +23,9 @@ import com.google.common.base.Function;
 
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Declaration;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.math.BigDecimal;
@@ -82,10 +82,10 @@ public interface FormulaVisitor<R> {
    * @param newApplicationConstructor Construct a new function of the same type,
    *                                  with the new arguments as given.
    */
-  R visitFunction(
+  R visitFuncApp(
       Formula f,
       List<Formula> args,
-      Declaration functionDeclaration,
+      FuncDecl functionDeclaration,
       Function<List<Formula>, Formula> newApplicationConstructor);
 
   /**

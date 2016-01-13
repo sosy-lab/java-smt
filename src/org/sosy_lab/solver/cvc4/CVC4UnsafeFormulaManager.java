@@ -26,9 +26,9 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
@@ -178,51 +178,51 @@ public class CVC4UnsafeFormulaManager
                   formulaCreator.encapsulate(formulaCreator.getFormulaType(f), f), formulas);
             }
           };
-      return visitor.visitFunction(
-          formula, args, Declaration.of(name, getDeclarationKind(f)), constructor);
+      return visitor.visitFuncApp(
+          formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
     }
   }
 
-  private DeclarationKind getDeclarationKind(Expr f) {
+  private FuncDeclKind getDeclarationKind(Expr f) {
     Kind kind = f.getKind();
     if (kind == Kind.EQUAL) {
-      return DeclarationKind.EQ;
+      return FuncDeclKind.EQ;
     } else if (kind == Kind.DISTINCT) {
-      return DeclarationKind.DISTINCT;
+      return FuncDeclKind.DISTINCT;
     } else if (kind == Kind.NOT) {
-      return DeclarationKind.NOT;
+      return FuncDeclKind.NOT;
     } else if (kind == Kind.AND) {
-      return DeclarationKind.AND;
+      return FuncDeclKind.AND;
     } else if (kind == Kind.IFF) {
-      return DeclarationKind.IFF;
+      return FuncDeclKind.IFF;
     } else if (kind == Kind.IMPLIES) {
-      return DeclarationKind.IMPLIES;
+      return FuncDeclKind.IMPLIES;
     } else if (kind == Kind.OR) {
-      return DeclarationKind.OR;
+      return FuncDeclKind.OR;
     } else if (kind == Kind.XOR) {
-      return DeclarationKind.XOR;
+      return FuncDeclKind.XOR;
     } else if (kind == Kind.ITE) {
-      return DeclarationKind.ITE;
+      return FuncDeclKind.ITE;
     } else if (kind == Kind.APPLY_UF) {
-      return DeclarationKind.UF;
+      return FuncDeclKind.UF;
     } else if (kind == Kind.PLUS) {
-      return DeclarationKind.ADD;
+      return FuncDeclKind.ADD;
     } else if (kind == Kind.MULT) {
-      return DeclarationKind.MUL;
+      return FuncDeclKind.MUL;
     } else if (kind == Kind.MINUS) {
-      return DeclarationKind.SUB;
+      return FuncDeclKind.SUB;
     } else if (kind == Kind.DIVISION) {
-      return DeclarationKind.DIV;
+      return FuncDeclKind.DIV;
     } else if (kind == Kind.LT) {
-      return DeclarationKind.LT;
+      return FuncDeclKind.LT;
     } else if (kind == Kind.LEQ) {
-      return DeclarationKind.LTE;
+      return FuncDeclKind.LTE;
     } else if (kind == Kind.GT) {
-      return DeclarationKind.GT;
+      return FuncDeclKind.GT;
     } else if (kind == Kind.GEQ) {
-      return DeclarationKind.GTE;
+      return FuncDeclKind.GTE;
     } else {
-      return DeclarationKind.OTHER;
+      return FuncDeclKind.OTHER;
     }
   }
 }

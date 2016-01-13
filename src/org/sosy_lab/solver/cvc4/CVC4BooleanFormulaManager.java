@@ -26,7 +26,6 @@ import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.Collection;
 
@@ -144,65 +143,5 @@ public class CVC4BooleanFormulaManager
   @Override
   protected boolean isIfThenElse(Expr pBits) {
     return pBits.getKind() == Kind.ITE;
-  }
-
-  @Override
-  protected <R> R visit(BooleanFormulaVisitor<R> pVisitor, Expr f) {
-    final long arity = f.getNumChildren();
-
-    if (f.isConst()) {
-      assert arity == 0;
-      if (f.getConstBoolean()) {
-        return pVisitor.visitTrue();
-      } else {
-        return pVisitor.visitFalse();
-      }
-
-    } else if (f.getKind() == Kind.NOT) {
-      assert arity == 1;
-      return pVisitor.visitNot(getArg(f, 0));
-
-    } else if (f.getKind() == Kind.AND) {
-      if (arity == 0) {
-        return pVisitor.visitTrue();
-      } else if (arity == 1) {
-        return visit(pVisitor, getArg(f, 0));
-      }
-      return pVisitor.visitAnd(getAllArgs(f));
-    } else if (f.getKind() == Kind.XOR) {
-
-      assert arity == 2;
-      return pVisitor.visitXor(getArg(f, 0), getArg(f, 1));
-    } else if (f.getKind() == Kind.OR) {
-      if (arity == 0) {
-        return pVisitor.visitFalse();
-      } else if (arity == 1) {
-        return visit(pVisitor, getArg(f, 0));
-      }
-      return pVisitor.visitOr(getAllArgs(f));
-
-    } else if (f.getKind() == Kind.EQUAL || f.getKind() == Kind.IFF) {
-      // TODO is there a relevant difference that needs to be handled here?
-      assert arity == 2;
-
-      if (f.getChild(0).getType().isBoolean() && f.getChild(1).getType().isBoolean()) {
-        return pVisitor.visitEquivalence(getArg(f, 0), getArg(f, 1));
-      }
-
-      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-
-    } else if (f.getKind() == Kind.IMPLIES) {
-      assert arity == 2;
-      return pVisitor.visitImplication(getArg(f, 0), getArg(f, 1));
-
-    } else if (f.getKind() == Kind.ITE) {
-      assert arity == 3;
-      return pVisitor.visitIfThenElse(getArg(f, 0), getArg(f, 1), getArg(f, 2));
-    } else if (f.isConst()) {
-      return pVisitor.visitBoolVar(f.toString());
-    } else {
-      // TODO this is probably wrong, atoms are more than constants and variables
-      return pVisitor.visitAtom(getFormulaCreator().encapsulateBoolean(f));
-    }
   }
 }

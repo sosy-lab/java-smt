@@ -38,10 +38,10 @@ import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -215,26 +215,32 @@ class PrincessUnsafeFormulaManager
               return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
             }
           };
-      return visitor.visitFunction(
-          f, args, Declaration.of(name, getDeclarationKind(input)), constructor);
+      return visitor.visitFuncApp(
+          f, args, FuncDecl.of(name, getDeclarationKind(input)), constructor);
     }
   }
 
-  private DeclarationKind getDeclarationKind(IExpression input) {
+  private FuncDeclKind getDeclarationKind(IExpression input) {
     if (PrincessUtil.isIfThenElse(input)) {
-      return DeclarationKind.ITE;
+      return FuncDeclKind.ITE;
     } else if (PrincessUtil.isUIF(input)) {
-      return DeclarationKind.UF;
+      return FuncDeclKind.UF;
     } else if (PrincessUtil.isAnd(input)) {
-      return DeclarationKind.AND;
+      return FuncDeclKind.AND;
+    } else if (PrincessUtil.isOr(input)) {
+      return FuncDeclKind.OR;
     } else if (PrincessUtil.isNot(input)) {
-      return DeclarationKind.NOT;
+      return FuncDeclKind.NOT;
     } else if (PrincessUtil.isEquivalence(input)) {
-      return DeclarationKind.EQ;
+      return FuncDeclKind.IFF;
+    } else if (PrincessUtil.isIfThenElse(input)) {
+      return FuncDeclKind.ITE;
+    } else if (isVariable(input)) {
+      return FuncDeclKind.VAR;
     } else {
 
       // TODO: other cases!!!
-      return DeclarationKind.OTHER;
+      return FuncDeclKind.OTHER;
     }
   }
 }

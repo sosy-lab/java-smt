@@ -60,6 +60,7 @@ import org.sosy_lab.solver.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
 import java.lang.ref.PhantomReference;
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.Map;
 
@@ -72,7 +73,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
-  private final Map<PhantomReference<Z3Formula>, Long> referenceMap = Maps.newIdentityHashMap();
+  private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
+      Maps.newIdentityHashMap();
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -154,11 +156,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
         new Z3ArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType), pTerm);
   }
 
-  @SuppressWarnings("unchecked")
   private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
     if (usePhantomReferences) {
       PhantomReference<T> ref = new PhantomReference<>(out, referenceQueue);
-      referenceMap.put((PhantomReference<Z3Formula>) ref, pTerm);
+      referenceMap.put(ref, pTerm);
     }
     return out;
   }
@@ -235,8 +236,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     }
     cleanupTimer.start();
     try {
-      PhantomReference<? extends Z3Formula> ref;
-      while ((ref = (PhantomReference<? extends Z3Formula>) referenceQueue.poll()) != null) {
+      Reference<? extends Z3Formula> ref;
+      while ((ref = referenceQueue.poll()) != null) {
 
         Long z3ast = referenceMap.remove(ref);
         assert z3ast != null;

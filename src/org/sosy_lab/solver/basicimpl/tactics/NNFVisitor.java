@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
@@ -87,13 +88,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitAtom(BooleanFormula pAtom) {
+    public BooleanFormula visitAtom(BooleanFormula pAtom, FuncDecl decl) {
       return bfmgr.not(pAtom);
-    }
-
-    @Override
-    public BooleanFormula visitBoolVar(String name) {
-      return bfmgr.not(bfmgr.makeVariable(name));
     }
 
     @Override
