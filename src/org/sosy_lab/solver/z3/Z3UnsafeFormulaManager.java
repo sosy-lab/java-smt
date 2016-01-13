@@ -395,10 +395,11 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     for (int i = 0; i < numBound; i++) {
       long varName = get_quantifier_bound_name(z3context, f, i);
       long varSort = get_quantifier_bound_sort(z3context, f, i);
-      Formula c =
+      boundVars.add(
           formulaCreator.encapsulate(
               formulaCreator.getFormulaTypeFromSort(varSort),
-              mk_const(z3context, varName, varSort));
+              mk_const(z3context, varName, varSort))
+      );
     }
     return boundVars;
   }
