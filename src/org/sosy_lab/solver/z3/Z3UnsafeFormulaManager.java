@@ -398,8 +398,7 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       boundVars.add(
           formulaCreator.encapsulate(
               formulaCreator.getFormulaTypeFromSort(varSort),
-              mk_const(z3context, varName, varSort))
-      );
+              mk_const(z3context, varName, varSort)));
     }
     return boundVars;
   }

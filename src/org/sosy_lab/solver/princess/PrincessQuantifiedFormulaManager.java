@@ -62,13 +62,15 @@ public class PrincessQuantifiedFormulaManager
   @Override
   public IExpression mkQuantifier(Quantifier q, List<IExpression> vars, IExpression body) {
     checkArgument(body instanceof IFormula);
-    ap.terfor.conjunctions.Quantifier pq =
-        (q == Quantifier.FORALL) ? ALL$.MODULE$ : EX$.MODULE$;
+    ap.terfor.conjunctions.Quantifier pq = (q == Quantifier.FORALL) ? ALL$.MODULE$ : EX$.MODULE$;
     if (vars.size() == 0) {
-      new IQuantified(pq, (IFormula) body);
+
+      // Body already contains bound variables.
+      return new IQuantified(pq, (IFormula) body);
+    } else {
+      return IExpression.quanConsts(
+          pq, iterableAsScalaIterable(toConstantTerm(vars)), (IFormula) body);
     }
-    return IExpression.quanConsts(
-        pq, iterableAsScalaIterable(toConstantTerm(vars)), (IFormula) body);
   }
 
   private List<ConstantTerm> toConstantTerm(List<IExpression> lst) {

@@ -184,13 +184,16 @@ class PrincessUnsafeFormulaManager
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
     } else if (isQuantification(input)) {
-      BooleanFormula body = formulaCreator.encapsulateBoolean(
-          PrincessUtil.getQuantifierBody(input)
-      );
-      Quantifier q = PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS;
-
+      BooleanFormula body =
+          formulaCreator.encapsulateBoolean(PrincessUtil.getQuantifierBody(input));
       return visitor.visitQuantifier(
-          (BooleanFormula) f, q,
+          (BooleanFormula) f,
+          PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS,
+
+          // Princess does not hold any metadata about bound variables,
+          // so we can't get meaningful list here.
+          // HOWEVER, passing this list to QuantifiedFormulaManager#mkQuantifier
+          // works as expected.
           new ArrayList<Formula>(),
           body);
     } else if (isBoundVariable(input)) {
