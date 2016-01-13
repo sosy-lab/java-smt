@@ -38,6 +38,8 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
+import scala.SerialVersionUID;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -320,6 +322,12 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
       }
     }
 
+    private List<BooleanFormula> getBoolArgs(List<Formula> args) {
+      @SuppressWarnings("unchecked")
+      List<BooleanFormula> out = (List<BooleanFormula>) (List<?>) args;
+      return out;
+    }
+
     @Override
     public R visitFuncApp(
         Formula f,
@@ -329,8 +337,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
       switch (functionDeclaration.getKind()) {
         case AND:
           Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
-          @SuppressWarnings("unchecked")
-          R out = delegate.visitAnd((List) args);
+          R out = delegate.visitAnd(getBoolArgs(args));
           return out;
         case NOT:
           Preconditions.checkState(args.size() == 1);
@@ -340,17 +347,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
           return delegate.visitNot((BooleanFormula) arg);
         case OR:
           Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
-
-          // Unchecked cast to avoid creating a new array.
-          @SuppressWarnings("unchecked")
-          R out2 = delegate.visitOr((List) args);
+          R out2 = delegate.visitOr(getBoolArgs(args));
           return out2;
         case IFF:
           Preconditions.checkState(args.size() == 2);
           Formula a = args.get(0);
           Formula b = args.get(1);
           Preconditions.checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
-          @SuppressWarnings("unchecked")
           R out3 = delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
           return out3;
         case ITE:
