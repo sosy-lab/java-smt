@@ -72,7 +72,7 @@ public class SolverContextFactory {
     SMTINTERPOL,
     Z3,
     PRINCESS
-//    CVC4
+    //    CVC4
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -152,9 +152,9 @@ public class SolverContextFactory {
           // TODO: pass randomSeed to Princess
           return PrincessSolverContext.create(config, logger, shutdownNotifier, logfile);
 
-        //case CVC4:
-        //  return CVC4SolverContext.create(
-        //      logger, config, shutdownNotifier, logfile, (int) randomSeed);
+          //case CVC4:
+          //  return CVC4SolverContext.create(
+          //      logger, config, shutdownNotifier, logfile, (int) randomSeed);
 
         default:
           throw new AssertionError("no solver selected");

@@ -45,9 +45,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   private BooleanFormula rewriteEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
     return bfmgr.or(
-        bfmgr.and(pOperand1, pOperand2),
-        bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2))
-    );
+        bfmgr.and(pOperand1, pOperand2), bfmgr.and(bfmgr.not(pOperand1), bfmgr.not(pOperand2)));
   }
 
   @Override
@@ -130,9 +128,7 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
     @Override
     public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-      return bfmgr.visit(this,
-          rewriteEquivalence(pOperand1, pOperand2)
-      );
+      return bfmgr.visit(this, rewriteEquivalence(pOperand1, pOperand2));
     }
 
     @Override

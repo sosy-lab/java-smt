@@ -21,9 +21,9 @@ package org.sosy_lab.solver.basicimpl;
 
 import com.google.common.testing.AbstractPackageSanityTests;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.Declaration;
 import org.sosy_lab.solver.api.DeclarationKind;
+import org.sosy_lab.solver.api.FormulaType;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 

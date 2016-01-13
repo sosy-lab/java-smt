@@ -6,7 +6,6 @@ package org.sosy_lab.solver.api;
  * @see Declaration
  */
 public enum DeclarationKind {
-
   AND,
   NOT,
   OR,

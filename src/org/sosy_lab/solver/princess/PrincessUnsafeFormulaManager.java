@@ -38,13 +38,13 @@ import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Declaration;
+import org.sosy_lab.solver.api.DeclarationKind;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
-import org.sosy_lab.solver.api.Declaration;
-import org.sosy_lab.solver.api.DeclarationKind;
 
 import java.util.ArrayList;
 import java.util.List;
