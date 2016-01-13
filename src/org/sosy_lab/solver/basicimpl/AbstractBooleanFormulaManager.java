@@ -38,8 +38,6 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
-import scala.SerialVersionUID;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
