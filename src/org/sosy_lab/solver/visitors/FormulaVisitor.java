@@ -92,7 +92,12 @@ public interface FormulaVisitor<R> {
    *
    * @param f Quantifier formula.
    * @param quantifier Quantifier type: either {@code FORALL} or {@code EXISTS}.
-   * @param boundVariables Variables bound by the quantifier
+   * @param boundVariables Variables bound by the quantifier.
+   *                       <b>NOTE:</b> not all solvers hold metadata about
+   *                       bound variables.
+   *                       In case this is not available, this method will be
+   *                       called with an empty list, yet {@code mkQuantifier}
+   *                       will work fine with an empty list as well.
    * @param body Body of the quantifier.
    */
   R visitQuantifier(
