@@ -107,13 +107,13 @@ public class SolverContextFactory {
    * Create new context with solver chosen according to the supplied configuration.
    */
   public SolverContext generateContext() throws InvalidConfigurationException {
-    return generateContext(solver, config);
+    return generateContext(solver);
   }
 
   /**
    * Create new context with solver name supplied.
    */
-  public SolverContext generateContext(Solvers solverToCreate, Configuration config)
+  public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
     try {
       switch (solverToCreate) {
