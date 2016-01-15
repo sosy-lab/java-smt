@@ -143,9 +143,7 @@ public abstract class SolverBasedTest0 {
 
   @After
   public final void closeSolver() throws Exception {
-    if (mgr instanceof AutoCloseable) {
-      ((AutoCloseable) mgr).close();
-    }
+    context.close();
   }
 
   /**
