@@ -113,7 +113,7 @@ public abstract class SolverBasedTest0 {
     config = createTestConfigBuilder().build();
 
     factory = new SolverContextFactory(config, logger, ShutdownManager.create().getNotifier());
-    context = factory.getSolverContext();
+    context = factory.generateContext();
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getFunctionFormulaManager();

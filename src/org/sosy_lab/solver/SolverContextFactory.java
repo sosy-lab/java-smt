@@ -25,8 +25,6 @@ import static com.google.common.collect.FluentIterable.from;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -38,7 +36,6 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.solver.princess.PrincessSolverContext;
@@ -57,8 +54,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Factory class for loading and instantiating SMT solvers:
- * instantiates and loads a {@link SolverContext} corresponding to the chosen
+ * Factory class for loading and generating solver contexts.
+ * Generates a {@link SolverContext} corresponding to the chosen
  * solver.
  *
  * <p>Main entry point.
@@ -89,49 +86,34 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Which SMT solver to use.")
   private Solvers solver = Solvers.SMTINTERPOL;
 
-  @Option(
-    secure = true,
-    description =
-        "Which solver to use specifically for interpolation (default is to use the main one)."
-  )
-  @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE")
-  private @Nullable Solvers interpolationSolver = null;
-
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
-
-  private final SolverContext context;
-  private final SolverContext itpContext;
+  private final Configuration config;
 
   public SolverContextFactory(
-      Configuration config, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
+      Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
-    config.inject(this);
+    pConfig.inject(this);
     logger = checkNotNull(pLogger);
     shutdownNotifier = checkNotNull(pShutdownNotifier);
+    config = pConfig;
 
     if (!logAllQueries) {
       logfile = null;
     }
-
-    if (solver.equals(interpolationSolver)) {
-      // If interpolationSolver is not null, we use SeparateInterpolatingProverEnvironment
-      // which copies formula from and to the main solver using string serialization.
-      // We don't need this if the solvers are the same anyway.
-      interpolationSolver = null;
-    }
-
-    context = instantiateSolver(solver, config);
-
-    // Instantiate another SMT solver for interpolation if requested.
-    if (interpolationSolver != null) {
-      itpContext = instantiateSolver(interpolationSolver, config);
-    } else {
-      itpContext = context;
-    }
   }
 
-  private SolverContext instantiateSolver(Solvers solverToCreate, Configuration config)
+  /**
+   * Create new context with solver chosen according to the supplied configuration.
+   */
+  public SolverContext generateContext() throws InvalidConfigurationException {
+    return generateContext(solver, config);
+  }
+
+  /**
+   * Create new context with solver name supplied.
+   */
+  public SolverContext generateContext(Solvers solverToCreate, Configuration config)
       throws InvalidConfigurationException {
     try {
       switch (solverToCreate) {
@@ -152,6 +134,7 @@ public class SolverContextFactory {
           // TODO: pass randomSeed to Princess
           return PrincessSolverContext.create(config, logger, shutdownNotifier, logfile);
 
+          // TODO: CVC4 temporarily commented out.
           //case CVC4:
           //  return CVC4SolverContext.create(
           //      logger, config, shutdownNotifier, logfile, (int) randomSeed);
@@ -173,7 +156,7 @@ public class SolverContextFactory {
   }
 
   /**
-   * Shortcut for getting a {@link FormulaManager}.
+   * Shortcut for getting a {@link SolverContext}.
    *
    * <p>See
    * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
@@ -182,15 +165,7 @@ public class SolverContextFactory {
   public static SolverContext createFormulaManager(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
       throws InvalidConfigurationException {
-    return new SolverContextFactory(config, logger, shutdownNotifier).getSolverContext();
-  }
-
-  public SolverContext getSolverContext() {
-    return context;
-  }
-
-  public SolverContext getSolverContextForInterpolation() {
-    return itpContext;
+    return new SolverContextFactory(config, logger, shutdownNotifier).generateContext();
   }
 
   /**
