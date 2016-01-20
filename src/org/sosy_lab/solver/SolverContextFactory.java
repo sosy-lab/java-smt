@@ -20,10 +20,8 @@
 package org.sosy_lab.solver;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
@@ -41,16 +39,15 @@ import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.solver.princess.PrincessSolverContext;
 import org.sosy_lab.solver.z3.Z3SolverContext;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -200,6 +197,8 @@ public class SolverContextFactory {
               + ")\\..*");
   private static final String SMTINTERPOL_FACTORY_CLASS =
       "org.sosy_lab.solver.smtinterpol.SmtInterpolSolverFactory";
+  private static final String SMTINTERPOL_CLASS =
+      "de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol";
 
   // We keep the class loader for SmtInterpol around
   // in case someone creates a second instance of FormulaManagerFactory
@@ -232,24 +231,45 @@ public class SolverContextFactory {
     }
 
     classLoader = SolverContextFactory.class.getClassLoader();
-    if (classLoader instanceof URLClassLoader) {
 
-      // Filter out java-cup-runtime.jar from the class path,
-      // so that the class loader for SmtInterpol loads the Java CUP classes
-      // from SmtInterpol's JAR file.
-      URL[] urls =
-          from(Arrays.asList(((URLClassLoader) classLoader).getURLs()))
-              .filter(
-                  new Predicate<URL>() {
-                    @Override
-                    public boolean apply(@Nonnull URL pInput) {
-                      return !pInput.getPath().contains("java-cup");
-                    }
-                  })
-              .toArray(URL.class);
+    // If possible, create class loader with special class path with only SMTInterpol and JavaSMT.
+    // SMTInterpol needs to have its own version of java-cup,
+    // so the class loader should not load java-cup classes from any other place.
 
-      classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls, classLoader);
+    String smtinterpolClassFile = SMTINTERPOL_CLASS.replace('.', File.separatorChar) + ".class";
+    URL smtinterpolUrl = classLoader.getResource(smtinterpolClassFile);
+    if (smtinterpolUrl != null
+        && smtinterpolUrl.getProtocol().equals("jar")
+        && smtinterpolUrl.getFile().contains("!")) {
+      try {
+        smtinterpolUrl =
+            new URL(
+                smtinterpolUrl.getFile().substring(0, smtinterpolUrl.getFile().lastIndexOf('!')));
+
+        URL[] urls = {
+          smtinterpolUrl,
+          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
+        };
+        // By using ChildFirstPatternClassLoader we ensure that SMTInterpol classes
+        // do not get loaded by the parent class loader.
+        classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls, classLoader);
+
+      } catch (MalformedURLException e) {
+        logger.logUserException(
+            Level.WARNING,
+            e,
+            "Could not create proper classpath for SMTInterpol, "
+                + "loading correct java-cup classes may fail.");
+      }
+    } else {
+      logger.log(
+          Level.WARNING,
+          "Could not create proper classpath for SMTInterpol because location of SMTInterpol "
+              + "classes is unexpected, loading correct java-cup classes may fail. "
+              + "Location of SMTInterpol is ",
+          smtinterpolUrl);
     }
+
     smtInterpolClassLoader = new WeakReference<>(classLoader);
     return classLoader;
   }
