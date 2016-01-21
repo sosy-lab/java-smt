@@ -37,7 +37,7 @@ import javax.annotation.Nullable;
 
 public final class Mathsat5SolverContext extends AbstractSolverContext {
 
-  @Options(prefix = "solver.mathsat5", deprecatedPrefix = "cpa.predicate.solver.mathsat5")
+  @Options(prefix = "solver.mathsat5")
   private static class Mathsat5Settings {
 
     @Option(

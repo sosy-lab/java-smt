@@ -46,7 +46,7 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-@Options(prefix = "solver.z3", deprecatedPrefix = "cpa.predicate.solver.z3")
+@Options(prefix = "solver.z3")
 public final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings */
