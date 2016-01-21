@@ -121,20 +121,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       ImmutableSet.of(Z3_OP_AND, Z3_OP_OR, Z3_OP_IMPLIES, Z3_OP_ITE, Z3_OP_NOT);
 
   @Override
-  public boolean isAtom(Long t) {
-    int astKind = get_ast_kind(z3context, t);
-    switch (astKind) {
-      case Z3_APP_AST:
-        long decl = get_app_decl(z3context, t);
-        return !NON_ATOMIC_OP_TYPES.contains(get_decl_kind(z3context, decl));
-      case Z3_QUANTIFIER_AST:
-        return false;
-      default:
-        return true;
-    }
-  }
-
-  @Override
   public int getArity(Long t) {
     Preconditions.checkArgument(get_ast_kind(z3context, t) != Z3_QUANTIFIER_AST);
     return get_app_num_args(z3context, t);
@@ -297,37 +283,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     Preconditions.checkState(size == changeTo.size());
     return Z3NativeApi.substitute(
         z3context, t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
-  }
-
-  @Override
-  protected boolean isQuantification(Long pT) {
-    return Z3_QUANTIFIER_AST == get_ast_kind(z3context, pT);
-  }
-
-  @Override
-  protected Long getQuantifiedBody(Long pT) {
-    return get_quantifier_body(z3context, pT);
-  }
-
-  @Override
-  protected Long replaceQuantifiedBody(Long pF, Long pBody) {
-    boolean isForall = is_quantifier_forall(z3context, pF);
-    final int boundCount = get_quantifier_num_bound(z3context, pF);
-    long[] boundVars = new long[boundCount];
-
-    // todo: duplication with visitor code.
-    for (int b = 0; b < boundCount; b++) {
-      long varName = get_quantifier_bound_name(z3context, pF, b);
-      long varSort = get_quantifier_bound_sort(z3context, pF, b);
-      long var = mk_const(z3context, varName, varSort);
-      boundVars[b] = var;
-
-      // todo: memory leak, Z3Formula never has the chance to release it.
-      inc_ref(z3context, var);
-    }
-
-    return Z3NativeApi.mk_quantifier_const(
-        z3context, isForall, 0, boundCount, boundVars, 0, new long[0], pBody);
   }
 
   @Override

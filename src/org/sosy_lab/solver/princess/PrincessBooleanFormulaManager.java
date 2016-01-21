@@ -82,7 +82,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula not(IExpression pBits) {
-    if (isNot(pBits)) {
+    if (PrincessUtil.isNot(pBits)) {
       return ((INot) pBits).subformula(); // "not not a" == "a"
     } else {
       return new INot(castToFormula(pBits));
@@ -149,41 +149,6 @@ class PrincessBooleanFormulaManager
   @Override
   public IFormula xor(IExpression t1, IExpression t2) {
     return new INot(new IBinFormula(IBinJunctor.Eqv(), castToFormula(t1), castToFormula(t2)));
-  }
-
-  @Override
-  public boolean isNot(IExpression pBits) {
-    return pBits instanceof INot;
-  }
-
-  @Override
-  public boolean isAnd(IExpression pBits) {
-    return PrincessUtil.isAnd(pBits);
-  }
-
-  @Override
-  public boolean isOr(IExpression pBits) {
-    return PrincessUtil.isOr(pBits);
-  }
-
-  @Override
-  public boolean isXor(IExpression pBits) {
-    return PrincessUtil.isXor(pBits);
-  }
-
-  @Override
-  protected boolean isEquivalence(IExpression pBits) {
-    return PrincessUtil.isEquivalence(pBits);
-  }
-
-  @Override
-  protected boolean isImplication(IExpression pFormula) {
-    return PrincessUtil.isImplication(pFormula);
-  }
-
-  @Override
-  protected boolean isIfThenElse(IExpression pBits) {
-    return PrincessUtil.isIfThenElse(pBits);
   }
 
   private BooleanFormula getArg(IFormula f, int i) {

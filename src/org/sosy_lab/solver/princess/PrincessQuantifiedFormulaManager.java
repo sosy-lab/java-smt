@@ -87,39 +87,4 @@ public class PrincessQuantifiedFormulaManager
     checkArgument(formula instanceof IFormula);
     return env.elimQuantifiers((IFormula) formula);
   }
-
-  @Override
-  protected boolean isQuantifier(IExpression pExtractInfo) {
-    return PrincessUtil.isQuantifier(pExtractInfo);
-  }
-
-  @Override
-  protected boolean isForall(IExpression pExtractInfo) {
-    return PrincessUtil.isForall(pExtractInfo);
-  }
-
-  @Override
-  protected boolean isExists(IExpression pExtractInfo) {
-    return isQuantifier(pExtractInfo)
-        && ((IQuantified) pExtractInfo)
-            .quan()
-            .equals(ap.terfor.conjunctions.Quantifier.apply(false));
-  }
-
-  @Override
-  protected int numQuantifierBound(IExpression pExtractInfo) {
-    // in Princess a quantifier binds exactly one variable
-    // so returning 1 here is correct
-    return 1;
-  }
-
-  @Override
-  protected IExpression getQuantifierBody(IExpression pExtractInfo) {
-    return PrincessUtil.getQuantifierBody(pExtractInfo);
-  }
-
-  @Override
-  public boolean isBoundByQuantifier(IExpression pF) {
-    return PrincessUtil.isBoundByQuantifier(pF);
-  }
 }

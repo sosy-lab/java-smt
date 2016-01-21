@@ -46,14 +46,6 @@ public interface UnsafeFormulaManager {
   List<Formula> getAllArgs(Formula f);
 
   /**
-   * @return whether the given Formula is an atom.
-   *
-   * @deprecated Use the {@link #visit(FormulaVisitor, Formula)} instead.
-   */
-  @Deprecated
-  boolean isAtom(Formula f);
-
-  /**
    * @return whether the given Formula is a variable, either free or quantified
    */
   boolean isVariable(Formula f);
@@ -77,29 +69,6 @@ public interface UnsafeFormulaManager {
    * @return whether the given Formula is an uninterpreted function call.
    */
   boolean isUF(Formula f);
-
-  /**
-   * @return whether the given Formula is quantified,
-   * either with universal or existential quantification.
-   *
-   * @deprecated Use {@link #visit(FormulaVisitor, Formula)} instead.
-   */
-  @Deprecated
-  boolean isQuantification(Formula f);
-
-  /**
-   * Get the body of the given, quantified, formula.
-   *
-   * <p>Precondition: {@link #isQuantification(Formula)} returns true for this formula.
-   */
-  BooleanFormula getQuantifiedBody(Formula pQuantifiedFormula);
-
-  /**
-   * Replace the body of a quantified formula.
-   *
-   * <p>Precondition: {@link #isQuantification(Formula)} returns true for the first parameter.
-   */
-  BooleanFormula replaceQuantifiedBody(BooleanFormula pF, BooleanFormula pNewBody);
 
   /**
    * Returns the name of the formula (or function)

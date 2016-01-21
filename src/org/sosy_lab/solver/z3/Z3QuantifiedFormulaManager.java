@@ -19,10 +19,6 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
-
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.SolverException;
@@ -60,36 +56,6 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
         0,
         new long[0],
         pBody);
-  }
-
-  @Override
-  protected boolean isQuantifier(Long pExtractInfo) {
-    return Z3NativeApi.get_ast_kind(z3context, pExtractInfo) == Z3_QUANTIFIER_AST;
-  }
-
-  @Override
-  protected boolean isForall(Long pExtractInfo) {
-    return Z3NativeApi.is_quantifier_forall(z3context, pExtractInfo);
-  }
-
-  @Override
-  protected boolean isExists(Long pExtractInfo) {
-    return isQuantifier(pExtractInfo) && !isForall(pExtractInfo);
-  }
-
-  @Override
-  protected int numQuantifierBound(Long pExtractInfo) {
-    return get_quantifier_num_bound(z3context, pExtractInfo);
-  }
-
-  @Override
-  protected Long getQuantifierBody(Long pExtractInfo) {
-    return Z3NativeApi.get_quantifier_body(z3context, pExtractInfo);
-  }
-
-  @Override
-  public boolean isBoundByQuantifier(Long pF) {
-    return Z3NativeApi.get_ast_kind(z3context, pF) == Z3_VAR_AST;
   }
 
   @Override

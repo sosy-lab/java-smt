@@ -22,10 +22,8 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
@@ -48,15 +46,6 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator = getFormulaCreator();
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), e);
   }
-
-  @Override
-  @Deprecated
-  public boolean isAtom(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isAtom(t);
-  }
-
-  protected abstract boolean isAtom(TFormulaInfo pT);
 
   @Override
   public int getArity(Formula pF) {
@@ -113,45 +102,10 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   protected abstract boolean isBoundVariable(TFormulaInfo pT);
 
   @Override
-  @Deprecated
-  public boolean isQuantification(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isQuantification(t);
-  }
-
-  protected abstract boolean isQuantification(TFormulaInfo pT);
-
-  @Override
-  @Deprecated
-  public BooleanFormula getQuantifiedBody(Formula pQuantifiedFormula) {
-    Preconditions.checkArgument(isQuantification(pQuantifiedFormula));
-
-    TFormulaInfo t = extractInfo(pQuantifiedFormula);
-    TFormulaInfo result = getQuantifiedBody(t);
-
-    return getFormulaCreator().encapsulateBoolean(result);
-  }
-
-  protected abstract TFormulaInfo getQuantifiedBody(TFormulaInfo pT);
-
-  @Override
   public boolean isNumber(Formula pF) {
     TFormulaInfo t = extractInfo(pF);
     return isNumber(t);
   }
-
-  @Override
-  public BooleanFormula replaceQuantifiedBody(BooleanFormula pF, BooleanFormula pNewBody) {
-    Preconditions.checkArgument(isQuantification(pF));
-
-    TFormulaInfo f = extractInfo(pF);
-    TFormulaInfo body = extractInfo(pNewBody);
-    TFormulaInfo result = replaceQuantifiedBody(f, body);
-
-    return getFormulaCreator().encapsulateBoolean(result);
-  }
-
-  protected abstract TFormulaInfo replaceQuantifiedBody(TFormulaInfo pF, TFormulaInfo pBody);
 
   protected abstract boolean isNumber(TFormulaInfo pT);
 
@@ -241,7 +195,8 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
    * Default implementation for {@link #substitute(Formula, Map)} for solvers that provide
    * an internal substitute operation that takes two lists instead of a map.
    *
-   * <p>If this is called, one needs to overwrite {@link #substituteUsingLists(Formula, Map)}.
+   * <p>If this is called, one needs to overwrite
+   * {@link #substitute(Formula, Map)}.
    */
   protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingLists(
       T1 pF, Map<T2, T2> pFromToMapping) {

@@ -19,9 +19,6 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_false;
@@ -31,17 +28,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_xor;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IFF;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IMPLIES;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.primitives.Longs;
@@ -109,26 +97,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   }
 
   @Override
-  protected boolean isNot(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_NOT);
-  }
-
-  @Override
-  protected boolean isAnd(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_AND);
-  }
-
-  @Override
-  protected boolean isOr(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_OR);
-  }
-
-  @Override
-  protected boolean isXor(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_XOR);
-  }
-
-  @Override
   protected Long equivalence(Long pBits1, Long pBits2) {
     return mk_eq(z3context, pBits1, pBits2);
   }
@@ -151,24 +119,5 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   @Override
   protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
     return mk_ite(z3context, pCond, pF1, pF2);
-  }
-
-  @Override
-  protected boolean isEquivalence(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_IFF)
-        || isOP(z3context, pParam, Z3_OP_EQ)
-            && get_app_num_args(z3context, pParam) == 2
-            && get_sort(z3context, get_app_arg(z3context, pParam, 0)) == Z3_BOOL_SORT
-            && get_sort(z3context, get_app_arg(z3context, pParam, 1)) == Z3_BOOL_SORT;
-  }
-
-  @Override
-  protected boolean isImplication(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_IMPLIES);
-  }
-
-  @Override
-  protected boolean isIfThenElse(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_ITE);
   }
 }

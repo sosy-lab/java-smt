@@ -48,7 +48,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_atom;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_equal;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
@@ -82,11 +81,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
     super(pCreator);
     this.msatEnv = pCreator.getEnv();
     this.formulaCreator = pCreator;
-  }
-
-  @Override
-  public boolean isAtom(Long t) {
-    return msat_term_is_atom(msatEnv, t);
   }
 
   @Override
@@ -234,11 +228,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   }
 
   @Override
-  protected boolean isQuantification(Long pT) {
-    return false;
-  }
-
-  @Override
   protected boolean isFreeVariable(Long pT) {
     return isVariable(pT);
   }
@@ -246,16 +235,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   @Override
   protected boolean isBoundVariable(Long pT) {
     return false;
-  }
-
-  @Override
-  protected Long getQuantifiedBody(Long pT) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected Long replaceQuantifiedBody(Long pF, Long pBody) {
-    throw new UnsupportedOperationException();
   }
 
   private FuncDeclKind getDeclarationKind(long pF) {

@@ -68,11 +68,6 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  public boolean isAtom(Term t) {
-    return SmtInterpolUtil.isAtom(t);
-  }
-
-  @Override
   public int getArity(Term pT) {
     assert !(pT instanceof LetTerm)
         : "Formulas used by JavaSMT are expected to not have LetTerms."
@@ -162,21 +157,6 @@ class SmtInterpolUnsafeFormulaManager
   @Override
   public boolean isNumber(Term pT) {
     return SmtInterpolUtil.isNumber(pT);
-  }
-
-  @Override
-  protected boolean isQuantification(Term pT) {
-    return false;
-  }
-
-  @Override
-  protected Term getQuantifiedBody(Term pT) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected Term replaceQuantifiedBody(Term pF, Term pBody) {
-    throw new UnsupportedOperationException();
   }
 
   @Override

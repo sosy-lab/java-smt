@@ -21,7 +21,6 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -36,9 +35,15 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.UnsafeFormulaManager;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(Parameterized.class)
 public class QuantifierManagerTest extends SolverBasedTest0 {
@@ -261,80 +266,81 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEquals() {
+    assert qmgr != null;
     BooleanFormula f1 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
     BooleanFormula f2 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
 
     assertThat(f1).isEqualTo(f2);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testIntrospectionForall() {
+    assert qmgr != null;
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
-    assertThat(qmgr.isQuantifier(forall)).isTrue();
-    assertThat(qmgr.isForall(forall)).isTrue();
-    assertThat(qmgr.isExists(forall)).isFalse();
-    assertThat(qmgr.isBoundByQuantifier(forall)).isFalse();
-    assertThat(qmgr.numQuantifierBound(forall)).isEqualTo(1);
 
-    UnsafeFormulaManager umgr = mgr.getUnsafeFormulaManager();
-    assertThat(umgr.isQuantification(forall)).isTrue();
-    assertThat(umgr.getQuantifiedBody(forall)).isEqualTo(qmgr.getQuantifierBody(forall));
-    assertThat(umgr.isAtom(forall)).isFalse();
-    assertThat(umgr.isBoundVariable(forall)).isFalse();
-    assertThat(umgr.isFreeVariable(forall)).isFalse();
-    assertThat(umgr.isVariable(forall)).isFalse();
-    assertThat(umgr.isNumber(forall)).isFalse();
-    assertThat(umgr.isUF(forall)).isFalse();
+    final AtomicBoolean isQuantifier = new AtomicBoolean(false);
+    final AtomicBoolean isForall = new AtomicBoolean(false);
+    final AtomicInteger numBound = new AtomicInteger(0);
 
-    try {
-      umgr.getArity(forall);
-      fail("getArity for quantifier should fail");
-    } catch (IllegalArgumentException expected) {
-    }
+    // Test introspection with visitors.
+    mgr.visit(
+        new DefaultFormulaVisitor<Void>() {
+          @Override
+          protected Void visitDefault(Formula f) {
+            return null;
+          }
 
-    try {
-      umgr.getName(forall);
-      fail("getName for quantifier should fail");
-    } catch (IllegalArgumentException expected) {
-    }
+          @Override
+          public Void visitQuantifier(
+              BooleanFormula f,
+              Quantifier quantifier,
+              List<Formula> boundVariables,
+              BooleanFormula body) {
+            isForall.set(quantifier == Quantifier.FORALL);
+            isQuantifier.set(true);
+            numBound.set(boundVariables.size());
+            return null;
+          }
+        },
+        forall);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testIntrospectionExists() {
+    assert qmgr != null;
     assume()
         .withFailureMessage("Bug in Z3QuantifiedFormulaManager")
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
-    assertThat(qmgr.isQuantifier(exists)).isTrue();
-    assertThat(qmgr.isForall(exists)).isFalse();
-    assertThat(qmgr.isExists(exists)).isTrue();
-    assertThat(qmgr.isBoundByQuantifier(exists)).isFalse();
-    assertThat(qmgr.numQuantifierBound(exists)).isEqualTo(1);
+    final AtomicBoolean isQuantifier = new AtomicBoolean(false);
+    final AtomicBoolean isForall = new AtomicBoolean(false);
+    final AtomicInteger numBound = new AtomicInteger(0);
 
-    UnsafeFormulaManager umgr = mgr.getUnsafeFormulaManager();
-    assertThat(umgr.isQuantification(exists)).isTrue();
-    assertThat(umgr.getQuantifiedBody(exists)).isEqualTo(qmgr.getQuantifierBody(exists));
-    assertThat(umgr.isAtom(exists)).isFalse();
-    assertThat(umgr.isBoundVariable(exists)).isFalse();
-    assertThat(umgr.isFreeVariable(exists)).isFalse();
-    assertThat(umgr.isVariable(exists)).isFalse();
-    assertThat(umgr.isNumber(exists)).isFalse();
-    assertThat(umgr.isUF(exists)).isFalse();
+    // Test introspection with visitors.
+    mgr.visit(
+        new DefaultFormulaVisitor<Void>() {
+          @Override
+          protected Void visitDefault(Formula f) {
+            return null;
+          }
 
-    try {
-      umgr.getArity(exists);
-      fail("getArity for quantifier should fail");
-    } catch (IllegalArgumentException expected) {
-    }
-
-    try {
-      umgr.getName(exists);
-      fail("getName for quantifier should fail");
-    } catch (IllegalArgumentException expected) {
-    }
+          @Override
+          public Void visitQuantifier(
+              BooleanFormula f,
+              Quantifier quantifier,
+              List<Formula> boundVariables,
+              BooleanFormula body) {
+            isForall.set(quantifier == Quantifier.FORALL);
+            isQuantifier.set(true);
+            numBound.set(boundVariables.size());
+            return null;
+          }
+        },
+        exists);
+    assertThat(isQuantifier.get()).isTrue();
+    assertThat(isForall.get()).isFalse();
+    assertThat(numBound.get()).isEqualTo(1);
   }
 }

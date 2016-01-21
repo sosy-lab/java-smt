@@ -47,11 +47,6 @@ public class CVC4UnsafeFormulaManager
   }
 
   @Override
-  protected boolean isAtom(Expr pT) {
-    return pT.isConst() || pT.isVariable();
-  }
-
-  @Override
   protected int getArity(Expr pT) {
     return (int) pT.getNumChildren();
   }
@@ -77,34 +72,15 @@ public class CVC4UnsafeFormulaManager
   }
 
   @Override
-  protected boolean isQuantification(Expr pT) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
-  @Override
-  protected Expr getQuantifiedBody(Expr pT) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
-  @Override
-  protected Expr replaceQuantifiedBody(Expr pF, Expr pBody) {
-    throw new UnsupportedOperationException("Quantifiers not implemented for CVC4");
-  }
-
-  @Override
   protected boolean isNumber(Expr pT) {
-    return isAtom(pT) && pT.getType().isInteger(); // TODO float, rationals?
+    return (pT.isConst()) && pT.getType().isInteger(); // TODO float, rationals?
   }
 
   @Override
   protected boolean isUF(Expr pT) {
     Preconditions.checkState(!pT.isNull());
 
-    if (pT.isConst() || pT.isVariable()) {
-      return false;
-    }
-
-    return pT.getKind().equals(Kind.APPLY_UF);
+    return !(pT.isConst() || pT.isVariable()) && pT.getKind().equals(Kind.APPLY_UF);
   }
 
   @Override

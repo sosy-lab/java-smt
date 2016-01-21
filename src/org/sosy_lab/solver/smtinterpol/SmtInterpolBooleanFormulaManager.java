@@ -121,41 +121,6 @@ class SmtInterpolBooleanFormulaManager
     return theory.xor(pBits1, pBits2);
   }
 
-  @Override
-  public boolean isNot(Term pBits) {
-    return SmtInterpolUtil.isNot(pBits);
-  }
-
-  @Override
-  public boolean isAnd(Term pBits) {
-    return SmtInterpolUtil.isAnd(pBits);
-  }
-
-  @Override
-  public boolean isOr(Term pBits) {
-    return SmtInterpolUtil.isOr(pBits);
-  }
-
-  @Override
-  public boolean isXor(Term pBits) {
-    return SmtInterpolUtil.isXor(pBits);
-  }
-
-  @Override
-  protected boolean isEquivalence(Term pBits) {
-    return SmtInterpolUtil.isEquivalence(pBits);
-  }
-
-  @Override
-  protected boolean isImplication(Term pFormula) {
-    return SmtInterpolUtil.isImplication(pFormula);
-  }
-
-  @Override
-  protected boolean isIfThenElse(Term pBits) {
-    return SmtInterpolUtil.isIfThenElse(pBits);
-  }
-
   private BooleanFormula getArg(ApplicationTerm pF, int index) {
     return formulaCreator.encapsulateBoolean(pF.getParameters()[index]);
   }

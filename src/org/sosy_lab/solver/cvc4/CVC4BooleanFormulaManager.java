@@ -90,26 +90,6 @@ public class CVC4BooleanFormulaManager
   }
 
   @Override
-  protected boolean isNot(Expr pParam) {
-    return pParam.getKind() == Kind.NOT;
-  }
-
-  @Override
-  protected boolean isAnd(Expr pParam) {
-    return pParam.getKind() == Kind.AND;
-  }
-
-  @Override
-  protected boolean isOr(Expr pParam) {
-    return pParam.getKind() == Kind.OR;
-  }
-
-  @Override
-  protected boolean isXor(Expr pParam) {
-    return pParam.getKind() == Kind.XOR;
-  }
-
-  @Override
   protected Expr equivalence(Expr pBits1, Expr pBits2) {
     return exprManager.mkExpr(Kind.IFF, pBits1, pBits2);
   }
@@ -127,21 +107,5 @@ public class CVC4BooleanFormulaManager
   @Override
   protected Expr ifThenElse(Expr pCond, Expr pF1, Expr pF2) {
     return pCond.iteExpr(pF1, pF2);
-  }
-
-  @Override
-  protected boolean isEquivalence(Expr pBits) {
-    // TODO is there a relevant difference that needs to be handled here?
-    return pBits.getKind() == Kind.EQUAL || pBits.getKind() == Kind.IFF;
-  }
-
-  @Override
-  protected boolean isImplication(Expr pFormula) {
-    return pFormula.getKind() == Kind.IMPLIES;
-  }
-
-  @Override
-  protected boolean isIfThenElse(Expr pBits) {
-    return pBits.getKind() == Kind.ITE;
   }
 }

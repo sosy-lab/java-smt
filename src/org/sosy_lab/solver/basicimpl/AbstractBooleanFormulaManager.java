@@ -54,12 +54,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     this.ufmgr = ufmgr;
   }
 
-  @Override
-  @Deprecated
-  public boolean isBoolean(Formula f) {
-    return f instanceof BooleanFormula;
-  }
-
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateBoolean(formulaInfo);
   }
@@ -156,42 +150,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
-  @Override
-  @Deprecated
-  public boolean isNot(BooleanFormula pBits) {
-    TFormulaInfo param = extractInfo(pBits);
-    return isNot(param);
-  }
-
-  protected abstract boolean isNot(TFormulaInfo pParam);
-
-  @Override
-  @Deprecated
-  public boolean isAnd(BooleanFormula pBits) {
-    TFormulaInfo param = extractInfo(pBits);
-    return isAnd(param);
-  }
-
-  protected abstract boolean isAnd(TFormulaInfo pParam);
-
-  @Override
-  @Deprecated
-  public boolean isOr(BooleanFormula pBits) {
-    TFormulaInfo param = extractInfo(pBits);
-    return isOr(param);
-  }
-
-  protected abstract boolean isOr(TFormulaInfo pParam);
-
-  @Override
-  @Deprecated
-  public boolean isXor(BooleanFormula pBits) {
-    TFormulaInfo param = extractInfo(pBits);
-    return isXor(param);
-  }
-
-  protected abstract boolean isXor(TFormulaInfo pParam);
-
   /**
    * Creates a formula representing an equivalence of the two arguments.
    * @param pBits1 a Formula
@@ -256,30 +214,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract TFormulaInfo ifThenElse(TFormulaInfo cond, TFormulaInfo f1, TFormulaInfo f2);
-
-  @Override
-  @Deprecated
-  public boolean isEquivalence(BooleanFormula pFormula) {
-    return isEquivalence(extractInfo(pFormula));
-  }
-
-  protected abstract boolean isEquivalence(TFormulaInfo pBits);
-
-  @Override
-  @Deprecated
-  public boolean isImplication(BooleanFormula pFormula) {
-    return isImplication(extractInfo(pFormula));
-  }
-
-  protected abstract boolean isImplication(TFormulaInfo pFormula);
-
-  @Override
-  @Deprecated
-  public <T extends Formula> boolean isIfThenElse(T pF) {
-    return isIfThenElse(extractInfo(pF));
-  }
-
-  protected abstract boolean isIfThenElse(TFormulaInfo pBits);
 
   @Override
   public <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula pFormula) {

@@ -27,14 +27,8 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_or;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term_ite;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_and;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_iff;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_not;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_or;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_term_ite;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
@@ -120,45 +114,5 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
   @Override
   public Long xor(Long pBits1, Long pBits2) {
     return not(msat_make_iff(mathsatEnv, pBits1, pBits2));
-  }
-
-  @Override
-  public boolean isNot(Long pBits) {
-    return msat_term_is_not(mathsatEnv, pBits);
-  }
-
-  @Override
-  public boolean isAnd(Long pBits) {
-    return msat_term_is_and(mathsatEnv, pBits);
-  }
-
-  @Override
-  public boolean isOr(Long pBits) {
-    return msat_term_is_or(mathsatEnv, pBits);
-  }
-
-  @Override
-  public boolean isXor(Long pBits) {
-    boolean isNot = msat_term_is_not(mathsatEnv, pBits);
-    if (!isNot) {
-      return false;
-    }
-    long notArg = msat_term_get_arg(pBits, 0);
-    return msat_term_is_iff(mathsatEnv, notArg);
-  }
-
-  @Override
-  public boolean isEquivalence(Long pBits) {
-    return msat_term_is_iff(mathsatEnv, pBits);
-  }
-
-  @Override
-  protected boolean isImplication(Long pFormula) {
-    return false; // Mathsat does not have implications
-  }
-
-  @Override
-  public boolean isIfThenElse(Long pBits) {
-    return msat_term_is_term_ite(mathsatEnv, pBits);
   }
 }

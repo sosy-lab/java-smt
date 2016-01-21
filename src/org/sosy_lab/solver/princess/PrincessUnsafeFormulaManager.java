@@ -20,9 +20,7 @@
 package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.singleton;
 import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
-import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
@@ -33,7 +31,6 @@ import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
@@ -58,11 +55,6 @@ class PrincessUnsafeFormulaManager
   PrincessUnsafeFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);
     formulaCreator = pCreator;
-  }
-
-  @Override
-  public boolean isAtom(IExpression t) {
-    return PrincessUtil.isAtom(t);
   }
 
   @Override
@@ -150,22 +142,6 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  protected boolean isQuantification(IExpression pT) {
-    return PrincessUtil.isQuantifier(pT);
-  }
-
-  @Override
-  protected IExpression getQuantifiedBody(IExpression pT) {
-    return PrincessUtil.getQuantifierBody(pT);
-  }
-
-  @Override
-  protected IExpression replaceQuantifiedBody(IExpression pF, IExpression pBody) {
-    Preconditions.checkArgument(isQuantification(pF));
-    return pF.update(iterableAsScalaIterable(singleton(pBody)).toSeq());
-  }
-
-  @Override
   protected boolean isFreeVariable(IExpression pT) {
     return isVariable(pT);
   }
@@ -183,7 +159,7 @@ class PrincessUnsafeFormulaManager
     } else if (input instanceof IBoolLit) {
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
-    } else if (isQuantification(input)) {
+    } else if (PrincessUtil.isQuantifier(input)) {
       BooleanFormula body =
           formulaCreator.encapsulateBoolean(PrincessUtil.getQuantifierBody(input));
       return visitor.visitQuantifier(

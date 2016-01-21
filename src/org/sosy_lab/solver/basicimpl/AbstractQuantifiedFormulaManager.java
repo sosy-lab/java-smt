@@ -64,54 +64,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       throws SolverException, InterruptedException;
 
   @Override
-  @Deprecated
-  public boolean isQuantifier(BooleanFormula pF) {
-    return isQuantifier(extractInfo(pF));
-  }
-
-  protected abstract boolean isQuantifier(TFormulaInfo pExtractInfo);
-
-  @Override
-  @Deprecated
-  public boolean isForall(BooleanFormula pF) {
-    return isForall(extractInfo(pF));
-  }
-
-  protected abstract boolean isForall(TFormulaInfo pExtractInfo);
-
-  @Override
-  @Deprecated
-  public boolean isExists(BooleanFormula pF) {
-    return isExists(extractInfo(pF));
-  }
-
-  protected abstract boolean isExists(TFormulaInfo pExtractInfo);
-
-  @Override
-  @Deprecated
-  public int numQuantifierBound(BooleanFormula pF) {
-    return numQuantifierBound(extractInfo(pF));
-  }
-
-  protected abstract int numQuantifierBound(TFormulaInfo pExtractInfo);
-
-  @Override
-  @Deprecated
-  public BooleanFormula getQuantifierBody(BooleanFormula pF) {
-    return wrap(getQuantifierBody(extractInfo(pF)));
-  }
-
-  protected abstract TFormulaInfo getQuantifierBody(TFormulaInfo pExtractInfo);
-
-  @Override
-  @Deprecated
-  public boolean isBoundByQuantifier(Formula pF) {
-    return isBoundByQuantifier(extractInfo(pF));
-  }
-
-  public abstract boolean isBoundByQuantifier(TFormulaInfo pF);
-
-  @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     return wrap(mkQuantifier(q, Lists.transform(pVariables, extractor), extractInfo(pBody)));
