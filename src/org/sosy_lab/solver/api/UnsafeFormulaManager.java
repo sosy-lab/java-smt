@@ -41,46 +41,12 @@ public interface UnsafeFormulaManager {
   Formula getArg(Formula f, int n);
 
   /**
-   * @return all arguments of the given function application
-   */
-  List<Formula> getAllArgs(Formula f);
-
-  /**
-   * @return whether the given Formula is a variable, either free or quantified
-   */
-  boolean isVariable(Formula f);
-
-  /**
-   * @return whether the given Formula is a free (not quantified) variable.
-   */
-  boolean isFreeVariable(Formula f);
-
-  /**
-   * @return whether the given Formula is a bound (by a quantifier) variable.
-   */
-  boolean isBoundVariable(Formula f);
-
-  /**
-   * @return whether the given Formula is a number.
-   */
-  boolean isNumber(Formula pTt);
-
-  /**
-   * @return whether the given Formula is an uninterpreted function call.
-   */
-  boolean isUF(Formula f);
-
-  /**
-   * Returns the name of the formula (or function)
-   */
-  String getName(Formula f);
-
-  /**
    * Replaces the name and the arguments of the given formula.
    * The old and the new name need to be of the same type.
    * If f is a variable, use an empty list of arguments.
    */
   <T extends Formula> T replaceArgsAndName(T f, String newName, List<Formula> args);
+
   /**
    * Replaces the arguments of the given formula
    */
@@ -90,7 +56,7 @@ public interface UnsafeFormulaManager {
    * If the given formula is a numeral (i.e., non-boolean) equality "x = y",
    * return a list {@code x<=y, x>=y}.
    *
-   * <p>Otherwise, return the unchanged formula.
+   * <p>Otherwise, return the list consisting of the input formula.
    * Note:
    *  1) Returned list always has one or two elements.
    *  2) Conjunction over the returned list is equivalent to the input formula.

@@ -346,10 +346,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     return getFormulaCreator().encapsulateBoolean(ufmgr.getArg(pF, index));
   }
 
-  protected final List<BooleanFormula> getAllArgs(TFormulaInfo pF) {
-    return checkedCast(ufmgr.getAllArgs(getFormulaCreator().encapsulateBoolean(pF)));
-  }
-
   private static List<BooleanFormula> checkedCast(List<Formula> list) {
     List<BooleanFormula> ret = new ArrayList<>(list.size());
     for (Formula f : list) {

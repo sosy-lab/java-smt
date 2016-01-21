@@ -41,8 +41,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_app;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvuge;
@@ -145,29 +143,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
     return get_ast_kind(z3context, t) == Z3_APP_AST;
   }
 
-  @Override
-  protected boolean isFreeVariable(Long pT) {
-    if (isOP(z3context, pT, Z3_OP_TRUE) || isOP(z3context, pT, Z3_OP_FALSE)) {
-      return false;
-    }
-
-    int astKind = get_ast_kind(z3context, pT);
-    return ((astKind == Z3_APP_AST) && (getArity(pT) == 0));
-  }
-
-  @Override
-  protected boolean isBoundVariable(Long pT) {
-    int astKind = get_ast_kind(z3context, pT);
-    return (astKind == Z3_VAR_AST);
-  }
-
-  @Override
-  public boolean isUF(Long t) {
-    return is_app(z3context, t)
-        && get_decl_kind(z3context, get_app_decl(z3context, t)) == Z3_OP_UNINTERPRETED;
-  }
-
-  @Override
   public String getName(Long t) {
     int astKind = get_ast_kind(z3context, t);
     if (astKind == Z3_VAR_AST) {
@@ -265,11 +240,6 @@ class Z3UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Lo
       }
     }
     return ImmutableList.of(pF);
-  }
-
-  @Override
-  public boolean isNumber(Long t) {
-    return is_numeral_ast(z3context, t);
   }
 
   @Override

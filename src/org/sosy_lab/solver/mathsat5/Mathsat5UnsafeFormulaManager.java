@@ -150,12 +150,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
     return msat_term_is_constant(msatEnv, t);
   }
 
-  @Override
-  public boolean isUF(Long t) {
-    return msat_term_is_uf(msatEnv, t);
-  }
-
-  @Override
   public String getName(Long t) {
     if (isVariable(t)) {
       return msat_term_repr(t);
@@ -186,7 +180,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
 
   @Override
   public Long replaceArgsAndName(Long t, String newName, List<Long> newArgs) {
-    if (isUF(t)) {
+    if (msat_term_is_uf(msatEnv, t)) {
       long decl = msat_term_get_decl(t);
       int arity = msat_decl_get_arity(decl);
       long retType = msat_decl_get_return_type(decl);
@@ -220,21 +214,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       }
     }
     return ImmutableList.of(pF);
-  }
-
-  @Override
-  public boolean isNumber(Long pT) {
-    return msat_term_is_number(msatEnv, pT);
-  }
-
-  @Override
-  protected boolean isFreeVariable(Long pT) {
-    return isVariable(pT);
-  }
-
-  @Override
-  protected boolean isBoundVariable(Long pT) {
-    return false;
   }
 
   private FuncDeclKind getDeclarationKind(long pF) {

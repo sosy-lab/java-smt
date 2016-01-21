@@ -61,29 +61,6 @@ public class CVC4UnsafeFormulaManager
     return pT.isVariable();
   }
 
-  @Override
-  protected boolean isFreeVariable(Expr pT) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
-  @Override
-  protected boolean isBoundVariable(Expr pT) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
-  @Override
-  protected boolean isNumber(Expr pT) {
-    return (pT.isConst()) && pT.getType().isInteger(); // TODO float, rationals?
-  }
-
-  @Override
-  protected boolean isUF(Expr pT) {
-    Preconditions.checkState(!pT.isNull());
-
-    return !(pT.isConst() || pT.isVariable()) && pT.getKind().equals(Kind.APPLY_UF);
-  }
-
-  @Override
   protected String getName(Expr pT) {
     Preconditions.checkState(!pT.isNull());
 

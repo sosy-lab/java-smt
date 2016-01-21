@@ -21,6 +21,7 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
+import static org.sosy_lab.solver.princess.PrincessUtil.isUIF;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
@@ -73,20 +74,6 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  public boolean isUF(IExpression t) {
-    return PrincessUtil.isUIF(t);
-  }
-
-  @Override
-  public String getName(IExpression t) {
-    if (isUF(t)) {
-      return ((IFunApp) t).fun().name();
-    } else {
-      return t.toString();
-    }
-  }
-
-  @Override
   public IExpression replaceArgs(IExpression pT, List<IExpression> newArgs) {
     return PrincessUtil.replaceArgs(pT, newArgs);
   }
@@ -108,7 +95,7 @@ class PrincessUnsafeFormulaManager
 
       return getFormulaCreator().makeVariable(getType(t), pNewName);
 
-    } else if (isUF(t)) {
+    } else if (PrincessUtil.isUIF(t)) {
       IFunApp fun = (IFunApp) t;
       PrincessEnvironment env = getFormulaCreator().getEnv();
       TermType returnType = env.getReturnTypeForFunction(fun.fun());
@@ -137,21 +124,6 @@ class PrincessUnsafeFormulaManager
   }
 
   @Override
-  public boolean isNumber(IExpression pT) {
-    return PrincessUtil.isNumber(pT);
-  }
-
-  @Override
-  protected boolean isFreeVariable(IExpression pT) {
-    return isVariable(pT);
-  }
-
-  @Override
-  protected boolean isBoundVariable(IExpression pT) {
-    return PrincessUtil.isBoundByQuantifier(pT);
-  }
-
-  @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
@@ -172,13 +144,18 @@ class PrincessUnsafeFormulaManager
           // works as expected.
           new ArrayList<Formula>(),
           body);
-    } else if (isBoundVariable(input)) {
+    } else if (PrincessUtil.isBoundByQuantifier(input)) {
       return visitor.visitBoundVariable(f, PrincessUtil.getIndex(input));
     } else if (isVariable(input)) {
-      return visitor.visitFreeVariable(f, getName(input));
+      return visitor.visitFreeVariable(f, input.toString());
     } else {
       int arity = getArity(input);
-      String name = getName(input);
+      String name;
+      if (isUIF(input)) {
+        name = ((IFunApp) input).fun().name();
+      } else {
+        name = toString();
+      }
       final FormulaType<?> type = formulaCreator.getFormulaType(input);
       List<Formula> args = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {

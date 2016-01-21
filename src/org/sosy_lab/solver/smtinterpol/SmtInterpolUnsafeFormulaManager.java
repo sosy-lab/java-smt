@@ -88,20 +88,6 @@ class SmtInterpolUnsafeFormulaManager
   }
 
   @Override
-  public boolean isUF(Term t) {
-    return SmtInterpolUtil.isUIF(t);
-  }
-
-  @Override
-  public String getName(Term t) {
-    if (isUF(t)) {
-      return ((ApplicationTerm) t).getFunction().getName();
-    } else {
-      return dequote(t.toString());
-    }
-  }
-
-  @Override
   public Term replaceArgs(Term pT, List<Term> newArgs) {
     return SmtInterpolUtil.replaceArgs(
         getFormulaCreator().getEnv(), pT, SmtInterpolUtil.toTermArray(newArgs));
@@ -113,7 +99,7 @@ class SmtInterpolUnsafeFormulaManager
       checkArgument(pNewArgs.isEmpty());
       return getFormulaCreator().makeVariable(t.getSort(), pNewName);
 
-    } else if (isUF(t)) {
+    } else if (SmtInterpolUtil.isUIF(t)) {
       ApplicationTerm at = (ApplicationTerm) t;
       Term[] args = at.getParameters();
       Sort[] sorts = new Sort[args.length];
@@ -152,21 +138,6 @@ class SmtInterpolUnsafeFormulaManager
     Term ufc = getFormulaCreator().getEnv().term(funcDecl, args);
     assert SmtInterpolUtil.isUIF(ufc);
     return ufc;
-  }
-
-  @Override
-  public boolean isNumber(Term pT) {
-    return SmtInterpolUtil.isNumber(pT);
-  }
-
-  @Override
-  protected boolean isFreeVariable(Term pT) {
-    return isVariable(pT);
-  }
-
-  @Override
-  protected boolean isBoundVariable(Term pT) {
-    return false;
   }
 
   @Override

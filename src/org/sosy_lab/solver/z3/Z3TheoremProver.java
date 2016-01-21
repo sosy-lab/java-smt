@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_get;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_inc_ref;
@@ -167,9 +168,10 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     ast_vector_inc_ref(z3context, unsatCore);
     for (int i = 0; i < ast_vector_size(z3context, unsatCore); i++) {
       long ast = ast_vector_get(z3context, unsatCore, i);
-      BooleanFormula f = creator.encapsulateBoolean(ast);
-
-      constraints.add(storedConstraints.get(mgr.getUnsafeFormulaManager().getName(f)));
+      inc_ref(z3context, ast);
+      String varName = ast_to_string(z3context, ast);
+      dec_ref(z3context, ast);
+      constraints.add(storedConstraints.get(varName));
     }
     ast_vector_dec_ref(z3context, unsatCore);
     return constraints;

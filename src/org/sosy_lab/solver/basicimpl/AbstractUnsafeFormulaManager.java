@@ -67,64 +67,7 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo getArg(TFormulaInfo pT, int n);
 
-  @Override
-  public List<Formula> getAllArgs(Formula pF) {
-    int arity = getArity(pF);
-    List<Formula> args = new ArrayList<>(arity);
-    for (int i = 0; i < arity; i++) {
-      args.add(getArg(pF, i));
-    }
-    return args;
-  }
-
-  @Override
-  public boolean isVariable(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isVariable(t);
-  }
-
   protected abstract boolean isVariable(TFormulaInfo pT);
-
-  @Override
-  public boolean isFreeVariable(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isFreeVariable(t);
-  }
-
-  protected abstract boolean isFreeVariable(TFormulaInfo pT);
-
-  @Override
-  public boolean isBoundVariable(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isBoundVariable(t);
-  }
-
-  protected abstract boolean isBoundVariable(TFormulaInfo pT);
-
-  @Override
-  public boolean isNumber(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isNumber(t);
-  }
-
-  protected abstract boolean isNumber(TFormulaInfo pT);
-
-  @Override
-  public boolean isUF(Formula pF) {
-    TFormulaInfo t = extractInfo(pF);
-    return isUF(t);
-  }
-
-  protected abstract boolean isUF(TFormulaInfo pT);
-
-  @Override
-  public String getName(Formula pF) {
-
-    TFormulaInfo t = extractInfo(pF);
-    return getName(t);
-  }
-
-  protected abstract String getName(TFormulaInfo pT);
 
   @Override
   public <T extends Formula> T replaceArgsAndName(T f, String newName, List<Formula> args) {
