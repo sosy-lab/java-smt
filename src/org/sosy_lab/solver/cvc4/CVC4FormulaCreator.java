@@ -81,7 +81,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     if (t.isArray()) {
       return FormulaType.getArrayType(
           getFormulaTypeFromTermType(((ArrayType) t).getIndexType()),
-          getFormulaTypeFromTermType(((ArrayType) t).getBaseType()));
+          getFormulaTypeFromTermType(t.getBaseType()));
     }
     return getFormulaTypeFromTermType(t);
   }

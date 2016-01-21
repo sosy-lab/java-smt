@@ -28,7 +28,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
@@ -36,12 +35,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_retur
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_function_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_roundingmode_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_bv_uleq;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
@@ -49,7 +43,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_equal;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
@@ -57,8 +50,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.Formula;
@@ -70,7 +61,6 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
 
@@ -165,20 +155,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
   }
 
   @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingLists(pF, pFromToMapping);
-  }
-
-  @Override
-  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
-    long size = changeFrom.size();
-    Preconditions.checkState(size == changeTo.size());
-
-    return msat_apply_substitution(
-        msatEnv, t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
-  }
-
-  @Override
   public Long replaceArgsAndName(Long t, String newName, List<Long> newArgs) {
     if (msat_term_is_uf(msatEnv, t)) {
       long decl = msat_term_get_decl(t);
@@ -197,23 +173,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
     } else {
       throw new IllegalArgumentException("Can't set the name from the given formula!");
     }
-  }
-
-  @Override
-  protected List<Long> splitNumeralEqualityIfPossible(Long pF) {
-    if (msat_term_is_equal(msatEnv, pF) && getArity(pF) == 2) {
-      long arg0 = msat_term_get_arg(pF, 0);
-      long arg1 = msat_term_get_arg(pF, 1);
-      long type = msat_term_get_type(arg0);
-      if (msat_is_bv_type(msatEnv, type)) {
-        return ImmutableList.of(
-            msat_make_bv_uleq(msatEnv, arg0, arg1), msat_make_bv_uleq(msatEnv, arg1, arg0));
-      } else if (msat_is_integer_type(msatEnv, type) || msat_is_rational_type(msatEnv, type)) {
-        return ImmutableList.of(
-            msat_make_leq(msatEnv, arg0, arg1), msat_make_leq(msatEnv, arg1, arg0));
-      }
-    }
-    return ImmutableList.of(pF);
   }
 
   private FuncDeclKind getDeclarationKind(long pF) {
@@ -239,7 +198,6 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
 
       case MSAT_TAG_PLUS:
         return FuncDeclKind.ADD;
-        // todo: UF??
       case MSAT_TAG_LEQ:
         return FuncDeclKind.LTE;
       case MSAT_TAG_EQ:

@@ -34,7 +34,6 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CVC4UnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Expr, Type, CVC4Environment> {
@@ -79,16 +78,6 @@ public class CVC4UnsafeFormulaManager
   @Override
   protected Expr replaceArgs(Expr pT, List<Expr> pNewArgs) {
     throw new UnsupportedOperationException("Not implemented");
-  }
-
-  @Override
-  protected List<? extends Expr> splitNumeralEqualityIfPossible(Expr pF) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
-  @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingMap(pF, pFromToMapping);
   }
 
   @Override

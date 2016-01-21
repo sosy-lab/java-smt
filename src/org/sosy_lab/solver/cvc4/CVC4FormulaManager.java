@@ -29,6 +29,9 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.util.List;
+import java.util.Map;
+
 class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environment> {
 
   CVC4FormulaManager(
@@ -65,5 +68,15 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
   @Override
   public Appender dumpFormula(Expr pT) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected List<? extends Expr> splitNumeralEqualityIfPossible(Expr pF) {
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
+  @Override
+  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
+    return substituteUsingMap(pF, pFromToMapping);
   }
 }

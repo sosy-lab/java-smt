@@ -43,6 +43,9 @@ abstract class Mathsat5Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
     if (!(o instanceof Mathsat5Formula)) {
       return false;
     }

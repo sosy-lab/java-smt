@@ -33,6 +33,7 @@ public class CVC4Util {
   private CVC4Util() {}
 
   public static Set<Expr> getVarsAndUIFs(Collection<Expr> termList) {
+    // TODO: code duplication with FormulaManager#extractFunctionNames
     Set<Expr> result = new HashSet<>();
     Set<Expr> seen = new HashSet<>();
     Deque<Expr> todo = new ArrayDeque<>(termList);

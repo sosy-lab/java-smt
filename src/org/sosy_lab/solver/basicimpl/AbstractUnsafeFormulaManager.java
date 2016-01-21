@@ -21,19 +21,14 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.UnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements UnsafeFormulaManager {
@@ -86,86 +81,6 @@ public abstract class AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract TFormulaInfo replaceArgs(TFormulaInfo pT, List<TFormulaInfo> newArgs);
-
-  @Override
-  public <T extends Formula> List<T> splitNumeralEqualityIfPossible(final T pF) {
-    return Lists.transform(
-        splitNumeralEqualityIfPossible(extractInfo(pF)),
-        new Function<TFormulaInfo, T>() {
-          @Override
-          public T apply(TFormulaInfo input) {
-            return encapsulateWithTypeOf(pF, input);
-          }
-        });
-  }
-
-  protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
-
-  /**
-   * Default implementation for {@link #substitute(Formula, Map)}.
-   */
-  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingMap(
-      T1 pF, Map<T2, T2> pFromToMapping) {
-    Map<TFormulaInfo, TFormulaInfo> mapping = new HashMap<>(pFromToMapping.size());
-    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
-      mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
-    }
-
-    TFormulaInfo result = substituteUsingMapImpl(extractInfo(pF), mapping);
-    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, result);
-  }
-
-  protected TFormulaInfo substituteUsingMapImpl(
-      TFormulaInfo expr, Map<TFormulaInfo, TFormulaInfo> memoization) {
-    TFormulaInfo out = memoization.get(expr);
-
-    if (out == null) {
-      int arity = getArity(expr);
-      List<TFormulaInfo> updatedChildren = new ArrayList<>(arity);
-      for (int childIdx = 0; childIdx < arity; childIdx++) {
-        TFormulaInfo child = getArg(expr, childIdx);
-        updatedChildren.add(substituteUsingMapImpl(child, memoization));
-      }
-      out = replaceArgs(expr, updatedChildren);
-      memoization.put(expr, out);
-    }
-
-    return out;
-  }
-
-  /**
-   * Default implementation for {@link #substitute(Formula, Map)} for solvers that provide
-   * an internal substitute operation that takes two lists instead of a map.
-   *
-   * <p>If this is called, one needs to overwrite
-   * {@link #substitute(Formula, Map)}.
-   */
-  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingLists(
-      T1 pF, Map<T2, T2> pFromToMapping) {
-    List<TFormulaInfo> substituteFrom = new ArrayList<>(pFromToMapping.size());
-    List<TFormulaInfo> substituteTo = new ArrayList<>(pFromToMapping.size());
-    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
-      substituteFrom.add(extractInfo(entry.getKey()));
-      substituteTo.add(extractInfo(entry.getValue()));
-    }
-
-    TFormulaInfo result = substituteUsingListsImpl(extractInfo(pF), substituteFrom, substituteTo);
-    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, result);
-  }
-
-  /**
-   * Backend for {@link #substituteUsingLists(Formula, Map)}.
-   * @param pF The formula to change.
-   * @param substituteFrom The list of parts that should be replaced.
-   * @param substituteTo The list of replacement parts, in same order.
-   * @return The formula with th replacements applied.
-   */
-  protected TFormulaInfo substituteUsingListsImpl(
-      TFormulaInfo pF, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
-    throw new UnsupportedOperationException();
-  }
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula input) {

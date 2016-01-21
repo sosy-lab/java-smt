@@ -46,6 +46,9 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
   @Override
   public final boolean equals(@Nullable Object o) {
+    if (o == this) {
+      return true;
+    }
     if (!(o instanceof AbstractFormula)) {
       return false;
     }

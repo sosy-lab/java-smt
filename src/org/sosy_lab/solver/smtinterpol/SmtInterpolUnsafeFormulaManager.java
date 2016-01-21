@@ -24,7 +24,6 @@ import static org.sosy_lab.solver.smtinterpol.SmtInterpolUtil.toTermArray;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -41,7 +40,6 @@ import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
-import java.util.Map;
 
 class SmtInterpolUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -111,27 +109,6 @@ class SmtInterpolUnsafeFormulaManager
     } else {
       throw new IllegalArgumentException("The Term " + t + " has no name!");
     }
-  }
-
-  @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingMap(pF, pFromToMapping);
-  }
-
-  @Override
-  protected List<Term> splitNumeralEqualityIfPossible(Term pF) {
-    if (SmtInterpolUtil.isFunction(pF, "=") && SmtInterpolUtil.getArity(pF) == 2) {
-      Term arg0 = SmtInterpolUtil.getArg(pF, 0);
-      Term arg1 = SmtInterpolUtil.getArg(pF, 1);
-      assert arg0 != null && arg1 != null;
-      assert arg0.getSort().equals(arg1.getSort());
-      if (!SmtInterpolUtil.isBoolean(arg0)) {
-        return ImmutableList.of(
-            getFormulaCreator().getEnv().term("<=", arg0, arg1),
-            getFormulaCreator().getEnv().term("<=", arg1, arg0));
-      }
-    }
-    return ImmutableList.of(pF);
   }
 
   Term createUIFCallImpl(String funcDecl, Term[] args) {

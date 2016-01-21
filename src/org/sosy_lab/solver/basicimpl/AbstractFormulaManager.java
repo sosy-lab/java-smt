@@ -22,6 +22,7 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
@@ -33,16 +34,19 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -236,20 +240,18 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    * Extract names of all free variables in a formula.
    *
    * @param f   The input formula
-   * @return    Set of variable names.
    */
-  public Set<String> extractVariableNames(Formula f) {
-    return myExtractSubformulas(f, false).keySet();
+  public Map<String, Formula> extractVariableNames(Formula f) {
+    return myExtractSubformulas(f, false);
   }
 
   /**
    * Extract the names of all free variables and UFs in a formula.
    *
    * @param f   The input formula
-   * @return    Set of variable names.
    */
-  public Set<String> extractFunctionNames(Formula f) {
-    return myExtractSubformulas(f, true).keySet();
+  public Map<String, Formula> extractFunctionNames(Formula f) {
+    return myExtractSubformulas(f, true);
   }
 
   /**
@@ -288,5 +290,178 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
         },
         pFormula);
     return found;
+  }
+
+  private <T extends Formula> T encapsulateWithTypeOf(T f, TFormulaInfo e) {
+    return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), e);
+  }
+
+  @Override
+  public <T extends Formula> List<T> splitNumeralEqualityIfPossible(final T pF) {
+    return Lists.transform(
+        splitNumeralEqualityIfPossible(extractInfo(pF)),
+        new Function<TFormulaInfo, T>() {
+          @Override
+          public T apply(TFormulaInfo input) {
+            return encapsulateWithTypeOf(pF, input);
+          }
+        });
+  }
+
+  protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
+
+  /**
+   * Default implementation for {@link #substitute(Formula, Map)}.
+   */
+  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingMap(
+      T1 pF, Map<T2, T2> pFromToMapping) {
+    Map<TFormulaInfo, TFormulaInfo> mapping = new HashMap<>(pFromToMapping.size());
+    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
+      mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
+    }
+
+    TFormulaInfo result = substituteUsingMapImpl(extractInfo(pF), mapping, pF, pFromToMapping);
+    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
+    return getFormulaCreator().encapsulate(type, result);
+  }
+
+  protected TFormulaInfo substituteUsingMapImpl(
+      TFormulaInfo expr,
+      Map<TFormulaInfo, TFormulaInfo> memoization,
+      Formula f,
+      final Map<? extends Formula, ? extends Formula> fromToMapping) {
+
+    final Deque<Formula> toProcess = new ArrayDeque<>();
+    final Map<Formula, Formula> pCache = new HashMap<>();
+
+    // Add the formula to the work queue
+    toProcess.push(f);
+
+    FormulaVisitor<Void> process =
+        new DefaultFormulaVisitor<Void>() {
+
+          @Override
+          protected Void visitDefault(Formula f) {
+            Formula out = fromToMapping.get(f);
+            if (out == null) {
+              out = f;
+            }
+            pCache.put(f, out);
+            return null;
+          }
+
+          @Override
+          public Void visitBoundVariable(Formula f, int deBruijnIdx) {
+
+            // Bound variables have to stay as-is.
+            pCache.put(f, f);
+            return null;
+          }
+
+          @Override
+          public Void visitFuncApp(
+              Formula f,
+              List<Formula> args,
+              FuncDecl decl,
+              Function<List<Formula>, Formula> newApplicationConstructor) {
+            Formula out = fromToMapping.get(f);
+            if (out != null) {
+              pCache.put(f, out);
+              return null;
+            }
+
+            boolean allArgumentsTransformed = true;
+
+            // Construct a new argument list for the function application.
+            List<Formula> newArgs = new ArrayList<>(args.size());
+
+            for (Formula c : args) {
+              Formula newC = pCache.get(c);
+
+              if (newC != null) {
+                newArgs.add(newC);
+              } else {
+                toProcess.push(c);
+                allArgumentsTransformed = false;
+              }
+            }
+
+            // The Flag allArgumentsTransformed indicates whether all arguments
+            // of the function were already processed.
+            if (allArgumentsTransformed) {
+
+              // Create an processed version of the
+              // function application.
+              toProcess.pop();
+              out = newApplicationConstructor.apply(newArgs);
+              pCache.put(f, out);
+            }
+            return null;
+          }
+
+          @Override
+          public Void visitQuantifier(
+              BooleanFormula f, Quantifier quantifier, List<Formula> args, BooleanFormula body) {
+            BooleanFormula transformedBody = (BooleanFormula) pCache.get(body);
+
+            if (transformedBody != null) {
+              BooleanFormula newTt =
+                  getQuantifiedFormulaManager().mkQuantifier(quantifier, args, transformedBody);
+              pCache.put(f, newTt);
+
+            } else {
+              toProcess.push(body);
+            }
+            return null;
+          }
+        };
+
+    // Process the work queue
+    while (!toProcess.isEmpty()) {
+      Formula tt = toProcess.peek();
+
+      if (pCache.containsKey(tt)) {
+        toProcess.pop();
+        continue;
+      }
+
+      //noinspection ResultOfMethodCallIgnored
+      visit(process, tt);
+    }
+
+    return formulaCreator.extractInfo(pCache.get(f));
+  }
+
+  /**
+   * Default implementation for {@link #substitute(Formula, Map)} for solvers that provide
+   * an internal substitute operation that takes two lists instead of a map.
+   *
+   * <p>If this is called, one needs to overwrite
+   * {@link #substitute(Formula, Map)}.
+   */
+  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingLists(
+      T1 pF, Map<T2, T2> pFromToMapping) {
+    List<TFormulaInfo> substituteFrom = new ArrayList<>(pFromToMapping.size());
+    List<TFormulaInfo> substituteTo = new ArrayList<>(pFromToMapping.size());
+    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
+      substituteFrom.add(extractInfo(entry.getKey()));
+      substituteTo.add(extractInfo(entry.getValue()));
+    }
+
+    TFormulaInfo result = substituteUsingListsImpl(extractInfo(pF), substituteFrom, substituteTo);
+    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
+    return getFormulaCreator().encapsulate(type, result);
+  }
+
+  /**
+   * Backend for {@link #substituteUsingLists(Formula, Map)}.
+   * @param pF The formula to change.
+   * @param substituteFrom The list of parts that should be replaced.
+   * @param substituteTo The list of replacement parts, in same order.
+   * @return The formula with th replacements applied.
+   */
+  protected TFormulaInfo substituteUsingListsImpl(
+      TFormulaInfo pF, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
+    throw new UnsupportedOperationException();
   }
 }

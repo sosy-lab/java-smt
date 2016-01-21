@@ -45,6 +45,9 @@ public class CVC4Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
     if (!(o instanceof CVC4Formula)) {
       return false;
     }

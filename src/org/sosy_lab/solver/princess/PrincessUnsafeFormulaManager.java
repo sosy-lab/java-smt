@@ -27,12 +27,9 @@ import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
-import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
-import ap.parser.IIntRelation;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -46,7 +43,6 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 class PrincessUnsafeFormulaManager
     extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
@@ -104,23 +100,6 @@ class PrincessUnsafeFormulaManager
     } else {
       throw new IllegalArgumentException("The Term " + t + " has no name!");
     }
-  }
-
-  @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingMap(pF, pFromToMapping);
-  }
-
-  @Override
-  protected List<? extends IExpression> splitNumeralEqualityIfPossible(IExpression pF) {
-    // Princess does not support Equal.
-    // Formulas are converted from "a==b" to "a+(-b)==0".
-    if (pF instanceof IIntFormula && ((IIntFormula) pF).rel() == IIntRelation.EqZero()) {
-      return ImmutableList.of(
-          ((IIntFormula) pF).t().$less$eq(new IIntLit(IdealInt.ZERO())),
-          ((IIntFormula) pF).t().$greater$eq(new IIntLit(IdealInt.ZERO())));
-    }
-    return ImmutableList.of(pF);
   }
 
   @Override

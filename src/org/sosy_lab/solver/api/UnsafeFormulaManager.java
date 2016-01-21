@@ -22,7 +22,6 @@ package org.sosy_lab.solver.api;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This interface contains methods for formula traversal,
@@ -51,31 +50,6 @@ public interface UnsafeFormulaManager {
    * Replaces the arguments of the given formula
    */
   <T extends Formula> T replaceArgs(T f, List<Formula> args);
-
-  /**
-   * If the given formula is a numeral (i.e., non-boolean) equality "x = y",
-   * return a list {@code x<=y, x>=y}.
-   *
-   * <p>Otherwise, return the list consisting of the input formula.
-   * Note:
-   *  1) Returned list always has one or two elements.
-   *  2) Conjunction over the returned list is equivalent to the input formula.
-   */
-  <T extends Formula> List<T> splitNumeralEqualityIfPossible(T f);
-
-  /**
-   * Substitute every occurrence of any item from {@code changeFrom}
-   * in formula {@code f} to the corresponding occurrence from {@code changeTo}.
-   *
-   * <p>E.g. if {@code changeFrom} contains a variable {@code a} and
-   * {@code changeTo} contains a variable {@code b} all occurrences of {@code a}
-   * will be changed to {@code b} in the returned formula.
-   *
-   * @param f Formula to change.
-   * @param fromToMapping Mapping of old and new formula parts.
-   * @return Formula with parts replaced.
-   */
-  Formula substitute(Formula f, Map<Formula, Formula> fromToMapping);
 
   <R> R visit(FormulaVisitor<R> visitor, Formula f);
 }

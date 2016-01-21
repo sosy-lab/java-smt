@@ -40,7 +40,6 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -113,9 +112,8 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
     Preconditions.checkState(!closed);
     List<BooleanFormula> converted = new ArrayList<>();
     UnsatCore core = smtEngine.getUnsatCore();
-    Iterator<Expr> it = core.iterator();
-    while (it.hasNext()) {
-      converted.add(mgr.encapsulateBooleanFormula(it.next()));
+    for (Expr aCore : core) {
+      converted.add(mgr.encapsulateBooleanFormula(aCore));
     }
     return converted;
   }

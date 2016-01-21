@@ -19,10 +19,28 @@
  */
 package org.sosy_lab.solver.z3;
 
+import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvuge;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvule;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ge;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_le;
 import static org.sosy_lab.solver.z3.Z3NativeApi.parse_smtlib2_string;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -37,6 +55,8 @@ import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
 
@@ -146,7 +166,56 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
   }
 
   @Override
+  protected List<? extends Long> splitNumeralEqualityIfPossible(Long pF) {
+    long z3context = getFormulaCreator().getEnv();
+    if (isOP(z3context, pF, Z3_OP_EQ) && get_app_num_args(z3context, pF) == 2) {
+      long arg0 = get_app_arg(z3context, pF, 0);
+      inc_ref(z3context, arg0);
+      long arg1 = get_app_arg(z3context, pF, 1);
+      inc_ref(z3context, arg1);
+
+      try {
+        long sortKind = get_sort_kind(z3context, get_sort(z3context, arg0));
+        assert sortKind == get_sort_kind(z3context, get_sort(z3context, arg1));
+        if (sortKind == Z3_BV_SORT) {
+
+          long out1 = mk_bvule(z3context, arg0, arg1);
+          inc_ref(z3context, out1);
+          long out2 = mk_bvuge(z3context, arg0, arg1);
+          inc_ref(z3context, out2);
+
+          return ImmutableList.of(out1, out2);
+        } else if (sortKind == Z3_INT_SORT || sortKind == Z3_REAL_SORT) {
+
+          long out1 = mk_le(z3context, arg0, arg1);
+          inc_ref(z3context, out1);
+          long out2 = mk_ge(z3context, arg0, arg1);
+          inc_ref(z3context, out2);
+          return ImmutableList.of(out1, out2);
+        }
+      } finally {
+        dec_ref(z3context, arg0);
+        dec_ref(z3context, arg1);
+      }
+    }
+    return ImmutableList.of(pF);
+  }
+
+  @Override
   public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
     return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
+  }
+
+  @Override
+  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
+    return substituteUsingLists(pF, pFromToMapping);
+  }
+
+  @Override
+  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
+    int size = changeFrom.size();
+    Preconditions.checkState(size == changeTo.size());
+    return Z3NativeApi.substitute(
+        getFormulaCreator().getEnv(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
   }
 }

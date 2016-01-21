@@ -21,10 +21,16 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
+import ap.basetypes.IdealInt;
 import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
+import ap.parser.IIntFormula;
+import ap.parser.IIntLit;
+import ap.parser.IIntRelation;
 import ap.parser.PartialEvaluator;
+
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.TermType;
@@ -33,6 +39,9 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+
+import java.util.List;
+import java.util.Map;
 
 final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
@@ -87,5 +96,22 @@ final class PrincessFormulaManager
       f = BooleanCompactifier.apply((IFormula) f);
     }
     return PartialEvaluator.apply(f);
+  }
+
+  @Override
+  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
+    return substituteUsingMap(pF, pFromToMapping);
+  }
+
+  @Override
+  protected List<? extends IExpression> splitNumeralEqualityIfPossible(IExpression pF) {
+    // Princess does not support Equal.
+    // Formulas are converted from "a==b" to "a+(-b)==0".
+    if (pF instanceof IIntFormula && ((IIntFormula) pF).rel() == IIntRelation.EqZero()) {
+      return ImmutableList.of(
+          ((IIntFormula) pF).t().$less$eq(new IIntLit(IdealInt.ZERO())),
+          ((IIntFormula) pF).t().$greater$eq(new IIntLit(IdealInt.ZERO())));
+    }
+    return ImmutableList.of(pF);
   }
 }
