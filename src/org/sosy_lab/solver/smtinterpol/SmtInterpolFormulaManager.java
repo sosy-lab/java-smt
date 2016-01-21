@@ -53,7 +53,7 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
 
   SmtInterpolFormulaManager(
       SmtInterpolFormulaCreator pCreator,
-      SmtInterpolUnsafeFormulaManager pUnsafeManager,
+      SmtInterpolIntrospectionFormulaManager pIntrospectionManager,
       SmtInterpolFunctionFormulaManager pFunctionManager,
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
@@ -61,7 +61,7 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
       SmtInterpolArrayFormulaManager pArrayFormulaManager) {
     super(
         pCreator,
-        pUnsafeManager,
+        pIntrospectionManager,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
@@ -155,7 +155,7 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
 
   @Override
   public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
+    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   /** This method returns a 'shared' environment or

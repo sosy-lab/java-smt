@@ -49,7 +49,7 @@ final class PrincessFormulaManager
   @SuppressWarnings("checkstyle:parameternumber")
   PrincessFormulaManager(
       PrincessFormulaCreator pCreator,
-      PrincessUnsafeFormulaManager pUnsafeManager,
+      PrincessIntrospectionFormulaManager introspectionManager,
       PrincessFunctionFormulaManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
@@ -57,7 +57,7 @@ final class PrincessFormulaManager
       PrincessQuantifiedFormulaManager pQuantifierManager) {
     super(
         pCreator,
-        pUnsafeManager,
+        introspectionManager,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
@@ -86,7 +86,7 @@ final class PrincessFormulaManager
 
   @Override
   public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
+    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   @Override

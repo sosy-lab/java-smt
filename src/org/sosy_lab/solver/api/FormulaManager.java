@@ -75,11 +75,6 @@ public interface FormulaManager {
   FunctionFormulaManager getFunctionFormulaManager();
 
   /**
-   * Returns some unsafe traverse methods.
-   */
-  UnsafeFormulaManager getUnsafeFormulaManager();
-
-  /**
    * Returns the interface for handling quantifiers.
    */
   QuantifiedFormulaManager getQuantifiedFormulaManager();

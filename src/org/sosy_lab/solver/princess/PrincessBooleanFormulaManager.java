@@ -41,7 +41,7 @@ class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
   PrincessBooleanFormulaManager(
-      PrincessFormulaCreator creator, PrincessUnsafeFormulaManager ufmgr) {
+      PrincessFormulaCreator creator, PrincessIntrospectionFormulaManager ufmgr) {
     super(creator, ufmgr);
   }
 

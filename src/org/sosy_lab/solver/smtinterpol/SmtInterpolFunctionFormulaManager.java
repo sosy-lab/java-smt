@@ -29,18 +29,20 @@ import java.util.List;
 class SmtInterpolFunctionFormulaManager
     extends AbstractFunctionFormulaManager<Term, String, Sort, SmtInterpolEnvironment> {
 
-  private final SmtInterpolUnsafeFormulaManager unsafeManager;
-
-  SmtInterpolFunctionFormulaManager(
-      SmtInterpolFormulaCreator creator, SmtInterpolUnsafeFormulaManager unsafeManager) {
+  SmtInterpolFunctionFormulaManager(SmtInterpolFormulaCreator creator) {
     super(creator);
-    this.unsafeManager = unsafeManager;
   }
 
   @Override
   public Term createUninterpretedFunctionCallImpl(String funcDecl, List<Term> pArgs) {
     Term[] args = SmtInterpolUtil.toTermArray(pArgs);
-    return unsafeManager.createUIFCallImpl(funcDecl, args);
+    return createUIFCallImpl(funcDecl, args);
+  }
+
+  private Term createUIFCallImpl(String funcDecl, Term[] args) {
+    Term ufc = getFormulaCreator().getEnv().term(funcDecl, args);
+    assert SmtInterpolUtil.isUIF(ufc);
+    return ufc;
   }
 
   @Override

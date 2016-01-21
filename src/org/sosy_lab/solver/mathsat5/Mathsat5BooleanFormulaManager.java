@@ -38,7 +38,7 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
   private final long mathsatEnv;
 
   protected Mathsat5BooleanFormulaManager(
-      Mathsat5FormulaCreator pCreator, Mathsat5UnsafeFormulaManager ufmgr) {
+      Mathsat5FormulaCreator pCreator, Mathsat5IntrospectionFormulaManager ufmgr) {
     super(pCreator, ufmgr);
     this.mathsatEnv = pCreator.getEnv();
   }

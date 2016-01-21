@@ -29,38 +29,31 @@ import edu.nyu.acsys.CVC4.Type;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.FuncDeclKind;
-import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractIntrospectionFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CVC4UnsafeFormulaManager
-    extends AbstractUnsafeFormulaManager<Expr, Type, CVC4Environment> {
+public class CVC4IntrospectionFormulaManager
+    extends AbstractIntrospectionFormulaManager<Expr, Type, CVC4Environment> {
 
   private final CVC4FormulaCreator formulaCreator;
 
-  CVC4UnsafeFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4IntrospectionFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     formulaCreator = pCreator;
   }
 
-  @Override
-  protected int getArity(Expr pT) {
-    return (int) pT.getNumChildren();
-  }
-
-  @Override
-  protected Expr getArg(Expr pT, int pN) {
+  private Expr getArg(Expr pT, int pN) {
     return pT.getChild(pN);
   }
 
-  @Override
-  protected boolean isVariable(Expr pT) {
+  private boolean isVariable(Expr pT) {
     return pT.isVariable();
   }
 
-  protected String getName(Expr pT) {
+  private String getName(Expr pT) {
     Preconditions.checkState(!pT.isNull());
 
     if (pT.isConst() || pT.isVariable()) {
@@ -70,13 +63,9 @@ public class CVC4UnsafeFormulaManager
     }
   }
 
-  @Override
-  protected Expr replaceArgsAndName(Expr pT, String pNewName, List<Expr> pNewArgs) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+  private Expr replaceArgs(Expr pT, List<Expr> pNewArgs) {
 
-  @Override
-  protected Expr replaceArgs(Expr pT, List<Expr> pNewArgs) {
+    // TODO!
     throw new UnsupportedOperationException("Not implemented");
   }
 
@@ -103,9 +92,9 @@ public class CVC4UnsafeFormulaManager
 
     } else {
       String name = getName(f);
-      int arity = getArity(f);
+      long arity = f.getNumChildren();
 
-      List<Formula> args = new ArrayList<>(arity);
+      List<Formula> args = new ArrayList<>((int) arity);
       for (int i = 0; i < arity; i++) {
         Expr arg = getArg(f, i);
         args.add(formulaCreator.encapsulate(formulaCreator.getFormulaType(arg), arg));
@@ -116,8 +105,7 @@ public class CVC4UnsafeFormulaManager
           new Function<List<Formula>, Formula>() {
             @Override
             public Formula apply(List<Formula> formulas) {
-              return replaceArgs(
-                  formulaCreator.encapsulate(formulaCreator.getFormulaType(f), f), formulas);
+              return formulaCreator.encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
             }
           };
       return visitor.visitFuncApp(

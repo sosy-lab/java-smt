@@ -41,12 +41,12 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
     SmtInterpolEnvironment env =
         new SmtInterpolEnvironment(config, logger, pShutdownNotifier, smtLogfile, randomSeed);
     SmtInterpolFormulaCreator creator = new SmtInterpolFormulaCreator(env);
-    SmtInterpolUnsafeFormulaManager unsafeManager =
-        new SmtInterpolUnsafeFormulaManager(creator, env.getTheory());
+    SmtInterpolIntrospectionFormulaManager introspectionManager =
+        new SmtInterpolIntrospectionFormulaManager(creator, env.getTheory());
     SmtInterpolFunctionFormulaManager functionTheory =
-        new SmtInterpolFunctionFormulaManager(creator, unsafeManager);
+        new SmtInterpolFunctionFormulaManager(creator);
     SmtInterpolBooleanFormulaManager booleanTheory =
-        new SmtInterpolBooleanFormulaManager(creator, env.getTheory(), unsafeManager);
+        new SmtInterpolBooleanFormulaManager(creator, env.getTheory(), introspectionManager);
     SmtInterpolIntegerFormulaManager integerTheory = new SmtInterpolIntegerFormulaManager(creator);
     SmtInterpolRationalFormulaManager rationalTheory =
         new SmtInterpolRationalFormulaManager(creator);
@@ -54,7 +54,7 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
             creator,
-            unsafeManager,
+            introspectionManager,
             functionTheory,
             booleanTheory,
             integerTheory,

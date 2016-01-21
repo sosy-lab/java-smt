@@ -72,7 +72,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   private final AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager;
 
-  private final AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager;
+  protected final AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv>
+      introspectionManager;
 
   private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
       quantifiedManager;
@@ -81,17 +82,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   /**
    * Builds a solver from the given theory implementations
-   * @param unsafeManager the unsafe manager
-   * @param functionManager the function theory
-   * @param booleanManager the boolean theory
-   * @param pIntegerManager the integer theory
-   * @param pRationalManager the rational theory
-   * @param bitvectorManager the bitvector theory
    */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator,
-      AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> unsafeManager,
+      AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv> introspectionManager,
       AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager,
       @Nullable IntegerFormulaManager pIntegerManager,
@@ -109,11 +104,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     this.rationalManager = pRationalManager;
     this.bitvectorManager = bitvectorManager;
     this.floatingPointManager = floatingPointManager;
-    this.unsafeManager = checkNotNull(unsafeManager, "unsafe manager needed");
+    this.introspectionManager = checkNotNull(introspectionManager, "unsafe manager needed");
     this.formulaCreator = pFormulaCreator;
 
     if (booleanManager.getFormulaCreator() != formulaCreator
-        || unsafeManager.getFormulaCreator() != formulaCreator
+        || introspectionManager.getFormulaCreator() != formulaCreator
         || functionManager.getFormulaCreator() != formulaCreator
         || (bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
         || (floatingPointManager != null
@@ -168,11 +163,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> getFunctionFormulaManager() {
     return functionManager;
-  }
-
-  @Override
-  public AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> getUnsafeFormulaManager() {
-    return unsafeManager;
   }
 
   @Override
@@ -233,7 +223,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   @Override
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    unsafeManager.visitRecursively(pFormulaVisitor, pF);
+    introspectionManager.visitRecursively(pFormulaVisitor, pF);
   }
 
   /**

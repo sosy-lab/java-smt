@@ -35,7 +35,8 @@ public class CVC4BooleanFormulaManager
   private final ExprManager exprManager;
   private final CVC4Environment env;
 
-  protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator, CVC4UnsafeFormulaManager ufmgr) {
+  protected CVC4BooleanFormulaManager(
+      CVC4FormulaCreator pCreator, CVC4IntrospectionFormulaManager ufmgr) {
     super(pCreator, ufmgr);
     env = pCreator.getEnv();
     exprManager = env.getExprManager();

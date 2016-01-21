@@ -63,7 +63,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
   @SuppressWarnings("checkstyle:parameternumber")
   Z3FormulaManager(
       Z3FormulaCreator pFormulaCreator,
-      Z3UnsafeFormulaManager pUnsafeManager,
+      Z3IntrospectionFormulaManager pIntrospectionManager,
       Z3FunctionFormulaManager pFunctionManager,
       Z3BooleanFormulaManager pBooleanManager,
       Z3IntegerFormulaManager pIntegerManager,
@@ -77,7 +77,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
       throws InvalidConfigurationException {
     super(
         pFormulaCreator,
-        pUnsafeManager,
+        pIntrospectionManager,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
@@ -203,7 +203,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
 
   @Override
   public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
+    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   @Override

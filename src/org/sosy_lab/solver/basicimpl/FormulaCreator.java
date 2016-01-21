@@ -120,6 +120,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
+  public Formula encapsulateWithTypeOf(TFormulaInfo pTerm) {
+    return encapsulate(getFormulaType(pTerm), pTerm);
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(FormulaType<T> pType, TFormulaInfo pTerm) {
     assert pType.equals(getFormulaType(pTerm))

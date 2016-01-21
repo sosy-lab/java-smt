@@ -36,7 +36,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
 
   CVC4FormulaManager(
       FormulaCreator<Expr, Type, CVC4Environment> pFormulaCreator,
-      CVC4UnsafeFormulaManager pUfmgr,
+      CVC4IntrospectionFormulaManager pUfmgr,
       CVC4FunctionFormulaManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr) {
@@ -62,7 +62,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
 
   @Override
   public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return getUnsafeFormulaManager().visit(rFormulaVisitor, f);
+    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   @Override

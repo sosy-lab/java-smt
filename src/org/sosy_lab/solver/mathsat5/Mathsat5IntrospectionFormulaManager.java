@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
@@ -28,20 +27,12 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_return_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_function_type;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_roundingmode_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
@@ -56,45 +47,27 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.FuncDeclKind;
-import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractIntrospectionFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Long, Long> {
+class Mathsat5IntrospectionFormulaManager
+    extends AbstractIntrospectionFormulaManager<Long, Long, Long> {
 
   private final long msatEnv;
   private final Mathsat5FormulaCreator formulaCreator;
 
-  Mathsat5UnsafeFormulaManager(Mathsat5FormulaCreator pCreator) {
+  Mathsat5IntrospectionFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.msatEnv = pCreator.getEnv();
     this.formulaCreator = pCreator;
   }
 
   @Override
-  public int getArity(Long pT) {
-    return msat_term_arity(pT);
-  }
-
-  @Override
-  public Formula getArg(Formula pF, int pN) {
-    long f = Mathsat5FormulaManager.getMsatTerm(pF);
-    long arg = msat_term_get_arg(f, pN);
-    if (msat_is_fp_roundingmode_type(msatEnv, msat_term_get_type(arg))) {
-      // We have terms that are of type fp_roundingmode
-      // (for example, arguments to floating-point arithmetic operators),
-      // but we do not want to work with them.
-      // So we just return an untyped formula here.
-      return new Mathsat5Formula(arg) {};
-    }
-    return super.getArg(pF, pN);
-  }
-
-  @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
-    int arity = getArity(f);
+    int arity = msat_term_arity(f);
     if (msat_term_is_number(msatEnv, f)) {
 
       // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
@@ -103,18 +76,17 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
       return visitor.visitConstant(formula, true);
     } else if (msat_term_is_false(msatEnv, f)) {
       return visitor.visitConstant(formula, false);
-    } else if (isVariable(f)) {
-      return visitor.visitFreeVariable(formula, getName(f));
+    } else if (msat_term_is_constant(msatEnv, f)) {
+      return visitor.visitFreeVariable(formula, msat_term_repr(f));
     } else {
 
       List<Formula> args = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {
-        long arg = getArg(f, i);
+        long arg = msat_term_get_arg(f, i);
         FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
         args.add(formulaCreator.encapsulate(argumentType, arg));
       }
 
-      final FormulaType<?> type = formulaCreator.getFormulaType(f);
       String name = getName(f);
 
       // Any function application.
@@ -122,7 +94,7 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
           new Function<List<Formula>, Formula>() {
             @Override
             public Formula apply(List<Formula> formulas) {
-              return replaceArgs(formulaCreator.encapsulate(type, f), formulas);
+              return formulaCreator.encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
             }
           };
       return visitor.visitFuncApp(
@@ -130,49 +102,17 @@ class Mathsat5UnsafeFormulaManager extends AbstractUnsafeFormulaManager<Long, Lo
     }
   }
 
-  @Override
-  public Long getArg(Long t, int n) {
-    return msat_term_get_arg(t, n);
-  }
-
-  @Override
-  public boolean isVariable(Long t) {
-    return msat_term_is_constant(msatEnv, t);
-  }
-
-  public String getName(Long t) {
-    if (isVariable(t)) {
+  private String getName(Long t) {
+    if (msat_term_is_constant(msatEnv, t)) {
       return msat_term_repr(t);
     } else {
       return msat_decl_get_name(msat_term_get_decl(t));
     }
   }
 
-  @Override
-  public Long replaceArgs(Long t, List<Long> newArgs) {
+  private Long replaceArgs(Long t, List<Long> newArgs) {
     long tDecl = msat_term_get_decl(t);
     return msat_make_term(msatEnv, tDecl, Longs.toArray(newArgs));
-  }
-
-  @Override
-  public Long replaceArgsAndName(Long t, String newName, List<Long> newArgs) {
-    if (msat_term_is_uf(msatEnv, t)) {
-      long decl = msat_term_get_decl(t);
-      int arity = msat_decl_get_arity(decl);
-      long retType = msat_decl_get_return_type(decl);
-      long[] argTypes = new long[arity];
-      for (int i = 0; i < arity; i++) {
-        argTypes[i] = msat_decl_get_arg_type(decl, i);
-      }
-      long funcType = msat_get_function_type(msatEnv, argTypes, argTypes.length, retType);
-      long funcDecl = msat_declare_function(msatEnv, newName, funcType);
-      return msat_make_uf(msatEnv, funcDecl, Longs.toArray(newArgs));
-    } else if (isVariable(t)) {
-      checkArgument(newArgs.isEmpty());
-      return formulaCreator.makeVariable(msat_term_get_type(t), newName);
-    } else {
-      throw new IllegalArgumentException("Can't set the name from the given formula!");
-    }
   }
 
   private FuncDeclKind getDeclarationKind(long pF) {

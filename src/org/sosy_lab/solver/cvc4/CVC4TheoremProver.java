@@ -165,7 +165,8 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
         Object valueOfExpr = model.get(importantFormulas[j].toString());
 
         if (valueOfExpr instanceof Boolean && !((Boolean) valueOfExpr)) {
-          valuesOfModel[j] = getCVC4Expr(bfmgr.not(encapsulateBoolean.apply(importantFormulas[j])));
+          valuesOfModel[j] =
+              getCVC4Expr(bfmgr.not(mgr.encapsulateBooleanFormula(importantFormulas[j])));
         } else {
           valuesOfModel[j] = importantFormulas[j];
         }

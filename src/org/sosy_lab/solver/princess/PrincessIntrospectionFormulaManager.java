@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.princess.PrincessUtil.isBoolean;
 import static org.sosy_lab.solver.princess.PrincessUtil.isUIF;
 
@@ -38,68 +37,28 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FuncDecl;
 import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.solver.basicimpl.AbstractUnsafeFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractIntrospectionFormulaManager;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class PrincessUnsafeFormulaManager
-    extends AbstractUnsafeFormulaManager<IExpression, TermType, PrincessEnvironment> {
+class PrincessIntrospectionFormulaManager
+    extends AbstractIntrospectionFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
   private final PrincessFormulaCreator formulaCreator;
 
-  PrincessUnsafeFormulaManager(PrincessFormulaCreator pCreator) {
+  PrincessIntrospectionFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);
     formulaCreator = pCreator;
   }
 
-  @Override
-  public int getArity(IExpression pT) {
-    return PrincessUtil.getArity(pT);
-  }
-
-  @Override
-  public IExpression getArg(IExpression pT, int pN) {
-    return PrincessUtil.getArg(pT, pN);
-  }
-
-  @Override
-  public boolean isVariable(IExpression pT) {
-    return PrincessUtil.isVariable(pT);
-  }
-
-  @Override
-  public IExpression replaceArgs(IExpression pT, List<IExpression> newArgs) {
+  private IExpression replaceArgs(IExpression pT, List<IExpression> newArgs) {
     return PrincessUtil.replaceArgs(pT, newArgs);
   }
 
-  TermType getType(IExpression t) {
+  private TermType getType(IExpression t) {
     return isBoolean(t) ? TermType.Boolean : TermType.Integer;
-  }
-
-  @Override
-  public IExpression replaceArgsAndName(IExpression t, String pNewName, List<IExpression> newArgs) {
-
-    if (isVariable(t)) {
-      checkArgument(newArgs.isEmpty());
-
-      // when no new name is given we need to use the old variable
-      if (t.toString().equals(pNewName)) {
-        return t;
-      }
-
-      return getFormulaCreator().makeVariable(getType(t), pNewName);
-
-    } else if (PrincessUtil.isUIF(t)) {
-      IFunApp fun = (IFunApp) t;
-      PrincessEnvironment env = getFormulaCreator().getEnv();
-      TermType returnType = env.getReturnTypeForFunction(fun.fun());
-      return env.makeFunction(env.declareFun(pNewName, fun.args().size(), returnType), newArgs);
-
-    } else {
-      throw new IllegalArgumentException("The Term " + t + " has no name!");
-    }
   }
 
   @Override
@@ -125,20 +84,19 @@ class PrincessUnsafeFormulaManager
           body);
     } else if (PrincessUtil.isBoundByQuantifier(input)) {
       return visitor.visitBoundVariable(f, PrincessUtil.getIndex(input));
-    } else if (isVariable(input)) {
+    } else if (PrincessUtil.isVariable(input)) {
       return visitor.visitFreeVariable(f, input.toString());
     } else {
-      int arity = getArity(input);
+      int arity = PrincessUtil.getArity(input);
       String name;
       if (isUIF(input)) {
         name = ((IFunApp) input).fun().name();
       } else {
         name = toString();
       }
-      final FormulaType<?> type = formulaCreator.getFormulaType(input);
       List<Formula> args = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {
-        IExpression arg = getArg(input, i);
+        IExpression arg = PrincessUtil.getArg(input, i);
         FormulaType<?> argumentType = formulaCreator.getFormulaType(arg);
         args.add(formulaCreator.encapsulate(argumentType, arg));
       }
@@ -148,7 +106,8 @@ class PrincessUnsafeFormulaManager
           new Function<List<Formula>, Formula>() {
             @Override
             public Formula apply(List<Formula> formulas) {
-              return replaceArgs(formulaCreator.encapsulate(type, input), formulas);
+              return formulaCreator.encapsulateWithTypeOf(
+                  PrincessUtil.replaceArgs(input, extractInfo(formulas)));
             }
           };
       return visitor.visitFuncApp(
@@ -171,7 +130,7 @@ class PrincessUnsafeFormulaManager
       return FuncDeclKind.IFF;
     } else if (PrincessUtil.isIfThenElse(input)) {
       return FuncDeclKind.ITE;
-    } else if (isVariable(input)) {
+    } else if (PrincessUtil.isVariable(input)) {
       return FuncDeclKind.VAR;
     } else {
 

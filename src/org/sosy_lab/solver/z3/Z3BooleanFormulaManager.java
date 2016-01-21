@@ -41,10 +41,10 @@ import java.util.Collection;
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
 
   private final long z3context;
-  private final Z3UnsafeFormulaManager ufmgr;
+  private final Z3IntrospectionFormulaManager ufmgr;
   private final Z3FormulaCreator creator;
 
-  Z3BooleanFormulaManager(Z3FormulaCreator creator, Z3UnsafeFormulaManager ufmgr) {
+  Z3BooleanFormulaManager(Z3FormulaCreator creator, Z3IntrospectionFormulaManager ufmgr) {
     super(creator, ufmgr);
     z3context = creator.getEnv();
     this.creator = creator;

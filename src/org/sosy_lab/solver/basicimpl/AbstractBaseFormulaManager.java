@@ -31,7 +31,7 @@ import org.sosy_lab.solver.api.FormulaType;
  */
 abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> {
 
-  private final FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator;
+  protected final FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator;
 
   final Function<Formula, TFormulaInfo> extractor =
       new Function<Formula, TFormulaInfo>() {

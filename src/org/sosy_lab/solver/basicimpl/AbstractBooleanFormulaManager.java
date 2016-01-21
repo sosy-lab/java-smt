@@ -45,13 +45,13 @@ import java.util.List;
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
 
-  private final AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ufmgr;
+  private final AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv> ifmgr;
 
   protected AbstractBooleanFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv> pCreator,
-      AbstractUnsafeFormulaManager<TFormulaInfo, TType, TEnv> ufmgr) {
+      AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv> ifmgr) {
     super(pCreator);
-    this.ufmgr = ufmgr;
+    this.ifmgr = ifmgr;
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -217,7 +217,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   @Override
   public <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula pFormula) {
-    return ufmgr.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
+    return ifmgr.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
@@ -337,13 +337,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         return;
       }
     }
-  }
-
-  /**
-   * Syntax sugar for type casting.
-   */
-  protected final BooleanFormula getArg(TFormulaInfo pF, int index) {
-    return getFormulaCreator().encapsulateBoolean(ufmgr.getArg(pF, index));
   }
 
   private static List<BooleanFormula> checkedCast(List<Formula> list) {

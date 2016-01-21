@@ -94,7 +94,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @SuppressWarnings("checkstyle:parameternumber")
   private Z3SolverContext(
       Z3FormulaCreator pFormulaCreator,
-      Z3UnsafeFormulaManager pUnsafeManager,
+      Z3IntrospectionFormulaManager pIntrospectionManager,
       Z3FunctionFormulaManager pFunctionManager,
       Z3BooleanFormulaManager pBooleanManager,
       Z3IntegerFormulaManager pIntegerManager,
@@ -196,9 +196,10 @@ public final class Z3SolverContext extends AbstractSolverContext {
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config);
 
     // Create managers
-    Z3UnsafeFormulaManager unsafeManager = new Z3UnsafeFormulaManager(creator);
+    Z3IntrospectionFormulaManager introspectionManager = new Z3IntrospectionFormulaManager(creator);
     Z3FunctionFormulaManager functionTheory = new Z3FunctionFormulaManager(creator);
-    Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator, unsafeManager);
+    Z3BooleanFormulaManager booleanTheory =
+        new Z3BooleanFormulaManager(creator, introspectionManager);
     Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
     Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
@@ -213,7 +214,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3FormulaManager manager =
         new Z3FormulaManager(
             creator,
-            unsafeManager,
+            introspectionManager,
             functionTheory,
             booleanTheory,
             integerTheory,
@@ -226,7 +227,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             logger);
     return new Z3SolverContext(
         creator,
-        unsafeManager,
+        introspectionManager,
         functionTheory,
         booleanTheory,
         integerTheory,
