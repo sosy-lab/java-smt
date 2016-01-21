@@ -82,10 +82,14 @@ class SmtInterpolRationalFormulaManager
 
   @Override
   public Term divide(Term pNumber1, Term pNumber2) {
-    Sort intSort = pNumber1.getTheory().getNumericSort();
-    Sort realSort = pNumber1.getTheory().getRealSort();
-    assert intSort.equals(pNumber1.getSort()) || realSort.equals(pNumber1.getSort());
-    assert intSort.equals(pNumber2.getSort()) || realSort.equals(pNumber2.getSort());
-    return getFormulaCreator().getEnv().term("/", pNumber1, pNumber2);
+    if (isNumeral(pNumber2)) {
+      Sort intSort = pNumber1.getTheory().getNumericSort();
+      Sort realSort = pNumber1.getTheory().getRealSort();
+      assert intSort.equals(pNumber1.getSort()) || realSort.equals(pNumber1.getSort());
+      assert intSort.equals(pNumber2.getSort()) || realSort.equals(pNumber2.getSort());
+      return getFormulaCreator().getEnv().term("/", pNumber1, pNumber2);
+    } else {
+      return super.divide(pNumber1, pNumber2);
+    }
   }
 }
