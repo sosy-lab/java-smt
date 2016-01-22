@@ -67,11 +67,9 @@ public final class PrincessSolverContext extends AbstractSolverContext {
         new PrincessFormulaCreator(env, TermType.Boolean, TermType.Integer);
 
     // Create managers
-    PrincessIntrospectionFormulaManager introspectionManager =
-        new PrincessIntrospectionFormulaManager(creator);
     PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
     PrincessBooleanFormulaManager booleanTheory =
-        new PrincessBooleanFormulaManager(creator, introspectionManager);
+        new PrincessBooleanFormulaManager(creator);
     PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
@@ -79,7 +77,6 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
             creator,
-            introspectionManager,
             functionTheory,
             booleanTheory,
             integerTheory,

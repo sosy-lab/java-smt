@@ -49,7 +49,6 @@ final class PrincessFormulaManager
   @SuppressWarnings("checkstyle:parameternumber")
   PrincessFormulaManager(
       PrincessFormulaCreator pCreator,
-      PrincessIntrospectionFormulaManager introspectionManager,
       PrincessFunctionFormulaManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
@@ -57,7 +56,6 @@ final class PrincessFormulaManager
       PrincessQuantifiedFormulaManager pQuantifierManager) {
     super(
         pCreator,
-        introspectionManager,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
@@ -82,11 +80,6 @@ final class PrincessFormulaManager
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     return getEnvironment().dumpFormula((IFormula) formula);
-  }
-
-  @Override
-  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   @Override

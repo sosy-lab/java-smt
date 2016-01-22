@@ -42,7 +42,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,6 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   @SuppressWarnings("checkstyle:parameternumber")
   Mathsat5FormulaManager(
       Mathsat5FormulaCreator creator,
-      Mathsat5IntrospectionFormulaManager introspectionManager,
       Mathsat5FunctionFormulaManager pFunctionManager,
       Mathsat5BooleanFormulaManager pBooleanManager,
       Mathsat5IntegerFormulaManager pIntegerManager,
@@ -62,7 +60,6 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       Mathsat5ArrayFormulaManager pArrayManager) {
     super(
         creator,
-        introspectionManager,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
@@ -144,10 +141,5 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       }
     }
     return ImmutableList.of(pF);
-  }
-
-  @Override
-  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return introspectionManager.visit(rFormulaVisitor, f);
   }
 }

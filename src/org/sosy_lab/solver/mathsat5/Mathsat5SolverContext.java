@@ -153,11 +153,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
 
     // Create managers
-    Mathsat5IntrospectionFormulaManager introspectionManager =
-        new Mathsat5IntrospectionFormulaManager(creator);
     Mathsat5FunctionFormulaManager functionTheory = new Mathsat5FunctionFormulaManager(creator);
     Mathsat5BooleanFormulaManager booleanTheory =
-        new Mathsat5BooleanFormulaManager(creator, introspectionManager);
+        new Mathsat5BooleanFormulaManager(creator);
     Mathsat5IntegerFormulaManager integerTheory = new Mathsat5IntegerFormulaManager(creator);
     Mathsat5RationalFormulaManager rationalTheory = new Mathsat5RationalFormulaManager(creator);
     Mathsat5BitvectorFormulaManager bitvectorTheory =
@@ -168,7 +166,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
             creator,
-            introspectionManager,
             functionTheory,
             booleanTheory,
             integerTheory,

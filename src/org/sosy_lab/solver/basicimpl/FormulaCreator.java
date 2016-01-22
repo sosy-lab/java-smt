@@ -21,6 +21,9 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -38,6 +41,7 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.BooleanFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 
@@ -59,7 +63,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   private final TType boolType;
   private final @Nullable TType integerType;
   private final @Nullable TType rationalType;
-  private final TEnv environment;
+  protected final TEnv environment;
 
   protected FormulaCreator(
       TEnv env, TType boolType, @Nullable TType pIntegerType, @Nullable TType pRationalType) {
@@ -199,5 +203,24 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   public <T extends Formula, TF> UfDeclaration<T> createUfDeclaration(
       FormulaType<T> returnType, TF funcDecl, List<FormulaType<?>> argumentTypes) {
     return new UfDeclarationImpl<>(returnType, funcDecl, argumentTypes);
+  }
+
+  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
+    return visit(visitor, input, extractInfo(input));
+  }
+
+  public abstract <R> R visit(FormulaVisitor<R> visitor,
+                              final Formula formula,
+                              final TFormulaInfo f);
+
+  protected List<TFormulaInfo> extractInfo(List<Formula> input) {
+    return Lists.transform(
+        input,
+        new Function<Formula, TFormulaInfo>() {
+          @Override
+          public TFormulaInfo apply(Formula formula) {
+            return extractInfo(formula);
+          }
+        });
   }
 }

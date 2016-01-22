@@ -52,7 +52,6 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
-import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.io.IOException;
 import java.util.List;
@@ -63,7 +62,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
   @SuppressWarnings("checkstyle:parameternumber")
   Z3FormulaManager(
       Z3FormulaCreator pFormulaCreator,
-      Z3IntrospectionFormulaManager pIntrospectionManager,
       Z3FunctionFormulaManager pFunctionManager,
       Z3BooleanFormulaManager pBooleanManager,
       Z3IntegerFormulaManager pIntegerManager,
@@ -77,7 +75,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
       throws InvalidConfigurationException {
     super(
         pFormulaCreator,
-        pIntrospectionManager,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
@@ -199,11 +196,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
       }
     }
     return ImmutableList.of(pF);
-  }
-
-  @Override
-  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   @Override

@@ -45,13 +45,9 @@ import java.util.List;
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
 
-  private final AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv> ifmgr;
-
   protected AbstractBooleanFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator,
-      AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv> ifmgr) {
+      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
-    this.ifmgr = ifmgr;
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -217,7 +213,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
   @Override
   public <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula pFormula) {
-    return ifmgr.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
+    return formulaCreator.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {

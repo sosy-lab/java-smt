@@ -31,7 +31,9 @@
           <root url="jar://$MODULE_DIR$/lib/java/runtime/guava.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/guava-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">

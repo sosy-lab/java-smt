@@ -45,12 +45,11 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     CVC4FormulaCreator creator = new CVC4FormulaCreator(env);
 
     // Create managers
-    CVC4IntrospectionFormulaManager ufmgr = new CVC4IntrospectionFormulaManager(creator);
     CVC4FunctionFormulaManager ffmgr = new CVC4FunctionFormulaManager(creator);
-    CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator, ufmgr);
+    CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator);
     CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
 
-    CVC4FormulaManager manager = new CVC4FormulaManager(creator, ufmgr, ffmgr, bfmgr, ifmgr);
+    CVC4FormulaManager manager = new CVC4FormulaManager(creator, ffmgr, bfmgr, ifmgr);
     return new CVC4SolverContext(config, logger, manager);
   }
 

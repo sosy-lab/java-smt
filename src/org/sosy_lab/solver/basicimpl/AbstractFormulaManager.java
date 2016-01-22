@@ -72,9 +72,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   private final AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager;
 
-  protected final AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv>
-      introspectionManager;
-
   private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
       quantifiedManager;
 
@@ -86,7 +83,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator,
-      AbstractIntrospectionFormulaManager<TFormulaInfo, TType, TEnv> introspectionManager,
       AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager,
       @Nullable IntegerFormulaManager pIntegerManager,
@@ -104,11 +100,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     this.rationalManager = pRationalManager;
     this.bitvectorManager = bitvectorManager;
     this.floatingPointManager = floatingPointManager;
-    this.introspectionManager = checkNotNull(introspectionManager, "unsafe manager needed");
     this.formulaCreator = pFormulaCreator;
 
     if (booleanManager.getFormulaCreator() != formulaCreator
-        || introspectionManager.getFormulaCreator() != formulaCreator
         || functionManager.getFormulaCreator() != formulaCreator
         || (bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
         || (floatingPointManager != null
@@ -222,8 +216,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
+    return formulaCreator.visit(visitor, input);
+  }
+
+  @Override
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    introspectionManager.visitRecursively(pFormulaVisitor, pF);
+    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
+    recVisitor.addToQueue(pF);
+    while (!recVisitor.isQueueEmpty()) {
+      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
   }
 
   /**

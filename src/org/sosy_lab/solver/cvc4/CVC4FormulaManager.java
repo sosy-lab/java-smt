@@ -36,11 +36,10 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
 
   CVC4FormulaManager(
       FormulaCreator<Expr, Type, CVC4Environment> pFormulaCreator,
-      CVC4IntrospectionFormulaManager pUfmgr,
       CVC4FunctionFormulaManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr) {
-    super(pFormulaCreator, pUfmgr, pFfmgr, pBfmgr, pIfmgr, null, null, null, null, null);
+    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, null, null, null, null, null);
   }
 
   static Expr getCVC4Expr(Formula pT) {
@@ -58,11 +57,6 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return introspectionManager.visit(rFormulaVisitor, f);
   }
 
   @Override

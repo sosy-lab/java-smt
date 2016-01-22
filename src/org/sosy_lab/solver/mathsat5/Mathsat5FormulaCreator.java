@@ -20,6 +20,16 @@
 package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_element_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_index_type;
@@ -39,9 +49,21 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_term;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_number;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_type_repr;
+
+import com.google.common.base.Function;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
@@ -51,6 +73,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
+import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5ArrayFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BitvectorFormula;
@@ -58,6 +82,10 @@ import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BooleanFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5FloatingPointFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5IntegerFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5RationalFormula;
+import org.sosy_lab.solver.visitors.FormulaVisitor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
@@ -219,5 +247,79 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
     //    return allocatedArraySort;
     return msat_get_array_type(getEnv(), pIndexType, pElementType);
     //throw new IllegalArgumentException("MathSAT5.getArrayType(): Implement me!");
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
+    int arity = msat_term_arity(f);
+    if (msat_term_is_number(environment, f)) {
+
+      // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
+      return visitor.visitConstant(formula, msat_term_repr(f));
+    } else if (msat_term_is_true(environment, f)) {
+      return visitor.visitConstant(formula, true);
+    } else if (msat_term_is_false(environment, f)) {
+      return visitor.visitConstant(formula, false);
+    } else if (msat_term_is_constant(environment, f)) {
+      return visitor.visitFreeVariable(formula, msat_term_repr(f));
+    } else {
+
+      List<Formula> args = new ArrayList<>(arity);
+      for (int i = 0; i < arity; i++) {
+        long arg = msat_term_get_arg(f, i);
+        FormulaType<?> argumentType = getFormulaType(arg);
+        args.add(encapsulate(argumentType, arg));
+      }
+
+      String name = msat_decl_get_name(msat_term_get_decl(f));
+
+      // Any function application.
+      Function<List<Formula>, Formula> constructor =
+          new Function<List<Formula>, Formula>() {
+            @Override
+            public Formula apply(List<Formula> formulas) {
+              return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
+            }
+          };
+      return visitor.visitFuncApp(
+          formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
+    }
+  }
+
+  private Long replaceArgs(Long t, List<Long> newArgs) {
+    long tDecl = msat_term_get_decl(t);
+    return msat_make_term(environment, tDecl, Longs.toArray(newArgs));
+  }
+
+  private FuncDeclKind getDeclarationKind(long pF) {
+    if (msat_term_is_uf(environment, pF)) {
+      return FuncDeclKind.UF;
+    } else if (msat_term_is_constant(environment, pF)) {
+      return FuncDeclKind.VAR;
+    }
+
+    long decl = msat_term_get_decl(pF);
+    int tag = msat_decl_get_tag(environment, decl);
+    switch (tag) {
+      case MSAT_TAG_AND:
+        return FuncDeclKind.AND;
+      case MSAT_TAG_NOT:
+        return FuncDeclKind.NOT;
+      case MSAT_TAG_OR:
+        return FuncDeclKind.OR;
+      case MSAT_TAG_IFF:
+        return FuncDeclKind.IFF;
+      case MSAT_TAG_ITE:
+        return FuncDeclKind.ITE;
+
+      case MSAT_TAG_PLUS:
+        return FuncDeclKind.ADD;
+      case MSAT_TAG_LEQ:
+        return FuncDeclKind.LTE;
+      case MSAT_TAG_EQ:
+        return FuncDeclKind.EQ;
+      default:
+        return FuncDeclKind.OTHER;
+    }
   }
 }
