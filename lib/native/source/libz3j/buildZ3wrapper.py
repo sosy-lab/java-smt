@@ -13,7 +13,6 @@ HEADER = '''// THIS FILE IS BUILD AUTOMATICALLY, DO NOT CHANGE!!!
 #include<stdlib.h>
 #include"z3.h"
 
-// include CPAchecker-specific parts
 #include"includes/function.h"
 #include"includes/arguments.h"
 #include"includes/types.h"
