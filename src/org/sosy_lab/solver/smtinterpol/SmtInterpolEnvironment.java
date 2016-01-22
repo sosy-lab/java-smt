@@ -71,7 +71,7 @@ import javax.annotation.Nullable;
  * so functions remain declared, if levels are popped.
  * This Wrapper allows to set a logfile for all Smt-Queries (default "smtinterpol.smt2").
  */
-@Options(prefix = "solver.smtinterpol")
+@Options(deprecatedPrefix = "cpa.predicate.solver.smtinterpol", prefix = "solver.smtinterpol")
 class SmtInterpolEnvironment {
 
   @Option(

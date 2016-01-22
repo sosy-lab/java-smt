@@ -57,7 +57,7 @@ import javax.annotation.Nullable;
  *
  * <p>Main entry point.
  */
-@Options(prefix = "solver")
+@Options(prefix = "solver", deprecatedPrefix = "cpa.predicate")
 public class SolverContextFactory {
 
   @VisibleForTesting
