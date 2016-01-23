@@ -102,14 +102,14 @@ class SmtInterpolUtil {
 
   /** converts a term to a number,
    * currently only Double is supported. */
-  public static Object toNumber(Term t) {
+  public static Number toNumber(Term t) {
     assert isNumber(t) : "term is not a number: " + t;
 
     // ConstantTerm with Number --> "123"
     if (t instanceof ConstantTerm) {
       Object value = ((ConstantTerm) t).getValue();
       if (value instanceof Number) {
-        return value;
+        return (Number) value;
       } else if (value instanceof Rational) {
         Rational rat = (Rational) value;
         if (t.getSort().getName().equals("Int") && rat.isIntegral()) {

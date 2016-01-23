@@ -146,8 +146,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
         input);
 
     if (SmtInterpolUtil.isNumber(input)) {
-      final Object value = SmtInterpolUtil.toNumber(input);
-      assert value instanceof Number;
+      final Number value = SmtInterpolUtil.toNumber(input);
       return visitor.visitConstant(f, value);
 
     } else if (input instanceof ApplicationTerm) {
