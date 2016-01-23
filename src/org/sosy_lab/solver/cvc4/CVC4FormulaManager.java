@@ -27,7 +27,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 import java.util.Map;
