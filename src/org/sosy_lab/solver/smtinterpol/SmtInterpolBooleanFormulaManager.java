@@ -43,9 +43,7 @@ class SmtInterpolBooleanFormulaManager
   private final Theory theory;
   private final SmtInterpolFormulaCreator formulaCreator;
 
-  SmtInterpolBooleanFormulaManager(
-      SmtInterpolFormulaCreator creator,
-      Theory pTheory) {
+  SmtInterpolBooleanFormulaManager(SmtInterpolFormulaCreator creator, Theory pTheory) {
     super(creator);
     theory = pTheory;
     formulaCreator = creator;

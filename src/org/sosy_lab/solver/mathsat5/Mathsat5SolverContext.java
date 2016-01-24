@@ -154,8 +154,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     // Create managers
     Mathsat5FunctionFormulaManager functionTheory = new Mathsat5FunctionFormulaManager(creator);
-    Mathsat5BooleanFormulaManager booleanTheory =
-        new Mathsat5BooleanFormulaManager(creator);
+    Mathsat5BooleanFormulaManager booleanTheory = new Mathsat5BooleanFormulaManager(creator);
     Mathsat5IntegerFormulaManager integerTheory = new Mathsat5IntegerFormulaManager(creator);
     Mathsat5RationalFormulaManager rationalTheory = new Mathsat5RationalFormulaManager(creator);
     Mathsat5BitvectorFormulaManager bitvectorTheory =

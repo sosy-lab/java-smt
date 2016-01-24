@@ -152,29 +152,29 @@ class Z3Model {
       lArguments[i] = lValue;
     }
 
-
     return new Function(lName, lType, lArguments);
   }
 
-  static Number termToNumber(long z3context, long arg)
-      throws IllegalArgumentException {
+  static Number termToNumber(long z3context, long arg) throws IllegalArgumentException {
     Preconditions.checkState(get_ast_kind(z3context, arg) == Z3_NUMERAL_AST);
     long argSort = get_sort(z3context, arg);
     int sortKind = get_sort_kind(z3context, argSort);
     switch (sortKind) {
-      case Z3_INT_SORT: {
-        return new BigInteger(get_numeral_string(z3context, arg));
-      }
-      case Z3_REAL_SORT: {
-        String s = get_numeral_string(z3context, arg);
-        return Rational.ofString(s);
-      }
-      case Z3_BV_SORT: {
-        return interpretBitvector(z3context, arg);
-      }
+      case Z3_INT_SORT:
+        {
+          return new BigInteger(get_numeral_string(z3context, arg));
+        }
+      case Z3_REAL_SORT:
+        {
+          String s = get_numeral_string(z3context, arg);
+          return Rational.ofString(s);
+        }
+      case Z3_BV_SORT:
+        {
+          return interpretBitvector(z3context, arg);
+        }
       default:
-        throw new IllegalArgumentException(
-            "Can't parse: " + ast_to_string(z3context, arg));
+        throw new IllegalArgumentException("Can't parse: " + ast_to_string(z3context, arg));
     }
   }
 

@@ -103,8 +103,7 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
     } else if (PrincessUtil.isQuantifier(input)) {
-      BooleanFormula body =
-          encapsulateBoolean(PrincessUtil.getQuantifierBody(input));
+      BooleanFormula body = encapsulateBoolean(PrincessUtil.getQuantifierBody(input));
       return visitor.visitQuantifier(
           (BooleanFormula) f,
           PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS,
@@ -139,8 +138,7 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
           new Function<List<Formula>, Formula>() {
             @Override
             public Formula apply(List<Formula> formulas) {
-              return encapsulateWithTypeOf(
-                  PrincessUtil.replaceArgs(input, extractInfo(formulas)));
+              return encapsulateWithTypeOf(PrincessUtil.replaceArgs(input, extractInfo(formulas)));
             }
           };
       return visitor.visitFuncApp(

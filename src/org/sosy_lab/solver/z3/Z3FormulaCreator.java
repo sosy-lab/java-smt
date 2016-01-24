@@ -330,10 +330,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   }
 
   @Override
-  public <R> R visit(
-      FormulaVisitor<R> visitor,
-      final Formula formula,
-      final Long f) {
+  public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (get_ast_kind(environment, f)) {
       case Z3_NUMERAL_AST:
         // TODO extract logic from Z3Model for conversion from string to number and use it here
@@ -397,9 +394,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
       long varName = get_quantifier_bound_name(environment, f, i);
       long varSort = get_quantifier_bound_sort(environment, f, i);
       boundVars.add(
-          encapsulate(
-              getFormulaTypeFromSort(varSort),
-              mk_const(environment, varName, varSort)));
+          encapsulate(getFormulaTypeFromSort(varSort), mk_const(environment, varName, varSort)));
     }
     return boundVars;
   }

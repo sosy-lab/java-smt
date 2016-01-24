@@ -40,8 +40,7 @@ import scala.Enumeration;
 class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
 
-  PrincessBooleanFormulaManager(
-      PrincessFormulaCreator creator) {
+  PrincessBooleanFormulaManager(PrincessFormulaCreator creator) {
     super(creator);
   }
 

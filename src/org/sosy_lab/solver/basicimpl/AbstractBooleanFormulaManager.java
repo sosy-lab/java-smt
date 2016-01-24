@@ -45,8 +45,7 @@ import java.util.List;
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
 
-  protected AbstractBooleanFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractBooleanFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
     super(pCreator);
   }
 

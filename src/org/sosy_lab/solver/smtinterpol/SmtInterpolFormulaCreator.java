@@ -134,8 +134,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   }
 
   private Term replaceArgs(Term pT, List<Term> newArgs) {
-    return SmtInterpolUtil.replaceArgs(
-        getEnv(), pT, SmtInterpolUtil.toTermArray(newArgs));
+    return SmtInterpolUtil.replaceArgs(getEnv(), pT, SmtInterpolUtil.toTermArray(newArgs));
   }
 
   @Override
@@ -174,8 +173,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
             new Function<List<Formula>, Formula>() {
               @Override
               public Formula apply(List<Formula> formulas) {
-                return encapsulateWithTypeOf(
-                    replaceArgs(input, extractInfo(formulas)));
+                return encapsulateWithTypeOf(replaceArgs(input, extractInfo(formulas)));
               }
             };
         return visitor.visitFuncApp(
