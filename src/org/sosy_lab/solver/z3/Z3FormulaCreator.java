@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
@@ -338,7 +337,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     switch (get_ast_kind(environment, f)) {
       case Z3_NUMERAL_AST:
         // TODO extract logic from Z3Model for conversion from string to number and use it here
-        return visitor.visitConstant(formula, ast_to_string(environment, f));
+        return visitor.visitConstant(formula, Z3Model.termToNumber(environment, f));
       case Z3_APP_AST:
         String name = getName(f);
         int arity = get_app_num_args(environment, f);

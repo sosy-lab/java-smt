@@ -25,6 +25,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
@@ -44,6 +46,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
@@ -123,20 +126,17 @@ class Z3Model {
       long argSort = get_sort(z3context, arg);
       int sortKind = get_sort_kind(z3context, argSort);
       switch (sortKind) {
+        case Z3_BOOL_SORT:
+          {
+            long declKind = get_decl_kind(z3context, get_app_decl(z3context, arg));
+            lValue = declKind == Z3_OP_TRUE;
+            break;
+          }
         case Z3_INT_SORT:
-          {
-            lValue = new BigInteger(get_numeral_string(z3context, arg));
-            break;
-          }
         case Z3_REAL_SORT:
-          {
-            String s = get_numeral_string(z3context, arg);
-            lValue = Rational.ofString(s);
-            break;
-          }
         case Z3_BV_SORT:
           {
-            lValue = interpretBitvector(z3context, arg);
+            lValue = termToNumber(z3context, arg);
             break;
           }
         default:
@@ -152,7 +152,30 @@ class Z3Model {
       lArguments[i] = lValue;
     }
 
+
     return new Function(lName, lType, lArguments);
+  }
+
+  static Number termToNumber(long z3context, long arg)
+      throws IllegalArgumentException {
+    Preconditions.checkState(get_ast_kind(z3context, arg) == Z3_NUMERAL_AST);
+    long argSort = get_sort(z3context, arg);
+    int sortKind = get_sort_kind(z3context, argSort);
+    switch (sortKind) {
+      case Z3_INT_SORT: {
+        return new BigInteger(get_numeral_string(z3context, arg));
+      }
+      case Z3_REAL_SORT: {
+        String s = get_numeral_string(z3context, arg);
+        return Rational.ofString(s);
+      }
+      case Z3_BV_SORT: {
+        return interpretBitvector(z3context, arg);
+      }
+      default:
+        throw new IllegalArgumentException(
+            "Can't parse: " + ast_to_string(z3context, arg));
+    }
   }
 
   private static AssignableTerm toAssignable(long z3context, long expr) {
@@ -237,28 +260,11 @@ class Z3Model {
     return model.build();
   }
 
-  /* INFO:
-   * There are 2 representations for BVs, depending on the length:
-   * (display (_ bv10 6)) -> #b001010, length=6
-   * (display (_ bv10 8)) -> #x0a, length=8, 8 modulo 4 == 0
-   */
-  private static Object interpretBitvector(long z3context, long bv) {
+  private static BigInteger interpretBitvector(long z3context, long bv) {
     long argSort = get_sort(z3context, bv);
     int sortKind = get_sort_kind(z3context, argSort);
     Preconditions.checkArgument(sortKind == Z3_BV_SORT);
-    //    int size = get_bv_sort_size(z3context, argSort);
-
-    return ast_to_string(z3context, bv);
-
-    // TODO make BigInteger from BV? signed/unsigned?
-
-    // next lines are not working, mk_bv2int can only handle short BVs (<31 bit)
-    //    boolean isSigned = false;
-    //    long numExpr = mk_bv2int(z3context, bv, isSigned);
-    //    PointerToInt p = new PointerToInt();
-    //    boolean check = get_numeral_int(z3context, numExpr, p);
-    //    Preconditions.checkState(check);
-    //    return p.value;
+    return new BigInteger(get_numeral_string(z3context, bv));
   }
 
   /** Delays the conversion to string. */
