@@ -237,7 +237,7 @@ class Mathsat5Model {
 
   //TODO: change this to the latest version
   // (if possible try to use a BitvectorFormula instance here)
-  private static Object interpretBitvector(String lTermRepresentation) {
+  private static Number interpretBitvector(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<WIDTH>"
     Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
@@ -248,7 +248,7 @@ class Mathsat5Model {
     String term = matcher.group(1);
     String lengthValue = matcher.group(2);
     long length = Long.parseLong(lengthValue);
-    Object value;
+    Number value;
     if (length < 64) {
       value = Long.valueOf(term);
     } else {
@@ -260,7 +260,8 @@ class Mathsat5Model {
 
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
 
-  private static Object interpretFloatingPoint(String lTermRepresentation) {
+  private static Number interpretFloatingPoint(String lTermRepresentation) {
+
     // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
     Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
@@ -280,7 +281,7 @@ class Mathsat5Model {
     return new BigInteger(matcher.group(1));
   }
 
-  private static Object parseReal(String lTermRepresentation) {
+  private static BigDecimal parseReal(String lTermRepresentation) {
     BigDecimal lValue;
     try {
       lValue = new BigDecimal(lTermRepresentation);
