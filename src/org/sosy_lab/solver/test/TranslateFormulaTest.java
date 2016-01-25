@@ -66,8 +66,8 @@ public class TranslateFormulaTest {
     // Every combination: translateFrom and translateTo.
     int len = Solvers.values().length;
     Solvers[][] combinations = new Solvers[len * len][2];
-    for (int i=0; i<len; i++) {
-      for (int j=0; j<len; j++) {
+    for (int i = 0; i < len; i++) {
+      for (int j = 0; j < len; j++) {
         combinations[i * len + j][0] = Solvers.values()[i];
         combinations[i * len + j][1] = Solvers.values()[j];
       }
@@ -78,9 +78,8 @@ public class TranslateFormulaTest {
   @Before
   public void initSolvers() throws Exception {
     Configuration empty = Configuration.builder().build();
-    SolverContextFactory factory = new SolverContextFactory(
-        empty, logger, ShutdownManager.create().getNotifier()
-    );
+    SolverContextFactory factory =
+        new SolverContextFactory(empty, logger, ShutdownManager.create().getNotifier());
 
     from = factory.generateContext(translateFrom);
     to = factory.generateContext(translateTo);
@@ -98,7 +97,7 @@ public class TranslateFormulaTest {
   public void testDumpingAndParsing() throws Exception {
     // TODO: currently formula serialization does not work with Princess.
     assume().that(translateFrom).isNotEqualTo(Solvers.PRINCESS);
-//    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
+    //    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
@@ -111,7 +110,7 @@ public class TranslateFormulaTest {
   public void testTranslating() throws Exception {
     // TODO: currently formula translating does not work with Princess.
     assume().that(translateFrom).isNotEqualTo(Solvers.PRINCESS);
-//    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
+    //    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translate(input, from);
@@ -122,20 +121,14 @@ public class TranslateFormulaTest {
   private BooleanFormula createTestFormula(FormulaManager mgr) {
     BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
     IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
-    IntegerFormula x, y , z;
+    IntegerFormula x, y, z;
     x = ifmgr.makeVariable("x");
     y = ifmgr.makeVariable("y");
     z = ifmgr.makeVariable("z");
-    BooleanFormula t = bfmgr.and(
-        bfmgr.or(
-            ifmgr.equal(x, y),
-            ifmgr.equal(x, ifmgr.makeNumber(2))
-        ),
-        bfmgr.or(
-            ifmgr.equal(y, z),
-            ifmgr.equal(z, ifmgr.makeNumber(10))
-        )
-    );
+    BooleanFormula t =
+        bfmgr.and(
+            bfmgr.or(ifmgr.equal(x, y), ifmgr.equal(x, ifmgr.makeNumber(2))),
+            bfmgr.or(ifmgr.equal(y, z), ifmgr.equal(z, ifmgr.makeNumber(10))));
     return t;
   }
 
@@ -143,5 +136,4 @@ public class TranslateFormulaTest {
       BooleanFormula formula, SolverContext context) {
     return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
   }
-
 }
