@@ -98,7 +98,7 @@ public class TranslateFormulaTest {
   public void testDumpingAndParsing() throws Exception {
     // TODO: currently formula serialization does not work with Princess.
     assume().that(translateFrom).isNotEqualTo(Solvers.PRINCESS);
-    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
+//    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
@@ -111,7 +111,7 @@ public class TranslateFormulaTest {
   public void testTranslating() throws Exception {
     // TODO: currently formula translating does not work with Princess.
     assume().that(translateFrom).isNotEqualTo(Solvers.PRINCESS);
-    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
+//    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translate(input, from);
