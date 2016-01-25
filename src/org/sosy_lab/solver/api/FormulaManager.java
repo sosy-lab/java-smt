@@ -178,4 +178,18 @@ public interface FormulaManager {
    *  2) Conjunction over the returned list is equivalent to the input formula.
    */
   <T extends Formula> List<T> splitNumeralEqualityIfPossible(T f);
+
+  /**
+   * Translates the formula from another context into the context represented by
+   * {@code this}.
+   * Default implementation relies on string serialization
+   * ({@link #dumpFormula(BooleanFormula)} and {@link #parse(String)}),
+   * but each solver may implement more efficient translation between its own
+   * contexts.
+   *
+   * @param other Formula belonging to {@code otherContext}.
+   * @param otherContext A different context
+   * @return Formula belonging to {@code this} context.
+   */
+  BooleanFormula translate(BooleanFormula other, SolverContext otherContext);
 }

@@ -36,6 +36,7 @@ import org.sosy_lab.solver.api.FuncDeclKind;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.api.RationalFormulaManager;
+import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -459,5 +460,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   protected TFormulaInfo substituteUsingListsImpl(
       TFormulaInfo pF, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
     throw new UnsupportedOperationException();
+  }
+
+  public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
+    return parse(otherContext.getFormulaManager().dumpFormula(other).toString());
   }
 }
