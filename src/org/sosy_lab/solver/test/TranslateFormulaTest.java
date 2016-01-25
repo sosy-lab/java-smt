@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assert_;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import org.junit.After;
 import org.junit.Before;
@@ -95,10 +94,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testDumpingAndParsing() throws Exception {
-    // TODO: currently formula serialization does not work with Princess.
-    assume().that(translateFrom).isNotEqualTo(Solvers.PRINCESS);
-    //    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
-
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
@@ -108,10 +103,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslating() throws Exception {
-    // TODO: currently formula translating does not work with Princess.
-    assume().that(translateFrom).isNotEqualTo(Solvers.PRINCESS);
-    //    assume().that(translateTo).isNotEqualTo(Solvers.PRINCESS);
-
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translate(input, from);
 
