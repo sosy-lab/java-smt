@@ -184,12 +184,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
     long realSort = mk_real_sort(context);
     inc_ref(context, sort_to_ast(context, realSort));
 
-    // The string representations of Z3s formulas should be in SMTLib2!
+    // The string representations of Z3s formulas should be in SMTLib2,
+    // otherwise serialization wouldn't work.
     set_ast_print_mode(context, Z3NativeApiConstants.Z3_PRINT_SMTLIB2_COMPLIANT);
 
     long z3params = mk_params(context);
     params_inc_ref(context, z3params);
-    params_set_uint(context, z3params, mk_string_symbol(context, ":random-seed"), 42);
+    params_set_uint(context, z3params, mk_string_symbol(context, ":random-seed"), (int)randomSeed);
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config);

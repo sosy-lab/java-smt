@@ -29,7 +29,12 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvuge;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvule;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ge;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_le;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
 import static org.sosy_lab.solver.z3.Z3NativeApi.parse_smtlib2_string;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
@@ -37,7 +42,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
@@ -136,23 +140,15 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
-        String txt =
-            Z3NativeApi.benchmark_to_smtlib_string(
-                getEnvironment(), "dumped-formula", "", "unknown", "", 0, new long[] {}, expr);
 
-        for (String line : Splitter.on('\n').split(txt)) {
-
-          if (line.startsWith("(set-info") || line.startsWith(";") || line.startsWith("(check")) {
-            // ignore
-          } else if (line.startsWith("(assert") || line.startsWith("(dec")) {
-            out.append('\n');
-            out.append(line);
-          } else {
-            // Z3 spans formulas over multiple lines, append to previous line
-            out.append(' ');
-            out.append(line.trim());
-          }
-        }
+        // Serializing a solver is a simplest way to dump a formula in Z3,
+        // cf https://github.com/Z3Prover/z3/issues/397
+        long z3solver = mk_solver(getEnvironment());
+        solver_inc_ref(getEnvironment(), z3solver);
+        solver_assert(getEnvironment(), z3solver, expr);
+        String serialized = solver_to_string(getEnvironment(), z3solver);
+        solver_dec_ref(getEnvironment(), z3solver);
+        out.append(serialized);
       }
     };
   }
