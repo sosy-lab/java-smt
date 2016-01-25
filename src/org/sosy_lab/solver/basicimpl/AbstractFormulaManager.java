@@ -462,6 +462,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
     return parse(otherContext.getFormulaManager().dumpFormula(other).toString());
   }

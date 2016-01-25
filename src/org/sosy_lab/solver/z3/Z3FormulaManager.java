@@ -54,6 +54,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
@@ -205,5 +206,25 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
     Preconditions.checkState(size == changeTo.size());
     return Z3NativeApi.substitute(
         getFormulaCreator().getEnv(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
+  }
+
+  @Override
+  public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
+    if (otherContext instanceof Z3SolverContext) {
+      Z3SolverContext o = (Z3SolverContext) otherContext;
+      long otherZ3Context = o.getFormulaManager().getEnvironment();
+      if (otherZ3Context == getEnvironment()) {
+
+        // Same context.
+        return other;
+      } else {
+
+        // Z3-to-Z3 translation.
+        long translatedAST = Z3NativeApi.translate(
+            otherZ3Context, extractInfo(other), getEnvironment());
+        return getFormulaCreator().encapsulateBoolean(translatedAST);
+      }
+    }
+    return super.translate(other, otherContext);
   }
 }

@@ -190,7 +190,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     long z3params = mk_params(context);
     params_inc_ref(context, z3params);
-    params_set_uint(context, z3params, mk_string_symbol(context, ":random-seed"), (int)randomSeed);
+    params_set_uint(context, z3params, mk_string_symbol(context, ":random-seed"), (int) randomSeed);
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config);
