@@ -220,8 +220,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
       } else {
 
         // Z3-to-Z3 translation.
-        long translatedAST = Z3NativeApi.translate(
-            otherZ3Context, extractInfo(other), getEnvironment());
+        long translatedAST =
+            Z3NativeApi.translate(otherZ3Context, extractInfo(other), getEnvironment());
         return getFormulaCreator().encapsulateBoolean(translatedAST);
       }
     }
