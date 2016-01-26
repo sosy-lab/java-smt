@@ -2,18 +2,15 @@
 
 JavaSMT is a common API layer for accessing various SMT solvers.
 
-It was born out of our experience integrating and using different SMT solvers
+It was created out of our experience integrating and using different SMT solvers
 in [CPAchecker](http://cpachecker.sosy-lab.org/) project.
-Consequently it is developed for medium to large software projects which
-require SMT capabilities.
-The API is optimized for transparency (it should be obvious what action is
-performed when, the wrapping shouldn't be too "clever"), customizability
+The library is developed for medium to large software projects which
+require access to SMT solvers.
+The API is optimized for performance (using JavaSMT has very little runtime
+overhead compared to using the solver API directly), customizability
 (features and settings exposed by various solvers should be visible through the
 wrapping layer) and type-safety (it shouldn't be possible to add boolean terms
 to integer ones at _compile_ time) sometimes at the cost of verbosity.
-
-While the initial boylerplate may be discouraging for shorter scripts,
-we have found it very useful for larger projects.
 
 # Installation
 
@@ -23,7 +20,8 @@ We plan to add the packages to Maven Central soon.
 
 ### Automatic Installation using Ivy
 
-If your build tool supports [Apache Ivy](http://ant.apache.org/ivy/) configured,
+If your build tool supports fetching packages from
+[Apache Ivy](http://ant.apache.org/ivy/),
 you can point it to [Sosy-Lab](http://www.sosy-lab.org/) Ivy
 [repository](IvyRepository), which would automatically fetch
 `JavaSMT` and all of its dependencies.
@@ -32,13 +30,15 @@ After the repository URL is configured, you only need to add the following
 dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt" rev="latest" />
+<dependency org="org.sosy_lab" name="javasmt" rev="latest.integration" />
 ```
 
 ### Manual Installation using JAR files
 
 Alternatively, JARs for JavaSMT and its dependencies can be downloaded from our
-[Ivy Repository](IvyRepository) manually.
+[Ivy Repository](IvyRepository) manually:
+
+<!-- TODO: guide for fetching solver binaries/etc-->
 
 ## Binaries for Native Solvers (MathSAT and Z3)
 
@@ -54,7 +54,7 @@ architecture.
 See [NativeLibraries](NativeLibraries) documentation for more details.
 
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
-do not require any such configuration and work out of the box.
+do not require any configuration and work out of the box.
 
 # Usage
 
@@ -63,16 +63,30 @@ do not require any such configuration and work out of the box.
 Below is a small example showing how to initialize the library:
 
 ```java
-int main(String[] args) {
+package org.sosy_lab.solver.test;
 
-    Configuration config = Configuration.fromCommandLine(args);
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.BasicLogManager;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverContextFactory;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
+import org.sosy_lab.solver.api.SolverContext;
+
+public class TestApp {
+  public static void main(String[] args) throws InvalidConfigurationException {
+    Configuration config = Configuration.fromCmdLineArguments(args);
     LogManager logger = new BasicLogManager(config);
-    ShutdownNotifier notifier = new ShutdownNotifier();
+    ShutdownNotifier notifier = ShutdownManager.create().getNotifier();
 
-    // FormulaManager is a class wrapping a solver context.
-    // All interactions with a solver are normally done through this class.
-    FormulaManager manager = FormulaManagerFactory.createFormulaManager
-        config, logger, notifier);
+    // SolverContext is a class wrapping a solver context.
+    // Solver can be selected either using an argument or a configuration option
+    // inside `config`.
+    SolverContext context = SolverContextFactory.
+        createSolverContext(config, logger, notifier, Solvers.SMTINTERPOL);
+  }
 }
 ```
 
@@ -94,11 +108,12 @@ These dependencies are:
     Shutdown notifier provides a solution to handle interrupts gracefully,
     without having to resort to `kill -9` command.
 
-## Usage
+## Quickstart guide
 
 Once the formula manager is initialized, we can start posing queries to the
 solver.
-For a start, let's solve a simple query over integers:
+In this example, we want to find a satisfying example for a constraint
+over integers `a`, `b` and `c`:
 
 ```
 a + b = c \/ a + c = 2 * b
@@ -107,36 +122,50 @@ a + b = c \/ a + c = 2 * b
 Creating the required constraint is straghtforward:
 
 ```java
-// Assume we have a FormulaManager instance.
-BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
-IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+    // Assume we have a SolverContext instance.
+    FormulaManager fmgr = context.getFormulaManager();
 
-IntegerFormula a = imgr.makeVar('a'), b = imgr.makeVar('b'), c = imgr.makeVar('c');
-BooleanFormula constraint = bfmgr.or(
-    imgr.equal(
-        imgr.add(a, b), c
-    ),
-    imgr.equal(
-        imgr.add(a, c), imgr.multiply(imgr.makeNumber(2), b)
-    )
-);
+    BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
+    IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+
+    IntegerFormula a = imgr.makeVariable("a"),
+                   b = imgr.makeVariable("b"),
+                   c = imgr.makeVariable("c");
+    BooleanFormula constraint = bmgr.or(
+        imgr.equal(
+            imgr.add(a, b), c
+        ),
+        imgr.equal(
+            imgr.add(a, c), imgr.multiply(imgr.makeNumber(2), b)
+        )
+    );
 ```
 
-Once we have the constraint, we can solve it and get the model:
+Note the types of the formulas: `IntegerFormula` and `BooleanFormula`.
+Using different classes for different types of formulas adds additional
+guarantees at compile-time: unless and unsafe cast is used, it is impossible
+to e.g. add an integer to a boolean using JavaSMT API.
+
+Once the constraint is generated, we can solve it and get the model:
 
 ```java
-with (ProverEnvironment prover = fmgr.newProverEnvironment(false, true)) {
-    prover.addConstraint(constraint);
-    boolean isUnsat = prover.isUnsat();
-    if (!isUnsat) {
-        Model m = prover.getModel();
-        System.out.println(m);
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.addConstraint(constraint);
+      boolean isUnsat = prover.isUnsat();
+      if (!isUnsat) {
+        Model model = prover.getModel();
+      }
     }
-}
 ```
 
 Try-with-resources syntax will dispose of the prover once solving is finished.
 
+Once the model is obtained we can get values from it either by iterating
+through all of the returned data, or by querying for the variables we need:
+
+```java
+    int value = (int) model.getVariableValue("x", TermType.Integer);
+```
 
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
