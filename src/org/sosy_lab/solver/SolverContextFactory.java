@@ -153,16 +153,31 @@ public class SolverContextFactory {
   }
 
   /**
-   * Shortcut for getting a {@link SolverContext}.
+   * Shortcut for getting a {@link SolverContext},
+   * the solver is selected using configuration.
    *
    * <p>See
    * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
    * for documentation of accepted parameters.
    */
-  public static SolverContext createFormulaManager(
+  public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
       throws InvalidConfigurationException {
     return new SolverContextFactory(config, logger, shutdownNotifier).generateContext();
+  }
+
+  /**
+   * Shortcut for getting a {@link SolverContext}, the solver is selected using
+   * an argument.
+   *
+   * <p>See
+   * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
+   * for documentation of accepted parameters.
+   */
+  public static SolverContext createSolverContext(
+      Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier, Solvers solver)
+      throws InvalidConfigurationException {
+    return new SolverContextFactory(config, logger, shutdownNotifier).generateContext(solver);
   }
 
   /**
