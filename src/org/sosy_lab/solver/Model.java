@@ -28,6 +28,7 @@ import com.google.common.collect.Ordering;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.solver.AssignableTerm.Variable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,6 +46,17 @@ public class Model extends ForwardingMap<AssignableTerm, Object> implements Appe
 
   public ImmutableMap<AssignableTerm, Object> getData() {
     return data;
+  }
+
+  /**
+   * Get the value out of the model
+   *
+   * @param varName Variable name
+   * @param type Variable type
+   * @return Value associated to the variable in the model
+   */
+  public Object getVariableValue(String varName, TermType type) {
+    return data.get(new Variable(varName, type));
   }
 
   public static Model empty() {
