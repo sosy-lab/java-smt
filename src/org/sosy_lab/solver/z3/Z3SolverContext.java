@@ -213,13 +213,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             quantifierManager,
             arrayManager);
     return new Z3SolverContext(
-        creator,
-        config,
-        z3params,
-        interruptListener,
-        pShutdownNotifier,
-        logger,
-        manager);
+        creator, config, z3params, interruptListener, pShutdownNotifier, logger, manager);
   }
 
   @Override
@@ -239,7 +233,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    Z3OptimizationProver out = new Z3OptimizationProver(getFormulaManager(), creator, shutdownNotifier, logger);
+    Z3OptimizationProver out =
+        new Z3OptimizationProver(getFormulaManager(), creator, shutdownNotifier, logger);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;

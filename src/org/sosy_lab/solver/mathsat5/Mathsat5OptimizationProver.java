@@ -36,7 +36,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void> implements OptimizationProverEnvironment {
+class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
+    implements OptimizationProverEnvironment {
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /**

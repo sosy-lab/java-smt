@@ -226,7 +226,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
       // Only boolean formulas can appear here.
       assert f instanceof BooleanFormula;
-      return delegate.visitAtom((BooleanFormula) f, FunctionDeclaration.of(name, FunctionDeclarationKind.VAR));
+      return delegate.visitAtom(
+          (BooleanFormula) f, FunctionDeclaration.of(name, FunctionDeclarationKind.VAR));
     }
 
     @Override
