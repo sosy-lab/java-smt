@@ -36,7 +36,7 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
@@ -255,8 +255,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptEnvironment newOptEnvironment() {
-    Z3OptProver out = new Z3OptProver(getFormulaManager(), creator, shutdownNotifier, logger);
+  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+    Z3OptimizationProver out = new Z3OptimizationProver(getFormulaManager(), creator, shutdownNotifier, logger);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;

@@ -19,8 +19,8 @@ import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.solver.api.OptEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment.OptStatus;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment.OptStatus;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -54,7 +54,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnbounded() throws Exception {
     requireRationals();
-    try (OptEnvironment prover = context.newOptEnvironment()) {
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x, obj;
       x = rmgr.makeVariable("x");
       obj = rmgr.makeVariable("obj");
@@ -70,7 +70,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnfeasible() throws Exception {
     requireRationals();
-    try (OptEnvironment prover = context.newOptEnvironment()) {
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x, y;
       x = rmgr.makeVariable("x");
       y = rmgr.makeVariable("y");
@@ -85,7 +85,7 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   public void testOptimal() throws Exception {
-    try (OptEnvironment prover = context.newOptEnvironment()) {
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       IntegerFormula x, y, obj;
       x = imgr.makeVariable("x");
@@ -130,7 +130,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testSwitchingObjectives() throws Exception {
     requireRationals();
-    try (OptEnvironment prover = context.newOptEnvironment()) {
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x, y, obj;
       x = rmgr.makeVariable("x");
       y = rmgr.makeVariable("y");

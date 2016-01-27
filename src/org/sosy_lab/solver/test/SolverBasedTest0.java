@@ -191,7 +191,7 @@ public abstract class SolverBasedTest0 {
    */
   protected final void requireOptimization() {
     try {
-      context.newOptEnvironment().close();
+      context.newOptimizationProverEnvironment().close();
     } catch (UnsupportedOperationException e) {
       assume()
           .withFailureMessage("Solver " + solverToUse() + " does not support optimization")

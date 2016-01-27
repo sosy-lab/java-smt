@@ -25,7 +25,7 @@ import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class Mathsat5OptProver extends Mathsat5AbstractProver<Void> implements OptEnvironment {
+class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void> implements OptimizationProverEnvironment {
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /**
@@ -56,7 +56,7 @@ class Mathsat5OptProver extends Mathsat5AbstractProver<Void> implements OptEnvir
    */
   private final Deque<ImmutableMap<Integer, Integer>> stack;
 
-  Mathsat5OptProver(Mathsat5SolverContext pMgr) {
+  Mathsat5OptimizationProver(Mathsat5SolverContext pMgr) {
     super(pMgr, createConfig());
     objectiveMap = new HashMap<>();
     stack = new ArrayDeque<>();

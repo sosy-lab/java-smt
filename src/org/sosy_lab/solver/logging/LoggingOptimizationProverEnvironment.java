@@ -29,7 +29,7 @@ import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 
 import java.util.logging.Level;
 
@@ -38,12 +38,12 @@ import javax.annotation.Nullable;
 /**
  * Wrapper for an optimizing solver.
  */
-public class LoggingOptEnvironment implements OptEnvironment {
+public class LoggingOptimizationProverEnvironment implements OptimizationProverEnvironment {
 
-  private final OptEnvironment wrapped;
+  private final OptimizationProverEnvironment wrapped;
   private final LogManager logger;
 
-  public LoggingOptEnvironment(LogManager logger, OptEnvironment oe) {
+  public LoggingOptimizationProverEnvironment(LogManager logger, OptimizationProverEnvironment oe) {
     this.wrapped = checkNotNull(oe);
     this.logger = checkNotNull(logger);
   }

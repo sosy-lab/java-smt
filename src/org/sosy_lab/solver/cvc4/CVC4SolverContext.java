@@ -9,7 +9,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
@@ -69,7 +69,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptEnvironment newOptEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
     throw new UnsupportedOperationException();
   }
 

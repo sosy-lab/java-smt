@@ -51,7 +51,7 @@ public abstract class AbstractSolverContext implements SolverContext {
     if (!(ipe instanceof InterpolatingProverEnvironmentWithAssumptions)) {
       out = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
     } else {
-      out = (InterpolatingProverEnvironmentWithAssumptions) ipe;
+      out = (InterpolatingProverEnvironmentWithAssumptions<?>) ipe;
     }
 
     if (useLogger) {

@@ -10,7 +10,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
@@ -95,7 +95,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptEnvironment newOptEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
     throw new UnsupportedOperationException("Princess does not support optimization");
   }
 

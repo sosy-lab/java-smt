@@ -27,7 +27,7 @@ import org.sosy_lab.solver.SolverException;
 /**
  * Interface for optimization modulo SMT.
  */
-public interface OptEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
+public interface OptimizationProverEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
 
   /**
    * Add the maximization <code>objective</code>.

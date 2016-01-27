@@ -56,10 +56,10 @@ public interface SolverContext extends AutoCloseable {
   InterpolatingProverEnvironmentWithAssumptions<?> newProverEnvironmentWithInterpolation();
 
   /**
-   * Create a fresh new {@link OptEnvironment} which encapsulates an assertion stack
+   * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
    * and allows to solve optimization queries.
    */
-  OptEnvironment newOptEnvironment();
+  OptimizationProverEnvironment newOptimizationProverEnvironment();
 
   /**
    * Get version information out of the solver.
@@ -71,5 +71,6 @@ public interface SolverContext extends AutoCloseable {
    * Necessary for solvers implemented in native code, frees the associated
    * memory.
    */
+  @Override
   void close();
 }

@@ -24,7 +24,7 @@ import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
@@ -227,8 +227,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptEnvironment newOptEnvironment() {
-    return new Mathsat5OptProver(this);
+  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+    return new Mathsat5OptimizationProver(this);
   }
 
   @Override

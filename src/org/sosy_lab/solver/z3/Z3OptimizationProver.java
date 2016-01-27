@@ -53,7 +53,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.OptEnvironment;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
@@ -62,7 +62,7 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
+class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
 
   private final FormulaManager mgr;
   private final RationalFormulaManager rfmgr;
@@ -71,7 +71,7 @@ class Z3OptProver extends Z3AbstractProver<Void> implements OptEnvironment {
   private final long z3optContext;
   private final ShutdownNotifier shutdownNotifier;
 
-  Z3OptProver(
+  Z3OptimizationProver(
       FormulaManager mgr,
       Z3FormulaCreator creator,
       ShutdownNotifier pShutdownNotifier,
