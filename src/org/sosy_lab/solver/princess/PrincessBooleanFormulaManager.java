@@ -32,7 +32,6 @@ import ap.parser.INot;
 import ap.parser.ITermITE;
 
 import org.sosy_lab.solver.TermType;
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
 import scala.Enumeration;
@@ -148,9 +147,5 @@ class PrincessBooleanFormulaManager
   @Override
   public IFormula xor(IExpression t1, IExpression t2) {
     return new INot(new IBinFormula(IBinJunctor.Eqv(), castToFormula(t1), castToFormula(t2)));
-  }
-
-  private BooleanFormula getArg(IFormula f, int i) {
-    return getFormulaCreator().encapsulateBoolean(f.apply(i));
   }
 }

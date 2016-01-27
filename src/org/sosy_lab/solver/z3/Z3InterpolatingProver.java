@@ -62,7 +62,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   private int level = 0;
   private final Deque<Long> assertedFormulas = new ArrayDeque<>();
 
-  Z3InterpolatingProver(Z3FormulaCreator creator, Z3FormulaManager mgr, long z3params) {
+  Z3InterpolatingProver(Z3FormulaCreator creator, long z3params) {
     super(creator);
     this.z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);

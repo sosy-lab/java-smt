@@ -94,13 +94,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @SuppressWarnings("checkstyle:parameternumber")
   private Z3SolverContext(
       Z3FormulaCreator pFormulaCreator,
-      Z3FunctionFormulaManager pFunctionManager,
-      Z3BooleanFormulaManager pBooleanManager,
-      Z3IntegerFormulaManager pIntegerManager,
-      Z3RationalFormulaManager pRationalManager,
-      Z3BitvectorFormulaManager pBitpreciseManager,
-      Z3QuantifiedFormulaManager pQuantifiedManager,
-      Z3ArrayFormulaManager pArrayManager,
       Configuration config,
       long pZ3params,
       ShutdownRequestListener pInterruptListener,
@@ -218,19 +211,9 @@ public final class Z3SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             quantifierManager,
-            arrayManager,
-            interruptListener,
-            pShutdownNotifier,
-            logger);
+            arrayManager);
     return new Z3SolverContext(
         creator,
-        functionTheory,
-        booleanTheory,
-        integerTheory,
-        rationalTheory,
-        bitvectorTheory,
-        quantifierManager,
-        arrayManager,
         config,
         z3params,
         interruptListener,
@@ -251,7 +234,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new Z3InterpolatingProver(creator, manager, z3params);
+    return new Z3InterpolatingProver(creator, z3params);
   }
 
   @Override

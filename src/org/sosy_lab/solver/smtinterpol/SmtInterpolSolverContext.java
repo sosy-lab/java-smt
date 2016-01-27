@@ -17,7 +17,6 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
 
   private final SmtInterpolEnvironment environment;
   private final SmtInterpolFormulaManager manager;
-  private final SmtInterpolFormulaCreator formulaCreator;
 
   private SmtInterpolSolverContext(
       Configuration configuration,
@@ -26,7 +25,6 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
       SmtInterpolFormulaManager pManager)
       throws InvalidConfigurationException {
     super(configuration, logger, pManager);
-    formulaCreator = pFormulaCreator;
     environment = pFormulaCreator.getEnv();
     manager = pManager;
   }

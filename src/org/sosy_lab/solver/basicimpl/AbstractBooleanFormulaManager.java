@@ -38,7 +38,6 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -332,18 +331,5 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         return;
       }
     }
-  }
-
-  private static List<BooleanFormula> checkedCast(List<Formula> list) {
-    List<BooleanFormula> ret = new ArrayList<>(list.size());
-    for (Formula f : list) {
-      if (f instanceof BooleanFormula) {
-        ret.add((BooleanFormula) f);
-      } else {
-        throw new IllegalStateException(
-            "Non-boolean formula where only boolean formulas should occur");
-      }
-    }
-    return ret;
   }
 }

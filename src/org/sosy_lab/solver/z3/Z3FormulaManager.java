@@ -48,9 +48,6 @@ import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -73,11 +70,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
       Z3RationalFormulaManager pRationalManager,
       Z3BitvectorFormulaManager pBitpreciseManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
-      Z3ArrayFormulaManager pArrayManager,
-      ShutdownNotifier.ShutdownRequestListener pInterruptListener,
-      ShutdownNotifier pShutdownNotifier,
-      LogManager pLogger)
-      throws InvalidConfigurationException {
+      Z3ArrayFormulaManager pArrayManager) {
     super(
         pFormulaCreator,
         pFunctionManager,

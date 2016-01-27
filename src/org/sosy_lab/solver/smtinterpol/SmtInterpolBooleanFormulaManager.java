@@ -19,21 +19,13 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 class SmtInterpolBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -41,12 +33,10 @@ class SmtInterpolBooleanFormulaManager
   // We use the Theory directly here because the methods there perform simplifications
   // that we could not use otherwise.
   private final Theory theory;
-  private final SmtInterpolFormulaCreator formulaCreator;
 
   SmtInterpolBooleanFormulaManager(SmtInterpolFormulaCreator creator, Theory pTheory) {
     super(creator);
     theory = pTheory;
-    formulaCreator = creator;
   }
 
   @Override
@@ -118,26 +108,5 @@ class SmtInterpolBooleanFormulaManager
   @Override
   public Term xor(Term pBits1, Term pBits2) {
     return theory.xor(pBits1, pBits2);
-  }
-
-  private BooleanFormula getArg(ApplicationTerm pF, int index) {
-    return formulaCreator.encapsulateBoolean(pF.getParameters()[index]);
-  }
-
-  private List<BooleanFormula> getAllArgs(final ApplicationTerm pF) {
-    return Lists.transform(
-        Arrays.asList(pF.getParameters()),
-        new Function<Term, BooleanFormula>() {
-          @Override
-          public BooleanFormula apply(Term pInput) {
-            return formulaCreator.encapsulateBoolean(pInput);
-          }
-        });
-  }
-
-  private boolean isBinaryBooleanOperator(final FunctionSymbol func) {
-    return func.getParameterSorts().length == 2
-        && (func.getParameterSorts()[0]).equals(theory.getBooleanSort())
-        && (func.getParameterSorts()[1]).equals(theory.getBooleanSort());
   }
 }
