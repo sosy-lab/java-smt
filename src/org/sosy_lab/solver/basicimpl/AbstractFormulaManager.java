@@ -31,8 +31,8 @@ import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.api.RationalFormulaManager;
@@ -272,10 +272,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
           public TraversalProcess visitFunction(
               Formula f,
               List<Formula> args,
-              FuncDecl functionDeclaration,
+              FunctionDeclaration functionDeclaration,
               Function<List<Formula>, Formula> constructor) {
 
-            if (functionDeclaration.getKind() == FuncDeclKind.UF && extractUF) {
+            if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
               found.put(functionDeclaration.getName(), f);
             }
             return TraversalProcess.CONTINUE;
@@ -361,7 +361,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
           public Void visitFunction(
               Formula f,
               List<Formula> args,
-              FuncDecl decl,
+              FunctionDeclaration decl,
               Function<List<Formula>, Formula> newApplicationConstructor) {
             Formula out = fromToMapping.get(f);
             if (out != null) {

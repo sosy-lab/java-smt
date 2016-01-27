@@ -32,7 +32,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
@@ -182,7 +182,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitAtom(BooleanFormula pAtom, FuncDecl decl) {
+    public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
       started = true;
       return null;
     }
@@ -301,7 +301,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitAtom(BooleanFormula pAtom, FuncDecl decl) {
+    public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
       wasLastVisitNot = false;
       return null;
     }

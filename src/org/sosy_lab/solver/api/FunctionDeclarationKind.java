@@ -3,9 +3,9 @@ package org.sosy_lab.solver.api;
 /**
  * Types of function declarations.
  *
- * @see FuncDecl
+ * @see FunctionDeclaration
  */
-public enum FuncDeclKind {
+public enum FunctionDeclarationKind {
   AND,
   NOT,
   OR,

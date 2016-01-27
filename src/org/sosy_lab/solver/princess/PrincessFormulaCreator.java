@@ -33,8 +33,8 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -142,31 +142,31 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
             }
           };
       return visitor.visitFunction(
-          f, args, FuncDecl.of(name, getDeclarationKind(input)), constructor);
+          f, args, FunctionDeclaration.of(name, getDeclarationKind(input)), constructor);
     }
   }
 
-  private FuncDeclKind getDeclarationKind(IExpression input) {
+  private FunctionDeclarationKind getDeclarationKind(IExpression input) {
     if (PrincessUtil.isIfThenElse(input)) {
-      return FuncDeclKind.ITE;
+      return FunctionDeclarationKind.ITE;
     } else if (PrincessUtil.isUIF(input)) {
-      return FuncDeclKind.UF;
+      return FunctionDeclarationKind.UF;
     } else if (PrincessUtil.isAnd(input)) {
-      return FuncDeclKind.AND;
+      return FunctionDeclarationKind.AND;
     } else if (PrincessUtil.isOr(input)) {
-      return FuncDeclKind.OR;
+      return FunctionDeclarationKind.OR;
     } else if (PrincessUtil.isNot(input)) {
-      return FuncDeclKind.NOT;
+      return FunctionDeclarationKind.NOT;
     } else if (PrincessUtil.isEquivalence(input)) {
-      return FuncDeclKind.IFF;
+      return FunctionDeclarationKind.IFF;
     } else if (PrincessUtil.isIfThenElse(input)) {
-      return FuncDeclKind.ITE;
+      return FunctionDeclarationKind.ITE;
     } else if (PrincessUtil.isVariable(input)) {
-      return FuncDeclKind.VAR;
+      return FunctionDeclarationKind.VAR;
     } else {
 
       // TODO: other cases!!!
-      return FuncDeclKind.OTHER;
+      return FunctionDeclarationKind.OTHER;
     }
   }
 }

@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
@@ -93,7 +93,7 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
   }
 
   @Override
-  public TraversalProcess visitAtom(BooleanFormula pAtom, FuncDecl decl) {
+  public TraversalProcess visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
     return delegate.visitAtom(pAtom, decl);
   }
 

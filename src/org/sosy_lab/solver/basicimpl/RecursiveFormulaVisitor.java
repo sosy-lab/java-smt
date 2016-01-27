@@ -25,7 +25,7 @@ import com.google.common.base.Function;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
@@ -80,7 +80,7 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   public TraversalProcess visitFunction(
       Formula pF,
       List<Formula> pArgs,
-      FuncDecl pFunctionDeclaration,
+      FunctionDeclaration pFunctionDeclaration,
       Function<List<Formula>, Formula> pNewApplicationConstructor) {
     TraversalProcess result =
         delegate.visitFunction(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);

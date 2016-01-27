@@ -21,7 +21,7 @@ package org.sosy_lab.solver.visitors;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaV
   }
 
   @Override
-  public R visitAtom(BooleanFormula pAtom, FuncDecl decl) {
+  public R visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
     return visitDefault();
   }
 

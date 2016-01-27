@@ -37,8 +37,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4ArrayFormula;
 import org.sosy_lab.solver.cvc4.CVC4Formula.CVC4BitvectorFormula;
@@ -218,50 +218,50 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
             }
           };
       return visitor.visitFunction(
-          formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
+          formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
     }
   }
 
-  private FuncDeclKind getDeclarationKind(Expr f) {
+  private FunctionDeclarationKind getDeclarationKind(Expr f) {
     Kind kind = f.getKind();
     if (kind == Kind.EQUAL) {
-      return FuncDeclKind.EQ;
+      return FunctionDeclarationKind.EQ;
     } else if (kind == Kind.DISTINCT) {
-      return FuncDeclKind.DISTINCT;
+      return FunctionDeclarationKind.DISTINCT;
     } else if (kind == Kind.NOT) {
-      return FuncDeclKind.NOT;
+      return FunctionDeclarationKind.NOT;
     } else if (kind == Kind.AND) {
-      return FuncDeclKind.AND;
+      return FunctionDeclarationKind.AND;
     } else if (kind == Kind.IFF) {
-      return FuncDeclKind.IFF;
+      return FunctionDeclarationKind.IFF;
     } else if (kind == Kind.IMPLIES) {
-      return FuncDeclKind.IMPLIES;
+      return FunctionDeclarationKind.IMPLIES;
     } else if (kind == Kind.OR) {
-      return FuncDeclKind.OR;
+      return FunctionDeclarationKind.OR;
     } else if (kind == Kind.XOR) {
-      return FuncDeclKind.XOR;
+      return FunctionDeclarationKind.XOR;
     } else if (kind == Kind.ITE) {
-      return FuncDeclKind.ITE;
+      return FunctionDeclarationKind.ITE;
     } else if (kind == Kind.APPLY_UF) {
-      return FuncDeclKind.UF;
+      return FunctionDeclarationKind.UF;
     } else if (kind == Kind.PLUS) {
-      return FuncDeclKind.ADD;
+      return FunctionDeclarationKind.ADD;
     } else if (kind == Kind.MULT) {
-      return FuncDeclKind.MUL;
+      return FunctionDeclarationKind.MUL;
     } else if (kind == Kind.MINUS) {
-      return FuncDeclKind.SUB;
+      return FunctionDeclarationKind.SUB;
     } else if (kind == Kind.DIVISION) {
-      return FuncDeclKind.DIV;
+      return FunctionDeclarationKind.DIV;
     } else if (kind == Kind.LT) {
-      return FuncDeclKind.LT;
+      return FunctionDeclarationKind.LT;
     } else if (kind == Kind.LEQ) {
-      return FuncDeclKind.LTE;
+      return FunctionDeclarationKind.LTE;
     } else if (kind == Kind.GT) {
-      return FuncDeclKind.GT;
+      return FunctionDeclarationKind.GT;
     } else if (kind == Kind.GEQ) {
-      return FuncDeclKind.GTE;
+      return FunctionDeclarationKind.GTE;
     } else {
-      return FuncDeclKind.OTHER;
+      return FunctionDeclarationKind.OTHER;
     }
   }
 }

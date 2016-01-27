@@ -73,8 +73,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5ArrayFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BitvectorFormula;
@@ -282,7 +282,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
             }
           };
       return visitor.visitFunction(
-          formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
+          formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
     }
   }
 
@@ -291,35 +291,35 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
     return msat_make_term(environment, tDecl, Longs.toArray(newArgs));
   }
 
-  private FuncDeclKind getDeclarationKind(long pF) {
+  private FunctionDeclarationKind getDeclarationKind(long pF) {
     if (msat_term_is_uf(environment, pF)) {
-      return FuncDeclKind.UF;
+      return FunctionDeclarationKind.UF;
     } else if (msat_term_is_constant(environment, pF)) {
-      return FuncDeclKind.VAR;
+      return FunctionDeclarationKind.VAR;
     }
 
     long decl = msat_term_get_decl(pF);
     int tag = msat_decl_get_tag(environment, decl);
     switch (tag) {
       case MSAT_TAG_AND:
-        return FuncDeclKind.AND;
+        return FunctionDeclarationKind.AND;
       case MSAT_TAG_NOT:
-        return FuncDeclKind.NOT;
+        return FunctionDeclarationKind.NOT;
       case MSAT_TAG_OR:
-        return FuncDeclKind.OR;
+        return FunctionDeclarationKind.OR;
       case MSAT_TAG_IFF:
-        return FuncDeclKind.IFF;
+        return FunctionDeclarationKind.IFF;
       case MSAT_TAG_ITE:
-        return FuncDeclKind.ITE;
+        return FunctionDeclarationKind.ITE;
 
       case MSAT_TAG_PLUS:
-        return FuncDeclKind.ADD;
+        return FunctionDeclarationKind.ADD;
       case MSAT_TAG_LEQ:
-        return FuncDeclKind.LTE;
+        return FunctionDeclarationKind.LTE;
       case MSAT_TAG_EQ:
-        return FuncDeclKind.EQ;
+        return FunctionDeclarationKind.EQ;
       default:
-        return FuncDeclKind.OTHER;
+        return FunctionDeclarationKind.OTHER;
     }
   }
 }

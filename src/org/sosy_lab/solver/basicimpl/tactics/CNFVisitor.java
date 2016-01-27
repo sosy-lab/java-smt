@@ -10,7 +10,7 @@ import com.google.common.collect.FluentIterable;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
@@ -52,7 +52,7 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitAtom(BooleanFormula pAtom, FuncDecl decl) {
+  public List<BooleanFormula> visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
     return singletonList(pAtom);
   }
 

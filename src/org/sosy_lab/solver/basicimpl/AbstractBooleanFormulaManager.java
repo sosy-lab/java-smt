@@ -31,8 +31,8 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -227,7 +227,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
       // Only boolean formulas can appear here.
       assert f instanceof BooleanFormula;
-      return delegate.visitAtom((BooleanFormula) f, FuncDecl.of(name, FuncDeclKind.VAR));
+      return delegate.visitAtom((BooleanFormula) f, FunctionDeclaration.of(name, FunctionDeclarationKind.VAR));
     }
 
     @Override
@@ -259,7 +259,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     public R visitFunction(
         Formula f,
         List<Formula> args,
-        FuncDecl functionDeclaration,
+        FunctionDeclaration functionDeclaration,
         Function<List<Formula>, Formula> newApplicationConstructor) {
       switch (functionDeclaration.getKind()) {
         case AND:

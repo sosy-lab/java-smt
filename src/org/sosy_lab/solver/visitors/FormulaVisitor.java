@@ -25,7 +25,7 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.math.BigDecimal;
@@ -84,7 +84,7 @@ public interface FormulaVisitor<R> {
   R visitFunction(
       Formula f,
       List<Formula> args,
-      FuncDecl functionDeclaration,
+      FunctionDeclaration functionDeclaration,
       Function<List<Formula>, Formula> newApplicationConstructor);
 
   /**

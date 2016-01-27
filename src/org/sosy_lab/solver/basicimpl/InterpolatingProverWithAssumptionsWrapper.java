@@ -10,8 +10,8 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
@@ -143,8 +143,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     }
 
     @Override
-    public BooleanFormula visitAtom(BooleanFormula atom, FuncDecl decl) {
-      if (decl.getKind() == FuncDeclKind.VAR) {
+    public BooleanFormula visitAtom(BooleanFormula atom, FunctionDeclaration decl) {
+      if (decl.getKind() == FunctionDeclarationKind.VAR) {
         String varName = decl.getName();
         if (solverAssumptionsContainsVar(varName)) {
           return bmgr.makeBoolean(true);

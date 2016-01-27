@@ -9,25 +9,25 @@ import javax.annotation.Nullable;
 /**
  * Declaration of function.
  */
-public class FuncDecl {
+public class FunctionDeclaration {
   private final String name;
-  private final FuncDeclKind kind;
+  private final FunctionDeclarationKind kind;
 
-  private FuncDecl(String name, FuncDeclKind kind) {
+  private FunctionDeclaration(String name, FunctionDeclarationKind kind) {
     Preconditions.checkNotNull(name);
     Preconditions.checkNotNull(kind);
     this.name = name;
     this.kind = kind;
   }
 
-  public static FuncDecl of(String name, FuncDeclKind kind) {
-    return new FuncDecl(name, kind);
+  public static FunctionDeclaration of(String name, FunctionDeclarationKind kind) {
+    return new FunctionDeclaration(name, kind);
   }
 
   /**
    * Get type of the declaration.
    */
-  public FuncDeclKind getKind() {
+  public FunctionDeclarationKind getKind() {
     return kind;
   }
 
@@ -56,10 +56,10 @@ public class FuncDecl {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof FuncDecl)) {
+    if (!(o instanceof FunctionDeclaration)) {
       return false;
     }
-    FuncDecl other = (FuncDecl) o;
+    FunctionDeclaration other = (FunctionDeclaration) o;
     return (name.equals(other.name) && kind.equals(other.kind));
   }
 }

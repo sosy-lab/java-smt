@@ -33,8 +33,8 @@ import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.basicimpl.ObjectArrayBackedList;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -177,7 +177,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
               }
             };
         return visitor.visitFunction(
-            f, args, FuncDecl.of(name, getDeclarationKind(app)), constructor);
+            f, args, FunctionDeclaration.of(name, getDeclarationKind(app)), constructor);
       }
 
     } else {
@@ -191,35 +191,35 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     }
   }
 
-  private FuncDeclKind getDeclarationKind(ApplicationTerm input) {
+  private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {
     FunctionSymbol symbol = input.getFunction();
     Theory t = input.getTheory();
     if (SmtInterpolUtil.isUIF(input)) {
-      return FuncDeclKind.UF;
+      return FunctionDeclarationKind.UF;
     } else if (symbol == t.mAnd) {
-      return FuncDeclKind.AND;
+      return FunctionDeclarationKind.AND;
     } else if (symbol == t.mOr) {
-      return FuncDeclKind.OR;
+      return FunctionDeclarationKind.OR;
     } else if (symbol == t.mNot) {
-      return FuncDeclKind.NOT;
+      return FunctionDeclarationKind.NOT;
     } else if (symbol == t.mImplies) {
-      return FuncDeclKind.IMPLIES;
+      return FunctionDeclarationKind.IMPLIES;
     } else if (symbol == t.mXor) {
-      return FuncDeclKind.XOR;
+      return FunctionDeclarationKind.XOR;
 
       // Polymorphic function symbols are more difficult.
     } else if (symbol.getName().equals("=")) {
-      return FuncDeclKind.EQ;
+      return FunctionDeclarationKind.EQ;
     } else if (symbol.getName().equals("distinct")) {
-      return FuncDeclKind.DISTINCT;
+      return FunctionDeclarationKind.DISTINCT;
     } else if (symbol.getName().equals("ite")) {
-      return FuncDeclKind.ITE;
+      return FunctionDeclarationKind.ITE;
     } else if (SmtInterpolUtil.isVariable(input)) {
-      return FuncDeclKind.VAR;
+      return FunctionDeclarationKind.VAR;
     } else {
 
       // TODO: other declaration kinds!
-      return FuncDeclKind.OTHER;
+      return FunctionDeclarationKind.OTHER;
     }
   }
 }

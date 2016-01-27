@@ -22,13 +22,13 @@ package org.sosy_lab.solver.basicimpl;
 import com.google.common.testing.AbstractPackageSanityTests;
 
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
-    setDefault(FuncDecl.class, FuncDecl.of("F", FuncDeclKind.UF));
+    setDefault(FunctionDeclaration.class, FunctionDeclaration.of("F", FunctionDeclarationKind.UF));
   }
 }

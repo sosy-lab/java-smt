@@ -101,8 +101,8 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.solver.api.FuncDecl;
-import org.sosy_lab.solver.api.FuncDeclKind;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -369,7 +369,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
               }
             };
         return visitor.visitFunction(
-            formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
+            formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(environment, f);
         return visitor.visitBoundVariable(formula, deBruijnIdx);
@@ -399,56 +399,56 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     return boundVars;
   }
 
-  private FuncDeclKind getDeclarationKind(long f) {
+  private FunctionDeclarationKind getDeclarationKind(long f) {
     int decl = get_decl_kind(environment, get_app_decl(environment, f));
 
     if (get_arity(environment, f) == 0) {
-      return FuncDeclKind.VAR;
+      return FunctionDeclarationKind.VAR;
     }
 
     switch (decl) {
       case Z3_OP_AND:
-        return FuncDeclKind.AND;
+        return FunctionDeclarationKind.AND;
       case Z3_OP_NOT:
-        return FuncDeclKind.NOT;
+        return FunctionDeclarationKind.NOT;
       case Z3_OP_OR:
-        return FuncDeclKind.OR;
+        return FunctionDeclarationKind.OR;
       case Z3_OP_IFF:
-        return FuncDeclKind.IFF;
+        return FunctionDeclarationKind.IFF;
       case Z3_OP_ITE:
-        return FuncDeclKind.ITE;
+        return FunctionDeclarationKind.ITE;
       case Z3_OP_XOR:
-        return FuncDeclKind.XOR;
+        return FunctionDeclarationKind.XOR;
       case Z3_OP_DISTINCT:
-        return FuncDeclKind.DISTINCT;
+        return FunctionDeclarationKind.DISTINCT;
 
       case Z3_OP_SUB:
-        return FuncDeclKind.SUB;
+        return FunctionDeclarationKind.SUB;
       case Z3_OP_ADD:
-        return FuncDeclKind.ADD;
+        return FunctionDeclarationKind.ADD;
       case Z3_OP_DIV:
-        return FuncDeclKind.DIV;
+        return FunctionDeclarationKind.DIV;
       case Z3_OP_MUL:
-        return FuncDeclKind.MUL;
+        return FunctionDeclarationKind.MUL;
       case Z3_OP_MOD:
-        return FuncDeclKind.MODULO;
+        return FunctionDeclarationKind.MODULO;
 
       case Z3_OP_UNINTERPRETED:
-        return FuncDeclKind.UF;
+        return FunctionDeclarationKind.UF;
 
       case Z3_OP_LT:
-        return FuncDeclKind.LT;
+        return FunctionDeclarationKind.LT;
       case Z3_OP_LE:
-        return FuncDeclKind.LTE;
+        return FunctionDeclarationKind.LTE;
       case Z3_OP_GT:
-        return FuncDeclKind.GT;
+        return FunctionDeclarationKind.GT;
       case Z3_OP_GE:
-        return FuncDeclKind.GTE;
+        return FunctionDeclarationKind.GTE;
       case Z3_OP_EQ:
-        return FuncDeclKind.EQ;
+        return FunctionDeclarationKind.EQ;
 
       default:
-        return FuncDeclKind.OTHER;
+        return FunctionDeclarationKind.OTHER;
     }
   }
 }

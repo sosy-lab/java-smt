@@ -22,7 +22,7 @@ package org.sosy_lab.solver.visitors;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FuncDecl;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
@@ -123,5 +123,5 @@ public interface BooleanFormulaVisitor<R> {
    * This is anything with a boolean sort which is not covered by the cases
    * above.
    */
-  R visitAtom(BooleanFormula atom, FuncDecl funcDecl);
+  R visitAtom(BooleanFormula atom, FunctionDeclaration funcDecl);
 }
