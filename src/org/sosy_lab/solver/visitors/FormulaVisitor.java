@@ -81,7 +81,7 @@ public interface FormulaVisitor<R> {
    * @param newApplicationConstructor Construct a new function of the same type,
    *                                  with the new arguments as given.
    */
-  R visitFuncApp(
+  R visitFunction(
       Formula f,
       List<Formula> args,
       FuncDecl functionDeclaration,

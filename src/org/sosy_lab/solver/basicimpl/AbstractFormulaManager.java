@@ -238,6 +238,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    *
    * @param f   The input formula
    */
+  @Override
   public Map<String, Formula> extractVariableNames(Formula f) {
     return myExtractSubformulas(f, false);
   }
@@ -247,6 +248,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    *
    * @param f   The input formula
    */
+  @Override
   public Map<String, Formula> extractFunctionNames(Formula f) {
     return myExtractSubformulas(f, true);
   }
@@ -267,7 +269,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
           }
 
           @Override
-          public TraversalProcess visitFuncApp(
+          public TraversalProcess visitFunction(
               Formula f,
               List<Formula> args,
               FuncDecl functionDeclaration,
@@ -356,7 +358,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
           }
 
           @Override
-          public Void visitFuncApp(
+          public Void visitFunction(
               Formula f,
               List<Formula> args,
               FuncDecl decl,

@@ -176,7 +176,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
                 return encapsulateWithTypeOf(replaceArgs(input, extractInfo(formulas)));
               }
             };
-        return visitor.visitFuncApp(
+        return visitor.visitFunction(
             f, args, FuncDecl.of(name, getDeclarationKind(app)), constructor);
       }
 

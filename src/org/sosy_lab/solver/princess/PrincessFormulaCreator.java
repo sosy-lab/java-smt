@@ -141,7 +141,7 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
               return encapsulateWithTypeOf(PrincessUtil.replaceArgs(input, extractInfo(formulas)));
             }
           };
-      return visitor.visitFuncApp(
+      return visitor.visitFunction(
           f, args, FuncDecl.of(name, getDeclarationKind(input)), constructor);
     }
   }

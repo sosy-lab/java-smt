@@ -217,7 +217,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
               return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
             }
           };
-      return visitor.visitFuncApp(
+      return visitor.visitFunction(
           formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
     }
   }

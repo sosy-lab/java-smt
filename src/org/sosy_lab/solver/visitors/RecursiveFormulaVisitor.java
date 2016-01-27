@@ -76,7 +76,7 @@ public abstract class RecursiveFormulaVisitor implements FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitFuncApp(
+  public Void visitFunction(
       Formula f,
       List<Formula> args,
       FuncDecl functionDeclaration,

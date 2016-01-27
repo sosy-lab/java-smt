@@ -256,7 +256,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     }
 
     @Override
-    public R visitFuncApp(
+    public R visitFunction(
         Formula f,
         List<Formula> args,
         FuncDecl functionDeclaration,

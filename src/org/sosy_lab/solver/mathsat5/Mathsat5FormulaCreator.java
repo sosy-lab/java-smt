@@ -281,7 +281,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
               return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
             }
           };
-      return visitor.visitFuncApp(
+      return visitor.visitFunction(
           formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
     }
   }

@@ -368,7 +368,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
                 return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
               }
             };
-        return visitor.visitFuncApp(
+        return visitor.visitFunction(
             formula, args, FuncDecl.of(name, getDeclarationKind(f)), constructor);
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(environment, f);

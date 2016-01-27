@@ -77,13 +77,13 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   }
 
   @Override
-  public TraversalProcess visitFuncApp(
+  public TraversalProcess visitFunction(
       Formula pF,
       List<Formula> pArgs,
       FuncDecl pFunctionDeclaration,
       Function<List<Formula>, Formula> pNewApplicationConstructor) {
     TraversalProcess result =
-        delegate.visitFuncApp(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
+        delegate.visitFunction(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
     if (result == TraversalProcess.CONTINUE) {
       for (Formula arg : pArgs) {
         addToQueue(arg);
