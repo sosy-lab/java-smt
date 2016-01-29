@@ -13,19 +13,30 @@
 
     <configurations>
         <!-- All dependencies that are only needed during build. -->
-        <conf name="build" />
+        <conf name="build" visibility="private" description="for developing and testing"/>
 
-        <!-- The normal dependencies. -->
-        <conf name="runtime" />
+        <!-- The minimal dependencies, without any solver. -->
+        <conf name="core" visibility="private" description="minimal configuration, no solver included"/>
+
+        <!-- The normal dependencies with only one solver included. -->
+        <conf name="runtime-mathsat" extends="core" description="only one solver included"/>
+        <conf name="runtime-optimathsat" extends="core" description="only one solver included"/>
+        <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
+        <conf name="runtime-princess" extends="core" description="only one solver included"/>
+        <conf name="runtime-z3" extends="core" description="only one solver included"/>
+        <conf name="runtime-cvc4" extends="core" description="only one solver included"/>
+
+        <!-- The normal dependencies with all solvers included. -->
+        <conf name="runtime" extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4" description="all solvers included"/>
 
         <!-- Dependencies needed for building or running tests. -->
-        <conf name="test" />
+        <conf name="test" visibility="private" description="for developing and testing"/>
 
         <!-- Dependencies needed for running CheckStyle. -->
-        <conf name="checkstyle" />
+        <conf name="checkstyle" visibility="private" description="for developing and testing"/>
 
         <!-- Dependencies needed for running FindBugs. -->
-        <conf name="findbugs" />
+        <conf name="findbugs" visibility="private" description="for developing and testing"/>
 
         <!-- Additional files like JavaDocs or source code that will help developers.
              These are not downloaded by default, but only when "ant install-contrib" is called. -->
@@ -35,7 +46,7 @@
         <conf name="sources" />
     </configurations>
 
-    <publications defaultconf="runtime">
+    <publications defaultconf="core">
         <artifact />
 
         <artifact conf="sources" e:classifier="sources" type="source" ext="jar"/>
@@ -43,11 +54,11 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.1000-30-gdf43a3c" conf="runtime->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.1000-30-gdf43a3c" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="19.0" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="19.0" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
         <dependency org="com.google.guava" name="guava-testlib" rev="19.0" conf="test->default; contrib->sources"/>
@@ -89,22 +100,22 @@
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-224-gfd408f2" conf="runtime->runtime; contrib->sources">
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-224-gfd408f2" conf="runtime-smtinterpol->runtime; contrib->sources">
           <artifact name="smtinterpol" e:classifier="comp" conf="runtime"/>
           <artifact name="smtinterpol" e:classifier="sources" conf="contrib" ext="zip"/>
         </dependency>
 
         <!-- Princess -->
-        <dependency org="org.ruemmer.philipp" name="princess" rev="2015-12-08-r2563" conf="runtime->runtime; contrib->sources">
+        <dependency org="org.ruemmer.philipp" name="princess" rev="2015-12-08-r2563" conf="runtime-princess->runtime; contrib->sources">
           <artifact name="princess" e:classifier="assertionless" conf="runtime"/>
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-87-gad58226" conf="runtime->solver-z3" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.10" conf="runtime->solver-mathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.3.5" conf="runtime->solver-optimathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="custom1-1.5-prerelease" conf="runtime->solver-cvc4" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-87-gad58226" conf="runtime-z3->solver-z3" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.10" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.3.5" conf="runtime-optimathsat->solver-optimathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="custom1-1.5-prerelease" conf="runtime-cvc4->solver-cvc4" />
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.0.5"/>

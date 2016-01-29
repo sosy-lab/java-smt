@@ -14,7 +14,7 @@
         <fail unless="version.publishable"
             message="Cannot publish version ${version}, only unmodified working copies may be published." />
         <ivy:publish
-            conf="runtime, sources"
+            conf="core, runtime, runtime-mathsat, runtime-optimathsat, runtime-smtinterpol, runtime-princess, runtime-z3, runtime-cvc4, sources"
             pubrevision="${version}"
             resolver="Sosy-Lab-Publish"
             status="release"
