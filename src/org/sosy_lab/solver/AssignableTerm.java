@@ -21,6 +21,7 @@ package org.sosy_lab.solver;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Arrays;
@@ -38,6 +39,8 @@ public interface AssignableTerm {
     private final TermType type;
 
     public Variable(final String name, final TermType type) {
+      Preconditions.checkNotNull(name);
+      Preconditions.checkNotNull(type);
       this.name = name;
       this.type = type;
     }
