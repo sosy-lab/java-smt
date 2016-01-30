@@ -25,6 +25,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_interpolant;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_params;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
@@ -202,7 +203,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
         compute_interpolant(
             z3context,
             root, // last element is end of chain (root of tree)
-            0,
+            mk_params(z3context),
             interpolant,
             model);
 

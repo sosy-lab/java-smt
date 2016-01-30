@@ -1125,22 +1125,116 @@ final class Z3NativeApi {
   static native boolean model_eval(
       long context, long model, long a1, boolean model_completion, PointerToLong a2);
 
+  /**
+   * Return the interpretation (i.e., assignment) of constant {@code a} in the
+   * model {@code m}.
+   * Return {@code NULL}, if the model does not assign an interpretation for
+   * {@code a}.
+   * That should be interpreted as: the value of {@code a} does not matter.
+   *
+   * <p>Precondition: {@code get_arity(c, f) == 0}
+   *
+   * @param context z3context
+   * @param model z3model
+   * @param funcDecl Z3_func_decl
+   * @return
+   *      0 if the value does not matter.
+   *      Z3_ast otherwise.
+   */
   static native long model_get_const_interp(long context, long model, long funcDecl);
 
+  /**
+   * Return the interpretation of the function {@code f} in the model
+   * {@code m}.
+   * Return {@code NULL}, if the model does not assign an interpretation for
+   * {@code f}.
+   * That should be interpreted as: the {@code f} does not matter.
+   *
+   * <p>Precondition: {@code get_arity(c, f) > 0}
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   * @param funcDecl Z3_func_decl
+   * @return
+   *    0 if the value does not matter.
+   *    Z3_func_interp otherwise.
+   */
   static native long model_get_func_interp(long context, long model, long funcDecl);
 
+  /**
+   * Return the number of constants assigned by the given model.
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   */
   static native int model_get_num_consts(long context, long model);
 
+  /**
+   * Return the i-th constant in the given model.
+   *
+   * <p>Precondition: {@code i < Z3_model_get_num_consts(c, m)}
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   * @return Z3_func_decl
+   */
   static native long model_get_const_decl(long context, long model, int i);
 
+  /**
+   * Return the number of function interpretations in the given model.
+   *
+   * <p>A function interpretation is represented as a finite map and an 'else' value.
+   * Each entry in the finite map represents the value of a function given a set
+   * of arguments.
+   * @param context Z3_context
+   * @param model Z3_model
+   */
   static native int model_get_num_funcs(long context, long model);
 
+  /**
+   * Return the declaration of the i-th function in the given model.
+   *
+   * <p>Precondition: {@code i < Z3_model_get_num_funcs(c, m)}
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   * @return Z3_func_decl
+   */
   static native long model_get_func_decl(long context, long model, int i);
 
+  /**
+   * Return the number of uninterpreted sorts that {@code m}
+   * assigns an interpretation to.
+   *
+   * <p>Z3 also provides an interpretation for uninterpreted sorts used in a formula.
+   * The interpretation for a sort {@code s} is a finite set of distinct values.
+   * We say this finite set is the "universe" of {@code s}.
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   */
   static native int model_get_num_sorts(long context, long model);
 
+  /**
+   * Return a uninterpreted sort that {@code m} assigns an interpretation.
+   *
+   * <p>{@code i < Z3_model_get_num_sorts(c, m)}
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   * @return Z3_sort
+   */
   static native long model_get_sort(long context, long model, int i);
 
+  /**
+   * Return the finite set of distinct values that represent the interpretation
+   * for sort {@code s}.
+   *
+   * @param context Z3_context
+   * @param model Z3_model
+   * @param sort Z3_sort
+   * @return Z3_ast_vector
+   */
   static native long model_get_sort_universe(long context, long model, long sort);
 
   static native boolean is_as_array(long context, long a1);

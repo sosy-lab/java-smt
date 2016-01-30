@@ -285,17 +285,28 @@ def process_text(text):
     return tmp4
 
 def main():
-    api = open(os.path.join(sys.argv[1], "z3_api.h")).read()
-    interp_api = open(os.path.join(sys.argv[1], "z3_interp.h")).read()
+    # TODO: replace with running cpp on z3.h and parsing the output.
+    o = lambda f: open(os.path.join(sys.argv[1], f)).read()
+
+    api = o("z3_api.h")
+    interp_api = o("z3_interp.h")
+    containers_api = o("z3_ast_containers.h")
+    optimization_api = o("z3_optimization.h")
 
     result_text = process_text(api)
     result_interp = process_text(interp_api)
+    result_containers = process_text(containers_api)
+    result_opt = process_text(optimization_api)
 
     # Write result
     print(HEADER)
     print(result_text)
     print('\n\n// INTERPOLATION\n\n')
     print(result_interp)
+    print('\n\n// AST CONTAINERS\n\n')
+    print(result_containers)
+    print('\n\n// OPTIMIZATION \n\n')
+    print(result_opt)
 
 def getType(typ):
     return typ.replace("Z3","J")
