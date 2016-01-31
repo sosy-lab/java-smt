@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Function;
-import com.sun.istack.internal.Nullable;
 
 import de.uni_freiburg.informatik.ultimate.logic.Model;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -33,6 +32,8 @@ import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.annotation.Nullable;
 
 class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
