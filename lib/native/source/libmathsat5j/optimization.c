@@ -1,6 +1,6 @@
 #include "includes/defines.h"
 
-DEFINE_FUNC(jfailureCode, 1push_1minimize) WITH_FOUR_ARGS(jenv, jterm, string, string)
+DEFINE_FUNC(jobjective, 1push_1minimize) WITH_FOUR_ARGS(jenv, jterm, string, string)
 ENV_ARG(1)
 TERM_ARG(2)
 OPTIONAL_STRING_ARG(3)
@@ -10,7 +10,7 @@ FREE_STRING_OPTIONAL_ARG(3)
 FREE_STRING_OPTIONAL_ARG(4)
 STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jfailureCode, 1push_1maximize) WITH_FOUR_ARGS(jenv, jterm, string, string)
+DEFINE_FUNC(jobjective, 1push_1maximize) WITH_FOUR_ARGS(jenv, jterm, string, string)
 ENV_ARG(1)
 TERM_ARG(2)
 OPTIONAL_STRING_ARG(3)
@@ -20,7 +20,7 @@ FREE_STRING_OPTIONAL_ARG(3)
 FREE_STRING_OPTIONAL_ARG(4)
 STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jfailureCode, 1push_1maxmin) WITH_FIVE_ARGS(jenv, int, jtermArray, string, string)
+DEFINE_FUNC(jobjective, 1push_1maxmin) WITH_FIVE_ARGS(jenv, int, jtermArray, string, string)
 ENV_ARG(1)
 SIMPLE_ARG(size_t, 2)
 TERM_ARRAY_ARG(3)
@@ -32,7 +32,7 @@ FREE_STRING_OPTIONAL_ARG(4)
 FREE_STRING_OPTIONAL_ARG(5)
 STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jfailureCode, 1assert_1soft_1formula) WITH_FOUR_ARGS(jenv, jterm, jterm, string)
+DEFINE_FUNC(int, 1assert_1soft_1formula) WITH_FOUR_ARGS(jenv, jterm, jterm, string)
 ENV_ARG(1)
 TERM_ARG(2)
 TERM_ARG(3)
@@ -80,7 +80,7 @@ OBJECTIVE_ARG(2)
 CALL2(msat_objective_type, objective_get_type)
 INT_RETURN
 
-DEFINE_FUNC(jfailureCode, 1set_1model) WITH_TWO_ARGS(jenv, jobjective)
+DEFINE_FUNC(int, 1set_1model) WITH_TWO_ARGS(jenv, jobjective)
 ENV_ARG(1)
 OBJECTIVE_ARG(2)
 CALL2(int, set_model)
