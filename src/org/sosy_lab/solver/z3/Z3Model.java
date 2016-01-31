@@ -118,7 +118,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
           "Given symbol of expression is no stringSymbol! (%s)",
           new LazyString(var, z3context));
 
-      String lName = get_symbol_string(z3context, symbol);
       Object lValue = creator.convertValue(value);
 
       // cleanup outdated data

@@ -459,7 +459,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   public Object convertValue(Long value) {
     inc_ref(environment, value);
     try {
-      long sort = get_sort(environment, value);
       FormulaType<?> type = getFormulaType(value);
       Object lValue;
       if (type.isBooleanType()) {
