@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.princess;
 
-import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -29,7 +28,6 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
 import ap.parser.IFunApp;
-import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.INot;
 import ap.parser.IQuantified;
@@ -40,15 +38,9 @@ import ap.parser.IVariable;
 import com.google.common.base.Preconditions;
 
 import scala.Enumeration;
-import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /** Static helper functions for Princess. */
 class PrincessUtil {
@@ -171,40 +163,6 @@ class PrincessUtil {
 
   /** @return a new Term with the same function and new parameters. */
   public static IExpression replaceArgs(IExpression t, List<IExpression> newParams) {
-
     return t.update(JavaConversions.asScalaBuffer(newParams));
-  }
-
-  /** this function returns all variables in the terms.
-   * Duplicates are removed. */
-  public static Set<IExpression> getVarsAndUFs(Collection<IExpression> exprList) {
-    Set<IExpression> result = new HashSet<>();
-    Set<IExpression> seen = new HashSet<>();
-    Set<IFunction> uifs = new HashSet<>();
-    Deque<IExpression> todo = new ArrayDeque<>(exprList);
-
-    while (!todo.isEmpty()) {
-      IExpression t = todo.removeLast();
-      if (!seen.add(t)) {
-        continue;
-      }
-
-      if (isVariable(t)) {
-        result.add(t);
-        // this is a real variable we can skip here
-        continue;
-
-      } else if (isUF(t) && uifs.add(((IFunApp) t).fun())) {
-        result.add(t);
-      }
-
-      if (t.length() > 0) {
-        Iterator<IExpression> it = t.iterator();
-        while (it.hasNext()) {
-          todo.add(it.next());
-        }
-      }
-    }
-    return result;
   }
 }

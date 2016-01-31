@@ -44,6 +44,8 @@ import java.util.Map;
 final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
 
+  private final PrincessFormulaCreator creator;
+
   @SuppressWarnings("checkstyle:parameternumber")
   PrincessFormulaManager(
       PrincessFormulaCreator pCreator,
@@ -62,6 +64,7 @@ final class PrincessFormulaManager
         null,
         pQuantifierManager,
         pArrayManager);
+    creator = pCreator;
   }
 
   BooleanFormula encapsulateBooleanFormula(IExpression t) {
@@ -70,14 +73,15 @@ final class PrincessFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    return encapsulateBooleanFormula(getOnlyElement(getEnvironment().parseStringToTerms(pS)));
+    return encapsulateBooleanFormula(getOnlyElement(
+        getEnvironment().parseStringToTerms(pS, creator)));
   }
 
   @Override
   public Appender dumpFormula(final IExpression formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    return getEnvironment().dumpFormula((IFormula) formula);
+    return getEnvironment().dumpFormula((IFormula) formula, creator);
   }
 
   @Override

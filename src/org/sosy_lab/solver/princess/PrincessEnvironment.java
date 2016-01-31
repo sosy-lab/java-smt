@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static java.util.Collections.singleton;
 import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
@@ -181,7 +180,9 @@ class PrincessEnvironment {
     allStacks.remove(stack);
   }
 
-  public List<IExpression> parseStringToTerms(String s) {
+  public List<IExpression> parseStringToTerms(
+      String s,
+      PrincessFormulaCreator creator) {
 
     Tuple3<
             Seq<IFormula>, scala.collection.immutable.Map<IFunction, SMTFunctionType>,
@@ -192,8 +193,12 @@ class PrincessEnvironment {
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
     Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
-    Set<IExpression> declaredfunctions = PrincessUtil.getVarsAndUFs(formula);
-    for (IExpression var : declaredfunctions) {
+
+    Set<IExpression> declaredFunctions = new HashSet<>();
+    for (IExpression f : formula) {
+      declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
+    }
+    for (IExpression var : declaredFunctions) {
       if (var instanceof IConstant) {
         SMTType type = constantTypes.get(((IConstant) var).c());
         if (type instanceof SMTParser2InputAbsy.SMTArray) {
@@ -241,7 +246,7 @@ class PrincessEnvironment {
     return retVal;
   }
 
-  public Appender dumpFormula(IFormula formula) {
+  public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
     // remove redundant expressions
     // TODO do we want to remove redundancy completely (as checked in the unit
     // tests (SolverFormulaIOTest class)) or do we want to remove redundancy up
@@ -256,7 +261,8 @@ class PrincessEnvironment {
       @Override
       public void appendTo(Appendable out) throws IOException {
         out.append("(set-logic AUFLIA)\n");
-        Set<IExpression> allVars = PrincessUtil.getVarsAndUFs(singleton(lettedFormula));
+        Set<IExpression> allVars =
+            new HashSet<>(creator.extractVariablesAndUFs(lettedFormula, true).values());
         Deque<IExpression> declaredFunctions = new ArrayDeque<>(allVars);
         Set<String> doneFunctions = new HashSet<>();
         Set<String> todoAbbrevs = new HashSet<>();
@@ -277,7 +283,7 @@ class PrincessEnvironment {
           if (name.startsWith("abbrev_")) {
             todoAbbrevs.add(name);
             Set<IExpression> varsFromAbbrev =
-                PrincessUtil.getVarsAndUFs(singleton(abbrevMap.get(var)));
+                new HashSet<>(creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
             for (IExpression addVar : Sets.difference(varsFromAbbrev, allVars)) {
               declaredFunctions.push(addVar);
             }
@@ -313,7 +319,9 @@ class PrincessEnvironment {
         for (Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
           IExpression abbrev = entry.getKey();
           IExpression fullFormula = entry.getValue();
-          String name = getName(getOnlyElement(PrincessUtil.getVarsAndUFs(singleton(abbrev))));
+          String name = getName(getOnlyElement(
+                  creator.extractVariablesAndUFs(abbrev, true).values()
+              ));
 
           //only add the necessary abbreviations
           if (!todoAbbrevs.contains(name)) {
