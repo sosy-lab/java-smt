@@ -9,7 +9,7 @@ public class InterpolatingProverWithAssumptionsWrapperTest
     extends SolverFormulaWithAssumptionsTest {
 
   @Override
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked", "rawtypes", "resource"})
   protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest()
       throws InvalidConfigurationException {
     final InterpolatingProverEnvironment<?> proverEnvironment =
