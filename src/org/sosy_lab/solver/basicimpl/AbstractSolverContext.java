@@ -40,6 +40,7 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   public abstract ProverEnvironment newProverEnvironment0(ProverOptions... options);
 
+  @SuppressWarnings("resource")
   @Override
   public final InterpolatingProverEnvironmentWithAssumptions<?>
       newProverEnvironmentWithInterpolation() {
