@@ -25,7 +25,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
