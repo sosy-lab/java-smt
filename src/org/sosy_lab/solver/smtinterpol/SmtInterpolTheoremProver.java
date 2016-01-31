@@ -21,17 +21,17 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,20 +44,15 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
   private final List<Term> assertedTerms;
+  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment> creator;
   private boolean closed = false;
 
-  private final Function<Term, BooleanFormula> encapsulateBoolean =
-      new Function<Term, BooleanFormula>() {
-        @Override
-        public BooleanFormula apply(Term pInput) {
-          return mgr.encapsulateBooleanFormula(pInput);
-        }
-      };
-
-  SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr) {
+  SmtInterpolTheoremProver(
+      SmtInterpolFormulaManager pMgr, FormulaCreator<Term, Sort, SmtInterpolEnvironment> pCreator) {
     mgr = pMgr;
     assertedTerms = new ArrayList<>();
     env = mgr.createEnvironment();
+    creator = pCreator;
     checkNotNull(env);
   }
 
@@ -70,7 +65,7 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
-    return SmtInterpolModel.createSmtInterpolModel(env, assertedTerms);
+    return new SmtInterpolModel(env.getModel(), creator, assertedTerms);
   }
 
   @Override
@@ -120,7 +115,7 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
     Term[] terms = env.getUnsatCore();
-    return Lists.transform(Arrays.asList(terms), encapsulateBoolean);
+    return Lists.transform(Arrays.asList(terms), creator.encapsulateBoolean);
   }
 
   @Override
@@ -133,13 +128,8 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
       importantTerms[i++] = mgr.extractInfo(impF);
     }
     for (Term[] model : env.checkAllSat(importantTerms)) {
-      callback.apply(Lists.transform(Arrays.asList(model), encapsulateBoolean));
+      callback.apply(Lists.transform(Arrays.asList(model), creator.encapsulateBoolean));
     }
     return callback.getResult();
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T f) {
-    throw new UnsupportedOperationException("SmtInterpol does not support model " + "evaluation");
   }
 }

@@ -21,32 +21,44 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import ap.parser.IExpression;
+
 import com.google.common.base.Preconditions;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.api.BasicProverEnvironment;
+import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.Model;
 
-abstract class PrincessAbstractProver {
+abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
 
   protected final PrincessStack stack;
   protected final PrincessFormulaManager mgr;
+  protected final FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> creator;
   protected boolean closed = false;
 
-  protected PrincessAbstractProver(PrincessFormulaManager pMgr, boolean useForInterpolation) {
+  protected PrincessAbstractProver(
+      PrincessFormulaManager pMgr,
+      boolean useForInterpolation,
+      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> creator) {
     this.mgr = pMgr;
+    this.creator = creator;
     this.stack = checkNotNull(mgr.getEnvironment().getNewStack(useForInterpolation));
   }
 
   /** This function causes the SatSolver to check all the terms on the stack,
    * if their conjunction is SAT or UNSAT.
    */
+  @Override
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
     return !stack.checkSat();
   }
 
+  @Override
   public abstract void pop();
 
+  @Override
   public abstract Model getModel() throws SolverException;
 
   public void close() {

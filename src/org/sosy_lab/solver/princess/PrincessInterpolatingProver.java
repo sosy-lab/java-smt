@@ -31,11 +31,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
+import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,15 +44,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class PrincessInterpolatingProver extends PrincessAbstractProver
+class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
 
   private final List<Integer> assertedFormulas = new ArrayList<>(); // Collection of termNames
   private final Map<Integer, IFormula> annotatedTerms = new HashMap<>(); // Collection of termNames
   private static final UniqueIdGenerator counter = new UniqueIdGenerator(); // for different indices
 
-  PrincessInterpolatingProver(PrincessFormulaManager pMgr) {
-    super(pMgr, true);
+  PrincessInterpolatingProver(
+      PrincessFormulaManager pMgr,
+      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> creator) {
+
+    super(pMgr, true, creator);
   }
 
   @Override
@@ -130,13 +133,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
     assert assertedFormulas.size() == annotatedTerms.size();
     final List<IExpression> values = Lists.<IExpression>newArrayList(annotatedTerms.values());
-    return PrincessModel.createModel(stack, values);
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T f) {
-    throw new UnsupportedOperationException("Princess does not support term evaluation");
+    return new PrincessModel(stack.getPartialModel(), creator, values);
   }
 }

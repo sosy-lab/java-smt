@@ -89,10 +89,9 @@ public enum FunctionDeclarationKind {
    * Binary equality is modelled with {@code IFF}.
    */
   EQ,
-
-  /**
-   * Solvers support a lot of different built-in theories.
-   * We enforce standardization only across a small subset.
-   */
+  FunctionDeclarationKind, /**
+                            * Solvers support a lot of different built-in theories.
+                            * We enforce standardization only across a small subset.
+                            */
   OTHER
 }

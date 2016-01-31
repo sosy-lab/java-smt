@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
@@ -32,6 +33,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_bv_sort_size;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_index_value;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
@@ -82,6 +84,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_SORT_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -94,6 +97,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.common.time.Timer;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
@@ -115,6 +119,7 @@ import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -333,8 +338,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (get_ast_kind(environment, f)) {
       case Z3_NUMERAL_AST:
-        // TODO extract logic from Z3Model for conversion from string to number and use it here
-        return visitor.visitConstant(formula, Z3Model.termToNumber(environment, f));
+        return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
         String name = getName(f);
         int arity = get_app_num_args(environment, f);
@@ -450,5 +454,43 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
       default:
         return FunctionDeclarationKind.OTHER;
     }
+  }
+
+  public Object convertValue(Long value) {
+    inc_ref(environment, value);
+    try {
+      long sort = get_sort(environment, value);
+      FormulaType<?> type = getFormulaType(value);
+      Object lValue;
+      if (type.isBooleanType()) {
+        return isOP(environment, value, Z3_OP_TRUE);
+      } else if (type.isIntegerType()) {
+        return new BigInteger(get_numeral_string(environment, value));
+      } else if (type.isRationalType()) {
+
+        // String serialization is expensive, but getting arbitrary-sized
+        // numbers is difficult otherwise.
+        // TODO: an optimization is possible here, try to get an integer first,
+        // resort to strings if that fails.
+        String s = get_numeral_string(environment, value);
+        return Rational.ofString(s);
+      } else if (type.isBitvectorType()) {
+        return interpretBitvector(environment, value);
+      } else {
+
+        // Unknown type --- return string serialization.
+        return ast_to_string(environment, value);
+      }
+
+    } finally {
+      dec_ref(environment, value);
+    }
+  }
+
+  private static BigInteger interpretBitvector(long z3context, long bv) {
+    long argSort = get_sort(z3context, bv);
+    int sortKind = get_sort_kind(z3context, argSort);
+    Preconditions.checkArgument(sortKind == Z3_BV_SORT);
+    return new BigInteger(get_numeral_string(z3context, bv));
   }
 }

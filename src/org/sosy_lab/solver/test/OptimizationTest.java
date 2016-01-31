@@ -12,15 +12,13 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment.OptStatus;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -54,6 +52,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnbounded() throws Exception {
     requireRationals();
+    assert rmgr != null;
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x, obj;
       x = rmgr.makeVariable("x");
@@ -117,9 +116,9 @@ public class OptimizationTest extends SolverBasedTest0 {
       assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
       Model model = prover.getModel();
-      BigInteger xValue = (BigInteger) model.get(new Variable("x", TermType.Integer));
-      BigInteger objValue = (BigInteger) model.get(new Variable("obj", TermType.Integer));
-      BigInteger yValue = (BigInteger) model.get(new Variable("y", TermType.Integer));
+      BigInteger xValue = (BigInteger) model.evaluate(x).get();
+      BigInteger objValue = (BigInteger) model.evaluate(obj).get();
+      BigInteger yValue = (BigInteger) model.evaluate(y).get();
 
       assertThat(objValue).isEqualTo(BigInteger.valueOf(19));
       assertThat(xValue).isEqualTo(BigInteger.valueOf(10));

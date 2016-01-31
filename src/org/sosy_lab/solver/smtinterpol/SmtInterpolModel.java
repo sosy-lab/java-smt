@@ -19,126 +19,69 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
-import com.google.common.base.Verify;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import org.sosy_lab.solver.AssignableTerm;
-import org.sosy_lab.solver.AssignableTerm.Function;
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Iterator;
 
-class SmtInterpolModel {
-  private SmtInterpolModel() {}
+class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
-  private static TermType getType(Term t) {
-    if (SmtInterpolUtil.isBoolean(t)) {
-      return TermType.Boolean;
-    } else if (SmtInterpolUtil.hasIntegerType(t)) {
-      return TermType.Integer;
-    } else if (SmtInterpolUtil.hasRationalType(t)) {
-      return TermType.Real;
-    } else if (SmtInterpolUtil.hasArrayType(t)) {
-      return TermType.Array;
-    }
+  private final Model model;
+  private final Collection<Term> assertedTerms;
 
-    throw new IllegalArgumentException(
-        "Given sort cannot be converted to a TermType: " + t.getSort());
+  SmtInterpolModel(
+      Model pModel,
+      FormulaCreator<Term, Sort, SmtInterpolEnvironment> pCreator,
+      Collection<Term> assertedTerms) {
+    super(pCreator);
+    model = pModel;
+    this.assertedTerms = assertedTerms;
   }
 
-  private static AssignableTerm toVariable(Term t) {
-    if (!SmtInterpolUtil.isVariable(t)) {
-      throw new IllegalArgumentException("Given term is no variable! (" + t.toString() + ")");
-    }
-
-    ApplicationTerm appTerm = (ApplicationTerm) t;
-    String lName = appTerm.getFunction().getName();
-    TermType lType = getType(appTerm);
-    return new Variable(lName, lType);
+  @Override
+  public Optional<Object> evaluate(Term f) {
+    Term out = model.evaluate(f);
+    return Optional.of(getValue(out));
   }
 
-  private static Function toFunction(
-      Term t, de.uni_freiburg.informatik.ultimate.logic.Model values) {
-    if (SmtInterpolUtil.isVariable(t)) {
-      throw new IllegalArgumentException("Given term is no function! (" + t.toString() + ")");
-    }
-
-    ApplicationTerm appTerm = (ApplicationTerm) t;
-    String lName = appTerm.getFunction().getName();
-    TermType lType = getType(appTerm);
-
-    int lArity = SmtInterpolUtil.getArity(appTerm);
-
-    Object[] lArguments = new Object[lArity];
-
-    for (int lArgumentIndex = 0; lArgumentIndex < lArity; lArgumentIndex++) {
-      Term lArgument = SmtInterpolUtil.getArg(appTerm, lArgumentIndex);
-      lArgument = values.evaluate(lArgument);
-      lArguments[lArgumentIndex] = getValue(lArgument);
-    }
-
-    return new Function(lName, lType, lArguments);
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    return new TermExtractionModelIterator<>(
+        creator,
+        new Function<Term, Optional<Object>>() {
+          @Override
+          public Optional<Object> apply(Term input) {
+            return evaluate(input);
+          }
+        },
+        assertedTerms);
   }
 
-  private static AssignableTerm toAssignable(
-      Term t, de.uni_freiburg.informatik.ultimate.logic.Model values) {
-
-    assert t instanceof ApplicationTerm : "This is no ApplicationTerm: " + t.toString();
-
-    if (SmtInterpolUtil.isVariable(t)) {
-      return toVariable(t);
-    } else {
-      return toFunction(t, values);
-    }
+  @Override
+  public String toString() {
+    return model.toString();
   }
 
-  private static Object getValue(Term value) {
-    if (SmtInterpolUtil.isTrue(value)) {
-      return true;
-    } else if (SmtInterpolUtil.isFalse(value)) {
-      return false;
+  private Object getValue(Term value) {
+    FormulaType<?> type = creator.getFormulaType(value);
+    if (type.isBooleanType()) {
+      return SmtInterpolUtil.isTrue(value);
     } else if (SmtInterpolUtil.isNumber(value)) {
       return SmtInterpolUtil.toNumber(value);
+    } else {
+
+      // Return string serialization for unknown values.
+      return value.toString();
     }
-
-    throw new IllegalArgumentException("SmtInterpol model term with expected value " + value);
-  }
-
-  static Model createSmtInterpolModel(
-      SmtInterpolEnvironment env, Collection<Term> assertedFormulas) {
-    de.uni_freiburg.informatik.ultimate.logic.Model values = env.getModel();
-
-    Map<AssignableTerm, Object> model = new LinkedHashMap<>();
-    for (Term lKeyTerm : SmtInterpolUtil.getVarsAndUIFs(assertedFormulas)) {
-      Term lValueTerm = values.evaluate(lKeyTerm);
-
-      if (SmtInterpolUtil.isArrayTerm(lValueTerm)) {
-        // TODO Implement the parsing for array terms
-        continue;
-      }
-
-      AssignableTerm lAssignable = toAssignable(lKeyTerm, values);
-      Object lValue = getValue(lValueTerm);
-
-      // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
-      // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
-      // leading to two entries for "uf(1)" (if value is 1).
-      Object existingValue = model.get(lAssignable);
-      Verify.verify(
-          existingValue == null || lValue.equals(existingValue),
-          "Duplicate values for model entry %s: %s and %s",
-          lAssignable,
-          existingValue,
-          lValue);
-      model.put(lAssignable, lValue);
-    }
-
-    return new Model(model);
   }
 }

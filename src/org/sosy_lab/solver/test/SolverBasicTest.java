@@ -120,9 +120,8 @@ public class SolverBasicTest extends SolverBasedTest0 {
                     imgr.add(imgr.makeVariable("x"), imgr.makeVariable("z")), imgr.makeNumber(10)),
                 imgr.makeVariable("y")),
             imgr.equal(imgr.makeVariable("xx"), imgr.makeVariable("zz")));
-    assertThat(mgr.extractVariableNames(constr).keySet())
-        .containsExactly("x", "y", "z", "xx", "zz");
-    assertThat(mgr.extractFunctionNames(constr)).isEqualTo(mgr.extractVariableNames(constr));
+    assertThat(mgr.extractVariables(constr).keySet()).containsExactly("x", "y", "z", "xx", "zz");
+    assertThat(mgr.extractVariablesAndUFs(constr)).isEqualTo(mgr.extractVariables(constr));
   }
 
   @Test
@@ -134,9 +133,9 @@ public class SolverBasicTest extends SolverBasedTest0 {
             fmgr.declareAndCallUninterpretedFunction(
                 "uf2", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("y"))));
 
-    assertThat(mgr.extractFunctionNames(constraint).keySet())
+    assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
         .containsExactly("uf1", "uf2", "x", "y");
 
-    assertThat(mgr.extractVariableNames(constraint).keySet()).containsExactly("x", "y");
+    assertThat(mgr.extractVariables(constraint).keySet()).containsExactly("x", "y");
   }
 }

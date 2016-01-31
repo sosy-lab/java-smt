@@ -27,32 +27,35 @@ import ap.parser.IFunction;
 
 import com.google.common.base.Predicates;
 
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
 import java.util.List;
 
 class PrincessFunctionFormulaManager
-    extends AbstractFunctionFormulaManager<IExpression, IFunction, TermType, PrincessEnvironment> {
+    extends AbstractFunctionFormulaManager<
+        IExpression, IFunction, PrincessTermType, PrincessEnvironment> {
+
+  private final PrincessFormulaCreator creator;
 
   PrincessFunctionFormulaManager(PrincessFormulaCreator creator) {
     super(creator);
+    this.creator = creator;
   }
 
   @Override
   protected IExpression createUninterpretedFunctionCallImpl(
       IFunction pFuncDecl, List<IExpression> pArgs) {
-    return getFormulaCreator().getEnv().makeFunction(pFuncDecl, pArgs);
+    return creator.makeFunction(pFuncDecl, pArgs);
   }
 
   @Override
   protected IFunction declareUninterpretedFunctionImpl(
-      String pName, TermType pReturnType, List<TermType> args) {
+      String pName, PrincessTermType pReturnType, List<PrincessTermType> args) {
     checkArgument(
-        pReturnType == TermType.Integer || pReturnType == TermType.Boolean,
+        pReturnType == PrincessTermType.Integer || pReturnType == PrincessTermType.Boolean,
         "Princess does not support return types of UFs other than Integer");
     checkArgument(
-        from(args).allMatch(Predicates.equalTo(TermType.Integer)),
+        from(args).allMatch(Predicates.equalTo(PrincessTermType.Integer)),
         "Princess does not support argument types of UFs other than Integer");
 
     return getFormulaCreator().getEnv().declareFun(pName, args.size(), pReturnType);

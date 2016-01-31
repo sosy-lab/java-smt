@@ -194,7 +194,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {
     FunctionSymbol symbol = input.getFunction();
     Theory t = input.getTheory();
-    if (SmtInterpolUtil.isUIF(input)) {
+    if (SmtInterpolUtil.isUF(input)) {
       return FunctionDeclarationKind.UF;
     } else if (symbol == t.mAnd) {
       return FunctionDeclarationKind.AND;

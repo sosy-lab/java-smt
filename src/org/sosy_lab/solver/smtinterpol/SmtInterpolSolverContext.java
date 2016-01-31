@@ -1,5 +1,7 @@
 package org.sosy_lab.solver.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -55,7 +57,11 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
 
   @Override
   public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
-    return environment.createProver(manager);
+    checkState(
+        environment.getStackDepth() == 0,
+        "Not allowed to create a new prover environment while solver stack is still non-empty, "
+            + "parallel stacks are not supported.");
+    return new SmtInterpolTheoremProver(manager, manager.getFormulaCreator());
   }
 
   @Override

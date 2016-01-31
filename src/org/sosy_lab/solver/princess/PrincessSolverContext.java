@@ -7,7 +7,6 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
@@ -64,7 +63,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessOptions options = new PrincessOptions(config);
     PrincessEnvironment env = new PrincessEnvironment(pLogfileTemplate, pShutdownNotifier, options);
     PrincessFormulaCreator creator =
-        new PrincessFormulaCreator(env, TermType.Boolean, TermType.Integer);
+        new PrincessFormulaCreator(env, PrincessTermType.Boolean, PrincessTermType.Integer);
 
     // Create managers
     PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
@@ -86,12 +85,12 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
-    return new PrincessTheoremProver(manager, shutdownNotifier);
+    return new PrincessTheoremProver(manager, shutdownNotifier, creator);
   }
 
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new PrincessInterpolatingProver(manager);
+    return new PrincessInterpolatingProver(manager, creator);
   }
 
   @Override

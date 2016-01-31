@@ -4,11 +4,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
@@ -112,11 +110,6 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public <E extends Formula> E evaluate(E f) {
-    return delegate.evaluate(f);
-  }
-
-  @Override
   public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     clearAssumptions();
@@ -158,7 +151,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
     private boolean solverAssumptionsContainsVar(String variableName) {
       for (BooleanFormula solverVar : solverAssumptionsAsFormula) {
-        if (fmgr.extractVariableNames(solverVar).keySet().contains(variableName)) {
+        if (fmgr.extractVariables(solverVar).keySet().contains(variableName)) {
           return true;
         }
       }

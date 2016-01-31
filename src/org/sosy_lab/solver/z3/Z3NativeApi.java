@@ -960,8 +960,22 @@ final class Z3NativeApi {
 
   static native String get_numeral_decimal_string(long context, long a1, int a2);
 
+  /**
+   * Return the numerator (as a numeral AST) of a numeral AST of sort Real.
+   *
+   * @param context z3_context
+   * @param a1 Z3_ast
+   * @return Z3_ast
+   */
   static native long get_numerator(long context, long a1);
 
+  /**
+   * Return the denominator (as a numeral AST) of a numeral AST of sort Real.
+   *
+   * @param context z3_context
+   * @param a1 Z3_ast
+   * @return Z3_ast
+   */
   static native long get_denominator(long context, long a1);
 
   static native boolean get_numeral_small(

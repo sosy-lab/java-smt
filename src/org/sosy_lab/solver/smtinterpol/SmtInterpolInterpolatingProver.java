@@ -29,10 +29,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -226,16 +225,11 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
-  public <T extends Formula> T evaluate(T f) {
-    throw new UnsupportedOperationException("SmtInterpol can't evaluate formulas.");
-  }
-
-  @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
     assert assertedFormulas.size() == annotatedTerms.size();
 
-    return SmtInterpolModel.createSmtInterpolModel(env, annotatedTerms.values());
+    return new SmtInterpolModel(env.getModel(), mgr.getFormulaCreator(), annotatedTerms.values());
   }
 
   private static String generateTermName() {

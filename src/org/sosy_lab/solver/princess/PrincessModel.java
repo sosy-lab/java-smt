@@ -19,87 +19,65 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import ap.SimpleAPI;
-import ap.parser.IAtom;
-import ap.parser.IConstant;
+import ap.SimpleAPI.ModelValue;
+import ap.SimpleAPI.PartialModel;
 import ap.parser.IExpression;
-import ap.parser.IFunApp;
 
-import com.google.common.base.Verify;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 
-import org.sosy_lab.solver.AssignableTerm;
-import org.sosy_lab.solver.AssignableTerm.Function;
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 
 import scala.Option;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Iterator;
 
-class PrincessModel {
-  private PrincessModel() {}
+class PrincessModel extends AbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
+  private final PartialModel model;
+  private final Collection<IExpression> assertedTerms;
 
-  private static AssignableTerm toVariable(IExpression t) {
-    if (!PrincessUtil.isVariable(t)) {
-      throw new IllegalArgumentException("Given term is no variable! (" + t.toString() + ")");
-    }
-
-    final String lName;
-    final TermType lType;
-    if (t instanceof IAtom) {
-      lName = ((IAtom) t).pred().name();
-      lType = TermType.Boolean;
-    } else {
-      IConstant v = (IConstant) t;
-      lName = v.c().name();
-      lType = TermType.Integer;
-    }
-    return new Variable(lName, lType);
+  PrincessModel(
+      PartialModel partialModel,
+      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> creator,
+      Collection<IExpression> assertedTerms) {
+    super(creator);
+    this.model = partialModel;
+    this.assertedTerms = assertedTerms;
   }
 
-  private static Function toFunction(IExpression t, SimpleAPI.PartialModel partialModel) {
-    if (PrincessUtil.isVariable(t)) {
-      throw new IllegalArgumentException("Given term is no function! (" + t.toString() + ")");
+  @Override
+  public Optional<Object> evaluate(IExpression f) {
+    Option<ModelValue> out = model.evalExpression(f);
+    if (out.isEmpty()) {
+      return Optional.absent();
     }
-
-    IFunApp appTerm = (IFunApp) t;
-    String lName = appTerm.fun().name();
-
-    int lArity = PrincessUtil.getArity(appTerm);
-
-    // TODO we assume only constants (ints) as parameters for now
-    Object[] lArguments = new Object[lArity];
-
-    for (int lArgumentIndex = 0; lArgumentIndex < lArity; lArgumentIndex++) {
-      IExpression lArgument = PrincessUtil.getArg(appTerm, lArgumentIndex);
-      Option<SimpleAPI.ModelValue> argumentValue = partialModel.evalExpression(lArgument);
-      if (argumentValue.isDefined()) {
-        lArguments[lArgumentIndex] = getValue(argumentValue.get());
-      } else {
-        lArguments[lArgumentIndex] = lArgument.toString();
-      }
-    }
-
-    // currently only int is supported in princess as return type, this needs to
-    // be changed if
-    return new Function(lName, TermType.Integer, lArguments);
+    ModelValue value = out.get();
+    return Optional.of(getValue(value));
   }
 
-  private static AssignableTerm toAssignable(IExpression t, SimpleAPI.PartialModel partialModel) {
-    if (PrincessUtil.isVariable(t)) {
-      return toVariable(t);
-    } else {
-      return toFunction(t, partialModel);
-    }
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    return new TermExtractionModelIterator<>(
+        creator,
+        new Function<IExpression, Optional<Object>>() {
+          @Override
+          public Optional<Object> apply(IExpression input) {
+            return evaluate(input);
+          }
+        },
+        assertedTerms);
   }
 
-  private static Object getValue(SimpleAPI.ModelValue value) {
+  @Override
+  public String toString() {
+    return model.toString();
+  }
+
+  private Object getValue(SimpleAPI.ModelValue value) {
     if (value instanceof SimpleAPI.BoolValue) {
       return ((SimpleAPI.BoolValue) value).v();
 
@@ -110,40 +88,5 @@ class PrincessModel {
       throw new IllegalArgumentException(
           "unhandled model value " + value + " of type " + value.getClass());
     }
-  }
-
-  static Model createModel(PrincessStack stack, Collection<IExpression> assertedFormulas)
-      throws SolverException {
-    Map<AssignableTerm, Object> model = new LinkedHashMap<>();
-
-    checkArgument(stack.checkSat(), "model is only available for SAT environments");
-
-    SimpleAPI.PartialModel partialModel = stack.getPartialModel();
-
-    for (IExpression lKeyTerm : PrincessUtil.getVarsAndUIFs(assertedFormulas)) {
-      Option<SimpleAPI.ModelValue> value = partialModel.evalExpression(lKeyTerm);
-
-      if (!value.isDefined()) {
-        continue;
-      }
-
-      AssignableTerm lAssignable = toAssignable(lKeyTerm, partialModel);
-      Object lValue = getValue(value.get());
-
-      // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
-      // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
-      // leading to two entries for "uf(1)" (if value is 1).
-      Object existingValue = model.get(lAssignable);
-      Verify.verify(
-          existingValue == null || lValue.equals(existingValue),
-          "Duplicate values for model entry %s: %s and %s",
-          lAssignable,
-          existingValue,
-          lValue);
-
-      model.put(lAssignable, lValue);
-    }
-
-    return new Model(model);
   }
 }

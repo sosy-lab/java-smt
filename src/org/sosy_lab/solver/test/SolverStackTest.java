@@ -32,12 +32,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.AssignableTerm.Function;
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -46,7 +42,9 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.api.UfDeclaration;
+import org.sosy_lab.solver.basicimpl.Model;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -315,14 +313,13 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void modelForSatFormula() throws Exception {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
-      stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
-      stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(2)));
+      IntegerFormula a = imgr.makeVariable("a");
+      stack.push(imgr.greaterThan(a, imgr.makeNumber(0)));
+      stack.push(imgr.lessThan(a, imgr.makeNumber(2)));
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
-      Variable expectedVar = new Variable("a", TermType.Integer);
-      assertThat(model.keySet()).containsExactly(expectedVar);
-      assertThat(model).containsEntry(expectedVar, BigInteger.ONE);
+      assertThat(model.evaluate(a).get()).isEqualTo(BigInteger.ONE);
     }
   }
 
@@ -330,13 +327,12 @@ public class SolverStackTest extends SolverBasedTest0 {
   public void modelForSatFormulaWithLargeValue() throws Exception {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       BigInteger val = BigInteger.TEN.pow(1000);
-      stack.push(imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(val)));
+      IntegerFormula a = imgr.makeVariable("a");
+      stack.push(imgr.equal(a, imgr.makeNumber(val)));
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
-      Variable expectedVar = new Variable("a", TermType.Integer);
-      assertThat(model.keySet()).containsExactly(expectedVar);
-      assertThat(model).containsEntry(expectedVar, val);
+      assertThat(model.evaluate(a).get()).isEqualTo(val);
     }
   }
 
@@ -355,18 +351,20 @@ public class SolverStackTest extends SolverBasedTest0 {
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
-      Variable expectedVarA = new Variable("a", TermType.Integer);
-      Variable expectedVarB = new Variable("b", TermType.Integer);
-      assertThat(model.keySet()).containsAllOf(expectedVarA, expectedVarB);
+
       // actual type of object is not defined, thus do string matching:
-      assertThat(model).containsEntry(expectedVarA, BigInteger.ZERO);
-      assertThat(model).containsEntry(expectedVarB, BigInteger.ZERO);
+      assertThat(model.evaluate(varA).get()).isEqualTo(BigInteger.ZERO);
+      assertThat(model.evaluate(varB).get()).isEqualTo(BigInteger.ZERO);
 
       requireUfValuesInModel();
 
-      Function expectedFunc = new Function("uf", TermType.Integer, new Object[] {BigInteger.ZERO});
-      assertThat(model.keySet()).containsExactly(expectedVarA, expectedVarB, expectedFunc);
-      assertThat(model).containsEntry(expectedFunc, BigInteger.ZERO);
+      assertThat(
+              model
+                  .evaluate(
+                      fmgr.callUninterpretedFunction(
+                          uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO))))
+                  .get())
+          .isEqualTo(BigInteger.ZERO);
     }
   }
 }

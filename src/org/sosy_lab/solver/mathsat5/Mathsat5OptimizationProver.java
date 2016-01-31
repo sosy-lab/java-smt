@@ -21,11 +21,11 @@ import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -57,8 +57,8 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
    */
   private final Deque<ImmutableMap<Integer, Integer>> stack;
 
-  Mathsat5OptimizationProver(Mathsat5SolverContext pMgr) {
-    super(pMgr, createConfig());
+  Mathsat5OptimizationProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
+    super(pMgr, createConfig(), creator);
     objectiveMap = new HashMap<>();
     stack = new ArrayDeque<>();
   }
@@ -174,11 +174,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
     msat_set_model(curEnv, objectivePtr[0]);
     return super.getModel();
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T f) {
-    throw new UnsupportedOperationException("Mathsat solver does not support evaluation");
   }
 
   @Override

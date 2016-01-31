@@ -32,7 +32,6 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
-import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.api.RationalFormulaManager;
@@ -223,14 +222,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
 
   @Override
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
-    recVisitor.addToQueue(pF);
-    while (!recVisitor.isQueueEmpty()) {
-      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
-      if (process == TraversalProcess.ABORT) {
-        return;
-      }
-    }
+    formulaCreator.visitRecursively(pFormulaVisitor, pF);
   }
 
   /**
@@ -239,8 +231,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    * @param f   The input formula
    */
   @Override
-  public Map<String, Formula> extractVariableNames(Formula f) {
-    return myExtractSubformulas(f, false);
+  public Map<String, Formula> extractVariables(Formula f) {
+    return formulaCreator.extractVariablesAndUFs(f, false);
   }
 
   /**
@@ -249,46 +241,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    * @param f   The input formula
    */
   @Override
-  public Map<String, Formula> extractFunctionNames(Formula f) {
-    return myExtractSubformulas(f, true);
-  }
-
-  /**
-   * Extract all free variables from the formula, optionally including UFs.
-   */
-  protected Map<String, Formula> myExtractSubformulas(
-      final Formula pFormula, final boolean extractUF) {
-
-    final Map<String, Formula> found = new HashMap<>();
-    visitRecursively(
-        new DefaultFormulaVisitor<TraversalProcess>() {
-
-          @Override
-          protected TraversalProcess visitDefault(Formula f) {
-            return TraversalProcess.CONTINUE;
-          }
-
-          @Override
-          public TraversalProcess visitFunction(
-              Formula f,
-              List<Formula> args,
-              FunctionDeclaration functionDeclaration,
-              Function<List<Formula>, Formula> constructor) {
-
-            if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
-              found.put(functionDeclaration.getName(), f);
-            }
-            return TraversalProcess.CONTINUE;
-          }
-
-          @Override
-          public TraversalProcess visitFreeVariable(Formula f, String name) {
-            found.put(name, f);
-            return TraversalProcess.CONTINUE;
-          }
-        },
-        pFormula);
-    return found;
+  public Map<String, Formula> extractVariablesAndUFs(Formula f) {
+    return formulaCreator.extractVariablesAndUFs(f, true);
   }
 
   private <T extends Formula> T encapsulateWithTypeOf(T f, TFormulaInfo e) {

@@ -33,7 +33,6 @@ import ap.parser.PartialEvaluator;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -43,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 final class PrincessFormulaManager
-    extends AbstractFormulaManager<IExpression, TermType, PrincessEnvironment> {
+    extends AbstractFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
 
   @SuppressWarnings("checkstyle:parameternumber")
   PrincessFormulaManager(

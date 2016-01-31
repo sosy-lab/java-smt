@@ -41,7 +41,7 @@ class SmtInterpolFunctionFormulaManager
 
   private Term createUIFCallImpl(String funcDecl, Term[] args) {
     Term ufc = getFormulaCreator().getEnv().term(funcDecl, args);
-    assert SmtInterpolUtil.isUIF(ufc);
+    assert SmtInterpolUtil.isUF(ufc);
     return ufc;
   }
 

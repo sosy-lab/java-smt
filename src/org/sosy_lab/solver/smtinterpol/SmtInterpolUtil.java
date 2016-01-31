@@ -21,33 +21,19 @@ package org.sosy_lab.solver.smtinterpol;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
-import de.uni_freiburg.informatik.ultimate.logic.FormulaUnLet;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Rational;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
 /** Collection of utilities for working with SmtInterpol */
 class SmtInterpolUtil {
   private SmtInterpolUtil() {}
-
-  /** A Term is an Atom, iff its function is no element of {"And", "Or", "Not"}.*/
-  public static boolean isAtom(Term t) {
-    boolean is = !isAnd(t) && !isOr(t) && !isNot(t) && !isImplication(t) && !isIfThenElse(t);
-    assert is || isBoolean(t);
-    return is;
-  }
 
   public static boolean isVariable(Term t) {
     // A variable is the same as an UIF without parameters
@@ -58,7 +44,7 @@ class SmtInterpolUtil {
         && ((ApplicationTerm) t).getFunction().getDefinition() == null;
   }
 
-  public static boolean isUIF(Term t) {
+  public static boolean isUF(Term t) {
     if (!(t instanceof ApplicationTerm)) {
       return false;
     }
@@ -145,87 +131,13 @@ class SmtInterpolUtil {
     throw new NumberFormatException("unknown format of numeric term: " + t);
   }
 
-  public static boolean isArrayTerm(Term t) {
-    boolean is = false;
-
-    if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
-      if ("store".equals(at.getFunction().getName())) {
-        is = true;
-      } else if ("select".equals(at.getFunction().getName())) {
-        is = true;
-      } else if (at.getFunction().getReturnSort().isArraySort()) {
-        is = true;
-      }
-    }
-
-    return is;
-  }
-
   public static boolean isBoolean(Term t) {
     return t.getTheory().getBooleanSort() == t.getSort();
-  }
-
-  public static boolean hasIntegerType(Term t) {
-    return t.getTheory().getNumericSort() == t.getSort();
-  }
-
-  public static boolean hasRationalType(Term t) {
-    return t.getTheory().getRealSort() == t.getSort();
-  }
-
-  public static boolean hasArrayType(Term t) {
-    Sort[] tmp = t.getSort().getArguments();
-    Sort newSort = t.getTheory().getSort("Array", tmp);
-    Sort termSort = t.getSort();
-    return newSort == termSort;
-  }
-
-  /** t1 and t2 */
-  public static boolean isAnd(Term t) {
-    return isFunction(t, t.getTheory().mAnd);
-  }
-
-  /** t1 or t2 */
-  public static boolean isOr(Term t) {
-    return isFunction(t, t.getTheory().mOr);
-  }
-
-  /** not t */
-  public static boolean isNot(Term t) {
-    return isFunction(t, t.getTheory().mNot);
-  }
-
-  /** t1 => t2 */
-  public static boolean isImplication(Term t) {
-    return isFunction(t, t.getTheory().mImplies);
-  }
-
-  /** t1 or t2 */
-  public static boolean isXor(Term t) {
-    return isFunction(t, t.getTheory().mXor);
-  }
-
-  /** (ite t1 t2 t3) */
-  public static boolean isIfThenElse(Term t) {
-    return isFunction(t, "ite");
-  }
-
-  /** t1 = t2 */
-  public static boolean isEquivalence(Term t) {
-    return isFunction(t, "=")
-        && getArity(t) == 2
-        && isBoolean(getArg(t, 0))
-        && isBoolean(getArg(t, 1));
   }
 
   public static boolean isFunction(Term t, String name) {
     return (t instanceof ApplicationTerm)
         && name.equals(((ApplicationTerm) t).getFunction().getName());
-  }
-
-  public static boolean isFunction(Term t, FunctionSymbol func) {
-    return (t instanceof ApplicationTerm) && func == ((ApplicationTerm) t).getFunction();
   }
 
   public static int getArity(Term t) {
@@ -271,36 +183,6 @@ class SmtInterpolUtil {
       // AnnotatedTerm, LetTerm:  should not happen here
       return t;
     }
-  }
-
-  /**
-   * This function returns all variables and applications of uninterpreted functions
-   * in the terms without duplicates.
-   */
-  public static Set<Term> getVarsAndUIFs(Collection<Term> termList) {
-    Set<Term> result = new HashSet<>();
-    Set<Term> seen = new HashSet<>();
-    Deque<Term> todo = new ArrayDeque<>();
-    for (Term t : termList) {
-      todo.add(new FormulaUnLet().unlet(t));
-    }
-
-    while (!todo.isEmpty()) {
-      Term t = todo.removeLast();
-      if (!seen.add(t)) {
-        continue;
-      }
-
-      if (isVariable(t) || isUIF(t)) {
-        result.add(t);
-      }
-
-      if (t instanceof ApplicationTerm) {
-        Term[] params = ((ApplicationTerm) t).getParameters();
-        Collections.addAll(todo, params);
-      }
-    }
-    return result;
   }
 
   static Term[] toTermArray(Collection<? extends Term> terms) {

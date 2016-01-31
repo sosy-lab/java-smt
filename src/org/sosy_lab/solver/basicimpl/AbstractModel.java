@@ -17,14 +17,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver;
+package org.sosy_lab.solver.basicimpl;
 
-public enum TermType {
-  Boolean,
-  Uninterpreted,
-  Integer,
-  Real,
-  FloatingPoint,
-  Bitvector,
-  Array
+import com.google.common.base.Optional;
+
+import org.sosy_lab.solver.api.Formula;
+
+public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
+
+  protected final FormulaCreator<TFormulaInfo, TType, TEnv> creator;
+
+  protected AbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv> creator) {
+    this.creator = creator;
+  }
+
+  public Optional<Object> evaluate(Formula f) {
+    return evaluate(creator.extractInfo(f));
+  }
+
+  public abstract Optional<Object> evaluate(TFormulaInfo f);
 }

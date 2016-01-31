@@ -144,7 +144,7 @@ public interface FormulaManager {
    * @param f   The input formula
    * @return    Map from variable names to the corresponding formulas.
    */
-  Map<String, Formula> extractVariableNames(Formula f);
+  Map<String, Formula> extractVariables(Formula f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
@@ -152,7 +152,7 @@ public interface FormulaManager {
    * @param f   The input formula
    * @return    Map from variable names to the corresponding formulas.
    */
-  Map<String, Formula> extractFunctionNames(Formula f);
+  Map<String, Formula> extractVariablesAndUFs(Formula f);
 
   /**
    * Substitute every occurrence of any item from {@code changeFrom}

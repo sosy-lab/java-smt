@@ -22,7 +22,6 @@ package org.sosy_lab.solver.princess;
 import ap.parser.IExpression;
 import ap.parser.ITerm;
 
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
@@ -30,12 +29,12 @@ import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 public class PrincessArrayFormulaManager
-    extends AbstractArrayFormulaManager<IExpression, TermType, PrincessEnvironment> {
+    extends AbstractArrayFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
 
   private final PrincessEnvironment env;
 
   public PrincessArrayFormulaManager(
-      FormulaCreator<IExpression, TermType, PrincessEnvironment> pFormulaCreator) {
+      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> pFormulaCreator) {
     super(pFormulaCreator);
     env = pFormulaCreator.getEnv();
   }
@@ -59,7 +58,7 @@ public class PrincessArrayFormulaManager
 
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
-    final TermType arrayType = toSolverType(arrayFormulaType);
+    final PrincessTermType arrayType = toSolverType(arrayFormulaType);
 
     return getFormulaCreator().makeVariable(arrayType, pName);
   }

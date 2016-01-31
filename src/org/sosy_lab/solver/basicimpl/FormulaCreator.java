@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
@@ -32,6 +33,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.UfDeclaration;
@@ -41,9 +44,13 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.BooleanFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -103,6 +110,16 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
 
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
+  // Functional helper.
+  @SuppressWarnings("checkstyle:visibilitymodifier")
+  public Function<TFormulaInfo, BooleanFormula> encapsulateBoolean =
+      new Function<TFormulaInfo, BooleanFormula>() {
+        @Override
+        public BooleanFormula apply(TFormulaInfo pInput) {
+          return encapsulateBoolean(pInput);
+        }
+      };
+
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isBooleanType();
     return new BooleanFormulaImpl<>(pTerm);
@@ -132,7 +149,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   public <T extends Formula> T encapsulate(FormulaType<T> pType, TFormulaInfo pTerm) {
     assert pType.equals(getFormulaType(pTerm))
         : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+            "Trying to encapsulate formula %s of type %s as %s",
+            pTerm,
+            getFormulaType(pTerm),
+            pType);
     if (pType.isBooleanType()) {
       return (T) new BooleanFormulaImpl<>(pTerm);
     } else if (pType.isIntegerType()) {
@@ -221,5 +241,70 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
             return extractInfo(formula);
           }
         });
+  }
+
+  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
+    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
+    recVisitor.addToQueue(pF);
+    while (!recVisitor.isQueueEmpty()) {
+      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
+  }
+
+  /**
+   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean)} which unwraps
+   * both input and output.
+   */
+  public Map<String, TFormulaInfo> extractVariablesAndUFs(
+      final TFormulaInfo pFormula, final boolean extractUFs) {
+    return Maps.transformValues(
+        extractVariablesAndUFs(encapsulateWithTypeOf(pFormula), extractUFs),
+        new Function<Formula, TFormulaInfo>() {
+          @Override
+          public TFormulaInfo apply(Formula input) {
+            return extractInfo(input);
+          }
+        });
+  }
+
+  /**
+   * Extract all free variables from the formula, optionally including UFs.
+   */
+  public Map<String, Formula> extractVariablesAndUFs(
+      final Formula pFormula, final boolean extractUF) {
+
+    final Map<String, Formula> found = new HashMap<>();
+    visitRecursively(
+        new DefaultFormulaVisitor<TraversalProcess>() {
+
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFunction(
+              Formula f,
+              List<Formula> args,
+              FunctionDeclaration functionDeclaration,
+              Function<List<Formula>, Formula> constructor) {
+
+            if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
+              found.put(functionDeclaration.getName(), f);
+            }
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFreeVariable(Formula f, String name) {
+            found.put(name, f);
+            return TraversalProcess.CONTINUE;
+          }
+        },
+        pFormula);
+    return found;
   }
 }

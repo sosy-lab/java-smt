@@ -31,7 +31,6 @@ import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
 
 import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
@@ -39,12 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrincessQuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<IExpression, TermType, PrincessEnvironment> {
+    extends AbstractQuantifiedFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
 
   private final PrincessEnvironment env;
 
   protected PrincessQuantifiedFormulaManager(
-      FormulaCreator<IExpression, TermType, PrincessEnvironment> pCreator) {
+      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> pCreator) {
     super(pCreator);
     env = getFormulaCreator().getEnv();
   }

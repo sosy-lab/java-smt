@@ -25,11 +25,11 @@ import com.google.common.base.Optional;
 
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.logging.Level;
 
@@ -110,11 +110,6 @@ public class LoggingOptimizationProverEnvironment implements OptimizationProverE
   @Override
   public Model getModel() throws SolverException {
     return wrapped.getModel();
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T f) {
-    return wrapped.evaluate(f);
   }
 
   @Override

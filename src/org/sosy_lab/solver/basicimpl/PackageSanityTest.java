@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
+import com.google.common.base.Predicate;
 import com.google.common.testing.AbstractPackageSanityTests;
 
 import org.sosy_lab.solver.api.FormulaType;
@@ -30,5 +31,15 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
     setDefault(FunctionDeclaration.class, FunctionDeclaration.of("F", FunctionDeclarationKind.UF));
+    ignoreClasses(
+        new Predicate<Class<?>>() {
+          @Override
+          public boolean apply(Class<?> input) {
+
+            // No default testing for TermExtractionModelIterator,
+            // as the default instance for FormulaCreator can not be constructed.
+            return !(input.equals(TermExtractionModelIterator.class.getClass()));
+          }
+        });
   }
 }

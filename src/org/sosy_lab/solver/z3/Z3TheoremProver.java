@@ -50,12 +50,12 @@ import com.google.common.collect.Sets;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
+import org.sosy_lab.solver.basicimpl.Model;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
@@ -151,7 +151,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
-    return Z3Model.parseZ3Model(z3context, getZ3Model());
+    return new Z3Model(z3context, getZ3Model(), creator);
   }
 
   @Override

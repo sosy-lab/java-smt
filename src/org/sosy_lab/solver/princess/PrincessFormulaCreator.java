@@ -19,15 +19,23 @@
  */
 package org.sosy_lab.solver.princess;
 
+import static ap.basetypes.IdealInt.ONE;
+import static ap.basetypes.IdealInt.ZERO;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
 import ap.parser.IExpression;
+import ap.parser.IExpression.BooleanFunApplier;
+import ap.parser.IFormula;
 import ap.parser.IFunApp;
+import ap.parser.IFunction;
 import ap.parser.IIntLit;
+import ap.parser.ITerm;
+import ap.parser.ITermITE;
 
 import com.google.common.base.Function;
 
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
@@ -39,12 +47,16 @@ import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import scala.collection.mutable.ArrayBuffer;
+
 import java.util.ArrayList;
 import java.util.List;
 
-class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, PrincessEnvironment> {
+class PrincessFormulaCreator
+    extends FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> {
 
-  PrincessFormulaCreator(PrincessEnvironment pEnv, TermType pBoolType, TermType pIntegerType) {
+  PrincessFormulaCreator(
+      PrincessEnvironment pEnv, PrincessTermType pBoolType, PrincessTermType pIntegerType) {
     super(pEnv, pBoolType, pIntegerType, null);
   }
 
@@ -61,24 +73,24 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
   }
 
   @Override
-  public IExpression makeVariable(TermType type, String varName) {
+  public IExpression makeVariable(PrincessTermType type, String varName) {
     return getEnv().makeVariable(type, varName);
   }
 
   @Override
-  public TermType getBitvectorType(int pBitwidth) {
+  public PrincessTermType getBitvectorType(int pBitwidth) {
     throw new UnsupportedOperationException("Bitvector theory is not supported by Princess");
   }
 
   @Override
-  public TermType getFloatingPointType(FormulaType.FloatingPointType type) {
+  public PrincessTermType getFloatingPointType(FormulaType.FloatingPointType type) {
     throw new UnsupportedOperationException("FloatingPoint theory is not supported by Princess");
   }
 
   @Override
-  public TermType getArrayType(TermType pIndexType, TermType pElementType) {
+  public PrincessTermType getArrayType(PrincessTermType pIndexType, PrincessTermType pElementType) {
     // no special cases here, princess does only support int arrays with int indexes
-    return TermType.Array;
+    return PrincessTermType.Array;
   }
 
   @SuppressWarnings("unchecked")
@@ -119,16 +131,16 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
     } else if (PrincessUtil.isVariable(input)) {
       return visitor.visitFreeVariable(f, input.toString());
     } else {
-      int arity = PrincessUtil.getArity(input);
+      int arity = input.length();
       String name;
-      if (PrincessUtil.isUIF(input)) {
+      if (PrincessUtil.isUF(input)) {
         name = ((IFunApp) input).fun().name();
       } else {
         name = toString();
       }
       List<Formula> args = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {
-        IExpression arg = PrincessUtil.getArg(input, i);
+        IExpression arg = input.apply(i);
         FormulaType<?> argumentType = getFormulaType(arg);
         args.add(encapsulate(argumentType, arg));
       }
@@ -149,7 +161,7 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
     if (PrincessUtil.isIfThenElse(input)) {
       return FunctionDeclarationKind.ITE;
-    } else if (PrincessUtil.isUIF(input)) {
+    } else if (PrincessUtil.isUF(input)) {
       return FunctionDeclarationKind.UF;
     } else if (PrincessUtil.isAnd(input)) {
       return FunctionDeclarationKind.AND;
@@ -167,6 +179,36 @@ class PrincessFormulaCreator extends FormulaCreator<IExpression, TermType, Princ
 
       // TODO: other cases!!!
       return FunctionDeclarationKind.OTHER;
+    }
+  }
+
+  public IExpression makeFunction(IFunction funcDecl, List<IExpression> args) {
+    checkArgument(args.size() == funcDecl.arity(), "functiontype has different number of args.");
+
+    final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
+    for (IExpression arg : args) {
+      ITerm termArg;
+      if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
+        termArg = new ITermITE((IFormula) arg, new IIntLit(ZERO()), new IIntLit(ONE()));
+      } else {
+        termArg = (ITerm) arg;
+      }
+      argsBuf.$plus$eq(termArg);
+    }
+
+    IExpression returnFormula = new IFunApp(funcDecl, argsBuf.toSeq());
+    PrincessTermType returnType = environment.getReturnTypeForFunction(funcDecl);
+
+    // boolean term, so we have to use the fun-applier instead of the function itself
+    if (returnType == PrincessTermType.Boolean) {
+      BooleanFunApplier ap = new BooleanFunApplier(funcDecl);
+      return ap.apply(argsBuf);
+
+    } else if (returnType == PrincessTermType.Integer) {
+      return returnFormula;
+    } else {
+      throw new AssertionError(
+          "Not possible to have return types for functions other than bool or int.");
     }
   }
 }

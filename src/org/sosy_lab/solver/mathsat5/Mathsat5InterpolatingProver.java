@@ -44,8 +44,8 @@ import java.util.Set;
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     implements InterpolatingProverEnvironmentWithAssumptions<Integer> {
 
-  Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr) {
-    super(pMgr, createConfig());
+  Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
+    super(pMgr, createConfig(), creator);
   }
 
   private static Map<String, String> createConfig() {

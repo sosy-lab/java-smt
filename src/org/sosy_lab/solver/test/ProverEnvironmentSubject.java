@@ -26,11 +26,11 @@ import com.google.common.truth.TestVerb;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.List;
 
@@ -77,11 +77,7 @@ public class ProverEnvironmentSubject
 
     // get model for failure message
     final Model model = getSubject().getModel();
-    if (model.isEmpty()) {
-      fail("is", "unsatisfiable");
-    } else {
-      failWithBadResults("is", "unsatisfiable", "has counterexample", model);
-    }
+    failWithBadResults("is", "unsatisfiable", "has counterexample", model);
   }
 
   /**

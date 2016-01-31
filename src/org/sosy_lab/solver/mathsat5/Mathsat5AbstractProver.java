@@ -19,25 +19,21 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_model;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,10 +48,13 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   protected final long curEnv;
   private final long curConfig;
   private final long terminationTest;
+  private final Mathsat5FormulaCreator creator;
   protected boolean closed = false;
 
-  protected Mathsat5AbstractProver(Mathsat5SolverContext pContext, Map<String, String> pConfig) {
+  protected Mathsat5AbstractProver(
+      Mathsat5SolverContext pContext, Map<String, String> pConfig, Mathsat5FormulaCreator creator) {
     context = pContext;
+    this.creator = creator;
     curConfig = buildConfig(pConfig);
     curEnv = context.createEnvironment(curConfig);
     terminationTest = context.addTerminationTest(curEnv);
@@ -94,7 +93,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return Mathsat5Model.createMathsatModel(curEnv);
+    return new Mathsat5Model(curEnv, msat_get_model(curEnv), creator);
   }
 
   @Override
@@ -110,18 +109,5 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     msat_free_termination_test(terminationTest);
     msat_destroy_config(curConfig);
     closed = true;
-  }
-
-  @Override
-  public <E extends Formula> E evaluate(E f) {
-    long evalTerm = getMsatTerm(f);
-    Preconditions.checkState(!closed);
-    long model = msat_get_model(curEnv);
-    long term = msat_model_eval(model, evalTerm);
-    msat_destroy_model(model);
-    return context
-        .getFormulaManager()
-        .getFormulaCreator()
-        .encapsulate(context.getFormulaManager().getFormulaType(f), term);
   }
 }

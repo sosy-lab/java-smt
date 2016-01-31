@@ -22,11 +22,10 @@ package org.sosy_lab.solver.logging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -96,11 +95,6 @@ public class LoggingProverEnvironment implements ProverEnvironment {
     T result = wrapped.allSat(callback, important);
     logger.log(Level.FINE, "allsat-result:", result);
     return result;
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T f) {
-    return wrapped.evaluate(f);
   }
 
   @Override

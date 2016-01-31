@@ -31,13 +31,12 @@ import ap.parser.IFormulaITE;
 import ap.parser.INot;
 import ap.parser.ITermITE;
 
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
 import scala.Enumeration;
 
 class PrincessBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<IExpression, TermType, PrincessEnvironment> {
+    extends AbstractBooleanFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
 
   PrincessBooleanFormulaManager(PrincessFormulaCreator creator) {
     super(creator);

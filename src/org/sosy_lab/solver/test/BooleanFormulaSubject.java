@@ -28,13 +28,13 @@ import com.google.common.truth.TestVerb;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.List;
 
@@ -83,11 +83,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
       // get model for failure message
       final Model model = prover.getModel();
-      if (model.isEmpty()) {
-        fail(verb, expected);
-      } else {
-        failWithBadResults(verb, expected, "has counterexample", model);
-      }
+      failWithBadResults(verb, expected, "has counterexample", model);
     }
   }
 

@@ -692,17 +692,25 @@ class Mathsat5NativeApi {
 
   public static native void msat_destroy_model(long model);
 
-  private static native long msat_model_create_iterator(long model);
+  public static native long msat_model_create_iterator(long model);
 
+  /**
+   * Evaluates the input term in the given model.
+   *
+   * @param model msat_model The model used for the evaluation.
+   * @param term msat_term The term to evaluate.
+   * @return the value for {@code t} in {@code m}. Use MSAT_ERROR_TERM() to check
+   *         for errors.
+   */
   public static native long msat_model_eval(long model, long term);
 
   private static native long msat_create_model_iterator(long e);
 
-  private static native boolean msat_model_iterator_has_next(long i);
+  public static native boolean msat_model_iterator_has_next(long i);
 
-  private static native boolean msat_model_iterator_next(long i, long[] t, long[] v);
+  public static native boolean msat_model_iterator_next(long i, long[] t, long[] v);
 
-  private static native void msat_destroy_model_iterator(long i);
+  public static native void msat_destroy_model_iterator(long i);
 
   /*
    * Unsat core computation

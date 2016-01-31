@@ -19,12 +19,8 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static ap.basetypes.IdealInt.ONE;
-import static ap.basetypes.IdealInt.ZERO;
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
-import static org.sosy_lab.solver.princess.PrincessUtil.getVarsAndUIFs;
 import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
@@ -34,13 +30,10 @@ import ap.SimpleAPI;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
-import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
-import ap.parser.IIntLit;
 import ap.parser.ITerm;
-import ap.parser.ITermITE;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
@@ -55,13 +48,11 @@ import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.princess.PrincessSolverContext.PrincessOptions;
 
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.Seq;
-import scala.collection.mutable.ArrayBuffer;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,15 +83,15 @@ class PrincessEnvironment {
   private final Map<String, ITerm> arrayVariablesCache = new HashMap<>();
 
   private final Map<String, IFunction> functionsCache = new HashMap<>();
-  private final Map<IFunction, TermType> functionsReturnTypes = new HashMap<>();
+  private final Map<IFunction, PrincessTermType> functionsReturnTypes = new HashMap<>();
 
   private final @Nullable PathCounterTemplate basicLogfile;
   private final ShutdownNotifier shutdownNotifier;
 
-  /** the wrapped api is the first created api.
+  /** The wrapped API is the first created API.
    * It will never be used outside of this class and never be closed.
    * If a variable is declared, it is declared in the first api,
-   * then copied into all registered apis. Each api has its own stack for formulas. */
+   * then copied into all registered APIs. Each API has its own stack for formulas. */
   private final SimpleAPI api;
   private final List<SymbolTrackingPrincessStack> registeredStacks = new ArrayList<>();
   private final List<SymbolTrackingPrincessStack> reusableStacks = new ArrayList<>();
@@ -201,7 +192,7 @@ class PrincessEnvironment {
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
     Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
-    Set<IExpression> declaredfunctions = PrincessUtil.getVarsAndUIFs(formula);
+    Set<IExpression> declaredfunctions = PrincessUtil.getVarsAndUFs(formula);
     for (IExpression var : declaredfunctions) {
       if (var instanceof IConstant) {
         SMTType type = constantTypes.get(((IConstant) var).c());
@@ -233,12 +224,12 @@ class PrincessEnvironment {
     return formula;
   }
 
-  private TermType convertToTermType(SMTFunctionType type) {
+  private PrincessTermType convertToTermType(SMTFunctionType type) {
     SMTType resultType = type.result();
     if (resultType.equals(SMTParser2InputAbsy.SMTBool$.MODULE$)) {
-      return TermType.Boolean;
+      return PrincessTermType.Boolean;
     } else {
-      return TermType.Integer;
+      return PrincessTermType.Integer;
     }
   }
 
@@ -265,7 +256,7 @@ class PrincessEnvironment {
       @Override
       public void appendTo(Appendable out) throws IOException {
         out.append("(set-logic AUFLIA)\n");
-        Set<IExpression> allVars = getVarsAndUIFs(singleton(lettedFormula));
+        Set<IExpression> allVars = PrincessUtil.getVarsAndUFs(singleton(lettedFormula));
         Deque<IExpression> declaredFunctions = new ArrayDeque<>(allVars);
         Set<String> doneFunctions = new HashSet<>();
         Set<String> todoAbbrevs = new HashSet<>();
@@ -285,7 +276,8 @@ class PrincessEnvironment {
           // the rest is done afterwards
           if (name.startsWith("abbrev_")) {
             todoAbbrevs.add(name);
-            Set<IExpression> varsFromAbbrev = getVarsAndUIFs(singleton(abbrevMap.get(var)));
+            Set<IExpression> varsFromAbbrev =
+                PrincessUtil.getVarsAndUFs(singleton(abbrevMap.get(var)));
             for (IExpression addVar : Sets.difference(varsFromAbbrev, allVars)) {
               declaredFunctions.push(addVar);
             }
@@ -321,7 +313,7 @@ class PrincessEnvironment {
         for (Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
           IExpression abbrev = entry.getKey();
           IExpression fullFormula = entry.getValue();
-          String name = getName(getOnlyElement(getVarsAndUIFs(singleton(abbrev))));
+          String name = getName(getOnlyElement(PrincessUtil.getVarsAndUFs(singleton(abbrev))));
 
           //only add the necessary abbreviations
           if (!todoAbbrevs.contains(name)) {
@@ -372,7 +364,7 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  public IExpression makeVariable(TermType type, String varname) {
+  public IExpression makeVariable(PrincessTermType type, String varname) {
     switch (type) {
       case Boolean:
         {
@@ -422,7 +414,7 @@ class PrincessEnvironment {
 
   /** This function declares a new functionSymbol, that has a given number of params.
    * Princess has no support for typed params, only their number is important. */
-  public IFunction declareFun(String name, int nofArgs, TermType returnType) {
+  public IFunction declareFun(String name, int nofArgs, PrincessTermType returnType) {
     if (functionsCache.containsKey(name)) {
       assert returnType == functionsReturnTypes.get(functionsCache.get(name));
       return functionsCache.get(name);
@@ -438,38 +430,8 @@ class PrincessEnvironment {
     }
   }
 
-  TermType getReturnTypeForFunction(IFunction fun) {
+  PrincessTermType getReturnTypeForFunction(IFunction fun) {
     return functionsReturnTypes.get(fun);
-  }
-
-  public IExpression makeFunction(IFunction funcDecl, List<IExpression> args) {
-    checkArgument(args.size() == funcDecl.arity(), "functiontype has different number of args.");
-
-    final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
-    for (IExpression arg : args) {
-      ITerm termArg;
-      if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
-        termArg = new ITermITE((IFormula) arg, new IIntLit(ZERO()), new IIntLit(ONE()));
-      } else {
-        termArg = (ITerm) arg;
-      }
-      argsBuf.$plus$eq(termArg);
-    }
-
-    IExpression returnFormula = new IFunApp(funcDecl, argsBuf.toSeq());
-    TermType returnType = getReturnTypeForFunction(funcDecl);
-
-    // boolean term, so we have to use the fun-applier instead of the function itself
-    if (returnType == TermType.Boolean) {
-      BooleanFunApplier ap = new BooleanFunApplier(funcDecl);
-      return ap.apply(argsBuf);
-
-    } else if (returnType != TermType.Integer) {
-      throw new AssertionError(
-          "Not possible to have return types for functions other than bool or int.");
-    }
-
-    return returnFormula;
   }
 
   public ITerm makeSelect(ITerm array, ITerm index) {

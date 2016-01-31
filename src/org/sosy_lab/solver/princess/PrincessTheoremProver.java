@@ -32,11 +32,10 @@ import ap.parser.INot;
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.solver.Model;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.ProverEnvironment;
+import org.sosy_lab.solver.basicimpl.Model;
 
 import scala.Option;
 
@@ -45,20 +44,25 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvironment {
+class PrincessTheoremProver extends PrincessAbstractProver<Void> implements ProverEnvironment {
 
   private final List<IExpression> assertedTerms = new ArrayList<>();
   private final ShutdownNotifier shutdownNotifier;
 
-  PrincessTheoremProver(PrincessFormulaManager pMgr, ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, false);
+  PrincessTheoremProver(
+      PrincessFormulaManager pMgr,
+      ShutdownNotifier pShutdownNotifier,
+      PrincessFormulaCreator creator) {
+    super(pMgr, false, creator);
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
   }
 
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return PrincessModel.createModel(stack, assertedTerms);
+    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
+
+    return new PrincessModel(stack.getPartialModel(), creator, assertedTerms);
   }
 
   @Override
@@ -133,10 +137,5 @@ class PrincessTheoremProver extends PrincessAbstractProver implements ProverEnvi
     stack.pop(1);
 
     return callback.getResult();
-  }
-
-  @Override
-  public <T extends Formula> T evaluate(T f) {
-    throw new UnsupportedOperationException("Princess solver does not support model evaluation");
   }
 }

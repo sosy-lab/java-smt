@@ -218,17 +218,17 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Override
   public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
-    return new Mathsat5TheoremProver(this, shutdownNotifier, options);
+    return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
   }
 
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new Mathsat5InterpolatingProver(this);
+    return new Mathsat5InterpolatingProver(this, creator);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    return new Mathsat5OptimizationProver(this);
+    return new Mathsat5OptimizationProver(this, creator);
   }
 
   @Override

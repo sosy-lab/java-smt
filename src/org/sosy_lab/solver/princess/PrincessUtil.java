@@ -75,7 +75,7 @@ class PrincessUtil {
     return t instanceof IAtom || t instanceof IConstant;
   }
 
-  public static boolean isUIF(IExpression t) {
+  public static boolean isUF(IExpression t) {
     return (t instanceof IFunApp)
         && !((IFunApp) t).fun().name().equals("select")
         && !((IFunApp) t).fun().name().equals("store");
@@ -129,6 +129,7 @@ class PrincessUtil {
   }
 
   public static boolean isBoolean(IExpression t) {
+    // TODO: this is not always correct for UFs.
     return t instanceof IFormula;
   }
 
@@ -181,24 +182,6 @@ class PrincessUtil {
         && val == ((IBinFormula) t).j(); // j is the operator and Scala is evil!
   }
 
-  public static int getArity(IExpression t) {
-    return t.length();
-  }
-
-  public static IExpression getArg(IExpression t, int i) {
-    assert i < getArity(t)
-        : String.format("index %d out of bounds %d in expression %s", i, getArity(t), t);
-
-    return t.apply(i);
-    /*
-    if (t instanceof IBinFormula) {
-      return ((IBinFormula) t).apply(i);
-    } else {
-      return null;
-    }
-     */
-  }
-
   public static boolean isTrue(IExpression t) {
     return t instanceof IBoolLit && ((IBoolLit) t).value();
   }
@@ -215,7 +198,7 @@ class PrincessUtil {
 
   /** this function returns all variables in the terms.
    * Doubles are removed. */
-  public static Set<IExpression> getVarsAndUIFs(Collection<IExpression> exprList) {
+  public static Set<IExpression> getVarsAndUFs(Collection<IExpression> exprList) {
     Set<IExpression> result = new HashSet<>();
     Set<IExpression> seen = new HashSet<>();
     Set<IFunction> uifs = new HashSet<>();
@@ -232,7 +215,7 @@ class PrincessUtil {
         // this is a real variable we can skip here
         continue;
 
-      } else if (isUIF(t) && uifs.add(((IFunApp) t).fun())) {
+      } else if (isUF(t) && uifs.add(((IFunApp) t).fun())) {
         result.add(t);
       }
 

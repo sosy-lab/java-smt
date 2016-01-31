@@ -21,250 +21,117 @@ package org.sosy_lab.solver.z3;
 
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_consts;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Verify;
+import com.google.common.collect.UnmodifiableIterator;
 
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.AssignableTerm;
-import org.sosy_lab.solver.AssignableTerm.Function;
-import org.sosy_lab.solver.AssignableTerm.Variable;
-import org.sosy_lab.solver.Model;
-import org.sosy_lab.solver.TermType;
+import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
-import java.math.BigInteger;
+import java.util.Iterator;
 
-class Z3Model {
-  private Z3Model() {}
+class Z3Model extends AbstractModel<Long, Long, Long> {
 
-  private static TermType toZ3Type(long z3context, long sort) {
-    int sortKind = get_sort_kind(z3context, sort);
-    switch (sortKind) {
-      case Z3_BOOL_SORT:
-        return TermType.Boolean;
-      case Z3_INT_SORT:
-        return TermType.Integer;
-      case Z3_REAL_SORT:
-        return TermType.Real;
-      case Z3_BV_SORT:
-        return TermType.Bitvector;
-      case Z3_ARRAY_SORT:
-        return TermType.Array;
-      default:
-        // TODO Uninterpreted;
-        throw new IllegalArgumentException("Given parameter cannot be converted to a TermType!");
-    }
-  }
+  private final long model;
+  private final long z3context;
+  private final Z3FormulaCreator creator;
 
-  private static Variable toVariable(long z3context, long expr) {
-    long decl = get_app_decl(z3context, expr);
-    long symbol = get_decl_name(z3context, decl);
-
-    Preconditions.checkArgument(
-        get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
-        "Given symbol of expression is no stringSymbol! (%s)",
-        new LazyString(expr, z3context));
-
-    String lName = get_symbol_string(z3context, symbol);
-    long sort = get_sort(z3context, expr);
-    TermType lType = toZ3Type(z3context, sort);
-    return new Variable(lName, lType);
-  }
-
-  private static Function toFunction(long z3context, long expr) {
-    long decl = get_app_decl(z3context, expr);
-    long symbol = get_decl_name(z3context, decl);
-
-    Preconditions.checkArgument(
-        get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
-        "Given symbol of expression is no stringSymbol! (%s)",
-        new LazyString(expr, z3context));
-
-    String lName = get_symbol_string(z3context, symbol);
-    long sort = get_sort(z3context, expr);
-    TermType lType = toZ3Type(z3context, sort);
-
-    int lArity = get_app_num_args(z3context, expr);
-
-    // TODO we assume only constants (int/real) as parameters for now
-    Object[] lArguments = new Object[lArity];
-    for (int i = 0; i < lArity; i++) {
-      long arg = get_app_arg(z3context, expr, i);
-      inc_ref(z3context, arg);
-
-      Object lValue;
-      long argSort = get_sort(z3context, arg);
-      int sortKind = get_sort_kind(z3context, argSort);
-      switch (sortKind) {
-        case Z3_BOOL_SORT:
-          {
-            long declKind = get_decl_kind(z3context, get_app_decl(z3context, arg));
-            lValue = declKind == Z3_OP_TRUE;
-            break;
-          }
-        case Z3_INT_SORT:
-        case Z3_REAL_SORT:
-        case Z3_BV_SORT:
-          {
-            lValue = termToNumber(z3context, arg);
-            break;
-          }
-        default:
-          throw new IllegalArgumentException(
-              "function "
-                  + ast_to_string(z3context, expr)
-                  + " with unhandled arg "
-                  + ast_to_string(z3context, arg));
-      }
-
-      dec_ref(z3context, arg);
-
-      lArguments[i] = lValue;
-    }
-
-    return new Function(lName, lType, lArguments);
-  }
-
-  static Number termToNumber(long z3context, long arg) throws IllegalArgumentException {
-    Preconditions.checkState(get_ast_kind(z3context, arg) == Z3_NUMERAL_AST);
-    long argSort = get_sort(z3context, arg);
-    int sortKind = get_sort_kind(z3context, argSort);
-    switch (sortKind) {
-      case Z3_INT_SORT:
-        {
-          return new BigInteger(get_numeral_string(z3context, arg));
-        }
-      case Z3_REAL_SORT:
-        {
-          String s = get_numeral_string(z3context, arg);
-          return Rational.ofString(s);
-        }
-      case Z3_BV_SORT:
-        {
-          return interpretBitvector(z3context, arg);
-        }
-      default:
-        throw new IllegalArgumentException("Can't parse: " + ast_to_string(z3context, arg));
-    }
-  }
-
-  private static AssignableTerm toAssignable(long z3context, long expr) {
-    Preconditions.checkArgument(
-        is_app(z3context, expr),
-        "Given expr is no application! (%s)",
-        new LazyString(expr, z3context));
-
-    if (get_app_num_args(z3context, expr) == 0) {
-      return toVariable(z3context, expr);
-    } else {
-      return toFunction(z3context, expr);
-    }
-  }
-
-  public static Model createZ3Model(long z3context, long z3solver) {
-    long z3model = solver_get_model(z3context, z3solver);
-    return parseZ3Model(z3context, z3model);
-  }
-
-  public static Model parseZ3Model(long z3context, long z3model) {
-    return new Model(parseMapFromModel(z3context, z3model));
-  }
-
-  private static ImmutableMap<AssignableTerm, Object> parseMapFromModel(
-      long z3context, long z3model) {
+  Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
+    super(pCreator);
     model_inc_ref(z3context, z3model);
-    ImmutableMap.Builder<AssignableTerm, Object> model = ImmutableMap.builder();
+    model = z3model;
+    this.z3context = z3context;
+    creator = pCreator;
+  }
 
-    int n = model_get_num_consts(z3context, z3model);
-    for (int i = 0; i < n; i++) {
-      long keyDecl = model_get_const_decl(z3context, z3model, i);
+  public static Model parseZ3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
+    return new Z3Model(z3context, z3model, pCreator);
+  }
+
+  @Override
+  public Optional<Object> evaluate(Long f) {
+    PointerToLong out = new PointerToLong();
+    boolean status = model_eval(z3context, model, f, true, out);
+    Verify.verify(status, "Error during model evaluation");
+    if (out.value == 0) {
+      return Optional.absent();
+    }
+    return Optional.of(creator.convertValue(out.value));
+  }
+
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    return new Z3ModelIterator();
+  }
+
+  private class Z3ModelIterator extends UnmodifiableIterator<ValueAssignment> {
+    final int numConsts;
+    int cursor = 0;
+
+    Z3ModelIterator() {
+      // TODO: iterating through function applications.
+      numConsts = model_get_num_consts(z3context, model);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return cursor != numConsts;
+    }
+
+    @Override
+    public ValueAssignment next() {
+      long keyDecl = model_get_const_decl(z3context, model, cursor++);
       inc_ref(z3context, keyDecl);
 
-      Preconditions.checkArgument(get_arity(z3context, keyDecl) == 0, "declaration is no constant");
+      Preconditions.checkArgument(
+          get_arity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
       long var = mk_app(z3context, keyDecl);
-      inc_ref(z3context, var);
+      Formula key = creator.encapsulateWithTypeOf(var);
 
-      long value = model_get_const_interp(z3context, z3model, keyDecl);
+      long value = model_get_const_interp(z3context, model, keyDecl);
       inc_ref(z3context, value);
 
-      AssignableTerm lAssignable = toAssignable(z3context, var);
+      long decl = get_app_decl(z3context, var);
+      long symbol = get_decl_name(z3context, decl);
 
-      Object lValue;
-      switch (lAssignable.getType()) {
-        case Boolean:
-          lValue =
-              isOP(z3context, value, Z3_OP_TRUE); // if IS_TRUE, true, else false. TODO IS_UNKNOWN ?
-          break;
+      Preconditions.checkArgument(
+          get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
+          "Given symbol of expression is no stringSymbol! (%s)",
+          new LazyString(var, z3context));
 
-        case Integer:
-          lValue = new BigInteger(get_numeral_string(z3context, value));
-          break;
-
-        case Real:
-          String s = get_numeral_string(z3context, value);
-          lValue = Rational.ofString(s);
-          break;
-
-        case Bitvector:
-          lValue = interpretBitvector(z3context, value);
-          break;
-
-        case Array:
-          // TODO Implement the parsing for array terms
-          continue;
-
-        default:
-          throw new IllegalArgumentException(
-              "Z3 expr with unhandled type " + lAssignable.getType());
-      }
-
-      model.put(lAssignable, lValue);
+      String lName = get_symbol_string(z3context, symbol);
+      Object lValue = creator.convertValue(value);
 
       // cleanup outdated data
       dec_ref(z3context, keyDecl);
       dec_ref(z3context, value);
-      dec_ref(z3context, var);
+
+      return new ValueAssignment(key, lValue);
     }
-    model_dec_ref(z3context, z3model);
-    return model.build();
   }
 
-  private static BigInteger interpretBitvector(long z3context, long bv) {
-    long argSort = get_sort(z3context, bv);
-    int sortKind = get_sort_kind(z3context, argSort);
-    Preconditions.checkArgument(sortKind == Z3_BV_SORT);
-    return new BigInteger(get_numeral_string(z3context, bv));
+  @Override
+  public String toString() {
+    return model_to_string(z3context, model);
   }
 
   /** Delays the conversion to string. */

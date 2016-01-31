@@ -29,7 +29,6 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.BitShiftMultiplication;
 
-import org.sosy_lab.solver.TermType;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -78,7 +77,7 @@ class PrincessIntegerFormulaManager
 
   @Override
   protected IExpression makeVariableImpl(String varName) {
-    TermType t = getFormulaCreator().getIntegerType();
+    PrincessTermType t = getFormulaCreator().getIntegerType();
     return getFormulaCreator().makeVariable(t, varName);
   }
 
