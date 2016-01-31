@@ -25,7 +25,6 @@ import ap.SimpleAPI.PartialModel;
 import ap.parser.IExpression;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
@@ -35,6 +34,8 @@ import scala.Option;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.annotation.Nullable;
 
 class PrincessModel extends AbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
   private final PartialModel model;
@@ -49,23 +50,24 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
     this.assertedTerms = assertedTerms;
   }
 
+  @Nullable
   @Override
-  public Optional<Object> evaluate(IExpression f) {
+  public Object evaluate(IExpression f) {
     Option<ModelValue> out = model.evalExpression(f);
     if (out.isEmpty()) {
-      return Optional.absent();
+      return null;
     }
     ModelValue value = out.get();
-    return Optional.of(getValue(value));
+    return getValue(value);
   }
 
   @Override
   public Iterator<ValueAssignment> iterator() {
     return new TermExtractionModelIterator<>(
         creator,
-        new Function<IExpression, Optional<Object>>() {
+        new Function<IExpression, Object>() {
           @Override
-          public Optional<Object> apply(IExpression input) {
+          public Object apply(IExpression input) {
             return evaluate(input);
           }
         },

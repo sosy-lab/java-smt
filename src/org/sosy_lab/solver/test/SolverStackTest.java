@@ -319,7 +319,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
-      assertThat(model.evaluate(a).get()).isEqualTo(BigInteger.ONE);
+      assertThat(model.evaluate(a)).isEqualTo(BigInteger.ONE);
     }
   }
 
@@ -332,7 +332,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
-      assertThat(model.evaluate(a).get()).isEqualTo(val);
+      assertThat(model.evaluate(a)).isEqualTo(val);
     }
   }
 
@@ -353,8 +353,8 @@ public class SolverStackTest extends SolverBasedTest0 {
       Model model = stack.getModel();
 
       // actual type of object is not defined, thus do string matching:
-      assertThat(model.evaluate(varA).get()).isEqualTo(BigInteger.ZERO);
-      assertThat(model.evaluate(varB).get()).isEqualTo(BigInteger.ZERO);
+      assertThat(model.evaluate(varA)).isEqualTo(BigInteger.ZERO);
+      assertThat(model.evaluate(varB)).isEqualTo(BigInteger.ZERO);
 
       requireUfValuesInModel();
 
@@ -362,8 +362,7 @@ public class SolverStackTest extends SolverBasedTest0 {
               model
                   .evaluate(
                       fmgr.callUninterpretedFunction(
-                          uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO))))
-                  .get())
+                          uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
           .isEqualTo(BigInteger.ZERO);
     }
   }

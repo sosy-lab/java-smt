@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.cvc4;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Verify;
 
 import edu.nyu.acsys.CVC4.Expr;
@@ -56,17 +55,17 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
   }
 
   @Override
-  public Optional<Object> evaluate(Expr f) {
-    return Optional.of(getValue(smtEngine.getValue(f)));
+  public Object evaluate(Expr f) {
+    return getValue(smtEngine.getValue(f));
   }
 
   @Override
   public Iterator<ValueAssignment> iterator() {
     return new TermExtractionModelIterator<>(
         creator,
-        new Function<Expr, Optional<Object>>() {
+        new Function<Expr, Object>() {
           @Override
-          public Optional<Object> apply(Expr input) {
+          public Object apply(Expr input) {
             return evaluate(input);
           }
         },

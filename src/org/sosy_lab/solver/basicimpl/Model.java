@@ -19,13 +19,13 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import com.google.common.base.Optional;
-
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.Model.ValueAssignment;
 
 import java.util.Iterator;
 import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 public interface Model extends Iterable<ValueAssignment> {
 
@@ -36,10 +36,11 @@ public interface Model extends Iterable<ValueAssignment> {
    *
    * @param f Input formula
    * @return Either of:
-   *    - Number
+   *    - Number (Rational/Double/BigInteger/Long/Integer)
    *    - Boolean
+   *    - String (for types we do not handle)
    */
-  Optional<Object> evaluate(Formula f);
+  @Nullable Object evaluate(Formula f);
 
   /**
    * Iterate over all values present in the model.

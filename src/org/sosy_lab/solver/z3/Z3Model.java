@@ -35,7 +35,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.UnmodifiableIterator;
@@ -46,6 +45,8 @@ import org.sosy_lab.solver.basicimpl.Model;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
 import java.util.Iterator;
+
+import javax.annotation.Nullable;
 
 class Z3Model extends AbstractModel<Long, Long, Long> {
 
@@ -65,15 +66,16 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     return new Z3Model(z3context, z3model, pCreator);
   }
 
+  @Nullable
   @Override
-  public Optional<Object> evaluate(Long f) {
+  public Object evaluate(Long f) {
     PointerToLong out = new PointerToLong();
     boolean status = model_eval(z3context, model, f, true, out);
     Verify.verify(status, "Error during model evaluation");
     if (out.value == 0) {
-      return Optional.absent();
+      return null;
     }
-    return Optional.of(creator.convertValue(out.value));
+    return creator.convertValue(out.value);
   }
 
   @Override

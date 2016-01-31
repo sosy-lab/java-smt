@@ -22,7 +22,6 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Verify;
 import com.google.common.collect.UnmodifiableIterator;
 
@@ -40,11 +39,11 @@ import java.util.Map.Entry;
 public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAssignment> {
   private final Iterator<Entry<E, Object>> valuesIterator;
   private final FormulaCreator<E, ?, ?> creator;
-  private final Function<E, Optional<Object>> evaluator;
+  private final Function<E, Object> evaluator;
 
   public TermExtractionModelIterator(
       FormulaCreator<E, ?, ?> creator,
-      Function<E, Optional<Object>> evaluator,
+      Function<E, Object> evaluator,
       Collection<E> assertedTerms) {
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
@@ -53,12 +52,10 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
     Map<E, Object> values = new HashMap<>();
     for (E t : assertedTerms) {
       for (E key : creator.extractVariablesAndUFs(t, true).values()) {
-        Optional<Object> oValue = evaluator.apply(key);
-        assert oValue != null;
-        if (!oValue.isPresent()) {
+        Object value = evaluator.apply(key);
+        if (value == null) {
           continue;
         }
-        Object value = oValue.get();
         Object existingValue = values.get(key);
         Verify.verify(
             existingValue == null || value.equals(existingValue),

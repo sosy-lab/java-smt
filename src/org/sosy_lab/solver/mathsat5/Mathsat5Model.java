@@ -27,7 +27,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
@@ -59,9 +58,9 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public Optional<Object> evaluate(Long f) {
+  public Object evaluate(Long f) {
     long term = msat_model_eval(model, f);
-    return Optional.of(convertValue(term));
+    return convertValue(term);
   }
 
   @Override

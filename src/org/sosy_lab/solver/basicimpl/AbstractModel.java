@@ -19,9 +19,10 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import com.google.common.base.Optional;
 
 import org.sosy_lab.solver.api.Formula;
+
+import javax.annotation.Nullable;
 
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
 
@@ -31,9 +32,11 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     this.creator = creator;
   }
 
-  public Optional<Object> evaluate(Formula f) {
+  @Nullable
+  @Override
+  public Object evaluate(Formula f) {
     return evaluate(creator.extractInfo(f));
   }
 
-  public abstract Optional<Object> evaluate(TFormulaInfo f);
+  public abstract Object evaluate(TFormulaInfo f);
 }

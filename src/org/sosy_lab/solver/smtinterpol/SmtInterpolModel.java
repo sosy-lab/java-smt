@@ -20,7 +20,7 @@
 package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
+import com.sun.istack.internal.Nullable;
 
 import de.uni_freiburg.informatik.ultimate.logic.Model;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -48,19 +48,20 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
     this.assertedTerms = assertedTerms;
   }
 
+  @Nullable
   @Override
-  public Optional<Object> evaluate(Term f) {
+  public Object evaluate(Term f) {
     Term out = model.evaluate(f);
-    return Optional.of(getValue(out));
+    return getValue(out);
   }
 
   @Override
   public Iterator<ValueAssignment> iterator() {
     return new TermExtractionModelIterator<>(
         creator,
-        new Function<Term, Optional<Object>>() {
+        new Function<Term, Object>() {
           @Override
-          public Optional<Object> apply(Term input) {
+          public Object apply(Term input) {
             return evaluate(input);
           }
         },

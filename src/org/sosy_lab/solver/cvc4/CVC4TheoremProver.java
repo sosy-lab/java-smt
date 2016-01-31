@@ -150,7 +150,7 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
       CVC4Model model = new CVC4Model(smtEngine, creator, assertedFormulas);
 
       for (int j = 0; j < importantFormulas.length; j++) {
-        Object valueOfExpr = model.evaluate(importantFormulas[j]).get();
+        Object valueOfExpr = model.evaluate(importantFormulas[j]);
 
         if (valueOfExpr instanceof Boolean && !((Boolean) valueOfExpr)) {
           valuesOfModel[j] =

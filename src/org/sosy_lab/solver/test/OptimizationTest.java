@@ -116,9 +116,9 @@ public class OptimizationTest extends SolverBasedTest0 {
       assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
       Model model = prover.getModel();
-      BigInteger xValue = (BigInteger) model.evaluate(x).get();
-      BigInteger objValue = (BigInteger) model.evaluate(obj).get();
-      BigInteger yValue = (BigInteger) model.evaluate(y).get();
+      BigInteger xValue = (BigInteger) model.evaluate(x);
+      BigInteger objValue = (BigInteger) model.evaluate(obj);
+      BigInteger yValue = (BigInteger) model.evaluate(y);
 
       assertThat(objValue).isEqualTo(BigInteger.valueOf(19));
       assertThat(xValue).isEqualTo(BigInteger.valueOf(10));
