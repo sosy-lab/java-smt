@@ -38,7 +38,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
 
             // No default testing for TermExtractionModelIterator,
             // as the default instance for FormulaCreator can not be constructed.
-            return !(input.equals(TermExtractionModelIterator.class.getClass()));
+            return !(input.getName().equals("TermExtractionModelIterator"));
           }
         });
   }
