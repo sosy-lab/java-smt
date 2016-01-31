@@ -64,13 +64,6 @@ class PrincessUtil {
     return (IFormula) e;
   }
 
-  /** A Term is an Atom, iff its function is no element of {"And", "Or", "Not"}.*/
-  public static boolean isAtom(IExpression t) {
-    boolean is = !isAnd(t) && !isOr(t) && !isNot(t) && !isImplication(t) && !isIfThenElse(t);
-    assert is || isBoolean(t);
-    return is;
-  }
-
   public static boolean isVariable(IExpression t) {
     return t instanceof IAtom || t instanceof IConstant;
   }
@@ -112,20 +105,6 @@ class PrincessUtil {
   public static IExpression getQuantifierBody(IExpression t) {
     Preconditions.checkState(isQuantifier(t));
     return ((IQuantified) t).subformula();
-  }
-
-  /** converts a term to a number,
-   * currently only Double is supported. */
-  public static double toNumber(IExpression t) {
-    assert isNumber(t) : "term is not a number: " + t;
-
-    // ConstantTerm with Number --> "123"
-    if (t instanceof IIntLit) {
-      IdealInt value = ((IIntLit) t).value();
-      return value.longValue();
-    }
-
-    throw new NumberFormatException("unknown format of numeric term: " + t);
   }
 
   public static boolean isBoolean(IExpression t) {
@@ -197,7 +176,7 @@ class PrincessUtil {
   }
 
   /** this function returns all variables in the terms.
-   * Doubles are removed. */
+   * Duplicates are removed. */
   public static Set<IExpression> getVarsAndUFs(Collection<IExpression> exprList) {
     Set<IExpression> result = new HashSet<>();
     Set<IExpression> seen = new HashSet<>();
