@@ -25,14 +25,19 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
+import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.FloatingPointFormula;
 import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
+import org.sosy_lab.solver.api.NumeralFormula;
+import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
@@ -421,5 +426,38 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
     return parse(otherContext.getFormulaManager().dumpFormula(other).toString());
+  }
+
+  @Override
+  public  <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs) {
+    BooleanFormula t;
+    if (pLhs instanceof BooleanFormula && pRhs instanceof BooleanFormula) {
+      t = booleanManager.equivalence((BooleanFormula)pLhs, (BooleanFormula)pRhs);
+    } else if (pLhs instanceof IntegerFormula && pRhs instanceof IntegerFormula) {
+      assert integerManager != null;
+      t = integerManager.equal((IntegerFormula)pLhs, (IntegerFormula)pRhs);
+    } else if (pLhs instanceof NumeralFormula && pRhs instanceof NumeralFormula) {
+      assert rationalManager != null;
+      t = rationalManager.equal((NumeralFormula)pLhs, (NumeralFormula)pRhs);
+    } else if (pLhs instanceof BitvectorFormula) {
+      assert bitvectorManager != null;
+      t = bitvectorManager.equal((BitvectorFormula)pLhs, (BitvectorFormula)pRhs);
+    } else if (pLhs instanceof FloatingPointFormula && pRhs instanceof FloatingPointFormula) {
+      assert floatingPointManager != null;
+      t = floatingPointManager.equalWithFPSemantics((FloatingPointFormula)pLhs, (FloatingPointFormula)pRhs);
+    } else if (pLhs instanceof ArrayFormula<?, ?> && pRhs instanceof ArrayFormula<?, ?>) {
+      assert arrayManager != null;
+      @SuppressWarnings("rawtypes")
+      ArrayFormula rhs = (ArrayFormula) pRhs;
+
+      @SuppressWarnings("unchecked")
+      BooleanFormula t2 = arrayManager.equivalence((ArrayFormula<?, ?>) pLhs, rhs);
+      t = t2;
+    } else {
+      throw new IllegalArgumentException(
+          "No supported interface found for formulas: " + pLhs + " and " + pRhs);
+    }
+
+    return t;
   }
 }
