@@ -24,9 +24,6 @@
 package org.sosy_lab.solver.mathsat5;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.UnmodifiableIterator;
-
-import java.util.NoSuchElementException;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;

@@ -192,7 +192,6 @@ public abstract class SolverBasedTest0 {
   protected final void requireOptimization() {
 
     // TODO: re-enable opti-mathsat, currently it has too many bugs.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
     try {
       context.newOptimizationProverEnvironment().close();

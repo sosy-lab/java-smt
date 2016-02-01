@@ -27,8 +27,8 @@ import com.google.common.base.Preconditions;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
 

@@ -429,22 +429,24 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public  <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs) {
+  public <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs) {
     BooleanFormula t;
     if (pLhs instanceof BooleanFormula && pRhs instanceof BooleanFormula) {
-      t = booleanManager.equivalence((BooleanFormula)pLhs, (BooleanFormula)pRhs);
+      t = booleanManager.equivalence((BooleanFormula) pLhs, (BooleanFormula) pRhs);
     } else if (pLhs instanceof IntegerFormula && pRhs instanceof IntegerFormula) {
       assert integerManager != null;
-      t = integerManager.equal((IntegerFormula)pLhs, (IntegerFormula)pRhs);
+      t = integerManager.equal((IntegerFormula) pLhs, (IntegerFormula) pRhs);
     } else if (pLhs instanceof NumeralFormula && pRhs instanceof NumeralFormula) {
       assert rationalManager != null;
-      t = rationalManager.equal((NumeralFormula)pLhs, (NumeralFormula)pRhs);
+      t = rationalManager.equal((NumeralFormula) pLhs, (NumeralFormula) pRhs);
     } else if (pLhs instanceof BitvectorFormula) {
       assert bitvectorManager != null;
-      t = bitvectorManager.equal((BitvectorFormula)pLhs, (BitvectorFormula)pRhs);
+      t = bitvectorManager.equal((BitvectorFormula) pLhs, (BitvectorFormula) pRhs);
     } else if (pLhs instanceof FloatingPointFormula && pRhs instanceof FloatingPointFormula) {
       assert floatingPointManager != null;
-      t = floatingPointManager.equalWithFPSemantics((FloatingPointFormula)pLhs, (FloatingPointFormula)pRhs);
+      t =
+          floatingPointManager.equalWithFPSemantics(
+              (FloatingPointFormula) pLhs, (FloatingPointFormula) pRhs);
     } else if (pLhs instanceof ArrayFormula<?, ?> && pRhs instanceof ArrayFormula<?, ?>) {
       assert arrayManager != null;
       @SuppressWarnings("rawtypes")

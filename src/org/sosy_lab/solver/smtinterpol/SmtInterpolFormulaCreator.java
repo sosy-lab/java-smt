@@ -238,9 +238,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     assert t instanceof ConstantTerm;
     assert ((ConstantTerm) t).getValue() instanceof Rational;
     Rational value = (Rational) ((ConstantTerm) t).getValue();
-    org.sosy_lab.common.rationals.Rational out = org.sosy_lab.common.rationals.Rational.of(
-        value.numerator(), value.denominator()
-    );
+    org.sosy_lab.common.rationals.Rational out =
+        org.sosy_lab.common.rationals.Rational.of(value.numerator(), value.denominator());
     if (getFormulaTypeOfSort(t.getSort()).isIntegerType()) {
       assert out.isIntegral();
       return out.getNum();

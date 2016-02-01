@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
@@ -36,7 +35,6 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.NoSuchElementException;

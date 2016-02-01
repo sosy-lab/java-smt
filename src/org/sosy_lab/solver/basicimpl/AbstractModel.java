@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
