@@ -61,25 +61,25 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegers() throws Exception {
-    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(10), BigInteger.valueOf(10), true);
+    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(10), BigInteger.valueOf(10), "x");
   }
 
   @Test
   public void testGetNegativeIntegers() throws Exception {
-    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(-10), BigInteger.valueOf(-10), true);
+    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(-10), BigInteger.valueOf(-10), "x");
   }
 
   @Test
   public void testGetLargeIntegers() throws Exception {
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
-    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(large), large, true);
+    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(large), large, "x");
   }
 
   @Test
   public void testGetSmallIntegralRationals() throws Exception {
     requireRationals();
     assert rmgr != null;
-    testModelGetters(rmgr.makeVariable("x"), rmgr.makeNumber(1), Rational.ONE, true);
+    testModelGetters(rmgr.makeVariable("x"), rmgr.makeNumber(1), Rational.ONE, "x");
   }
 
   @Test
@@ -88,7 +88,7 @@ public class ModelTest extends SolverBasedTest0 {
     assert rmgr != null;
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
-        rmgr.makeVariable("x"), rmgr.makeNumber(large), Rational.ofBigInteger(large), true);
+        rmgr.makeVariable("x"), rmgr.makeNumber(large), Rational.ofBigInteger(large), "x");
   }
 
   @Test
@@ -99,12 +99,12 @@ public class ModelTest extends SolverBasedTest0 {
         rmgr.makeVariable("x"),
         rmgr.makeNumber(Rational.ofString("1/3")),
         Rational.ofString("1/3"),
-        true);
+        "x");
   }
 
   @Test
   public void testGetBooleans() throws Exception {
-    testModelGetters(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true, true);
+    testModelGetters(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true, "x");
   }
 
   @Test
@@ -112,7 +112,7 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula x =
         fmgr.declareAndCallUninterpretedFunction(
             "UF", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("arg")));
-    testModelGetters(x, imgr.makeNumber(1), BigInteger.ONE, false);
+    testModelGetters(x, imgr.makeNumber(1), BigInteger.ONE, "UF");
   }
 
   @Test
@@ -120,11 +120,12 @@ public class ModelTest extends SolverBasedTest0 {
     requireBitvectors();
     assert bvmgr != null;
     testModelGetters(
-        bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, true);
+        bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
   }
 
   private void testModelGetters(
-      Formula variable, Formula value, Object expectedValue, boolean testFound) throws Exception {
+      Formula variable, Formula value, Object expectedValue, String varName) throws Exception {
+
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(mgr.makeEqual(value, variable));
       assertThatEnvironment(prover).isSatisfiable();
@@ -132,14 +133,12 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
       boolean found = false;
       for (ValueAssignment assignment : m) {
-        if (assignment.getKey().equals(variable)) {
+        if (assignment.getName().equals(varName)) {
           found = true;
           assertThat(assignment.getValue()).isEqualTo(expectedValue);
         }
       }
-      if (testFound) { // Does not work as expected for UFs.
-        assertThat(found).isTrue();
-      }
+      assertThat(found).isTrue();
     }
   }
 }

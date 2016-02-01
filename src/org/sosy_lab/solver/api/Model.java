@@ -86,25 +86,41 @@ public interface Model extends Iterable<ValueAssignment> {
   String toString();
 
   final class ValueAssignment {
-    final Formula key;
-    final Object value;
+    private final Formula key;
+    private final Object value;
+    private final String name;
 
-    public ValueAssignment(Formula key, Object value) {
+    public ValueAssignment(Formula key, String name, Object value) {
       this.key = key;
+      this.name = name;
       this.value = value;
     }
 
+    /**
+     * The formula AST which is assigned a given value.
+     */
     public Formula getKey() {
       return key;
     }
 
+    /**
+     * Variable name for variables, function name for UFs, and array name for
+     * arrays.
+     */
+    public String getName() {
+      return name;
+    }
+
+    /**
+     * Value: see the {@link #evaluate} methods for the possible types.
+     */
     public Object getValue() {
       return value;
     }
 
     @Override
     public String toString() {
-      return String.format("%s=%s", key, value);
+      return String.format("%s(%s)=%s", name, key, value);
     }
 
     @Override
@@ -116,7 +132,7 @@ public interface Model extends Iterable<ValueAssignment> {
         return false;
       }
       ValueAssignment other = (ValueAssignment) o;
-      return key.equals(other.key) && value.equals(other.value);
+      return key.equals(other.key) && name.equals(other.name) && value.equals(other.value);
     }
 
     @Override

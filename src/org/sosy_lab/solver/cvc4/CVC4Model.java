@@ -69,7 +69,13 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
             return evaluateImpl(input);
           }
         },
-        assertedFormulas);
+        assertedFormulas,
+        new Function<Expr, String>() {
+          @Override
+          public String apply(Expr input) {
+            return input.toString();
+          }
+        });
   }
 
   static Map<String, Object> createAllsatModel(

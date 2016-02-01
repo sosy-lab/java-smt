@@ -42,7 +42,15 @@ import scala.collection.JavaConversions;
 
 import java.util.List;
 
-/** Static helper functions for Princess. */
+/**
+ * Static helper functions for Princess.
+ *
+ * <p>Princess does not support implication.
+ * Formulas are converted from {@code a=>b} to {@code !a||b}
+ *
+ * <p>Princess does not support XOR
+ * Formulas are converted from {@code a^b} to {@code !(a<=>b)}
+ */
 class PrincessUtil {
   private PrincessUtil() {}
 
@@ -100,13 +108,13 @@ class PrincessUtil {
   }
 
   public static boolean isBoolean(IExpression t) {
-    // TODO: this is not always correct for UFs.
     return t instanceof IFormula;
   }
 
   public static boolean hasIntegerType(IExpression t) {
     return t instanceof ITerm;
   }
+
 
   /** t1 and t2 */
   public static boolean isAnd(IExpression t) {
@@ -121,20 +129,6 @@ class PrincessUtil {
   /** not t */
   public static boolean isNot(IExpression t) {
     return t instanceof INot;
-  }
-
-  /** t1 => t2 */
-  public static boolean isImplication(@SuppressWarnings("unused") IExpression t) {
-    // Princess does not support implication.
-    // Formulas are converted from "a=>b" to "!a||b".
-    return false;
-  }
-
-  /** t1 or t2 */
-  public static boolean isXor(@SuppressWarnings("unused") IExpression t) {
-    // Princess does not support Xor.
-    // Formulas are converted from "a^b" to "!(a<=>b)".
-    return false;
   }
 
   /** (ite t1 t2 t3) */

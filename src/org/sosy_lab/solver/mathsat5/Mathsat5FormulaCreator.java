@@ -286,6 +286,13 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
     }
   }
 
+  String getName(long term) {
+    if (getDeclarationKind(term) == FunctionDeclarationKind.UF) {
+      return msat_decl_get_name(msat_term_get_decl(term));
+    }
+    return msat_term_repr(term);
+  }
+
   private Long replaceArgs(Long t, List<Long> newArgs) {
     long tDecl = msat_term_get_decl(t);
     return msat_make_term(environment, tDecl, Longs.toArray(newArgs));

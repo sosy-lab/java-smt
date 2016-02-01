@@ -40,9 +40,14 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
   private final Iterator<Entry<E, Object>> valuesIterator;
   private final FormulaCreator<E, ?, ?> creator;
   private final Function<E, Object> evaluator;
+  private final Function<E, String> nameExtractor;
 
   public TermExtractionModelIterator(
-      FormulaCreator<E, ?, ?> creator, Function<E, Object> evaluator, Collection<E> assertedTerms) {
+      FormulaCreator<E, ?, ?> creator,
+      Function<E, Object> evaluator,
+      Collection<E> assertedTerms,
+      Function<E, String> nameExtractor) {
+    this.nameExtractor = nameExtractor;
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
     this.evaluator = checkNotNull(evaluator);
@@ -75,6 +80,9 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
   @Override
   public ValueAssignment next() {
     Entry<E, Object> entry = valuesIterator.next();
-    return new ValueAssignment(creator.encapsulateWithTypeOf(entry.getKey()), entry.getValue());
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(entry.getKey()),
+        nameExtractor.apply(entry.getKey()),
+        entry.getValue());
   }
 }

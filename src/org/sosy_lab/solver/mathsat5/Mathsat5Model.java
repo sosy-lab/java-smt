@@ -45,6 +45,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   private final long env;
   private final long model;
+  private final Mathsat5FormulaCreator formulaCreator;
 
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
@@ -53,6 +54,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     super(creator);
     this.env = env;
     this.model = model;
+    formulaCreator = creator;
   }
 
   @Override
@@ -96,7 +98,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
       Formula fKey = creator.encapsulateWithTypeOf(key[0]);
       Object fValue = convertValue(key[0], value[0]);
 
-      return new ValueAssignment(fKey, fValue);
+      return new ValueAssignment(fKey, formulaCreator.getName(key[0]), fValue);
     }
   }
 

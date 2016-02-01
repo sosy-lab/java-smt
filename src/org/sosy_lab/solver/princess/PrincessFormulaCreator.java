@@ -106,6 +106,14 @@ class PrincessFormulaCreator
     return super.getFormulaType(pFormula);
   }
 
+  String getName(IExpression input) {
+    if (PrincessUtil.isUF(input)) {
+      return ((IFunApp) input).fun().name();
+    } else {
+      return input.toString();
+    }
+  }
+
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
@@ -132,12 +140,6 @@ class PrincessFormulaCreator
       return visitor.visitFreeVariable(f, input.toString());
     } else {
       int arity = input.length();
-      String name;
-      if (PrincessUtil.isUF(input)) {
-        name = ((IFunApp) input).fun().name();
-      } else {
-        name = toString();
-      }
       List<Formula> args = new ArrayList<>(arity);
       for (int i = 0; i < arity; i++) {
         IExpression arg = input.apply(i);
@@ -154,7 +156,7 @@ class PrincessFormulaCreator
             }
           };
       return visitor.visitFunction(
-          f, args, FunctionDeclaration.of(name, getDeclarationKind(input)), constructor);
+          f, args, FunctionDeclaration.of(getName(input), getDeclarationKind(input)), constructor);
     }
   }
 

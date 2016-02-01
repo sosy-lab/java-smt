@@ -21,19 +21,30 @@ package org.sosy_lab.solver.z3;
 
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_get_arg;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_get_num_args;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_get_value;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_get_entry;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_get_num_entries;
+import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_func_decl;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_func_interp;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_consts;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_funcs;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -80,23 +91,34 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private class Z3ModelIterator extends UnmodifiableIterator<ValueAssignment> {
     final int numConsts;
-    int cursor = 0;
+    final int numFuncs;
+
+    int constCursor = 0;
+    int funcCursor = 0;
+
+    int funcArgCursor = 0;
 
     Z3ModelIterator() {
-      // TODO: iterating through function applications.
-      // Difficult, as we don't know what arguments to substitute when we only
-      // have the model.
       numConsts = model_get_num_consts(z3context, model);
+      numFuncs = model_get_num_funcs(z3context, model);
     }
 
     @Override
     public boolean hasNext() {
-      return cursor != numConsts;
+      return constCursor != numConsts || funcCursor != numFuncs;
     }
 
     @Override
     public ValueAssignment next() {
-      long keyDecl = model_get_const_decl(z3context, model, cursor++);
+      if (constCursor != numConsts) {
+        return nextConstant();
+      } else {
+        return nextFuncApp();
+      }
+    }
+
+    ValueAssignment nextConstant() {
+      long keyDecl = model_get_const_decl(z3context, model, constCursor);
       inc_ref(z3context, keyDecl);
 
       Preconditions.checkArgument(
@@ -108,21 +130,65 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       long value = model_get_const_interp(z3context, model, keyDecl);
       inc_ref(z3context, value);
 
-      long decl = get_app_decl(z3context, var);
-      long symbol = get_decl_name(z3context, decl);
-
-      Preconditions.checkArgument(
-          get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
-          "Given symbol of expression is no stringSymbol! (%s)",
-          new LazyString(var, z3context));
-
+      long symbol = get_decl_name(z3context, keyDecl);
+      assert get_symbol_kind(z3context, symbol) == Z3NativeApiConstants.Z3_STRING_SYMBOL;
+      String name = get_symbol_string(z3context, symbol);
       Object lValue = creator.convertValue(value);
 
       // cleanup outdated data
       dec_ref(z3context, keyDecl);
       dec_ref(z3context, value);
 
-      return new ValueAssignment(key, lValue);
+      constCursor++;
+      return new ValueAssignment(key, name, lValue);
+    }
+
+    ValueAssignment nextFuncApp() {
+      long funcDecl = model_get_func_decl(z3context, model, funcCursor);
+      inc_ref(z3context, funcDecl);
+
+      long symbol = get_decl_name(z3context, funcDecl);
+      assert get_symbol_kind(z3context, symbol) == Z3NativeApiConstants.Z3_STRING_SYMBOL;
+      String name = get_symbol_string(z3context, symbol);
+
+      long interp = model_get_func_interp(z3context, model, funcDecl);
+      func_interp_inc_ref(z3context, interp);
+
+      int numInterpretations = func_interp_get_num_entries(z3context, interp);
+
+      long entry = func_interp_get_entry(z3context, interp, funcArgCursor);
+      func_entry_inc_ref(z3context, entry);
+
+      Object value = creator.convertValue(func_entry_get_value(z3context, entry));
+
+      int noArgs = func_entry_get_num_args(z3context, entry);
+      long[] args = new long[noArgs];
+
+      for (int i = 0; i < noArgs; i++) {
+        long arg = func_entry_get_arg(z3context, entry, i);
+        inc_ref(z3context, arg);
+        args[i] = arg;
+      }
+
+      Formula formula = creator.encapsulateWithTypeOf(mk_app(z3context, funcDecl, args));
+
+      // Clean up memory.
+      for (long arg : args) {
+        dec_ref(z3context, arg);
+      }
+      func_entry_dec_ref(z3context, entry);
+      func_interp_dec_ref(z3context, interp);
+      dec_ref(z3context, funcDecl);
+
+      // Move the cursor.
+      if (funcArgCursor == numInterpretations - 1) {
+        funcCursor++;
+        funcArgCursor = 0;
+      } else {
+        funcArgCursor++;
+      }
+
+      return new ValueAssignment(formula, name, value);
     }
   }
 
