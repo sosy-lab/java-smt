@@ -232,7 +232,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment<?> newOptimizationProverEnvironment() {
     Z3OptimizationProver out =
         new Z3OptimizationProver(getFormulaManager(), creator, shutdownNotifier, logger);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);

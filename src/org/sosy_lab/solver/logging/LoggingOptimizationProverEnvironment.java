@@ -38,12 +38,12 @@ import javax.annotation.Nullable;
 /**
  * Wrapper for an optimizing solver.
  */
-public class LoggingOptimizationProverEnvironment implements OptimizationProverEnvironment {
+public class LoggingOptimizationProverEnvironment<Handle> implements OptimizationProverEnvironment<Handle> {
 
-  private final OptimizationProverEnvironment wrapped;
+  private final OptimizationProverEnvironment<Handle> wrapped;
   private final LogManager logger;
 
-  public LoggingOptimizationProverEnvironment(LogManager logger, OptimizationProverEnvironment oe) {
+  public LoggingOptimizationProverEnvironment(LogManager logger, OptimizationProverEnvironment<Handle> oe) {
     this.wrapped = checkNotNull(oe);
     this.logger = checkNotNull(logger);
   }
@@ -55,13 +55,13 @@ public class LoggingOptimizationProverEnvironment implements OptimizationProverE
   }
 
   @Override
-  public int maximize(Formula objective) {
+  public Handle maximize(Formula objective) {
     logger.log(Level.FINE, "Maximizing: " + objective);
     return wrapped.maximize(objective);
   }
 
   @Override
-  public int minimize(Formula objective) {
+  public Handle minimize(Formula objective) {
     logger.log(Level.FINE, "Minimizing: " + objective);
     return wrapped.minimize(objective);
   }
@@ -98,12 +98,12 @@ public class LoggingOptimizationProverEnvironment implements OptimizationProverE
   }
 
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(Handle handle, Rational epsilon) {
     return wrapped.upper(handle, epsilon);
   }
 
   @Override
-  public Optional<Rational> lower(int handle, Rational epsilon) {
+  public Optional<Rational> lower(Handle handle, Rational epsilon) {
     return wrapped.lower(handle, epsilon);
   }
 

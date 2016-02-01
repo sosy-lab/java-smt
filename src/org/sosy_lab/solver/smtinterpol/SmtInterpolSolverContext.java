@@ -70,7 +70,7 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment<?> newOptimizationProverEnvironment() {
     throw new UnsupportedOperationException("SMTInterpol does not support optimization");
   }
 

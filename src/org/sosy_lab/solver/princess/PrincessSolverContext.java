@@ -94,7 +94,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment<?> newOptimizationProverEnvironment() {
     throw new UnsupportedOperationException("Princess does not support optimization");
   }
 

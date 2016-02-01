@@ -59,7 +59,7 @@ public interface SolverContext extends AutoCloseable {
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
    * and allows to solve optimization queries.
    */
-  OptimizationProverEnvironment newOptimizationProverEnvironment();
+  OptimizationProverEnvironment<?> newOptimizationProverEnvironment();
 
   /**
    * Get version information out of the solver.
