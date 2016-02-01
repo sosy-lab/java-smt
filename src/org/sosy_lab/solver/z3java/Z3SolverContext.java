@@ -1,6 +1,8 @@
 package org.sosy_lab.solver.z3java;
 
 import com.microsoft.z3.Context;
+import com.microsoft.z3.Global;
+import com.microsoft.z3.InterpolationContext;
 import com.microsoft.z3.Log;
 import com.microsoft.z3.Params;
 import com.microsoft.z3.Sort;
@@ -125,10 +127,14 @@ public final class Z3SolverContext extends AbstractSolverContext {
     if (extraOptions.requireProofs) {
       cfg.put("PROOF", "true");
     }
-    cfg.put("smt.random_seed", String.valueOf(randomSeed));
+    Global.setParameter("smt.random_seed", String.valueOf(randomSeed));
 
     // TODO add some other params, memory-limit?
-    final Context context = new Context(cfg);
+
+    // TODO do we always need interpolation? how much overhead?
+    // final Context context = new Context(cfg);
+    final Context context = new InterpolationContext(cfg);
+
     ShutdownNotifier.ShutdownRequestListener interruptListener =
         new ShutdownNotifier.ShutdownRequestListener() {
           @Override
