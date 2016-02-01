@@ -41,8 +41,6 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.basicimpl.ObjectArrayBackedList;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEnvironment> {
@@ -63,7 +61,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     return getFormulaTypeOfSort(pFormula.getSort());
   }
 
-  private FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
+  FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
     if (pSort == integerSort) {
       return FormulaType.IntegerType;
     } else if (pSort == realSort) {
@@ -149,9 +147,19 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
         input);
 
     if (input instanceof ConstantTerm) {
-      final Number value = toNumber(input);
-      return visitor.visitConstant(f, value);
-
+      Object outValue;
+      Object interpolValue = ((ConstantTerm) input).getValue();
+      if (interpolValue instanceof Rational) {
+        Rational rat = (Rational) interpolValue;
+        if (input.getSort().getName().equals("Int") && rat.isIntegral()) {
+          outValue = rat.numerator();
+        } else {
+          outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
+        }
+      } else {
+        outValue = ((ConstantTerm) input).getValue();
+      }
+      return visitor.visitConstant(f, outValue);
     } else if (input instanceof ApplicationTerm) {
       final ApplicationTerm app = (ApplicationTerm) input;
       final int arity = app.getParameters().length;
@@ -226,65 +234,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
 
     // TODO hex or binary data, string?
     return is;
-  }
-
-  /**
-   * Converts a term _which_came_from_the_model to a number.
-   * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
-   * the output is SmtInterpol's Rational unless it is a bitvector,
-   * and currently we do not support bitvectors for SmtInterpol.
-   **/
-  public Number modelTermToNumber(Term t) {
-    assert t instanceof ConstantTerm;
-    assert ((ConstantTerm) t).getValue() instanceof Rational;
-    Rational value = (Rational) ((ConstantTerm) t).getValue();
-    org.sosy_lab.common.rationals.Rational out =
-        org.sosy_lab.common.rationals.Rational.of(value.numerator(), value.denominator());
-    if (getFormulaTypeOfSort(t.getSort()).isIntegerType()) {
-      assert out.isIntegral();
-      return out.getNum();
-    }
-    return out;
-  }
-
-  public Number toNumber(Term t) {
-    // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
-      if (value instanceof Number) {
-        return (Number) value;
-      } else if (value instanceof Rational) {
-        Rational rat = (Rational) value;
-        if (t.getSort().getName().equals("Int") && rat.isIntegral()) {
-          return rat.numerator();
-        }
-        return org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
-      }
-
-      // ApplicationTerm with negative Number --> "-123"
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
-
-      if ("-".equals(at.getFunction().getName())) {
-        Object value = toNumber(at.getParameters()[0]);
-        if (value instanceof BigDecimal) {
-          return ((BigDecimal) value).negate();
-        } else if (value instanceof BigInteger) {
-          return ((BigInteger) value).negate();
-        } else if (value instanceof Long) {
-          return -(Long) value;
-        } else if (value instanceof Integer) {
-          return -(Integer) value;
-        } else if (value instanceof Double) {
-          return -(Double) value;
-        } else if (value instanceof Float) {
-          return -(Float) value;
-        } else if (value instanceof org.sosy_lab.common.rationals.Rational) {
-          return ((org.sosy_lab.common.rationals.Rational) value).negate();
-        }
-      }
-    }
-    throw new NumberFormatException("unknown format of numeric term: " + t);
   }
 
   private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {

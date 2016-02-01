@@ -1,7 +1,6 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 
@@ -131,8 +130,6 @@ public class OptimizationTest extends SolverBasedTest0 {
   public void testSwitchingObjectives() throws Exception {
     requireRationals();
 
-    // Currently Mathsat has issues with push/pop.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x, y, obj;
       x = rmgr.makeVariable("x");

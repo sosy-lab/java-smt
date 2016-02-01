@@ -21,7 +21,9 @@ package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Function;
 
+import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
@@ -80,8 +82,24 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
     FormulaType<?> type = creator.getFormulaType(value);
     if (type.isBooleanType()) {
       return SmtInterpolUtil.isTrue(value);
-    } else if (formulaCreator.isNumber(value)) {
-      return formulaCreator.modelTermToNumber(value);
+    } else if (value instanceof ConstantTerm
+        && ((ConstantTerm) value).getValue() instanceof Rational) {
+
+      /**
+       * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
+       * the output is SmtInterpol's Rational unless it is a bitvector,
+       * and currently we do not support bitvectors for SmtInterpol.
+       */
+      Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
+      org.sosy_lab.common.rationals.Rational out =
+          org.sosy_lab.common.rationals.Rational.of(
+              rationalValue.numerator(), rationalValue.denominator());
+      if (formulaCreator.getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
+        assert out.isIntegral();
+        return out.getNum();
+      } else {
+        return out;
+      }
     } else {
 
       // Return string serialization for unknown values.
