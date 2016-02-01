@@ -71,7 +71,6 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetLargeIntegers() throws Exception {
-    IntegerFormula x = imgr.makeVariable("x");
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(large), large, true);
   }
