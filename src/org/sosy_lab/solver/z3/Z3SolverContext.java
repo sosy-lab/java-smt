@@ -70,7 +70,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final LogManager logger;
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
-  private final Z3FormulaCreator formulaCreator;
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
@@ -103,7 +102,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
     super(config, pLogger, pManager);
 
-    formulaCreator = pFormulaCreator;
     creator = pFormulaCreator;
     config.inject(this);
     z3params = pZ3params;
@@ -252,7 +250,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    long context = formulaCreator.getEnv();
+    long context = creator.getEnv();
     params_dec_ref(context, z3params);
     del_context(context);
   }
