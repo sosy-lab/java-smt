@@ -19,7 +19,7 @@
  */
 
 /**
- * Interface to the SMT solver Z3 (based on the native C API and JNI).
+ * Interface to the SMT solver Z3 (based on the Java-Interface).
  */
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

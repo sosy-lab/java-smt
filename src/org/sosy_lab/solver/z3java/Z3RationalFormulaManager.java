@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.solver.z3java;
 
+import com.microsoft.z3.Expr;
+import com.microsoft.z3.Sort;
+
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
@@ -39,17 +42,17 @@ class Z3RationalFormulaManager extends Z3NumeralFormulaManager<NumeralFormula, R
   }
 
   @Override
-  protected long getNumeralType() {
+  protected Sort getNumeralType() {
     return getFormulaCreator().getRationalType();
   }
 
   @Override
-  protected Long makeNumberImpl(double pNumber) {
+  protected Expr makeNumberImpl(double pNumber) {
     return makeNumberImpl(Double.toString(pNumber));
   }
 
   @Override
-  protected Long makeNumberImpl(BigDecimal pNumber) {
+  protected Expr makeNumberImpl(BigDecimal pNumber) {
     return makeNumberImpl(pNumber.toPlainString());
   }
 }

@@ -37,7 +37,7 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Expr, So
     this.z3context = creator.getEnv();
   }
 
-  private static BitVecExpr toBV(Expr e) {
+  static BitVecExpr toBV(Expr e) {
     return (BitVecExpr)e;
   }
 

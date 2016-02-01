@@ -42,11 +42,11 @@ abstract class Z3NumeralFormulaManager<
     this.z3context = pCreator.getEnv();
   }
 
-  private static ArithExpr toNum(Expr e) {
+  static ArithExpr toAE(Expr e) {
     return (ArithExpr)e;
   }
 
-  private static ArithExpr[] toNum(Collection<Expr> e) {
+  private static ArithExpr[] toAE(Collection<Expr> e) {
     return e.toArray(new ArithExpr[]{});
   }
 
@@ -83,32 +83,32 @@ abstract class Z3NumeralFormulaManager<
   @Override
   public Expr negate(Expr pNumber) {
     ArithExpr minusOne = z3context.mkInt(-1);
-    return z3context.mkMul(minusOne, toNum(pNumber));
+    return z3context.mkMul(minusOne, toAE(pNumber));
   }
 
   @Override
   public Expr add(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkAdd(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkAdd(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr sumImpl(List<Expr> operands) {
-    return z3context.mkAdd(toNum(operands));
+    return z3context.mkAdd(toAE(operands));
   }
 
   @Override
   public Expr subtract(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkSub(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkSub(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr divide(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkDiv(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkDiv(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr multiply(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkMul(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkMul(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
@@ -118,26 +118,26 @@ abstract class Z3NumeralFormulaManager<
 
   @Override
   public Expr equal(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkEq(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkEq(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr greaterThan(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkGt(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkGt(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr greaterOrEquals(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkGe(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkGe(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr lessThan(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkLt(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkLt(toAE(pNumber1), toAE(pNumber2));
   }
 
   @Override
   public Expr lessOrEquals(Expr pNumber1, Expr pNumber2) {
-    return z3context.mkLe(toNum(pNumber1), toNum(pNumber2));
+    return z3context.mkLe(toAE(pNumber1), toAE(pNumber2));
   }
 }

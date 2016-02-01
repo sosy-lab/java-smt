@@ -19,24 +19,8 @@
  */
 package org.sosy_lab.solver.z3java;
 
-import static org.sosy_lab.solver.z3java.Z3NativeApi.apply_result_dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.apply_result_get_num_subgoals;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.apply_result_get_subgoal;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.apply_result_inc_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.goal_assert;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.goal_dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.goal_formula;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.goal_inc_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.goal_size;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_and;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_goal;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_or;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_tactic;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.tactic_apply;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.tactic_dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.tactic_inc_ref;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Expr;
 
 import org.sosy_lab.solver.SolverException;
 
@@ -64,28 +48,28 @@ class Z3NativeApiHelpers {
   /**
    * Apply tactic on a Z3_ast object, convert the result back to Z3_ast.
    *
-   * @param z3context Z3_context
+   * @param pContext Z3_context
    * @param tactic Z3 Tactic Name
-   * @param pF Z3_ast
+   * @param pInput Z3_ast
    * @return Z3_ast
    */
-  static long applyTactic(long z3context, long pF, String tactic) {
-    long tseitinTactic = mk_tactic(z3context, tactic);
-    tactic_inc_ref(z3context, tseitinTactic);
+  static Expr applyTactic(Context pContext, Expr pInput, String tactic) {
+    long tseitinTactic = mk_tactic(pContext, tactic);
+    tactic_inc_ref(pContext, tseitinTactic);
 
-    long goal = mk_goal(z3context, true, false, false);
-    goal_inc_ref(z3context, goal);
-    goal_assert(z3context, goal, pF);
+    long goal = mk_goal(pContext, true, false, false);
+    goal_inc_ref(pContext, goal);
+    goal_assert(pContext, goal, pInput);
 
-    long result = tactic_apply(z3context, tseitinTactic, goal);
-    apply_result_inc_ref(z3context, result);
+    long result = tactic_apply(pContext, tseitinTactic, goal);
+    apply_result_inc_ref(pContext, result);
 
     try {
-      return applyResultToAST(z3context, result);
+      return applyResultToAST(pContext, result);
     } finally {
-      apply_result_dec_ref(z3context, result);
-      goal_dec_ref(z3context, goal);
-      tactic_dec_ref(z3context, tseitinTactic);
+      apply_result_dec_ref(pContext, result);
+      goal_dec_ref(pContext, goal);
+      tactic_dec_ref(pContext, tseitinTactic);
     }
   }
 

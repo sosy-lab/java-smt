@@ -20,85 +20,28 @@
 package org.sosy_lab.solver.z3java;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.ast_to_string;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_app_arg;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_app_decl;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_app_num_args;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_arity;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_array_sort_domain;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_array_sort_range;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_ast_kind;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_bv_sort_size;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_decl_kind;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_decl_name;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_index_value;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_numeral_string;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_quantifier_body;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_quantifier_bound_name;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_quantifier_bound_sort;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_quantifier_num_bound;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_sort;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_sort_kind;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_symbol_int;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_symbol_kind;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_symbol_string;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.is_quantifier_forall;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_const;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_APP_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_ARRAY_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_BOOL_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_BV_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_FUNC_DECL_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_INT_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_INT_SYMBOL;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_NUMERAL_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_ADD;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_AND;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_DISTINCT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_DIV;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_EQ;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_FALSE;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_GE;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_GT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_IFF;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_ITE;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_LE;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_LT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_MOD;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_MUL;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_NOT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_OR;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_SUB;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_TRUE;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_XOR;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_REAL_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_SORT_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_STRING_SYMBOL;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_UNKNOWN_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_VAR_AST;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+import com.microsoft.z3.ArraySort;
+import com.microsoft.z3.BitVecSort;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
+import com.microsoft.z3.IntSymbol;
 import com.microsoft.z3.Sort;
 import com.microsoft.z3.StringSymbol;
+import com.microsoft.z3.Symbol;
+import com.microsoft.z3.enumerations.Z3_ast_kind;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.common.time.Timer;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -111,28 +54,14 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.z3java.Z3Formula.Z3ArrayFormula;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
 
-  @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
-  private boolean usePhantomReferences = false;
-
   private final Table<Sort, Sort, Sort> allocatedArraySorts = HashBasedTable.create();
-
-  private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
-  private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
-      Maps.newIdentityHashMap();
-
-  // todo: getters for statistic.
-  private final Timer cleanupTimer = new Timer();
 
   Z3FormulaCreator(
       Context pEnv, Sort pBoolType, Sort pIntegerType, Sort pRealType, Configuration config)
@@ -165,23 +94,22 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
   }
 
   public FormulaType<?> getFormulaTypeFromSort(Sort pSort) {
-    Context z3context = getEnv();
-    Z3_sort_kind sortKind = pSort.getSortKind();
-    if (sortKind == Z3_BOOL_SORT) {
-      return FormulaType.BooleanType;
-    } else if (sortKind == Z3_INT_SORT) {
-      return FormulaType.IntegerType;
-    } else if (sortKind == Z3_ARRAY_SORT) {
-      long domainSort = get_array_sort_domain(z3context, pSort);
-      long rangeSort = get_array_sort_range(z3context, pSort);
-      return FormulaType.getArrayType(
-          getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
-    } else if (sortKind == Z3_REAL_SORT) {
-      return FormulaType.RationalType;
-    } else if (sortKind == Z3_BV_SORT) {
-      return FormulaType.getBitvectorTypeWithSize(get_bv_sort_size(z3context, pSort));
+    switch (pSort.getSortKind()) {
+      case Z3_BOOL_SORT:
+        return FormulaType.BooleanType;
+      case Z3_INT_SORT:
+        return FormulaType.IntegerType;
+      case Z3_REAL_SORT:
+        return FormulaType.RationalType;
+      case Z3_ARRAY_SORT:
+        ArraySort aSort = (ArraySort)pSort;
+        return FormulaType.getArrayType(
+            getFormulaTypeFromSort(aSort.getDomain()), getFormulaTypeFromSort(aSort.getRange()));
+      case Z3_BV_SORT:
+        return FormulaType.getBitvectorTypeWithSize(((BitVecSort)pSort).getSize());
+      default:
+        throw new IllegalArgumentException("Unknown formula type");
     }
-    throw new IllegalArgumentException("Unknown formula type");
   }
 
   @Override
@@ -199,14 +127,6 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
   protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
       ArrayFormula<TD, TR> pArray) {
     return ((Z3ArrayFormula<TD, TR>) pArray).getIndexType();
-  }
-
-  private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
-    if (usePhantomReferences) {
-      PhantomReference<T> ref = new PhantomReference<>(out, referenceQueue);
-      referenceMap.put(ref, pTerm);
-    }
-    return out;
   }
 
   @Override
@@ -230,37 +150,18 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     throw new UnsupportedOperationException("FloatingPoint theory is not supported by Z3");
   }
 
-  private void cleanupReferences() {
-    if (!usePhantomReferences) {
-      return;
-    }
-    cleanupTimer.start();
-    try {
-      Reference<? extends Z3Formula> ref;
-      while ((ref = referenceQueue.poll()) != null) {
-
-        Long z3ast = referenceMap.remove(ref);
-        assert z3ast != null;
-        dec_ref(getEnv(), z3ast);
-      }
-    } finally {
-      cleanupTimer.stop();
-    }
-  }
-
-  private String getName(Long t) {
-    int astKind = get_ast_kind(environment, t);
-    if (astKind == Z3_VAR_AST) {
-      return "?" + get_index_value(environment, t);
+  private String getName(Expr t) {
+    Z3_ast_kind astKind = t.getASTKind();
+    if (astKind == Z3_ast_kind.Z3_VAR_AST) {
+      return "?" + t.getIndex();
     } else {
-      long funcDecl = get_app_decl(environment, t);
-      long symbol = get_decl_name(environment, funcDecl);
-      switch (get_symbol_kind(environment, symbol)) {
-        case Z3_INT_SYMBOL:
-          return Integer.toString(get_symbol_int(environment, symbol));
-        case Z3_STRING_SYMBOL:
-          return get_symbol_string(environment, symbol);
-        default:
+      FuncDecl funcDecl = t.getFuncDecl();
+      Symbol symbol = funcDecl.getName();
+      if (symbol instanceof IntSymbol) {
+          return Integer.toString(((IntSymbol)symbol).getInt());
+      } else if (symbol instanceof StringSymbol) {
+          return ((StringSymbol)symbol).getString();
+      } else {
           throw new AssertionError();
       }
     }
@@ -274,20 +175,20 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
-    switch (get_ast_kind(environment, f)) {
+  public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Expr f) {
+    switch (f.getASTKind()) {
       case Z3_NUMERAL_AST:
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
         String name = getName(f);
-        int arity = get_app_num_args(environment, f);
+        int arity = f.getNumArgs();
 
         if (arity == 0) {
 
           // true/false.
-          long declKind = get_decl_kind(environment, get_app_decl(environment, f));
-          if (declKind == Z3_OP_TRUE || declKind == Z3_OP_FALSE) {
-            return visitor.visitConstant(formula, declKind == Z3_OP_TRUE);
+          Z3_decl_kind declKind = f.getFuncDecl().getDeclKind();
+          if (declKind == Z3_decl_kind.Z3_OP_TRUE || declKind == Z3_decl_kind.Z3_OP_FALSE) {
+            return visitor.visitConstant(formula, declKind == Z3_decl_kind.Z3_OP_TRUE);
           } else {
 
             // Has to be a variable otherwise.
@@ -298,7 +199,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
 
         List<Formula> args = new ArrayList<>(arity);
         for (int i = 0; i < arity; i++) {
-          long arg = get_app_arg(environment, f, i);
+          Expr arg = f.getArgs()[i];
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
         }
@@ -314,12 +215,13 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
         return visitor.visitFunction(
             formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
       case Z3_VAR_AST:
-        int deBruijnIdx = get_index_value(environment, f);
+        int deBruijnIdx = f.getIndex();
         return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
-        BooleanFormula body = encapsulateBoolean(get_quantifier_body(environment, f));
-        Quantifier q = is_quantifier_forall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(f), body);
+        com.microsoft.z3.Quantifier qf = (com.microsoft.z3.Quantifier)f;
+        BooleanFormula body = encapsulateBoolean(qf.getBody());
+        Quantifier q = qf.isUniversal() ? Quantifier.FORALL : Quantifier.EXISTS;
+        return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(qf), body);
 
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:
@@ -330,22 +232,22 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     }
   }
 
-  private List<Formula> getBoundVars(long f) {
-    int numBound = get_quantifier_num_bound(environment, f);
+  private List<Formula> getBoundVars(com.microsoft.z3.Quantifier pQf) {
+    int numBound = pQf.getNumBound();
     List<Formula> boundVars = new ArrayList<>(numBound);
+    Symbol[] varNames = pQf.getBoundVariableNames();
+    Sort[] varSorts = pQf.getBoundVariableSorts();
     for (int i = 0; i < numBound; i++) {
-      long varName = get_quantifier_bound_name(environment, f, i);
-      long varSort = get_quantifier_bound_sort(environment, f, i);
-      boundVars.add(
-          encapsulate(getFormulaTypeFromSort(varSort), mk_const(environment, varName, varSort)));
+      boundVars.add(encapsulate(getFormulaTypeFromSort(varSorts[i]),
+          environment.mkConst(varNames[i], varSorts[i])));
     }
     return boundVars;
   }
 
-  private FunctionDeclarationKind getDeclarationKind(long f) {
-    int decl = get_decl_kind(environment, get_app_decl(environment, f));
+  private FunctionDeclarationKind getDeclarationKind(Expr pF) {
+    Z3_decl_kind decl = pF.getFuncDecl().getDeclKind();
 
-    if (get_arity(environment, f) == 0) {
+    if (pF.getArgs().length == 0) {
       return FunctionDeclarationKind.VAR;
     }
 
@@ -395,40 +297,32 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     }
   }
 
-  public Object convertValue(Long value) {
-    inc_ref(environment, value);
-    try {
-      FormulaType<?> type = getFormulaType(value);
-      Object lValue;
-      if (type.isBooleanType()) {
-        return isOP(environment, value, Z3_OP_TRUE);
-      } else if (type.isIntegerType()) {
-        return new BigInteger(get_numeral_string(environment, value));
-      } else if (type.isRationalType()) {
+  public Object convertValue(Expr pF) {
+    FormulaType<?> type = getFormulaType(pF);
+    if (type.isBooleanType()) {
+      return pF.isTrue();
+    } else if (type.isIntegerType()) {
+      return new BigInteger(pF.toString());
+    } else if (type.isRationalType()) {
 
-        // String serialization is expensive, but getting arbitrary-sized
-        // numbers is difficult otherwise.
-        // TODO: an optimization is possible here, try to get an integer first,
-        // resort to strings if that fails.
-        String s = get_numeral_string(environment, value);
-        return Rational.ofString(s);
-      } else if (type.isBitvectorType()) {
-        return interpretBitvector(environment, value);
-      } else {
+      // String serialization is expensive, but getting arbitrary-sized
+      // numbers is difficult otherwise.
+      // TODO: an optimization is possible here, try to get an integer first,
+      // resort to strings if that fails.
+      return Rational.ofString(pF.toString());
+    } else if (type.isBitvectorType()) {
+      return interpretBitvector(pF);
+    } else {
 
-        // Unknown type --- return string serialization.
-        return ast_to_string(environment, value);
-      }
-
-    } finally {
-      dec_ref(environment, value);
+      // Unknown type --- return string serialization.
+      return pF.toString();
     }
   }
 
-  private static BigInteger interpretBitvector(long z3context, long bv) {
-    long argSort = get_sort(z3context, bv);
-    int sortKind = get_sort_kind(z3context, argSort);
-    Preconditions.checkArgument(sortKind == Z3_BV_SORT);
-    return new BigInteger(get_numeral_string(z3context, bv));
+  private static BigInteger interpretBitvector(Expr pF) {
+    Sort argSort = pF.getSort();
+    Z3_sort_kind sortKind = argSort.getSortKind();
+    Preconditions.checkArgument(sortKind == Z3_sort_kind.Z3_BV_SORT);
+    return new BigInteger(pF.toString());
   }
 }

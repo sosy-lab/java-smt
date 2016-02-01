@@ -19,35 +19,20 @@
  */
 package org.sosy_lab.solver.z3java;
 
-import static org.sosy_lab.solver.z3java.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_app_arg;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_app_num_args;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_sort;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.get_sort_kind;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_bvuge;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_bvule;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_ge;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_le;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_solver;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.parse_smtlib2_string;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.solver_assert;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.solver_dec_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.solver_inc_ref;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.solver_to_string;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_BV_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_INT_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_OP_EQ;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.Z3_REAL_SORT;
-import static org.sosy_lab.solver.z3java.Z3NativeApiConstants.isOP;
+import static org.sosy_lab.solver.z3java.Z3BitvectorFormulaManager.toBV;
+import static org.sosy_lab.solver.z3java.Z3NumeralFormulaManager.toAE;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Longs;
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
+import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
+import com.microsoft.z3.Symbol;
+import com.microsoft.z3.enumerations.Z3_sort_kind;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -92,11 +77,11 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
     // TODO do we need sorts or decls?
     // the context should know them already,
     // TODO check this
-    long[] sortSymbols = new long[0];
-    long[] sorts = new long[0];
-    long[] declSymbols = new long[0];
-    long[] decls = new long[0];
-    long e = parse_smtlib2_string(getEnvironment(), str, sortSymbols, sorts, declSymbols, decls);
+    Symbol[] sortSymbols = new Symbol[0];
+    Sort[] sorts = new Sort[0];
+    Symbol[] declSymbols = new Symbol[0];
+    FuncDecl[] decls = new FuncDecl[0];
+    BoolExpr e = getEnvironment().parseSMTLIB2String(str, sortSymbols, sorts, declSymbols, decls);
 
     return getFormulaCreator().encapsulateBoolean(e);
   }
@@ -119,7 +104,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
           .build();
 
   @Override
-  protected Long applyTacticImpl(Long input, Tactic tactic) {
+  protected Expr applyTacticImpl(Expr input, Tactic tactic) {
     String z3TacticName = Z3_TACTICS.get(tactic);
     if (z3TacticName != null) {
       return Z3NativeApiHelpers.applyTactic(getFormulaCreator().getEnv(), input, z3TacticName);
@@ -129,7 +114,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
   }
 
   @Override
-  public Appender dumpFormula(final Long expr) {
+  public Appender dumpFormula(final Expr expr) {
     assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
@@ -140,11 +125,9 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
 
         // Serializing a solver is a simplest way to dump a formula in Z3,
         // cf https://github.com/Z3Prover/z3/issues/397
-        long z3solver = mk_solver(getEnvironment());
-        solver_inc_ref(getEnvironment(), z3solver);
-        solver_assert(getEnvironment(), z3solver, expr);
-        String serialized = solver_to_string(getEnvironment(), z3solver);
-        solver_dec_ref(getEnvironment(), z3solver);
+        Solver z3solver = getEnvironment().mkSolver();
+        z3solver.add((BoolExpr)expr);
+        String serialized = z3solver.toString();
         out.append(serialized);
       }
     };
@@ -156,36 +139,25 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
   }
 
   @Override
-  protected List<? extends Long> splitNumeralEqualityIfPossible(Long pF) {
-    long z3context = getFormulaCreator().getEnv();
-    if (isOP(z3context, pF, Z3_OP_EQ) && get_app_num_args(z3context, pF) == 2) {
-      long arg0 = get_app_arg(z3context, pF, 0);
-      inc_ref(z3context, arg0);
-      long arg1 = get_app_arg(z3context, pF, 1);
-      inc_ref(z3context, arg1);
+  protected List<? extends Expr> splitNumeralEqualityIfPossible(Expr pF) {
+    Context z3context = getFormulaCreator().getEnv();
+    if (pF.isEq() && pF.getNumArgs() == 2) {
+      Expr arg0 = pF.getArgs()[0];
+      Expr arg1 = pF.getArgs()[1];
 
-      try {
-        long sortKind = get_sort_kind(z3context, get_sort(z3context, arg0));
-        assert sortKind == get_sort_kind(z3context, get_sort(z3context, arg1));
-        if (sortKind == Z3_BV_SORT) {
+      Z3_sort_kind sortKind = arg0.getSort().getSortKind();
+      assert sortKind == arg1.getSort().getSortKind();
+      if (sortKind == Z3_sort_kind.Z3_BV_SORT) {
 
-          long out1 = mk_bvule(z3context, arg0, arg1);
-          inc_ref(z3context, out1);
-          long out2 = mk_bvuge(z3context, arg0, arg1);
-          inc_ref(z3context, out2);
+        Expr out1 = z3context.mkBVULE(toBV(arg0), toBV(arg1));
+        Expr out2 = z3context.mkBVUGE(toBV(arg0), toBV(arg1));
 
-          return ImmutableList.of(out1, out2);
-        } else if (sortKind == Z3_INT_SORT || sortKind == Z3_REAL_SORT) {
+        return ImmutableList.of(out1, out2);
+      } else if (sortKind == Z3_sort_kind.Z3_INT_SORT || sortKind == Z3_sort_kind.Z3_REAL_SORT) {
 
-          long out1 = mk_le(z3context, arg0, arg1);
-          inc_ref(z3context, out1);
-          long out2 = mk_ge(z3context, arg0, arg1);
-          inc_ref(z3context, out2);
-          return ImmutableList.of(out1, out2);
-        }
-      } finally {
-        dec_ref(z3context, arg0);
-        dec_ref(z3context, arg1);
+        Expr out1 = z3context.mkLe(toAE(arg0), toAE(arg1));
+        Expr out2 = z3context.mkGe(toAE(arg0), toAE(arg1));
+        return ImmutableList.of(out1, out2);
       }
     }
     return ImmutableList.of(pF);
@@ -197,18 +169,17 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
   }
 
   @Override
-  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
+  protected Expr substituteUsingListsImpl(Expr t, List<Expr> changeFrom, List<Expr> changeTo) {
     int size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
-    return Z3NativeApi.substitute(
-        getFormulaCreator().getEnv(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
+    return t.substitute(changeFrom.toArray(new Expr[]{}), changeTo.toArray(new Expr[]{}));
   }
 
   @Override
   public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
     if (otherContext instanceof Z3SolverContext) {
       Z3SolverContext o = (Z3SolverContext) otherContext;
-      long otherZ3Context = o.getFormulaManager().getEnvironment();
+      Context otherZ3Context = o.getFormulaManager().getEnvironment();
       if (otherZ3Context == getEnvironment()) {
 
         // Same context.
@@ -216,8 +187,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
       } else {
 
         // Z3-to-Z3 translation.
-        long translatedAST =
-            Z3NativeApi.translate(otherZ3Context, extractInfo(other), getEnvironment());
+        Expr translatedAST = extractInfo(other).translate(getEnvironment());
         return getFormulaCreator().encapsulateBoolean(translatedAST);
       }
     }

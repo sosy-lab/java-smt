@@ -19,11 +19,9 @@
  */
 package org.sosy_lab.solver.z3java;
 
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_div;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_eq;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_mod;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_mul;
-import static org.sosy_lab.solver.z3java.Z3NativeApi.mk_true;
+import com.microsoft.z3.Expr;
+import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Sort;
 
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
@@ -38,39 +36,43 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
     super(pCreator);
   }
 
+  private static IntExpr toIE(Expr e) {
+    return (IntExpr)e;
+  }
+
   @Override
   public FormulaType<IntegerFormula> getFormulaType() {
     return FormulaType.IntegerType;
   }
 
   @Override
-  protected long getNumeralType() {
+  protected Sort getNumeralType() {
     return getFormulaCreator().getIntegerType();
   }
 
   @Override
-  protected Long makeNumberImpl(double pNumber) {
+  protected Expr makeNumberImpl(double pNumber) {
     return makeNumberImpl((long) pNumber);
   }
 
   @Override
-  protected Long makeNumberImpl(BigDecimal pNumber) {
+  protected Expr makeNumberImpl(BigDecimal pNumber) {
     return decimalAsInteger(pNumber);
   }
 
   @Override
-  public Long modulo(Long pNumber1, Long pNumber2) {
-    return mk_mod(z3context, pNumber1, pNumber2);
+  public Expr modulo(Expr pNumber1, Expr pNumber2) {
+    return z3context.mkMod(toIE(pNumber1), toIE(pNumber2));
   }
 
   @Override
-  protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
+  protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     if (pModulo > 0) {
-      long n = makeNumberImpl(pModulo);
-      long x = subtract(pNumber1, pNumber2);
-      return mk_eq(z3context, x, mk_mul(z3context, n, mk_div(z3context, x, n)));
+      Expr n = makeNumberImpl(pModulo);
+      Expr x = subtract(pNumber1, pNumber2);
+      return z3context.mkEq(x, z3context.mkMul(toAE(n), z3context.mkDiv(toAE(x), toAE(n))));
     }
-    return mk_true(z3context);
+    return z3context.mkTrue();
   }
 }
