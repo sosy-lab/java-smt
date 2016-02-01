@@ -53,14 +53,16 @@ public class OptimizationTest extends SolverBasedTest0 {
   public void testUnbounded() throws Exception {
     requireRationals();
     assert rmgr != null;
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (@SuppressWarnings("unchecked")
+    OptimizationProverEnvironment<Object> prover =
+    (OptimizationProverEnvironment<Object>) context.newOptimizationProverEnvironment()) {
       RationalFormula x, obj;
       x = rmgr.makeVariable("x");
       obj = rmgr.makeVariable("obj");
       List<BooleanFormula> constraints =
           ImmutableList.of(rmgr.greaterOrEquals(x, rmgr.makeNumber("10")), rmgr.equal(x, obj));
       prover.addConstraint(bmgr.and(constraints));
-      int handle = prover.maximize(obj);
+      Object handle = prover.maximize(obj);
       prover.check();
       assertThat(prover.upper(handle, Rational.ZERO)).isAbsent();
     }
@@ -69,7 +71,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnfeasible() throws Exception {
     requireRationals();
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (OptimizationProverEnvironment<?> prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x, y;
       x = rmgr.makeVariable("x");
       y = rmgr.makeVariable("y");
@@ -84,7 +86,9 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   public void testOptimal() throws Exception {
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (@SuppressWarnings("unchecked")
+    OptimizationProverEnvironment<Object> prover =
+    (OptimizationProverEnvironment<Object>) context.newOptimizationProverEnvironment()) {
 
       IntegerFormula x, y, obj;
       x = imgr.makeVariable("x");
@@ -106,7 +110,7 @@ public class OptimizationTest extends SolverBasedTest0 {
               imgr.greaterOrEquals(imgr.subtract(x, y), imgr.makeNumber(1)));
 
       prover.addConstraint(bmgr.and(constraints));
-      int handle = prover.maximize(obj);
+      Object handle = prover.maximize(obj);
 
       // Maximize for x.
       OptStatus response = prover.check();
@@ -129,7 +133,9 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testSwitchingObjectives() throws Exception {
     requireRationals();
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (@SuppressWarnings("unchecked")
+    OptimizationProverEnvironment<Object> prover =
+    (OptimizationProverEnvironment<Object>) context.newOptimizationProverEnvironment()) {
       RationalFormula x, y, obj;
       x = rmgr.makeVariable("x");
       y = rmgr.makeVariable("y");
@@ -153,7 +159,7 @@ public class OptimizationTest extends SolverBasedTest0 {
 
       prover.push();
 
-      int handle = prover.maximize(obj);
+      Object handle = prover.maximize(obj);
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
       assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
