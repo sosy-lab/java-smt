@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.api;
 
 import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.basicimpl.Model;
 
 import javax.annotation.Nullable;
 

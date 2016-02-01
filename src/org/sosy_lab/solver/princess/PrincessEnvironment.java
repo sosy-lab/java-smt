@@ -180,9 +180,7 @@ class PrincessEnvironment {
     allStacks.remove(stack);
   }
 
-  public List<IExpression> parseStringToTerms(
-      String s,
-      PrincessFormulaCreator creator) {
+  public List<IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
     Tuple3<
             Seq<IFormula>, scala.collection.immutable.Map<IFunction, SMTFunctionType>,
@@ -192,7 +190,6 @@ class PrincessEnvironment {
     List<IExpression> formula = castToExpression(seqAsJavaList(triple._1()));
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
     Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
-
 
     Set<IExpression> declaredFunctions = new HashSet<>();
     for (IExpression f : formula) {
@@ -319,9 +316,8 @@ class PrincessEnvironment {
         for (Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
           IExpression abbrev = entry.getKey();
           IExpression fullFormula = entry.getValue();
-          String name = getName(getOnlyElement(
-                  creator.extractVariablesAndUFs(abbrev, true).values()
-              ));
+          String name =
+              getName(getOnlyElement(creator.extractVariablesAndUFs(abbrev, true).values()));
 
           //only add the necessary abbreviations
           if (!todoAbbrevs.contains(name)) {

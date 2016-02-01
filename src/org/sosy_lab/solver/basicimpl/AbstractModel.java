@@ -19,8 +19,15 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.api.BitvectorFormula;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+
+import java.math.BigInteger;
 
 import javax.annotation.Nullable;
 
@@ -34,9 +41,33 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
 
   @Nullable
   @Override
-  public Object evaluate(Formula f) {
-    return evaluate(creator.extractInfo(f));
+  public BigInteger evaluate(IntegerFormula f) {
+    return (BigInteger) evaluateImpl(creator.extractInfo(f));
   }
 
-  public abstract Object evaluate(TFormulaInfo f);
+  @Nullable
+  @Override
+  public Rational evaluate(RationalFormula f) {
+    return (Rational) evaluateImpl(creator.extractInfo(f));
+  }
+
+  @Nullable
+  @Override
+  public Boolean evaluate(BooleanFormula f) {
+    return (Boolean) evaluateImpl(creator.extractInfo(f));
+  }
+
+  @Nullable
+  @Override
+  public BigInteger evaluate(BitvectorFormula f) {
+    return (BigInteger) evaluateImpl(creator.extractInfo(f));
+  }
+
+  @Nullable
+  @Override
+  public final Object evaluate(Formula f) {
+    return evaluateImpl(creator.extractInfo(f));
+  }
+
+  protected abstract Object evaluateImpl(TFormulaInfo f);
 }

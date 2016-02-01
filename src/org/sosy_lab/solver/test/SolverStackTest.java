@@ -37,12 +37,12 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.api.UfDeclaration;
-import org.sosy_lab.solver.basicimpl.Model;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -359,10 +359,9 @@ public class SolverStackTest extends SolverBasedTest0 {
       requireUfValuesInModel();
 
       assertThat(
-              model
-                  .evaluate(
-                      fmgr.callUninterpretedFunction(
-                          uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
+              model.evaluate(
+                  fmgr.callUninterpretedFunction(
+                      uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
           .isEqualTo(BigInteger.ZERO);
     }
   }

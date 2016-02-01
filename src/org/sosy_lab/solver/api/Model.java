@@ -17,16 +17,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.basicimpl;
+package org.sosy_lab.solver.api;
 
-import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.basicimpl.Model.ValueAssignment;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
+import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+/**
+ * A model returned from the satisfiable solver environment.
+ */
 public interface Model extends Iterable<ValueAssignment> {
 
   /**
@@ -40,7 +46,32 @@ public interface Model extends Iterable<ValueAssignment> {
    *    - Boolean
    *    - String (for types we do not handle)
    */
-  @Nullable Object evaluate(Formula f);
+  @Nullable
+  Object evaluate(Formula f);
+
+  /**
+   * Type-safe evaluation for integer formulas.
+   */
+  @Nullable
+  BigInteger evaluate(IntegerFormula f);
+
+  /**
+   * Type-safe evaluation for rational formulas.
+   */
+  @Nullable
+  Rational evaluate(RationalFormula f);
+
+  /**
+   * Type-safe evaluation for boolean formulas.
+   */
+  @Nullable
+  Boolean evaluate(BooleanFormula f);
+
+  /**
+   * Type-safe evaluation for bitvector formulas.
+   */
+  @Nullable
+  BigInteger evaluate(BitvectorFormula f);
 
   /**
    * Iterate over all values present in the model.

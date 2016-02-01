@@ -80,6 +80,11 @@ public interface FormulaManager {
   QuantifiedFormulaManager getQuantifiedFormulaManager();
 
   /**
+   * Make two different formulas equal.
+   */
+  <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs);
+
+  /**
    * Returns the type of the given Formula.
    */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

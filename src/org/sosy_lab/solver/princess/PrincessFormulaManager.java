@@ -73,8 +73,8 @@ final class PrincessFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    return encapsulateBooleanFormula(getOnlyElement(
-        getEnvironment().parseStringToTerms(pS, creator)));
+    return encapsulateBooleanFormula(
+        getOnlyElement(getEnvironment().parseStringToTerms(pS, creator)));
   }
 
   @Override

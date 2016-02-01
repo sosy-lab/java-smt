@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
@@ -36,7 +35,6 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -58,9 +56,9 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public Object evaluate(Long f) {
+  public Object evaluateImpl(Long f) {
     long term = msat_model_eval(model, f);
-    return convertValue(term);
+    return convertValue(f, term);
   }
 
   @Override
@@ -69,6 +67,8 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   private class Mathsat5ModelIterator extends UnmodifiableIterator<ValueAssignment> {
+
+    // TODO: closing the iterator seems to trigger segfault when UFs are used.
     private final long modelIterator;
     private boolean closed = false;
 
@@ -79,14 +79,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     @Override
     public boolean hasNext() {
 
-      boolean out = msat_model_iterator_has_next(modelIterator);
-      if (!out) {
-
-        // Close the iterator if no more values are left.
-        msat_destroy_model_iterator(modelIterator);
-        closed = true;
-      }
-      return out;
+      return msat_model_iterator_has_next(modelIterator);
     }
 
     @Override
@@ -101,19 +94,21 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
         throw new NoSuchElementException();
       }
       Formula fKey = creator.encapsulateWithTypeOf(key[0]);
-      Object fValue = convertValue(value[0]);
+      Object fValue = convertValue(key[0], value[0]);
 
       return new ValueAssignment(fKey, fValue);
     }
   }
 
-  private Object convertValue(long term) {
-    FormulaType<?> type = creator.getFormulaType(term);
+  private Object convertValue(long key, long term) {
+
+    // To get the correct type, we generate it from the key, not the value.
+    FormulaType<?> type = creator.getFormulaType(key);
     String repr = msat_term_repr(term);
     if (type.isBooleanType()) {
       return msat_term_is_true(env, term);
     } else if (type.isRationalType()) {
-      return parseReal(repr);
+      return Rational.ofString(repr);
     } else if (type.isIntegerType()) {
       return new BigInteger(repr);
     } else if (type.isBitvectorType()) {
@@ -149,7 +144,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   //TODO: change this to the latest version
   // (if possible try to use a BitvectorFormula instance here)
-  private static Number parseBitvector(String lTermRepresentation) {
+  private static BigInteger parseBitvector(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<WIDTH>"
     Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
@@ -158,25 +153,6 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
     // TODO: calculate negative value?
     String term = matcher.group(1);
-    String lengthValue = matcher.group(2);
-    long length = Long.parseLong(lengthValue);
-    Number value;
-    if (length < 64) {
-      value = Long.valueOf(term);
-    } else {
-      value = new BigInteger(term);
-    }
-
-    return value;
-  }
-
-  private Number parseReal(String lTermRepresentation) {
-    Number lValue;
-    try {
-      lValue = new BigDecimal(lTermRepresentation);
-    } catch (NumberFormatException e) {
-      lValue = Rational.ofString(lTermRepresentation);
-    }
-    return lValue;
+    return new BigInteger(term);
   }
 }

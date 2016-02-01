@@ -24,9 +24,6 @@
 package org.sosy_lab.solver.mathsat5;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.UnmodifiableIterator;
-
-import java.util.NoSuchElementException;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -182,14 +179,6 @@ class Mathsat5NativeApi {
     }
   }
 
-  public static ModelIterator msat_create_ModelIteratorFromEnv(long e) {
-    return new ModelIterator(msat_create_model_iterator(e));
-  }
-
-  public static ModelIterator msat_create_ModelIteratorFromModel(long model) {
-    return new ModelIterator(msat_model_create_iterator(model));
-  }
-
   static class NamedTermsWrapper {
     final long[] terms;
     final String[] names;
@@ -197,34 +186,6 @@ class Mathsat5NativeApi {
     NamedTermsWrapper(long[] pTerms, String[] pNames) {
       terms = pTerms;
       names = pNames;
-    }
-  }
-
-  public static class ModelIterator extends UnmodifiableIterator<long[]> {
-
-    private final long i;
-
-    private ModelIterator(long pI) {
-      i = pI;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return msat_model_iterator_has_next(i);
-    }
-
-    @Override
-    public long[] next() {
-      long[] t = new long[1];
-      long[] v = new long[1];
-      if (msat_model_iterator_next(i, t, v)) {
-        throw new NoSuchElementException();
-      }
-      return new long[] {t[0], v[0]};
-    }
-
-    public void free() {
-      msat_destroy_model_iterator(i);
     }
   }
 

@@ -33,15 +33,17 @@ abstract class SmtInterpolNumeralFormulaManager<
         Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType> {
 
   private final SmtInterpolEnvironment env;
+  private final SmtInterpolFormulaCreator creator;
 
   SmtInterpolNumeralFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);
+    creator = pCreator;
     env = pCreator.getEnv();
   }
 
   @Override
   protected boolean isNumeral(Term val) {
-    return SmtInterpolUtil.isNumber(val);
+    return creator.isNumber(val);
   }
 
   @Override

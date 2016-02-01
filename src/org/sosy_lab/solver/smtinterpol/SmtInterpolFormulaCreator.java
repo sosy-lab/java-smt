@@ -24,7 +24,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Function;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
@@ -59,7 +61,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     return getFormulaTypeOfSort(pFormula.getSort());
   }
 
-  private FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
+  FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
     if (pSort == integerSort) {
       return FormulaType.IntegerType;
     } else if (pSort == realSort) {
@@ -144,10 +146,20 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
         "Given term belongs to a different instance of SMTInterpol: %s",
         input);
 
-    if (SmtInterpolUtil.isNumber(input)) {
-      final Number value = SmtInterpolUtil.toNumber(input);
-      return visitor.visitConstant(f, value);
-
+    if (input instanceof ConstantTerm) {
+      Object outValue;
+      Object interpolValue = ((ConstantTerm) input).getValue();
+      if (interpolValue instanceof Rational) {
+        Rational rat = (Rational) interpolValue;
+        if (input.getSort().getName().equals("Int") && rat.isIntegral()) {
+          outValue = rat.numerator();
+        } else {
+          outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
+        }
+      } else {
+        outValue = ((ConstantTerm) input).getValue();
+      }
+      return visitor.visitConstant(f, outValue);
     } else if (input instanceof ApplicationTerm) {
       final ApplicationTerm app = (ApplicationTerm) input;
       final int arity = app.getParameters().length;
@@ -189,6 +201,39 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
               input.getClass().getSimpleName(),
               input));
     }
+  }
+
+  /** check for ConstantTerm with Number or
+   * ApplicationTerm with negative Number */
+  public boolean isNumber(Term t) {
+    boolean is = false;
+    // ConstantTerm with Number --> "123"
+    if (t instanceof ConstantTerm) {
+      Object value = ((ConstantTerm) t).getValue();
+      if (value instanceof Number || value instanceof Rational) {
+        is = true;
+      }
+
+    } else if (t instanceof ApplicationTerm) {
+      ApplicationTerm at = (ApplicationTerm) t;
+
+      // ApplicationTerm with negative Number --> "(- 123)"
+      if ("-".equals(at.getFunction().getName())
+          && (at.getParameters().length == 1)
+          && isNumber(at.getParameters()[0])) {
+        is = true;
+
+        // ApplicationTerm with Division --> "(/ 1 5)"
+      } else if ("/".equals(at.getFunction().getName())
+          && (at.getParameters().length == 2)
+          && isNumber(at.getParameters()[0])
+          && isNumber(at.getParameters()[1])) {
+        is = true;
+      }
+    }
+
+    // TODO hex or binary data, string?
+    return is;
   }
 
   private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {

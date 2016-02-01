@@ -41,7 +41,6 @@ import com.google.common.collect.UnmodifiableIterator;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
-import org.sosy_lab.solver.basicimpl.Model;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
 import java.util.Iterator;
@@ -62,13 +61,9 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     creator = pCreator;
   }
 
-  public static Model parseZ3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
-    return new Z3Model(z3context, z3model, pCreator);
-  }
-
   @Nullable
   @Override
-  public Object evaluate(Long f) {
+  public Object evaluateImpl(Long f) {
     PointerToLong out = new PointerToLong();
     boolean status = model_eval(z3context, model, f, true, out);
     Verify.verify(status, "Error during model evaluation");
@@ -89,6 +84,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
     Z3ModelIterator() {
       // TODO: iterating through function applications.
+      // Difficult, as we don't know what arguments to substitute when we only
+      // have the model.
       numConsts = model_get_num_consts(z3context, model);
     }
 

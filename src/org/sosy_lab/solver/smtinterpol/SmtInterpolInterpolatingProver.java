@@ -31,7 +31,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
