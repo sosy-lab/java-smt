@@ -29,7 +29,8 @@ import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
 
 import java.util.List;
 
-class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Expr, FuncDecl, Sort, Context> {
+class Z3FunctionFormulaManager
+    extends AbstractFunctionFormulaManager<Expr, FuncDecl, Sort, Context> {
 
   private final Context z3context;
 
@@ -40,7 +41,7 @@ class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Expr, Func
 
   @Override
   protected Expr createUninterpretedFunctionCallImpl(FuncDecl funcDecl, List<Expr> pArgs) {
-    return z3context.mkApp(funcDecl, pArgs.toArray(new Expr[]{}));
+    return z3context.mkApp(funcDecl, pArgs.toArray(new Expr[] {}));
   }
 
   @Override
@@ -48,7 +49,7 @@ class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Expr, Func
       String pName, Sort returnType, List<Sort> pArgTypes) {
 
     StringSymbol symbol = z3context.mkSymbol(pName);
-    Sort[] sorts = pArgTypes.toArray(new Sort[]{});
+    Sort[] sorts = pArgTypes.toArray(new Sort[] {});
     return z3context.mkFuncDecl(symbol, sorts, returnType);
   }
 }

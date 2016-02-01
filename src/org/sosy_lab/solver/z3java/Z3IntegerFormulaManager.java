@@ -37,7 +37,7 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
   }
 
   private static IntExpr toIE(Expr e) {
-    return (IntExpr)e;
+    return (IntExpr) e;
   }
 
   @Override

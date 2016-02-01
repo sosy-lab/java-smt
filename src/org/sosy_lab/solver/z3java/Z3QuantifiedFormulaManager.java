@@ -53,8 +53,13 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Expr, 
   public Expr mkQuantifier(Quantifier q, List<Expr> pVariables, Expr pBody) {
     return z3context.mkQuantifier(
         q == Quantifier.FORALL,
-        pVariables.toArray(new Expr[]{}),
-        pBody, 0, null, null, null, null);
+        pVariables.toArray(new Expr[] {}),
+        pBody,
+        0,
+        null,
+        null,
+        null,
+        null);
     // TODO replace NULL by something better
   }
 

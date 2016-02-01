@@ -100,7 +100,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
   protected Expr applyTacticImpl(Expr input, Tactic tactic) {
     String z3TacticName = Z3_TACTICS.get(tactic);
     if (z3TacticName != null) {
-      return Z3NativeApiHelpers.applyTactic(getFormulaCreator().getEnv(), toBool(input), z3TacticName);
+      return Z3NativeApiHelpers.applyTactic(
+          getFormulaCreator().getEnv(), toBool(input), z3TacticName);
     } else {
       return super.applyTacticImpl(input, tactic);
     }
@@ -119,7 +120,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
         // Serializing a solver is a simplest way to dump a formula in Z3,
         // cf https://github.com/Z3Prover/z3/issues/397
         Solver z3solver = getEnvironment().mkSolver();
-        z3solver.add((BoolExpr)expr);
+        z3solver.add((BoolExpr) expr);
         String serialized = z3solver.toString();
         out.append(serialized);
       }
@@ -165,7 +166,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
   protected Expr substituteUsingListsImpl(Expr t, List<Expr> changeFrom, List<Expr> changeTo) {
     int size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
-    return t.substitute(changeFrom.toArray(new Expr[]{}), changeTo.toArray(new Expr[]{}));
+    return t.substitute(changeFrom.toArray(new Expr[] {}), changeTo.toArray(new Expr[] {}));
   }
 
   @Override

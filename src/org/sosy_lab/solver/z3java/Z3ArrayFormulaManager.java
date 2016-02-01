@@ -39,7 +39,7 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Sort, Cont
   }
 
   private static ArrayExpr toAE(Expr e) {
-    return (ArrayExpr)e;
+    return (ArrayExpr) e;
   }
 
   @Override

@@ -95,7 +95,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
-    BoolExpr z3Constraint = (BoolExpr)creator.extractInfo(constraint);
+    BoolExpr z3Constraint = (BoolExpr) creator.extractInfo(constraint);
     z3optContext.Add(z3Constraint);
     return null;
   }
@@ -106,8 +106,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     Handle handle = z3optContext.MkMaximize(toAE(creator.extractInfo(objective)));
     return putToMap(handle);
   }
-
-
 
   @Override
   public int minimize(Formula objective) {
@@ -210,10 +208,10 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
 
     RationalFormula epsFormula = rfmgr.makeVariable("epsilon");
 
-    Formula out = mgr.substitute(
-        z,
-        ImmutableMap.<Formula, Formula>of(
-            epsFormula, rfmgr.makeNumber(newValue.toString())));
+    Formula out =
+        mgr.substitute(
+            z,
+            ImmutableMap.<Formula, Formula>of(epsFormula, rfmgr.makeNumber(newValue.toString())));
     return creator.extractInfo(out).simplify();
   }
 

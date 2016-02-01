@@ -88,13 +88,13 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Nullable
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
-    BoolExpr e = (BoolExpr)creator.extractInfo(f);
+    BoolExpr e = (BoolExpr) creator.extractInfo(f);
 
     if (storedConstraints != null) { // Unsat core generation is on.
       String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
       BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
-      z3solver.assertAndTrack(e, (BoolExpr)creator.extractInfo(t));
+      z3solver.assertAndTrack(e, (BoolExpr) creator.extractInfo(t));
       storedConstraints.put(varName, f);
     } else {
       z3solver.add(e);
@@ -150,8 +150,8 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Override
   public void close() {
     Preconditions.checkState(!closed);
-    Preconditions.checkArgument(z3solver.getNumScopes() >= 0,
-        "a negative number of scopes is not allowed");
+    Preconditions.checkArgument(
+        z3solver.getNumScopes() >= 0, "a negative number of scopes is not allowed");
 
     while (level > 0) {
       pop();
@@ -169,7 +169,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     BoolExpr[] importantFormulas = new BoolExpr[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {
-      importantFormulas[i++] = (BoolExpr)creator.extractInfo(impF);
+      importantFormulas[i++] = (BoolExpr) creator.extractInfo(impF);
     }
 
     z3solver.push();

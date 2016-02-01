@@ -38,11 +38,11 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Expr, Sort, 
   }
 
   static BoolExpr toBool(Expr e) {
-    return (BoolExpr)e;
+    return (BoolExpr) e;
   }
 
   static BoolExpr[] toBool(Collection<? extends Expr> e) {
-    return e.toArray(new BoolExpr[]{});
+    return e.toArray(new BoolExpr[] {});
   }
 
   @Override

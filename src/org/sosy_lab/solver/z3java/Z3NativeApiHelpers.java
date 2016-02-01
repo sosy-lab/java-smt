@@ -70,15 +70,11 @@ class Z3NativeApiHelpers {
     for (int i = 0; i < subgoalsCount; i++) {
       goalFormulas[i] = goalToAST(pContext, subGoals[i]);
     }
-    return goalFormulas.length == 1
-          ? goalFormulas[0]
-          : pContext.mkOr(goalFormulas);
+    return goalFormulas.length == 1 ? goalFormulas[0] : pContext.mkOr(goalFormulas);
   }
 
   private static BoolExpr goalToAST(Context pContext, Goal pSubGoals) {
     BoolExpr[] subgoalFormulas = pSubGoals.getFormulas();
-    return subgoalFormulas.length == 1
-          ? subgoalFormulas[0]
-          : pContext.mkAnd(subgoalFormulas);
+    return subgoalFormulas.length == 1 ? subgoalFormulas[0] : pContext.mkAnd(subgoalFormulas);
   }
 }

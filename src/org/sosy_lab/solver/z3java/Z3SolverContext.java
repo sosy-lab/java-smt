@@ -204,6 +204,5 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public void close() {
-  }
+  public void close() {}
 }

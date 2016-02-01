@@ -40,6 +40,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   private final com.microsoft.z3.Model model;
   private final Context z3context;
+
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
 
@@ -50,7 +51,8 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
     creator = pCreator;
   }
 
-  public static Model parseZ3Model(Context z3context, com.microsoft.z3.Model z3model, Z3FormulaCreator pCreator) {
+  public static Model parseZ3Model(
+      Context z3context, com.microsoft.z3.Model z3model, Z3FormulaCreator pCreator) {
     return new Z3Model(z3context, z3model, pCreator);
   }
 
@@ -90,8 +92,10 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
       Expr value = model.getConstInterp(keyDecl);
       Symbol symbol = var.getFuncDecl().getName();
 
-      Preconditions.checkArgument(symbol instanceof StringSymbol,
-          "Given symbol of expression is no stringSymbol! (%s)", var);
+      Preconditions.checkArgument(
+          symbol instanceof StringSymbol,
+          "Given symbol of expression is no stringSymbol! (%s)",
+          var);
 
       Object lValue = creator.convertValue(value);
 

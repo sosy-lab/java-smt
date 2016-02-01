@@ -33,7 +33,8 @@ import java.util.List;
 
 abstract class Z3NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-    extends AbstractNumeralFormulaManager<Expr, Sort, Context, ParamFormulaType, ResultFormulaType> {
+    extends AbstractNumeralFormulaManager<
+        Expr, Sort, Context, ParamFormulaType, ResultFormulaType> {
 
   protected final Context z3context;
 
@@ -43,11 +44,11 @@ abstract class Z3NumeralFormulaManager<
   }
 
   static ArithExpr toAE(Expr e) {
-    return (ArithExpr)e;
+    return (ArithExpr) e;
   }
 
   private static ArithExpr[] toAE(Collection<Expr> e) {
-    return e.toArray(new ArithExpr[]{});
+    return e.toArray(new ArithExpr[] {});
   }
 
   abstract protected Sort getNumeralType();

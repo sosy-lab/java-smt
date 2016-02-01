@@ -168,7 +168,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
         Preconditions.checkState(currentSubtree == 0, "subtree of root should start at 0.");
         Preconditions.checkState(stack.isEmpty(), "root should be the last element in the stack.");
       } else {
-        interpolationPoint = ((InterpolationContext)z3context).MkInterpolant(conjunction);
+        interpolationPoint = ((InterpolationContext) z3context).MkInterpolant(conjunction);
       }
 
       interpolationFormulas[i] = interpolationPoint;
@@ -182,7 +182,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
     Preconditions.checkState(
         stack.isEmpty(), "root should have been the last element in the stack.");
 
-    ComputeInterpolantResult interpolationResult = ((InterpolationContext)z3context).ComputeInterpolant(root, z3context.mkParams());
+    ComputeInterpolantResult interpolationResult =
+        ((InterpolationContext) z3context).ComputeInterpolant(root, z3context.mkParams());
 
     Preconditions.checkState(
         interpolationResult.status == Z3_lbool.Z3_L_FALSE,

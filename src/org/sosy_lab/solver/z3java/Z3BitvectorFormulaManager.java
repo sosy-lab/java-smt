@@ -38,7 +38,7 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Expr, So
   }
 
   static BitVecExpr toBV(Expr e) {
-    return (BitVecExpr)e;
+    return (BitVecExpr) e;
   }
 
   @Override

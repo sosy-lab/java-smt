@@ -102,11 +102,11 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
       case Z3_REAL_SORT:
         return FormulaType.RationalType;
       case Z3_ARRAY_SORT:
-        ArraySort aSort = (ArraySort)pSort;
+        ArraySort aSort = (ArraySort) pSort;
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(aSort.getDomain()), getFormulaTypeFromSort(aSort.getRange()));
       case Z3_BV_SORT:
-        return FormulaType.getBitvectorTypeWithSize(((BitVecSort)pSort).getSize());
+        return FormulaType.getBitvectorTypeWithSize(((BitVecSort) pSort).getSize());
       default:
         throw new IllegalArgumentException("Unknown formula type");
     }
@@ -146,18 +146,18 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
       FuncDecl funcDecl = t.getFuncDecl();
       Symbol symbol = funcDecl.getName();
       if (symbol instanceof IntSymbol) {
-          return Integer.toString(((IntSymbol)symbol).getInt());
+        return Integer.toString(((IntSymbol) symbol).getInt());
       } else if (symbol instanceof StringSymbol) {
-          return ((StringSymbol)symbol).getString();
+        return ((StringSymbol) symbol).getString();
       } else {
-          throw new AssertionError();
+        throw new AssertionError();
       }
     }
   }
 
   private Expr replaceArgs(Expr t, List<Expr> newArgs) {
     Preconditions.checkState(t.getNumArgs() == newArgs.size());
-    Expr[] newParams = newArgs.toArray(new Expr[]{});
+    Expr[] newParams = newArgs.toArray(new Expr[] {});
     // TODO check equality of sort of each oldArg and newArg
     return environment.mkApp(t.getFuncDecl(), newParams);
   }
@@ -206,7 +206,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
         int deBruijnIdx = f.getIndex();
         return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
-        com.microsoft.z3.Quantifier qf = (com.microsoft.z3.Quantifier)f;
+        com.microsoft.z3.Quantifier qf = (com.microsoft.z3.Quantifier) f;
         BooleanFormula body = encapsulateBoolean(qf.getBody());
         Quantifier q = qf.isUniversal() ? Quantifier.FORALL : Quantifier.EXISTS;
         return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(qf), body);
@@ -226,8 +226,9 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     Symbol[] varNames = pQf.getBoundVariableNames();
     Sort[] varSorts = pQf.getBoundVariableSorts();
     for (int i = 0; i < numBound; i++) {
-      boundVars.add(encapsulate(getFormulaTypeFromSort(varSorts[i]),
-          environment.mkConst(varNames[i], varSorts[i])));
+      boundVars.add(
+          encapsulate(
+              getFormulaTypeFromSort(varSorts[i]), environment.mkConst(varNames[i], varSorts[i])));
     }
     return boundVars;
   }
