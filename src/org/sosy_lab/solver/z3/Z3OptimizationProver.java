@@ -62,7 +62,7 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment<Integer> {
+class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
 
   private final FormulaManager mgr;
   private final RationalFormulaManager rfmgr;
@@ -95,14 +95,14 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public Integer maximize(Formula objective) {
+  public int maximize(Formula objective) {
     Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
     return optimize_maximize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
-  public Integer minimize(Formula objective) {
+  public int minimize(Formula objective) {
     Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
     return optimize_minimize(z3context, z3optContext, z3Objective.getFormulaInfo());
@@ -150,7 +150,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public Optional<Rational> upper(Integer handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) {
     Preconditions.checkState(!closed);
     long ast = optimize_get_upper(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
@@ -160,7 +160,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public Optional<Rational> lower(Integer handle, Rational epsilon) {
+  public Optional<Rational> lower(int handle, Rational epsilon) {
     Preconditions.checkState(!closed);
     long ast = optimize_get_lower(z3context, z3optContext, handle);
     if (isInfinity(ast)) {

@@ -227,7 +227,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptimizationProverEnvironment<?> newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
     return new Mathsat5OptimizationProver(this, creator);
   }
 

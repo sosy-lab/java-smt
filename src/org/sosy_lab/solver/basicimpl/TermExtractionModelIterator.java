@@ -42,9 +42,7 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
   private final Function<E, Object> evaluator;
 
   public TermExtractionModelIterator(
-      FormulaCreator<E, ?, ?> creator,
-      Function<E, Object> evaluator,
-      Collection<E> assertedTerms) {
+      FormulaCreator<E, ?, ?> creator, Function<E, Object> evaluator, Collection<E> assertedTerms) {
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
     this.evaluator = checkNotNull(evaluator);

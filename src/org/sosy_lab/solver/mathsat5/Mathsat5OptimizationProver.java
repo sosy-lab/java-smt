@@ -37,7 +37,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
-    implements OptimizationProverEnvironment<Integer> {
+    implements OptimizationProverEnvironment {
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /**
@@ -75,7 +75,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Integer maximize(Formula objective) {
+  public int maximize(Formula objective) {
     // todo: code duplication.
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
@@ -84,7 +84,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Integer minimize(Formula objective) {
+  public int minimize(Formula objective) {
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
     msat_push_minimize(curEnv, getMsatTerm(objective), null, null);
@@ -133,12 +133,12 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Optional<Rational> upper(Integer handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) {
     return getValue(handle);
   }
 
   @Override
-  public Optional<Rational> lower(Integer handle, Rational epsilon) {
+  public Optional<Rational> lower(int handle, Rational epsilon) {
     return getValue(handle);
   }
 

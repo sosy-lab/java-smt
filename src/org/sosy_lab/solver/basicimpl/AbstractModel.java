@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-
 import org.sosy_lab.solver.api.Formula;
 
 import javax.annotation.Nullable;

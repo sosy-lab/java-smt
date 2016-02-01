@@ -69,7 +69,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public OptimizationProverEnvironment<?> newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
     throw new UnsupportedOperationException();
   }
 

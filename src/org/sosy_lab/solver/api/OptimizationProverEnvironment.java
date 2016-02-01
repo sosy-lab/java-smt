@@ -27,7 +27,7 @@ import org.sosy_lab.solver.SolverException;
 /**
  * Interface for optimization modulo SMT.
  */
-public interface OptimizationProverEnvironment<Handle> extends BasicProverEnvironment<Void>, AutoCloseable {
+public interface OptimizationProverEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
 
   /**
    * Add the maximization <code>objective</code>.
@@ -36,7 +36,7 @@ public interface OptimizationProverEnvironment<Handle> extends BasicProverEnviro
    *
    * @return Objective handle, to be used for retrieving the value.
    */
-  Handle maximize(Formula objective);
+  int maximize(Formula objective);
 
   /**
    * Add minimization <code>objective</code>.
@@ -45,7 +45,7 @@ public interface OptimizationProverEnvironment<Handle> extends BasicProverEnviro
    *
    * @return Objective handle, to be used for retrieving the value.
    */
-  Handle minimize(Formula objective);
+  int minimize(Formula objective);
 
   /**
    * Optimize the objective function subject to the previously
@@ -60,14 +60,14 @@ public interface OptimizationProverEnvironment<Handle> extends BasicProverEnviro
    * @return Upper approximation of the optimized value, or
    *  absent optional if the objective is unbounded.
    */
-  Optional<Rational> upper(Handle handle, Rational epsilon);
+  Optional<Rational> upper(int handle, Rational epsilon);
 
   /**
    * @param epsilon Value to substitute for the {@code epsilon}.
    * @return Lower approximation of the optimized value, or
    *  absent optional if the objective is unbounded.
    */
-  Optional<Rational> lower(Handle handle, Rational epsilon);
+  Optional<Rational> lower(int handle, Rational epsilon);
 
   /**
    * Status of the optimization problem.

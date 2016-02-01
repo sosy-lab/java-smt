@@ -44,7 +44,7 @@ public class SolverBasicTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Solvers[] getAllSolvers() {
-    return new Solvers[]{Solvers.Z3JAVA}; //Solvers.values();
+    return Solvers.values();
   }
 
   @Parameter(0)

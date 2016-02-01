@@ -359,10 +359,9 @@ public class SolverStackTest extends SolverBasedTest0 {
       requireUfValuesInModel();
 
       assertThat(
-              model
-                  .evaluate(
-                      fmgr.callUninterpretedFunction(
-                          uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
+              model.evaluate(
+                  fmgr.callUninterpretedFunction(
+                      uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
           .isEqualTo(BigInteger.ZERO);
     }
   }

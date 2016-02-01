@@ -40,7 +40,8 @@ public interface Model extends Iterable<ValueAssignment> {
    *    - Boolean
    *    - String (for types we do not handle)
    */
-  @Nullable Object evaluate(Formula f);
+  @Nullable
+  Object evaluate(Formula f);
 
   /**
    * Iterate over all values present in the model.
