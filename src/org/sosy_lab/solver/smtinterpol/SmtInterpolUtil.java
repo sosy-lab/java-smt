@@ -20,13 +20,9 @@
 package org.sosy_lab.solver.smtinterpol;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
-import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
@@ -51,84 +47,6 @@ class SmtInterpolUtil {
     ApplicationTerm applicationTerm = (ApplicationTerm) t;
     FunctionSymbol func = applicationTerm.getFunction();
     return applicationTerm.getParameters().length > 0 && !func.isIntern() && !func.isInterpreted();
-  }
-
-  /** check for ConstantTerm with Number or
-   * ApplicationTerm with negative Number */
-  public static boolean isNumber(Term t) {
-    boolean is = false;
-    // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
-      if (value instanceof Number || value instanceof Rational) {
-        is = true;
-      }
-
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
-
-      // ApplicationTerm with negative Number --> "(- 123)"
-      if ("-".equals(at.getFunction().getName())
-          && (at.getParameters().length == 1)
-          && isNumber(at.getParameters()[0])) {
-        is = true;
-
-        // ApplicationTerm with Division --> "(/ 1 5)"
-      } else if ("/".equals(at.getFunction().getName())
-          && (at.getParameters().length == 2)
-          && isNumber(at.getParameters()[0])
-          && isNumber(at.getParameters()[1])) {
-        is = true;
-      }
-    }
-
-    // TODO hex or binary data, string?
-    return is;
-  }
-
-  /** converts a term to a number,
-   * currently only Double is supported. */
-  public static Number toNumber(Term t) {
-    assert isNumber(t) : "term is not a number: " + t;
-
-    // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
-      if (value instanceof Number) {
-        return (Number) value;
-      } else if (value instanceof Rational) {
-        Rational rat = (Rational) value;
-        if (t.getSort().getName().equals("Int") && rat.isIntegral()) {
-          return rat.numerator();
-        }
-        return org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
-      }
-
-      // ApplicationTerm with negative Number --> "-123"
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
-
-      if ("-".equals(at.getFunction().getName())) {
-        Object value = toNumber(at.getParameters()[0]);
-        if (value instanceof BigDecimal) {
-          return ((BigDecimal) value).negate();
-        } else if (value instanceof BigInteger) {
-          return ((BigInteger) value).negate();
-        } else if (value instanceof Long) {
-          return -(Long) value;
-        } else if (value instanceof Integer) {
-          return -(Integer) value;
-        } else if (value instanceof Double) {
-          return -(Double) value;
-        } else if (value instanceof Float) {
-          return -(Float) value;
-        } else if (value instanceof org.sosy_lab.common.rationals.Rational) {
-          return ((org.sosy_lab.common.rationals.Rational) value).negate();
-        }
-      }
-    }
-
-    throw new NumberFormatException("unknown format of numeric term: " + t);
   }
 
   public static boolean isBoolean(Term t) {

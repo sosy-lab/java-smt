@@ -55,7 +55,7 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
   }
 
   @Override
-  public Object evaluate(Expr f) {
+  public Object evaluateImpl(Expr f) {
     return getValue(smtEngine.getValue(f));
   }
 
@@ -66,7 +66,7 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
         new Function<Expr, Object>() {
           @Override
           public Object apply(Expr input) {
-            return evaluate(input);
+            return evaluateImpl(input);
           }
         },
         assertedFormulas);

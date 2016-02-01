@@ -18,7 +18,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment.OptStatus;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.math.BigInteger;
 import java.util.List;

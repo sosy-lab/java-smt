@@ -42,7 +42,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.api.UfDeclaration;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

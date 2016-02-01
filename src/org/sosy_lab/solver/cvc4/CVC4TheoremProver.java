@@ -36,7 +36,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,7 +150,7 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
       CVC4Model model = new CVC4Model(smtEngine, creator, assertedFormulas);
 
       for (int j = 0; j < importantFormulas.length; j++) {
-        Object valueOfExpr = model.evaluate(importantFormulas[j]);
+        Object valueOfExpr = model.evaluateImpl(importantFormulas[j]);
 
         if (valueOfExpr instanceof Boolean && !((Boolean) valueOfExpr)) {
           valuesOfModel[j] =

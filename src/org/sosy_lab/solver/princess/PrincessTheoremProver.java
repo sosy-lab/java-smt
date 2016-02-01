@@ -35,7 +35,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import scala.Option;
 

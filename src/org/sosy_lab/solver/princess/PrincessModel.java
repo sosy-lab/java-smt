@@ -52,7 +52,7 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
 
   @Nullable
   @Override
-  public Object evaluate(IExpression f) {
+  public Object evaluateImpl(IExpression f) {
     Option<ModelValue> out = model.evalExpression(f);
     if (out.isEmpty()) {
       return null;
@@ -68,7 +68,7 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
         new Function<IExpression, Object>() {
           @Override
           public Object apply(IExpression input) {
-            return evaluate(input);
+            return evaluateImpl(input);
           }
         },
         assertedTerms);

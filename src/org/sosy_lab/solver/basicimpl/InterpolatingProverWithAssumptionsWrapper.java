@@ -12,6 +12,7 @@ import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
+import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;

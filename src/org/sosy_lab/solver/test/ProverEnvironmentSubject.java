@@ -30,7 +30,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.util.List;
 

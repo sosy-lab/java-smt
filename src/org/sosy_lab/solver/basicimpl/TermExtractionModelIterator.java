@@ -25,7 +25,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Verify;
 import com.google.common.collect.UnmodifiableIterator;
 
-import org.sosy_lab.solver.basicimpl.Model.ValueAssignment;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 import java.util.Collection;
 import java.util.HashMap;

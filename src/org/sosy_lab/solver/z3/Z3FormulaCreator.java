@@ -466,15 +466,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
       } else if (type.isIntegerType()) {
         return new BigInteger(get_numeral_string(environment, value));
       } else if (type.isRationalType()) {
-
-        // String serialization is expensive, but getting arbitrary-sized
-        // numbers is difficult otherwise.
-        // TODO: an optimization is possible here, try to get an integer first,
-        // resort to strings if that fails.
-        String s = get_numeral_string(environment, value);
-        return Rational.ofString(s);
+        return Rational.ofString(get_numeral_string(environment, value));
       } else if (type.isBitvectorType()) {
-        return interpretBitvector(environment, value);
+        return new BigInteger(get_numeral_string(environment, value));
       } else {
 
         // Unknown type --- return string serialization.
@@ -484,12 +478,5 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     } finally {
       dec_ref(environment, value);
     }
-  }
-
-  private static BigInteger interpretBitvector(long z3context, long bv) {
-    long argSort = get_sort(z3context, bv);
-    int sortKind = get_sort_kind(z3context, argSort);
-    Preconditions.checkArgument(sortKind == Z3_BV_SORT);
-    return new BigInteger(get_numeral_string(z3context, bv));
   }
 }

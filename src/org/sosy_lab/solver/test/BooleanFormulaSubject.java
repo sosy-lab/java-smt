@@ -34,7 +34,7 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.util.List;
 

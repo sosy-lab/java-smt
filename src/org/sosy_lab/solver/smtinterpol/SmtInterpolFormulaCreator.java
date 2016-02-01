@@ -24,7 +24,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Function;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
@@ -39,6 +41,8 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.basicimpl.ObjectArrayBackedList;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEnvironment> {
@@ -144,8 +148,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
         "Given term belongs to a different instance of SMTInterpol: %s",
         input);
 
-    if (SmtInterpolUtil.isNumber(input)) {
-      final Number value = SmtInterpolUtil.toNumber(input);
+    if (input instanceof ConstantTerm) {
+      final Number value = toNumber(input);
       return visitor.visitConstant(f, value);
 
     } else if (input instanceof ApplicationTerm) {
@@ -189,6 +193,99 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
               input.getClass().getSimpleName(),
               input));
     }
+  }
+
+  /** check for ConstantTerm with Number or
+   * ApplicationTerm with negative Number */
+  public boolean isNumber(Term t) {
+    boolean is = false;
+    // ConstantTerm with Number --> "123"
+    if (t instanceof ConstantTerm) {
+      Object value = ((ConstantTerm) t).getValue();
+      if (value instanceof Number || value instanceof Rational) {
+        is = true;
+      }
+
+    } else if (t instanceof ApplicationTerm) {
+      ApplicationTerm at = (ApplicationTerm) t;
+
+      // ApplicationTerm with negative Number --> "(- 123)"
+      if ("-".equals(at.getFunction().getName())
+          && (at.getParameters().length == 1)
+          && isNumber(at.getParameters()[0])) {
+        is = true;
+
+        // ApplicationTerm with Division --> "(/ 1 5)"
+      } else if ("/".equals(at.getFunction().getName())
+          && (at.getParameters().length == 2)
+          && isNumber(at.getParameters()[0])
+          && isNumber(at.getParameters()[1])) {
+        is = true;
+      }
+    }
+
+    // TODO hex or binary data, string?
+    return is;
+  }
+
+  /**
+   * Converts a term _which_came_from_the_model to a number.
+   * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
+   * the output is SmtInterpol's Rational unless it is a bitvector,
+   * and currently we do not support bitvectors for SmtInterpol.
+   **/
+  public Number modelTermToNumber(Term t) {
+    assert t instanceof ConstantTerm;
+    assert ((ConstantTerm) t).getValue() instanceof Rational;
+    Rational value = (Rational) ((ConstantTerm) t).getValue();
+    org.sosy_lab.common.rationals.Rational out = org.sosy_lab.common.rationals.Rational.of(
+        value.numerator(), value.denominator()
+    );
+    if (getFormulaTypeOfSort(t.getSort()).isIntegerType()) {
+      assert out.isIntegral();
+      return out.getNum();
+    }
+    return out;
+  }
+
+  public Number toNumber(Term t) {
+    // ConstantTerm with Number --> "123"
+    if (t instanceof ConstantTerm) {
+      Object value = ((ConstantTerm) t).getValue();
+      if (value instanceof Number) {
+        return (Number) value;
+      } else if (value instanceof Rational) {
+        Rational rat = (Rational) value;
+        if (t.getSort().getName().equals("Int") && rat.isIntegral()) {
+          return rat.numerator();
+        }
+        return org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
+      }
+
+      // ApplicationTerm with negative Number --> "-123"
+    } else if (t instanceof ApplicationTerm) {
+      ApplicationTerm at = (ApplicationTerm) t;
+
+      if ("-".equals(at.getFunction().getName())) {
+        Object value = toNumber(at.getParameters()[0]);
+        if (value instanceof BigDecimal) {
+          return ((BigDecimal) value).negate();
+        } else if (value instanceof BigInteger) {
+          return ((BigInteger) value).negate();
+        } else if (value instanceof Long) {
+          return -(Long) value;
+        } else if (value instanceof Integer) {
+          return -(Integer) value;
+        } else if (value instanceof Double) {
+          return -(Double) value;
+        } else if (value instanceof Float) {
+          return -(Float) value;
+        } else if (value instanceof org.sosy_lab.common.rationals.Rational) {
+          return ((org.sosy_lab.common.rationals.Rational) value).negate();
+        }
+      }
+    }
+    throw new NumberFormatException("unknown format of numeric term: " + t);
   }
 
   private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {

@@ -39,19 +39,21 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
 
   private final Model model;
   private final Collection<Term> assertedTerms;
+  private final SmtInterpolFormulaCreator formulaCreator;
 
   SmtInterpolModel(
       Model pModel,
       FormulaCreator<Term, Sort, SmtInterpolEnvironment> pCreator,
       Collection<Term> assertedTerms) {
     super(pCreator);
+    formulaCreator = (SmtInterpolFormulaCreator) pCreator;
     model = pModel;
     this.assertedTerms = assertedTerms;
   }
 
   @Nullable
   @Override
-  public Object evaluate(Term f) {
+  public Object evaluateImpl(Term f) {
     Term out = model.evaluate(f);
     return getValue(out);
   }
@@ -63,7 +65,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
         new Function<Term, Object>() {
           @Override
           public Object apply(Term input) {
-            return evaluate(input);
+            return evaluateImpl(input);
           }
         },
         assertedTerms);
@@ -78,8 +80,8 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
     FormulaType<?> type = creator.getFormulaType(value);
     if (type.isBooleanType()) {
       return SmtInterpolUtil.isTrue(value);
-    } else if (SmtInterpolUtil.isNumber(value)) {
-      return SmtInterpolUtil.toNumber(value);
+    } else if (formulaCreator.isNumber(value)) {
+      return formulaCreator.modelTermToNumber(value);
     } else {
 
       // Return string serialization for unknown values.

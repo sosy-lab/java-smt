@@ -33,7 +33,7 @@ import com.google.common.base.Strings;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 import java.util.Map;
 import java.util.Map.Entry;
