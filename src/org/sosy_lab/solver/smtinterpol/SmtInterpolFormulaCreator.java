@@ -206,7 +206,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   String getName(Term t) {
     if (SmtInterpolUtil.isUF(t)) {
       assert t instanceof ApplicationTerm;
-      ApplicationTerm app = (ApplicationTerm) t;
       return ((ApplicationTerm) t).getFunction().getName();
     } else {
       return dequote(t.toString());
