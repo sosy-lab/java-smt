@@ -1284,7 +1284,7 @@ final class Z3NativeApi {
   static native int func_interp_get_num_entries(long context, long a1);
 
   /**
-   * Return a "point" of the given function intepretation. It represents the
+   * Return a "point" of the given function interpretation. It represents the
    * value of {@code f} in a particular point.
    *
    * <p>Precondition: {@code i < func_interp_get_num_entries(c, f)}

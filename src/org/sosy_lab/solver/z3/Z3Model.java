@@ -58,6 +58,7 @@ import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
 
@@ -158,8 +159,22 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       func_interp_inc_ref(z3context, interp);
 
       int numInterpretations = func_interp_get_num_entries(z3context, interp);
+      long entry;
+      if (numInterpretations == 0) {
 
-      long entry = func_interp_get_entry(z3context, interp, funcArgCursor);
+        // Advance to the next element.
+        funcArgCursor++;
+        dec_ref(z3context, funcDecl);
+        func_interp_dec_ref(z3context, interp);
+        if (!hasNext()) {
+          throw new NoSuchElementException();
+        } else {
+          return nextFuncApp();
+        }
+      } else {
+        entry = func_interp_get_entry(z3context, interp, funcArgCursor);
+      }
+
       func_entry_inc_ref(z3context, entry);
 
       Object value = creator.convertValue(func_entry_get_value(z3context, entry));
@@ -187,7 +202,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       dec_ref(z3context, funcDecl);
 
       // Move the cursor.
-      if (funcArgCursor == numInterpretations - 1) {
+      if (funcArgCursor >= numInterpretations - 1) {
         funcCursor++;
         funcArgCursor = 0;
       } else {
