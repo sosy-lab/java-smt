@@ -133,6 +133,19 @@ public interface Model extends Iterable<ValueAssignment> {
       return argumentsInterpretation;
     }
 
+    public boolean isFunction() {
+      return !argumentsInterpretation.isEmpty();
+    }
+
+    public int getArity() {
+      return argumentsInterpretation.size();
+    }
+
+    public Object getArgInterpretation(int i) {
+      assert i < getArity();
+      return argumentsInterpretation.get(i);
+    }
+
     @Override
     public String toString() {
       return String.format("%s(%s)=%s", name, argumentsInterpretation, value);
