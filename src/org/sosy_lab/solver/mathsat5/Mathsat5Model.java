@@ -23,6 +23,8 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_i
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_next;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
@@ -36,7 +38,9 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,8 +101,15 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
       }
       Formula fKey = creator.encapsulateWithTypeOf(key[0]);
       Object fValue = convertValue(key[0], value[0]);
+      List<Object> argumentInterpretation = new ArrayList<>();
 
-      return new ValueAssignment(fKey, formulaCreator.getName(key[0]), fValue);
+      for (int i = 0; i < msat_term_arity(key[0]); i++) {
+        long arg = msat_term_get_arg(key[0], i);
+        argumentInterpretation.add(evaluateImpl(arg));
+      }
+
+      return new ValueAssignment(
+          fKey, formulaCreator.getName(key[0]), fValue, argumentInterpretation);
     }
   }
 
@@ -118,8 +129,9 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     } else if (type.isFloatingPointType()) {
       return parseFloatingPoint(repr);
     } else {
-      throw new IllegalArgumentException(
-          "Mathsat term with unhandled type " + type + " for formula " + repr);
+
+      // Default to string representation.
+      return repr;
     }
   }
 

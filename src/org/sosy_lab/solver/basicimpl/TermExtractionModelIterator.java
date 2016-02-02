@@ -25,11 +25,16 @@ import com.google.common.base.Function;
 import com.google.common.base.Verify;
 import com.google.common.collect.UnmodifiableIterator;
 
+import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
+import org.sosy_lab.solver.visitors.ExpectedFormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -40,14 +45,12 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
   private final Iterator<Entry<E, Object>> valuesIterator;
   private final FormulaCreator<E, ?, ?> creator;
   private final Function<E, Object> evaluator;
-  private final Function<E, String> nameExtractor;
 
   public TermExtractionModelIterator(
       FormulaCreator<E, ?, ?> creator,
       Function<E, Object> evaluator,
       Collection<E> assertedTerms,
       Function<E, String> nameExtractor) {
-    this.nameExtractor = nameExtractor;
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
     this.evaluator = checkNotNull(evaluator);
@@ -80,9 +83,32 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
   @Override
   public ValueAssignment next() {
     Entry<E, Object> entry = valuesIterator.next();
-    return new ValueAssignment(
-        creator.encapsulateWithTypeOf(entry.getKey()),
-        nameExtractor.apply(entry.getKey()),
-        entry.getValue());
+    Formula encapsulated = creator.encapsulateWithTypeOf(entry.getKey());
+    final List<Object> varInterpretation = new ArrayList<>();
+
+    String varName =
+        creator.visit(
+            new ExpectedFormulaVisitor<String>() {
+
+              public String visitFreeVariable(Formula f, String name) {
+                return name;
+              }
+
+              public String visitFunction(
+                  Formula f,
+                  List<Formula> args,
+                  FunctionDeclaration functionDeclaration,
+                  Function<List<Formula>, Formula> newApplicationConstructor) {
+
+                // Populate argument interpretation.
+                for (Formula arg : args) {
+                  varInterpretation.add(evaluator.apply(creator.extractInfo(arg)));
+                }
+                return functionDeclaration.getName();
+              }
+            },
+            encapsulated);
+
+    return new ValueAssignment(encapsulated, varName, entry.getValue(), varInterpretation);
   }
 }

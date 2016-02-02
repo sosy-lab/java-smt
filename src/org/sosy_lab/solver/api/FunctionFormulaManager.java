@@ -48,6 +48,8 @@ public interface FunctionFormulaManager {
   <T extends Formula> T callUninterpretedFunction(
       UfDeclaration<T> funcType, List<? extends Formula> args);
 
+  <T extends Formula> T callUninterpretedFunction(UfDeclaration<T> funcType, Formula... args);
+
   /**
    * Declares and calls an uninterpreted function.
    */

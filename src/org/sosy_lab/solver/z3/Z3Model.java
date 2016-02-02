@@ -48,13 +48,16 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -140,7 +143,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       dec_ref(z3context, value);
 
       constCursor++;
-      return new ValueAssignment(key, name, lValue);
+      return new ValueAssignment(key, name, lValue, ImmutableList.of());
     }
 
     ValueAssignment nextFuncApp() {
@@ -164,9 +167,12 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       int noArgs = func_entry_get_num_args(z3context, entry);
       long[] args = new long[noArgs];
 
+      List<Object> argumentInterpretation = new ArrayList<>();
+
       for (int i = 0; i < noArgs; i++) {
         long arg = func_entry_get_arg(z3context, entry, i);
         inc_ref(z3context, arg);
+        argumentInterpretation.add(evaluateImpl(arg));
         args[i] = arg;
       }
 
@@ -188,7 +194,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
         funcArgCursor++;
       }
 
-      return new ValueAssignment(formula, name, value);
+      return new ValueAssignment(formula, name, value, argumentInterpretation);
     }
   }
 

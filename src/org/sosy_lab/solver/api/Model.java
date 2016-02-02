@@ -19,12 +19,15 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.common.collect.ImmutableList;
+
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -88,12 +91,16 @@ public interface Model extends Iterable<ValueAssignment> {
   final class ValueAssignment {
     private final Formula key;
     private final Object value;
+    private final ImmutableList<Object> argumentsInterpretation;
     private final String name;
 
-    public ValueAssignment(Formula key, String name, Object value) {
+    public ValueAssignment(
+        Formula key, String name, Object value, Collection<?> argumentInterpretation) {
+
       this.key = key;
       this.name = name;
       this.value = value;
+      this.argumentsInterpretation = ImmutableList.copyOf(argumentInterpretation);
     }
 
     /**
@@ -118,9 +125,17 @@ public interface Model extends Iterable<ValueAssignment> {
       return value;
     }
 
+    /**
+     * Interpretation assigned for function arguments.
+     * Empty for variables.
+     */
+    public ImmutableList<Object> getArgumentsInterpretation() {
+      return argumentsInterpretation;
+    }
+
     @Override
     public String toString() {
-      return String.format("%s(%s)=%s", name, key, value);
+      return String.format("%s(%s)=%s", name, argumentsInterpretation, value);
     }
 
     @Override
@@ -132,12 +147,19 @@ public interface Model extends Iterable<ValueAssignment> {
         return false;
       }
       ValueAssignment other = (ValueAssignment) o;
-      return key.equals(other.key) && name.equals(other.name) && value.equals(other.value);
+
+      // "Key" is purposefully not included in the comparison,
+      // name and arguments should be sufficient.
+      boolean out =
+          name.equals(other.name)
+              && value.equals(other.value)
+              && argumentsInterpretation.equals(other.argumentsInterpretation);
+      return out;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(key, value);
+      return Objects.hash(name, argumentsInterpretation, value);
     }
   }
 }
