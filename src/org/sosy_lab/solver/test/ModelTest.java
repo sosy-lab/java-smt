@@ -116,6 +116,28 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testGetMultipleUFs() throws Exception {
+    IntegerFormula app1 =
+        fmgr.declareAndCallUninterpretedFunction(
+            "UF", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("arg1")));
+    IntegerFormula app2 =
+        fmgr.declareAndCallUninterpretedFunction(
+            "UF", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("arg2")));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(imgr.equal(app1, imgr.makeNumber(1)));
+      prover.push(imgr.equal(app2, imgr.makeNumber(2)));
+      assertThatEnvironment(prover).isSatisfiable();
+      Model m = prover.getModel();
+      assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
+      assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
+      for (ValueAssignment assignment : m) {
+        // Check that we can iterate through the values with no errors.
+      }
+    }
+  }
+
+  @Test
   public void testGetBitvectors() throws Exception {
     requireBitvectors();
     assert bvmgr != null;

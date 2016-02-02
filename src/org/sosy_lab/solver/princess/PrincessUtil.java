@@ -115,7 +115,6 @@ class PrincessUtil {
     return t instanceof ITerm;
   }
 
-
   /** t1 and t2 */
   public static boolean isAnd(IExpression t) {
     return isBinaryFunction(t, IBinJunctor.And());
