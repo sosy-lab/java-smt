@@ -163,7 +163,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       if (numInterpretations == 0) {
 
         // Advance to the next element.
-        funcArgCursor++;
+        funcCursor++;
         dec_ref(z3context, funcDecl);
         func_interp_dec_ref(z3context, interp);
         if (!hasNext()) {
