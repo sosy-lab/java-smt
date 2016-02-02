@@ -90,10 +90,12 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
         creator.visit(
             new ExpectedFormulaVisitor<String>() {
 
+              @Override
               public String visitFreeVariable(Formula f, String name) {
                 return name;
               }
 
+              @Override
               public String visitFunction(
                   Formula f,
                   List<Formula> args,

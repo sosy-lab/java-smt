@@ -191,7 +191,6 @@ public class ModelTest extends SolverBasedTest0 {
 
       for (ValueAssignment assignment : m) {
         // Check that we can iterate through with no crashes.
-        System.out.println(assignment);
       }
     }
 

@@ -26,6 +26,8 @@ import org.sosy_lab.solver.api.Formula;
  * {@link UnsupportedOperationException} on unexpected formula types.
  */
 public abstract class ExpectedFormulaVisitor<R> extends DefaultFormulaVisitor<R> {
+
+  @Override
   protected final R visitDefault(Formula f) {
     throw new UnsupportedOperationException();
   }
