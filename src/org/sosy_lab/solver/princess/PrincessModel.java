@@ -73,13 +73,7 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
             return evaluateImpl(input);
           }
         },
-        assertedTerms,
-        new Function<IExpression, String>() {
-          @Override
-          public String apply(IExpression input) {
-            return formulaCreator.getName(input);
-          }
-        });
+        assertedTerms);
   }
 
   @Override

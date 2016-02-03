@@ -31,7 +31,6 @@ import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.visitors.ExpectedFormulaVisitor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -49,8 +48,7 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
   public TermExtractionModelIterator(
       FormulaCreator<E, ?, ?> creator,
       Function<E, Object> evaluator,
-      Collection<E> assertedTerms,
-      Function<E, String> nameExtractor) {
+      Iterable<E> assertedTerms) {
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
     this.evaluator = checkNotNull(evaluator);

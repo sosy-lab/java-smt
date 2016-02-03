@@ -70,13 +70,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
             return evaluateImpl(input);
           }
         },
-        assertedTerms,
-        new Function<Term, String>() {
-          @Override
-          public String apply(Term input) {
-            return formulaCreator.getName(input);
-          }
-        });
+        assertedTerms);
   }
 
   @Override

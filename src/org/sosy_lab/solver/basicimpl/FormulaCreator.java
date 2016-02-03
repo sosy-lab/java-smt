@@ -120,6 +120,15 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
         }
       };
 
+  @SuppressWarnings("checkstyle:visibilitymodifier")
+  public Function<Formula, TFormulaInfo> extractInfo =
+      new Function<Formula, TFormulaInfo>() {
+        @Override
+        public TFormulaInfo apply(Formula pInput) {
+          return extractInfo(pInput);
+        }
+      };
+
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isBooleanType();
     return new BooleanFormulaImpl<>(pTerm);

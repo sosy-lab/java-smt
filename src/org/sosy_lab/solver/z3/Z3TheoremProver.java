@@ -53,7 +53,6 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
@@ -111,6 +110,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Nullable
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
+    trackConstraint(f);
     long e = Z3FormulaManager.getZ3Expr(f);
     inc_ref(z3context, e);
 
@@ -147,12 +147,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Override
   protected long getZ3Model() {
     return solver_get_model(z3context, z3solver);
-  }
-
-  @Override
-  public Model getModel() {
-    Preconditions.checkState(!closed);
-    return new Z3Model(z3context, getZ3Model(), creator);
   }
 
   @Override
