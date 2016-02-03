@@ -58,7 +58,6 @@ import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
 
@@ -97,10 +96,9 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     final int numConsts;
     final int numFuncs;
 
-    int constCursor = 0;
-    int funcCursor = 0;
-
-    int funcArgCursor = 0;
+    int constCursor = -1;
+    int funcCursor = -1;
+    int funcArgCursor = -1;
 
     Z3ModelIterator() {
       numConsts = model_get_num_consts(z3context, model);
@@ -109,7 +107,32 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
     @Override
     public boolean hasNext() {
-      return constCursor != numConsts || funcCursor != numFuncs;
+
+      // Advance cursor first.
+      if (constCursor + 1 < numConsts) {
+
+        // Simplest case, next application is a constant.
+        constCursor++;
+        return true;
+      } else if (funcCursor + 1 < numFuncs) {
+
+        int numInterpretations = getNumInterpretations();
+        if (funcArgCursor + 1 < numInterpretations) {
+
+          // More interpretations left.
+          funcArgCursor++;
+          return true;
+        } else {
+
+          funcCursor++;
+          funcArgCursor = 0;
+
+          // Function with no interpretations makes this case complicated.
+          return funcArgCursor >= getNumInterpretations() || hasNext();
+        }
+      } else {
+        return false;
+      }
     }
 
     @Override
@@ -119,6 +142,17 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       } else {
         return nextFuncApp();
       }
+    }
+
+    int getNumInterpretations() {
+      long funcDecl = model_get_func_decl(z3context, model, funcCursor);
+      inc_ref(z3context, funcDecl);
+      long interp = model_get_func_interp(z3context, model, funcDecl);
+      func_interp_inc_ref(z3context, interp);
+      int numInterpretations = func_interp_get_num_entries(z3context, interp);
+      dec_ref(z3context, funcDecl);
+      func_interp_dec_ref(z3context, interp);
+      return numInterpretations;
     }
 
     ValueAssignment nextConstant() {
@@ -143,7 +177,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       dec_ref(z3context, keyDecl);
       dec_ref(z3context, value);
 
-      constCursor++;
       return new ValueAssignment(key, name, lValue, ImmutableList.of());
     }
 
@@ -158,22 +191,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       long interp = model_get_func_interp(z3context, model, funcDecl);
       func_interp_inc_ref(z3context, interp);
 
-      int numInterpretations = func_interp_get_num_entries(z3context, interp);
-      long entry;
-      if (numInterpretations == 0) {
-
-        // Advance to the next element.
-        funcCursor++;
-        dec_ref(z3context, funcDecl);
-        func_interp_dec_ref(z3context, interp);
-        if (!hasNext()) {
-          throw new NoSuchElementException();
-        } else {
-          return nextFuncApp();
-        }
-      } else {
-        entry = func_interp_get_entry(z3context, interp, funcArgCursor);
-      }
+      int numInterpretations = getNumInterpretations();
+      long entry = func_interp_get_entry(z3context, interp, funcArgCursor);
 
       func_entry_inc_ref(z3context, entry);
 
@@ -200,14 +219,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       func_entry_dec_ref(z3context, entry);
       func_interp_dec_ref(z3context, interp);
       dec_ref(z3context, funcDecl);
-
-      // Move the cursor.
-      if (funcArgCursor >= numInterpretations - 1) {
-        funcCursor++;
-        funcArgCursor = 0;
-      } else {
-        funcArgCursor++;
-      }
 
       return new ValueAssignment(formula, name, value, argumentInterpretation);
     }
