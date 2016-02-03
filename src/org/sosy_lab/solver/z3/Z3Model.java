@@ -46,8 +46,11 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private final Z3FormulaCreator creator;
   private final ImmutableList<BooleanFormula> trackedConstraints;
 
-  Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator,
-          List<BooleanFormula> pTrackedConstraints) {
+  Z3Model(
+      long z3context,
+      long z3model,
+      Z3FormulaCreator pCreator,
+      List<BooleanFormula> pTrackedConstraints) {
     super(pCreator);
     model_inc_ref(z3context, z3model);
     model = z3model;
@@ -78,10 +81,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
             return evaluateImpl(input);
           }
         },
-        Iterables.transform(
-            trackedConstraints, creator.extractInfo
-        )
-    );
+        Iterables.transform(trackedConstraints, creator.extractInfo));
   }
 
   @Override

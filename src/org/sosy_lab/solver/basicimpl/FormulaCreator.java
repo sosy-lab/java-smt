@@ -146,10 +146,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType)) :
-      "Expected: "
-          + getFormulaType(pTerm)
-          + " but found: " + FormulaType.getArrayType(pIndexType, pElementType);
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
+        : "Expected: "
+            + getFormulaType(pTerm)
+            + " but found: "
+            + FormulaType.getArrayType(pIndexType, pElementType);
 
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }

@@ -173,18 +173,11 @@ public class ModelTest extends SolverBasedTest0 {
     assert amgr != null;
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", FormulaType.IntegerType, FormulaType.IntegerType);
-    ArrayFormula<IntegerFormula, IntegerFormula> updated = amgr.store(
-        array,
-        imgr.makeNumber(1),
-        imgr.makeNumber(1));
+    ArrayFormula<IntegerFormula, IntegerFormula> updated =
+        amgr.store(array, imgr.makeNumber(1), imgr.makeNumber(1));
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(
-          imgr.equal(
-            amgr.select(updated, imgr.makeNumber(1)),
-            imgr.makeNumber(1)
-          )
-      );
+      prover.push(imgr.equal(amgr.select(updated, imgr.makeNumber(1)), imgr.makeNumber(1)));
 
       assertThatEnvironment(prover).isSatisfiable();
       Model m = prover.getModel();
@@ -193,7 +186,6 @@ public class ModelTest extends SolverBasedTest0 {
         // Check that we can iterate through with no crashes.
       }
     }
-
   }
 
   private void testModelGetters(

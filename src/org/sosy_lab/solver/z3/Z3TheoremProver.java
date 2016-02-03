@@ -139,8 +139,8 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     Preconditions.checkState(!closed);
     int result = solver_check(z3context, z3solver);
     shutdownNotifier.shutdownIfNecessary();
-    Preconditions.checkArgument(result != Z3_LBOOL.Z3_L_UNDEF.status,
-        "Solver returned UNDEFINED status");
+    Preconditions.checkArgument(
+        result != Z3_LBOOL.Z3_L_UNDEF.status, "Solver returned UNDEFINED status");
     return result == Z3_LBOOL.Z3_L_FALSE.status;
   }
 
