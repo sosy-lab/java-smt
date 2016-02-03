@@ -8,8 +8,7 @@ package org.sosy_lab.solver.api;
  * <p>If you wish to use multiple contexts (even for the same solver),
  * create one SolverContext per each.
  * Formulas can be transferred between different contexts using
- * {@link FormulaManager#dumpFormula(BooleanFormula)} and
- * {@link FormulaManager#parse(String)} functions.
+ * {@link FormulaManager#translate(BooleanFormula, SolverContext)}.
  */
 public interface SolverContext extends AutoCloseable {
 

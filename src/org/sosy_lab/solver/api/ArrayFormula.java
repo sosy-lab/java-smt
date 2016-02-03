@@ -24,5 +24,4 @@ package org.sosy_lab.solver.api;
  * @param <TI> Index type.
  * @param <TE> Element type.
  */
-@SuppressWarnings("unused")
 public interface ArrayFormula<TI extends Formula, TE extends Formula> extends Formula {}

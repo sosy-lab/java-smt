@@ -27,10 +27,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * An uninterpreted function.
- * This not a subclass of {@link Formula} because it does not represent a term
- * (only an <em>application</em> of an uninterpreted function is a formula term,
- * not the function itself).
+ * An uninterpreted function declaration.
+ *
  * @param <T> The type of the return value
  */
 public abstract class UfDeclaration<T extends Formula> {
@@ -44,14 +42,14 @@ public abstract class UfDeclaration<T extends Formula> {
   }
 
   /**
-   * The list of arguments.
+   * Types of function arguments.
    */
   public List<FormulaType<?>> getArgumentTypes() {
     return argumentTypes;
   }
 
   /**
-   * The returntype.
+   * Function return type.
    */
   public FormulaType<T> getReturnType() {
     return returnType;
