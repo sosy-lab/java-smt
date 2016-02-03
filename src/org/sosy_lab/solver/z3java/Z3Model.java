@@ -29,8 +29,8 @@ import com.microsoft.z3.StringSymbol;
 import com.microsoft.z3.Symbol;
 
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
-import org.sosy_lab.solver.basicimpl.Model;
 
 import java.util.Iterator;
 
@@ -58,7 +58,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   @Nullable
   @Override
-  public Object evaluate(Expr f) {
+  public Object evaluateImpl(Expr f) {
     return creator.convertValue(model.eval(f, true));
   }
 

@@ -24,7 +24,7 @@ import com.microsoft.z3.Context;
 
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.basicimpl.Model;
+import org.sosy_lab.solver.api.Model;
 
 abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final Z3FormulaCreator creator;
