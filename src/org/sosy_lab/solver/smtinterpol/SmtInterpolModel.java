@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -40,7 +41,7 @@ import javax.annotation.Nullable;
 class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
   private final Model model;
-  private final Collection<Term> assertedTerms;
+  private final ImmutableList<Term> assertedTerms;
   private final SmtInterpolFormulaCreator formulaCreator;
 
   SmtInterpolModel(
@@ -50,7 +51,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
     super(pCreator);
     formulaCreator = (SmtInterpolFormulaCreator) pCreator;
     model = pModel;
-    this.assertedTerms = assertedTerms;
+    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
   }
 
   @Nullable
