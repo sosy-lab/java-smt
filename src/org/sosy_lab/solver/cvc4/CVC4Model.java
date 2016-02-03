@@ -21,6 +21,7 @@ package org.sosy_lab.solver.cvc4;
 
 import com.google.common.base.Function;
 import com.google.common.base.Verify;
+import com.google.common.collect.ImmutableList;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Rational;
@@ -43,7 +44,7 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
   // TODO: this will not work properly, as SmtEngine is affected by
   // added assertions.
   private final SmtEngine smtEngine;
-  private final Collection<Expr> assertedFormulas;
+  private final ImmutableList<Expr> assertedFormulas;
 
   CVC4Model(
       SmtEngine smtEngine,
@@ -51,7 +52,7 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
       Collection<Expr> assertedFormulas) {
     super(creator);
     this.smtEngine = smtEngine;
-    this.assertedFormulas = assertedFormulas;
+    this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
   @Override
