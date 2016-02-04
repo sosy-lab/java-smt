@@ -445,11 +445,12 @@ class PrincessEnvironment {
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = Lists.newArrayList(array, index, value);
-    return api.select(iterableAsScalaIterable(args).toSeq());
+    return api.store(iterableAsScalaIterable(args).toSeq());
   }
 
   public boolean hasArrayType(IExpression exp) {
-    return arrayVariablesCache.containsValue(exp);
+    return arrayVariablesCache.containsValue(exp)
+        || (exp instanceof IFunApp && ((IFunApp) exp).fun().toString().equals("store/3"));
   }
 
   public IFormula elimQuantifiers(IFormula formula) {
