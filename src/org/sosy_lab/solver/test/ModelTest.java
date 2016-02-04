@@ -22,7 +22,6 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.truth.TruthJUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -158,19 +157,15 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetBitvectors() throws Exception {
     requireBitvectors();
-    assert bvmgr != null;
+
     testModelGetters(
         bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
   }
 
   @Test
   public void testGetArrays() throws Exception {
-
-    // Princess has array issues.
-    TruthJUnit.assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-
     requireArrays();
-    assert amgr != null;
+
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", FormulaType.IntegerType, FormulaType.IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
