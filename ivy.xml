@@ -100,7 +100,7 @@
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-224-gfd408f2" conf="runtime-smtinterpol->runtime; contrib->sources">
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-235-g3b87807" conf="runtime-smtinterpol->runtime; contrib->sources">
           <artifact name="smtinterpol" e:classifier="comp" conf="runtime"/>
           <artifact name="smtinterpol" e:classifier="sources" conf="contrib" ext="zip"/>
         </dependency>
