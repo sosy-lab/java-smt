@@ -39,8 +39,6 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 
 import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
@@ -57,16 +55,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
 
   private final Table<Sort, Sort, Sort> allocatedArraySorts = HashBasedTable.create();
 
   Z3FormulaCreator(
-      Context pEnv, Sort pBoolType, Sort pIntegerType, Sort pRealType, Configuration config)
-      throws InvalidConfigurationException {
+      Context pEnv, Sort pBoolType, Sort pIntegerType, Sort pRealType, Configuration config) {
     super(pEnv, pBoolType, pIntegerType, pRealType);
-    config.inject(this);
   }
 
   @Override
