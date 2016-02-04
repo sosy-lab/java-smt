@@ -1,4 +1,4 @@
-
+#include<string.h>
 // WARNING: if an exception occures while a functioncall, the returnvalue is undefined!
 
 
@@ -148,14 +148,20 @@ typedef jobject jvoid_pointer;
     (*jenv)->SetObjectField(jenv, arg##num, fid, *z3_arg##num); \
   }
 
-
-
-
 // RETURN SOMETHING
-
 #define VOID_RETURN \
   return; \
 }
+
+#define HANDLE_NULL_RETVAL_WITH_CONTEXT \
+  if (retval == NULL) { \
+    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
+    if (strcmp(msg, "canceled") == 0) { \
+      throwException(jenv, "java/lang/InterruptedException", msg); \
+    } else { \
+      throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+    } \
+  }
 
 #define STRUCT_RETURN \
   if (retval == NULL) { \
@@ -173,15 +179,16 @@ typedef jobject jvoid_pointer;
 }
 
 #define STRUCT_RETURN_WITH_CONTEXT \
-  if (retval == NULL) { \
-    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
-    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-  } \
+  HANDLE_NULL_RETVAL_WITH_CONTEXT \
   return (jlong)((size_t)(retval)); \
 }
 
 #define INT_RETURN \
   return (jint)retval; \
+}
+
+#define __UINT64_RETURN \
+  return (junsigned_int64)retval; \
 }
 
 #define DOUBLE_RETURN \
@@ -198,33 +205,17 @@ typedef jobject jvoid_pointer;
   //TODO why is there an warning with "free(retval);"?
 
 #define STRING_RETURN_WITH_CONTEXT \
-  if (retval == NULL) { \
-    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
-    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-    return NULL; \
-  } \
+  HANDLE_NULL_RETVAL_WITH_CONTEXT \
   STRING_RETURN
 
 #define CONST_STRING_RETURN \
-  if (retval == NULL) { \
-    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
-    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-    return NULL; \
-  } \
+  HANDLE_NULL_RETVAL_WITH_CONTEXT \
   jstring jretval = NULL; \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewStringUTF(jenv, retval); \
   } \
   return jretval; \
 }
-
-#define FAILURE_CODE_RETURN \
-  if (retval != 0) { \
-    const char *msg = Z3_get_error_msg(z3_arg1, Z3_get_error_code(z3_arg1)); \
-    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-  } \
-}
-
 
 /*
  * Copied from the Sun JNI Programmer's Guide and Specification

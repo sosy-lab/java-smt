@@ -1,12 +1,17 @@
 
 // aliases for Z3 types
-
 typedef void jvoid;
 typedef unsigned int junsigned;
 typedef unsigned long long junsigned_int64;
+typedef unsigned long long j__uint64;
 typedef long long jint64;
 typedef long long int64;
 //typedef long long jint64;
+
+#ifndef __uint64
+#define __uint64 unsigned long long
+#endif
+#define __uint64 unsigned long long
 
 typedef jboolean jJ_bool;
 typedef jint jJ_lbool;
