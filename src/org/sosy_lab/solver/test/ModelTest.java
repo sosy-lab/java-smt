@@ -157,6 +157,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetBitvectors() throws Exception {
     requireBitvectors();
+    assert bvmgr != null;
 
     testModelGetters(
         bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
@@ -165,6 +166,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetArrays() throws Exception {
     requireArrays();
+    assert amgr != null;
 
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", FormulaType.IntegerType, FormulaType.IntegerType);
@@ -180,6 +182,7 @@ public class ModelTest extends SolverBasedTest0 {
       for (ValueAssignment assignment : m) {
         // Check that we can iterate through with no crashes.
       }
+      assertThat(m.evaluate(amgr.select(updated, imgr.makeNumber(1)))).isEqualTo(BigInteger.ONE);
     }
   }
 

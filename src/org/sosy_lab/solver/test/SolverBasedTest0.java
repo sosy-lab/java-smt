@@ -39,6 +39,7 @@ import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BitvectorFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionFormulaManager;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
@@ -94,6 +95,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable BitvectorFormulaManager bvmgr;
   protected @Nullable QuantifiedFormulaManager qmgr;
   protected @Nullable ArrayFormulaManager amgr;
+  protected @Nullable FloatingPointFormulaManager fpmgr;
 
   /**
    * Return the solver to use in this test.
@@ -138,6 +140,11 @@ public abstract class SolverBasedTest0 {
       amgr = mgr.getArrayFormulaManager();
     } catch (UnsupportedOperationException e) {
       amgr = null;
+    }
+    try {
+      fpmgr = mgr.getFloatingPointFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      fpmgr = null;
     }
   }
 
@@ -186,6 +193,14 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requireFloats() {
+    assume()
+        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of floats")
+        .that(fpmgr)
+        .isNotNull();
+
+  }
+
   /**
    * Skip test if the solver does not support optimization.
    */
@@ -217,14 +232,6 @@ public abstract class SolverBasedTest0 {
 
   protected final void requireFalse(String failureMessage) {
     assume().withFailureMessage(failureMessage).fail();
-  }
-
-  protected final void requireDumpingAndParsing() {
-    //    assume()
-    //        .withFailureMessage("Solver " + solverToUse() + " does not
-    //                     support dumping and parsing")
-    //        .that(solverToUse())
-    //        .isNotEqualTo(Solvers.CVC4);
   }
 
   /**
