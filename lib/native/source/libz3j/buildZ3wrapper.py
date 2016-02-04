@@ -17,6 +17,9 @@ HEADER = '''// THIS FILE IS BUILD AUTOMATICALLY, DO NOT CHANGE!!!
 #include"includes/arguments.h"
 #include"includes/types.h"
 #include"includes/error_handling.h"
+
+#define j__uint64 unsigned long long
+
 '''
 
 
@@ -272,7 +275,9 @@ def process_text(text):
 
         # RETURN_VALUE
         simpleRetvals = ["void", "Z3_bool", "Z3_lbool", "Z3_bool_opt", "unsigned", "int", "double", "Z3_error_code", "Z3_goal_prec"]
-        if retval not in simpleRetvals and not retval.endswith("kind") \
+        if retval == "__uint64":
+            x.append("LONG_RETURN\n")
+        elif retval not in simpleRetvals and not retval.endswith("kind") \
               and typs and typs[0] == "J_context":
             x.append( retval.replace("Z3_", "").upper() + "_RETURN_WITH_CONTEXT\n")
         else:

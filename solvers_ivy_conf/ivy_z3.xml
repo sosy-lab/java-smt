@@ -18,6 +18,8 @@
     <publications defaultconf="solver-z3">
         <artifact name="libz3" conf="solver-z3" type="shared-object" ext="so" />
         <artifact name="libz3j" conf="solver-z3" type="shared-object" ext="so"/>
+        <artifact name="libz3java" conf="solver-z3" type="shared-object" ext="so"/>
+        <artifact name="com.microsoft.z3" conf="solver-z3" ext="jar"/>
     </publications>
 
     <dependencies></dependencies>

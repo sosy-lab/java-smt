@@ -184,6 +184,10 @@ typedef jobject jvoid_pointer;
   return (jint)retval; \
 }
 
+#define LONG_RETURN \
+  return (jlong)retval; \
+}
+
 #define DOUBLE_RETURN \
   return (jdouble)retval; \
 }
