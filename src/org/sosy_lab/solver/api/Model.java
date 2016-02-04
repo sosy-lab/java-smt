@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.rationals.Rational;
@@ -97,9 +98,9 @@ public interface Model extends Iterable<ValueAssignment> {
     public ValueAssignment(
         Formula key, String name, Object value, Collection<?> argumentInterpretation) {
 
-      this.key = key;
-      this.name = name;
-      this.value = value;
+      this.key = Preconditions.checkNotNull(key);
+      this.name = Preconditions.checkNotNull(name);
+      this.value = Preconditions.checkNotNull(value);
       this.argumentsInterpretation = ImmutableList.copyOf(argumentInterpretation);
     }
 
