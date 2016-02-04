@@ -28,10 +28,12 @@ import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Optimize.Handle;
 import com.microsoft.z3.Params;
+import com.microsoft.z3.RatNum;
 import com.microsoft.z3.Status;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -205,7 +207,14 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
    * Replace the epsilon in the returned formula with a numeric value.
    */
   private Expr replaceEpsilon(ArithExpr pAst, Rational newValue) {
-    Formula z = creator.encapsulate(FormulaType.RationalType, pAst);
+    final Formula z;
+    if (pAst instanceof IntNum) {
+      z = creator.encapsulate(FormulaType.IntegerType, pAst);
+    } else if (pAst instanceof RatNum) {
+      z = creator.encapsulate(FormulaType.RationalType, pAst);
+    } else {
+      throw new AssertionError(String.format("unexpected type of expression %s (%s)", pAst, pAst.getClass()));
+    }
 
     RationalFormula epsFormula = rfmgr.makeVariable("epsilon");
 
