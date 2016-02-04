@@ -61,6 +61,7 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
   @Override
   public abstract Model getModel() throws SolverException;
 
+  @Override
   public void close() {
     checkNotNull(stack);
     checkNotNull(mgr);
