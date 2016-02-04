@@ -43,7 +43,9 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
 
-  Z3Model(com.microsoft.z3.Model pModel, Z3FormulaCreator pCreator,
+  Z3Model(
+      com.microsoft.z3.Model pModel,
+      Z3FormulaCreator pCreator,
       List<BooleanFormula> pTrackedConstraints) {
     super(pCreator);
     model = pModel;

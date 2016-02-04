@@ -88,6 +88,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     return super.getFormulaType(pFormula);
   }
 
+  @SuppressWarnings("unchecked")
   public FormulaType<?> getFormulaTypeFromSort(Sort pSort) {
     switch (pSort.getSortKind()) {
       case Z3_BOOL_SORT:
@@ -158,6 +159,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Expr f) {
     switch (f.getASTKind()) {
       case Z3_NUMERAL_AST:

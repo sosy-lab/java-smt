@@ -213,7 +213,8 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     } else if (pAst instanceof RatNum) {
       z = creator.encapsulate(FormulaType.RationalType, pAst);
     } else {
-      throw new AssertionError(String.format("unexpected type of expression %s (%s)", pAst, pAst.getClass()));
+      throw new AssertionError(
+          String.format("unexpected type of expression %s (%s)", pAst, pAst.getClass()));
     }
 
     RationalFormula epsFormula = rfmgr.makeVariable("epsilon");

@@ -140,7 +140,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
     }
 
     // build tree of interpolation-points
-    final BoolExpr[] interpolationFormulas = new BoolExpr[partitionedFormulas.size()];
     final Deque<Z3TreeInterpolant> stack = new ArrayDeque<>();
 
     int lastSubtree = -1; // subtree starts with 0. With -1<0 we start a new subtree.
@@ -172,7 +171,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
         interpolationPoint = ((InterpolationContext) z3context).MkInterpolant(conjunction);
       }
 
-      interpolationFormulas[i] = interpolationPoint;
       stack.addLast(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
       lastSubtree = currentSubtree;
     }
