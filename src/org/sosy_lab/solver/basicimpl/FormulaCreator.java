@@ -120,6 +120,15 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
         }
       };
 
+  @SuppressWarnings("checkstyle:visibilitymodifier")
+  public Function<Formula, TFormulaInfo> extractInfo =
+      new Function<Formula, TFormulaInfo>() {
+        @Override
+        public TFormulaInfo apply(Formula pInput) {
+          return extractInfo(pInput);
+        }
+      };
+
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isBooleanType();
     return new BooleanFormulaImpl<>(pTerm);
@@ -137,7 +146,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
+        : "Expected: "
+            + getFormulaType(pTerm)
+            + " but found: "
+            + FormulaType.getArrayType(pIndexType, pElementType);
+
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 

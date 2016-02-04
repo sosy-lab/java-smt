@@ -32,7 +32,7 @@ class SmtInterpolUtil {
   private SmtInterpolUtil() {}
 
   public static boolean isVariable(Term t) {
-    // A variable is the same as an UIF without parameters
+    // A variable is the same as an UF without parameters
     return !isTrue(t)
         && !isFalse(t)
         && (t instanceof ApplicationTerm)

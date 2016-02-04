@@ -203,6 +203,15 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     }
   }
 
+  String getName(Term t) {
+    if (SmtInterpolUtil.isUF(t)) {
+      assert t instanceof ApplicationTerm;
+      return ((ApplicationTerm) t).getFunction().getName();
+    } else {
+      return dequote(t.toString());
+    }
+  }
+
   /** check for ConstantTerm with Number or
    * ApplicationTerm with negative Number */
   public boolean isNumber(Term t) {

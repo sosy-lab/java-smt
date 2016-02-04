@@ -89,6 +89,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
+    trackConstraint(constraint);
     long z3Constraint = creator.extractInfo(constraint);
     optimize_assert(z3context, z3optContext, z3Constraint);
     return null;

@@ -83,6 +83,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   @Override
   public Long addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
+    trackConstraint(f);
     long e = creator.extractInfo(f);
     inc_ref(z3context, e);
     solver_assert(z3context, z3solver, e);

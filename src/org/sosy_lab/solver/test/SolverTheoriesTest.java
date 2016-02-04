@@ -41,6 +41,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.NumeralType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.UfDeclaration;
 
 @RunWith(Parameterized.class)
@@ -743,6 +744,72 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
                   + ">` multi i) i)");
     } else {
       assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    }
+  }
+
+  @Test
+  public void nonLinearMultiplication() throws SolverException, InterruptedException {
+    IntegerFormula i2 = imgr.makeNumber(2);
+    IntegerFormula i3 = imgr.makeNumber(3);
+    IntegerFormula i4 = imgr.makeNumber(4);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    IntegerFormula x_mult_y;
+    try {
+      x_mult_y = imgr.multiply(x, y);
+    } catch (UnsupportedOperationException e) {
+      // do nothing, this exception is fine here, because solvers do not need
+      // to support non-linear arithmetic, we can then skip the test completely
+      requireFalse("Support for non-linear arithmetic is optional");
+      return;
+    }
+
+    BooleanFormula x_equal_2 = imgr.equal(i2, x);
+    BooleanFormula y_equal_3 = imgr.equal(i3, y);
+    BooleanFormula z_equal_4 = imgr.equal(i4, z);
+    BooleanFormula z_equal_x_mult_y = imgr.equal(z, x_mult_y);
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      env.push(x_equal_2);
+      env.push(y_equal_3);
+      env.push(z_equal_4);
+      env.push(z_equal_x_mult_y);
+      assertThatEnvironment(env).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void nonLinearDivision() throws SolverException, InterruptedException {
+    IntegerFormula i2 = imgr.makeNumber(2);
+    IntegerFormula i3 = imgr.makeNumber(3);
+    IntegerFormula i4 = imgr.makeNumber(4);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    IntegerFormula x_div_y;
+    try {
+      x_div_y = imgr.divide(x, y);
+    } catch (UnsupportedOperationException e) {
+      // do nothing, this exception is fine here, because solvers do not need
+      // to support non-linear arithmetic, we can then skip the test completely
+      requireFalse("Support for non-linear arithmetic is optional");
+      return;
+    }
+
+    BooleanFormula x_equal_4 = imgr.equal(i4, x);
+    BooleanFormula y_equal_2 = imgr.equal(i2, y);
+    BooleanFormula z_equal_3 = imgr.equal(i3, z);
+    BooleanFormula z_equal_x_div_y = imgr.equal(z, x_div_y);
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      env.push(x_equal_4);
+      env.push(y_equal_2);
+      env.push(z_equal_3);
+      env.push(z_equal_x_div_y);
+      assertThatEnvironment(env).isUnsatisfiable();
     }
   }
 }

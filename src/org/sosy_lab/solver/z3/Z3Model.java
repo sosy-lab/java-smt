@@ -20,30 +20,22 @@
 package org.sosy_lab.solver.z3;
 
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_consts;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Function;
 import com.google.common.base.Verify;
-import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
-import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
 import java.util.Iterator;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -52,13 +44,19 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private final long model;
   private final long z3context;
   private final Z3FormulaCreator creator;
+  private final ImmutableList<BooleanFormula> trackedConstraints;
 
-  Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
+  Z3Model(
+      long z3context,
+      long z3model,
+      Z3FormulaCreator pCreator,
+      List<BooleanFormula> pTrackedConstraints) {
     super(pCreator);
     model_inc_ref(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     creator = pCreator;
+    trackedConstraints = ImmutableList.copyOf(pTrackedConstraints);
   }
 
   @Nullable
@@ -75,55 +73,15 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    return new Z3ModelIterator();
-  }
-
-  private class Z3ModelIterator extends UnmodifiableIterator<ValueAssignment> {
-    final int numConsts;
-    int cursor = 0;
-
-    Z3ModelIterator() {
-      // TODO: iterating through function applications.
-      // Difficult, as we don't know what arguments to substitute when we only
-      // have the model.
-      numConsts = model_get_num_consts(z3context, model);
-    }
-
-    @Override
-    public boolean hasNext() {
-      return cursor != numConsts;
-    }
-
-    @Override
-    public ValueAssignment next() {
-      long keyDecl = model_get_const_decl(z3context, model, cursor++);
-      inc_ref(z3context, keyDecl);
-
-      Preconditions.checkArgument(
-          get_arity(z3context, keyDecl) == 0, "Declaration is not a constant");
-
-      long var = mk_app(z3context, keyDecl);
-      Formula key = creator.encapsulateWithTypeOf(var);
-
-      long value = model_get_const_interp(z3context, model, keyDecl);
-      inc_ref(z3context, value);
-
-      long decl = get_app_decl(z3context, var);
-      long symbol = get_decl_name(z3context, decl);
-
-      Preconditions.checkArgument(
-          get_symbol_kind(z3context, symbol) == Z3_STRING_SYMBOL,
-          "Given symbol of expression is no stringSymbol! (%s)",
-          new LazyString(var, z3context));
-
-      Object lValue = creator.convertValue(value);
-
-      // cleanup outdated data
-      dec_ref(z3context, keyDecl);
-      dec_ref(z3context, value);
-
-      return new ValueAssignment(key, lValue);
-    }
+    return new TermExtractionModelIterator<>(
+        creator,
+        new Function<Long, Object>() {
+          @Override
+          public Object apply(Long input) {
+            return evaluateImpl(input);
+          }
+        },
+        Iterables.transform(trackedConstraints, creator.extractInfo));
   }
 
   @Override

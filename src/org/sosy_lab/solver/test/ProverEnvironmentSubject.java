@@ -91,10 +91,14 @@ public class ProverEnvironmentSubject
 
     // get unsat core for failure message if possible
     if (getSubject() instanceof ProverEnvironment) {
-      final List<BooleanFormula> unsatCore = ((ProverEnvironment) getSubject()).getUnsatCore();
-      if (!unsatCore.isEmpty()) {
-        failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
-        return;
+      try {
+        final List<BooleanFormula> unsatCore = ((ProverEnvironment) getSubject()).getUnsatCore();
+        if (!unsatCore.isEmpty()) {
+          failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
+          return;
+        }
+      } catch (IllegalArgumentException ignored) {
+        // Skip if unsat core generation is disabled.
       }
     }
     fail("is", "satisfiable");

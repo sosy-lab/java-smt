@@ -17,11 +17,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.api;
+package org.sosy_lab.solver.visitors;
+
+import org.sosy_lab.solver.api.Formula;
 
 /**
- * A formula of the array sort.
- * @param <TI> Index type.
- * @param <TE> Element type.
+ * Like {@link DefaultFormulaVisitor}, but throws
+ * {@link UnsupportedOperationException} on unexpected formula types.
  */
-public interface ArrayFormula<TI extends Formula, TE extends Formula> extends Formula {}
+public abstract class ExpectedFormulaVisitor<R> extends DefaultFormulaVisitor<R> {
+
+  @Override
+  protected final R visitDefault(Formula f) {
+    throw new UnsupportedOperationException();
+  }
+}

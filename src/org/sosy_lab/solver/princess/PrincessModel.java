@@ -25,6 +25,7 @@ import ap.SimpleAPI.PartialModel;
 import ap.parser.IExpression;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
@@ -39,7 +40,8 @@ import javax.annotation.Nullable;
 
 class PrincessModel extends AbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
   private final PartialModel model;
-  private final Collection<IExpression> assertedTerms;
+  private final ImmutableList<IExpression> assertedTerms;
+  private final PrincessFormulaCreator formulaCreator;
 
   PrincessModel(
       PartialModel partialModel,
@@ -47,7 +49,8 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
       Collection<IExpression> assertedTerms) {
     super(creator);
     this.model = partialModel;
-    this.assertedTerms = assertedTerms;
+    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
+    formulaCreator = (PrincessFormulaCreator) creator;
   }
 
   @Nullable

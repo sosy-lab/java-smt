@@ -1255,26 +1255,99 @@ final class Z3NativeApi {
 
   static native long get_as_array_func_decl(long context, long a1);
 
+  /**
+   * Increment the reference counter of the given Z3_func_interp object.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_interp
+   */
   static native void func_interp_inc_ref(long context, long a1);
 
+  /**
+   * Decrease the reference counter of the given Z3_func_interp object.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_interp
+   */
   static native void func_interp_dec_ref(long context, long a1);
 
+  /**
+   * Return the number of entries in the given function interpretation.
+   *
+   * <p>A function interpretation is represented as a finite map and an 'else' value.
+   * Each entry in the finite map represents the value of a function given a set of arguments.
+   * This procedure returns the number of element in the finite map of {@code f}.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_interp
+   */
   static native int func_interp_get_num_entries(long context, long a1);
 
+  /**
+   * Return a "point" of the given function interpretation. It represents the
+   * value of {@code f} in a particular point.
+   *
+   * <p>Precondition: {@code i < func_interp_get_num_entries(c, f)}
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_interp
+   * @param a2 index
+   * @return Z3_func_entry
+   */
   static native long func_interp_get_entry(long context, long a1, int a2);
 
+  /**
+   * Return the 'else' value of the given function interpretation.
+   *
+   * <p>A function interpretation is represented as a finite map and an 'else' value.
+   * This procedure returns the 'else' value.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_interp
+   * @return Z3_ast
+   */
   static native long func_interp_get_else(long context, long a1);
 
+  /**
+   * Return the arity (number of arguments) of the given function interpretation.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_ast
+   */
   static native int func_interp_get_arity(long context, long a1);
 
   static native void func_entry_inc_ref(long context, long a1);
 
   static native void func_entry_dec_ref(long context, long a1);
 
+  /**
+   * Return the value of this point.
+   *
+   * <p>A Z3_func_entry object represents an element in the finite map used to encode
+   * a function interpretation.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_entry
+   * @return Z3_ast
+   */
   static native long func_entry_get_value(long context, long a1);
 
+  /**
+   * Return the number of arguments in a Z3_func_entry object.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_entry
+   */
   static native int func_entry_get_num_args(long context, long a1);
 
+  /**
+   * Return an argument of a Z3_func_entry object.
+   *
+   * @param context Z3_context
+   * @param a1 Z3_func_entry
+   * @param a2 index
+   * @return Z3_ast
+   */
   static native long func_entry_get_arg(long context, long a1, int a2);
 
   // INTERACTION LOGGING

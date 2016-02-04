@@ -40,7 +40,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
@@ -56,7 +55,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FUNC_DECL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SYMBOL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ADD;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
@@ -308,24 +306,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     }
   }
 
-  private String getName(Long t) {
-    int astKind = get_ast_kind(environment, t);
-    if (astKind == Z3_VAR_AST) {
-      return "?" + get_index_value(environment, t);
-    } else {
-      long funcDecl = get_app_decl(environment, t);
-      long symbol = get_decl_name(environment, funcDecl);
-      switch (get_symbol_kind(environment, symbol)) {
-        case Z3_INT_SYMBOL:
-          return Integer.toString(get_symbol_int(environment, symbol));
-        case Z3_STRING_SYMBOL:
-          return get_symbol_string(environment, symbol);
-        default:
-          throw new AssertionError();
-      }
-    }
-  }
-
   private Long replaceArgs(Long t, List<Long> newArgs) {
     Preconditions.checkState(get_app_num_args(environment, t) == newArgs.size());
     long[] newParams = Longs.toArray(newArgs);
@@ -340,7 +320,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
       case Z3_NUMERAL_AST:
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
-        String name = getName(f);
+        long funcDecl = get_app_decl(environment, f);
+        long symbol = get_decl_name(environment, funcDecl);
+        assert get_symbol_kind(environment, symbol) == Z3_STRING_SYMBOL;
+        String name = get_symbol_string(environment, symbol);
         int arity = get_app_num_args(environment, f);
 
         if (arity == 0) {
@@ -460,7 +443,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     inc_ref(environment, value);
     try {
       FormulaType<?> type = getFormulaType(value);
-      Object lValue;
       if (type.isBooleanType()) {
         return isOP(environment, value, Z3_OP_TRUE);
       } else if (type.isIntegerType()) {
