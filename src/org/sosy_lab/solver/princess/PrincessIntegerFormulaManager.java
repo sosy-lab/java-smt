@@ -105,7 +105,13 @@ class PrincessIntegerFormulaManager
 
   @Override
   public IExpression multiply(IExpression pNumber1, IExpression pNumber2) {
-    return castToTerm(pNumber1).$times(castToTerm(pNumber2));
+    IExpression result;
+    try {
+      result = castToTerm(pNumber1).$times(castToTerm(pNumber2));
+    } catch (IllegalArgumentException e) {
+      result = BitShiftMultiplication.mult(castToTerm(pNumber1), castToTerm(pNumber2));
+    }
+    return result;
   }
 
   @Override
