@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
@@ -43,7 +42,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
-  private final Z3FormulaCreator creator;
   private final ImmutableList<BooleanFormula> trackedConstraints;
 
   Z3Model(
@@ -55,7 +53,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     model_inc_ref(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
-    creator = pCreator;
     trackedConstraints = ImmutableList.copyOf(pTrackedConstraints);
   }
 
@@ -68,7 +65,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     if (out.value == 0) {
       return null;
     }
-    return creator.convertValue(out.value);
+    return ((Z3FormulaCreator) creator).convertValue(out.value);
   }
 
   @Override
@@ -89,20 +86,4 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     return model_to_string(z3context, model);
   }
 
-  /** Delays the conversion to string. */
-  private static class LazyString {
-
-    final long value;
-    final long z3context;
-
-    LazyString(long v, long pZ3context) {
-      value = v;
-      z3context = pZ3context;
-    }
-
-    @Override
-    public String toString() {
-      return ast_to_string(z3context, value); // this could be an expensive operation!
-    }
-  }
 }
