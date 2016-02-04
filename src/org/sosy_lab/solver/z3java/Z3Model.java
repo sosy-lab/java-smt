@@ -19,41 +19,36 @@
  */
 package org.sosy_lab.solver.z3java;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
-import com.microsoft.z3.StringSymbol;
-import com.microsoft.z3.Symbol;
 
-import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 
 import java.util.Iterator;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   private final com.microsoft.z3.Model model;
-  private final Context z3context;
+  private final ImmutableList<BooleanFormula> trackedConstraints;
 
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
 
-  Z3Model(Context pZ3context, com.microsoft.z3.Model pModel, Z3FormulaCreator pCreator) {
+  Z3Model(com.microsoft.z3.Model pModel, Z3FormulaCreator pCreator,
+      List<BooleanFormula> pTrackedConstraints) {
     super(pCreator);
     model = pModel;
-    this.z3context = pZ3context;
     creator = pCreator;
-  }
-
-  public static Model parseZ3Model(
-      Context z3context, com.microsoft.z3.Model z3model, Z3FormulaCreator pCreator) {
-    return new Z3Model(z3context, z3model, pCreator);
+    trackedConstraints = ImmutableList.copyOf(pTrackedConstraints);
   }
 
   @Nullable
@@ -64,43 +59,15 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    return new Z3ModelIterator();
-  }
-
-  private class Z3ModelIterator extends UnmodifiableIterator<ValueAssignment> {
-    final int numConsts;
-    int cursor = 0;
-
-    Z3ModelIterator() {
-      // TODO: iterating through function applications.
-      numConsts = model.getNumConsts();
-    }
-
-    @Override
-    public boolean hasNext() {
-      return cursor != numConsts;
-    }
-
-    @Override
-    public ValueAssignment next() {
-      FuncDecl keyDecl = model.getConstDecls()[cursor++];
-
-      Preconditions.checkArgument(keyDecl.getArity() == 0, "Declaration is not a constant");
-
-      Expr var = z3context.mkApp(keyDecl);
-      Formula key = creator.encapsulateWithTypeOf(var);
-      Expr value = model.getConstInterp(keyDecl);
-      Symbol symbol = var.getFuncDecl().getName();
-
-      Preconditions.checkArgument(
-          symbol instanceof StringSymbol,
-          "Given symbol of expression is no stringSymbol! (%s)",
-          var);
-
-      Object lValue = creator.convertValue(value);
-
-      return new ValueAssignment(key, lValue);
-    }
+    return new TermExtractionModelIterator<>(
+        creator,
+        new Function<Expr, Object>() {
+          @Override
+          public Object apply(Expr input) {
+            return evaluateImpl(input);
+          }
+        },
+        Iterables.transform(trackedConstraints, creator.extractInfo));
   }
 
   @Override

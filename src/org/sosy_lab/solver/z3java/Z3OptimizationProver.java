@@ -95,6 +95,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
+    trackConstraint(constraint);
     BoolExpr z3Constraint = (BoolExpr) creator.extractInfo(constraint);
     z3optContext.Add(z3Constraint);
     return null;

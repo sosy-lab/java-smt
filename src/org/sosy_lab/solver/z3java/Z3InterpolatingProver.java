@@ -72,6 +72,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
   @Override
   public Expr addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
+    trackConstraint(f);
     BoolExpr e = (BoolExpr) creator.extractInfo(f);
     z3solver.add(e);
     assertedFormulas.addLast(e);
