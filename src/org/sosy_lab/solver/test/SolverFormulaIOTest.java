@@ -100,11 +100,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     return solver;
   }
 
-  @Before
-  public void setUp() {
-    requireDumpingAndParsing();
-  }
-
   @Test
   public void varDumpTest() {
     BooleanFormula a = bmgr.makeVariable("a");
