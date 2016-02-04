@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
 class PrincessModel extends AbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
   private final PartialModel model;
   private final ImmutableList<IExpression> assertedTerms;
-  private final PrincessFormulaCreator formulaCreator;
 
   PrincessModel(
       PartialModel partialModel,
@@ -50,7 +49,6 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
     super(creator);
     this.model = partialModel;
     this.assertedTerms = ImmutableList.copyOf(assertedTerms);
-    formulaCreator = (PrincessFormulaCreator) creator;
   }
 
   @Nullable
