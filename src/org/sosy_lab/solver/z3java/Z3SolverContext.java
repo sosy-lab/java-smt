@@ -9,6 +9,7 @@ import com.microsoft.z3.Sort;
 import com.microsoft.z3.Version;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -113,6 +114,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
           "Z3 does not support dumping a log file in SMTLIB format. "
               + "Please use the option solver.z3.log for a Z3-specific log instead.");
     }
+
+    if (NativeLibraries.OS.guessOperatingSystem() == NativeLibraries.OS.WINDOWS) {
+      // Z3 itself
+      NativeLibraries.loadLibrary("libz3java");
+    }
+
+    NativeLibraries.loadLibrary("z3java");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
