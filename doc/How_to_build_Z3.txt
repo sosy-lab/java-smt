@@ -1,3 +1,7 @@
+# requirements:
+#  - make, gcc, ... for compiling Z3
+#  - Java7, for compatibility of the library (Java8 is not available on some machines)
+
 # checkout Z3
 git clone https://github.com/kfriedberger/z3
 
