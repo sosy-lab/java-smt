@@ -203,6 +203,10 @@ class PrincessFormulaCreator
       return FunctionDeclarationKind.NOT;
     } else if (PrincessUtil.isEquivalence(input)) {
       return FunctionDeclarationKind.IFF;
+    } else if (PrincessUtil.isArraySelect(input)) {
+      return FunctionDeclarationKind.SELECT;
+    } else if (PrincessUtil.isArrayStore(input)) {
+      return FunctionDeclarationKind.STORE;
     } else {
 
       // TODO: other cases!!!

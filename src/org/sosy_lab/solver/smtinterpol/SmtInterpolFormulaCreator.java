@@ -268,6 +268,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
       return FunctionDeclarationKind.DISTINCT;
     } else if (symbol.getName().equals("ite")) {
       return FunctionDeclarationKind.ITE;
+    } else if (symbol.getName().equals("select")) {
+      return FunctionDeclarationKind.SELECT;
+    } else if (symbol.getName().equals("store")) {
+      return FunctionDeclarationKind.STORE;
     } else if (SmtInterpolUtil.isVariable(input)) {
       return FunctionDeclarationKind.VAR;
     } else {

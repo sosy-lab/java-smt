@@ -72,6 +72,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_MOD;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_MUL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_SELECT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_STORE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_SUB;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
@@ -433,6 +435,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
         return FunctionDeclarationKind.GTE;
       case Z3_OP_EQ:
         return FunctionDeclarationKind.EQ;
+
+      case Z3_OP_STORE:
+        return FunctionDeclarationKind.STORE;
+      case Z3_OP_SELECT:
+        return FunctionDeclarationKind.SELECT;
 
       default:
         return FunctionDeclarationKind.OTHER;

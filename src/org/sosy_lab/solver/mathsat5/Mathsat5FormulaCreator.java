@@ -21,6 +21,8 @@ package org.sosy_lab.solver.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_WRITE;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
@@ -325,6 +327,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
         return FunctionDeclarationKind.LTE;
       case MSAT_TAG_EQ:
         return FunctionDeclarationKind.EQ;
+      case MSAT_TAG_ARRAY_READ:
+        return FunctionDeclarationKind.SELECT;
+      case MSAT_TAG_ARRAY_WRITE:
+        return FunctionDeclarationKind.STORE;
       default:
         return FunctionDeclarationKind.OTHER;
     }

@@ -27,6 +27,12 @@ public enum FunctionDeclarationKind {
   IMPLIES,
   DISTINCT,
 
+  /**
+   * Store and select on arrays
+   */
+  STORE,
+  SELECT,
+
   // Simple arithmetic,
   // they work across integers and rationals.
   /**
@@ -89,9 +95,10 @@ public enum FunctionDeclarationKind {
    * Binary equality is modelled with {@code IFF}.
    */
   EQ,
-  FunctionDeclarationKind, /**
-                            * Solvers support a lot of different built-in theories.
-                            * We enforce standardization only across a small subset.
-                            */
+
+  /**
+   * Solvers support a lot of different built-in theories.
+   * We enforce standardization only across a small subset.
+   */
   OTHER
 }

@@ -74,6 +74,14 @@ class PrincessUtil {
         && !((IFunApp) t).fun().name().equals("store");
   }
 
+  public static boolean isArrayStore(IExpression t) {
+    return (t instanceof IFunApp) && ((IFunApp) t).fun().name().equals("store");
+  }
+
+  public static boolean isArraySelect(IExpression t) {
+    return (t instanceof IFunApp) && ((IFunApp) t).fun().name().equals("select");
+  }
+
   /** check for ConstantTerm with Number or
    * ApplicationTerm with negative Number */
   public static boolean isNumber(IExpression t) {
