@@ -24,15 +24,23 @@ import static ap.basetypes.IdealInt.ZERO;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import ap.basetypes.IdealInt;
+import ap.parser.IAtom;
+import ap.parser.IBinFormula;
 import ap.parser.IBoolLit;
+import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
+import ap.parser.IFormulaITE;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
+import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
+import ap.parser.INot;
+import ap.parser.IPlus;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+import ap.parser.ITimes;
 
 import com.google.common.base.Function;
 
@@ -107,30 +115,28 @@ class PrincessFormulaCreator
   }
 
   String getName(IExpression input) {
-    if (PrincessUtil.isUF(input)) {
-      return ((IFunApp) input).fun().name();
-    } else if (getDeclarationKind(input) != FunctionDeclarationKind.OTHER) {
-      return getFunctionName(input);
-    } else {
+    if (input instanceof IAtom || input instanceof IConstant) {
       return input.toString();
-    }
-  }
-
-  private String getFunctionName(IExpression input) {
-    FunctionDeclarationKind kind = getDeclarationKind(input);
-    switch (kind) {
-      case ITE:
-        return "ite";
-      case AND:
-        return "and";
-      case OR:
-        return "or";
-      case NOT:
-        return "not";
-      case IFF:
-        return "iff";
-      default:
-        throw new AssertionError("Unhandled function kind");
+    } else if (input instanceof IBinFormula) {
+      return ((IBinFormula) input).j().toString();
+    } else if (input instanceof IFormulaITE || input instanceof ITermITE) {
+      // in princess ite representation is the complete formula which we do not want here
+      return "ite";
+    } else if (input instanceof IIntFormula) {
+      return ((IIntFormula) input).rel().toString();
+    } else if (input instanceof INot) {
+      // in princess not representation is the complete formula which we do not want here
+      return "not";
+    } else if (input instanceof IFunApp) {
+      return ((IFunApp) input).fun().name();
+    } else if (input instanceof IPlus) {
+      // in princess plus representation is the complete formula which we do not want here
+      return "+";
+    } else if (input instanceof ITimes) {
+      // in princess times representation is the complete formula which we do not want here
+      return "*";
+    } else {
+      throw new AssertionError("Unhandled type " + input.getClass());
     }
   }
 
