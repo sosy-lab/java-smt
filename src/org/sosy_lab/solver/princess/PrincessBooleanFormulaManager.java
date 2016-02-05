@@ -60,12 +60,12 @@ class PrincessBooleanFormulaManager
 
   @Override
   public boolean isTrue(IExpression t) {
-    return PrincessUtil.isTrue(t);
+    return t instanceof IBoolLit && ((IBoolLit) t).value();
   }
 
   @Override
   public boolean isFalse(IExpression t) {
-    return PrincessUtil.isFalse(t);
+    return t instanceof IBoolLit && !((IBoolLit) t).value();
   }
 
   @Override
@@ -79,7 +79,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula not(IExpression pBits) {
-    if (PrincessUtil.isNot(pBits)) {
+    if (pBits instanceof INot) {
       return ((INot) pBits).subformula(); // "not not a" == "a"
     } else {
       return new INot(castToFormula(pBits));
@@ -91,10 +91,10 @@ class PrincessBooleanFormulaManager
     if (t1.equals(t2)) {
       return castToFormula(t1);
     }
-    if (PrincessUtil.isTrue(t1)) {
+    if (isTrue(t1)) {
       return castToFormula(t2);
     }
-    if (PrincessUtil.isTrue(t2)) {
+    if (isTrue(t2)) {
       return castToFormula(t1);
     }
     return simplify(new IBinFormula(IBinJunctor.And(), castToFormula(t1), castToFormula(t2)));
@@ -102,10 +102,10 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula or(IExpression t1, IExpression t2) {
-    if (PrincessUtil.isFalse(t1)) {
+    if (isFalse(t1)) {
       return castToFormula(t2);
     }
-    if (PrincessUtil.isFalse(t2)) {
+    if (isFalse(t2)) {
       return castToFormula(t1);
     }
     return simplify(new IBinFormula(IBinJunctor.Or(), castToFormula(t1), castToFormula(t2)));
@@ -143,6 +143,12 @@ class PrincessBooleanFormulaManager
     return f;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Princess does not support XOR
+   * Formulas are converted from {@code a^b} to {@code !(a<=>b)}
+   */
   @Override
   public IFormula xor(IExpression t1, IExpression t2) {
     return new INot(new IBinFormula(IBinJunctor.Eqv(), castToFormula(t1), castToFormula(t2)));

@@ -19,37 +19,12 @@
  */
 package org.sosy_lab.solver.princess;
 
-import ap.parser.IAtom;
-import ap.parser.IBinFormula;
-import ap.parser.IBinJunctor;
-import ap.parser.IBoolLit;
-import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-import ap.parser.IFormulaITE;
-import ap.parser.IFunApp;
-import ap.parser.IIntLit;
-import ap.parser.INot;
-import ap.parser.IQuantified;
 import ap.parser.ITerm;
-import ap.parser.ITermITE;
-import ap.parser.IVariable;
-
-import com.google.common.base.Preconditions;
-
-import scala.Enumeration;
-import scala.collection.JavaConversions;
-
-import java.util.List;
 
 /**
  * Static helper functions for Princess.
- *
- * <p>Princess does not support implication.
- * Formulas are converted from {@code a=>b} to {@code !a||b}
- *
- * <p>Princess does not support XOR
- * Formulas are converted from {@code a^b} to {@code !(a<=>b)}
  */
 class PrincessUtil {
   private PrincessUtil() {}
@@ -64,106 +39,4 @@ class PrincessUtil {
     return (IFormula) e;
   }
 
-  public static boolean isVariable(IExpression t) {
-    return t instanceof IAtom || t instanceof IConstant;
-  }
-
-  public static boolean isUF(IExpression t) {
-    return (t instanceof IFunApp)
-        && !((IFunApp) t).fun().name().equals("select")
-        && !((IFunApp) t).fun().name().equals("store");
-  }
-
-  public static boolean isArrayStore(IExpression t) {
-    return (t instanceof IFunApp) && ((IFunApp) t).fun().name().equals("store");
-  }
-
-  public static boolean isArraySelect(IExpression t) {
-    return (t instanceof IFunApp) && ((IFunApp) t).fun().name().equals("select");
-  }
-
-  /** check for ConstantTerm with Number or
-   * ApplicationTerm with negative Number */
-  public static boolean isNumber(IExpression t) {
-    return t instanceof IIntLit;
-  }
-
-  public static boolean isQuantifier(IExpression t) {
-    return t instanceof IQuantified;
-  }
-
-  public static boolean isBoundByQuantifier(IExpression t) {
-    return t instanceof IVariable;
-  }
-
-  public static boolean isForall(IExpression t) {
-    return isQuantifier(t)
-        && ((IQuantified) t).quan().equals(ap.terfor.conjunctions.Quantifier.apply(true));
-  }
-
-  /**
-   * Returns de-Bruijn index for a quantified variable.
-   */
-  public static int getIndex(IExpression t) {
-    Preconditions.checkState(isBoundByQuantifier(t));
-    IVariable v = (IVariable) t;
-    return v.index();
-  }
-
-  public static IExpression getQuantifierBody(IExpression t) {
-    Preconditions.checkState(isQuantifier(t));
-    return ((IQuantified) t).subformula();
-  }
-
-  public static boolean isBoolean(IExpression t) {
-    return t instanceof IFormula;
-  }
-
-  public static boolean hasIntegerType(IExpression t) {
-    return t instanceof ITerm;
-  }
-
-  /** t1 and t2 */
-  public static boolean isAnd(IExpression t) {
-    return isBinaryFunction(t, IBinJunctor.And());
-  }
-
-  /** t1 or t2 */
-  public static boolean isOr(IExpression t) {
-    return isBinaryFunction(t, IBinJunctor.Or());
-  }
-
-  /** not t */
-  public static boolean isNot(IExpression t) {
-    return t instanceof INot;
-  }
-
-  /** (ite t1 t2 t3) */
-  public static boolean isIfThenElse(IExpression t) {
-    return t instanceof IFormulaITE // boolean args
-        || t instanceof ITermITE; // arithmetic args
-  }
-
-  /** t1 = t2 */
-  public static boolean isEquivalence(IExpression t) {
-    return isBinaryFunction(t, IBinJunctor.Eqv());
-  }
-
-  private static boolean isBinaryFunction(IExpression t, Enumeration.Value val) {
-    return (t instanceof IBinFormula)
-        && val == ((IBinFormula) t).j(); // j is the operator and Scala is evil!
-  }
-
-  public static boolean isTrue(IExpression t) {
-    return t instanceof IBoolLit && ((IBoolLit) t).value();
-  }
-
-  public static boolean isFalse(IExpression t) {
-    return t instanceof IBoolLit && !((IBoolLit) t).value();
-  }
-
-  /** @return a new Term with the same function and new parameters. */
-  public static IExpression replaceArgs(IExpression t, List<IExpression> newParams) {
-    return t.update(JavaConversions.asScalaBuffer(newParams));
-  }
 }

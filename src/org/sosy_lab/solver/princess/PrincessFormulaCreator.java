@@ -22,10 +22,14 @@ package org.sosy_lab.solver.princess;
 import static ap.basetypes.IdealInt.ONE;
 import static ap.basetypes.IdealInt.ZERO;
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier.EXISTS;
+import static org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier.FORALL;
+import static scala.collection.JavaConversions.asScalaBuffer;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
 import ap.parser.IConstant;
 import ap.parser.IEpsilon;
@@ -39,9 +43,12 @@ import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
 import ap.parser.INot;
 import ap.parser.IPlus;
+import ap.parser.IQuantified;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.ITimes;
+import ap.parser.IVariable;
+import ap.terfor.conjunctions.Quantifier;
 
 import com.google.common.base.Function;
 
@@ -52,10 +59,10 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
-import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import scala.Enumeration;
 import scala.collection.mutable.ArrayBuffer;
 
 import java.util.ArrayList;
@@ -73,9 +80,9 @@ class PrincessFormulaCreator
   public FormulaType<?> getFormulaType(IExpression pFormula) {
     if (getEnv().hasArrayType(pFormula)) {
       return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
-    } else if (PrincessUtil.isBoolean(pFormula)) {
+    } else if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
-    } else if (PrincessUtil.hasIntegerType(pFormula)) {
+    } else if (pFormula instanceof ITerm) {
       return FormulaType.IntegerType;
     }
     throw new IllegalArgumentException("Unknown formula type");
@@ -149,14 +156,18 @@ class PrincessFormulaCreator
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
       return visitor.visitConstant(f, value.bigIntValue());
+
     } else if (input instanceof IBoolLit) {
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
-    } else if (PrincessUtil.isQuantifier(input)) {
-      BooleanFormula body = encapsulateBoolean(PrincessUtil.getQuantifierBody(input));
+
+      // this is a quantifier
+    } else if (input instanceof IQuantified) {
+
+      BooleanFormula body = encapsulateBoolean(((IQuantified) input).subformula());
       return visitor.visitQuantifier(
           (BooleanFormula) f,
-          PrincessUtil.isForall(input) ? Quantifier.FORALL : Quantifier.EXISTS,
+          ((IQuantified) input).quan().equals(Quantifier.apply(true)) ? FORALL : EXISTS,
 
           // Princess does not hold any metadata about bound variables,
           // so we can't get meaningful list here.
@@ -164,10 +175,15 @@ class PrincessFormulaCreator
           // works as expected.
           new ArrayList<Formula>(),
           body);
-    } else if (PrincessUtil.isBoundByQuantifier(input)) {
-      return visitor.visitBoundVariable(f, PrincessUtil.getIndex(input));
-    } else if (PrincessUtil.isVariable(input)) {
+
+      // variable bound by a quantifier
+    } else if (input instanceof IVariable) {
+      return visitor.visitBoundVariable(f, ((IVariable) input).index());
+
+      // atom and constant are variables
+    } else if (input instanceof IAtom || input instanceof IConstant) {
       return visitor.visitFreeVariable(f, input.toString());
+
     } else {
       int arity = input.length();
       List<Formula> args = new ArrayList<>(arity);
@@ -182,36 +198,43 @@ class PrincessFormulaCreator
           new Function<List<Formula>, Formula>() {
             @Override
             public Formula apply(List<Formula> formulas) {
-              return encapsulateWithTypeOf(PrincessUtil.replaceArgs(input, extractInfo(formulas)));
+              // replace arguments of function
+              return encapsulateWithTypeOf(input.update(asScalaBuffer(extractInfo(formulas))));
             }
           };
+
       return visitor.visitFunction(
           f, args, FunctionDeclaration.of(getName(input), getDeclarationKind(input)), constructor);
     }
   }
 
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
-    if (PrincessUtil.isIfThenElse(input)) {
+    if (input instanceof IFormulaITE || input instanceof ITermITE) {
       return FunctionDeclarationKind.ITE;
-    } else if (PrincessUtil.isUF(input)) {
+    } else if (input instanceof IFunApp) {
+      if (((IFunApp) input).fun().name().equals("select")) {
+        return FunctionDeclarationKind.SELECT;
+      } else if (((IFunApp) input).fun().name().equals("store")) {
+        return FunctionDeclarationKind.STORE;
+      }
       return FunctionDeclarationKind.UF;
-    } else if (PrincessUtil.isAnd(input)) {
+    } else if (isBinaryFunction(input, IBinJunctor.And())) {
       return FunctionDeclarationKind.AND;
-    } else if (PrincessUtil.isOr(input)) {
+    } else if (isBinaryFunction(input, IBinJunctor.Or())) {
       return FunctionDeclarationKind.OR;
-    } else if (PrincessUtil.isNot(input)) {
+    } else if (input instanceof INot) {
       return FunctionDeclarationKind.NOT;
-    } else if (PrincessUtil.isEquivalence(input)) {
+    } else if (isBinaryFunction(input, IBinJunctor.Eqv())) {
       return FunctionDeclarationKind.IFF;
-    } else if (PrincessUtil.isArraySelect(input)) {
-      return FunctionDeclarationKind.SELECT;
-    } else if (PrincessUtil.isArrayStore(input)) {
-      return FunctionDeclarationKind.STORE;
-    } else {
 
+    } else {
       // TODO: other cases!!!
       return FunctionDeclarationKind.OTHER;
     }
+  }
+
+  private static boolean isBinaryFunction(IExpression t, Enumeration.Value val) {
+    return (t instanceof IBinFormula) && val == ((IBinFormula) t).j(); // j is the operator
   }
 
   public IExpression makeFunction(IFunction funcDecl, List<IExpression> args) {

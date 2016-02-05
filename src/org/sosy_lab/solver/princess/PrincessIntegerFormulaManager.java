@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.princess;
 
 import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
-import static org.sosy_lab.solver.princess.PrincessUtil.isNumber;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
@@ -116,6 +115,6 @@ class PrincessIntegerFormulaManager
 
   @Override
   protected boolean isNumeral(IExpression val) {
-    return isNumber(val);
+    return val instanceof IIntLit;
   }
 }
