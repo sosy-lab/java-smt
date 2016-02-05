@@ -240,10 +240,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         },
         ab);
 
-    if (solver == Solvers.MATHSAT5) {
-      assertThat(found).containsExactly("a", "b", "`and`");
-    } else {
-      assertThat(found).containsExactly("a", "b", "and");
-    }
+    assertThat(found).hasSize(3);
+    assertThat(found).doesNotContain(ab.toString());
   }
 }
