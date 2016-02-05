@@ -391,9 +391,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
   private FunctionDeclarationKind getDeclarationKind(long f) {
     int decl = get_decl_kind(environment, get_app_decl(environment, f));
 
-    if (get_arity(environment, f) == 0) {
-      return FunctionDeclarationKind.VAR;
-    }
+    assert get_arity(environment, f) > 0 : "Variables should be handled somewhere else.";
 
     switch (decl) {
       case Z3_OP_AND:

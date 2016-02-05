@@ -209,6 +209,9 @@ class PrincessFormulaCreator
   }
 
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
+    assert !(input instanceof IAtom || input instanceof IConstant)
+        : "Variables should be handled somewhere else";
+
     if (input instanceof IFormulaITE || input instanceof ITermITE) {
       return FunctionDeclarationKind.ITE;
     } else if (input instanceof IFunApp) {

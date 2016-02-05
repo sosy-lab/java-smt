@@ -289,7 +289,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
   }
 
   String getName(long term) {
-    if (getDeclarationKind(term) == FunctionDeclarationKind.UF) {
+    if (msat_term_is_uf(environment, term)) {
       return msat_decl_get_name(msat_term_get_decl(term));
     }
     return msat_term_repr(term);
@@ -303,9 +303,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
   private FunctionDeclarationKind getDeclarationKind(long pF) {
     if (msat_term_is_uf(environment, pF)) {
       return FunctionDeclarationKind.UF;
-    } else if (msat_term_is_constant(environment, pF)) {
-      return FunctionDeclarationKind.VAR;
     }
+
+    assert !msat_term_is_constant(environment, pF) : "Variables should be handled somewhere else";
 
     long decl = msat_term_get_decl(pF);
     int tag = msat_decl_get_tag(environment, decl);

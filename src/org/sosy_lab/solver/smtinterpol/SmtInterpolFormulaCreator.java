@@ -246,6 +246,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   }
 
   private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {
+    assert !SmtInterpolUtil.isVariable(input) : "Variables should be handled somewhere else";
+
     FunctionSymbol symbol = input.getFunction();
     Theory t = input.getTheory();
     if (SmtInterpolUtil.isUF(input)) {
@@ -272,8 +274,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
       return FunctionDeclarationKind.SELECT;
     } else if (symbol.getName().equals("store")) {
       return FunctionDeclarationKind.STORE;
-    } else if (SmtInterpolUtil.isVariable(input)) {
-      return FunctionDeclarationKind.VAR;
     } else {
 
       // TODO: other declaration kinds!
