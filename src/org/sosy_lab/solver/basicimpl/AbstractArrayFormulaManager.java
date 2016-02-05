@@ -24,6 +24,7 @@ import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements ArrayFormulaManager {
@@ -63,6 +64,12 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv>
 
   protected abstract TFormulaInfo store(
       TFormulaInfo pArray, TFormulaInfo pIndex, TFormulaInfo pValue);
+
+  @Override
+  public <TI extends Formula, TE extends Formula>
+  ArrayFormula<TI, TE> makeArray(String pName, ArrayFormulaType<TI, TE> type) {
+    return makeArray(pName, type.getIndexType(), type.getElementType());
+  }
 
   @Override
   public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>,
