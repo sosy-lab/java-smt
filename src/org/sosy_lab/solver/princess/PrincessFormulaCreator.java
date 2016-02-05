@@ -28,6 +28,7 @@ import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBoolLit;
 import ap.parser.IConstant;
+import ap.parser.IEpsilon;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
@@ -135,6 +136,9 @@ class PrincessFormulaCreator
     } else if (input instanceof ITimes) {
       // in princess times representation is the complete formula which we do not want here
       return "*";
+    } else if (input instanceof IEpsilon) {
+      // in princess epsilon representation is the complete formula which we do not want here
+      return "eps";
     } else {
       throw new AssertionError("Unhandled type " + input.getClass());
     }
