@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import org.sosy_lab.solver.api.FormulaType.BitvectorType;
+
 import java.math.BigInteger;
 
 /**
@@ -31,6 +33,8 @@ public interface BitvectorFormulaManager {
   BitvectorFormula makeBitvector(int length, BigInteger pI);
 
   BitvectorFormula makeVariable(int length, String pVar);
+
+  BitvectorFormula makeVariable(BitvectorType type, String pVar);
 
   int getLength(BitvectorFormula number);
 

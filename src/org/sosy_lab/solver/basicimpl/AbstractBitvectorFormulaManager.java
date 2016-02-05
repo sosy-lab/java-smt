@@ -25,6 +25,7 @@ import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BitvectorFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 
 import java.math.BigInteger;
 
@@ -248,6 +249,11 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
   }
 
   protected abstract TFormulaInfo makeBitvectorImpl(int pLength, BigInteger pI);
+
+  @Override
+  public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
+    return makeVariable(type.getSize(), pVar);
+  }
 
   @Override
   public BitvectorFormula makeVariable(int pLength, String pVar) {
