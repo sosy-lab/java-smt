@@ -22,6 +22,7 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -36,6 +37,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
@@ -201,5 +203,47 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         },
         t);
     assertThat(containsTrue).isNotEmpty();
+  }
+
+  @Test
+  public void testCorrectFunctionNames() throws Exception {
+    BooleanFormula a = bmgr.makeVariable("a");
+    BooleanFormula b = bmgr.makeVariable("b");
+    BooleanFormula ab = bmgr.and(a, b);
+
+    final Set<String> found = new HashSet<>();
+    mgr.visitRecursively(
+        new DefaultFormulaVisitor<TraversalProcess>() {
+
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFunction(
+              Formula f,
+              List<Formula> args,
+              FunctionDeclaration functionDeclaration,
+              Function<List<Formula>, Formula> constructor) {
+
+            found.add(functionDeclaration.getName());
+
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFreeVariable(Formula f, String name) {
+            found.add(name);
+            return TraversalProcess.CONTINUE;
+          }
+        },
+        ab);
+
+    if (solver == Solvers.MATHSAT5) {
+      assertThat(found).containsExactly("a", "b", "`and`");
+    } else {
+      assertThat(found).containsExactly("a", "b", "and");
+    }
   }
 }
