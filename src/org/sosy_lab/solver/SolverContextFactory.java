@@ -65,6 +65,7 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
+    Z3JAVA,
     PRINCESS
     //    CVC4
   }
@@ -126,6 +127,10 @@ public class SolverContextFactory {
 
         case Z3:
           return Z3SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
+
+        case Z3JAVA:
+          return org.sosy_lab.solver.z3java.Z3SolverContext.create(
+              logger, config, shutdownNotifier, logfile, randomSeed);
 
         case PRINCESS:
           // TODO: pass randomSeed to Princess

@@ -164,8 +164,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     // TODO: currently neither Z3 nor Princess is working with quantifiers
     // properly due to bugs on our side =(.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.Z3, Solvers.Z3JAVA);
 
     assert qmgr != null;
 

@@ -311,7 +311,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assume()
         .withFailureMessage("Bug in Z3QuantifiedFormulaManager")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNoneOf(Solvers.Z3, Solvers.Z3JAVA);
 
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);

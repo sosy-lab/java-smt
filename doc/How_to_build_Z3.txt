@@ -1,0 +1,24 @@
+# requirements:
+#  - make, gcc, ... for compiling Z3
+#  - Java7, for compatibility of the library (Java8 is not available on some machines)
+
+# checkout Z3
+git clone https://github.com/kfriedberger/z3
+
+# build Z3 with external library loading, which is needed for JavaSMT
+cd z3
+./configure --java --javaExternalLibraryLoading
+cd build
+make
+cd ../..
+
+# build JNI-wrapper for direct usage
+cd java-smt
+cd lib/native/source/libz3j/
+./compile.sh ./../../../../../z3/
+cd ../../../..
+
+# produce files for ivy-repository
+ant publish-z3 -Dz3.path=/home/fri/workspace/z3
+
+# add and push files to svn with cmdline that is given as part of ant-output

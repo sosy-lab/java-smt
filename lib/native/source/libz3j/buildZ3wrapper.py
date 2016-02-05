@@ -17,6 +17,9 @@ HEADER = '''// THIS FILE IS BUILD AUTOMATICALLY, DO NOT CHANGE!!!
 #include"includes/arguments.h"
 #include"includes/types.h"
 #include"includes/error_handling.h"
+
+#define j__uint64 unsigned long long
+
 '''
 
 
