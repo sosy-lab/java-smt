@@ -38,6 +38,8 @@ public interface FormulaManager {
    * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
    * the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL and others.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   IntegerFormulaManager getIntegerFormulaManager();
 
@@ -46,6 +48,8 @@ public interface FormulaManager {
    * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
    * the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL, etc.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   RationalFormulaManager getRationalFormulaManager();
 
@@ -56,16 +60,22 @@ public interface FormulaManager {
 
   /**
    * Returns the Array-Theory.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   ArrayFormulaManager getArrayFormulaManager();
 
   /**
    * Returns the Bitvector-Theory.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   BitvectorFormulaManager getBitvectorFormulaManager();
 
   /**
    * Returns the Floating-Point-Theory.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   FloatingPointFormulaManager getFloatingPointFormulaManager();
 
@@ -76,11 +86,14 @@ public interface FormulaManager {
 
   /**
    * Returns the interface for handling quantifiers.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   QuantifiedFormulaManager getQuantifiedFormulaManager();
 
   /**
-   * Make two different formulas equal.
+   * Create a formula representing equality between two formulas of the same
+   * type.
    */
   <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs);
 
