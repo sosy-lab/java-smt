@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
 
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -76,7 +75,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
-    final IFormula t = castToFormula(mgr.extractInfo(constraint));
+    final IFormula t = (IFormula) mgr.extractInfo(constraint);
     assertedTerms.add(t);
     stack.assertTerm(t);
     return null;
@@ -109,7 +108,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
     // unpack formulas to terms
     List<IFormula> importantFormulas = new ArrayList<>(important.size());
     for (BooleanFormula impF : important) {
-      importantFormulas.add(castToFormula(mgr.extractInfo(impF)));
+      importantFormulas.add((IFormula) mgr.extractInfo(impF));
     }
 
     stack.push(1);

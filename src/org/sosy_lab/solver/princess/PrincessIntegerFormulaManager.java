@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
-
 import ap.basetypes.IdealInt;
 import ap.parser.IBoolLit;
 import ap.parser.IExpression;
@@ -94,21 +92,21 @@ class PrincessIntegerFormulaManager
 
   @Override
   public IExpression divide(IExpression pNumber1, IExpression pNumber2) {
-    return BitShiftMultiplication.eDiv(castToTerm(pNumber1), castToTerm(pNumber2));
+    return BitShiftMultiplication.eDiv((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   public IExpression modulo(IExpression pNumber1, IExpression pNumber2) {
-    return BitShiftMultiplication.eMod(castToTerm(pNumber1), castToTerm(pNumber2));
+    return BitShiftMultiplication.eMod((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   public IExpression multiply(IExpression pNumber1, IExpression pNumber2) {
     IExpression result;
     try {
-      result = castToTerm(pNumber1).$times(castToTerm(pNumber2));
+      result = ((ITerm) pNumber1).$times((ITerm) pNumber2);
     } catch (IllegalArgumentException e) {
-      result = BitShiftMultiplication.mult(castToTerm(pNumber1), castToTerm(pNumber2));
+      result = BitShiftMultiplication.mult((ITerm) pNumber1, (ITerm) pNumber2);
     }
     return result;
   }

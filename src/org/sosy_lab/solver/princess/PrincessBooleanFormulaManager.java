@@ -19,9 +19,6 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static org.sosy_lab.solver.princess.PrincessUtil.castToFormula;
-import static org.sosy_lab.solver.princess.PrincessUtil.castToTerm;
-
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
@@ -29,6 +26,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
 import ap.parser.INot;
+import ap.parser.ITerm;
 import ap.parser.ITermITE;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
@@ -44,8 +42,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula makeVariableImpl(String varName) {
-    return castToFormula(
-        getFormulaCreator().makeVariable(getFormulaCreator().getBoolType(), varName));
+    return (IFormula) getFormulaCreator().makeVariable(getFormulaCreator().getBoolType(), varName);
   }
 
   @Override
@@ -55,7 +52,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula equivalence(IExpression t1, IExpression t2) {
-    return new IBinFormula(IBinJunctor.Eqv(), castToFormula(t1), castToFormula(t2));
+    return new IBinFormula(IBinJunctor.Eqv(), (IFormula) t1, (IFormula) t2);
   }
 
   @Override
@@ -71,9 +68,9 @@ class PrincessBooleanFormulaManager
   @Override
   public IExpression ifThenElse(IExpression condition, IExpression t1, IExpression t2) {
     if (t1 instanceof IFormula) {
-      return new IFormulaITE(castToFormula(condition), castToFormula(t1), castToFormula(t2));
+      return new IFormulaITE((IFormula) condition, (IFormula) t1, (IFormula) t2);
     } else {
-      return new ITermITE(castToFormula(condition), castToTerm(t1), castToTerm(t2));
+      return new ITermITE((IFormula) condition, (ITerm) t1, (ITerm) t2);
     }
   }
 
@@ -82,33 +79,33 @@ class PrincessBooleanFormulaManager
     if (pBits instanceof INot) {
       return ((INot) pBits).subformula(); // "not not a" == "a"
     } else {
-      return new INot(castToFormula(pBits));
+      return new INot((IFormula) pBits);
     }
   }
 
   @Override
   public IFormula and(IExpression t1, IExpression t2) {
     if (t1.equals(t2)) {
-      return castToFormula(t1);
+      return (IFormula) t1;
     }
     if (isTrue(t1)) {
-      return castToFormula(t2);
+      return (IFormula) t2;
     }
     if (isTrue(t2)) {
-      return castToFormula(t1);
+      return (IFormula) t1;
     }
-    return simplify(new IBinFormula(IBinJunctor.And(), castToFormula(t1), castToFormula(t2)));
+    return simplify(new IBinFormula(IBinJunctor.And(), (IFormula) t1, (IFormula) t2));
   }
 
   @Override
   public IFormula or(IExpression t1, IExpression t2) {
     if (isFalse(t1)) {
-      return castToFormula(t2);
+      return (IFormula) t2;
     }
     if (isFalse(t2)) {
-      return castToFormula(t1);
+      return (IFormula) t1;
     }
-    return simplify(new IBinFormula(IBinJunctor.Or(), castToFormula(t1), castToFormula(t2)));
+    return simplify(new IBinFormula(IBinJunctor.Or(), (IFormula) t1, (IFormula) t2));
   }
 
   /** simplification to avoid identical subgraphs: (a&b)&(a&c) --> a&(b&c), etc */
@@ -151,6 +148,6 @@ class PrincessBooleanFormulaManager
    */
   @Override
   public IFormula xor(IExpression t1, IExpression t2) {
-    return new INot(new IBinFormula(IBinJunctor.Eqv(), castToFormula(t1), castToFormula(t2)));
+    return new INot(new IBinFormula(IBinJunctor.Eqv(), (IFormula) t1, (IFormula) t2));
   }
 }
