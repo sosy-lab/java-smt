@@ -109,8 +109,28 @@ class PrincessFormulaCreator
   String getName(IExpression input) {
     if (PrincessUtil.isUF(input)) {
       return ((IFunApp) input).fun().name();
+    } else if (getDeclarationKind(input) != FunctionDeclarationKind.OTHER) {
+      return getFunctionName(input);
     } else {
       return input.toString();
+    }
+  }
+
+  private String getFunctionName(IExpression input) {
+    FunctionDeclarationKind kind = getDeclarationKind(input);
+    switch (kind) {
+      case ITE:
+        return "ite";
+      case AND:
+        return "and";
+      case OR:
+        return "or";
+      case NOT:
+        return "not";
+      case IFF:
+        return "iff";
+      default:
+        throw new AssertionError("Unhandled function kind");
     }
   }
 
@@ -173,10 +193,6 @@ class PrincessFormulaCreator
       return FunctionDeclarationKind.NOT;
     } else if (PrincessUtil.isEquivalence(input)) {
       return FunctionDeclarationKind.IFF;
-    } else if (PrincessUtil.isIfThenElse(input)) {
-      return FunctionDeclarationKind.ITE;
-    } else if (PrincessUtil.isVariable(input)) {
-      return FunctionDeclarationKind.VAR;
     } else {
 
       // TODO: other cases!!!
