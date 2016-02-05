@@ -32,21 +32,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Base class for visitors for boolean formulas that traverse recursively
- * through the formula and somehow transform it (i.e., return a boolean formula).
- * This class ensures that each identical subtree of the formula
- * is visited only once to avoid the exponential explosion.
- * When a subclass wants to traverse into a subtree of the formula,
- * it needs to call {@link #visitIfNotSeen(BooleanFormula)} or
- * {@link #visitIfNotSeen(List)} to ensure this.
+ * Base class for visitors for boolean formulas that recursively transform
+ * boolean formulas.
  *
- * <p>
- * By default this class implements the identity function.
- * </p>
+ * <p>This class ensures that each subtree of the formula
+ * is visited only once.
+ * To ensure this for subclasses, they need to call
+ * {@link #visitIfNotSeen(BooleanFormula)} or
+ * {@link #visitIfNotSeen(List)}.
  *
- * <p>
- * No guarantee on iteration order is made.
- * </p>
+ * <p><b>WARNING:</b> transforming very large formulas with this class will lead
+ * to {@link StackOverflowError}.
  */
 public abstract class BooleanFormulaTransformationVisitor
     implements BooleanFormulaVisitor<BooleanFormula> {
