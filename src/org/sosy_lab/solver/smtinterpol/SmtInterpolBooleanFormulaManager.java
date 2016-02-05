@@ -57,7 +57,8 @@ class SmtInterpolBooleanFormulaManager
 
   @Override
   public Term equivalence(Term t1, Term t2) {
-    assert SmtInterpolUtil.isBoolean(t1) && SmtInterpolUtil.isBoolean(t2)
+    assert t1.getTheory().getBooleanSort() == t1.getSort()
+            && t2.getTheory().getBooleanSort() == t2.getSort()
         : "Cannot make equivalence of non-boolean terms:\nTerm 1:\n"
             + t1.toStringDirect()
             + "\nTerm 2:\n"
@@ -67,12 +68,12 @@ class SmtInterpolBooleanFormulaManager
 
   @Override
   public boolean isTrue(Term t) {
-    return SmtInterpolUtil.isTrue(t);
+    return t.getTheory().mTrue == t;
   }
 
   @Override
   public boolean isFalse(Term t) {
-    return SmtInterpolUtil.isFalse(t);
+    return t.getTheory().mFalse == t;
   }
 
   @Override
@@ -92,7 +93,7 @@ class SmtInterpolBooleanFormulaManager
 
   @Override
   protected Term andImpl(Collection<Term> pParams) {
-    return theory.and(SmtInterpolUtil.toTermArray(pParams));
+    return theory.and(pParams.toArray(new Term[pParams.size()]));
   }
 
   @Override
@@ -102,7 +103,7 @@ class SmtInterpolBooleanFormulaManager
 
   @Override
   protected Term orImpl(Collection<Term> pParams) {
-    return theory.or(SmtInterpolUtil.toTermArray(pParams));
+    return theory.or(pParams.toArray(new Term[pParams.size()]));
   }
 
   @Override

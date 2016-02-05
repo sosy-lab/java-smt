@@ -82,7 +82,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
   private Object getValue(Term value) {
     FormulaType<?> type = creator.getFormulaType(value);
     if (type.isBooleanType()) {
-      return SmtInterpolUtil.isTrue(value);
+      return value.getTheory().mTrue == value;
     } else if (value instanceof ConstantTerm
         && ((ConstantTerm) value).getValue() instanceof Rational) {
 

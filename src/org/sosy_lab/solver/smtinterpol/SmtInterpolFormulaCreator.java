@@ -136,7 +136,24 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   }
 
   private Term replaceArgs(Term pT, List<Term> newArgs) {
-    return SmtInterpolUtil.replaceArgs(getEnv(), pT, SmtInterpolUtil.toTermArray(newArgs));
+    Term[] newParams = newArgs.toArray(new Term[newArgs.size()]);
+    if (pT instanceof ApplicationTerm) {
+      ApplicationTerm at = (ApplicationTerm) pT;
+      Term[] oldParams = at.getParameters();
+
+      assert oldParams.length == newParams.length;
+      for (int i = 0; i < newParams.length; i++) {
+        assert oldParams[i].getSort() == newParams[i].getSort()
+            : "Cannot replace " + oldParams[i] + " with " + newParams[i] + ".";
+      }
+
+      FunctionSymbol funcSymb = at.getFunction();
+      return getEnv().term(funcSymb.getName(), funcSymb.getIndices(), null, newParams);
+    } else {
+      // ConstantTerm:            numeral, nothing to replace
+      // AnnotatedTerm, LetTerm:  should not happen here
+      return pT;
+    }
   }
 
   @Override
@@ -204,7 +221,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
   }
 
   String getName(Term t) {
-    if (SmtInterpolUtil.isUF(t)) {
+    if (isUF(t)) {
       assert t instanceof ApplicationTerm;
       return ((ApplicationTerm) t).getFunction().getName();
     } else {
@@ -245,12 +262,30 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
     return is;
   }
 
+  private static boolean isVariable(Term t) {
+    // A variable is the same as an UF without parameters
+    return t.getTheory().mTrue != t
+        && t.getTheory().mFalse != t
+        && (t instanceof ApplicationTerm)
+        && ((ApplicationTerm) t).getParameters().length == 0
+        && ((ApplicationTerm) t).getFunction().getDefinition() == null;
+  }
+
+  private static boolean isUF(Term t) {
+    if (!(t instanceof ApplicationTerm)) {
+      return false;
+    }
+    ApplicationTerm applicationTerm = (ApplicationTerm) t;
+    FunctionSymbol func = applicationTerm.getFunction();
+    return applicationTerm.getParameters().length > 0 && !func.isIntern() && !func.isInterpreted();
+  }
+
   private FunctionDeclarationKind getDeclarationKind(ApplicationTerm input) {
-    assert !SmtInterpolUtil.isVariable(input) : "Variables should be handled somewhere else";
+    assert !isVariable(input) : "Variables should be handled somewhere else";
 
     FunctionSymbol symbol = input.getFunction();
     Theory t = input.getTheory();
-    if (SmtInterpolUtil.isUF(input)) {
+    if (isUF(input)) {
       return FunctionDeclarationKind.UF;
     } else if (symbol == t.mAnd) {
       return FunctionDeclarationKind.AND;

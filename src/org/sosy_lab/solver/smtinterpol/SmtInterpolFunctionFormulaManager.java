@@ -35,13 +35,8 @@ class SmtInterpolFunctionFormulaManager
 
   @Override
   public Term createUninterpretedFunctionCallImpl(String funcDecl, List<Term> pArgs) {
-    Term[] args = SmtInterpolUtil.toTermArray(pArgs);
-    return createUIFCallImpl(funcDecl, args);
-  }
-
-  private Term createUIFCallImpl(String funcDecl, Term[] args) {
+    Term[] args = pArgs.toArray(new Term[pArgs.size()]);
     Term ufc = getFormulaCreator().getEnv().term(funcDecl, args);
-    assert SmtInterpolUtil.isUF(ufc);
     return ufc;
   }
 
