@@ -115,7 +115,7 @@ class PrincessFormulaCreator
     return super.getFormulaType(pFormula);
   }
 
-  String getName(IExpression input) {
+  private String getName(IExpression input) {
     if (input instanceof IAtom || input instanceof IConstant) {
       return input.toString();
     } else if (input instanceof IBinFormula) {
