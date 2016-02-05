@@ -105,7 +105,11 @@ final class TransformationFormulaVisitorImpl implements FormulaVisitor<Void> {
       // function application.
       toProcess.pop();
       Formula out = delegate.visitFunction(
-          f, newArgs, functionDeclaration, newApplicationConstructor);
+          newApplicationConstructor.apply(newArgs),
+          newArgs,
+          functionDeclaration,
+          newApplicationConstructor
+      );
       pCache.put(f, out);
     }
     return null;
