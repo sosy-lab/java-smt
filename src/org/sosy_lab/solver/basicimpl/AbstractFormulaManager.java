@@ -35,6 +35,9 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.solver.api.FormulaType.BitvectorType;
+import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -123,8 +126,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
     if (integerManager == null) {
-      // TODO fallback to rationalManager?
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Solver does not support integer theory"
+      );
     }
     return integerManager;
   }
@@ -132,8 +136,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
     if (rationalManager == null) {
-      // TODO fallback to integerManager?
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Solver does not support rationals theory"
+      );
     }
     return rationalManager;
   }
@@ -146,7 +151,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> getBitvectorFormulaManager() {
     if (bitvectorManager == null) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Solver does not support bitvector theory"
+      );
     }
     return bitvectorManager;
   }
@@ -154,7 +161,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
     if (floatingPointManager == null) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Solver does not support floating point theory"
+      );
     }
     return floatingPointManager;
   }
@@ -167,7 +176,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> getQuantifiedFormulaManager() {
     if (quantifiedManager == null) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Solver does not support quantification"
+      );
     }
     return quantifiedManager;
   }
@@ -175,7 +186,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
     if (arrayManager == null) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Solver does not support arrays");
     }
     return arrayManager;
   }
@@ -461,5 +472,35 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     }
 
     return t;
+  }
+
+  @Override
+  public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
+    Formula t;
+    if (formulaType.isBooleanType()) {
+      t = booleanManager.makeVariable(name);
+    } else if (formulaType.isIntegerType()) {
+      assert integerManager != null;
+      t = integerManager.makeVariable(name);
+    } else if (formulaType.isRationalType()) {
+      assert rationalManager != null;
+      t = rationalManager.makeVariable(name);
+    } else if (formulaType.isBitvectorType()) {
+      assert bitvectorManager != null;
+      BitvectorType impl = (BitvectorType) formulaType;
+      t = bitvectorManager.makeVariable((BitvectorType) formulaType, name);
+    } else if (formulaType.isFloatingPointType()) {
+      assert floatingPointManager != null;
+      t = floatingPointManager.makeVariable(name, (FloatingPointType) formulaType);
+    } else if (formulaType.isArrayType()) {
+      assert arrayManager != null;
+      t = arrayManager.makeArray(name, (ArrayFormulaType<?, ?>) formulaType);
+    } else {
+      throw new IllegalArgumentException("Unknown formula type");
+    }
+
+    @SuppressWarnings("unchecked")
+    T out = (T) t;
+    return out;
   }
 }

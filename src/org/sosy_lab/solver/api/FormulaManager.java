@@ -98,6 +98,15 @@ public interface FormulaManager {
   <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs);
 
   /**
+   * Create variable of the type equal to {@code formulaType}.
+   *
+   * @param formulaType the type of the variable.
+   * @param name the name of the variable.
+   * @return the created variable.
+   */
+  <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name);
+
+  /**
    * Returns the type of the given Formula.
    */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
@@ -187,17 +196,6 @@ public interface FormulaManager {
   Formula substitute(Formula f, Map<Formula, Formula> fromToMapping);
 
   /**
-   * If the given formula is a numeral (i.e., non-boolean) equality "x = y",
-   * return a list {@code x<=y, x>=y}.
-   *
-   * <p>Otherwise, return the list consisting of the input formula.
-   * Note:
-   *  1) Returned list always has one or two elements.
-   *  2) Conjunction over the returned list is equivalent to the input formula.
-   */
-  <T extends Formula> List<T> splitNumeralEqualityIfPossible(T f);
-
-  /**
    * Translates the formula from another context into the context represented by
    * {@code this}.
    * Default implementation relies on string serialization
@@ -210,4 +208,15 @@ public interface FormulaManager {
    * @return Formula belonging to {@code this} context.
    */
   BooleanFormula translate(BooleanFormula other, SolverContext otherContext);
+
+  /**
+   * For a numeral (i.e., non-boolean) equality "x = y",
+   * return a list {@code x<=y, x>=y}.
+   *
+   * <p>Otherwise, return the list consisting of the input formula.
+   * Note:
+   *  1) Returned list always has one or two elements.
+   *  2) Conjunction over the returned list is equivalent to the input formula.
+   */
+  <T extends Formula> List<T> splitNumeralEqualityIfPossible(T f);
 }
