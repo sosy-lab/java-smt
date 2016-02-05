@@ -41,6 +41,7 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
+import ap.parser.IIntRelation;
 import ap.parser.INot;
 import ap.parser.IPlus;
 import ap.parser.IQuantified;
@@ -229,9 +230,24 @@ class PrincessFormulaCreator
       return FunctionDeclarationKind.NOT;
     } else if (isBinaryFunction(input, IBinJunctor.Eqv())) {
       return FunctionDeclarationKind.IFF;
+    } else if (input instanceof ITimes) {
+      return FunctionDeclarationKind.MUL;
+    } else if (input instanceof IPlus) {
+      // SUB does not exist in princess a - b is a + (-b) there
+      return FunctionDeclarationKind.ADD;
+    } else if (input instanceof IIntFormula) {
+      IIntFormula f = (IIntFormula) input;
+      if (f.rel().equals(IIntRelation.EqZero())) {
+        return FunctionDeclarationKind.EQ;
+      } else if (f.rel().equals(IIntRelation.GeqZero())) {
+        return FunctionDeclarationKind.GTE;
+      } else {
+        throw new AssertionError("Unhandled value for integer relation");
+      }
 
     } else {
-      // TODO: other cases!!!
+      // we cannot handle XOR, IMPLIES, DISTINCT, DIV, MODULO, LT, LTE GT in princess
+      // they are either handled implicitly by the above mentioned parts or not at all
       return FunctionDeclarationKind.OTHER;
     }
   }
