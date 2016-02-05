@@ -19,7 +19,7 @@
  */
 
 /**
- * The visitors of this package allow to traverse and transform
- * (boolean) formulas in a convenient way.
+ * The visitors of this package allow for efficient traversal, manipulation
+ * and transformation of formulas.
  */
 package org.sosy_lab.solver.visitors;
