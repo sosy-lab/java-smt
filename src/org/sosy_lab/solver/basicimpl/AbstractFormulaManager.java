@@ -34,14 +34,12 @@ import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
@@ -49,9 +47,7 @@ import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,6 +237,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     formulaCreator.visitRecursively(pFormulaVisitor, pF);
   }
 
+  @Override
+  public <T extends Formula> T transformRecursively(FormulaVisitor<Formula> pFormulaVisitor, T f) {
+    return formulaCreator.transformRecursively(pFormulaVisitor, f, this);
+  }
+
   /**
    * Extract names of all free variables in a formula.
    *
@@ -300,105 +301,17 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       Formula f,
       final Map<? extends Formula, ? extends Formula> fromToMapping) {
 
-    final Deque<Formula> toProcess = new ArrayDeque<>();
-    final Map<Formula, Formula> pCache = new HashMap<>();
-
-    // Add the formula to the work queue
-    toProcess.push(f);
-
-    FormulaVisitor<Void> process =
-        new DefaultFormulaVisitor<Void>() {
-
-          @Override
-          protected Void visitDefault(Formula f) {
-            Formula out = fromToMapping.get(f);
-            if (out == null) {
-              out = f;
-            }
-            pCache.put(f, out);
-            return null;
-          }
-
-          @Override
-          public Void visitBoundVariable(Formula f, int deBruijnIdx) {
-
-            // Bound variables have to stay as-is.
-            pCache.put(f, f);
-            return null;
-          }
-
-          @Override
-          public Void visitFunction(
-              Formula f,
-              List<Formula> args,
-              FunctionDeclaration decl,
-              Function<List<Formula>, Formula> newApplicationConstructor) {
-            Formula out = fromToMapping.get(f);
-            if (out != null) {
-              pCache.put(f, out);
-              return null;
-            }
-
-            boolean allArgumentsTransformed = true;
-
-            // Construct a new argument list for the function application.
-            List<Formula> newArgs = new ArrayList<>(args.size());
-
-            for (Formula c : args) {
-              Formula newC = pCache.get(c);
-
-              if (newC != null) {
-                newArgs.add(newC);
-              } else {
-                toProcess.push(c);
-                allArgumentsTransformed = false;
-              }
-            }
-
-            // The Flag allArgumentsTransformed indicates whether all arguments
-            // of the function were already processed.
-            if (allArgumentsTransformed) {
-
-              // Create an processed version of the
-              // function application.
-              toProcess.pop();
-              out = newApplicationConstructor.apply(newArgs);
-              pCache.put(f, out);
-            }
-            return null;
-          }
-
-          @Override
-          public Void visitQuantifier(
-              BooleanFormula f, Quantifier quantifier, List<Formula> args, BooleanFormula body) {
-            BooleanFormula transformedBody = (BooleanFormula) pCache.get(body);
-
-            if (transformedBody != null) {
-              BooleanFormula newTt =
-                  getQuantifiedFormulaManager().mkQuantifier(quantifier, args, transformedBody);
-              pCache.put(f, newTt);
-
-            } else {
-              toProcess.push(body);
-            }
-            return null;
-          }
-        };
-
-    // Process the work queue
-    while (!toProcess.isEmpty()) {
-      Formula tt = toProcess.peek();
-
-      if (pCache.containsKey(tt)) {
-        toProcess.pop();
-        continue;
+    return formulaCreator.extractInfo(transformRecursively(new DefaultFormulaVisitor<Formula>() {
+      @Override
+      protected Formula visitDefault(Formula f) {
+        Formula out = fromToMapping.get(f);
+        if (out == null) {
+          return f;
+        } else {
+          return out;
+        }
       }
-
-      //noinspection ResultOfMethodCallIgnored
-      visit(process, tt);
-    }
-
-    return formulaCreator.extractInfo(pCache.get(f));
+    }, f));
   }
 
   /**

@@ -30,6 +30,7 @@ import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FloatingPointFormula;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
@@ -48,6 +49,8 @@ import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -266,6 +269,34 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
         return;
       }
     }
+  }
+
+  public <T extends Formula> T transformRecursively(
+      FormulaVisitor<Formula> pFormulaVisitor,
+      T pF,
+      FormulaManager formulaManager) {
+
+    final Deque<Formula> toProcess = new ArrayDeque<>();
+    Map<Formula, Formula> pCache = new HashMap<>();
+    TransformationFormulaVisitorImpl recVisitor = new TransformationFormulaVisitorImpl(
+      pFormulaVisitor, toProcess, pCache,
+        formulaManager);
+
+    // Process the work queue
+    while (!toProcess.isEmpty()) {
+      Formula tt = toProcess.peek();
+
+      if (pCache.containsKey(tt)) {
+        toProcess.pop();
+        continue;
+      }
+
+      //noinspection ResultOfMethodCallIgnored
+      visit(recVisitor, tt);
+    }
+    @SuppressWarnings("unchecked")
+    T out = (T) pCache.get(pF);
+    return out;
   }
 
   /**

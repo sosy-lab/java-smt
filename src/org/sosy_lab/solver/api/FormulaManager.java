@@ -166,6 +166,23 @@ public interface FormulaManager {
   void visitRecursively(FormulaVisitor<TraversalProcess> rFormulaVisitor, Formula f);
 
   /**
+   * Visit the formula recursively with a given {@link FormulaVisitor}.
+   *
+   * <p>This method guarantees that the traversal is done iteratively,
+   * without using Java recursion, and thus is not prone to StackOverflowErrors.
+   *
+   * <p>Furthermore, this method also guarantees that every equal part of the formula
+   * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   *
+   * @param pFormulaVisitor Transformation described by the user.
+   *                        <b>NOTE:</b> the arguments given to the visitor
+   *                        are <b>already</b> processed by the visitor.
+   *                        There is no need in issuing recursive calls, and in
+   *                        fact doing so would cause StackOverflowErrors.
+   */
+  <T extends Formula> T transformRecursively(FormulaVisitor<Formula> pFormulaVisitor, T f);
+
+  /**
    * Extract the names of all free variables and UFs in a formula.
    *
    * @param f   The input formula
