@@ -63,7 +63,8 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private final Optimize z3optContext;
   private final ShutdownNotifier shutdownNotifier;
 
-  // TODO maybe we should replace the List by a Generic interface and use the Handle directly as return-value.
+  // TODO maybe we should replace the List by a Generic interface and
+  // use the Handle directly as return-value.
   // This would also reduce the memory-usage here.
   /** We use a List like a HashMap, for the mapping of index to handle. */
   private final List<Handle> handles = new ArrayList<>();
