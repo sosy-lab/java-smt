@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -149,7 +150,13 @@ public interface Model extends Iterable<ValueAssignment> {
 
     @Override
     public String toString() {
-      return String.format("%s(%s)=%s", name, argumentsInterpretation, value);
+      StringBuilder sb = new StringBuilder().append(name);
+      if (!argumentsInterpretation.isEmpty()) {
+        sb.append("(");
+        Joiner.on(", ").appendTo(sb, argumentsInterpretation);
+        sb.append(")");
+      }
+      return sb.append(": ").append(value).toString();
     }
 
     @Override
