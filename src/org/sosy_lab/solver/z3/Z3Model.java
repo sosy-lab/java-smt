@@ -85,5 +85,4 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   public String toString() {
     return model_to_string(z3context, model);
   }
-
 }

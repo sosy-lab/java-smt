@@ -198,7 +198,6 @@ public abstract class SolverBasedTest0 {
         .withFailureMessage("Solver " + solverToUse() + " does not support the theory of floats")
         .that(fpmgr)
         .isNotNull();
-
   }
 
   /**
