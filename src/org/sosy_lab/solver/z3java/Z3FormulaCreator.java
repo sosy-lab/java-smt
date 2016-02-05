@@ -88,7 +88,6 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     return super.getFormulaType(pFormula);
   }
 
-  @SuppressWarnings("unchecked")
   public FormulaType<?> getFormulaTypeFromSort(Sort pSort) {
     switch (pSort.getSortKind()) {
       case Z3_BOOL_SORT:
@@ -98,10 +97,12 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
       case Z3_REAL_SORT:
         return FormulaType.RationalType;
       case Z3_ARRAY_SORT:
+        Preconditions.checkArgument(pSort instanceof ArraySort);
         ArraySort aSort = (ArraySort) pSort;
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(aSort.getDomain()), getFormulaTypeFromSort(aSort.getRange()));
       case Z3_BV_SORT:
+        Preconditions.checkArgument(pSort instanceof BitVecSort);
         return FormulaType.getBitvectorTypeWithSize(((BitVecSort) pSort).getSize());
       default:
         throw new IllegalArgumentException("Unknown formula type");
@@ -203,6 +204,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
         int deBruijnIdx = f.getIndex();
         return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
+        Preconditions.checkArgument(f instanceof com.microsoft.z3.Quantifier);
         com.microsoft.z3.Quantifier qf = (com.microsoft.z3.Quantifier) f;
         BooleanFormula body = encapsulateBoolean(qf.getBody());
         Quantifier q = qf.isUniversal() ? Quantifier.FORALL : Quantifier.EXISTS;
