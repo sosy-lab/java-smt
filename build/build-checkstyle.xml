@@ -30,6 +30,14 @@
         <xslt in="Checkstyle.Test.xml" out="Checkstyle.Test.html" style="build/checkstyle.xsl"/>
     </target>
 
-    <target name="checkstyle" depends="run-checkstyle, checkstyle-report" description="Run CheckStyle on source code">
+    <target name="checkstyle" depends="run-checkstyle, checkstyle-report" description="Run CheckStyle on source code" />
+
+    <target name="checkstyle-commandline" description="Run CheckStyle on source code and output warnings in the commandline">
+        <exec executable="ant">
+            <arg value="run-checkstyle" />
+            <arg value="-Dcheckstyle.output=plain" />
+        </exec>
+        <loadfile property="message" srcFile="Checkstyle.xml" />
+        <echo message="${message}" />
     </target>
 </project>
