@@ -29,6 +29,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.Model;
@@ -108,7 +109,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<String> pTermNamesOfA) {
+  public BooleanFormula getInterpolant(List<String> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
 
     Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
@@ -124,7 +125,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<String>> partitionedTermNames) {
+  public List<BooleanFormula> getSeqInterpolants(List<Set<String>> partitionedTermNames)
+      throws SolverException {
     Preconditions.checkState(!closed);
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
@@ -144,7 +146,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<String>> partitionedTermNames, int[] startOfSubTree) {
+      List<Set<String>> partitionedTermNames, int[] startOfSubTree) throws SolverException {
     Preconditions.checkState(!closed);
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
@@ -187,7 +189,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     return true;
   }
 
-  protected BooleanFormula getInterpolant(Term termA, Term termB) {
+  protected BooleanFormula getInterpolant(Term termA, Term termB) throws SolverException {
     Preconditions.checkState(!closed);
     // get interpolant of groups
     Term[] itp = env.getInterpolants(new Term[] {termA, termB});

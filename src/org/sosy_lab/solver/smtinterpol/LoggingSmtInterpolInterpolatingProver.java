@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 
 import java.io.PrintWriter;
@@ -56,7 +57,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  protected BooleanFormula getInterpolant(Term pTermA, Term pTermB) {
+  protected BooleanFormula getInterpolant(Term pTermA, Term pTermB) throws SolverException {
     out.println("(get-interpolants " + pTermA + " " + pTermB + ")");
     return super.getInterpolant(pTermA, pTermB);
   }

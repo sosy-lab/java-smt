@@ -56,6 +56,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @param formulasOfA A list of values returned by {@link #push(BooleanFormula)}.
    *     All the corresponding formulas from group A, the remaining formulas form group B.
    * @return An interpolant for A and B
+   * @throws SolverException if interpolant cannot be computed,
+   *     for example because interpolation procedure is incomplete
    */
   BooleanFormula getInterpolant(List<T> formulasOfA) throws SolverException;
 
@@ -71,8 +73,10 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @return a 'inductive sequence' of interpolants,
    *         such that the implication {@code AND(I_i, P_i) => I_(i+1)} is satisfied for all i,
    *         where P_i is the conjunction of all formulas in partition i.
+   * @throws SolverException if interpolant cannot be computed,
+   *     for example because interpolation procedure is incomplete
    */
-  List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas);
+  List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas) throws SolverException;
 
   /**
    * Compute a sequence of interpolants. The nesting array describes the
@@ -99,6 +103,9 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @param partitionedFormulas of formulas
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
+   * @throws SolverException if interpolant cannot be computed,
+   *     for example because interpolation procedure is incomplete
    */
-  List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree);
+  List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree)
+      throws SolverException;
 }

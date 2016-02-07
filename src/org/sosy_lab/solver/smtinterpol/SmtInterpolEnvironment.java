@@ -54,6 +54,7 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -529,10 +530,17 @@ class SmtInterpolEnvironment {
   /** This function returns a list of interpolants for the partitions.
    * Each partition must be a named term or a conjunction of named terms.
    * There should be (n-1) interpolants for n partitions. */
-  public Term[] getInterpolants(Term[] partition) {
+  public Term[] getInterpolants(Term[] partition) throws SolverException {
     checkState(stackDepth > 0, "interpolants should be on higher levels");
     try {
       return script.getInterpolants(partition);
+    } catch (UnsupportedOperationException e) {
+      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
+        // Not a bug, interpolation procedure is incomplete
+        throw new SolverException(e.getMessage(), e);
+      } else {
+        throw e;
+      }
     } catch (SMTLIBException e) {
       throw new AssertionError(e);
     }
@@ -565,10 +573,17 @@ class SmtInterpolEnvironment {
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
    */
-  public Term[] getTreeInterpolants(Term[] partition, int[] startOfSubTree) {
+  public Term[] getTreeInterpolants(Term[] partition, int[] startOfSubTree) throws SolverException {
     checkState(stackDepth > 0, "interpolants should be on higher levels");
     try {
       return script.getInterpolants(partition, startOfSubTree);
+    } catch (UnsupportedOperationException e) {
+      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
+        // Not a bug, interpolation procedure is incomplete
+        throw new SolverException(e.getMessage(), e);
+      } else {
+        throw e;
+      }
     } catch (SMTLIBException e) {
       throw new AssertionError(e);
     }
