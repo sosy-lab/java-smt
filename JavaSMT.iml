@@ -169,15 +169,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/CVC4.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime/java-cup-runtime.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -188,6 +179,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime/smt-parser.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime/com.microsoft.z3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
