@@ -49,24 +49,21 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void testSubstitution() throws SolverException, InterruptedException {
     System.out.println("Solver Version = " + context.getVersion());
-    BooleanFormula input = bmgr.or(
-        bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
-        bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d"))
-    );
-    BooleanFormula out = mgr.substitute(
-        input, ImmutableMap.of(
-            bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
-            bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
-            bmgr.and(
-                bmgr.makeVariable("c"),
-                bmgr.makeVariable("d")
-            ), bmgr.makeVariable("e")
-        )
-    );
-    assertThatFormula(out).isEquivalentTo(bmgr.or(
-        bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
-        bmgr.makeVariable("e")
-    ));
-
+    BooleanFormula input =
+        bmgr.or(
+            bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
+            bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")));
+    BooleanFormula out =
+        mgr.substitute(
+            input,
+            ImmutableMap.of(
+                bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+                bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
+                bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e")));
+    assertThatFormula(out)
+        .isEquivalentTo(
+            bmgr.or(
+                bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
+                bmgr.makeVariable("e")));
   }
 }

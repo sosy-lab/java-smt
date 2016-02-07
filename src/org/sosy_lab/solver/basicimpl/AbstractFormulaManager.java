@@ -432,7 +432,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public <T extends Formula> T substitute(T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
+  public <T extends Formula> T substitute(
+      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
     return substituteUsingMap(pF, pFromToMapping);
   }
 }
