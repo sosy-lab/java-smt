@@ -37,13 +37,14 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
-import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -238,7 +239,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public <T extends Formula> T transformRecursively(FormulaVisitor<Formula> pFormulaVisitor, T f) {
+  public <T extends Formula> T transformRecursively(FormulaTransformationVisitor pFormulaVisitor, T f) {
     return formulaCreator.transformRecursively(pFormulaVisitor, f, this);
   }
 
@@ -301,9 +302,27 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       Formula f,
       final Map<? extends Formula, ? extends Formula> fromToMapping) {
 
-    return formulaCreator.extractInfo(transformRecursively(new DefaultFormulaVisitor<Formula>() {
+    return formulaCreator.extractInfo(transformRecursively(new FormulaTransformationVisitor(this) {
       @Override
-      protected Formula visitDefault(Formula f) {
+      public Formula visitFreeVariable(Formula f, String name) {
+        return replace(f);
+      }
+
+      @Override
+      public Formula visitFunction(
+          Formula f,
+          List<Formula> newArgs,
+          FunctionDeclaration functionDeclaration,
+          Function<List<Formula>, Formula> newApplicationConstructor) {
+        Formula out = fromToMapping.get(f);
+        if (out == null) {
+          return newApplicationConstructor.apply(newArgs);
+        } else {
+          return out;
+        }
+      }
+
+      private Formula replace(Formula f) {
         Formula out = fromToMapping.get(f);
         if (out == null) {
           return f;

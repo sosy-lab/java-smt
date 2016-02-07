@@ -43,6 +43,7 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -241,5 +242,43 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     assertThat(found).hasSize(3);
     assertThat(found).doesNotContain(ab.toString());
+  }
+
+  @Test
+  public void recursiveTransformationVisitorTest() throws Exception {
+    BooleanFormula f = bmgr.or(
+      imgr.equal(
+        imgr.add(
+          imgr.makeVariable("x"),
+          imgr.makeVariable("y")
+        ),
+        imgr.makeNumber(1)
+      ),
+      imgr.equal(
+        imgr.makeVariable("z"),
+        imgr.makeNumber(10)
+      )
+    );
+    BooleanFormula transformed = mgr.transformRecursively(
+        new FormulaTransformationVisitor(mgr) {
+          @Override
+          public Formula visitFreeVariable(Formula f, String name) {
+            return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
+          }
+    }, f);
+    assertThatFormula(transformed).isEquivalentTo(
+        bmgr.or(
+            imgr.equal(
+                imgr.add(
+                    imgr.makeVariable("x'"),
+                    imgr.makeVariable("y'")
+                ),
+                imgr.makeNumber(1)
+            ),
+            imgr.equal(
+                imgr.makeVariable("z'"),
+                imgr.makeNumber(10)
+            )
+        ));
   }
 }

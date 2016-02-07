@@ -21,6 +21,7 @@ package org.sosy_lab.solver.api;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
+import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -175,12 +176,9 @@ public interface FormulaManager {
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    *
    * @param pFormulaVisitor Transformation described by the user.
-   *                        <b>NOTE:</b> the arguments given to the visitor
-   *                        are <b>already</b> processed by the visitor.
-   *                        There is no need in issuing recursive calls, and in
-   *                        fact doing so would cause StackOverflowErrors.
    */
-  <T extends Formula> T transformRecursively(FormulaVisitor<Formula> pFormulaVisitor, T f);
+  <T extends Formula> T transformRecursively(
+      FormulaTransformationVisitor pFormulaVisitor, T f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.

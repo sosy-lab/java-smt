@@ -46,6 +46,7 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -272,15 +273,16 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   }
 
   public <T extends Formula> T transformRecursively(
-      FormulaVisitor<Formula> pFormulaVisitor,
+      FormulaTransformationVisitor pFormulaVisitor,
       T pF,
       FormulaManager formulaManager) {
 
     final Deque<Formula> toProcess = new ArrayDeque<>();
     Map<Formula, Formula> pCache = new HashMap<>();
-    TransformationFormulaVisitorImpl recVisitor = new TransformationFormulaVisitorImpl(
+    FormulaTransformationVisitorImpl recVisitor = new FormulaTransformationVisitorImpl(
       pFormulaVisitor, toProcess, pCache,
         formulaManager);
+    toProcess.push(pF);
 
     // Process the work queue
     while (!toProcess.isEmpty()) {

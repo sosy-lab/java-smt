@@ -37,14 +37,14 @@ import java.util.Map;
 /**
  * Internal implementation of recursive transformation.
  */
-final class TransformationFormulaVisitorImpl implements FormulaVisitor<Void> {
+final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   private final Deque<Formula> toProcess;
   private final Map<Formula, Formula> pCache;
   private final FormulaVisitor<Formula> delegate;
   private final FormulaManager formulaManager;
 
-  TransformationFormulaVisitorImpl(FormulaVisitor<Formula> delegate,
+  FormulaTransformationVisitorImpl(FormulaVisitor<Formula> delegate,
                                    Deque<Formula> toProcess,
                                    Map<Formula, Formula> pCache,
                                    FormulaManager formulaManager) {
@@ -105,12 +105,13 @@ final class TransformationFormulaVisitorImpl implements FormulaVisitor<Void> {
       // function application.
       toProcess.pop();
       Formula out = delegate.visitFunction(
-          newApplicationConstructor.apply(newArgs),
+          f,
           newArgs,
           functionDeclaration,
           newApplicationConstructor
       );
-      pCache.put(f, out);
+      Formula prev = pCache.put(f, out);
+      assert prev == null;
     }
     return null;
   }
