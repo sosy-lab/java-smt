@@ -66,8 +66,8 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv>
       TFormulaInfo pArray, TFormulaInfo pIndex, TFormulaInfo pValue);
 
   @Override
-  public <TI extends Formula, TE extends Formula>
-  ArrayFormula<TI, TE> makeArray(String pName, ArrayFormulaType<TI, TE> type) {
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      String pName, ArrayFormulaType<TI, TE> type) {
     return makeArray(pName, type.getIndexType(), type.getElementType());
   }
 

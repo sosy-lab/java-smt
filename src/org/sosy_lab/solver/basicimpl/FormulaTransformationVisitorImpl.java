@@ -44,10 +44,11 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   private final FormulaVisitor<Formula> delegate;
   private final FormulaManager formulaManager;
 
-  FormulaTransformationVisitorImpl(FormulaVisitor<Formula> delegate,
-                                   Deque<Formula> toProcess,
-                                   Map<Formula, Formula> pCache,
-                                   FormulaManager formulaManager) {
+  FormulaTransformationVisitorImpl(
+      FormulaVisitor<Formula> delegate,
+      Deque<Formula> toProcess,
+      Map<Formula, Formula> pCache,
+      FormulaManager formulaManager) {
     this.toProcess = toProcess;
     this.pCache = pCache;
     this.formulaManager = formulaManager;
@@ -104,12 +105,8 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
       // Create an processed version of the
       // function application.
       toProcess.pop();
-      Formula out = delegate.visitFunction(
-          f,
-          newArgs,
-          functionDeclaration,
-          newApplicationConstructor
-      );
+      Formula out =
+          delegate.visitFunction(f, newArgs, functionDeclaration, newApplicationConstructor);
       Formula prev = pCache.put(f, out);
       assert prev == null;
     }
@@ -118,16 +115,14 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   @Override
   public Void visitQuantifier(
-      BooleanFormula f,
-      Quantifier quantifier,
-      List<Formula> boundVariables,
-      BooleanFormula body) {
+      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body) {
     BooleanFormula transformedBody = (BooleanFormula) pCache.get(body);
 
     if (transformedBody != null) {
-      BooleanFormula newTt = formulaManager.getQuantifiedFormulaManager().mkQuantifier(
-          quantifier, boundVariables, transformedBody
-      );
+      BooleanFormula newTt =
+          formulaManager
+              .getQuantifiedFormulaManager()
+              .mkQuantifier(quantifier, boundVariables, transformedBody);
       pCache.put(f, newTt);
 
     } else {

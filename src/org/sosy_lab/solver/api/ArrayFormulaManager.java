@@ -55,10 +55,7 @@ public interface ArrayFormulaManager {
    * @param pElementType  The type of the array elements
    * @return              Formula that represents the array
    */
-  <TI extends Formula,
-      TE extends Formula,
-      FTI extends FormulaType<TI>,
-      FTE extends FormulaType<TE>>
+  <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType);
 
   /**
@@ -66,8 +63,8 @@ public interface ArrayFormulaManager {
    *
    * @param pName         The name of the array variable
    */
-  <TI extends Formula, TE extends Formula>
-  ArrayFormula<TI, TE> makeArray(String pName, ArrayFormulaType<TI, TE> type);
+  <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      String pName, ArrayFormulaType<TI, TE> type);
 
   /**
    * Make a {@link BooleanFormula} that represents the equality of

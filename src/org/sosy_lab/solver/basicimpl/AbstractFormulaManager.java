@@ -123,9 +123,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
     if (integerManager == null) {
-      throw new UnsupportedOperationException(
-          "Solver does not support integer theory"
-      );
+      throw new UnsupportedOperationException("Solver does not support integer theory");
     }
     return integerManager;
   }
@@ -133,9 +131,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
     if (rationalManager == null) {
-      throw new UnsupportedOperationException(
-          "Solver does not support rationals theory"
-      );
+      throw new UnsupportedOperationException("Solver does not support rationals theory");
     }
     return rationalManager;
   }
@@ -148,9 +144,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> getBitvectorFormulaManager() {
     if (bitvectorManager == null) {
-      throw new UnsupportedOperationException(
-          "Solver does not support bitvector theory"
-      );
+      throw new UnsupportedOperationException("Solver does not support bitvector theory");
     }
     return bitvectorManager;
   }
@@ -158,9 +152,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
     if (floatingPointManager == null) {
-      throw new UnsupportedOperationException(
-          "Solver does not support floating point theory"
-      );
+      throw new UnsupportedOperationException("Solver does not support floating point theory");
     }
     return floatingPointManager;
   }
@@ -173,9 +165,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> getQuantifiedFormulaManager() {
     if (quantifiedManager == null) {
-      throw new UnsupportedOperationException(
-          "Solver does not support quantification"
-      );
+      throw new UnsupportedOperationException("Solver does not support quantification");
     }
     return quantifiedManager;
   }
@@ -240,7 +230,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public <T extends Formula> T transformRecursively(FormulaTransformationVisitor pFormulaVisitor, T f) {
+  public <T extends Formula> T transformRecursively(
+      FormulaTransformationVisitor pFormulaVisitor, T f) {
     return formulaCreator.transformRecursively(pFormulaVisitor, f, this);
   }
 
@@ -286,9 +277,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    * Default implementation for {@link #substitute(Formula, Map)}.
    */
   protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingMap(
-      T1 pF, Map<T2, T2> pFromToMapping) {
+      T1 pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
     Map<TFormulaInfo, TFormulaInfo> mapping = new HashMap<>(pFromToMapping.size());
-    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
+    for (Map.Entry<? extends Formula, ? extends Formula> entry : pFromToMapping.entrySet()) {
       mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
     }
 
@@ -303,35 +294,38 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       Formula f,
       final Map<? extends Formula, ? extends Formula> fromToMapping) {
 
-    return formulaCreator.extractInfo(transformRecursively(new FormulaTransformationVisitor(this) {
-      @Override
-      public Formula visitFreeVariable(Formula f, String name) {
-        return replace(f);
-      }
+    return formulaCreator.extractInfo(
+        transformRecursively(
+            new FormulaTransformationVisitor(this) {
+              @Override
+              public Formula visitFreeVariable(Formula f, String name) {
+                return replace(f);
+              }
 
-      @Override
-      public Formula visitFunction(
-          Formula f,
-          List<Formula> newArgs,
-          FunctionDeclaration functionDeclaration,
-          Function<List<Formula>, Formula> newApplicationConstructor) {
-        Formula out = fromToMapping.get(f);
-        if (out == null) {
-          return newApplicationConstructor.apply(newArgs);
-        } else {
-          return out;
-        }
-      }
+              @Override
+              public Formula visitFunction(
+                  Formula f,
+                  List<Formula> newArgs,
+                  FunctionDeclaration functionDeclaration,
+                  Function<List<Formula>, Formula> newApplicationConstructor) {
+                Formula out = fromToMapping.get(f);
+                if (out == null) {
+                  return newApplicationConstructor.apply(newArgs);
+                } else {
+                  return out;
+                }
+              }
 
-      private Formula replace(Formula f) {
-        Formula out = fromToMapping.get(f);
-        if (out == null) {
-          return f;
-        } else {
-          return out;
-        }
-      }
-    }, f));
+              private Formula replace(Formula f) {
+                Formula out = fromToMapping.get(f);
+                if (out == null) {
+                  return f;
+                } else {
+                  return out;
+                }
+              }
+            },
+            f));
   }
 
   /**
@@ -341,11 +335,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
    * <p>If this is called, one needs to overwrite
    * {@link #substitute(Formula, Map)}.
    */
-  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingLists(
-      T1 pF, Map<T2, T2> pFromToMapping) {
+  protected final <T1 extends Formula> T1 substituteUsingLists(
+      T1 pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
     List<TFormulaInfo> substituteFrom = new ArrayList<>(pFromToMapping.size());
     List<TFormulaInfo> substituteTo = new ArrayList<>(pFromToMapping.size());
-    for (Map.Entry<T2, T2> entry : pFromToMapping.entrySet()) {
+    for (Map.Entry<? extends Formula, ? extends Formula> entry : pFromToMapping.entrySet()) {
       substituteFrom.add(extractInfo(entry.getKey()));
       substituteTo.add(extractInfo(entry.getValue()));
     }
@@ -435,5 +429,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     @SuppressWarnings("unchecked")
     T out = (T) t;
     return out;
+  }
+
+  @Override
+  public <T extends Formula> T substitute(T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
+    return substituteUsingMap(pF, pFromToMapping);
   }
 }

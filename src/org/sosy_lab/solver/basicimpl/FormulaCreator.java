@@ -273,15 +273,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   }
 
   public <T extends Formula> T transformRecursively(
-      FormulaTransformationVisitor pFormulaVisitor,
-      T pF,
-      FormulaManager formulaManager) {
+      FormulaTransformationVisitor pFormulaVisitor, T pF, FormulaManager formulaManager) {
 
     final Deque<Formula> toProcess = new ArrayDeque<>();
     Map<Formula, Formula> pCache = new HashMap<>();
-    FormulaTransformationVisitorImpl recVisitor = new FormulaTransformationVisitorImpl(
-      pFormulaVisitor, toProcess, pCache,
-        formulaManager);
+    FormulaTransformationVisitorImpl recVisitor =
+        new FormulaTransformationVisitorImpl(pFormulaVisitor, toProcess, pCache, formulaManager);
     toProcess.push(pF);
 
     // Process the work queue
