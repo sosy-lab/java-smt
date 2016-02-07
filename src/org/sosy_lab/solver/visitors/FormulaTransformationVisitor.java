@@ -77,9 +77,29 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
     return newApplicationConstructor.apply(newArgs);
   }
 
+  /**
+   *
+   * @param f Quantifier formula.
+   * @param quantifier Quantifier type: either {@code FORALL} or {@code EXISTS}.
+   * @param boundVariables Variables bound by the quantifier.
+   *                       <b>NOTE:</b> not all solvers hold metadata about
+   *                       bound variables.
+   *                       In case this is not available, this method will be
+   *                       called with an empty list, yet {@code mkQuantifier}
+   *                       will work fine with an empty list as well.
+   * @param transformedBody Quantifier body <b>already transformed</b> by the
+   *                        visitor.
+   * @return Transformed AST
+   */
   @Override
-  public Formula visitQuantifier(
-      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body) {
-    return fmgr.getQuantifiedFormulaManager().mkQuantifier(quantifier, boundVariables, body);
+  public BooleanFormula visitQuantifier(
+      BooleanFormula f,
+      Quantifier quantifier,
+      List<Formula> boundVariables,
+      BooleanFormula transformedBody) {
+    return fmgr.getQuantifiedFormulaManager().mkQuantifier(
+        quantifier,
+        boundVariables,
+        transformedBody);
   }
 }

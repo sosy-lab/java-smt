@@ -30,7 +30,6 @@ import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FloatingPointFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
@@ -273,12 +272,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   }
 
   public <T extends Formula> T transformRecursively(
-      FormulaTransformationVisitor pFormulaVisitor, T pF, FormulaManager formulaManager) {
+      FormulaTransformationVisitor pFormulaVisitor, T pF) {
 
     final Deque<Formula> toProcess = new ArrayDeque<>();
     Map<Formula, Formula> pCache = new HashMap<>();
     FormulaTransformationVisitorImpl recVisitor =
-        new FormulaTransformationVisitorImpl(pFormulaVisitor, toProcess, pCache, formulaManager);
+        new FormulaTransformationVisitorImpl(pFormulaVisitor, toProcess, pCache);
     toProcess.push(pF);
 
     // Process the work queue

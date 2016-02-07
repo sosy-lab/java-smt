@@ -212,9 +212,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
 
     Z3Formula epsFormula = (Z3Formula) rfmgr.makeVariable("epsilon");
 
-    Z3Formula out =
-        (Z3Formula)
-            mgr.substitute(
+    Z3Formula out = mgr.substitute(
                 z,
                 ImmutableMap.<Formula, Formula>of(
                     epsFormula, rfmgr.makeNumber(newValue.toString())));

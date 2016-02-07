@@ -24,7 +24,6 @@ import com.google.common.base.Preconditions;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -42,16 +41,13 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   private final Deque<Formula> toProcess;
   private final Map<Formula, Formula> pCache;
   private final FormulaVisitor<Formula> delegate;
-  private final FormulaManager formulaManager;
 
   FormulaTransformationVisitorImpl(
       FormulaVisitor<Formula> delegate,
       Deque<Formula> toProcess,
-      Map<Formula, Formula> pCache,
-      FormulaManager formulaManager) {
+      Map<Formula, Formula> pCache) {
     this.toProcess = toProcess;
     this.pCache = pCache;
-    this.formulaManager = formulaManager;
     this.delegate = Preconditions.checkNotNull(delegate);
   }
 
@@ -119,10 +115,11 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
     BooleanFormula transformedBody = (BooleanFormula) pCache.get(body);
 
     if (transformedBody != null) {
-      BooleanFormula newTt =
-          formulaManager
-              .getQuantifiedFormulaManager()
-              .mkQuantifier(quantifier, boundVariables, transformedBody);
+      BooleanFormula newTt = (BooleanFormula) delegate.visitQuantifier(
+          f,
+          quantifier,
+          boundVariables,
+          transformedBody);
       pCache.put(f, newTt);
 
     } else {

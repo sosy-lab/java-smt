@@ -232,7 +232,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   @Override
   public <T extends Formula> T transformRecursively(
       FormulaTransformationVisitor pFormulaVisitor, T f) {
-    return formulaCreator.transformRecursively(pFormulaVisitor, f, this);
+    return formulaCreator.transformRecursively(pFormulaVisitor, f);
   }
 
   /**
