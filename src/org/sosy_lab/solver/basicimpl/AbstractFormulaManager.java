@@ -211,11 +211,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) {
+  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
     return formulaCreator.encapsulateBoolean(applyTacticImpl(extractInfo(f), tactic));
   }
 
-  protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic) {
+  protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic)
+      throws InterruptedException {
     return extractInfo(tactic.applyDefault(this, formulaCreator.encapsulateBoolean(f)));
   }
 

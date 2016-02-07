@@ -137,7 +137,7 @@ public interface FormulaManager {
    * Apply a tactic which performs formula transformation. The available tactics
    * depend on the used solver.
    */
-  BooleanFormula applyTactic(BooleanFormula input, Tactic tactic);
+  BooleanFormula applyTactic(BooleanFormula input, Tactic tactic) throws InterruptedException;
 
   /**
    * Simplify an input formula, while ensuring equivalence.

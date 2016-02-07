@@ -153,7 +153,8 @@ public enum Tactic {
    * @param pFmgr The formula manager that created the given formula.
    * @param pF The formula to rewrite.
    */
-  public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
+  public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF)
+      throws InterruptedException {
     throw new UnsupportedOperationException(
         String.format(
             "The tactic %s is not supported by the current solver has no default implementation.",

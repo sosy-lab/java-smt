@@ -116,7 +116,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
           .build();
 
   @Override
-  protected Long applyTacticImpl(Long input, Tactic tactic) {
+  protected Long applyTacticImpl(Long input, Tactic tactic) throws InterruptedException {
     String z3TacticName = Z3_TACTICS.get(tactic);
     if (z3TacticName != null) {
       return Z3NativeApiHelpers.applyTactic(getFormulaCreator().getEnv(), input, z3TacticName);

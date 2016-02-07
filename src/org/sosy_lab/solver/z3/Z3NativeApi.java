@@ -1802,7 +1802,7 @@ final class Z3NativeApi {
    * @param goal Z3_goal
    * @return Z3_apply_result
    */
-  static native long tactic_apply(long context, long t, long goal);
+  static native long tactic_apply(long context, long t, long goal) throws InterruptedException;
 
   /**
    * Apply tactic {@code t} to the goal {@code goal} using the parameter set

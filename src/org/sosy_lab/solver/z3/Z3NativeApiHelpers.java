@@ -69,7 +69,7 @@ class Z3NativeApiHelpers {
    * @param pF Z3_ast
    * @return Z3_ast
    */
-  static long applyTactic(long z3context, long pF, String tactic) {
+  static long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
     long tseitinTactic = mk_tactic(z3context, tactic);
     tactic_inc_ref(z3context, tseitinTactic);
 
