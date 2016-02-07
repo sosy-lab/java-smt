@@ -177,8 +177,7 @@ public interface FormulaManager {
    *
    * @param pFormulaVisitor Transformation described by the user.
    */
-  <T extends Formula> T transformRecursively(
-      FormulaTransformationVisitor pFormulaVisitor, T f);
+  <T extends Formula> T transformRecursively(FormulaTransformationVisitor pFormulaVisitor, T f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
@@ -208,7 +207,7 @@ public interface FormulaManager {
    * @param fromToMapping Mapping of old and new formula parts.
    * @return Formula with parts replaced.
    */
-  Formula substitute(Formula f, Map<Formula, Formula> fromToMapping);
+  <T extends Formula> T substitute(T f, Map<? extends Formula, ? extends Formula> fromToMapping);
 
   /**
    * Translates the formula from another context into the context represented by

@@ -34,12 +34,10 @@ import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
 import java.util.List;
-import java.util.Map;
 
 final class PrincessFormulaManager
     extends AbstractFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
@@ -91,11 +89,6 @@ final class PrincessFormulaManager
       f = BooleanCompactifier.apply((IFormula) f);
     }
     return PartialEvaluator.apply(f);
-  }
-
-  @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingMap(pF, pFromToMapping);
   }
 
   @Override

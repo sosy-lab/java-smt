@@ -189,7 +189,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
   }
 
   @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
+  public <T extends Formula> T substitute(T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
     return substituteUsingLists(pF, pFromToMapping);
   }
 

@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtInterpolEnvironment> {
@@ -165,11 +164,6 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
   @Override
   public Term simplify(Term pF) {
     return getFormulaCreator().getEnv().simplify(pF);
-  }
-
-  @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingMap(pF, pFromToMapping);
   }
 
   @Override

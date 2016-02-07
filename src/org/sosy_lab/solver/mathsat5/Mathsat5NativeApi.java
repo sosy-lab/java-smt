@@ -455,7 +455,7 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_copy_from(long e, long t, long src);
 
-  public static native long msat_apply_substitution(long e, long t, long s, long[] from, long[] to);
+  public static native long msat_apply_substitution(long e, long t, int s, long[] from, long[] to);
 
   /*
    * Term access and navigation

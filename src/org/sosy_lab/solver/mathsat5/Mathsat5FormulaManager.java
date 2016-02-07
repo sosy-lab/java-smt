@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
@@ -32,9 +31,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_equal;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -44,7 +41,6 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
 import java.util.List;
-import java.util.Map;
 
 final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
 
@@ -109,20 +105,6 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
             return smtString.toString();
           }
         });
-  }
-
-  @Override
-  public Formula substitute(Formula pF, Map<Formula, Formula> pFromToMapping) {
-    return substituteUsingLists(pF, pFromToMapping);
-  }
-
-  @Override
-  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
-    long size = changeFrom.size();
-    Preconditions.checkState(size == changeTo.size());
-
-    return msat_apply_substitution(
-        getFormulaCreator().getEnv(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
   }
 
   @Override
