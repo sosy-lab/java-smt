@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
+import com.google.common.base.Joiner;
+
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -70,4 +72,9 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   }
 
   protected abstract Object evaluateImpl(TFormulaInfo f);
+
+  @Override
+  public String toString() {
+    return Joiner.on('\n').join(iterator());
+  }
 }
