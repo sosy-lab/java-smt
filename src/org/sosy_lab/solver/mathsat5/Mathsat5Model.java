@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
@@ -28,7 +29,8 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
 
@@ -45,11 +47,14 @@ import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
 class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   private final long env;
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
+  private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
 
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
@@ -69,31 +74,17 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    return new Mathsat5ModelIterator();
+    if (modelAssignments == null) {
+      modelAssignments = generateAssignments();
+    }
+    return modelAssignments.iterator();
   }
 
-  private class Mathsat5ModelIterator extends UnmodifiableIterator<ValueAssignment> {
+  private ImmutableList<ValueAssignment> generateAssignments() {
+    Builder<ValueAssignment> assignments = ImmutableList.builder();
 
-    // TODO: closing the iterator seems to trigger segfault when UFs are used.
-    private final long modelIterator;
-    private boolean closed = false;
-
-    Mathsat5ModelIterator() {
-      modelIterator = msat_model_create_iterator(model);
-    }
-
-    @Override
-    public boolean hasNext() {
-
-      return msat_model_iterator_has_next(modelIterator);
-    }
-
-    @Override
-    public ValueAssignment next() {
-      if (closed) {
-        throw new NoSuchElementException();
-      }
-
+    long modelIterator = msat_model_create_iterator(model);
+    while (msat_model_iterator_has_next(modelIterator)) {
       long[] key = new long[1];
       long[] value = new long[1];
       if (msat_model_iterator_next(modelIterator, key, value)) {
@@ -108,9 +99,11 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
         argumentInterpretation.add(evaluateImpl(arg));
       }
 
-      return new ValueAssignment(
-          fKey, formulaCreator.getName(key[0]), fValue, argumentInterpretation);
+      assignments.add(new ValueAssignment(
+          fKey, formulaCreator.getName(key[0]), fValue, argumentInterpretation));
     }
+    msat_destroy_model_iterator(modelIterator);
+    return assignments.build();
   }
 
   private Object convertValue(long key, long term) {
