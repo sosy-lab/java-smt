@@ -67,7 +67,6 @@ public class SolverContextFactory {
     Z3,
     Z3JAVA,
     PRINCESS
-    //    CVC4
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
