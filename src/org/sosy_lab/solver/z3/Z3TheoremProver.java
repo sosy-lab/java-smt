@@ -110,7 +110,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Nullable
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
-    trackConstraint(f);
     long e = Z3FormulaManager.getZ3Expr(f);
     inc_ref(z3context, e);
 
