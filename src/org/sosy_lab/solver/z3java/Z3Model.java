@@ -69,7 +69,15 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
             return evaluateImpl(input);
           }
         },
-        Iterables.transform(trackedConstraints, creator.extractInfo));
+        Iterables.transform(
+            trackedConstraints,
+            new Function<BooleanFormula, Expr>() {
+              @Override
+              public Expr apply(BooleanFormula input) {
+                return creator.extractInfo(input);
+              }
+            }
+        ));
   }
 
   @Override
