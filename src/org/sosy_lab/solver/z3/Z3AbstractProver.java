@@ -41,7 +41,7 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
-    return new Z3Model(z3context, getZ3Model(), creator);
+    return Z3Model.create(z3context, getZ3Model(), creator);
   }
 
   @Override

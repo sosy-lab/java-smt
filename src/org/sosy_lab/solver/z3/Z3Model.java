@@ -35,6 +35,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
@@ -43,20 +44,24 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_func_interp;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_consts;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_funcs;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_to_string;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Maps;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -67,12 +72,26 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private final Z3FormulaCreator creator;
   private @Nullable ImmutableList<ValueAssignment> assignments = null;
 
-  Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
+  /**
+   * Automatic clean-up of Z3Models.
+   */
+  private static final ReferenceQueue<Z3Model> referenceQueue = new ReferenceQueue<>();
+  private static final Map<PhantomReference<? extends Z3Model>, Long[]> referenceMap =
+      Maps.newIdentityHashMap();
+
+  private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
     model_inc_ref(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     creator = pCreator;
+  }
+
+  static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
+    Z3Model model = new Z3Model(z3context, z3model, pCreator);
+    storePhantomReference(model);
+    cleanupReferences();
+    return model;
   }
 
   @Nullable
@@ -125,8 +144,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       out.add(new ValueAssignment(key, name, lValue, ImmutableList.of()));
     }
 
-    for (int i=0; i<model_get_num_funcs(z3context, model); i++) {
-      long funcDecl = model_get_func_decl(z3context, model, i);
+    for (int funcIdx=0; funcIdx<model_get_num_funcs(z3context, model); funcIdx++) {
+      long funcDecl = model_get_func_decl(z3context, model, funcIdx);
       inc_ref(z3context, funcDecl);
 
       long symbol = get_decl_name(z3context, funcDecl);
@@ -137,47 +156,50 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       func_interp_inc_ref(z3context, interp);
 
       int numInterpretations = func_interp_get_num_entries(z3context, interp);
-      if (numInterpretations == 0) {
+      for (int interpIdx=0; interpIdx < numInterpretations; interpIdx++) {
+        long entry = func_interp_get_entry(z3context, interp, interpIdx);
+        func_entry_inc_ref(z3context, entry);
 
-        // Some functions have no interpretations.
-        continue;
+        Object value = creator.convertValue(func_entry_get_value(z3context, entry));
+        int noArgs = func_entry_get_num_args(z3context, entry);
+        long[] args = new long[noArgs];
+        List<Object> argumentInterpretation = new ArrayList<>();
+
+        for (int k = 0; k < noArgs; k++) {
+          long arg = func_entry_get_arg(z3context, entry, k);
+          inc_ref(z3context, arg);
+          argumentInterpretation.add(evaluateImpl(arg));
+          args[k] = arg;
+        }
+        Formula formula = creator.encapsulateWithTypeOf(mk_app(z3context, funcDecl, args));
+
+        // Clean up memory.
+        for (long arg : args) {
+          dec_ref(z3context, arg);
+        }
+        func_entry_dec_ref(z3context, entry);
+        func_interp_dec_ref(z3context, interp);
+        dec_ref(z3context, funcDecl);
+
+        out.add(new ValueAssignment(formula, name, value, argumentInterpretation));
       }
-
-      long entry = func_interp_get_entry(z3context, interp, i);
-
-      func_entry_inc_ref(z3context, entry);
-
-      Object value = creator.convertValue(func_entry_get_value(z3context, entry));
-
-      int noArgs = func_entry_get_num_args(z3context, entry);
-      long[] args = new long[noArgs];
-
-      List<Object> argumentInterpretation = new ArrayList<>();
-
-      for (int k = 0; k < noArgs; k++) {
-        long arg = func_entry_get_arg(z3context, entry, k);
-        inc_ref(z3context, arg);
-        argumentInterpretation.add(evaluateImpl(arg));
-        args[k] = arg;
-      }
-
-      Formula formula = creator.encapsulateWithTypeOf(mk_app(z3context, funcDecl, args));
-
-      // Clean up memory.
-      for (long arg : args) {
-        dec_ref(z3context, arg);
-      }
-      func_entry_dec_ref(z3context, entry);
-      func_interp_dec_ref(z3context, interp);
-      dec_ref(z3context, funcDecl);
-
-      out.add(new ValueAssignment(formula, name, value, argumentInterpretation));
     }
     return out.build();
   }
 
-  @Override
-  public String toString() {
-    return model_to_string(z3context, model);
+  private static void storePhantomReference(Z3Model model) {
+    PhantomReference<Z3Model> ref = new PhantomReference<>(model, referenceQueue);
+    referenceMap.put(ref, new Long[] {model.z3context, model.model});
+  }
+
+  private static void cleanupReferences() {
+    Reference<? extends Z3Model> ref;
+    while ((ref = referenceQueue.poll()) != null) {
+
+      Long[] data = referenceMap.remove(ref);
+      long z3context = data[0];
+      long z3model = data[1];
+      model_dec_ref(z3context, z3model);
+    }
   }
 }
