@@ -283,6 +283,14 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
           Preconditions.checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
           R out3 = delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
           return out3;
+        case EQ:
+          if (args.size() == 2
+              && args.get(0) instanceof BooleanFormula
+              && args.get(1) instanceof BooleanFormula) {
+            return delegate.visitEquivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
+          } else {
+            return delegate.visitAtom((BooleanFormula) f, functionDeclaration);
+          }
         case ITE:
           Preconditions.checkArgument(args.size() == 3);
           Formula ifC = args.get(0);
