@@ -100,13 +100,13 @@
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-236-ge5a0f5a" conf="runtime-smtinterpol->runtime; contrib->sources">
-          <artifact name="smtinterpol" e:classifier="comp" conf="runtime"/>
+          <artifact name="smtinterpol" e:classifier="comp" conf="runtime-smtinterpol"/>
           <artifact name="smtinterpol" e:classifier="sources" conf="contrib" ext="zip"/>
         </dependency>
 
         <!-- Princess -->
         <dependency org="org.ruemmer.philipp" name="princess" rev="2015-12-08-r2563" conf="runtime-princess->runtime; contrib->sources">
-          <artifact name="princess" e:classifier="assertionless" conf="runtime"/>
+          <artifact name="princess" e:classifier="assertionless" conf="runtime-princess"/>
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
 
