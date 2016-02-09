@@ -254,6 +254,8 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
         return FunctionDeclarationKind.XOR;
       case Z3_OP_DISTINCT:
         return FunctionDeclarationKind.DISTINCT;
+      case Z3_OP_IMPLIES:
+        return FunctionDeclarationKind.IMPLIES;
 
       case Z3_OP_SUB:
         return FunctionDeclarationKind.SUB;

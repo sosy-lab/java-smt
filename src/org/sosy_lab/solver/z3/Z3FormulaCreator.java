@@ -66,6 +66,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IFF;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IMPLIES;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_LE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_LT;
@@ -438,6 +439,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
         return FunctionDeclarationKind.XOR;
       case Z3_OP_DISTINCT:
         return FunctionDeclarationKind.DISTINCT;
+      case Z3_OP_IMPLIES:
+        return FunctionDeclarationKind.IMPLIES;
 
       case Z3_OP_SUB:
         return FunctionDeclarationKind.SUB;
