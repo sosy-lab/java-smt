@@ -59,11 +59,18 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
-  Mathsat5Model(long env, long model, Mathsat5FormulaCreator creator) {
+  private Mathsat5Model(long env, long model, Mathsat5FormulaCreator creator) {
     super(creator);
     this.env = env;
     this.model = model;
     formulaCreator = creator;
+  }
+
+  static Mathsat5Model create(long env, long model, Mathsat5FormulaCreator creator) {
+    Mathsat5Model out = new Mathsat5Model(env, model, creator);
+    creator.storeModelPhantomReference(out, model);
+    creator.cleanupModelReferences();
+    return out;
   }
 
   @Override

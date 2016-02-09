@@ -33,6 +33,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_declare_function;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_element_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_index_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_array_type;
@@ -65,6 +66,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.api.ArrayFormula;
@@ -86,10 +88,21 @@ import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5IntegerFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5RationalFormula;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
+
+  /**
+   * Automatic clean-up of Mathsat5 models.
+   */
+  private final ReferenceQueue<Mathsat5Model> modelReferenceQueue = new ReferenceQueue<>();
+  private final Map<PhantomReference<? extends Mathsat5Model>, Long> modelReferenceMap =
+      Maps.newIdentityHashMap();
 
   Mathsat5FormulaCreator(final Long msatEnv) {
     super(
@@ -334,5 +347,19 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
       default:
         return FunctionDeclarationKind.OTHER;
     }
+  }
+
+  public void storeModelPhantomReference(Mathsat5Model out, long model) {
+    PhantomReference<Mathsat5Model> ref = new PhantomReference<>(out, modelReferenceQueue);
+    modelReferenceMap.put(ref, model);
+  }
+
+  public void cleanupModelReferences() {
+    Reference<? extends Mathsat5Model> ref;
+    while ((ref = modelReferenceQueue.poll()) != null) {
+      long model = modelReferenceMap.remove(ref);
+      msat_destroy_model(model);
+    }
+
   }
 }

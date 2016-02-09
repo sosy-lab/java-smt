@@ -76,8 +76,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
     Z3Model model = new Z3Model(z3context, z3model, pCreator);
-    model.creator.storeModelPhantomReference(model, model.model);
-    model.creator.cleanupModelReferences();
+    pCreator.storeModelPhantomReference(model, z3model);
+    pCreator.cleanupModelReferences();
     return model;
   }
 

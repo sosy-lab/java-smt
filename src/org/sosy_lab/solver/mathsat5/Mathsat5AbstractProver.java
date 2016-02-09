@@ -93,7 +93,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return new Mathsat5Model(curEnv, msat_get_model(curEnv), creator);
+    return Mathsat5Model.create(curEnv, msat_get_model(curEnv), creator);
   }
 
   @Override
