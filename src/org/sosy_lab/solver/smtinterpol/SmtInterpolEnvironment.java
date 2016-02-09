@@ -359,7 +359,6 @@ class SmtInterpolEnvironment {
         case UNSAT:
           return false;
         case UNKNOWN:
-          shutdownNotifier.shutdownIfNecessary();
           Object reason = script.getInfo(":reason-unknown");
           if (!(reason instanceof ReasonUnknown)) {
             throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
@@ -368,6 +367,10 @@ class SmtInterpolEnvironment {
             case MEMOUT:
               // SMTInterpol catches OOM, but we want to have it thrown.
               throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
+            case CANCELLED:
+              shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
+              throw new SMTLIBException(
+                  "checkSat returned UNKNOWN with unexpected reason " + reason);
             default:
               throw new SMTLIBException(
                   "checkSat returned UNKNOWN with unexpected reason " + reason);
