@@ -48,6 +48,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_const;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
@@ -132,8 +133,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
+  /**
+   * Automatic clean-up of Z3 ASTs.
+   */
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
   private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
+      Maps.newIdentityHashMap();
+
+  /**
+   * Automatic clean-up of Z3Models.
+   */
+  private final ReferenceQueue<Z3Model> modelReferenceQueue = new ReferenceQueue<>();
+  private final Map<PhantomReference<? extends Z3Model>, Long> modelReferenceMap =
       Maps.newIdentityHashMap();
 
   // todo: getters for statistic.
@@ -301,11 +312,30 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
 
         Long z3ast = referenceMap.remove(ref);
         assert z3ast != null;
-        dec_ref(getEnv(), z3ast);
+        dec_ref(environment, z3ast);
       }
     } finally {
       cleanupTimer.stop();
     }
+  }
+
+  void storeModelPhantomReference(Z3Model model, long nativeModel) {
+
+    // NB: this is not protected by the usePhantomReferences option, as there
+    // are relatively few model objects.
+    PhantomReference<Z3Model> ref = new PhantomReference<>(model, modelReferenceQueue);
+    modelReferenceMap.put(ref, nativeModel);
+  }
+
+  void cleanupModelReferences() {
+    Reference<? extends Z3Model> ref;
+    cleanupTimer.start();
+    while ((ref = modelReferenceQueue.poll()) != null) {
+
+      Long z3model = modelReferenceMap.remove(ref);
+      model_dec_ref(environment, z3model);
+    }
+    cleanupTimer.stop();
   }
 
   private Long replaceArgs(Long t, List<Long> newArgs) {

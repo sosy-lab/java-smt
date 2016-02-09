@@ -35,7 +35,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
@@ -49,19 +48,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Maps;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -71,13 +65,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private final long z3context;
   private final Z3FormulaCreator creator;
   private @Nullable ImmutableList<ValueAssignment> assignments = null;
-
-  /**
-   * Automatic clean-up of Z3Models.
-   */
-  private static final ReferenceQueue<Z3Model> referenceQueue = new ReferenceQueue<>();
-  private static final Map<PhantomReference<? extends Z3Model>, Long[]> referenceMap =
-      Maps.newIdentityHashMap();
 
   private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
@@ -89,8 +76,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
     Z3Model model = new Z3Model(z3context, z3model, pCreator);
-    storePhantomReference(model);
-    cleanupReferences();
+    model.creator.storeModelPhantomReference(model, model.model);
+    model.creator.cleanupModelReferences();
     return model;
   }
 
@@ -185,21 +172,5 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       }
     }
     return out.build();
-  }
-
-  private static void storePhantomReference(Z3Model model) {
-    PhantomReference<Z3Model> ref = new PhantomReference<>(model, referenceQueue);
-    referenceMap.put(ref, new Long[] {model.z3context, model.model});
-  }
-
-  private static void cleanupReferences() {
-    Reference<? extends Z3Model> ref;
-    while ((ref = referenceQueue.poll()) != null) {
-
-      Long[] data = referenceMap.remove(ref);
-      long z3context = data[0];
-      long z3model = data[1];
-      model_dec_ref(z3context, z3model);
-    }
   }
 }
