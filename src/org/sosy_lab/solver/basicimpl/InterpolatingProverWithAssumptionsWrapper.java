@@ -45,7 +45,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<T> pFormulasOfA) throws SolverException {
+  public BooleanFormula getInterpolant(List<T> pFormulasOfA)
+      throws SolverException, InterruptedException {
     List<T> completeListOfA = Lists.newArrayList(pFormulasOfA);
     completeListOfA.addAll(solverAssumptionsFromPush);
     BooleanFormula interpolant = delegate.getInterpolant(completeListOfA);
@@ -60,7 +61,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<T>> pPartitionedFormulas)
-      throws SolverException {
+      throws SolverException, InterruptedException {
     if (solverAssumptionsAsFormula.isEmpty()) {
       return delegate.getSeqInterpolants(pPartitionedFormulas);
     } else {
@@ -70,7 +71,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<T>> pPartitionedFormulas, int[] pStartOfSubTree) throws SolverException {
+      List<Set<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      throws SolverException, InterruptedException {
     if (solverAssumptionsAsFormula.isEmpty()) {
       return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
     } else {

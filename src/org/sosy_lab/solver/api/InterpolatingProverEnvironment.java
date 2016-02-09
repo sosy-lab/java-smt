@@ -59,7 +59,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed,
    *     for example because interpolation procedure is incomplete
    */
-  BooleanFormula getInterpolant(List<T> formulasOfA) throws SolverException;
+  BooleanFormula getInterpolant(List<T> formulasOfA) throws SolverException, InterruptedException;
 
   /**
    * This method returns interpolants of an 'inductive sequence'.
@@ -76,7 +76,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed,
    *     for example because interpolation procedure is incomplete
    */
-  List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas) throws SolverException;
+  List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas)
+      throws SolverException, InterruptedException;
 
   /**
    * Compute a sequence of interpolants. The nesting array describes the
@@ -107,5 +108,5 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    *     for example because interpolation procedure is incomplete
    */
   List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree)
-      throws SolverException;
+      throws SolverException, InterruptedException;
 }
