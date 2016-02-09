@@ -360,6 +360,5 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
       long model = modelReferenceMap.remove(ref);
       msat_destroy_model(model);
     }
-
   }
 }

@@ -97,9 +97,7 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
       Quantifier quantifier,
       List<Formula> boundVariables,
       BooleanFormula transformedBody) {
-    return fmgr.getQuantifiedFormulaManager().mkQuantifier(
-        quantifier,
-        boundVariables,
-        transformedBody);
+    return fmgr.getQuantifiedFormulaManager()
+        .mkQuantifier(quantifier, boundVariables, transformedBody);
   }
 }

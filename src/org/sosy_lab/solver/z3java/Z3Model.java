@@ -76,8 +76,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
               public Expr apply(BooleanFormula input) {
                 return creator.extractInfo(input);
               }
-            }
-        ));
+            }));
   }
 
   @Override

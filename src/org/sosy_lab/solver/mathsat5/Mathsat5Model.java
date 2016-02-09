@@ -106,8 +106,9 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
         argumentInterpretation.add(evaluateImpl(arg));
       }
 
-      assignments.add(new ValueAssignment(
-          fKey, formulaCreator.getName(key[0]), fValue, argumentInterpretation));
+      assignments.add(
+          new ValueAssignment(
+              fKey, formulaCreator.getName(key[0]), fValue, argumentInterpretation));
     }
     msat_destroy_model_iterator(modelIterator);
     return assignments.build();

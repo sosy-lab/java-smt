@@ -43,9 +43,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   private final FormulaVisitor<Formula> delegate;
 
   FormulaTransformationVisitorImpl(
-      FormulaVisitor<Formula> delegate,
-      Deque<Formula> toProcess,
-      Map<Formula, Formula> pCache) {
+      FormulaVisitor<Formula> delegate, Deque<Formula> toProcess, Map<Formula, Formula> pCache) {
     this.toProcess = toProcess;
     this.pCache = pCache;
     this.delegate = Preconditions.checkNotNull(delegate);
@@ -115,11 +113,8 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
     BooleanFormula transformedBody = (BooleanFormula) pCache.get(body);
 
     if (transformedBody != null) {
-      BooleanFormula newTt = (BooleanFormula) delegate.visitQuantifier(
-          f,
-          quantifier,
-          boundVariables,
-          transformedBody);
+      BooleanFormula newTt =
+          (BooleanFormula) delegate.visitQuantifier(f, quantifier, boundVariables, transformedBody);
       pCache.put(f, newTt);
 
     } else {

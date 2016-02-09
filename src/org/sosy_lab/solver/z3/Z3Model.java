@@ -106,7 +106,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private ImmutableList<ValueAssignment> modelToList() {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
-    for (int i=0; i<model_get_num_consts(z3context, model); i++) {
+    for (int i = 0; i < model_get_num_consts(z3context, model); i++) {
       long keyDecl = model_get_const_decl(z3context, model, i);
       inc_ref(z3context, keyDecl);
 
@@ -131,7 +131,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       out.add(new ValueAssignment(key, name, lValue, ImmutableList.of()));
     }
 
-    for (int funcIdx=0; funcIdx<model_get_num_funcs(z3context, model); funcIdx++) {
+    for (int funcIdx = 0; funcIdx < model_get_num_funcs(z3context, model); funcIdx++) {
       long funcDecl = model_get_func_decl(z3context, model, funcIdx);
       inc_ref(z3context, funcDecl);
 
@@ -143,7 +143,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       func_interp_inc_ref(z3context, interp);
 
       int numInterpretations = func_interp_get_num_entries(z3context, interp);
-      for (int interpIdx=0; interpIdx < numInterpretations; interpIdx++) {
+      for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
         long entry = func_interp_get_entry(z3context, interp, interpIdx);
         func_entry_inc_ref(z3context, entry);
 
