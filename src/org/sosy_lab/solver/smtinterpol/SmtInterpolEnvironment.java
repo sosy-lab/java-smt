@@ -532,8 +532,9 @@ class SmtInterpolEnvironment {
 
   /** This function returns a list of interpolants for the partitions.
    * Each partition must be a named term or a conjunction of named terms.
-   * There should be (n-1) interpolants for n partitions. */
-  public Term[] getInterpolants(Term[] partition) throws SolverException {
+   * There should be (n-1) interpolants for n partitions.
+   */
+  public Term[] getInterpolants(Term[] partition) throws SolverException, InterruptedException {
     checkState(stackDepth > 0, "interpolants should be on higher levels");
     try {
       return script.getInterpolants(partition);
@@ -545,6 +546,9 @@ class SmtInterpolEnvironment {
         throw e;
       }
     } catch (SMTLIBException e) {
+      if ("Timeout exceeded".equals(e.getMessage())) {
+        shutdownNotifier.shutdownIfNecessary();
+      }
       throw new AssertionError(e);
     }
   }
@@ -576,7 +580,8 @@ class SmtInterpolEnvironment {
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
    */
-  public Term[] getTreeInterpolants(Term[] partition, int[] startOfSubTree) throws SolverException {
+  public Term[] getTreeInterpolants(Term[] partition, int[] startOfSubTree)
+      throws SolverException, InterruptedException {
     checkState(stackDepth > 0, "interpolants should be on higher levels");
     try {
       return script.getInterpolants(partition, startOfSubTree);
@@ -588,6 +593,9 @@ class SmtInterpolEnvironment {
         throw e;
       }
     } catch (SMTLIBException e) {
+      if ("Timeout exceeded".equals(e.getMessage())) {
+        shutdownNotifier.shutdownIfNecessary();
+      }
       throw new AssertionError(e);
     }
   }

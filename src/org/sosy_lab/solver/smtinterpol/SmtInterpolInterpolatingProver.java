@@ -109,7 +109,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<String> pTermNamesOfA) throws SolverException {
+  public BooleanFormula getInterpolant(List<String> pTermNamesOfA)
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
     Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
@@ -126,7 +127,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<String>> partitionedTermNames)
-      throws SolverException {
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
@@ -146,7 +147,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<String>> partitionedTermNames, int[] startOfSubTree) throws SolverException {
+      List<Set<String>> partitionedTermNames, int[] startOfSubTree)
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
@@ -189,7 +191,8 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     return true;
   }
 
-  protected BooleanFormula getInterpolant(Term termA, Term termB) throws SolverException {
+  protected BooleanFormula getInterpolant(Term termA, Term termB)
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     // get interpolant of groups
     Term[] itp = env.getInterpolants(new Term[] {termA, termB});

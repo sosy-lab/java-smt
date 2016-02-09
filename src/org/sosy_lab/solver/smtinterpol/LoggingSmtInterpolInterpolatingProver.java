@@ -57,7 +57,8 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  protected BooleanFormula getInterpolant(Term pTermA, Term pTermB) throws SolverException {
+  protected BooleanFormula getInterpolant(Term pTermA, Term pTermB)
+      throws SolverException, InterruptedException {
     out.println("(get-interpolants " + pTermA + " " + pTermB + ")");
     return super.getInterpolant(pTermA, pTermB);
   }
