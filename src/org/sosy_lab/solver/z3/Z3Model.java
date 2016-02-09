@@ -165,11 +165,11 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
           dec_ref(z3context, arg);
         }
         func_entry_dec_ref(z3context, entry);
-        func_interp_dec_ref(z3context, interp);
-        dec_ref(z3context, funcDecl);
 
         out.add(new ValueAssignment(formula, name, value, argumentInterpretation));
       }
+      func_interp_dec_ref(z3context, interp);
+      dec_ref(z3context, funcDecl);
     }
     return out.build();
   }
