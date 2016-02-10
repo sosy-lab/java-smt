@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_optimize;
@@ -69,19 +68,17 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private final LogManager logger;
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final long z3optContext;
-  private final ShutdownNotifier shutdownNotifier;
 
   Z3OptimizationProver(
       FormulaManager mgr,
       Z3FormulaCreator creator,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger) {
-    super(creator);
+    super(creator, pShutdownNotifier);
     this.mgr = mgr;
     rfmgr = mgr.getRationalFormulaManager();
     z3optContext = mk_optimize(z3context);
     optimize_inc_ref(z3context, z3optContext);
-    shutdownNotifier = checkNotNull(pShutdownNotifier);
     logger = pLogger;
   }
 

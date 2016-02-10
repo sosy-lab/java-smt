@@ -26,6 +26,7 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Params;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
+import com.microsoft.z3.Z3Exception;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -47,7 +48,6 @@ import javax.annotation.Nullable;
 
 class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
 
-  private final ShutdownNotifier shutdownNotifier;
   private final Solver z3solver;
   private int level = 0;
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
@@ -63,7 +63,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Params z3params,
       ShutdownNotifier pShutdownNotifier,
       ProverOptions... options) {
-    super(creator);
+    super(creator, pShutdownNotifier);
     mgr = pMgr;
     z3solver = z3context.mkSolver();
     z3solver.setParameters(z3params);
@@ -73,7 +73,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     } else {
       storedConstraints = null;
     }
-    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
@@ -166,37 +165,44 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
-    // Unpack formulas to terms.
-    BoolExpr[] importantFormulas = new BoolExpr[important.size()];
-    int i = 0;
-    for (BooleanFormula impF : important) {
-      importantFormulas[i++] = (BoolExpr) creator.extractInfo(impF);
-    }
+    try {
 
-    z3solver.push();
-
-    while (z3solver.check() == Status.SATISFIABLE) {
-      BoolExpr[] valuesOfModel = new BoolExpr[importantFormulas.length];
-      com.microsoft.z3.Model z3model = z3solver.getModel();
-
-      for (int j = 0; j < importantFormulas.length; j++) {
-        BoolExpr valueOfExpr = (BoolExpr) z3model.getConstInterp(importantFormulas[j]);
-
-        if (valueOfExpr.isFalse()) {
-          valuesOfModel[j] = z3context.mkNot(importantFormulas[j]);
-        } else {
-          valuesOfModel[j] = importantFormulas[j];
-        }
+      // Unpack formulas to terms.
+      BoolExpr[] importantFormulas = new BoolExpr[important.size()];
+      int i = 0;
+      for (BooleanFormula impF : important) {
+        importantFormulas[i++] = (BoolExpr) creator.extractInfo(impF);
       }
 
-      callback.apply(Lists.transform(Arrays.asList(valuesOfModel), creator.encapsulateBoolean));
+      z3solver.push();
 
-      BoolExpr negatedModel = z3context.mkNot(z3context.mkAnd(valuesOfModel));
-      z3solver.add(negatedModel);
+      while (z3solver.check() == Status.SATISFIABLE) {
+        BoolExpr[] valuesOfModel = new BoolExpr[importantFormulas.length];
+        com.microsoft.z3.Model z3model = z3solver.getModel();
+
+        for (int j = 0; j < importantFormulas.length; j++) {
+          BoolExpr valueOfExpr = (BoolExpr) z3model.getConstInterp(importantFormulas[j]);
+
+          if (valueOfExpr.isFalse()) {
+            valuesOfModel[j] = z3context.mkNot(importantFormulas[j]);
+          } else {
+            valuesOfModel[j] = importantFormulas[j];
+          }
+        }
+
+        callback.apply(Lists.transform(Arrays.asList(valuesOfModel), creator.encapsulateBoolean));
+
+        BoolExpr negatedModel = z3context.mkNot(z3context.mkAnd(valuesOfModel));
+        z3solver.add(negatedModel);
+      }
+
+      // we pushed some levels on assertionStack, remove them and delete solver
+      z3solver.pop();
+      return callback.getResult();
+
+    } catch (Z3Exception e) {
+      shutdownNotifier.shutdownIfNecessary();
+      throw new SolverException("Z3 had a problem during ALLSAT computation", e);
     }
-
-    // we pushed some levels on assertionStack, remove them and delete solver
-    z3solver.pop();
-    return callback.getResult();
   }
 }

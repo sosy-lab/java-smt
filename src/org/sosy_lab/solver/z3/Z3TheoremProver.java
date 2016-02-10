@@ -68,7 +68,6 @@ import javax.annotation.Nullable;
 
 class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
 
-  private final ShutdownNotifier shutdownNotifier;
   private final long z3solver;
   private int level = 0;
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
@@ -84,7 +83,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       long z3params,
       ShutdownNotifier pShutdownNotifier,
       ProverOptions... options) {
-    super(creator);
+    super(creator, pShutdownNotifier);
     mgr = pMgr;
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
@@ -95,7 +94,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     } else {
       storedConstraints = null;
     }
-    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override

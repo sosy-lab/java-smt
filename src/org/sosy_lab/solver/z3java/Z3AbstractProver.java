@@ -22,6 +22,7 @@ package org.sosy_lab.solver.z3java;
 import com.google.common.base.Preconditions;
 import com.microsoft.z3.Context;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
@@ -35,11 +36,13 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final List<BooleanFormula> storedConstraints;
 
   protected boolean closed = false;
+  protected final ShutdownNotifier shutdownNotifier;
 
-  protected Z3AbstractProver(Z3FormulaCreator creator) {
+  protected Z3AbstractProver(Z3FormulaCreator creator, ShutdownNotifier pShutdownNotifier) {
     this.creator = creator;
     z3context = creator.getEnv();
     storedConstraints = new ArrayList<>();
+    shutdownNotifier = pShutdownNotifier;
   }
 
   protected abstract com.microsoft.z3.Model getZ3Model();

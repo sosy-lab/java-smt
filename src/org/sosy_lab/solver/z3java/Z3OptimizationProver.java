@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.z3java;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.solver.z3java.Z3NumeralFormulaManager.toAE;
 
 import com.google.common.base.Optional;
@@ -61,7 +60,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private final LogManager logger;
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final Optimize z3optContext;
-  private final ShutdownNotifier shutdownNotifier;
 
   // TODO maybe we should replace the List by a Generic interface and
   // use the Handle directly as return-value.
@@ -74,11 +72,10 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
       Z3FormulaCreator creator,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger) {
-    super(creator);
+    super(creator, pShutdownNotifier);
     this.mgr = mgr;
     rfmgr = mgr.getRationalFormulaManager();
     z3optContext = z3context.mkOptimize();
-    shutdownNotifier = checkNotNull(pShutdownNotifier);
     logger = pLogger;
   }
 

@@ -44,6 +44,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
@@ -63,8 +64,9 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   private int level = 0;
   private final Deque<Long> assertedFormulas = new ArrayDeque<>();
 
-  Z3InterpolatingProver(Z3FormulaCreator creator, long z3params) {
-    super(creator);
+  Z3InterpolatingProver(
+      Z3FormulaCreator creator, long z3params, ShutdownNotifier pShutdownNotifier) {
+    super(creator, pShutdownNotifier);
     this.z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
@@ -99,17 +101,17 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   }
 
   @Override
-  public boolean isUnsat() throws Z3SolverException {
+  public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     int result = solver_check(z3context, z3solver);
-
+    shutdownNotifier.shutdownIfNecessary();
     Preconditions.checkState(result != Z3_LBOOL.Z3_L_UNDEF.status);
     return result == Z3_LBOOL.Z3_L_FALSE.status;
   }
 
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
-  public BooleanFormula getInterpolant(final List<Long> formulasOfA) {
+  public BooleanFormula getInterpolant(final List<Long> formulasOfA) throws InterruptedException {
     Preconditions.checkState(!closed);
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
@@ -129,7 +131,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas) {
+  public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas)
+      throws InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
         partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
@@ -140,7 +143,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Long>> partitionedFormulas, int[] startOfSubTree) {
+      List<Set<Long>> partitionedFormulas, int[] startOfSubTree) throws InterruptedException {
     Preconditions.checkState(!closed);
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
@@ -207,6 +210,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
             interpolant,
             model);
 
+    shutdownNotifier.shutdownIfNecessary();
     Preconditions.checkState(
         isSat == Z3_LBOOL.Z3_L_FALSE.status,
         "interpolation not possible, because SAT-check returned status '%s'",
