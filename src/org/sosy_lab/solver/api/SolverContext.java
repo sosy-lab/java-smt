@@ -2,8 +2,7 @@ package org.sosy_lab.solver.api;
 
 /**
  * Instances of this interface provide access to an SMT solver.
- * A single formula manager encapsulates a single solver context, and thus
- * should be used only from a single thread.
+ * A single SolverContext should be used only from a single thread.
  *
  * <p>If you wish to use multiple contexts (even for the same solver),
  * create one SolverContext per each.
