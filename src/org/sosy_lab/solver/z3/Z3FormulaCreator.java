@@ -310,9 +310,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     try {
       Reference<? extends Z3Formula> ref;
       while ((ref = referenceQueue.poll()) != null) {
-
-        Long z3ast = referenceMap.remove(ref);
-        assert z3ast != null;
+        long z3ast = referenceMap.remove(ref);
         dec_ref(environment, z3ast);
       }
     } finally {
@@ -332,8 +330,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     Reference<? extends Z3Model> ref;
     cleanupTimer.start();
     while ((ref = modelReferenceQueue.poll()) != null) {
-
-      Long z3model = modelReferenceMap.remove(ref);
+      long z3model = modelReferenceMap.remove(ref);
       model_dec_ref(environment, z3model);
     }
     cleanupTimer.stop();
