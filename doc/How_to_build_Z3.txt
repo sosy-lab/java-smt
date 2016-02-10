@@ -26,17 +26,11 @@ This step is already sufficient to use the option  `solver.solver=Z3JAVA`, as ev
   cd build
   make
 
-3) Build our own JNI-wrapper.
-This step is needed for direct usage of Z3 within JavaSMT with the option `solver.solver=Z3`.
-
-  cd java-smt
-  cd lib/native/source/libz3j/
-  ./compile.sh PATH_TO_Z3_DIRECTORY
-
-4) Produce and package all files for the IVY-repository.
+3) Produce and package all files for the IVY-repository.
 This step will determine the version of Z3 (including GIT revision) and produce files for IVY. 
+This step includes the compilation of the Z3 adapter for direct usage within JavaSMT with the option `solver.solver=Z3`.
 As last step you might wish to add and commit the produced files to the IVY-repository (SVN).
 You can use the cmdline that is given as part of the ANT-output.
-(You can also copy the files into your own repository and use the cmdline `ant -Divy.repo.url=IVY_REPOSITORY` to compile JavaSMT.)
+(You can also copy the files into your own repository and use the cmdline `ant -Divy.repo.url=IVY_REPOSITORY` to compile JavaSMT without using our central repository.)
 
   ant publish-z3 -Dz3.path=ABSOLUTE_PATH_TO_Z3_DIRECTORY
