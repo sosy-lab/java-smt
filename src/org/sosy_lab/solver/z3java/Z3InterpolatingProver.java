@@ -29,13 +29,11 @@ import com.google.common.collect.Sets;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.InterpolationContext;
-import com.microsoft.z3.InterpolationContext.ComputeInterpolantResult;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Params;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
-import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
@@ -191,22 +189,18 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
       Preconditions.checkState(
           stack.isEmpty(), "root should have been the last element in the stack.");
 
-      ComputeInterpolantResult interpolationResult =
-          ((InterpolationContext) z3context).ComputeInterpolant(root, z3context.mkParams());
+      Expr proof = z3solver.getProof();
+      BoolExpr[] interpolationResult =
+          ((InterpolationContext) z3context).GetInterpolant(proof, root, z3context.mkParams());
 
       shutdownNotifier.shutdownIfNecessary();
-
-      Preconditions.checkState(
-          interpolationResult.status == Z3_lbool.Z3_L_FALSE,
-          "interpolation not possible, because SAT-check returned status '%s'",
-          interpolationResult);
 
       // n partitions -> n-1 interpolants
       // the given tree interpolants are sorted in post-order,
       // so we only need to copy them
       final List<BooleanFormula> result = new ArrayList<>();
       for (int i = 0; i < partitionedFormulas.size() - 1; i++) {
-        result.add(creator.encapsulateBoolean(interpolationResult.interp[i]));
+        result.add(creator.encapsulateBoolean(interpolationResult[i]));
       }
 
       return result;
