@@ -179,15 +179,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     optimize_set_params(z3context, z3optContext, params);
   }
 
-  /**
-   * Dumps the optimized objectives and the constraints on the solver in the
-   * SMT-lib format. Super-useful!
-   */
-  @Override
-  public String toString() {
-    Preconditions.checkState(!closed);
-    return optimize_to_string(z3context, z3optContext);
-  }
 
   @Override
   public void close() {
@@ -219,8 +210,12 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     return Rational.ofString(get_numeral_string(z3context, ast));
   }
 
+  /**
+   * Dumps the optimized objectives and the constraints on the solver in the
+   * SMT-lib format. Super-useful!
+   */
   @Override
-  public String dump() {
+  public String toString() {
     Preconditions.checkState(!closed);
     return optimize_to_string(z3context, z3optContext);
   }

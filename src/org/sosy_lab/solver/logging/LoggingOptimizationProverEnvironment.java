@@ -117,9 +117,4 @@ public class LoggingOptimizationProverEnvironment implements OptimizationProverE
     wrapped.close();
     logger.log(Level.FINER, "closed");
   }
-
-  @Override
-  public String dump() {
-    return wrapped.dump();
-  }
 }

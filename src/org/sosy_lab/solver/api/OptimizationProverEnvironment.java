@@ -77,6 +77,4 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
     UNSAT, // SMT problem is unsatisfiable.
     UNDEF // The result is unknown.
   }
-
-  String dump();
 }

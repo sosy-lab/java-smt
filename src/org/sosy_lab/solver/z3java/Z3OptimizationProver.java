@@ -227,10 +227,4 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private Rational rationalFromZ3AST(Expr ast) {
     return Rational.ofString(ast.toString());
   }
-
-  @Override
-  public String dump() {
-    Preconditions.checkState(!closed);
-    return z3optContext.toString();
-  }
 }

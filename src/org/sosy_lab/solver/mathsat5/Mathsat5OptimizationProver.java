@@ -175,9 +175,4 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     msat_set_model(curEnv, objectivePtr[0]);
     return super.getModel();
   }
-
-  @Override
-  public String dump() {
-    throw new UnsupportedOperationException("Mathsat solver does not constraint dumping");
-  }
 }
