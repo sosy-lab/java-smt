@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -116,6 +118,7 @@ public interface BooleanFormulaManager {
   BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2);
 
   /** Visit the formula with the given visitor. */
+  @CanIgnoreReturnValue
   <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula formula);
 
   /**

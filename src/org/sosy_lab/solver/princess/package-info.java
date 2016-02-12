@@ -20,6 +20,7 @@
 /**
  * Interface to the SMT solver Princess.
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

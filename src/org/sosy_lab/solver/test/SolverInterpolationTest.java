@@ -72,6 +72,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws Exception {
     requireInterpolation();
 

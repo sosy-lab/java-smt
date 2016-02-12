@@ -363,6 +363,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
         .startsWith("(assert ");
   }
 
+  @SuppressWarnings("CheckReturnValue")
   private void checkThatDumpIsParseable(String dump) {
     mgr.parse(dump);
   }

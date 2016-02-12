@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.z3;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.Nullable;
@@ -1351,6 +1353,7 @@ final class Z3NativeApi {
   static native long func_entry_get_arg(long context, long a1, int a2);
 
   // INTERACTION LOGGING
+  @CanIgnoreReturnValue
   static native boolean open_log(String filename);
 
   static native void append_log(String s);

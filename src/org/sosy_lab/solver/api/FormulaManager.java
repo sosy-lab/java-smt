@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
@@ -153,6 +155,7 @@ public interface FormulaManager {
   /**
    * Visit the formula with a given visitor.
    */
+  @CanIgnoreReturnValue
   <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f);
 
   /**

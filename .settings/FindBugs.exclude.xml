@@ -5,4 +5,6 @@
         <Bug pattern="NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION"/>
         <Method name="equals" returns="boolean" params="java.lang.Object"/>
     </And></Match>
+    <!-- Error-prone checks this, too, and FindBugs does not know @CanIgnoreReturnValue. -->
+    <Match><Bug pattern="RV_RETURN_VALUE_IGNORED"/></Match>
 </FindBugsFilter>

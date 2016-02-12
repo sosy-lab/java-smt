@@ -21,6 +21,7 @@
 /**
  * JavaSMT: a generic SMT solver API.
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

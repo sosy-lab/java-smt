@@ -298,6 +298,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula() throws Exception {
     try (BasicProverEnvironment<?> stack =
             newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE)) {

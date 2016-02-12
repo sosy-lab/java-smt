@@ -68,6 +68,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void testUnfeasible() throws Exception {
     requireRationals();
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {

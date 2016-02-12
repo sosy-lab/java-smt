@@ -98,6 +98,7 @@ public class Mathsat5NativeApiTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
   public void fpExpWidthIllegal() {
     long type = msat_get_integer_type(env);
     msat_get_fp_type_exp_width(env, type);

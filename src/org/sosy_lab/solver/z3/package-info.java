@@ -21,6 +21,7 @@
 /**
  * Interface to the SMT solver Z3 (based on the native C API and JNI).
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

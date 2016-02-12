@@ -21,6 +21,7 @@
  * The core interfaces for abstracting from SMT solvers and providing a common API
  * for all solvers.
  */
+@javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

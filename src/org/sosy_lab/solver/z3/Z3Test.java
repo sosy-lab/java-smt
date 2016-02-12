@@ -31,9 +31,9 @@ public class Z3Test extends SolverBasedTest0 {
   }
 
   @Test(expected = Exception.class)
+  @SuppressWarnings("CheckReturnValue")
   public void testErrorHandling() throws Exception {
     // Will exit(1) without an exception handler.
-    //noinspection ConstantConditions,ResultOfMethodCallIgnored
     rmgr.makeNumber("not-a-number");
   }
 }

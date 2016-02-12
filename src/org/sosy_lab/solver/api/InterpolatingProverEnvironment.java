@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import org.sosy_lab.solver.SolverException;
 
 import java.util.List;
@@ -41,6 +43,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * The returned value can be used when selecting the formulas for interpolant generation.
    */
   @Override
+  @CanIgnoreReturnValue
   T push(BooleanFormula f);
 
   /**

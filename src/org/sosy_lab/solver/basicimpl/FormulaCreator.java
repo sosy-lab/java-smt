@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
@@ -233,6 +234,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
     return new UfDeclarationImpl<>(returnType, funcDecl, argumentTypes);
   }
 
+  @CanIgnoreReturnValue
   public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
     return visit(visitor, input, extractInfo(input));
   }
@@ -280,7 +282,6 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
         continue;
       }
 
-      //noinspection ResultOfMethodCallIgnored
       visit(recVisitor, tt);
     }
     @SuppressWarnings("unchecked")

@@ -72,6 +72,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public <T> void basicAssumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireInterpolation();

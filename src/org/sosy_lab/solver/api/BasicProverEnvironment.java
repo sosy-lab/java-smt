@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import org.sosy_lab.solver.SolverException;
 
 import javax.annotation.Nullable;
@@ -37,6 +39,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * in a query (this depends on the sub-type of the environment).
    */
   @Nullable
+  @CanIgnoreReturnValue
   T push(BooleanFormula f);
 
   /**
@@ -47,6 +50,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   /**
    * Add constraint to the context.
    */
+  @Nullable
+  @CanIgnoreReturnValue
   T addConstraint(BooleanFormula constraint);
 
   /**

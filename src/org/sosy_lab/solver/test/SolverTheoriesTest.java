@@ -583,6 +583,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
   public void testUfWithBoolArg_unsupported() {
     fmgr.declareUninterpretedFunction("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
   }
