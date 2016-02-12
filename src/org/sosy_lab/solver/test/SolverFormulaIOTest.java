@@ -21,7 +21,6 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
@@ -365,11 +364,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   }
 
   private void checkThatDumpIsParseable(String dump) {
-    try {
-      mgr.parse(dump);
-    } catch (Exception e) {
-      fail("Dump could not be parsed again.");
-    }
+    mgr.parse(dump);
   }
 
   private BooleanFormula genBoolExpr() {
