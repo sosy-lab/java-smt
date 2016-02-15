@@ -26,26 +26,17 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_next;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.primitives.UnsignedInteger;
-import com.google.common.primitives.UnsignedLong;
 
-import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -55,9 +46,6 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
   private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
-
-  private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
-  private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
   private Mathsat5Model(long env, long model, Mathsat5FormulaCreator creator) {
     super(creator);
@@ -76,7 +64,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   @Override
   public Object evaluateImpl(Long f) {
     long term = msat_model_eval(model, f);
-    return convertValue(f, term);
+    return formulaCreator.convertValue(f, term);
   }
 
   @Override
@@ -98,7 +86,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
         throw new NoSuchElementException();
       }
       Formula fKey = creator.encapsulateWithTypeOf(key[0]);
-      Object fValue = convertValue(key[0], value[0]);
+      Object fValue = formulaCreator.convertValue(key[0], value[0]);
       List<Object> argumentInterpretation = new ArrayList<>();
 
       for (int i = 0; i < msat_term_arity(key[0]); i++) {
@@ -114,60 +102,4 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     return assignments.build();
   }
 
-  private Object convertValue(long key, long term) {
-
-    // To get the correct type, we generate it from the key, not the value.
-    FormulaType<?> type = creator.getFormulaType(key);
-    String repr = msat_term_repr(term);
-    if (type.isBooleanType()) {
-      return msat_term_is_true(env, term);
-    } else if (type.isRationalType()) {
-      return Rational.ofString(repr);
-    } else if (type.isIntegerType()) {
-      return new BigInteger(repr);
-    } else if (type.isBitvectorType()) {
-      return parseBitvector(repr);
-    } else if (type.isFloatingPointType()) {
-      return parseFloatingPoint(repr);
-    } else {
-
-      // Default to string representation.
-      return repr;
-    }
-  }
-
-  private Number parseFloatingPoint(String lTermRepresentation) {
-
-    // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
-    Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
-    if (!matcher.matches()) {
-      throw new NumberFormatException("Unknown floating-point format: " + lTermRepresentation);
-    }
-
-    int expWidth = Integer.parseInt(matcher.group(2));
-    int mantWidth = Integer.parseInt(matcher.group(3));
-
-    if (expWidth == 11 && mantWidth == 52) {
-      return Double.longBitsToDouble(UnsignedLong.valueOf(matcher.group(1)).longValue());
-    } else if (expWidth == 8 && mantWidth == 23) {
-      return Float.intBitsToFloat(UnsignedInteger.valueOf(matcher.group(1)).intValue());
-    }
-
-    // TODO to be fully correct, we would need to interpret this string
-    return new BigInteger(matcher.group(1));
-  }
-
-  //TODO: change this to the latest version
-  // (if possible try to use a BitvectorFormula instance here)
-  private static BigInteger parseBitvector(String lTermRepresentation) {
-    // the term is of the format "<VALUE>_<WIDTH>"
-    Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);
-    if (!matcher.matches()) {
-      throw new NumberFormatException("Unknown bitvector format: " + lTermRepresentation);
-    }
-
-    // TODO: calculate negative value?
-    String term = matcher.group(1);
-    return new BigInteger(term);
-  }
 }

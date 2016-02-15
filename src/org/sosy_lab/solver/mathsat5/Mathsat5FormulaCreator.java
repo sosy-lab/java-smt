@@ -68,7 +68,10 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_type_repr;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.UnsignedInteger;
+import com.google.common.primitives.UnsignedLong;
 
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -91,11 +94,17 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
+
+  private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
+  private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
   /**
    * Automatic clean-up of Mathsat5 models.
@@ -268,9 +277,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
     int arity = msat_term_arity(f);
     if (msat_term_is_number(environment, f)) {
-
-      // TODO extract logic from Mathsat5Model for conversion from string to number and use it here
-      return visitor.visitConstant(formula, msat_term_repr(f));
+      return visitor.visitConstant(formula, convertValue(f, f));
     } else if (msat_term_is_true(environment, f)) {
       return visitor.visitConstant(formula, true);
     } else if (msat_term_is_false(environment, f)) {
@@ -360,5 +367,62 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
       long model = modelReferenceMap.remove(ref);
       msat_destroy_model(model);
     }
+  }
+
+  Object convertValue(long key, long term) {
+
+    // To get the correct type, we generate it from the key, not the value.
+    FormulaType<?> type = getFormulaType(key);
+    String repr = msat_term_repr(term);
+    if (type.isBooleanType()) {
+      return msat_term_is_true(getEnv(), term);
+    } else if (type.isRationalType()) {
+      return Rational.ofString(repr);
+    } else if (type.isIntegerType()) {
+      return new BigInteger(repr);
+    } else if (type.isBitvectorType()) {
+      return parseBitvector(repr);
+    } else if (type.isFloatingPointType()) {
+      return parseFloatingPoint(repr);
+    } else {
+
+      // Default to string representation.
+      return repr;
+    }
+  }
+
+  private Number parseFloatingPoint(String lTermRepresentation) {
+
+    // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
+    Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
+    if (!matcher.matches()) {
+      throw new NumberFormatException("Unknown floating-point format: " + lTermRepresentation);
+    }
+
+    int expWidth = Integer.parseInt(matcher.group(2));
+    int mantWidth = Integer.parseInt(matcher.group(3));
+
+    if (expWidth == 11 && mantWidth == 52) {
+      return Double.longBitsToDouble(UnsignedLong.valueOf(matcher.group(1)).longValue());
+    } else if (expWidth == 8 && mantWidth == 23) {
+      return Float.intBitsToFloat(UnsignedInteger.valueOf(matcher.group(1)).intValue());
+    }
+
+    // TODO to be fully correct, we would need to interpret this string
+    return new BigInteger(matcher.group(1));
+  }
+
+  //TODO: change this to the latest version
+  // (if possible try to use a BitvectorFormula instance here)
+  private static BigInteger parseBitvector(String lTermRepresentation) {
+    // the term is of the format "<VALUE>_<WIDTH>"
+    Matcher matcher = BITVECTOR_PATTERN.matcher(lTermRepresentation);
+    if (!matcher.matches()) {
+      throw new NumberFormatException("Unknown bitvector format: " + lTermRepresentation);
+    }
+
+    // TODO: calculate negative value?
+    String term = matcher.group(1);
+    return new BigInteger(term);
   }
 }
