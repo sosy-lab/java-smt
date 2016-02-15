@@ -999,7 +999,7 @@ out:
 FREE_TERM_ARRAY_ARG(2)
 INT_RETURN
 
-DEFINE_FUNC(jterm, 1_apply_1substitution) WITH_FIVE_ARGS(jenv, jterm, int, jtermArray, jtermArray)
+DEFINE_FUNC(jterm, 1apply_1substitution) WITH_FIVE_ARGS(jenv, jterm, int, jtermArray, jtermArray)
 ENV_ARG(1)
 TERM_ARG(2)
 SIMPLE_ARG(int, 3)
