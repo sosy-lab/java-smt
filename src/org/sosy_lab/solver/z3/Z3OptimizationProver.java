@@ -179,7 +179,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     optimize_set_params(z3context, z3optContext, params);
   }
 
-
   @Override
   public void close() {
     Preconditions.checkState(!closed);

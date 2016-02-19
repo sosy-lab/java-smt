@@ -63,7 +63,10 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
+
+  @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
+
   private @Nullable ImmutableList<ValueAssignment> assignments = null;
 
   private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {

@@ -55,6 +55,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
 
   private static final String UNSAT_CORE_TEMP_VARNAME = "UNSAT_CORE_%d";
 
+  @SuppressWarnings("hiding")
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3TheoremProver(
