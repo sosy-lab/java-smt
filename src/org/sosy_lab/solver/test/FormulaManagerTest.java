@@ -48,7 +48,6 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testSubstitution() throws SolverException, InterruptedException {
-    System.out.println("Solver Version = " + context.getVersion());
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),

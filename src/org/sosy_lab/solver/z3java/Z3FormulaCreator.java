@@ -38,7 +38,6 @@ import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 
-import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
@@ -59,8 +58,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
 
   private final Table<Sort, Sort, Sort> allocatedArraySorts = HashBasedTable.create();
 
-  Z3FormulaCreator(
-      Context pEnv, Sort pBoolType, Sort pIntegerType, Sort pRealType, Configuration config) {
+  Z3FormulaCreator(Context pEnv, Sort pBoolType, Sort pIntegerType, Sort pRealType) {
     super(pEnv, pBoolType, pIntegerType, pRealType);
   }
 

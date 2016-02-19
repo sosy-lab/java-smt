@@ -163,6 +163,7 @@ public class ModelTest extends SolverBasedTest0 {
         bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
   }
 
+  @SuppressWarnings("unused")
   @Test
   public void testGetArrays() throws Exception {
     requireArrays();

@@ -414,7 +414,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
       t = rationalManager.makeVariable(name);
     } else if (formulaType.isBitvectorType()) {
       assert bitvectorManager != null;
-      BitvectorType impl = (BitvectorType) formulaType;
       t = bitvectorManager.makeVariable((BitvectorType) formulaType, name);
     } else if (formulaType.isFloatingPointType()) {
       assert floatingPointManager != null;

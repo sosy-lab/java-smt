@@ -42,20 +42,18 @@ import javax.annotation.Nullable;
 
 class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
-  private final long env;
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
   private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
 
-  private Mathsat5Model(long env, long model, Mathsat5FormulaCreator creator) {
+  private Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
     super(creator);
-    this.env = env;
     this.model = model;
     formulaCreator = creator;
   }
 
-  static Mathsat5Model create(long env, long model, Mathsat5FormulaCreator creator) {
-    Mathsat5Model out = new Mathsat5Model(env, model, creator);
+  static Mathsat5Model create(long model, Mathsat5FormulaCreator creator) {
+    Mathsat5Model out = new Mathsat5Model(model, creator);
     creator.storeModelPhantomReference(out, model);
     creator.cleanupModelReferences();
     return out;
@@ -101,5 +99,4 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     msat_destroy_model_iterator(modelIterator);
     return assignments.build();
   }
-
 }
