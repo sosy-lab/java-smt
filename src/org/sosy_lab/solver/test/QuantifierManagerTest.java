@@ -45,6 +45,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+@SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
 @RunWith(Parameterized.class)
 public class QuantifierManagerTest extends SolverBasedTest0 {
 
@@ -346,6 +349,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assert qmgr != null;
 
     // An empty list of quantified variables throws an exception.
+    @SuppressWarnings("unused")
     BooleanFormula quantified = qmgr.exists(ImmutableList.<Formula>of(), bmgr.makeVariable("x"));
   }
 }
