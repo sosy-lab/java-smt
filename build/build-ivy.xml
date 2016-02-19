@@ -66,4 +66,13 @@
         <ivy:resolve conf="contrib" log="download-only"/>
         <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
     </target>
+
+    <target name="gen-pom" depends="load-ivy, determine-version" description="Generate a POM file from Ivy metadata">
+        <property name="ivy.pom.version" value="${version}"/>
+
+        <ivy:makepom ivyfile="ivy.xml" pomfile="pom.xml" templatefile="pom_template.xml">
+            <mapping conf="runtime" scope="compile"/>
+        </ivy:makepom>
+    </target>
+
 </project>

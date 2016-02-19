@@ -12,6 +12,13 @@
     <property name="jar.excludes" value=""/>
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
 
+    <!-- Maven Central metadata -->
+    <property name="ivy.pom.description" value="Unified acccess layer to SMT solvers"/>
+    <property name="ivy.pom.url" value="https://github.com/sosy-lab/java-smt"/>
+    <property name="ivy.pom.name" value="java-smt"/>
+    <property name="ivy.pom.groupId" value="org.sosy-lab"/>
+    <property name="ivy.pom.artifactId" value="java-smt"/>
+
     <import file="build/build-version.xml"/>
     <import file="build/build-ivy.xml"/>
     <import file="build/build-compile.xml"/>
@@ -23,6 +30,7 @@
     <import file="build/build-findbugs.xml"/>
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
+    <import file="build/build-maven-publish.xml"/>
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
@@ -40,7 +48,7 @@
 
     <target name="build" depends="build-project, collect-options" description="Build"/>
 
-    <target name="dist" depends="jar, sources" description="Make a distributable release"/>
+    <target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 

@@ -1,0 +1,60 @@
+<project name="maven" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+    <!-- Defined maven snapshots and staging repository id and url -->
+    <property name="ossrh-snapshots-repository-url"
+        value="https://oss.sonatype.org/content/repositories/snapshots" />
+    <property name="ossrh-staging-repository-url"
+        value="https://oss.sonatype.org/service/local/staging/deploy/maven2" />
+
+    <!-- There server id in the Maven settings.xml -->
+    <property name="ossrh-server-id" value="ossrh" />
+
+    <target name="deploy-to-maven-central" depends="dist, gen-pom, jar"
+        description="deploy snapshot version to Maven snapshot repository">
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+            <arg value="-Durl=${ossrh-snapshots-repository-url}" />
+            <arg value="-DrepositoryId=${ossrh-server-id}" />
+            <arg value="-DpomFile=pom.xml" />
+            <arg value="-Dfile=${jar.file}" />
+        </artifact:mvn>
+    </target>
+
+    <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
+    <target name="stage" depends="dist, gen-pom, jar, sources" description="deploy release version to Maven staging repository">
+
+        <!-- Sign and deploy the main artifact. -->
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+            <arg value="-Durl=${ossrh-staging-repository-url}" />
+            <arg value="-DrepositoryId=${ossrh-server-id}" />
+            <arg value="-DpomFile=pom.xml" />
+            <arg value="-Dfile=${jar.file}" />
+            <arg value="-Pgpg" />
+        </artifact:mvn>
+
+        <!-- Sign and deploy the sources artifact -->
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+            <arg value="-Durl=${ossrh-staging-repository-url}" />
+            <arg value="-DrepositoryId=${ossrh-server-id}" />
+            <arg value="-DpomFile=pom.xml" />
+            <arg value="-Dfile=${ivy.module}-${version}-sources.jar" />
+            <arg value="-Dclassifier=sources" />
+            <arg value="-Pgpg" />
+        </artifact:mvn>
+
+        <!-- sign and deploy the javadoc artifact -->
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+            <arg value="-Durl=${ossrh-staging-repository-url}" />
+            <arg value="-DrepositoryId=${ossrh-server-id}" />
+            <arg value="-DpomFile=pom.xml" />
+            <arg value="-Dfile=${ivy.module}-${version}-javadoc.jar" />
+            <arg value="-Dclassifier=javadoc" />
+            <arg value="-Pgpg" />
+        </artifact:mvn>
+    </target>
+
+</project>
