@@ -75,6 +75,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Before
   public void setUp() throws Exception {
+    assert amgr != null;
     requireArrays();
     requireQuantifiers();
     assume()
@@ -308,10 +309,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testIntrospectionExists() {
     assert qmgr != null;
-    assume()
-        .withFailureMessage("Bug in Z3QuantifiedFormulaManager")
-        .that(solverToUse())
-        .isNoneOf(Solvers.Z3, Solvers.Z3JAVA);
 
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -342,5 +339,13 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThat(isQuantifier.get()).isTrue();
     assertThat(isForall.get()).isFalse();
     assertThat(numBound.get()).isEqualTo(1);
+  }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void testEmpty() {
+    assert qmgr != null;
+
+    // An empty list of quantified variables throws an exception.
+    BooleanFormula quantified = qmgr.exists(ImmutableList.<Formula>of(), bmgr.makeVariable("x"));
   }
 }

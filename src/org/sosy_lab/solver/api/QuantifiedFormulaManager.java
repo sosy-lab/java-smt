@@ -40,6 +40,8 @@ public interface QuantifiedFormulaManager {
    *
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
+   *
+   * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody);
 
@@ -48,6 +50,8 @@ public interface QuantifiedFormulaManager {
    *
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
+   *
+   * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
 
@@ -57,6 +61,8 @@ public interface QuantifiedFormulaManager {
    * @param q           Quantifier type
    * @param pVariables  The variables that will get bound (variables) by the quantification.
    * @param pBody       The {@link BooleanFormula}} within that the binding will be performed.
+   *
+   * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody);

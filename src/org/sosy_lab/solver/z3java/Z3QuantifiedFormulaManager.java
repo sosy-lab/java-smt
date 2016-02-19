@@ -24,6 +24,7 @@ import static org.sosy_lab.solver.z3java.Z3BooleanFormulaManager.toBool;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Sort;
+import com.microsoft.z3.Z3Exception;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
@@ -51,16 +52,23 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Expr, 
 
   @Override
   public Expr mkQuantifier(Quantifier q, List<Expr> pVariables, Expr pBody) {
-    return z3context.mkQuantifier(
-        q == Quantifier.FORALL,
-        pVariables.toArray(new Expr[] {}),
-        pBody,
-        0,
-        null,
-        null,
-        null,
-        null);
-    // TODO replace NULL by something better
+    try {
+      return z3context.mkQuantifier(
+          q == Quantifier.FORALL,
+          pVariables.toArray(new Expr[] {}),
+          pBody,
+          0,
+          null,
+          null,
+          null,
+          null);
+    } catch (Z3Exception ex) {
+      if (ex.getMessage().equals("invalid usage")) {
+        throw new IllegalArgumentException(ex.getMessage());
+      } else {
+        throw ex;
+      }
+    }
   }
 
   @Override
