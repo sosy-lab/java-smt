@@ -163,9 +163,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   public void testBooleanFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
 
-    // TODO: currently neither Z3 nor Princess is working with quantifiers
-    // properly due to bugs on our side =(.
-    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.Z3, Solvers.Z3JAVA);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
     assert qmgr != null;
 

@@ -112,11 +112,20 @@ public interface BooleanFormulaVisitor<R> {
   /**
    * Visit a quantifier: forall- or exists-.
    *
+   * @param quantifier Quantifier type: FORALL- or EXISTS-
+   * @param quantifiedAST AST of the quantified node.
+   *                      Provided because it is difficult to re-create from the parameters.
+   * @param boundVars Variables bound by this quantifier.
+   * @param body Body of the quantified expression.
+   *
    * @see QuantifiedFormulaManager#mkQuantifier
    * @see QuantifiedFormulaManager#forall
    * @see QuantifiedFormulaManager#exists
    */
-  R visitQuantifier(Quantifier quantifier, List<Formula> boundVars, BooleanFormula body);
+  R visitQuantifier(Quantifier quantifier,
+                    BooleanFormula quantifiedAST,
+                    List<Formula> boundVars,
+                    BooleanFormula body);
 
   /**
    * Visit an SMT atom.

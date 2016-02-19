@@ -155,8 +155,10 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
 
   @Override
   public TraversalProcess visitQuantifier(
-      Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
-    TraversalProcess result = delegate.visitQuantifier(pQuantifier, boundVars, pBody);
+      Quantifier pQuantifier, BooleanFormula quantifiedAST, List<Formula> boundVars, BooleanFormula
+      pBody) {
+    TraversalProcess result = delegate.visitQuantifier(pQuantifier, quantifiedAST, boundVars,
+        pBody);
     if (result == TraversalProcess.CONTINUE) {
       addToQueue(pBody);
     }

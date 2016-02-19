@@ -254,7 +254,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     @Override
     public Void visitQuantifier(
-        Quantifier quantifier, List<Formula> boundVars, BooleanFormula pBody) {
+        Quantifier quantifier, BooleanFormula quantifierAST, List<Formula> boundVars,
+        BooleanFormula pBody) {
       if (started) {
         visit(pBody);
       }
@@ -378,7 +379,9 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     @Override
     public Void visitQuantifier(
-        Quantifier quantifier, List<Formula> boundVars, BooleanFormula pBody) {
+        Quantifier quantifier,
+        BooleanFormula quantifierAST,
+        List<Formula> boundVars, BooleanFormula pBody) {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {

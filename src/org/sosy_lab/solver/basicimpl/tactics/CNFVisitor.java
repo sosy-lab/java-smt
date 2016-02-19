@@ -153,7 +153,9 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
 
   @Override
   public List<BooleanFormula> visitQuantifier(
-      Quantifier quantifier, List<Formula> boundVars, BooleanFormula pBody) {
-    throw new IllegalStateException("Traversed formula is not in NNF if quantifiers are present");
+      Quantifier quantifier,
+      BooleanFormula quantifiedAST,
+      List<Formula> boundVars, BooleanFormula pBody) {
+    throw new IllegalStateException("Quantifiers are not supported.");
   }
 }

@@ -24,7 +24,6 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
-import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
 import java.util.ArrayList;
@@ -136,14 +135,9 @@ public abstract class BooleanFormulaTransformationVisitor
 
   @Override
   public BooleanFormula visitQuantifier(
-      Quantifier quantifier, List<Formula> boundVars, BooleanFormula body) {
-    QuantifiedFormulaManager qfmgr = manager.getQuantifiedFormulaManager();
-    if (quantifier == Quantifier.FORALL) {
-
-      // Bound variables are already quantified inside the body!
-      return qfmgr.forall(new ArrayList<Formula>(), visitIfNotSeen(body));
-    } else {
-      return qfmgr.exists(new ArrayList<Formula>(), visitIfNotSeen(body));
-    }
+      Quantifier quantifier,
+      BooleanFormula quantifiedAST,
+      List<Formula> boundVars, BooleanFormula body) {
+    return quantifiedAST;
   }
 }
