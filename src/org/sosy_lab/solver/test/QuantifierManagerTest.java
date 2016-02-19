@@ -25,6 +25,8 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +47,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
 @RunWith(Parameterized.class)
