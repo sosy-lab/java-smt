@@ -163,6 +163,7 @@ public class ModelTest extends SolverBasedTest0 {
         bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
   }
 
+  @SuppressWarnings("unused")
   @Test
   public void testGetArrays() throws Exception {
     requireArrays();
@@ -179,7 +180,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThatEnvironment(prover).isSatisfiable();
       Model m = prover.getModel();
 
-      for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+      for (ValueAssignment assignment : m) {
         // Check that we can iterate through with no crashes.
       }
       assertThat(m.evaluate(amgr.select(updated, imgr.makeNumber(1)))).isEqualTo(BigInteger.ONE);
