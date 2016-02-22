@@ -22,6 +22,7 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
@@ -57,6 +58,14 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
     return toVisit.isEmpty();
   }
 
+  private void addToQueueIfNecessary(TraversalProcess result, List<? extends Formula> pOperands) {
+    for (Formula operand : pOperands) {
+      if (result.contains(operand)) {
+        addToQueue(operand);
+      }
+    }
+  }
+
   Formula pop() {
     return toVisit.pop();
   }
@@ -84,11 +93,7 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
       Function<List<Formula>, Formula> pNewApplicationConstructor) {
     TraversalProcess result =
         delegate.visitFunction(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
-    if (result == TraversalProcess.CONTINUE) {
-      for (Formula arg : pArgs) {
-        addToQueue(arg);
-      }
-    }
+    addToQueueIfNecessary(result, pArgs);
     return result;
   }
 
@@ -96,9 +101,7 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   public TraversalProcess visitQuantifier(
       BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
     TraversalProcess result = delegate.visitQuantifier(pF, pQuantifier, boundVars, pBody);
-    if (result == TraversalProcess.CONTINUE) {
-      addToQueue(pBody);
-    }
+    addToQueueIfNecessary(result, ImmutableList.of(pBody));
     return result;
   }
 }

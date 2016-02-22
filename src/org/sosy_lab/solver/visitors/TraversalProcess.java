@@ -19,26 +19,69 @@
  */
 package org.sosy_lab.solver.visitors;
 
+import com.google.common.collect.ImmutableSet;
+
+import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 
 /**
- * Enum that lets the visitor guide the recursive formula traversal process
+ * Return class that lets the visitor guide the recursive formula traversal process
  * started with
  * {@link FormulaManager#visitRecursively(FormulaVisitor, org.sosy_lab.solver.api.Formula)}.
+ * or
+ * {@link BooleanFormulaManager#visitRecursively(BooleanFormulaVisitor, BooleanFormula)}.
  */
-public enum TraversalProcess {
+public class TraversalProcess {
   /**
    * Continue traversal and recurse into current formula subtree.
    */
-  CONTINUE,
+  public static final TraversalProcess CONTINUE = new TraversalProcess(
+      TraversalType.CONTINUE_TYPE, ImmutableSet.<Formula>of());
 
   /**
    * Continue traversal, but do not recurse into current formula subtree.
    */
-  SKIP,
+  public static final TraversalProcess SKIP = new TraversalProcess(
+      TraversalType.SKIP_TYPE, ImmutableSet.<Formula>of());
 
   /**
    * Immediately abort traversal and return to caller.
    */
-  ABORT;
+  public static final TraversalProcess ABORT = new TraversalProcess(
+      TraversalType.ABORT_TYPE, ImmutableSet.<Formula>of());
+
+  /**
+   * Traverse only the given children.
+   *
+   * <p>NOTE: given formulas which are <em>not</em> children of the given node will be ignored.
+   */
+  public static TraversalProcess custom(Iterable<? extends Formula> pToTraverse) {
+    return new TraversalProcess(TraversalType.CUSTOM_TYPE, ImmutableSet.copyOf(pToTraverse));
+  }
+
+  private enum TraversalType {
+    CONTINUE_TYPE, SKIP_TYPE, ABORT_TYPE, CUSTOM_TYPE
+  }
+
+  private final TraversalType type;
+  private final ImmutableSet<? extends Formula> toTraverse;
+
+  private TraversalProcess(TraversalType pType, ImmutableSet<? extends Formula> pToTraverse) {
+    type = pType;
+    toTraverse = pToTraverse;
+  }
+
+  public boolean contains(Formula f) {
+    if (type == TraversalType.CONTINUE_TYPE) {
+      return true;
+    } else if (type == TraversalType.SKIP_TYPE || type == TraversalType.ABORT_TYPE) {
+      return false;
+    } else {
+      assert type == TraversalType.CUSTOM_TYPE;
+      return toTraverse.contains(f);
+    }
+  }
+
 }

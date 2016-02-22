@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -214,6 +213,12 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     return formulaCreator.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
   }
 
+  @Override
+  public void visitRecursively(
+      BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor, BooleanFormula pF) {
+    formulaCreator.visitRecursively(new DelegatingFormulaVisitor<>(pFormulaVisitor), pF);
+  }
+
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
     private final BooleanFormulaVisitor<R> delegate;
 
@@ -323,19 +328,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         BooleanFormula body) {
       return delegate.visitQuantifier(quantifier, f,
           boundVariables, body);
-    }
-  }
-
-  @Override
-  public void visitRecursively(
-      BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor, BooleanFormula pF) {
-    RecursiveBooleanFormulaVisitor recVisitor = new RecursiveBooleanFormulaVisitor(pFormulaVisitor);
-    recVisitor.addToQueue(pF);
-    while (!recVisitor.isQueueEmpty()) {
-      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
-      if (process == TraversalProcess.ABORT) {
-        return;
-      }
     }
   }
 }

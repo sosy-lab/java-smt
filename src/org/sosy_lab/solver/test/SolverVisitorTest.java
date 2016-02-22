@@ -27,8 +27,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -38,10 +36,11 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.solver.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -67,18 +66,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
-  }
-
-  private ProverEnvironment env;
-
-  @Before
-  public void setupEnvironment() {
-    env = context.newProverEnvironment();
-  }
-
-  @After
-  public void closeEnvironment() {
-    env.close();
   }
 
   @Test
@@ -264,5 +251,34 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 imgr.equal(
                     imgr.add(imgr.makeVariable("x'"), imgr.makeVariable("y'")), imgr.makeNumber(1)),
                 imgr.equal(imgr.makeVariable("z'"), imgr.makeNumber(10))));
+  }
+
+  @Test
+  public void booleanRecursiveTraversalTest() throws Exception {
+    BooleanFormula f = bmgr.or(
+        bmgr.and(
+            bmgr.makeVariable("x"), bmgr.makeVariable("y")
+        ),
+        bmgr.and(
+            bmgr.makeVariable("z"), bmgr.makeVariable("d")
+        )
+    );
+    final Set<String> foundVars = new HashSet<>();
+    bmgr.visitRecursively(new DefaultBooleanFormulaVisitor<TraversalProcess>() {
+      @Override
+      protected TraversalProcess visitDefault() {
+        return TraversalProcess.CONTINUE;
+      }
+
+      @Override
+      public TraversalProcess visitAtom(
+          BooleanFormula atom, FunctionDeclaration funcDecl) {
+        if (funcDecl.getKind() == FunctionDeclarationKind.VAR) {
+          foundVars.add(funcDecl.getName());
+        }
+        return TraversalProcess.CONTINUE;
+      }
+    }, f);
+    assertThat(foundVars).containsExactly("x", "y", "z", "d");
   }
 }
