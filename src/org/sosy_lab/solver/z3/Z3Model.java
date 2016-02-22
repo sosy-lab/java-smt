@@ -88,7 +88,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   @Override
   public Object evaluateImpl(Long f) {
     PointerToLong out = new PointerToLong();
-    boolean status = model_eval(z3context, model, f, true, out);
+    boolean status = model_eval(z3context, model, f, false, out);
     Verify.verify(status, "Error during model evaluation");
     if (out.value == 0) {
       return null;
@@ -109,6 +109,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private ImmutableList<ValueAssignment> modelToList() {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
+    // Iterate through constants.
     for (int i = 0; i < model_get_num_consts(z3context, model); i++) {
       long keyDecl = model_get_const_decl(z3context, model, i);
       inc_ref(z3context, keyDecl);
@@ -134,6 +135,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       out.add(new ValueAssignment(key, name, lValue, ImmutableList.of()));
     }
 
+    // Iterate through function applications.
     for (int funcIdx = 0; funcIdx < model_get_num_funcs(z3context, model); funcIdx++) {
       long funcDecl = model_get_func_decl(z3context, model, funcIdx);
       inc_ref(z3context, funcDecl);
