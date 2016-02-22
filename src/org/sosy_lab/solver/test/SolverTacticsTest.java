@@ -164,13 +164,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitTrue() {
-      started = true;
-      return null;
-    }
-
-    @Override
-    public Void visitFalse() {
+    public Void visitConstant(boolean value) {
       started = true;
       return null;
     }
@@ -284,13 +278,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitTrue() {
-      wasLastVisitNot = false;
-      return null;
-    }
-
-    @Override
-    public Void visitFalse() {
+    public Void visitConstant(boolean value) {
       wasLastVisitNot = false;
       return null;
     }

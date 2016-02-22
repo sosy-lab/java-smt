@@ -241,12 +241,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     @Override
     public R visitConstant(Formula f, Object value) {
       Preconditions.checkState(value instanceof Boolean);
-      boolean v = (Boolean) value;
-      if (v) {
-        return delegate.visitTrue();
-      } else {
-        return delegate.visitFalse();
-      }
+      return delegate.visitConstant((boolean) value);
     }
 
     private List<BooleanFormula> getBoolArgs(List<Formula> args) {

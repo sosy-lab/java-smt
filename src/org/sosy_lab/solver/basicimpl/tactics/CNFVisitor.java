@@ -37,13 +37,8 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitTrue() {
-    return singletonList(bfmgr.makeBoolean(true));
-  }
-
-  @Override
-  public List<BooleanFormula> visitFalse() {
-    return singletonList(bfmgr.makeBoolean(false));
+  public List<BooleanFormula> visitConstant(boolean value) {
+    return singletonList(bfmgr.makeBoolean(value));
   }
 
   @Override

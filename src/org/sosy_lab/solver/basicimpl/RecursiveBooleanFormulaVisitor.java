@@ -78,13 +78,8 @@ final class RecursiveBooleanFormulaVisitor implements BooleanFormulaVisitor<Trav
   }
 
   @Override
-  public TraversalProcess visitTrue() {
-    return delegate.visitTrue();
-  }
-
-  @Override
-  public TraversalProcess visitFalse() {
-    return delegate.visitFalse();
+  public TraversalProcess visitConstant(boolean value) {
+    return delegate.visitConstant(value);
   }
 
   @Override

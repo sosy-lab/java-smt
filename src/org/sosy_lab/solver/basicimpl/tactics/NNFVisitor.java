@@ -78,13 +78,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitTrue() {
-      return bfmgr.makeBoolean(false);
-    }
-
-    @Override
-    public BooleanFormula visitFalse() {
-      return bfmgr.makeBoolean(true);
+    public BooleanFormula visitConstant(boolean value) {
+      return bfmgr.makeBoolean(value);
     }
 
     @Override

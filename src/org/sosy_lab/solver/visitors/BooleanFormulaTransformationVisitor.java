@@ -77,13 +77,8 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitTrue() {
-    return bfmgr.makeBoolean(true);
-  }
-
-  @Override
-  public BooleanFormula visitFalse() {
-    return bfmgr.makeBoolean(false);
+  public BooleanFormula visitConstant(boolean value) {
+    return bfmgr.makeBoolean(value);
   }
 
   @Override

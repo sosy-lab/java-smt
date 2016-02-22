@@ -38,18 +38,11 @@ import java.util.List;
 public interface BooleanFormulaVisitor<R> {
 
   /**
-   * Visit a constant {@code true}.
+   * Visit a constant with a given value.
    *
    * @see BooleanFormulaManager#makeBoolean
    */
-  R visitTrue();
-
-  /**
-   * Visit a constant {@code false}.
-   *
-   * @see BooleanFormulaManager#makeBoolean
-   */
-  R visitFalse();
+  R visitConstant(boolean value);
 
   /**
    * Visit a boolean variable bound by a quantifier.
@@ -129,7 +122,8 @@ public interface BooleanFormulaVisitor<R> {
 
   /**
    * Visit an SMT atom.
-   * This is anything with a boolean sort which is not covered by the cases
+   *
+   * <p>This is anything with a boolean sort which is not covered by the cases
    * above.
    */
   R visitAtom(BooleanFormula atom, FunctionDeclaration funcDecl);

@@ -36,12 +36,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaV
   protected abstract R visitDefault();
 
   @Override
-  public R visitTrue() {
-    return visitDefault();
-  }
-
-  @Override
-  public R visitFalse() {
+  public R visitConstant(boolean value) {
     return visitDefault();
   }
 
