@@ -216,7 +216,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
   @Override
   public void visitRecursively(
       BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor, BooleanFormula pF) {
-    formulaCreator.visitRecursively(new DelegatingFormulaVisitor<>(pFormulaVisitor), pF);
+    formulaCreator.visitRecursively(new RecursiveDelegatingFormulaVisitor(pFormulaVisitor), pF);
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
@@ -328,6 +328,32 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         BooleanFormula body) {
       return delegate.visitQuantifier(quantifier, f,
           boundVariables, body);
+    }
+  }
+
+  private class RecursiveDelegatingFormulaVisitor
+      extends DelegatingFormulaVisitor<TraversalProcess> {
+
+    RecursiveDelegatingFormulaVisitor(BooleanFormulaVisitor<TraversalProcess> pDelegate) {
+      super(pDelegate);
+    }
+
+    @Override
+    public TraversalProcess visitFunction(
+        Formula f,
+        List<Formula> args,
+        FunctionDeclaration functionDeclaration,
+        Function<List<Formula>, Formula> newApplicationConstructor) {
+      TraversalProcess out = super.visitFunction(f, args, functionDeclaration,
+          newApplicationConstructor);
+      for (Formula arg : args) {
+        if (!(arg instanceof BooleanFormula)) {
+
+          // Can't recurse down non-boolean formulas.
+          return TraversalProcess.SKIP;
+        }
+      }
+      return out;
     }
   }
 }

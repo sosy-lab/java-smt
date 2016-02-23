@@ -260,7 +260,14 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             bmgr.makeVariable("x"), bmgr.makeVariable("y")
         ),
         bmgr.and(
-            bmgr.makeVariable("z"), bmgr.makeVariable("d")
+            ImmutableList.of(
+                bmgr.makeVariable("z"),
+                bmgr.makeVariable("d"),
+                imgr.equal(
+                    imgr.makeVariable("gg"),
+                    imgr.makeNumber(5)
+                )
+            )
         )
     );
     final Set<String> foundVars = new HashSet<>();
