@@ -257,7 +257,6 @@ class PrincessEnvironment {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
-        out.append("(set-logic AUFLIA)\n");
         Set<IExpression> allVars =
             new HashSet<>(creator.extractVariablesAndUFs(lettedFormula, true).values());
         Deque<IExpression> declaredFunctions = new ArrayDeque<>(allVars);
