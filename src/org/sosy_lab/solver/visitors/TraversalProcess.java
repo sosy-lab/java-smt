@@ -61,6 +61,15 @@ public class TraversalProcess {
     return new TraversalProcess(TraversalType.CUSTOM_TYPE, ImmutableSet.copyOf(pToTraverse));
   }
 
+  /**
+   * Traverse only the given child.
+   *
+   * <p>NOTE: any given which is <em>not</em> child of the given node will be ignored.
+   */
+  public static TraversalProcess custom(Formula pToTraverse) {
+    return new TraversalProcess(TraversalType.CUSTOM_TYPE, ImmutableSet.of(pToTraverse));
+  }
+
   private enum TraversalType {
     CONTINUE_TYPE, SKIP_TYPE, ABORT_TYPE, CUSTOM_TYPE
   }
