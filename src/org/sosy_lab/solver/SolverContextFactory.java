@@ -34,6 +34,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.log.NullLogManager;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.solver.princess.PrincessSolverContext;
@@ -153,7 +154,7 @@ public class SolverContextFactory {
 
   /**
    * Shortcut for getting a {@link SolverContext},
-   * the solver is selected using configuration.
+   * the solver is selected using the configuration {@code config}
    *
    * <p>See
    * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
@@ -177,6 +178,21 @@ public class SolverContextFactory {
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier, Solvers solver)
       throws InvalidConfigurationException {
     return new SolverContextFactory(config, logger, shutdownNotifier).generateContext(solver);
+  }
+
+  /**
+   * Minimalistic shortcut for creating a solver context.
+   * Empty default configuration, no logging, and no shutdown notifier.
+   *
+   * @param solver Solver to initialize
+   */
+  public static SolverContext createSolverContext(Solvers solver)
+      throws InvalidConfigurationException {
+    Configuration config = Configuration.defaultConfiguration();
+    return new SolverContextFactory(
+        Configuration.defaultConfiguration(),
+        NullLogManager.getInstance(),
+        ShutdownNotifier.createDummy()).generateContext(solver);
   }
 
   /**
