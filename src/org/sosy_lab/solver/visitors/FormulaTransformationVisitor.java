@@ -47,11 +47,8 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
     return f;
   }
 
-  /**
-   * Bound variables can not be changed.
-   */
   @Override
-  public final Formula visitBoundVariable(Formula f, int deBruijnIdx) {
+  public Formula visitBoundVariable(Formula f, int deBruijnIdx) {
     return f;
   }
 
