@@ -42,7 +42,9 @@
           <root url="jar://$MODULE_DIR$/lib/java/runtime/common.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/common-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
