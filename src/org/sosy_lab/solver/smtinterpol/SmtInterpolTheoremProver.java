@@ -105,7 +105,7 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   public void close() {
     Preconditions.checkState(!closed);
     if (!assertedTerms.isEmpty()) {
-      env.pop(assertedTerms.size());
+      env.pop(env.getStackDepth());
       assertedTerms.clear();
     }
     closed = true;
