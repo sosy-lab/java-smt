@@ -188,7 +188,6 @@ public class SolverContextFactory {
    */
   public static SolverContext createSolverContext(Solvers solver)
       throws InvalidConfigurationException {
-    Configuration config = Configuration.defaultConfiguration();
     return new SolverContextFactory(
             Configuration.defaultConfiguration(),
             NullLogManager.getInstance(),
