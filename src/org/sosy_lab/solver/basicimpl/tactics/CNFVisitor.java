@@ -150,7 +150,8 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   public List<BooleanFormula> visitQuantifier(
       Quantifier quantifier,
       BooleanFormula quantifiedAST,
-      List<Formula> boundVars, BooleanFormula pBody) {
+      List<Formula> boundVars,
+      BooleanFormula pBody) {
     throw new IllegalStateException("Quantifiers are not supported.");
   }
 }

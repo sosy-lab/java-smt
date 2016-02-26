@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
 @RunWith(Parameterized.class)
 public class QuantifierManagerTest extends SolverBasedTest0 {
@@ -345,7 +344,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThat(numBound.get()).isEqualTo(1);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testEmpty() {
     assert qmgr != null;
 

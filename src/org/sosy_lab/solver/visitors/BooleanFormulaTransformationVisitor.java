@@ -132,7 +132,8 @@ public abstract class BooleanFormulaTransformationVisitor
   public BooleanFormula visitQuantifier(
       Quantifier quantifier,
       BooleanFormula quantifiedAST,
-      List<Formula> boundVars, BooleanFormula body) {
+      List<Formula> boundVars,
+      BooleanFormula body) {
     return quantifiedAST;
   }
 }

@@ -115,10 +115,11 @@ public interface BooleanFormulaVisitor<R> {
    * @see QuantifiedFormulaManager#forall
    * @see QuantifiedFormulaManager#exists
    */
-  R visitQuantifier(Quantifier quantifier,
-                    BooleanFormula quantifiedAST,
-                    List<Formula> boundVars,
-                    BooleanFormula body);
+  R visitQuantifier(
+      Quantifier quantifier,
+      BooleanFormula quantifiedAST,
+      List<Formula> boundVars,
+      BooleanFormula body);
 
   /**
    * Visit an SMT atom.

@@ -326,8 +326,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         Quantifier quantifier,
         List<Formula> boundVariables,
         BooleanFormula body) {
-      return delegate.visitQuantifier(quantifier, f,
-          boundVariables, body);
+      return delegate.visitQuantifier(quantifier, f, boundVariables, body);
     }
   }
 
@@ -344,8 +343,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         List<Formula> args,
         FunctionDeclaration functionDeclaration,
         Function<List<Formula>, Formula> newApplicationConstructor) {
-      TraversalProcess out = super.visitFunction(f, args, functionDeclaration,
-          newApplicationConstructor);
+      TraversalProcess out =
+          super.visitFunction(f, args, functionDeclaration, newApplicationConstructor);
       for (Formula arg : args) {
         if (!(arg instanceof BooleanFormula)) {
 
