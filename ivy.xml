@@ -105,7 +105,7 @@
         </dependency>
 
         <!-- Princess -->
-        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-02-10-r2566" conf="runtime-princess->runtime; contrib->sources">
+        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-02-29-r2569" conf="runtime-princess->runtime; contrib->sources">
           <artifact name="princess" e:classifier="assertionless" conf="runtime-princess"/>
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
