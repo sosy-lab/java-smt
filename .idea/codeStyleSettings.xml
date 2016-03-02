@@ -27,6 +27,8 @@
           <value>
             <package name="" withSubpackages="true" static="true" />
             <emptyLine />
+            <package name="ap" withSubpackages="true" static="false" />
+            <emptyLine />
             <package name="com.google" withSubpackages="true" static="false" />
             <emptyLine />
             <package name="android" withSubpackages="true" static="false" />
@@ -196,6 +198,8 @@
             <package name="oracle" withSubpackages="true" static="false" />
             <emptyLine />
             <package name="org" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="scala" withSubpackages="true" static="false" />
             <emptyLine />
             <package name="penn2dg" withSubpackages="true" static="false" />
             <emptyLine />
