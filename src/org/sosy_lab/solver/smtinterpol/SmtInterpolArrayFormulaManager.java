@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
@@ -28,7 +29,7 @@ import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 
 class SmtInterpolArrayFormulaManager
-    extends AbstractArrayFormulaManager<Term, Sort, SmtInterpolEnvironment> {
+    extends AbstractArrayFormulaManager<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
 
   private final SmtInterpolEnvironment env;
 

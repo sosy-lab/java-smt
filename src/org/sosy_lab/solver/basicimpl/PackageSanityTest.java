@@ -23,14 +23,11 @@ import com.google.common.base.Predicate;
 import com.google.common.testing.AbstractPackageSanityTests;
 
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
-import org.sosy_lab.solver.api.FunctionDeclarationKind;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
-    setDefault(FunctionDeclaration.class, FunctionDeclaration.of("F", FunctionDeclarationKind.UF));
     ignoreClasses(
         new Predicate<Class<?>>() {
           @Override

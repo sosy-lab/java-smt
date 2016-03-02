@@ -21,7 +21,7 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
@@ -35,15 +35,16 @@ import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.solver.basicimpl.ObjectArrayBackedList;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 
-class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolFormulaCreator extends
+                                FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
 
   private final Sort booleanSort;
   private final Sort integerSort;
@@ -195,18 +196,21 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
 
       } else {
         final String name = func.getName();
-        final List<Formula> args = encapsulate(app.getParameters());
+        List<Formula> args = encapsulate(app.getParameters());
+        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+        for (Term t : app.getParameters()) {
+          argTypes.add(getFormulaType(t));
+        }
 
         // Any function application.
-        Function<List<Formula>, Formula> constructor =
-            new Function<List<Formula>, Formula>() {
-              @Override
-              public Formula apply(List<Formula> formulas) {
-                return encapsulateWithTypeOf(replaceArgs(input, extractInfo(formulas)));
-              }
-            };
         return visitor.visitFunction(
-            f, args, FunctionDeclaration.of(name, getDeclarationKind(app)), constructor);
+            f, args, FunctionDeclarationImpl.of(
+                name,
+                getDeclarationKind(app),
+                argTypes.build(),
+                getFormulaType(f),
+                app.getFunction()
+            ));
       }
 
     } else {
@@ -314,5 +318,20 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, SmtInterpolEn
       // TODO: other declaration kinds!
       return FunctionDeclarationKind.OTHER;
     }
+  }
+
+  @Override
+  public Term callFunctionImpl(
+      FunctionDeclarationImpl<?, FunctionSymbol> declaration, List<Term> args) {
+    return environment.term(
+        declaration.getSolverDeclaration().getApplicationString(),
+        args.toArray(new Term[args.size()])
+    );
+  }
+
+  @Override
+  protected FunctionSymbol getBooleanVarDeclarationImpl(Term pTerm) {
+    assert pTerm instanceof ApplicationTerm;
+    return ((ApplicationTerm) pTerm).getFunction();
   }
 }

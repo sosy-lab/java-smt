@@ -19,33 +19,31 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractUFManager;
 
 import java.util.List;
 
-class SmtInterpolFunctionFormulaManager
-    extends AbstractFunctionFormulaManager<Term, String, Sort, SmtInterpolEnvironment> {
+class SmtInterpolUFManager
+    extends AbstractUFManager<Term, FunctionSymbol, Sort, SmtInterpolEnvironment> {
 
-  SmtInterpolFunctionFormulaManager(SmtInterpolFormulaCreator creator) {
+  SmtInterpolUFManager(SmtInterpolFormulaCreator creator) {
     super(creator);
   }
 
   @Override
-  public Term createUninterpretedFunctionCallImpl(String funcDecl, List<Term> pArgs) {
+  public Term createUninterpretedFunctionCallImpl(FunctionSymbol funcDecl, List<Term> pArgs) {
     Term[] args = pArgs.toArray(new Term[pArgs.size()]);
-    Term ufc = getFormulaCreator().getEnv().term(funcDecl, args);
-    return ufc;
+    return funcDecl.getTheory().term(funcDecl, args);
   }
 
   @Override
-  protected String declareUninterpretedFunctionImpl(
+  protected FunctionSymbol declareUninterpretedFunctionImpl(
       String pName, Sort returnType, List<Sort> pArgs) {
     Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
-    getFormulaCreator().getEnv().declareFun(pName, types, returnType);
-
-    return pName;
+    return getFormulaCreator().getEnv().declareFun(pName, types, returnType);
   }
 }

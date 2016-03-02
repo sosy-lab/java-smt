@@ -39,12 +39,16 @@ import java.util.List;
  * such that the concrete class needs to handle only its own internal types.
  */
 public abstract class AbstractNumeralFormulaManager<
-        TFormulaInfo, TType, TEnv, ParamFormulaType extends NumeralFormula,
-        ResultFormulaType extends NumeralFormula>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+        TFormulaInfo, TType, TEnv,
+        ParamFormulaType extends NumeralFormula,
+        ResultFormulaType extends NumeralFormula,
+        TFuncDecl
+    >
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
 
-  protected AbstractNumeralFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractNumeralFormulaManager(
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
   }
 

@@ -39,10 +39,10 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.NumeralType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
-import org.sosy_lab.solver.api.UfDeclaration;
 
 @RunWith(Parameterized.class)
 public class SolverTheoriesTest extends SolverBasedTest0 {
@@ -544,12 +544,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testUfWithBoolType() throws SolverException, InterruptedException {
-    UfDeclaration<BooleanFormula> uf =
-        fmgr.declareUninterpretedFunction(
+    FunctionDeclaration<BooleanFormula> uf =
+        fmgr.declareUF(
             "fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
-    BooleanFormula uf0 = fmgr.callUninterpretedFunction(uf, ImmutableList.of(imgr.makeNumber(0)));
-    BooleanFormula uf1 = fmgr.callUninterpretedFunction(uf, ImmutableList.of(imgr.makeNumber(1)));
-    BooleanFormula uf2 = fmgr.callUninterpretedFunction(uf, ImmutableList.of(imgr.makeNumber(2)));
+    BooleanFormula uf0 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(0)));
+    BooleanFormula uf1 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(1)));
+    BooleanFormula uf2 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(2)));
 
     BooleanFormula f01 = bmgr.xor(uf0, uf1);
     BooleanFormula f02 = bmgr.xor(uf0, uf2);
@@ -569,13 +569,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     // We can simulate this with "uf(ite(p,0,1))", but currently we do not need this.
     // Thus this test is disabled and the following is enabled.
 
-    UfDeclaration<IntegerFormula> uf =
-        fmgr.declareUninterpretedFunction(
+    FunctionDeclaration<IntegerFormula> uf =
+        fmgr.declareUF(
             "fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
     IntegerFormula ufTrue =
-        fmgr.callUninterpretedFunction(uf, ImmutableList.of(bmgr.makeBoolean(true)));
+        fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(true)));
     IntegerFormula ufFalse =
-        fmgr.callUninterpretedFunction(uf, ImmutableList.of(bmgr.makeBoolean(false)));
+        fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(false)));
 
     BooleanFormula f = bmgr.not(imgr.equal(ufTrue, ufFalse));
     assertThat(f.toString()).isEmpty();
@@ -585,7 +585,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public void testUfWithBoolArg_unsupported() {
-    fmgr.declareUninterpretedFunction("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
+    fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
   }
 
   @Test

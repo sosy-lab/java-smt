@@ -46,7 +46,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
 
   SmtInterpolModel(
       Model pModel,
-      FormulaCreator<Term, Sort, SmtInterpolEnvironment> pCreator,
+      FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator,
       Collection<Term> assertedTerms) {
     super(pCreator);
     formulaCreator = (SmtInterpolFormulaCreator) pCreator;

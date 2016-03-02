@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
@@ -28,7 +29,7 @@ import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import java.util.Collection;
 
 class SmtInterpolBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment> {
+    extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
 
   // We use the Theory directly here because the methods there perform simplifications
   // that we could not use otherwise.

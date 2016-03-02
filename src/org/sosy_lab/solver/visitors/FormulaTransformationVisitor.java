@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.solver.visitors;
 
-import com.google.common.base.Function;
-
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
@@ -61,7 +59,6 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
    * @param f Input function.
    * @param newArgs New arguments <b>after</b> the transformation
    * @param functionDeclaration Function declaration
-   * @param newApplicationConstructor Construct a new function of the same type,
    *
    * @return Transformed function.
    */
@@ -69,9 +66,8 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
   public Formula visitFunction(
       Formula f,
       List<Formula> newArgs,
-      FunctionDeclaration functionDeclaration,
-      Function<List<Formula>, Formula> newApplicationConstructor) {
-    return newApplicationConstructor.apply(newArgs);
+      FunctionDeclaration<?> functionDeclaration) {
+    return fmgr.makeApplication(functionDeclaration, newArgs);
   }
 
   /**

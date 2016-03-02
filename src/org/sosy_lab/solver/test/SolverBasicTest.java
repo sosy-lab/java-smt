@@ -33,8 +33,8 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -57,8 +57,8 @@ public class SolverBasicTest extends SolverBasedTest0 {
 
   @Test
   public void formulaEqualsAndHashCode() {
-    UfDeclaration<IntegerFormula> f_b =
-        fmgr.declareUninterpretedFunction("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
+    FunctionDeclaration<IntegerFormula> f_b =
+        fmgr.declareUF("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
 
     new EqualsTester()
         .addEqualityGroup(bmgr.makeBoolean(true))
@@ -99,15 +99,15 @@ public class SolverBasicTest extends SolverBasedTest0 {
         // UninterpretedFunctionDeclarations should not compare equal to Formulas,
         // but declaring one twice needs to return the same UIF.
         .addEqualityGroup(
-            fmgr.declareUninterpretedFunction(
+            fmgr.declareUF(
                 "f_a", FormulaType.IntegerType, FormulaType.IntegerType),
-            fmgr.declareUninterpretedFunction(
+            fmgr.declareUF(
                 "f_a", FormulaType.IntegerType, FormulaType.IntegerType))
         .addEqualityGroup(f_b)
-        .addEqualityGroup(fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(0))))
+        .addEqualityGroup(fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(0))))
         .addEqualityGroup(
-            fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))),
-            fmgr.callUninterpretedFunction(f_b, ImmutableList.of(imgr.makeNumber(1))))
+            fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(1))),
+            fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(1))))
         .testEquals();
   }
 
@@ -128,9 +128,9 @@ public class SolverBasicTest extends SolverBasedTest0 {
   public void ufNameExtractorTest() throws Exception {
     BooleanFormula constraint =
         imgr.equal(
-            fmgr.declareAndCallUninterpretedFunction(
+            fmgr.declareAndCallUF(
                 "uf1", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("x"))),
-            fmgr.declareAndCallUninterpretedFunction(
+            fmgr.declareAndCallUF(
                 "uf2", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("y"))));
 
     assertThat(mgr.extractVariablesAndUFs(constraint).keySet())

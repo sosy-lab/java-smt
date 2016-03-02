@@ -25,23 +25,22 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 import com.microsoft.z3.StringSymbol;
 
-import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractUFManager;
 
 import java.util.List;
 
-class Z3FunctionFormulaManager
-    extends AbstractFunctionFormulaManager<Expr, FuncDecl, Sort, Context> {
+class Z3UFManager extends AbstractUFManager<Expr, FuncDecl, Sort, Context> {
 
   private final Context z3context;
 
-  Z3FunctionFormulaManager(Z3FormulaCreator creator) {
+  Z3UFManager(Z3FormulaCreator creator) {
     super(creator);
     this.z3context = creator.getEnv();
   }
 
   @Override
   protected Expr createUninterpretedFunctionCallImpl(FuncDecl funcDecl, List<Expr> pArgs) {
-    return z3context.mkApp(funcDecl, pArgs.toArray(new Expr[] {}));
+    return z3context.mkApp(funcDecl, pArgs.toArray(new Expr[pArgs.size()]));
   }
 
   @Override
@@ -49,7 +48,7 @@ class Z3FunctionFormulaManager
       String pName, Sort returnType, List<Sort> pArgTypes) {
 
     StringSymbol symbol = z3context.mkSymbol(pName);
-    Sort[] sorts = pArgTypes.toArray(new Sort[] {});
+    Sort[] sorts = pArgTypes.toArray(new Sort[pArgTypes.size()]);
     return z3context.mkFuncDecl(symbol, sorts, returnType);
   }
 }

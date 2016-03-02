@@ -1,65 +1,55 @@
+/*
+ *
+ *  *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  *  This file is part of JavaSMT.
+ *  *
+ *  *  Copyright (C) 2007-2016  Dirk Beyer
+ *  *  All rights reserved.
+ *  *
+ *  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  *  you may not use this file except in compliance with the License.
+ *  *  You may obtain a copy of the License at
+ *  *
+ *  *      http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  *  Unless required by applicable law or agreed to in writing, software
+ *  *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  *  See the License for the specific language governing permissions and
+ *  *  limitations under the License.
+ *
+ *
+ */
+
 package org.sosy_lab.solver.api;
 
-import com.google.common.base.Preconditions;
-
-import java.util.Objects;
-
-import javax.annotation.Nullable;
+import java.util.List;
 
 /**
- * Declaration of function.
+ * Function declaration,
+ * for both UFs and built-in functions (theory and boolean).
+ *
+ * <p>Can be instantiated using {@link FormulaManager#makeApplication}
  */
-public class FunctionDeclaration {
-  private final String name;
-  private final FunctionDeclarationKind kind;
-
-  private FunctionDeclaration(String name, FunctionDeclarationKind kind) {
-    Preconditions.checkNotNull(name);
-    Preconditions.checkNotNull(kind);
-    this.name = name;
-    this.kind = kind;
-  }
-
-  public static FunctionDeclaration of(String name, FunctionDeclarationKind kind) {
-    return new FunctionDeclaration(name, kind);
-  }
+public interface FunctionDeclaration<E extends Formula> {
 
   /**
-   * Get type of the declaration.
+   * @return Type of the function (LT / GT / UF / etc...).
    */
-  public FunctionDeclarationKind getKind() {
-    return kind;
-  }
+  FunctionDeclarationKind getKind();
 
   /**
-   * Name of the function.
-   * For variables and UF's, it's the user-supplied name.
-   * For default theories, it is the operator name (e.g. {@code "ITE"} for the
-   * if-then-else operator.)
+   * @return Name of the function (UF name / "LT" / etc...).
    */
-  public String getName() {
-    return name;
-  }
+  String getName();
 
-  @Override
-  public String toString() {
-    return String.format("%s (%s)", kind, name);
-  }
+  /**
+   * @return Sort of the function output.
+   */
+  FormulaType<E> getType();
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(kind, name);
-  }
-
-  @Override
-  public boolean equals(@Nullable Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (!(o instanceof FunctionDeclaration)) {
-      return false;
-    }
-    FunctionDeclaration other = (FunctionDeclaration) o;
-    return (name.equals(other.name) && kind.equals(other.kind));
-  }
+  /**
+   * @return Sorts of the arguments.
+   */
+  List<FormulaType<?>> getArgumentTypes();
 }

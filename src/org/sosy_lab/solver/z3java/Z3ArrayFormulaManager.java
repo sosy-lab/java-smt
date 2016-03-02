@@ -22,6 +22,7 @@ package org.sosy_lab.solver.z3java;
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 
 import org.sosy_lab.solver.api.Formula;
@@ -29,7 +30,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 
-class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Sort, Context> {
+class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Sort, Context, FuncDecl> {
 
   private final Context z3context;
 

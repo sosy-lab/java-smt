@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.solver.visitors;
 
-import com.google.common.base.Function;
-
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
@@ -77,15 +75,15 @@ public interface FormulaVisitor<R> {
    *
    * @param f Input function.
    * @param args List of arguments
-   * @param functionDeclaration Function declaration
-   * @param newApplicationConstructor Construct a new function of the same type,
-   *                                  with the new arguments as given.
+   * @param functionDeclaration Function declaration.
+   *                            Can be given to {@link FormulaManager#makeApplication} to construct
+   *                            a new instance of the same function with different
+   *                            arguments.
    */
   R visitFunction(
       Formula f,
       List<Formula> args,
-      FunctionDeclaration functionDeclaration,
-      Function<List<Formula>, Formula> newApplicationConstructor);
+      FunctionDeclaration<?> functionDeclaration);
 
   /**
    * Visit a quantified node.

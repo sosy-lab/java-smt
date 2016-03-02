@@ -25,6 +25,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -294,16 +295,19 @@ class SmtInterpolEnvironment {
   /** This function declares a new functionSymbol, that has a given (result-) sort.
    * The params for the functionSymbol also have sorts.
    * If you want to declare a new variable, i.e. "X", paramSorts is an empty array. */
-  public void declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
+  @CanIgnoreReturnValue
+  public FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
     FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
 
     if (fsym == null) {
       script.declareFun(fun, paramSorts, resultSort);
+      return theory.getFunction(fun, paramSorts);
     } else {
       if (!fsym.getReturnSort().equals(resultSort)) {
         throw new SMTLIBException(
             "Function " + fun + " is already declared with different definition");
       }
+      return fsym;
     }
   }
 

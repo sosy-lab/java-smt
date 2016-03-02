@@ -33,12 +33,12 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
-import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigInteger;
 
@@ -112,7 +112,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetUFs() throws Exception {
     IntegerFormula x =
-        fmgr.declareAndCallUninterpretedFunction(
+        fmgr.declareAndCallUF(
             "UF", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("arg")));
     testModelGetters(x, imgr.makeNumber(1), BigInteger.ONE, "UF");
   }
@@ -121,10 +121,10 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetMultipleUFs() throws Exception {
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
-    UfDeclaration<IntegerFormula> declaration =
-        fmgr.declareUninterpretedFunction("UF", FormulaType.IntegerType, FormulaType.IntegerType);
-    IntegerFormula app1 = fmgr.callUninterpretedFunction(declaration, arg1);
-    IntegerFormula app2 = fmgr.callUninterpretedFunction(declaration, arg2);
+    FunctionDeclaration<IntegerFormula> declaration =
+        fmgr.declareUF("UF", FormulaType.IntegerType, FormulaType.IntegerType);
+    IntegerFormula app1 = fmgr.callUF(declaration, arg1);
+    IntegerFormula app2 = fmgr.callUF(declaration, arg2);
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(imgr.equal(app1, imgr.makeNumber(1)));
@@ -142,12 +142,12 @@ public class ModelTest extends SolverBasedTest0 {
               new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
               new ValueAssignment(arg1, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
               new ValueAssignment(
-                  fmgr.callUninterpretedFunction(declaration, imgr.makeNumber(3)),
+                  fmgr.callUF(declaration, imgr.makeNumber(3)),
                   "UF",
                   BigInteger.valueOf(1),
                   ImmutableList.of(BigInteger.valueOf(3))),
               new ValueAssignment(
-                  fmgr.callUninterpretedFunction(declaration, imgr.makeNumber(4)),
+                  fmgr.callUF(declaration, imgr.makeNumber(4)),
                   "UF",
                   BigInteger.valueOf(2),
                   ImmutableList.of(BigInteger.valueOf(4))));

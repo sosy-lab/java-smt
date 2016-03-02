@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.solver.visitors;
 
-import com.google.common.base.Function;
-
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FunctionDeclaration;
@@ -56,8 +54,7 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
   public R visitFunction(
       Formula f,
       List<Formula> args,
-      FunctionDeclaration functionDeclaration,
-      Function<List<Formula>, Formula> newApplicationConstructor) {
+      FunctionDeclaration<?> functionDeclaration) {
     return visitDefault(f);
   }
 

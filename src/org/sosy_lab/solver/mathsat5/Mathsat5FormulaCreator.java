@@ -65,7 +65,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
-import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedInteger;
@@ -80,9 +80,9 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5ArrayFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BitvectorFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BooleanFormula;
@@ -95,13 +95,12 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
+class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
@@ -286,25 +285,25 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
     } else {
 
-      List<Formula> args = new ArrayList<>(arity);
+      ImmutableList.Builder<Formula> args = ImmutableList.builder();
+      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
         long arg = msat_term_get_arg(f, i);
         FormulaType<?> argumentType = getFormulaType(arg);
         args.add(encapsulate(argumentType, arg));
+        argTypes.add(argumentType);
       }
 
       String name = msat_decl_get_name(msat_term_get_decl(f));
-
-      // Any function application.
-      Function<List<Formula>, Formula> constructor =
-          new Function<List<Formula>, Formula>() {
-            @Override
-            public Formula apply(List<Formula> formulas) {
-              return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
-            }
-          };
       return visitor.visitFunction(
-          formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
+          formula, args.build(), FunctionDeclarationImpl.of(
+              name,
+              getDeclarationKind(f),
+              argTypes.build(),
+              getFormulaType(f),
+              msat_term_get_decl(f)
+          )
+      );
     }
   }
 
@@ -424,5 +423,15 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long> {
     // TODO: calculate negative value?
     String term = matcher.group(1);
     return new BigInteger(term);
+  }
+
+  @Override
+  public Long callFunctionImpl(FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
+    return msat_make_term(environment, declaration.getSolverDeclaration(), Longs.toArray(args));
+  }
+
+  @Override
+  protected Long getBooleanVarDeclarationImpl(Long pLong) {
+    return msat_term_get_decl(pLong);
   }
 }

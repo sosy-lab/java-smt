@@ -153,7 +153,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
 
     // Create managers
-    Mathsat5FunctionFormulaManager functionTheory = new Mathsat5FunctionFormulaManager(creator);
+    Mathsat5UFManager functionTheory = new Mathsat5UFManager(creator);
     Mathsat5BooleanFormulaManager booleanTheory = new Mathsat5BooleanFormulaManager(creator);
     Mathsat5IntegerFormulaManager integerTheory = new Mathsat5IntegerFormulaManager(creator);
     Mathsat5RationalFormulaManager rationalTheory = new Mathsat5RationalFormulaManager(creator);

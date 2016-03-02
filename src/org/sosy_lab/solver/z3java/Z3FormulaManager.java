@@ -26,6 +26,7 @@ import static org.sosy_lab.solver.z3java.Z3NumeralFormulaManager.toAE;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
@@ -48,12 +49,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context> {
+final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context, FuncDecl> {
 
   @SuppressWarnings("checkstyle:parameternumber")
   Z3FormulaManager(
       Z3FormulaCreator pFormulaCreator,
-      Z3FunctionFormulaManager pFunctionManager,
+      Z3UFManager pFunctionManager,
       Z3BooleanFormulaManager pBooleanManager,
       Z3IntegerFormulaManager pIntegerManager,
       Z3RationalFormulaManager pRationalManager,
@@ -167,7 +168,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context>
   protected Expr substituteUsingListsImpl(Expr t, List<Expr> changeFrom, List<Expr> changeTo) {
     int size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
-    return t.substitute(changeFrom.toArray(new Expr[] {}), changeTo.toArray(new Expr[] {}));
+    return t.substitute(changeFrom.toArray(new Expr[changeFrom.size()]),
+        changeTo.toArray(new Expr[changeTo.size()]));
   }
 
   @Override

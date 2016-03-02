@@ -47,7 +47,8 @@ class CNFVisitor implements BooleanFormulaVisitor<List<BooleanFormula>> {
   }
 
   @Override
-  public List<BooleanFormula> visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
+  public List<BooleanFormula> visitAtom(
+      BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
     return singletonList(pAtom);
   }
 

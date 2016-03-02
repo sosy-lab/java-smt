@@ -25,16 +25,15 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_uf;
 
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractUFManager;
 
 import java.util.List;
 
-class Mathsat5FunctionFormulaManager
-    extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {
+class Mathsat5UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 
   private final long mathsatEnv;
 
-  Mathsat5FunctionFormulaManager(Mathsat5FormulaCreator pCreator) {
+  Mathsat5UFManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
     this.mathsatEnv = pCreator.getEnv();
   }

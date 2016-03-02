@@ -29,11 +29,12 @@ import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 
 import java.math.BigInteger;
 
-public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements BitvectorFormulaManager {
 
-  protected AbstractBitvectorFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractBitvectorFormulaManager(
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
   }
 

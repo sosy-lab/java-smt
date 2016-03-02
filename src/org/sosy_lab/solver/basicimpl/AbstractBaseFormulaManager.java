@@ -29,9 +29,9 @@ import org.sosy_lab.solver.api.FormulaType;
  * A BaseFormulaManager because all Abstract*FormulaManager-Classes wrap a FormulaCreator-instance.
  * @param <TFormulaInfo> the solver specific type.
  */
-abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> {
+abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
-  protected final FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator;
+  protected final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
   final Function<Formula, TFormulaInfo> extractor =
       new Function<Formula, TFormulaInfo>() {
@@ -41,11 +41,11 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> {
         }
       };
 
-  AbstractBaseFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator) {
+  AbstractBaseFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
     this.formulaCreator = pFormulaCreator;
   }
 
-  protected final FormulaCreator<TFormulaInfo, TType, TEnv> getFormulaCreator() {
+  protected final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> getFormulaCreator() {
     return formulaCreator;
   }
 

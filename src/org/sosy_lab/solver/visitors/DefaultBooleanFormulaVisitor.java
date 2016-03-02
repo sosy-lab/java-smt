@@ -46,7 +46,7 @@ public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaV
   }
 
   @Override
-  public R visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
+  public R visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
     return visitDefault();
   }
 

@@ -41,8 +41,8 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
     SmtInterpolEnvironment env =
         new SmtInterpolEnvironment(config, logger, pShutdownNotifier, smtLogfile, randomSeed);
     SmtInterpolFormulaCreator creator = new SmtInterpolFormulaCreator(env);
-    SmtInterpolFunctionFormulaManager functionTheory =
-        new SmtInterpolFunctionFormulaManager(creator);
+    SmtInterpolUFManager functionTheory =
+        new SmtInterpolUFManager(creator);
     SmtInterpolBooleanFormulaManager booleanTheory =
         new SmtInterpolBooleanFormulaManager(creator, env.getTheory());
     SmtInterpolIntegerFormulaManager integerTheory = new SmtInterpolIntegerFormulaManager(creator);

@@ -42,12 +42,12 @@ import java.math.BigDecimal;
  * (for example multiplication with constants should be supported by all solvers
  * and implemented by all sub-classes).
  */
-public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FloatingPointFormulaManager {
 
   protected AbstractFloatingPointFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
   }
 

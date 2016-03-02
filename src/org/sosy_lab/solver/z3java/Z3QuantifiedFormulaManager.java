@@ -23,6 +23,7 @@ import static org.sosy_lab.solver.z3java.Z3BooleanFormulaManager.toBool;
 
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 import com.microsoft.z3.Z3Exception;
 
@@ -31,7 +32,8 @@ import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 
 import java.util.List;
 
-class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Expr, Sort, Context> {
+class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Expr, Sort, Context,
+    FuncDecl> {
 
   private final Context z3context;
 
@@ -55,7 +57,7 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Expr, 
     try {
       return z3context.mkQuantifier(
           q == Quantifier.FORALL,
-          pVariables.toArray(new Expr[] {}),
+          pVariables.toArray(new Expr[pVariables.size()]),
           pBody,
           0,
           null,

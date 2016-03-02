@@ -87,7 +87,7 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
+  public BooleanFormula visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
     return pAtom;
   }
 

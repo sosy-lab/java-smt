@@ -48,11 +48,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort,
+    SmtInterpolEnvironment, FunctionSymbol> {
 
   SmtInterpolFormulaManager(
       SmtInterpolFormulaCreator pCreator,
-      SmtInterpolFunctionFormulaManager pFunctionManager,
+      SmtInterpolUFManager pFunctionManager,
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
@@ -185,4 +186,5 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, SmtIn
     }
     return ImmutableList.of(pF);
   }
+
 }

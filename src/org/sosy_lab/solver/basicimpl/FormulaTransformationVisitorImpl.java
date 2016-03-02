@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -73,8 +72,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   public Void visitFunction(
       Formula f,
       List<Formula> args,
-      FunctionDeclaration functionDeclaration,
-      Function<List<Formula>, Formula> newApplicationConstructor) {
+      FunctionDeclaration<?> functionDeclaration) {
 
     boolean allArgumentsTransformed = true;
 
@@ -100,7 +98,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
       // function application.
       toProcess.pop();
       Formula out =
-          delegate.visitFunction(f, newArgs, functionDeclaration, newApplicationConstructor);
+          delegate.visitFunction(f, newArgs, functionDeclaration);
       Formula prev = pCache.put(f, out);
       assert prev == null;
     }

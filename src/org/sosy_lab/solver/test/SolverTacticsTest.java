@@ -176,7 +176,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
+    public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
       started = true;
       return null;
     }
@@ -290,7 +290,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     }
 
     @Override
-    public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
+    public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
       wasLastVisitNot = false;
       return null;
     }

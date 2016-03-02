@@ -37,12 +37,12 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormulaManager;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
-import org.sosy_lab.solver.api.UfDeclaration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -345,10 +345,10 @@ public class SolverStackTest extends SolverBasedTest0 {
       IntegerFormula varB = imgr.makeVariable("b");
       stack.push(imgr.equal(varA, zero));
       stack.push(imgr.equal(varB, zero));
-      UfDeclaration<IntegerFormula> uf =
-          fmgr.declareUninterpretedFunction("uf", FormulaType.IntegerType, FormulaType.IntegerType);
-      stack.push(imgr.equal(fmgr.callUninterpretedFunction(uf, ImmutableList.of(varA)), zero));
-      stack.push(imgr.equal(fmgr.callUninterpretedFunction(uf, ImmutableList.of(varB)), zero));
+      FunctionDeclaration<IntegerFormula> uf =
+          fmgr.declareUF("uf", FormulaType.IntegerType, FormulaType.IntegerType);
+      stack.push(imgr.equal(fmgr.callUF(uf, ImmutableList.of(varA)), zero));
+      stack.push(imgr.equal(fmgr.callUF(uf, ImmutableList.of(varB)), zero));
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
@@ -361,7 +361,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       assertThat(
               model.evaluate(
-                  fmgr.callUninterpretedFunction(
+                  fmgr.callUF(
                       uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
           .isEqualTo(BigInteger.ZERO);
     }

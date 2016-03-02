@@ -377,6 +377,14 @@ final class Z3NativeApi {
   private static native long mk_func_decl(
       long context, long symbol, int len, long[] sorts, long sort);
 
+  /**
+   * Create a constant or function application.
+   *
+   * @param context Z3_context
+   * @param decl Z3_func_decl
+   * @param args Z3_ast[]
+   * @return Z3_ast
+   */
   private static native long mk_app(long context, long decl, int len, long[] args);
 
   static native long mk_const(long context, long symbol, long sort);

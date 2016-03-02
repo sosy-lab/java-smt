@@ -22,7 +22,6 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -209,8 +208,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
           public TraversalProcess visitFunction(
               Formula f,
               List<Formula> args,
-              FunctionDeclaration functionDeclaration,
-              Function<List<Formula>, Formula> constructor) {
+              FunctionDeclaration<?> functionDeclaration) {
 
             found.add(functionDeclaration.getName());
 
@@ -279,7 +277,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
       @Override
       public TraversalProcess visitAtom(
-          BooleanFormula atom, FunctionDeclaration funcDecl) {
+          BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
         if (funcDecl.getKind() == FunctionDeclarationKind.VAR) {
           foundVars.add(funcDecl.getName());
         }

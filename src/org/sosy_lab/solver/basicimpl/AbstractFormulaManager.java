@@ -59,43 +59,49 @@ import javax.annotation.Nullable;
  * Simplifies building a solver from the specific theories.
  * @param <TFormulaInfo> The solver specific type.
  */
-public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implements FormulaManager {
+public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> implements
+                                                                          FormulaManager {
 
-  private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv> arrayManager;
+  private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      arrayManager;
 
-  private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager;
+  private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> booleanManager;
 
   private final @Nullable IntegerFormulaManager integerManager;
 
   private final @Nullable RationalFormulaManager rationalManager;
 
-  private final @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv>
+  private final @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       bitvectorManager;
 
-  private final @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv>
+  private final @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       floatingPointManager;
 
-  private final AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager;
+  private final AbstractUFManager<TFormulaInfo, ?, TType, TEnv> functionManager;
 
-  private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
+  private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       quantifiedManager;
 
-  private final FormulaCreator<TFormulaInfo, TType, TEnv> formulaCreator;
+  private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
   /**
    * Builds a solver from the given theory implementations
    */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv> pFormulaCreator,
-      AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> functionManager,
-      AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> booleanManager,
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,
+      AbstractUFManager<TFormulaInfo, ?, TType, TEnv> functionManager,
+      AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> booleanManager,
       @Nullable IntegerFormulaManager pIntegerManager,
       @Nullable RationalFormulaManager pRationalManager,
-      @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> bitvectorManager,
-      @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv> floatingPointManager,
-      @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> quantifiedManager,
-      @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv> arrayManager) {
+      @Nullable
+      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bitvectorManager,
+      @Nullable
+      AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+          floatingPointManager,
+      @Nullable
+      AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> quantifiedManager,
+      @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager) {
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -116,7 +122,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     }
   }
 
-  public final FormulaCreator<TFormulaInfo, TType, TEnv> getFormulaCreator() {
+  public final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> getFormulaCreator() {
     return formulaCreator;
   }
 
@@ -137,12 +143,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv> getBooleanFormulaManager() {
+  public AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      getBooleanFormulaManager() {
     return booleanManager;
   }
 
   @Override
-  public AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv> getBitvectorFormulaManager() {
+  public AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      getBitvectorFormulaManager() {
     if (bitvectorManager == null) {
       throw new UnsupportedOperationException("Solver does not support bitvector theory");
     }
@@ -158,12 +166,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
   }
 
   @Override
-  public AbstractFunctionFormulaManager<TFormulaInfo, ?, TType, TEnv> getFunctionFormulaManager() {
+  public AbstractUFManager<TFormulaInfo, ?, TType, TEnv> getFunctionFormulaManager() {
     return functionManager;
   }
 
   @Override
-  public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv> getQuantifiedFormulaManager() {
+  public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      getQuantifiedFormulaManager() {
     if (quantifiedManager == null) {
       throw new UnsupportedOperationException("Solver does not support quantification");
     }
@@ -306,11 +315,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
               public Formula visitFunction(
                   Formula f,
                   List<Formula> newArgs,
-                  FunctionDeclaration functionDeclaration,
-                  Function<List<Formula>, Formula> newApplicationConstructor) {
+                  FunctionDeclaration<?> functionDeclaration) {
                 Formula out = fromToMapping.get(f);
                 if (out == null) {
-                  return newApplicationConstructor.apply(newArgs);
+                  return makeApplication(functionDeclaration, newArgs);
                 } else {
                   return out;
                 }
@@ -429,6 +437,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv> implemen
     T out = (T) t;
     return out;
   }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T extends Formula> T makeApplication(
+      FunctionDeclaration<T> declaration,
+      List<? extends Formula> args) {
+    return formulaCreator.callFunction(declaration, args);
+  }
+
 
   @Override
   public <T extends Formula> T substitute(

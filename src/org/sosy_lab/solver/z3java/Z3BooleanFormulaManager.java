@@ -22,13 +22,14 @@ package org.sosy_lab.solver.z3java;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
 import java.util.Collection;
 
-class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Expr, Sort, Context> {
+class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Expr, Sort, Context, FuncDecl> {
 
   private final Context z3context;
 
@@ -42,7 +43,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Expr, Sort, 
   }
 
   static BoolExpr[] toBool(Collection<? extends Expr> e) {
-    return e.toArray(new BoolExpr[] {});
+    return e.toArray(new BoolExpr[e.size()]);
   }
 
   @Override

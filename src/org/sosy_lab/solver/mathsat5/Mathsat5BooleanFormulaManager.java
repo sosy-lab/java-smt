@@ -33,7 +33,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
-class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
+class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long mathsatEnv;
 

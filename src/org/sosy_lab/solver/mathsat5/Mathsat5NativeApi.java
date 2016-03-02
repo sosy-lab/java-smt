@@ -452,6 +452,18 @@ class Mathsat5NativeApi {
   public static native long msat_make_fp_bits_number(
       long e, String bitRep, long exp_w, long mant_w);
 
+  /**
+   * Creates a term from a declaration and a list of arguments
+   *
+   * <p>Precondition: The length of {@code args} should be equal to the arity
+   *             of {@code d}
+   *
+   * @param e msat_env The environment in which to create the term
+   * @param d msat_decl The declaration
+   * @param args msat_term[] The arguments
+   * @return msat_term The created term, or a t s.t. ::MSAT_ERROR_TERM(t) is true
+   *         in case of errors.
+   */
   public static native long msat_make_term(long e, long d, long[] args);
 
   public static native long msat_make_copy_from(long e, long t, long src);
@@ -569,6 +581,18 @@ class Mathsat5NativeApi {
   //public static native int msat_visit_term(long e, msat_visit_term_callback func)
   public static native long msat_find_decl(long e, String symbol);
 
+  /**
+   * Returns the declaration associated to {@code t} (if any)
+   *
+   * <p>If {@code t} is not a constant or a function application, the returned value \a
+   * ret will be s.t. MSAT_ERROR_DECL(ret) is true
+   *
+   * @param t msat_term The term for which to retrieve the declaration
+   *
+   * @return msat_decl If {@code t} is a constant, its declaration is returned; if it
+   *         is an uif, the declaration of the function is returned; otherwise,
+   *         a {@code ret} s.t. MSAT_ERROR_DECL(ret) is true is returned
+   */
   public static native long msat_term_get_decl(long t);
 
   public static native int msat_decl_id(long d);

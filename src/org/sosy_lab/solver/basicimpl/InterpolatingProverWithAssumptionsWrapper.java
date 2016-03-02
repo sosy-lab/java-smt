@@ -140,7 +140,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     }
 
     @Override
-    public BooleanFormula visitAtom(BooleanFormula atom, FunctionDeclaration decl) {
+    public BooleanFormula visitAtom(BooleanFormula atom, FunctionDeclaration<BooleanFormula> decl) {
       if (decl.getKind() == FunctionDeclarationKind.VAR) {
         String varName = decl.getName();
         if (solverAssumptionsContainsVar(varName)) {

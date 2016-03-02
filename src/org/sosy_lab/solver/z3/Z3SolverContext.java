@@ -187,7 +187,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config);
 
     // Create managers
-    Z3FunctionFormulaManager functionTheory = new Z3FunctionFormulaManager(creator);
+    Z3UFManager functionTheory = new Z3UFManager(creator);
     Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
     Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
     Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);

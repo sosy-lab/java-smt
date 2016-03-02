@@ -25,6 +25,5 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
-    setDefault(FunctionDeclaration.class, FunctionDeclaration.of("F", FunctionDeclarationKind.UF));
   }
 }

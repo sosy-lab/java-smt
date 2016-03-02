@@ -53,7 +53,8 @@ import java.math.BigInteger;
 /**
  * Mathsat Bitvector Theory, build out of Bitvector*Operations.
  */
-class Mathsat5BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Long, Long> {
+class Mathsat5BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Long, Long,
+    Long> {
 
   private final long mathsatEnv;
 

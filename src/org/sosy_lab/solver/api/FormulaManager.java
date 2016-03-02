@@ -85,7 +85,7 @@ public interface FormulaManager {
   /**
    * Returns the Function-Theory.
    */
-  FunctionFormulaManager getFunctionFormulaManager();
+  UFManager getFunctionFormulaManager();
 
   /**
    * Returns the interface for handling quantifiers.
@@ -108,6 +108,16 @@ public interface FormulaManager {
    * @return the created variable.
    */
   <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name);
+
+  /**
+   * Create a function application to the given list of arguments.
+   *
+   * @param declaration Function declaration
+   * @param args List of arguments
+   * @return Constructed formula
+   */
+  <T extends Formula> T makeApplication(
+      FunctionDeclaration<T> declaration, List<? extends Formula> args);
 
   /**
    * Returns the type of the given Formula.

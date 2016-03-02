@@ -19,12 +19,8 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static ap.basetypes.IdealInt.ONE;
-import static ap.basetypes.IdealInt.ZERO;
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier.FORALL;
-import static scala.collection.JavaConversions.asScalaBuffer;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
@@ -34,11 +30,9 @@ import ap.parser.IBoolLit;
 import ap.parser.IConstant;
 import ap.parser.IEpsilon;
 import ap.parser.IExpression;
-import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
 import ap.parser.IFunApp;
-import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
@@ -51,26 +45,28 @@ import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 
-import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.solver.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
+import org.sosy_lab.solver.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import scala.Enumeration;
-import scala.collection.mutable.ArrayBuffer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class PrincessFormulaCreator
-    extends FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> {
+    extends FormulaCreator<IExpression,
+      PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   PrincessFormulaCreator(
       PrincessEnvironment pEnv, PrincessTermType pBoolType, PrincessTermType pIntegerType) {
@@ -187,25 +183,29 @@ class PrincessFormulaCreator
 
     } else {
       int arity = input.length();
-      List<Formula> args = new ArrayList<>(arity);
+      ImmutableList.Builder<Formula> args = ImmutableList.builder();
+      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
         IExpression arg = input.apply(i);
         FormulaType<?> argumentType = getFormulaType(arg);
         args.add(encapsulate(argumentType, arg));
+        argTypes.add(argumentType);
+      }
+      PrincessFunctionDeclaration solverDeclaration;
+      if (input instanceof IFunApp) {
+        solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+      } else {
+        solverDeclaration = new PrincessByExampleDeclaration(input);
       }
 
-      // Any function application.
-      Function<List<Formula>, Formula> constructor =
-          new Function<List<Formula>, Formula>() {
-            @Override
-            public Formula apply(List<Formula> formulas) {
-              // replace arguments of function
-              return encapsulateWithTypeOf(input.update(asScalaBuffer(extractInfo(formulas))));
-            }
-          };
-
       return visitor.visitFunction(
-          f, args, FunctionDeclaration.of(getName(input), getDeclarationKind(input)), constructor);
+          f, args.build(), FunctionDeclarationImpl.of(
+              getName(input),
+              getDeclarationKind(input),
+              argTypes.build(),
+              getFormulaType(f),
+              solverDeclaration
+          ));
     }
   }
 
@@ -256,33 +256,18 @@ class PrincessFormulaCreator
     return (t instanceof IBinFormula) && val == ((IBinFormula) t).j(); // j is the operator
   }
 
-  public IExpression makeFunction(IFunction funcDecl, List<IExpression> args) {
-    checkArgument(args.size() == funcDecl.arity(), "functiontype has different number of args.");
+  public IExpression makeFunction(PrincessFunctionDeclaration pFuncDecl, List<IExpression> args) {
+    return pFuncDecl.makeApp(getEnv(), args);
+  }
 
-    final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
-    for (IExpression arg : args) {
-      ITerm termArg;
-      if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
-        termArg = new ITermITE((IFormula) arg, new IIntLit(ZERO()), new IIntLit(ONE()));
-      } else {
-        termArg = (ITerm) arg;
-      }
-      argsBuf.$plus$eq(termArg);
-    }
+  @Override
+  public IExpression callFunctionImpl(
+      FunctionDeclarationImpl<?, PrincessFunctionDeclaration> declaration, List<IExpression> args) {
+    return makeFunction(declaration.getSolverDeclaration(), args);
+  }
 
-    IExpression returnFormula = new IFunApp(funcDecl, argsBuf.toSeq());
-    PrincessTermType returnType = environment.getReturnTypeForFunction(funcDecl);
-
-    // boolean term, so we have to use the fun-applier instead of the function itself
-    if (returnType == PrincessTermType.Boolean) {
-      BooleanFunApplier ap = new BooleanFunApplier(funcDecl);
-      return ap.apply(argsBuf);
-
-    } else if (returnType == PrincessTermType.Integer) {
-      return returnFormula;
-    } else {
-      throw new AssertionError(
-          "Not possible to have return types for functions other than bool or int.");
-    }
+  @Override
+  protected PrincessFunctionDeclaration getBooleanVarDeclarationImpl(IExpression pIExpression) {
+    return new PrincessByExampleDeclaration(pIExpression);
   }
 }

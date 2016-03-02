@@ -50,16 +50,16 @@ import org.sosy_lab.solver.basicimpl.AbstractFloatingPointFormulaManager;
 import java.math.BigDecimal;
 
 class Mathsat5FloatingPointFormulaManager
-    extends AbstractFloatingPointFormulaManager<Long, Long, Long> {
+    extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {
 
-  private final Mathsat5FunctionFormulaManager ffmgr;
+  private final Mathsat5UFManager ffmgr;
 
   private final long mathsatEnv;
 
   private final long roundingMode;
 
   Mathsat5FloatingPointFormulaManager(
-      Mathsat5FormulaCreator pCreator, Mathsat5FunctionFormulaManager pFfmgr) {
+      Mathsat5FormulaCreator pCreator, Mathsat5UFManager pFfmgr) {
     super(pCreator);
 
     ffmgr = pFfmgr;

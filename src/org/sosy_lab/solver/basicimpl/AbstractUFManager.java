@@ -23,12 +23,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FunctionFormulaManager;
-import org.sosy_lab.solver.api.UfDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.FunctionDeclarationKind;
+import org.sosy_lab.solver.api.UFManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,14 +40,14 @@ import java.util.List;
  * to the solver specific type.
  *
  * @param <TFormulaInfo> The solver specific type.
- * @param <TFunctionDecl> The solver specific type of declarations of uninterpreted functions
+ * @param <TFunctionDecl> The solver specific type of declarations of any function application
  * @param <TType> The solver specific type of formula-types.
  */
-public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl, TType, TEnv>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
-    implements FunctionFormulaManager {
+public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFunctionDecl>
+    implements UFManager {
 
-  protected AbstractFunctionFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractUFManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFunctionDecl> pCreator) {
     super(pCreator);
   }
 
@@ -54,7 +55,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       String pName, TType pReturnType, List<TType> pArgTypes);
 
   @Override
-  public final <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
+  public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkArgument(
         !pArgTypes.contains(FormulaType.BooleanType),
@@ -65,48 +66,37 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
       argTypes.add(toSolverType(argtype));
     }
 
-    return new UfDeclarationImpl<>(
+    return FunctionDeclarationImpl.of(
+        pName,
+        FunctionDeclarationKind.UF,
+        pArgTypes,
         pReturnType,
-        declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes),
-        pArgTypes);
+        declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes));
   }
 
   @Override
-  public <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
+  public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
 
-    return declareUninterpretedFunction(pName, pReturnType, Arrays.asList(pArgs));
+    return declareUF(pName, pReturnType, Arrays.asList(pArgs));
   }
 
   protected abstract TFormulaInfo createUninterpretedFunctionCallImpl(
       TFunctionDecl func, List<TFormulaInfo> pArgs);
 
   @Override
-  public <T extends Formula> T callUninterpretedFunction(
-      UfDeclaration<T> funcType, Formula... args) {
-    return callUninterpretedFunction(funcType, Arrays.asList(args));
+  public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
+    return formulaCreator.callFunction(funcType, ImmutableList.copyOf(args));
   }
 
   @Override
-  public final <T extends Formula> T callUninterpretedFunction(
-      UfDeclaration<T> pFunc, List<? extends Formula> pArgs) {
-    FormulaType<T> retType = pFunc.getReturnType();
-    List<TFormulaInfo> list = Lists.transform(pArgs, extractor);
-
-    TFormulaInfo formulaInfo = createUninterpretedFunctionCallImpl(pFunc, list);
-    return getFormulaCreator().encapsulate(retType, formulaInfo);
-  }
-
-  final <T extends Formula> TFormulaInfo createUninterpretedFunctionCallImpl(
-      UfDeclaration<T> pFunc, List<TFormulaInfo> pArgs) {
-    @SuppressWarnings("unchecked")
-    UfDeclarationImpl<T, TFunctionDecl> func = (UfDeclarationImpl<T, TFunctionDecl>) pFunc;
-
-    return createUninterpretedFunctionCallImpl(func.getFuncDecl(), pArgs);
+  public final <T extends Formula> T callUF(
+      FunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
+    return formulaCreator.callFunction(pFunc, pArgs);
   }
 
   @Override
-  public <T extends Formula> T declareAndCallUninterpretedFunction(
+  public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
 
     List<FormulaType<?>> argTypes =
@@ -119,7 +109,7 @@ public abstract class AbstractFunctionFormulaManager<TFormulaInfo, TFunctionDecl
                   }
                 })
             .toList();
-    UfDeclaration<T> func = declareUninterpretedFunction(name, pReturnType, argTypes);
-    return callUninterpretedFunction(func, pArgs);
+    FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
+    return callUF(func, pArgs);
   }
 }

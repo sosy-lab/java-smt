@@ -26,7 +26,7 @@ import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 
 import java.util.List;
 
-class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long> {
+class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
 

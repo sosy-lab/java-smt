@@ -42,11 +42,12 @@ import java.util.Map.Entry;
  */
 public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAssignment> {
   private final Iterator<Entry<E, Object>> valuesIterator;
-  private final FormulaCreator<E, ?, ?> creator;
+  private final FormulaCreator<E, ?, ?, ?> creator;
   private final Function<E, Object> evaluator;
 
   public TermExtractionModelIterator(
-      FormulaCreator<E, ?, ?> creator, Function<E, Object> evaluator, Iterable<E> assertedTerms) {
+      FormulaCreator<E, ?, ?, ?> creator, Function<E, Object> evaluator, Iterable<E>
+      assertedTerms) {
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
     this.evaluator = checkNotNull(evaluator);
@@ -95,8 +96,7 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
               public String visitFunction(
                   Formula f,
                   List<Formula> args,
-                  FunctionDeclaration functionDeclaration,
-                  Function<List<Formula>, Formula> newApplicationConstructor) {
+                  FunctionDeclaration<?> functionDeclaration) {
 
                 // Populate argument interpretation.
                 for (Formula arg : args) {

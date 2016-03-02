@@ -28,7 +28,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 
-class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long> {
+class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long mathsatEnv;
 

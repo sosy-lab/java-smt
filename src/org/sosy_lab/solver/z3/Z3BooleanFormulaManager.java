@@ -38,7 +38,7 @@ import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
 import java.util.Collection;
 
-class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long> {
+class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
 

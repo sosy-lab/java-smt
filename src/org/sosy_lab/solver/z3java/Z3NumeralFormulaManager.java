@@ -22,6 +22,7 @@ package org.sosy_lab.solver.z3java;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 
 import org.sosy_lab.solver.api.NumeralFormula;
@@ -34,7 +35,7 @@ import java.util.List;
 abstract class Z3NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        Expr, Sort, Context, ParamFormulaType, ResultFormulaType> {
+        Expr, Sort, Context, ParamFormulaType, ResultFormulaType, FuncDecl> {
 
   protected final Context z3context;
 
@@ -48,7 +49,7 @@ abstract class Z3NumeralFormulaManager<
   }
 
   private static ArithExpr[] toAE(Collection<Expr> e) {
-    return e.toArray(new ArithExpr[] {});
+    return e.toArray(new ArithExpr[e.size()]);
   }
 
   abstract protected Sort getNumeralType();

@@ -66,7 +66,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
         new PrincessFormulaCreator(env, PrincessTermType.Boolean, PrincessTermType.Integer);
 
     // Create managers
-    PrincessFunctionFormulaManager functionTheory = new PrincessFunctionFormulaManager(creator);
+    PrincessUFManager functionTheory = new PrincessUFManager(creator);
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
     PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);

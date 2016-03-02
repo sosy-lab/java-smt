@@ -53,7 +53,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
   PrincessInterpolatingProver(
       PrincessFormulaManager pMgr,
-      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> creator) {
+      FormulaCreator<IExpression,
+          PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> creator) {
 
     super(pMgr, true, creator);
   }

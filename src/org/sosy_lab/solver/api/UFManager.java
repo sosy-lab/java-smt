@@ -24,35 +24,36 @@ import java.util.List;
 /**
  * Manager for dealing with UFs.
  */
-public interface FunctionFormulaManager {
+public interface UFManager {
 
   /**
    * Declare an uninterpreted function.
    */
-  <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
+  <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args);
 
   /**
    * Declare an uninterpreted function.
    */
-  <T extends Formula> UfDeclaration<T> declareUninterpretedFunction(
+  <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, FormulaType<?>... args);
 
   /**
    * Create an uninterpreted function call.
    *
+   * <p>Simply delegates to {@link FormulaManager#makeApplication(FunctionDeclaration, List)}
+   *
    * @param funcType Declaration of the function to call.
    * @param args Arguments of the function.
    * @return Instantiated function call.
    */
-  <T extends Formula> T callUninterpretedFunction(
-      UfDeclaration<T> funcType, List<? extends Formula> args);
+  <T extends Formula> T callUF(FunctionDeclaration<T> funcType, List<? extends Formula> args);
 
-  <T extends Formula> T callUninterpretedFunction(UfDeclaration<T> funcType, Formula... args);
+  <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args);
 
   /**
    * Declares and calls an uninterpreted function.
    */
-  <T extends Formula> T declareAndCallUninterpretedFunction(
+  <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs);
 }

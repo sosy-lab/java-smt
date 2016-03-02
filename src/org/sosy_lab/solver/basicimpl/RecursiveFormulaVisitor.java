@@ -21,7 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -89,10 +88,9 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
   public TraversalProcess visitFunction(
       Formula pF,
       List<Formula> pArgs,
-      FunctionDeclaration pFunctionDeclaration,
-      Function<List<Formula>, Formula> pNewApplicationConstructor) {
+      FunctionDeclaration<?> pFunctionDeclaration) {
     TraversalProcess result =
-        delegate.visitFunction(pF, pArgs, pFunctionDeclaration, pNewApplicationConstructor);
+        delegate.visitFunction(pF, pArgs, pFunctionDeclaration);
     addToQueueIfNecessary(result, pArgs);
     return result;
   }

@@ -26,7 +26,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 
-class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long> {
+class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
 

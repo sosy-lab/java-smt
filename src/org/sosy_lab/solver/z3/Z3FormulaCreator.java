@@ -88,9 +88,9 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
@@ -107,10 +107,10 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.z3.Z3Formula.Z3ArrayFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3BitvectorFormula;
@@ -127,7 +127,7 @@ import java.util.List;
 import java.util.Map;
 
 @Options(prefix = "solver.z3")
-class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
+class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
@@ -370,23 +370,25 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
           }
         }
 
-        List<Formula> args = new ArrayList<>(arity);
+        ImmutableList.Builder<Formula> args = ImmutableList.builder();
+        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         for (int i = 0; i < arity; i++) {
           long arg = get_app_arg(environment, f, i);
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
+          argTypes.add(argumentType);
         }
-
-        // Any function application.
-        Function<List<Formula>, Formula> constructor =
-            new Function<List<Formula>, Formula>() {
-              @Override
-              public Formula apply(List<Formula> formulas) {
-                return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
-              }
-            };
         return visitor.visitFunction(
-            formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
+            formula,
+            args.build(),
+            FunctionDeclarationImpl.of(
+                name,
+                getDeclarationKind(f),
+                argTypes.build(),
+                getFormulaType(f),
+                funcDecl
+            )
+        );
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(environment, f);
         return visitor.visitBoundVariable(formula, deBruijnIdx);
@@ -495,5 +497,20 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long> {
     } finally {
       dec_ref(environment, value);
     }
+  }
+
+  @Override
+  public Long callFunctionImpl(
+      FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
+    return Z3NativeApi.mk_app(
+        environment,
+        declaration.getSolverDeclaration(),
+        Longs.toArray(args)
+    );
+  }
+
+  @Override
+  protected Long getBooleanVarDeclarationImpl(Long pLong) {
+    return get_app_decl(getEnv(), pLong);
   }
 }

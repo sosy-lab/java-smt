@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
@@ -44,11 +45,12 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
   private final List<Term> assertedTerms;
-  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment> creator;
+  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private boolean closed = false;
 
   SmtInterpolTheoremProver(
-      SmtInterpolFormulaManager pMgr, FormulaCreator<Term, Sort, SmtInterpolEnvironment> pCreator) {
+      SmtInterpolFormulaManager pMgr,
+      FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> pCreator) {
     mgr = pMgr;
     assertedTerms = new ArrayList<>();
     env = mgr.createEnvironment();

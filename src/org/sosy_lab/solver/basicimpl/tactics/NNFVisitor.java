@@ -83,7 +83,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitAtom(BooleanFormula pAtom, FunctionDeclaration decl) {
+    public BooleanFormula visitAtom(
+        BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
       return bfmgr.not(pAtom);
     }
 

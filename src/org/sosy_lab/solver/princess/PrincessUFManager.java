@@ -23,33 +23,33 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.FluentIterable.from;
 
 import ap.parser.IExpression;
-import ap.parser.IFunction;
 
 import com.google.common.base.Predicates;
 
-import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractUFManager;
+import org.sosy_lab.solver.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 
 import java.util.List;
 
-class PrincessFunctionFormulaManager
-    extends AbstractFunctionFormulaManager<
-        IExpression, IFunction, PrincessTermType, PrincessEnvironment> {
+class PrincessUFManager
+    extends AbstractUFManager<
+        IExpression, PrincessFunctionDeclaration, PrincessTermType, PrincessEnvironment> {
 
   private final PrincessFormulaCreator creator;
 
-  PrincessFunctionFormulaManager(PrincessFormulaCreator creator) {
+  PrincessUFManager(PrincessFormulaCreator creator) {
     super(creator);
     this.creator = creator;
   }
 
   @Override
   protected IExpression createUninterpretedFunctionCallImpl(
-      IFunction pFuncDecl, List<IExpression> pArgs) {
+      PrincessFunctionDeclaration pFuncDecl, List<IExpression> pArgs) {
     return creator.makeFunction(pFuncDecl, pArgs);
   }
 
   @Override
-  protected IFunction declareUninterpretedFunctionImpl(
+  protected PrincessFunctionDeclaration declareUninterpretedFunctionImpl(
       String pName, PrincessTermType pReturnType, List<PrincessTermType> args) {
     checkArgument(
         pReturnType == PrincessTermType.Integer || pReturnType == PrincessTermType.Boolean,
@@ -58,6 +58,7 @@ class PrincessFunctionFormulaManager
         from(args).allMatch(Predicates.equalTo(PrincessTermType.Integer)),
         "Princess does not support argument types of UFs other than Integer");
 
-    return getFormulaCreator().getEnv().declareFun(pName, args.size(), pReturnType);
+    return new PrincessIFunctionDeclaration(
+        getFormulaCreator().getEnv().declareFun(pName, args.size(), pReturnType));
   }
 }

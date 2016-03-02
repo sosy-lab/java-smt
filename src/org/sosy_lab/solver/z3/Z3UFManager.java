@@ -26,15 +26,15 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
 
 import com.google.common.primitives.Longs;
 
-import org.sosy_lab.solver.basicimpl.AbstractFunctionFormulaManager;
+import org.sosy_lab.solver.basicimpl.AbstractUFManager;
 
 import java.util.List;
 
-class Z3FunctionFormulaManager extends AbstractFunctionFormulaManager<Long, Long, Long, Long> {
+class Z3UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 
   private final long z3context;
 
-  Z3FunctionFormulaManager(Z3FormulaCreator creator) {
+  Z3UFManager(Z3FormulaCreator creator) {
     super(creator);
     this.z3context = creator.getEnv();
   }

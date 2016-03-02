@@ -38,7 +38,6 @@ import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.solver.api.UfDeclaration;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.ArrayFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.BitvectorFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.BooleanFormulaImpl;
@@ -69,7 +68,7 @@ import javax.annotation.Nullable;
  * @param <TType> the solver specific type for formula types.
  * @param <TEnv> the solver specific type for the environment/context.
  */
-public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
+public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   private final TType boolType;
   private final @Nullable TType integerType;
@@ -229,11 +228,6 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
 
-  public <T extends Formula, TF> UfDeclaration<T> createUfDeclaration(
-      FormulaType<T> returnType, TF funcDecl, List<FormulaType<?>> argumentTypes) {
-    return new UfDeclarationImpl<>(returnType, funcDecl, argumentTypes);
-  }
-
   @CanIgnoreReturnValue
   public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
     return visit(visitor, input, extractInfo(input));
@@ -242,15 +236,16 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
   public abstract <R> R visit(
       FormulaVisitor<R> visitor, final Formula formula, final TFormulaInfo f);
 
-  protected List<TFormulaInfo> extractInfo(List<Formula> input) {
-    return Lists.transform(
-        input,
-        new Function<Formula, TFormulaInfo>() {
-          @Override
-          public TFormulaInfo apply(Formula formula) {
-            return extractInfo(formula);
-          }
-        });
+  private final Function<Formula, TFormulaInfo> infoExtractor =
+      new Function<Formula, TFormulaInfo>() {
+    @Override
+    public TFormulaInfo apply(Formula formula) {
+      return extractInfo(formula);
+    }
+  };
+
+  protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
+    return Lists.transform(input, infoExtractor);
   }
 
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
@@ -324,8 +319,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
           public TraversalProcess visitFunction(
               Formula f,
               List<Formula> args,
-              FunctionDeclaration functionDeclaration,
-              Function<List<Formula>, Formula> constructor) {
+              FunctionDeclaration<?> functionDeclaration) {
 
             if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
               found.put(functionDeclaration.getName(), f);
@@ -342,4 +336,23 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv> {
         pFormula);
     return found;
   }
+
+  @SuppressWarnings("unchecked")
+  public final <T extends Formula> T callFunction(
+      FunctionDeclaration<T> declaration,
+      List<? extends Formula> args) {
+    return encapsulate(declaration.getType(), callFunctionImpl(
+        (FunctionDeclarationImpl<T, TFuncDecl>) declaration, extractInfo(args)
+    ));
+  }
+
+  public abstract TFormulaInfo callFunctionImpl(
+      FunctionDeclarationImpl<?, TFuncDecl> declaration,
+      List<TFormulaInfo> args);
+
+  public TFuncDecl getBooleanVarDeclaration(BooleanFormula var) {
+    return getBooleanVarDeclarationImpl(extractInfo(var));
+  }
+
+  protected abstract TFuncDecl getBooleanVarDeclarationImpl(TFormulaInfo pTFormulaInfo);
 }

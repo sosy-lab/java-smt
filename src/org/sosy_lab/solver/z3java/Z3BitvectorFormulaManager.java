@@ -22,13 +22,15 @@ package org.sosy_lab.solver.z3java;
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 
 import org.sosy_lab.solver.basicimpl.AbstractBitvectorFormulaManager;
 
 import java.math.BigInteger;
 
-class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Expr, Sort, Context> {
+class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Expr, Sort, Context,
+    FuncDecl> {
 
   private final Context z3context;
 

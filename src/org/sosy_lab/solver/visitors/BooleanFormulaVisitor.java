@@ -122,9 +122,10 @@ public interface BooleanFormulaVisitor<R> {
 
   /**
    * Visit an SMT atom.
+   * An atom can be a theory expression, constant, or a variable.
    *
    * <p>This is anything with a boolean sort which is not covered by the cases
    * above.
    */
-  R visitAtom(BooleanFormula atom, FunctionDeclaration funcDecl);
+  R visitAtom(BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl);
 }

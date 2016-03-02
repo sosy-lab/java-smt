@@ -21,10 +21,11 @@ package org.sosy_lab.solver.z3java;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
+
 import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.BitVecSort;
 import com.microsoft.z3.Context;
@@ -44,17 +45,17 @@ import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+import org.sosy_lab.solver.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
+class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
 
   private final Table<Sort, Sort, Sort> allocatedArraySorts = HashBasedTable.create();
 
@@ -152,7 +153,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
 
   private Expr replaceArgs(Expr t, List<Expr> newArgs) {
     Preconditions.checkState(t.getNumArgs() == newArgs.size());
-    Expr[] newParams = newArgs.toArray(new Expr[] {});
+    Expr[] newParams = newArgs.toArray(new Expr[newArgs.size()]);
     // TODO check equality of sort of each oldArg and newArg
     return environment.mkApp(t.getFuncDecl(), newParams);
   }
@@ -181,23 +182,26 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
           }
         }
 
-        List<Formula> args = new ArrayList<>(arity);
+        ImmutableList.Builder<Formula> args = ImmutableList.builder();
+        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         for (int i = 0; i < arity; i++) {
           Expr arg = f.getArgs()[i];
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
+          argTypes.add(argumentType);
         }
 
         // Any function application.
-        Function<List<Formula>, Formula> constructor =
-            new Function<List<Formula>, Formula>() {
-              @Override
-              public Formula apply(List<Formula> formulas) {
-                return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
-              }
-            };
         return visitor.visitFunction(
-            formula, args, FunctionDeclaration.of(name, getDeclarationKind(f)), constructor);
+            formula,
+            args.build(),
+            FunctionDeclarationImpl.of(
+                name,
+                getDeclarationKind(f),
+                argTypes.build(),
+                getFormulaType(f),
+                f.getFuncDecl()
+            ));
       case Z3_VAR_AST:
         int deBruijnIdx = f.getIndex();
         return visitor.visitBoundVariable(formula, deBruijnIdx);
@@ -312,5 +316,16 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context> {
     Z3_sort_kind sortKind = argSort.getSortKind();
     Preconditions.checkArgument(sortKind == Z3_sort_kind.Z3_BV_SORT);
     return new BigInteger(pF.toString());
+  }
+
+  @Override
+  public Expr callFunctionImpl(
+      FunctionDeclarationImpl<?, FuncDecl> declaration, List<Expr> args) {
+    return declaration.getSolverDeclaration().apply(args.toArray(new Expr[args.size()]));
+  }
+
+  @Override
+  protected FuncDecl getBooleanVarDeclarationImpl(Expr pExpr) {
+    return pExpr.getFuncDecl();
   }
 }

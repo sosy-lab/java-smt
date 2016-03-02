@@ -1,9 +1,11 @@
 package org.sosy_lab.solver.api;
 
+import org.sosy_lab.solver.basicimpl.FunctionDeclarationImpl;
+
 /**
  * Types of function declarations.
  *
- * @see FunctionDeclaration
+ * @see FunctionDeclarationImpl
  */
 public enum FunctionDeclarationKind {
   AND,

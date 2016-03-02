@@ -41,11 +41,11 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FloatingPointFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
-import org.sosy_lab.solver.api.FunctionFormulaManager;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.api.UFManager;
 
 import javax.annotation.Nullable;
 
@@ -89,7 +89,7 @@ public abstract class SolverBasedTest0 {
   protected SolverContext context;
   protected FormulaManager mgr;
   protected BooleanFormulaManager bmgr;
-  protected FunctionFormulaManager fmgr;
+  protected UFManager fmgr;
   protected IntegerFormulaManager imgr;
   protected @Nullable RationalFormulaManager rmgr;
   protected @Nullable BitvectorFormulaManager bvmgr;

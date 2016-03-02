@@ -28,11 +28,12 @@ import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
 import java.util.List;
 
-public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv>
+public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
 
-  protected AbstractQuantifiedFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractQuantifiedFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl>
+                                                 pCreator) {
     super(pCreator);
   }
 

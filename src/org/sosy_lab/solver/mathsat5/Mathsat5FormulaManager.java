@@ -46,12 +46,12 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import java.util.List;
 import java.util.Map;
 
-final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
+final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
   @SuppressWarnings("checkstyle:parameternumber")
   Mathsat5FormulaManager(
       Mathsat5FormulaCreator creator,
-      Mathsat5FunctionFormulaManager pFunctionManager,
+      Mathsat5UFManager pFunctionManager,
       Mathsat5BooleanFormulaManager pBooleanManager,
       Mathsat5IntegerFormulaManager pIntegerManager,
       Mathsat5RationalFormulaManager pRationalManager,
@@ -77,6 +77,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   BooleanFormula encapsulateBooleanFormula(long t) {
     return getFormulaCreator().encapsulateBoolean(t);
   }
+
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {

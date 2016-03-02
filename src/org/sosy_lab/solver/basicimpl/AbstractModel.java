@@ -35,9 +35,9 @@ import javax.annotation.Nullable;
 
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
 
-  protected final FormulaCreator<TFormulaInfo, TType, TEnv> creator;
+  protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
 
-  protected AbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv> creator) {
+  protected AbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
     this.creator = creator;
   }
 

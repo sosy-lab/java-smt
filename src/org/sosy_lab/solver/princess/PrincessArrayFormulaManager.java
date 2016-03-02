@@ -29,12 +29,14 @@ import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 public class PrincessArrayFormulaManager
-    extends AbstractArrayFormulaManager<IExpression, PrincessTermType, PrincessEnvironment> {
+    extends AbstractArrayFormulaManager<IExpression, PrincessTermType, PrincessEnvironment,
+    PrincessFunctionDeclaration> {
 
   private final PrincessEnvironment env;
 
   public PrincessArrayFormulaManager(
-      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment> pFormulaCreator) {
+      FormulaCreator<IExpression,
+          PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> pFormulaCreator) {
     super(pFormulaCreator);
     env = pFormulaCreator.getEnv();
   }

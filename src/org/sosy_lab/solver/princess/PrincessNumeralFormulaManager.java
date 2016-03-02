@@ -29,7 +29,8 @@ import org.sosy_lab.solver.basicimpl.AbstractNumeralFormulaManager;
 abstract class PrincessNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        IExpression, PrincessTermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType> {
+        IExpression, PrincessTermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType,
+    PrincessFunctionDeclaration> {
 
   PrincessNumeralFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);

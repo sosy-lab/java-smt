@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
@@ -30,7 +31,7 @@ import java.math.BigInteger;
 abstract class SmtInterpolNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType> {
+        Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType, FunctionSymbol> {
 
   private final SmtInterpolEnvironment env;
   private final SmtInterpolFormulaCreator creator;

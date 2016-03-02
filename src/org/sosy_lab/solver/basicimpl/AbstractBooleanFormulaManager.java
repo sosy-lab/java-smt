@@ -21,9 +21,9 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -40,10 +40,12 @@ import org.sosy_lab.solver.visitors.TraversalProcess;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv> implements BooleanFormulaManager {
+public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> implements
+                                                                     BooleanFormulaManager {
 
-  protected AbstractBooleanFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv> pCreator) {
+  protected AbstractBooleanFormulaManager(
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
   }
 
@@ -231,8 +233,15 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
 
       // Only boolean formulas can appear here.
       assert f instanceof BooleanFormula;
+      BooleanFormula casted = (BooleanFormula) f;
       return delegate.visitAtom(
-          (BooleanFormula) f, FunctionDeclaration.of(name, FunctionDeclarationKind.VAR));
+           casted, FunctionDeclarationImpl.of(
+              name,
+              FunctionDeclarationKind.VAR,
+              ImmutableList.<FormulaType<?>>of(),
+              FormulaType.BooleanType,
+              formulaCreator.getBooleanVarDeclaration(casted)
+          ));
     }
 
     @Override
@@ -259,8 +268,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     public R visitFunction(
         Formula f,
         List<Formula> args,
-        FunctionDeclaration functionDeclaration,
-        Function<List<Formula>, Formula> newApplicationConstructor) {
+        FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
           Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
@@ -290,7 +298,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
             return delegate.visitEquivalence(
                 (BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
           } else {
-            return delegate.visitAtom((BooleanFormula) f, functionDeclaration);
+            return delegate.visitAtom(
+                (BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
           }
         case ITE:
           Preconditions.checkArgument(args.size() == 3);
@@ -316,7 +325,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
           Preconditions.checkArgument(b1 instanceof BooleanFormula && b2 instanceof BooleanFormula);
           return delegate.visitImplication((BooleanFormula) b1, (BooleanFormula) b2);
         default:
-          return delegate.visitAtom((BooleanFormula) f, functionDeclaration);
+          return delegate.visitAtom((BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
       }
     }
 
@@ -328,6 +337,12 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
         BooleanFormula body) {
       return delegate.visitQuantifier(quantifier, f,
           boundVariables, body);
+    }
+
+    @SuppressWarnings("unchecked")
+    private FunctionDeclaration<BooleanFormula> toBooleanDeclaration(
+        FunctionDeclaration<?> decl) {
+      return (FunctionDeclaration<BooleanFormula>) decl;
     }
   }
 
@@ -342,10 +357,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv>
     public TraversalProcess visitFunction(
         Formula f,
         List<Formula> args,
-        FunctionDeclaration functionDeclaration,
-        Function<List<Formula>, Formula> newApplicationConstructor) {
-      TraversalProcess out = super.visitFunction(f, args, functionDeclaration,
-          newApplicationConstructor);
+        FunctionDeclaration<?> functionDeclaration) {
+      TraversalProcess out = super.visitFunction(f, args, functionDeclaration);
       for (Formula arg : args) {
         if (!(arg instanceof BooleanFormula)) {
 

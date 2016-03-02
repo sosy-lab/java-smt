@@ -59,12 +59,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
+final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
   @SuppressWarnings("checkstyle:parameternumber")
   Z3FormulaManager(
       Z3FormulaCreator pFormulaCreator,
-      Z3FunctionFormulaManager pFunctionManager,
+      Z3UFManager pFunctionManager,
       Z3BooleanFormulaManager pBooleanManager,
       Z3IntegerFormulaManager pIntegerManager,
       Z3RationalFormulaManager pRationalManager,
@@ -221,4 +221,5 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long> {
     }
     return super.translate(other, otherContext);
   }
+
 }
