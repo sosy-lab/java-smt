@@ -37,20 +37,20 @@ public class TraversalProcess {
   /**
    * Continue traversal and recurse into current formula subtree.
    */
-  public static final TraversalProcess CONTINUE = new TraversalProcess(
-      TraversalType.CONTINUE_TYPE, ImmutableSet.<Formula>of());
+  public static final TraversalProcess CONTINUE =
+      new TraversalProcess(TraversalType.CONTINUE_TYPE, ImmutableSet.<Formula>of());
 
   /**
    * Continue traversal, but do not recurse into current formula subtree.
    */
-  public static final TraversalProcess SKIP = new TraversalProcess(
-      TraversalType.SKIP_TYPE, ImmutableSet.<Formula>of());
+  public static final TraversalProcess SKIP =
+      new TraversalProcess(TraversalType.SKIP_TYPE, ImmutableSet.<Formula>of());
 
   /**
    * Immediately abort traversal and return to caller.
    */
-  public static final TraversalProcess ABORT = new TraversalProcess(
-      TraversalType.ABORT_TYPE, ImmutableSet.<Formula>of());
+  public static final TraversalProcess ABORT =
+      new TraversalProcess(TraversalType.ABORT_TYPE, ImmutableSet.<Formula>of());
 
   /**
    * Traverse only the given children.
@@ -71,7 +71,10 @@ public class TraversalProcess {
   }
 
   private enum TraversalType {
-    CONTINUE_TYPE, SKIP_TYPE, ABORT_TYPE, CUSTOM_TYPE
+    CONTINUE_TYPE,
+    SKIP_TYPE,
+    ABORT_TYPE,
+    CUSTOM_TYPE
   }
 
   private final TraversalType type;
@@ -92,5 +95,4 @@ public class TraversalProcess {
       return toTraverse.contains(f);
     }
   }
-
 }

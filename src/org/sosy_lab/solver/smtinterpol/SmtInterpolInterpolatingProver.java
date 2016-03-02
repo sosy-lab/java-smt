@@ -222,7 +222,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     Preconditions.checkState(!closed);
     assert assertedFormulas.size() == annotatedTerms.size();
     if (!assertedFormulas.isEmpty()) {
-      env.pop(assertedFormulas.size());
+      env.pop(env.getStackDepth());
       assertedFormulas.clear();
       annotatedTerms.clear();
     }

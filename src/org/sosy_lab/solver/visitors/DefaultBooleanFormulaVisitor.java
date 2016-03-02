@@ -87,8 +87,11 @@ public abstract class DefaultBooleanFormulaVisitor<R> implements BooleanFormulaV
   }
 
   @Override
-  public R visitQuantifier(Quantifier quantifier, BooleanFormula quantifiedAST, List<Formula>
-      boundVars, BooleanFormula body) {
+  public R visitQuantifier(
+      Quantifier quantifier,
+      BooleanFormula quantifiedAST,
+      List<Formula> boundVars,
+      BooleanFormula body) {
     return visitDefault();
   }
 }

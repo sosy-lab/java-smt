@@ -189,9 +189,10 @@ public class SolverContextFactory {
   public static SolverContext createSolverContext(Solvers solver)
       throws InvalidConfigurationException {
     return new SolverContextFactory(
-        Configuration.defaultConfiguration(),
-        NullLogManager.getInstance(),
-        ShutdownNotifier.createDummy()).generateContext(solver);
+            Configuration.defaultConfiguration(),
+            NullLogManager.getInstance(),
+            ShutdownNotifier.createDummy())
+        .generateContext(solver);
   }
 
   /**

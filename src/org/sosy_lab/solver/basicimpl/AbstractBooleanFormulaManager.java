@@ -335,8 +335,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         Quantifier quantifier,
         List<Formula> boundVariables,
         BooleanFormula body) {
-      return delegate.visitQuantifier(quantifier, f,
-          boundVariables, body);
+      return delegate.visitQuantifier(quantifier, f, boundVariables, body);
     }
 
     @SuppressWarnings("unchecked")

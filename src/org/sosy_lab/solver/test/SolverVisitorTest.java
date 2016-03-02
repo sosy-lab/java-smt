@@ -253,21 +253,14 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
   @Test
   public void booleanRecursiveTraversalTest() throws Exception {
-    BooleanFormula f = bmgr.or(
-        bmgr.and(
-            bmgr.makeVariable("x"), bmgr.makeVariable("y")
-        ),
-        bmgr.and(
-            ImmutableList.of(
-                bmgr.makeVariable("z"),
-                bmgr.makeVariable("d"),
-                imgr.equal(
-                    imgr.makeVariable("gg"),
-                    imgr.makeNumber(5)
-                )
-            )
-        )
-    );
+    BooleanFormula f =
+        bmgr.or(
+            bmgr.and(bmgr.makeVariable("x"), bmgr.makeVariable("y")),
+            bmgr.and(
+                ImmutableList.of(
+                    bmgr.makeVariable("z"),
+                    bmgr.makeVariable("d"),
+                    imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5)))));
     final Set<String> foundVars = new HashSet<>();
     bmgr.visitRecursively(new DefaultBooleanFormulaVisitor<TraversalProcess>() {
       @Override
