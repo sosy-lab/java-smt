@@ -49,6 +49,7 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -444,6 +445,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       FunctionDeclaration<T> declaration,
       List<? extends Formula> args) {
     return formulaCreator.callFunction(declaration, args);
+  }
+
+  @Override
+  public <T extends Formula> T makeApplication(
+      FunctionDeclaration<T> declaration, Formula... args) {
+    return makeApplication(declaration, Arrays.asList(args));
   }
 
 

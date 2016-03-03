@@ -324,7 +324,7 @@ class SmtInterpolFormulaCreator extends
   public Term callFunctionImpl(
       FunctionDeclarationImpl<?, FunctionSymbol> declaration, List<Term> args) {
     return environment.term(
-        declaration.getSolverDeclaration().getApplicationString(),
+        declaration.getSolverDeclaration().getName(),
         args.toArray(new Term[args.size()])
     );
   }

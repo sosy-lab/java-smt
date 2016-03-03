@@ -120,6 +120,16 @@ public interface FormulaManager {
       FunctionDeclaration<T> declaration, List<? extends Formula> args);
 
   /**
+   * Create a function application to the given list of arguments.
+   *
+   * @param declaration Function declaration
+   * @param args List of arguments
+   * @return Constructed formula
+   */
+  <T extends Formula> T makeApplication(
+      FunctionDeclaration<T> declaration, Formula... args);
+
+  /**
    * Returns the type of the given Formula.
    */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
