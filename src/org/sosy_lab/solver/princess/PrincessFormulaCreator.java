@@ -192,7 +192,8 @@ class PrincessFormulaCreator
         argTypes.add(argumentType);
       }
       PrincessFunctionDeclaration solverDeclaration;
-      if (input instanceof IFunApp) {
+      FunctionDeclarationKind kind = getDeclarationKind(input);
+      if (input instanceof IFunApp && kind == FunctionDeclarationKind.UF) {
         solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
       } else {
         solverDeclaration = new PrincessByExampleDeclaration(input);
