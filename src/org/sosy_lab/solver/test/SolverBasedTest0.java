@@ -118,7 +118,7 @@ public abstract class SolverBasedTest0 {
     context = factory.generateContext();
     mgr = context.getFormulaManager();
 
-    fmgr = mgr.getFunctionFormulaManager();
+    fmgr = mgr.getUFManager();
     bmgr = mgr.getBooleanFormulaManager();
     imgr = mgr.getIntegerFormulaManager();
     try {

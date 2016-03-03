@@ -83,9 +83,9 @@ public interface FormulaManager {
   FloatingPointFormulaManager getFloatingPointFormulaManager();
 
   /**
-   * Returns the Function-Theory.
+   * Returns the function for dealing with uninterpreted functions (UFs).
    */
-  UFManager getFunctionFormulaManager();
+  UFManager getUFManager();
 
   /**
    * Returns the interface for handling quantifiers.

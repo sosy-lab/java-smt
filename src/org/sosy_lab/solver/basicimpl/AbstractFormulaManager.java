@@ -166,7 +166,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public AbstractUFManager<TFormulaInfo, ?, TType, TEnv> getFunctionFormulaManager() {
+  public AbstractUFManager<TFormulaInfo, ?, TType, TEnv> getUFManager() {
     return functionManager;
   }
 

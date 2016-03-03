@@ -22,7 +22,7 @@ package org.sosy_lab.solver.api;
 import java.util.List;
 
 /**
- * Manager for dealing with UFs.
+ * Manager for dealing with uninterpreted functions (UFs).
  */
 public interface UFManager {
 
