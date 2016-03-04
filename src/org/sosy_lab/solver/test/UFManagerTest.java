@@ -24,6 +24,7 @@
 package org.sosy_lab.solver.test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.truth.Truth;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,9 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
-import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.visitors.ExpectedFormulaVisitor;
+
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class UFManagerTest extends SolverBasedTest0 {
@@ -53,50 +56,25 @@ public class UFManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testDeclareAndCallUF() {
-    fmgr.declareAndCallUF(
-        "Func",
-        FormulaType.IntegerType,
-        ImmutableList.<Formula>of(
-            imgr.makeNumber(1)
-        )
-    );
+    List<String> names = ImmutableList.of("Func", "|Func|", "(Func)");
+    for (String name : names) {
+      Formula f = fmgr.declareAndCallUF(
+          name, FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeNumber(1))
+      );
+      FunctionDeclaration<?> declaration = getDeclaration(f);
+      Truth.assertThat(declaration.getName()).isEqualTo(name);
+      Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
+      Truth.assertThat(f2).isEqualTo(f);
+    }
   }
 
-  @Test
-  public void testDeclareAndCallUFWithPipes() {
-    fmgr.declareAndCallUF(
-
-        // SMTInterpol escaping is too eager.
-        "|Func|",
-        FormulaType.IntegerType,
-        ImmutableList.<Formula>of(
-            imgr.makeNumber(1)
-        )
-    );
-  }
-
-  @Test
-  public void testDeclareAndCallUFWithBrackets() {
-    fmgr.declareAndCallUF(
-
-        // SMTInterpol escaping is too eager.
-        "(Func)",
-        FormulaType.IntegerType,
-        ImmutableList.<Formula>of(
-            imgr.makeNumber(1)
-        )
-    );
-  }
-
-  @Test
-  public void testDeclareThanCall() {
-    FunctionDeclaration<IntegerFormula>
-        declaration = fmgr.declareUF(
-        "Func2",
-        FormulaType.IntegerType,
-        FormulaType.IntegerType);
-
-    mgr.makeApplication(declaration, imgr.makeNumber(1));
-    fmgr.callUF(declaration, imgr.makeNumber(2));
+  private FunctionDeclaration<?> getDeclaration(Formula f) {
+    return mgr.visit(new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
+      @Override
+      public FunctionDeclaration<?> visitFunction(
+          Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+        return functionDeclaration;
+      }
+    }, f);
   }
 }
