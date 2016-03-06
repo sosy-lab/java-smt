@@ -73,6 +73,11 @@
         <ivy:makepom ivyfile="ivy.xml" pomfile="pom.xml" templatefile="pom_template.xml">
             <mapping conf="runtime" scope="compile"/>
         </ivy:makepom>
+        <!-- Maven group is "sosy-lab", not "sosy_lab"-->
+        <replace file="pom.xml">
+            <replacetoken>sosy_lab</replacetoken>
+            <replacevalue>sosy-lab</replacevalue>
+        </replace>
     </target>
 
 </project>
