@@ -70,8 +70,8 @@
     <target name="gen-pom" depends="load-ivy, determine-version" description="Generate a POM file from Ivy metadata">
         <property name="ivy.pom.version" value="${version}"/>
 
-        <ivy:makepom ivyfile="ivy.xml" pomfile="pom.xml" templatefile="pom_template.xml">
-            <mapping conf="runtime" scope="compile"/>
+        <ivy:makepom ivyfile="ivy.xml" pomfile="pom.xml" conf="core,runtime-z3" templatefile="pom_template.xml">
+            <mapping conf="core" scope="compile"/>
         </ivy:makepom>
         <!-- Maven group is "sosy-lab", not "sosy_lab"-->
         <replace file="pom.xml">
