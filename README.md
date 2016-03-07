@@ -202,12 +202,13 @@ through all of the returned data, or by querying for the variables we need:
  - Initial codebase, many design decisions: Philipp Wendler
  - Contributions: Thomas Stieglmaier, Karlheinz Friedberger
 
+## Further Documentation
+
+ - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
+
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
 [Configuration]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html
 [LogManager]: https://sosy-lab.github.io/java-common-lib/api/index.html?org/sosy_lab/common/configuration/package-summary.html
 [FormulaManagerFactory]: http://sosy-lab.github.io/java-smt/api/org/sosy_lab/solver/FormulaManagerFactory.html
 [IvyRepository]: http://www.sosy-lab.org/ivy
-
- - [Quickstart Guide](https://github.com/sosy-lab/java-smt/blob/master/doc/index.md)
- - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
