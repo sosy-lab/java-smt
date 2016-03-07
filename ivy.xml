@@ -99,7 +99,7 @@
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-236-ge5a0f5a" conf="runtime-smtinterpol->runtime; contrib->sources">
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-238-g1f06d6a" conf="runtime-smtinterpol->runtime; contrib->sources">
           <artifact name="smtinterpol" e:classifier="comp" conf="runtime-smtinterpol"/>
           <artifact name="smtinterpol" e:classifier="sources" conf="contrib" ext="zip"/>
         </dependency>
