@@ -34,6 +34,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert_and_track;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check_assumptions;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_num_scopes;
@@ -46,7 +47,9 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -139,6 +142,20 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     Preconditions.checkArgument(
         result != Z3_LBOOL.Z3_L_UNDEF.status, "Solver returned UNDEFINED status");
     return result == Z3_LBOOL.Z3_L_FALSE.status;
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    int result = solver_check_assumptions(z3context, z3solver, Longs.toArray(Lists.transform(
+        assumptions, creator.infoExtractor
+    )));
+    shutdownNotifier.shutdownIfNecessary();
+    Preconditions.checkArgument(
+        result != Z3_LBOOL.Z3_L_UNDEF.status, "Solver returned UNDEFINED status");
+    return result == Z3_LBOOL.Z3_L_FALSE.status;
+
   }
 
   @Override

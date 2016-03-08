@@ -23,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Expr;
 import com.microsoft.z3.Params;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
@@ -205,5 +206,17 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       shutdownNotifier.shutdownIfNecessary();
       throw new SolverException("Z3 had a problem during ALLSAT computation", e);
     }
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    Status result = z3solver.check(
+        Lists.transform(assumptions, creator.infoExtractor).toArray(new Expr[assumptions.size()])
+    );
+    shutdownNotifier.shutdownIfNecessary();
+    Preconditions.checkArgument(result != Status.UNKNOWN);
+    return result == Status.UNSATISFIABLE;
   }
 }

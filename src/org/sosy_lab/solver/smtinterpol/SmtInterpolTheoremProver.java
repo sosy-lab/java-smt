@@ -65,6 +65,16 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   }
 
   @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    push(mgr.getBooleanFormulaManager().and(assumptions));
+    boolean out = isUnsat();
+    pop();
+    return out;
+  }
+
+  @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
     return new SmtInterpolModel(env.getModel(), creator, assertedTerms);

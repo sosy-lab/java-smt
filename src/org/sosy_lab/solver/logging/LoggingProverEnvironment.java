@@ -76,6 +76,14 @@ public class LoggingProverEnvironment implements ProverEnvironment {
   }
 
   @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    boolean result = wrapped.isUnsatWithAssumptions(assumptions);
+    logger.log(Level.FINE, "unsat-check returned:", result);
+    return result;
+  }
+
+  @Override
   public Model getModel() throws SolverException {
     Model m = wrapped.getModel();
     logger.log(Level.FINE, "model", m);

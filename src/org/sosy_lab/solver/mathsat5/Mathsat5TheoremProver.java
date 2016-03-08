@@ -22,13 +22,16 @@ package org.sosy_lab.solver.mathsat5;
 import static org.sosy_lab.solver.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_all_sat;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
@@ -139,6 +142,21 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
               return context.getFormulaManager().encapsulateBooleanFormula(pE);
             }
           });
+    }
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    try {
+      return !msat_check_sat_with_assumptions(
+          curEnv,
+          Longs.toArray(Lists.transform(assumptions, creator.infoExtractor))
+      );
+    } catch (IllegalStateException e) {
+      handleSolverExceptionInUnsatCheck(e);
+      throw e;
     }
   }
 }

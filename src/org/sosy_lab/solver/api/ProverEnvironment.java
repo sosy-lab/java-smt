@@ -59,6 +59,15 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
   <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
 
+  /**
+   * Check whether the conjunction of all formulas on the stack together with the
+   * list of assumptions is satisfiable.
+   *
+   * @param assumptions Must be a list of literals.
+   */
+  boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
+
 
   /**
    * Interface for the {@link #allSat} callback.

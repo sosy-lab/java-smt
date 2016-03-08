@@ -237,7 +237,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public abstract <R> R visit(
       FormulaVisitor<R> visitor, final Formula formula, final TFormulaInfo f);
 
-  private final Function<Formula, TFormulaInfo> infoExtractor =
+  @SuppressWarnings("checkstyle:visibilitymodifier")
+  public final Function<Formula, TFormulaInfo> infoExtractor =
       new Function<Formula, TFormulaInfo>() {
     @Override
     public TFormulaInfo apply(Formula formula) {

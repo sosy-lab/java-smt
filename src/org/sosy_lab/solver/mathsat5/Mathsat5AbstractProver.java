@@ -48,7 +48,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   protected final long curEnv;
   private final long curConfig;
   private final long terminationTest;
-  private final Mathsat5FormulaCreator creator;
+  protected final Mathsat5FormulaCreator creator;
   protected boolean closed = false;
 
   protected Mathsat5AbstractProver(

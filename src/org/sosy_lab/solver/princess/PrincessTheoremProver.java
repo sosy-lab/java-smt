@@ -137,4 +137,13 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
 
     return callback.getResult();
   }
+
+  @Override
+  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    push(mgr.getBooleanFormulaManager().and(assumptions));
+    boolean out = isUnsat();
+    pop();
+    return out;
+  }
 }
