@@ -1895,7 +1895,11 @@ final class Z3NativeApi {
 
   static native int solver_check(long context, long solver) throws Z3SolverException;
 
-  static native int solver_check_assumptions(
+  static int solver_check_assumptions(long context, long solver, long[] assumptions) {
+    return solver_check_assumptions(context, solver, assumptions.length, assumptions);
+  }
+
+  private static native int solver_check_assumptions(
       long context, long solver, int len, long[] assumptions);
 
   static native long solver_get_model(long context, long solver);
