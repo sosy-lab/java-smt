@@ -21,6 +21,7 @@ package org.sosy_lab.solver.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
+import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -131,4 +132,18 @@ public interface BooleanFormulaManager {
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
   void visitRecursively(BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor, BooleanFormula f);
+
+
+  /**
+   * Visit the formula recursively with a given {@link BooleanFormulaVisitor}.
+   * The arguments each visitor method receives are <b>already</b> transformed.
+   *
+   * <p>This method guarantees that the traversal is done iteratively,
+   * without using Java recursion, and thus is not prone to StackOverflowErrors.
+   *
+   * <p>Furthermore, this method also guarantees that every equal part of the formula
+   * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   */
+  BooleanFormula transformRecursively(BooleanFormulaTransformationVisitor pVisitor,
+                                             BooleanFormula f);
 }

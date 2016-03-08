@@ -59,6 +59,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
   <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
 
+
   /**
    * Interface for the {@link #allSat} callback.
    * @param <T> The result type of the callback, passed through by {@link #allSat}.

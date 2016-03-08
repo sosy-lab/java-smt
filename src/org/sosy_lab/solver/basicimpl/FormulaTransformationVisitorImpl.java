@@ -39,10 +39,12 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   private final Deque<Formula> toProcess;
   private final Map<Formula, Formula> pCache;
-  private final FormulaVisitor<Formula> delegate;
+  private final FormulaVisitor<? extends Formula> delegate;
 
   FormulaTransformationVisitorImpl(
-      FormulaVisitor<Formula> delegate, Deque<Formula> toProcess, Map<Formula, Formula> pCache) {
+      FormulaVisitor<? extends Formula> delegate,
+      Deque<Formula> toProcess, Map<Formula, Formula>
+      pCache) {
     this.toProcess = toProcess;
     this.pCache = pCache;
     this.delegate = Preconditions.checkNotNull(delegate);

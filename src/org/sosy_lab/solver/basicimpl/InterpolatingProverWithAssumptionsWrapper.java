@@ -16,7 +16,6 @@ import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +52,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
     // remove assumption variables from the rawInterpolant if necessary
     if (!solverAssumptionsAsFormula.isEmpty()) {
-      interpolant = bmgr.visit(new RemoveAssumptionsFromFormulaVisitor(), interpolant);
+      interpolant = bmgr.transformRecursively(
+          new RemoveAssumptionsFromFormulaVisitor(), interpolant);
     }
 
     return interpolant;
@@ -136,7 +136,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   class RemoveAssumptionsFromFormulaVisitor extends BooleanFormulaTransformationVisitor {
 
     private RemoveAssumptionsFromFormulaVisitor() {
-      super(fmgr, new HashMap<BooleanFormula, BooleanFormula>());
+      super(fmgr.getBooleanFormulaManager());
     }
 
     @Override

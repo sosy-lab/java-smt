@@ -36,14 +36,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> {
+final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProcess> {
 
   private final Set<Formula> seen = new HashSet<>();
   private final Deque<Formula> toVisit = new ArrayDeque<>();
 
   private final FormulaVisitor<TraversalProcess> delegate;
 
-  RecursiveFormulaVisitor(FormulaVisitor<TraversalProcess> pDelegate) {
+  RecursiveFormulaVisitorImpl(FormulaVisitor<TraversalProcess> pDelegate) {
     delegate = checkNotNull(pDelegate);
   }
 
@@ -86,11 +86,8 @@ final class RecursiveFormulaVisitor implements FormulaVisitor<TraversalProcess> 
 
   @Override
   public TraversalProcess visitFunction(
-      Formula pF,
-      List<Formula> pArgs,
-      FunctionDeclaration<?> pFunctionDeclaration) {
-    TraversalProcess result =
-        delegate.visitFunction(pF, pArgs, pFunctionDeclaration);
+      Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+    TraversalProcess result = delegate.visitFunction(pF, pArgs, pFunctionDeclaration);
     addToQueueIfNecessary(result, pArgs);
     return result;
   }

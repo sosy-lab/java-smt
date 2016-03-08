@@ -46,7 +46,6 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -84,7 +83,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     for (BooleanFormula bf : Lists.newArrayList(t, f, x, y, z, and, or, ite, impl, eq, not)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
           new BooleanFormulaTransformationVisitor(
-              mgr, new HashMap<BooleanFormula, BooleanFormula>()) {
+              mgr.getBooleanFormulaManager()) {
             // we need a subclass, because the original class is 'abstract'
           };
       assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
@@ -105,7 +104,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     for (IntegerFormula f : Lists.newArrayList(a, b, n12, neg, ite)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
           new BooleanFormulaTransformationVisitor(
-              mgr, new HashMap<BooleanFormula, BooleanFormula>()) {
+              mgr.getBooleanFormulaManager()) {
             // we need a subclass, because the original class is 'abstract'
           };
       BooleanFormula bf = imgr.equal(n12, f);
@@ -159,7 +158,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula newConstraint =
         bmgr.visit(
             new BooleanFormulaTransformationVisitor(
-                mgr, new HashMap<BooleanFormula, BooleanFormula>()) {},
+                mgr.getBooleanFormulaManager()) {},
             constraint);
     assertThatFormula(newConstraint).isUnsatisfiable();
   }

@@ -22,6 +22,7 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -33,6 +34,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
@@ -218,7 +220,20 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   @Override
   public void visitRecursively(
       BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor, BooleanFormula pF) {
-    formulaCreator.visitRecursively(new RecursiveDelegatingFormulaVisitor(pFormulaVisitor), pF);
+    formulaCreator.visitRecursively(
+        new DelegatingFormulaVisitor<>(pFormulaVisitor),
+        pF,
+        Predicates.instanceOf(BooleanFormula.class)
+    );
+  }
+
+  public BooleanFormula transformRecursively(
+      BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f) {
+    return formulaCreator.transformRecursively(
+        new DelegatingFormulaVisitor<>(pVisitor),
+        f,
+        Predicates.instanceOf(BooleanFormula.class)
+    );
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
@@ -342,30 +357,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     private FunctionDeclaration<BooleanFormula> toBooleanDeclaration(
         FunctionDeclaration<?> decl) {
       return (FunctionDeclaration<BooleanFormula>) decl;
-    }
-  }
-
-  private class RecursiveDelegatingFormulaVisitor
-      extends DelegatingFormulaVisitor<TraversalProcess> {
-
-    RecursiveDelegatingFormulaVisitor(BooleanFormulaVisitor<TraversalProcess> pDelegate) {
-      super(pDelegate);
-    }
-
-    @Override
-    public TraversalProcess visitFunction(
-        Formula f,
-        List<Formula> args,
-        FunctionDeclaration<?> functionDeclaration) {
-      TraversalProcess out = super.visitFunction(f, args, functionDeclaration);
-      for (Formula arg : args) {
-        if (!(arg instanceof BooleanFormula)) {
-
-          // Can't recurse down non-boolean formulas.
-          return TraversalProcess.SKIP;
-        }
-      }
-      return out;
     }
   }
 }

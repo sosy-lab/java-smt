@@ -22,58 +22,24 @@ package org.sosy_lab.solver.visitors;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Base class for visitors for boolean formulas that recursively transform
  * boolean formulas.
  *
- * <p>This class ensures that each subtree of the formula
- * is visited only once.
- * To ensure this for subclasses, they need to call
- * {@link #visitIfNotSeen(BooleanFormula)} or
- * {@link #visitIfNotSeen(List)}.
- *
- * <p><b>WARNING:</b> transforming very large formulas with this class will lead
- * to {@link StackOverflowError}.
+ * @see BooleanFormulaManager#transformRecursively
  */
 public abstract class BooleanFormulaTransformationVisitor
     implements BooleanFormulaVisitor<BooleanFormula> {
 
   private final BooleanFormulaManager bfmgr;
-  private final FormulaManager manager;
 
-  private final Map<BooleanFormula, BooleanFormula> cache;
-
-  protected BooleanFormulaTransformationVisitor(
-      FormulaManager pFmgr, Map<BooleanFormula, BooleanFormula> pCache) {
-    bfmgr = pFmgr.getBooleanFormulaManager();
-    manager = pFmgr;
-
-    cache = pCache;
-  }
-
-  protected final BooleanFormula visitIfNotSeen(BooleanFormula f) {
-    BooleanFormula out = cache.get(f);
-    if (out == null) {
-      out = bfmgr.visit(this, f);
-      cache.put(f, out);
-    }
-    return out;
-  }
-
-  protected final List<BooleanFormula> visitIfNotSeen(List<BooleanFormula> pOperands) {
-    List<BooleanFormula> args = new ArrayList<>(pOperands.size());
-    for (BooleanFormula arg : pOperands) {
-      args.add(visitIfNotSeen(arg));
-    }
-    return args;
+  protected BooleanFormulaTransformationVisitor(BooleanFormulaManager pBfmgr) {
+    bfmgr = pBfmgr;
   }
 
   @Override
@@ -93,17 +59,17 @@ public abstract class BooleanFormulaTransformationVisitor
 
   @Override
   public BooleanFormula visitNot(BooleanFormula pOperand) {
-    return bfmgr.not(visitIfNotSeen(pOperand));
+    return bfmgr.not(pOperand);
   }
 
   @Override
   public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
-    return bfmgr.and(visitIfNotSeen(pOperands));
+    return bfmgr.and(pOperands);
   }
 
   @Override
   public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
-    return bfmgr.or(visitIfNotSeen(pOperands));
+    return bfmgr.or(pOperands);
   }
 
   @Override
@@ -113,19 +79,18 @@ public abstract class BooleanFormulaTransformationVisitor
 
   @Override
   public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    return bfmgr.equivalence(visitIfNotSeen(pOperand1), visitIfNotSeen(pOperand2));
+    return bfmgr.equivalence(pOperand1, pOperand2);
   }
 
   @Override
   public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    return bfmgr.implication(visitIfNotSeen(pOperand1), visitIfNotSeen(pOperand2));
+    return bfmgr.implication(pOperand1, pOperand2);
   }
 
   @Override
   public BooleanFormula visitIfThenElse(
       BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-    return bfmgr.ifThenElse(
-        visitIfNotSeen(pCondition), visitIfNotSeen(pThenFormula), visitIfNotSeen(pElseFormula));
+    return bfmgr.ifThenElse(pCondition, pThenFormula, pElseFormula);
   }
 
   @Override

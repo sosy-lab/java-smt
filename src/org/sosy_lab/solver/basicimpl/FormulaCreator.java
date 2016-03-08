@@ -22,6 +22,8 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -45,7 +47,6 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
@@ -248,19 +249,36 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return Lists.transform(input, infoExtractor);
   }
 
-  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    RecursiveFormulaVisitor recVisitor = new RecursiveFormulaVisitor(pFormulaVisitor);
+  public void visitRecursively(
+      FormulaVisitor<TraversalProcess> pFormulaVisitor,
+      Formula pF) {
+    visitRecursively(pFormulaVisitor, pF, Predicates.alwaysTrue());
+  }
+
+  public void visitRecursively(
+      FormulaVisitor<TraversalProcess> pFormulaVisitor,
+      Formula pF,
+      Predicate<Object> shouldProcess) {
+    RecursiveFormulaVisitorImpl recVisitor = new RecursiveFormulaVisitorImpl(pFormulaVisitor);
     recVisitor.addToQueue(pF);
     while (!recVisitor.isQueueEmpty()) {
-      TraversalProcess process = checkNotNull(visit(recVisitor, recVisitor.pop()));
-      if (process == TraversalProcess.ABORT) {
-        return;
+      Formula tt = recVisitor.pop();
+      if (shouldProcess.apply(tt)) {
+        TraversalProcess process = checkNotNull(visit(recVisitor, tt));
+        if (process == TraversalProcess.ABORT) {
+          return;
+        }
       }
     }
   }
 
   public <T extends Formula> T transformRecursively(
-      FormulaTransformationVisitor pFormulaVisitor, T pF) {
+      FormulaVisitor<? extends Formula> pFormulaVisitor, T pF) {
+    return transformRecursively(pFormulaVisitor, pF, Predicates.alwaysTrue());
+  }
+
+  public <T extends Formula> T transformRecursively(
+      FormulaVisitor<? extends Formula> pFormulaVisitor, T pF, Predicate<Object> shouldProcess) {
 
     final Deque<Formula> toProcess = new ArrayDeque<>();
     Map<Formula, Formula> pCache = new HashMap<>();
@@ -277,7 +295,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         continue;
       }
 
-      visit(recVisitor, tt);
+      if (shouldProcess.apply(tt)) {
+        visit(recVisitor, tt);
+      } else {
+        pCache.put(tt, tt);
+      }
     }
     @SuppressWarnings("unchecked")
     T out = (T) pCache.get(pF);

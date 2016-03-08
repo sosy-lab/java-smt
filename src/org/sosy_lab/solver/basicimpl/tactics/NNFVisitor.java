@@ -1,7 +1,5 @@
 package org.sosy_lab.solver.basicimpl.tactics;
 
-import com.google.common.collect.Maps;
-
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
@@ -9,19 +7,16 @@ import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class NNFVisitor extends BooleanFormulaTransformationVisitor {
   private final NNFInsideNotVisitor insideNotVisitor;
   private final BooleanFormulaManager bfmgr;
 
   NNFVisitor(FormulaManager pFmgr) {
-    super(pFmgr, Maps.<BooleanFormula, BooleanFormula>newHashMap());
+    super(pFmgr.getBooleanFormulaManager());
     bfmgr = pFmgr.getBooleanFormulaManager();
-    insideNotVisitor =
-        new NNFInsideNotVisitor(pFmgr, new HashMap<BooleanFormula, BooleanFormula>());
+    insideNotVisitor = new NNFInsideNotVisitor(pFmgr);
   }
 
   @Override
@@ -72,9 +67,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   private class NNFInsideNotVisitor extends BooleanFormulaTransformationVisitor {
 
-    protected NNFInsideNotVisitor(
-        FormulaManager pFmgr, Map<BooleanFormula, BooleanFormula> pCache) {
-      super(pFmgr, pCache);
+    protected NNFInsideNotVisitor(FormulaManager pFmgr) {
+      super(pFmgr.getBooleanFormulaManager());
     }
 
     @Override
