@@ -193,7 +193,7 @@ Once the model is obtained we can get values from it either by iterating
 through all of the returned data, or by querying for the variables we need:
 
 ```java
-    int value = (int) model.getVariableValue("x", TermType.Integer);
+    BigInteger value = model.evaluate(a);
 ```
 
 ## Authors
