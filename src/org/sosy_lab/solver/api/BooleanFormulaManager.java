@@ -101,7 +101,15 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula and(BooleanFormula bits1, BooleanFormula bits2);
 
+  /**
+   * @see #and(BooleanFormula, BooleanFormula)
+   */
   BooleanFormula and(Collection<BooleanFormula> bits);
+
+  /**
+   * @see #and(BooleanFormula, BooleanFormula)
+   */
+  BooleanFormula and(BooleanFormula... bits);
 
   /**
    * Creates a formula representing an OR of the two arguments.
@@ -111,7 +119,15 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula or(BooleanFormula bits1, BooleanFormula bits2);
 
+  /**
+   * @see #or(BooleanFormula, BooleanFormula)
+   */
   BooleanFormula or(Collection<BooleanFormula> bits);
+
+  /**
+   * @see #or(BooleanFormula, BooleanFormula)
+   */
+  BooleanFormula or(BooleanFormula... bits);
 
   /**
    * Creates a formula representing XOR of the two arguments.

@@ -26,6 +26,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
@@ -99,6 +100,18 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     return wrap(result);
   }
 
+  @Override
+  public BooleanFormula and(BooleanFormula... pBits) {
+    if (pBits.length == 0) {
+      return makeBoolean(true);
+    }
+    if (pBits.length == 1) {
+      return pBits[0];
+    }
+    TFormulaInfo result = andImpl(Collections2.transform(Lists.newArrayList(pBits), extractor));
+    return wrap(result);
+  }
+
   protected TFormulaInfo andImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(true);
     for (TFormulaInfo formula : pParams) {
@@ -113,6 +126,18 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param2 = extractInfo(pBits2);
 
     return wrap(or(param1, param2));
+  }
+
+  @Override
+  public BooleanFormula or(BooleanFormula... pBits) {
+    if (pBits.length == 0) {
+      return makeBoolean(false);
+    }
+    if (pBits.length == 1) {
+      return pBits[0];
+    }
+    TFormulaInfo result = orImpl(Collections2.transform(Lists.newArrayList(pBits), extractor));
+    return wrap(result);
   }
 
   protected abstract TFormulaInfo or(TFormulaInfo pParam1, TFormulaInfo pParam2);
