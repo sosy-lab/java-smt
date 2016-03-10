@@ -26,6 +26,7 @@ import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Manager for dealing with boolean formulas.
@@ -149,7 +150,6 @@ public interface BooleanFormulaManager {
    */
   void visitRecursively(BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor, BooleanFormula f);
 
-
   /**
    * Visit the formula recursively with a given {@link BooleanFormulaVisitor}.
    * The arguments each visitor method receives are <b>already</b> transformed.
@@ -160,6 +160,37 @@ public interface BooleanFormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
-  BooleanFormula transformRecursively(BooleanFormulaTransformationVisitor pVisitor,
-                                             BooleanFormula f);
+  BooleanFormula transformRecursively(
+      BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f);
+
+  /**
+   * Return a set of formulas such that a conjunction over them
+   * is equivalent to the input formula.
+   *
+   * <p>Example output:
+   * <ul>
+   *   <li>For conjunction {@code A /\ B /\ C}: {@code A, B, C}</li>
+   *   <li>For "true": empty set.</li>
+   *   <li>For anything else: singleton set consisting of the input formula.</li>
+   * </ul>
+   *
+   * @param flatten If {@code true}, flatten recursively.
+   */
+  Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten);
+
+  /**
+   * Return a set of formulas such that a disjunction over them
+   * is equivalent to the input formula.
+   *
+   * <p>Example output:
+   * <ul>
+   *   <li>For conjunction {@code A \/ B \/ C}: {@code A, B, C}</li>
+   *   <li>For "false": empty set.</li>
+   *   <li>For anything else: singleton set consisting of the input formula.</li>
+   * </ul>
+   *
+   * @param flatten If {@code true}, flatten recursively.
+   */
+  Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten);
+
 }

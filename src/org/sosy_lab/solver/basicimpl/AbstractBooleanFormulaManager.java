@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -37,11 +38,18 @@ import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> implements
@@ -384,4 +392,101 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       return (FunctionDeclaration<BooleanFormula>) decl;
     }
   }
+
+  @Override
+  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) {
+    if (flatten) {
+      return asFuncRecursive(f, conjunctionFinder);
+    }
+    return formulaCreator.visit(conjunctionFinder, f);
+  }
+
+  @Override
+  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) {
+    if (flatten) {
+      return asFuncRecursive(f, disjunctionFinder);
+    }
+    return formulaCreator.visit(disjunctionFinder, f);
+  }
+
+  /**
+   * Optimized non-recursive flattening implementation.
+   */
+  private Set<BooleanFormula> asFuncRecursive(
+      BooleanFormula f, FormulaVisitor<Set<BooleanFormula>> visitor) {
+    Set<BooleanFormula> output = new HashSet<>();
+    Deque<BooleanFormula> toProcess = new ArrayDeque<>();
+    Map<BooleanFormula, Set<BooleanFormula>> cache = new HashMap<>();
+    toProcess.add(f);
+
+    while (!toProcess.isEmpty()) {
+      BooleanFormula s = toProcess.pop();
+      Set<BooleanFormula> out = cache.get(s);
+      if (out == null) {
+
+        out = formulaCreator.visit(visitor, s);
+        cache.put(s, out);
+      }
+      if (out.size() == 1 && s.equals(out.iterator().next())) {
+        output.add(s);
+      }
+      for (BooleanFormula arg : out) {
+        if (cache.get(arg) == null) { // Wasn't processed yet.
+          toProcess.add(arg);
+        }
+      }
+    }
+
+    return output;
+  }
+
+  private final FormulaVisitor<Set<BooleanFormula>> conjunctionFinder =
+      new DefaultFormulaVisitor<Set<BooleanFormula>>() {
+        @Override
+        protected Set<BooleanFormula> visitDefault(Formula f) {
+          assert f instanceof BooleanFormula;
+          BooleanFormula bf = (BooleanFormula) f;
+          if (isTrue(bf)) {
+            return ImmutableSet.of();
+          }
+          return ImmutableSet.of((BooleanFormula) f);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Set<BooleanFormula> visitFunction(
+            Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+          if (functionDeclaration.getKind() == FunctionDeclarationKind.AND) {
+            return ImmutableSet.copyOf((List<BooleanFormula>) (List<?>) args);
+          }
+          return visitDefault(f);
+        }
+      };
+
+  /**
+   * Optimized, but ugly, implementation of argument extraction.
+   * Avoids extra visitor instantiation.
+   */
+  private final FormulaVisitor<Set<BooleanFormula>> disjunctionFinder =
+      new DefaultFormulaVisitor<Set<BooleanFormula>>() {
+        @Override
+        protected Set<BooleanFormula> visitDefault(Formula f) {
+          assert f instanceof BooleanFormula;
+          BooleanFormula bf = (BooleanFormula) f;
+          if (isFalse(bf)) {
+            return ImmutableSet.of();
+          }
+          return ImmutableSet.of((BooleanFormula) f);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Set<BooleanFormula> visitFunction(
+            Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+          if (functionDeclaration.getKind() == FunctionDeclarationKind.OR) {
+            return ImmutableSet.copyOf((List<BooleanFormula>) (List<?>) args);
+          }
+          return visitDefault(f);
+        }
+      };
 }
