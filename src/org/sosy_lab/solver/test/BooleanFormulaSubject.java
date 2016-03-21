@@ -127,6 +127,20 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   }
 
   /**
+   * Check that the subject is tautological, i.e., always holds.
+   * This is equivalent to calling {@link #isEquivalentTo(BooleanFormula)}
+   * with the formula {@code true}, but it checks satisfiability of the subject
+   * and unsatisfiability of the negated subject in two steps to improve error messages.
+   */
+  public void isTautological() throws SolverException, InterruptedException {
+    isSatisfiable();
+    checkIsUnsat(
+        context.getFormulaManager().getBooleanFormulaManager().not(getSubject()),
+        "is",
+        "tautological");
+  }
+
+  /**
    * Check that the subject is equivalent to a given formula,
    * i.e. {@code subject <=> expected} always holds.
    * Will show a counterexample on failure.
