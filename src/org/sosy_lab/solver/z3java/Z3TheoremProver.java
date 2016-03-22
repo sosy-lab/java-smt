@@ -114,7 +114,15 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Override
   public boolean isUnsat() throws InterruptedException {
     Preconditions.checkState(!closed);
-    Status result = z3solver.check();
+    Status result;
+    try {
+     result = z3solver.check();
+    } catch (Z3Exception e) {
+      if ("canceled".equals(e.getMessage())) {
+        shutdownNotifier.shutdownIfNecessary();
+      }
+      throw e;
+    }
     shutdownNotifier.shutdownIfNecessary();
     Preconditions.checkArgument(result != Status.UNKNOWN);
     return result == Status.UNSATISFIABLE;
