@@ -170,6 +170,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
     Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
+    Z3FloatingPointFormulaManager floatingPointTheory =
+        new Z3FloatingPointFormulaManager(creator, functionTheory);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
 
@@ -181,6 +183,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             integerTheory,
             rationalTheory,
             bitvectorTheory,
+            floatingPointTheory,
             quantifierManager,
             arrayManager);
     return new Z3SolverContext(

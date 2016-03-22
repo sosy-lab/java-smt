@@ -582,6 +582,144 @@ final class Z3NativeApi {
 
   static native long mk_bvmul_no_underflow(long context, long a1, long a2);
 
+  // FLOATING POINTS
+  static native long mk_fpa_rounding_mode_sort(long context);
+
+  static native long mk_fpa_round_nearest_ties_to_even(long context);
+
+  static native long mk_fpa_rne(long context);
+
+  static native long mk_fpa_round_nearest_ties_to_away(long context);
+
+  static native long mk_fpa_rna(long context);
+
+  static native long mk_fpa_round_toward_positive(long context);
+
+  static native long mk_fpa_rtp(long context);
+
+  static native long mk_fpa_round_toward_negative(long context);
+
+  static native long mk_fpa_rtn(long context);
+
+  static native long mk_fpa_round_toward_zero(long context);
+
+  static native long mk_fpa_rtz(long context);
+
+  static native long mk_fpa_sort(long context, int ebits, int sbits);
+
+  static native long mk_fpa_sort_half(long context);
+
+  static native long mk_fpa_sort_16(long context);
+
+  static native long mk_fpa_sort_single(long context);
+
+  static native long mk_fpa_sort_32(long context);
+
+  static native long mk_fpa_sort_double(long context);
+
+  static native long mk_fpa_sort_64(long context);
+
+  static native long mk_fpa_sort_quadruple(long context);
+
+  static native long mk_fpa_sort_128(long context);
+
+  static native long mk_fpa_nan(long context, long s);
+
+  static native long mk_fpa_inf(long context, long s, boolean negative);
+
+  static native long mk_fpa_zero(long context, long s, boolean negative);
+
+  static native long mk_fpa_fp(long context, long sgn, long exp, long sig);
+
+  static native long mk_fpa_numeral_float(long context, float v, long ty);
+
+  static native long mk_fpa_numeral_double(long context, double v, long ty);
+
+  static native long mk_fpa_numeral_int(long context, int v, long ty);
+
+  static native long mk_fpa_numeral_int_uint(long context, boolean sgn, int exp, int sig, long ty);
+
+  static native long mk_fpa_numeral_int64_uint64(
+      long context, boolean sgn, long exp, long sig, long ty);
+
+  static native long mk_fpa_abs(long context, long t);
+
+  static native long mk_fpa_neg(long context, long t);
+
+  static native long mk_fpa_add(long context, long rm, long t1, long t2);
+
+  static native long mk_fpa_sub(long context, long rm, long t1, long t2);
+
+  static native long mk_fpa_mul(long context, long rm, long t1, long t2);
+
+  static native long mk_fpa_div(long context, long rm, long t1, long t2);
+
+  static native long mk_fpa_fma(long context, long rm, long t1, long t2, long t3);
+
+  static native long mk_fpa_sqrt(long context, long rm, long t);
+
+  static native long mk_fpa_rem(long context, long t1, long t2);
+
+  static native long mk_fpa_round_to_integral(long context, long rm, long t);
+
+  static native long mk_fpa_min(long context, long t1, long t2);
+
+  static native long mk_fpa_max(long context, long t1, long t2);
+
+  static native long mk_fpa_leq(long context, long t1, long t2);
+
+  static native long mk_fpa_lt(long context, long t1, long t2);
+
+  static native long mk_fpa_geq(long context, long t1, long t2);
+
+  static native long mk_fpa_gt(long context, long t1, long t2);
+
+  static native long mk_fpa_eq(long context, long t1, long t2);
+
+  static native long mk_fpa_is_normal(long context, long t);
+
+  static native long mk_fpa_is_subnormal(long context, long t);
+
+  static native long mk_fpa_is_zero(long context, long t);
+
+  static native long mk_fpa_is_infinite(long context, long t);
+
+  static native long mk_fpa_is_nan(long context, long t);
+
+  static native long mk_fpa_is_negative(long context, long t);
+
+  static native long mk_fpa_is_positive(long context, long t);
+
+  static native long mk_fpa_to_fp_bv(long context, long bv, long s);
+
+  static native long mk_fpa_to_fp_float(long context, long rm, long t, long s);
+
+  static native long mk_fpa_to_fp_real(long context, long rm, long t, long s);
+
+  static native long mk_fpa_to_fp_signed(long context, long rm, long t, long s);
+
+  static native long mk_fpa_to_fp_unsigned(long context, long rm, long t, long s);
+
+  static native long mk_fpa_to_ubv(long context, long rm, long t, int sz);
+
+  static native long mk_fpa_to_sbv(long context, long rm, long t, int sz);
+
+  static native long mk_fpa_to_real(long context, long t);
+
+  static native int fpa_get_ebits(long context, long s);
+
+  static native int fpa_get_sbits(long context, long s);
+
+  static native boolean fpa_get_numeral_sign(long context, long t, PointerToInt sgn);
+
+  static native String fpa_get_numeral_significand_string(long context, long t);
+
+  static native String fpa_get_numeral_exponent_string(long context, long t);
+
+  static native long mk_fpa_to_ieee_bv(long context, long t);
+
+  static native long mk_fpa_to_fp_int_real(long context, long rm, long exp, long sig, long s);
+
   // ARRAYS
   static native long mk_select(long context, long a, long i);
 
