@@ -48,6 +48,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_rational_t
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_array_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bool_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_roundingmode_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_fp_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
@@ -87,6 +88,7 @@ import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5ArrayFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BitvectorFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5BooleanFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5FloatingPointFormula;
+import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5FloatingPointRoundingModeFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5IntegerFormula;
 import org.sosy_lab.solver.mathsat5.Mathsat5Formula.Mathsat5RationalFormula;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -178,6 +180,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (msat_is_fp_type(env, type)) {
       return FormulaType.getFloatingPointType(
           msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
+    } else if (msat_is_fp_roundingmode_type(env, type)) {
+      return FormulaType.FloatingPointRoundingModeType;
     } else if (msat_is_array_type(env, type)) {
       long indexType = msat_get_array_index_type(env, type);
       long elementType = msat_get_array_element_type(env, type);
@@ -218,6 +222,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) new Mathsat5BitvectorFormula(pTerm);
     } else if (pType.isFloatingPointType()) {
       return (T) new Mathsat5FloatingPointFormula(pTerm);
+    } else if (pType.isFloatingPointRoundingModeType()) {
+      return (T) new Mathsat5FloatingPointRoundingModeFormula(pTerm);
     }
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
   }

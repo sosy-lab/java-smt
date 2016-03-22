@@ -25,6 +25,7 @@ import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FloatingPointFormula;
+import org.sosy_lab.solver.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -109,6 +110,16 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements FloatingPointFormula {
     FloatingPointFormulaImpl(TFormulaInfo info) {
+      super(info);
+    }
+  }
+
+  /**
+   * Simple FloatingPointRoundingModeFormula implementation.
+   */
+  static final class FloatingPointRoundingModeFormulaImpl<TFormulaInfo>
+      extends AbstractFormula<TFormulaInfo> implements FloatingPointRoundingModeFormula {
+    FloatingPointRoundingModeFormulaImpl(TFormulaInfo info) {
       super(info);
     }
   }

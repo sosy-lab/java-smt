@@ -44,6 +44,7 @@ import org.sosy_lab.solver.basicimpl.AbstractFormula.ArrayFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.BitvectorFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.BooleanFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
+import org.sosy_lab.solver.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.solver.basicimpl.AbstractFormula.RationalFormulaImpl;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
@@ -172,6 +173,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       return (T) new BitvectorFormulaImpl<>(pTerm);
     } else if (pType.isFloatingPointType()) {
       return (T) new FloatingPointFormulaImpl<>(pTerm);
+    } else if (pType.isFloatingPointRoundingModeType()) {
+      return (T) new FloatingPointRoundingModeFormulaImpl<>(pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
       return (T) encapsulateArray(pTerm, arrayType.getIndexType(), arrayType.getElementType());

@@ -115,6 +115,8 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
         Preconditions.checkArgument(pSort instanceof FPSort);
         FPSort fpSort = (FPSort) pSort;
         return FormulaType.getFloatingPointType(fpSort.getEBits(), fpSort.getSBits());
+      case Z3_ROUNDING_MODE_SORT:
+        return FormulaType.FloatingPointRoundingModeType;
       default:
         throw new IllegalArgumentException(
             "Unknown formula type " + pSort + " with kind " + pSort.getSortKind());

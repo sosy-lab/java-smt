@@ -25,7 +25,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -322,9 +321,6 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  @Ignore(
-      "Multiplication adds terms of type rounding mode, "
-          + "currently we can create such terms but not traverse them.")
   public void fpTraversalWithRoundingMode() throws Exception {
     FloatingPointFormula two = fpmgr.makeNumber(2.0, singlePrecType);
     FloatingPointFormula var = fpmgr.makeVariable("x", singlePrecType);

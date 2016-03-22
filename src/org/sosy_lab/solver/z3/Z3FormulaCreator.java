@@ -131,6 +131,7 @@ import org.sosy_lab.solver.z3.Z3Formula.Z3ArrayFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3BitvectorFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3BooleanFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3FloatingPointFormula;
+import org.sosy_lab.solver.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
@@ -224,6 +225,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (sortKind == Z3_FLOATING_POINT_SORT) {
       return FormulaType.getFloatingPointType(
           fpa_get_ebits(z3context, pSort), fpa_get_sbits(z3context, pSort));
+    } else if (sortKind == Z3_ROUNDING_MODE_SORT) {
+      return FormulaType.FloatingPointRoundingModeType;
     }
     throw new IllegalArgumentException(
         "Unknown formula type " + sort_to_string(z3context, pSort) + " with kind " + sortKind);
@@ -283,6 +286,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isFloatingPointType()) {
       return (T) storePhantomReference(new Z3FloatingPointFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isFloatingPointRoundingModeType()) {
+      return (T)
+          storePhantomReference(new Z3FloatingPointRoundingModeFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)

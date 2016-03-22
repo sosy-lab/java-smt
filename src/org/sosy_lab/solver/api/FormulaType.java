@@ -49,6 +49,10 @@ public abstract class FormulaType<T extends Formula> {
     return false;
   }
 
+  public boolean isFloatingPointRoundingModeType() {
+    return false;
+  }
+
   public boolean isNumeralType() {
     return false;
   }
@@ -218,6 +222,23 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
+  public static final FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
+      new FloatingPointRoundingModeType();
+
+  private static class FloatingPointRoundingModeType
+      extends FormulaType<FloatingPointRoundingModeFormula> {
+
+    @Override
+    public boolean isFloatingPointRoundingModeType() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return "FloatingPointRoundingMode";
+    }
+  }
+
   public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
       FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
     return new ArrayFormulaType<>(pDomainSort, pRangeSort);
@@ -288,6 +309,8 @@ public abstract class FormulaType<T extends Formula> {
       return IntegerType;
     } else if (RationalType.toString().equals(t)) {
       return RationalType;
+    } else if (FloatingPointRoundingModeType.toString().equals(t)) {
+      return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {
       // FloatingPoint<exp=11,mant=52>
       String[] exman = t.substring(14, t.length() - 1).split(",");
