@@ -71,6 +71,8 @@ class Z3NativeApiConstants {
   static final int Z3_DATATYPE_SORT = 6;
   static final int Z3_RELATION_SORT = 7;
   static final int Z3_FINITE_DOMAIN_SORT = 8;
+  static final int Z3_FLOATING_POINT_SORT = 9;
+  static final int Z3_ROUNDING_MODE_SORT = 10;
   static final int Z3_UNKNOWN_SORT = 1000;
 
   // Z3_symbol_kind
@@ -232,18 +234,75 @@ class Z3NativeApiConstants {
   static final int Z3_OP_RA_CLONE = 1548;
   static final int Z3_OP_FD_LT = 1549;
 
-  static final int Z3_OP_LABEL = 1792;
-  static final int Z3_OP_LABEL_LIT = 1793;
+  // Auxiliary
+  static final int Z3_OP_LABEL = 0x700;
+  static final int Z3_OP_LABEL_LIT = 0x701;
 
-  static final int Z3_OP_DT_CONSTRUCTOR = 2048;
-  static final int Z3_OP_DT_RECOGNISER = 2049;
-  static final int Z3_OP_DT_ACCESSOR = 2050;
+  // Datatypes
+  static final int Z3_OP_DT_CONSTRUCTOR = 0x800;
+  static final int Z3_OP_DT_RECOGNISER = 0x801;
+  static final int Z3_OP_DT_ACCESSOR = 0x802;
+  static final int Z3_OP_DT_UPDATE_FIELD = 0x803;
+
+  // Pseudo Booleans
+  static final int Z3_OP_PB_AT_MOST = 0x900;
+  static final int Z3_OP_PB_LE = 0x901;
+  static final int Z3_OP_PB_GE = 0x902;
+
+  // Floating-Point Arithmetic
+  static final int Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN = 0x903;
+  static final int Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY = 0x904;
+  static final int Z3_OP_FPA_RM_TOWARD_POSITIVE = 0x905;
+  static final int Z3_OP_FPA_RM_TOWARD_NEGATIVE = 0x906;
+  static final int Z3_OP_FPA_RM_TOWARD_ZERO = 0x907;
+
+  static final int Z3_OP_FPA_NUM = 0x908;
+  static final int Z3_OP_FPA_PLUS_INF = 0x909;
+  static final int Z3_OP_FPA_MINUS_INF = 0x90a;
+  static final int Z3_OP_FPA_NAN = 0x90b;
+  static final int Z3_OP_FPA_PLUS_ZERO = 0x90c;
+  static final int Z3_OP_FPA_MINUS_ZERO = 0x90d;
+
+  static final int Z3_OP_FPA_ADD = 0x90e;
+  static final int Z3_OP_FPA_SUB = 0x90f;
+  static final int Z3_OP_FPA_NEG = 0x910;
+  static final int Z3_OP_FPA_MUL = 0x911;
+  static final int Z3_OP_FPA_DIV = 0x912;
+  static final int Z3_OP_FPA_REM = 0x913;
+  static final int Z3_OP_FPA_ABS = 0x914;
+  static final int Z3_OP_FPA_MIN = 0x915;
+  static final int Z3_OP_FPA_MAX = 0x916;
+  static final int Z3_OP_FPA_FMA = 0x917;
+  static final int Z3_OP_FPA_SQRT = 0x918;
+  static final int Z3_OP_FPA_ROUND_TO_INTEGRAL = 0x919;
+
+  static final int Z3_OP_FPA_EQ = 0x91a;
+  static final int Z3_OP_FPA_LT = 0x91b;
+  static final int Z3_OP_FPA_GT = 0x91c;
+  static final int Z3_OP_FPA_LE = 0x91d;
+  static final int Z3_OP_FPA_GE = 0x91e;
+  static final int Z3_OP_FPA_IS_NAN = 0x91f;
+  static final int Z3_OP_FPA_IS_INF = 0x920;
+  static final int Z3_OP_FPA_IS_ZERO = 0x921;
+  static final int Z3_OP_FPA_IS_NORMAL = 0x922;
+  static final int Z3_OP_FPA_IS_SUBNORMAL = 0x923;
+  static final int Z3_OP_FPA_IS_NEGATIVE = 0x924;
+  static final int Z3_OP_FPA_IS_POSITIVE = 0x925;
+
+  static final int Z3_OP_FPA_FP = 0x926;
+  static final int Z3_OP_FPA_TO_FP = 0x927;
+  static final int Z3_OP_FPA_TO_FP_UNSIGNED = 0x928;
+  static final int Z3_OP_FPA_TO_UBV = 0x929;
+  static final int Z3_OP_FPA_TO_SBV = 0x92a;
+  static final int Z3_OP_FPA_TO_REAL = 0x92b;
+
+  static final int Z3_OP_FPA_TO_IEEE_BV = 0x92c;
+
+  static final int Z3_OP_UNINTERPRETED = 0x92d;
 
   // Z3_ast_print_mode
   static final int Z3_PRINT_SMTLIB_FULL = 0;
   static final int Z3_PRINT_LOW_LEVEL = 1;
   static final int Z3_PRINT_SMTLIB_COMPLIANT = 2;
   static final int Z3_PRINT_SMTLIB2_COMPLIANT = 3;
-
-  static final int Z3_OP_UNINTERPRETED = 2349;
 }

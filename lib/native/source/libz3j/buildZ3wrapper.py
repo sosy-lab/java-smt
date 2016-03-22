@@ -84,6 +84,7 @@ def process_text(text):
         if "set_error_handler" in line: continue # not supported
         if "_interpolation_problem" in line: continue # not supported
         if "_check_interpolant" in line: continue # not supported
+        if " __uint64 * " in line: continue # not supported
         if line.startswith("typedef"): continue
         line = line.replace(" Z3_API ", " ")
         line = line.replace("const ", " ")
@@ -302,6 +303,8 @@ def main():
     print(process_file("z3_ast_containers.h"))
     print('\n\n// OPTIMIZATION \n\n')
     print(process_file("z3_optimization.h"))
+    print('\n\n// FLOATING-POINT \n\n')
+    print(process_file("z3_fpa.h"))
 
 def getType(typ):
     return typ.replace("Z3","J")
