@@ -172,6 +172,57 @@ public abstract class FormulaType<T extends Formula> {
     return DOUBLE_PRECISION_FP_TYPE;
   }
 
+  public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
+
+    private final int exponentSize;
+    private final int mantissaSize;
+
+    private FloatingPointType(int pExponentSize, int pMantissaSize) {
+      exponentSize = pExponentSize;
+      mantissaSize = pMantissaSize;
+    }
+
+    @Override
+    public boolean isFloatingPointType() {
+      return true;
+    }
+
+    public int getExponentSize() {
+      return exponentSize;
+    }
+
+    public int getMantissaSize() {
+      return mantissaSize;
+    }
+
+    @Override
+    public int hashCode() {
+      return (31 + exponentSize) * 31 + mantissaSize;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof FloatingPointType)) {
+        return false;
+      }
+      FloatingPointType other = (FloatingPointType) obj;
+      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
+    }
+
+    @Override
+    public String toString() {
+      return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
+    }
+  }
+
+  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
+      FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
+    return new ArrayFormulaType<>(pDomainSort, pRangeSort);
+  }
+
   public static final class ArrayFormulaType<TI extends Formula, TE extends Formula>
       extends FormulaType<ArrayFormula<TI, TE>> {
 
@@ -224,57 +275,6 @@ public abstract class FormulaType<T extends Formula> {
 
       return elementType.equals(other.elementType) && indexType.equals(other.indexType);
     }
-  }
-
-  public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
-
-    private final int exponentSize;
-    private final int mantissaSize;
-
-    private FloatingPointType(int pExponentSize, int pMantissaSize) {
-      exponentSize = pExponentSize;
-      mantissaSize = pMantissaSize;
-    }
-
-    @Override
-    public boolean isFloatingPointType() {
-      return true;
-    }
-
-    public int getExponentSize() {
-      return exponentSize;
-    }
-
-    public int getMantissaSize() {
-      return mantissaSize;
-    }
-
-    @Override
-    public int hashCode() {
-      return (31 + exponentSize) * 31 + mantissaSize;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof FloatingPointType)) {
-        return false;
-      }
-      FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
-    }
-
-    @Override
-    public String toString() {
-      return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
-    }
-  }
-
-  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
-      FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
-    return new ArrayFormulaType<>(pDomainSort, pRangeSort);
   }
 
   /**
