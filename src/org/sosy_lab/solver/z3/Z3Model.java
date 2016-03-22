@@ -31,6 +31,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_get_num_entries;
 import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
@@ -141,8 +142,17 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       inc_ref(z3context, funcDecl);
 
       long symbol = get_decl_name(z3context, funcDecl);
-      assert get_symbol_kind(z3context, symbol) == Z3NativeApiConstants.Z3_STRING_SYMBOL;
-      String name = get_symbol_string(z3context, symbol);
+      String name;
+      switch (get_symbol_kind(z3context, symbol)) {
+        case Z3NativeApiConstants.Z3_STRING_SYMBOL:
+          name = get_symbol_string(z3context, symbol);
+          break;
+        case Z3NativeApiConstants.Z3_INT_SYMBOL:
+          name = "#" + get_symbol_int(z3context, symbol);
+          break;
+        default:
+          throw new AssertionError("Unknown symbol kind " + get_symbol_kind(z3context, symbol));
+      }
 
       long interp = model_get_func_interp(z3context, model, funcDecl);
       func_interp_inc_ref(z3context, interp);
