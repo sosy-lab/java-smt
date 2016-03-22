@@ -184,8 +184,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FormulaType.getArrayType(
           getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
     }
-    throw new IllegalArgumentException(
-        "Unknown formula type " + msat_type_repr(type) + " for term " + msat_term_repr(type));
+    throw new IllegalArgumentException("Unknown formula type " + msat_type_repr(type));
   }
 
   @Override
