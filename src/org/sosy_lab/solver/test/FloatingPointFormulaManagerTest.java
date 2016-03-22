@@ -137,26 +137,40 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void numberConstants() throws Exception {
-    FloatingPointFormula doubleNumber = fpmgr.makeNumber(1.5, singlePrecType);
-    FloatingPointFormula stringOne = fpmgr.makeNumber("1.5", singlePrecType);
-    FloatingPointFormula bigDecimalOne = fpmgr.makeNumber(new BigDecimal(1.5), singlePrecType);
-    FloatingPointFormula rationalOne =
-        fpmgr.makeNumber(Rational.ofBigDecimal(new BigDecimal(1.5)), singlePrecType);
-
-    BooleanFormula eq1 = fpmgr.equalWithFPSemantics(doubleNumber, stringOne);
-    BooleanFormula eq2 = fpmgr.equalWithFPSemantics(doubleNumber, bigDecimalOne);
-
-    BooleanFormula eq3 = fpmgr.equalWithFPSemantics(doubleNumber, rationalOne);
-    assertThatFormula(bmgr.and(eq1, eq2, eq3)).isTautological();
-
-    FloatingPointType doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
-    FloatingPointFormula doubleLargeValue =
-        fpmgr.makeNumber(3.40282346638528859812e+38F, doublePrecType);
-    FloatingPointFormula bigDecimalLargeValue =
-        fpmgr.makeNumber(new BigDecimal("3.4028234663852886E+38"), doublePrecType);
-    assertThatFormula(fpmgr.equalWithFPSemantics(doubleLargeValue, bigDecimalLargeValue))
+  public void specialDoubles() throws Exception {
+    assertThatFormula(fpmgr.assignment(fpmgr.makeNumber(Double.NaN, singlePrecType), nan))
         .isTautological();
+    assertThatFormula(
+            fpmgr.assignment(fpmgr.makeNumber(Double.POSITIVE_INFINITY, singlePrecType), posInf))
+        .isTautological();
+    assertThatFormula(
+            fpmgr.assignment(fpmgr.makeNumber(Double.NEGATIVE_INFINITY, singlePrecType), negInf))
+        .isTautological();
+  }
+
+  private void checkEqualityOfNumberConstantsFor(double value, FloatingPointType type)
+      throws Exception {
+    FloatingPointFormula doubleNumber = fpmgr.makeNumber(value, type);
+    FloatingPointFormula stringNumber = fpmgr.makeNumber(Double.toString(value), type);
+    FloatingPointFormula bigDecimalNumber = fpmgr.makeNumber(new BigDecimal(value), type);
+    FloatingPointFormula rationalNumber =
+        fpmgr.makeNumber(Rational.ofBigDecimal(new BigDecimal(value)), type);
+
+    BooleanFormula eq1 = fpmgr.equalWithFPSemantics(doubleNumber, stringNumber);
+    BooleanFormula eq2 = fpmgr.equalWithFPSemantics(doubleNumber, bigDecimalNumber);
+
+    BooleanFormula eq3 = fpmgr.equalWithFPSemantics(doubleNumber, rationalNumber);
+    assertThatFormula(bmgr.and(eq1, eq2, eq3)).isTautological();
+  }
+
+  @Test
+  public void numberConstants() throws Exception {
+    FloatingPointType doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
+    checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
+    checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, singlePrecType);
+    checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, doublePrecType);
+    checkEqualityOfNumberConstantsFor(3.40282346638528859812e+38, singlePrecType);
+    checkEqualityOfNumberConstantsFor(3.40282346638528859812e+38, doublePrecType);
   }
 
   @Test
@@ -171,6 +185,14 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(fpmgr.equalWithFPSemantics(narrowedNumber, singlePrecNumber))
         .isTautological();
     assertThatFormula(fpmgr.equalWithFPSemantics(widenedNumber, doublePrecNumber)).isTautological();
+
+    FloatingPointFormula doublePrecSmallNumber =
+        fpmgr.makeNumber(5.8774717541114375E-39, doublePrecType);
+    FloatingPointFormula singlePrecSmallNumber =
+        fpmgr.makeNumber(5.8774717541114375E-39, singlePrecType);
+    FloatingPointFormula widenedSmallNumber = fpmgr.castTo(singlePrecSmallNumber, doublePrecType);
+    assertThatFormula(fpmgr.equalWithFPSemantics(widenedSmallNumber, doublePrecSmallNumber))
+        .isTautological();
   }
 
   @Test

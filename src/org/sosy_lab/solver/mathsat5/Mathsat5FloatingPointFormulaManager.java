@@ -69,6 +69,15 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   public Long makeNumberImpl(double pN, FloatingPointType pType) {
+    if (Double.isNaN(pN)) {
+      return makeNaNImpl(pType);
+    } else if (Double.isInfinite(pN)) {
+      if (pN > 0.0) {
+        return makePlusInfinityImpl(pType);
+      } else {
+        return makeMinusInfinityImpl(pType);
+      }
+    }
     return makeNumberImpl(Double.toString(pN), pType);
   }
 
