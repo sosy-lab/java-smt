@@ -43,6 +43,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
@@ -247,5 +248,11 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     // we pushed some levels on assertionStack, remove them and delete solver
     solver_pop(z3context, z3solver, 1);
     return callback.getResult();
+  }
+
+  @Override
+  public String toString() {
+    Preconditions.checkState(!closed);
+    return solver_to_string(z3context, z3solver);
   }
 }

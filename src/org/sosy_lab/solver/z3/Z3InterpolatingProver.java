@@ -37,6 +37,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -267,5 +268,11 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     private long getInterpolationPoint() {
       return interpolationPoint;
     }
+  }
+
+  @Override
+  public String toString() {
+    Preconditions.checkState(!closed);
+    return solver_to_string(z3context, z3solver);
   }
 }
