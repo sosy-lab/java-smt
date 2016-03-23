@@ -69,6 +69,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       Z3IntegerFormulaManager pIntegerManager,
       Z3RationalFormulaManager pRationalManager,
       Z3BitvectorFormulaManager pBitpreciseManager,
+      Z3FloatingPointFormulaManager pFloatingPointManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager) {
     super(
@@ -78,7 +79,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pIntegerManager,
         pRationalManager,
         pBitpreciseManager,
-        null,
+        pFloatingPointManager,
         pQuantifiedManager,
         pArrayManager);
   }

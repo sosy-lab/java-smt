@@ -22,6 +22,8 @@ package org.sosy_lab.solver.z3;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.fpa_get_ebits;
+import static org.sosy_lab.solver.z3.Z3NativeApi.fpa_get_sbits;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
@@ -47,13 +49,17 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_const;
+import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_real;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
 import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_ast;
+import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FLOATING_POINT_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FUNC_DECL_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
@@ -63,6 +69,12 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_DISTINCT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_DIV;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_MINUS_INF;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_MINUS_ZERO;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_NAN;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_NUM;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_PLUS_INF;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_PLUS_ZERO;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IFF;
@@ -82,6 +94,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
+import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ROUNDING_MODE_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_SORT_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
@@ -91,6 +104,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
@@ -104,6 +118,7 @@ import org.sosy_lab.common.time.Timer;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.FloatingPointFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
@@ -115,6 +130,8 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.z3.Z3Formula.Z3ArrayFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3BitvectorFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3BooleanFormula;
+import org.sosy_lab.solver.z3.Z3Formula.Z3FloatingPointFormula;
+import org.sosy_lab.solver.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
@@ -128,6 +145,18 @@ import java.util.Map;
 
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
+
+  private static final Map<Integer, Object> Z3_CONSTANTS =
+      ImmutableMap.<Integer, Object>builder()
+          .put(Z3_OP_TRUE, true)
+          .put(Z3_OP_FALSE, false)
+          .put(Z3_OP_FPA_PLUS_ZERO, +0.0)
+          .put(Z3_OP_FPA_MINUS_ZERO, -0.0)
+          .put(Z3_OP_FPA_PLUS_INF, Double.POSITIVE_INFINITY)
+          .put(Z3_OP_FPA_MINUS_INF, Double.NEGATIVE_INFINITY)
+          .put(Z3_OP_FPA_NAN, Double.NaN)
+          .build();
+
 
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
@@ -173,12 +202,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    if (pFormula instanceof ArrayFormula<?, ?> || pFormula instanceof BitvectorFormula) {
-      long term = extractInfo(pFormula);
-      return (FormulaType<T>) getFormulaType(term);
-    }
-
-    return super.getFormulaType(pFormula);
+    Long term = extractInfo(pFormula);
+    return (FormulaType<T>) getFormulaType(term);
   }
 
   public FormulaType<?> getFormulaTypeFromSort(Long pSort) {
@@ -197,8 +222,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FormulaType.RationalType;
     } else if (sortKind == Z3_BV_SORT) {
       return FormulaType.getBitvectorTypeWithSize(get_bv_sort_size(z3context, pSort));
+    } else if (sortKind == Z3_FLOATING_POINT_SORT) {
+      return FormulaType.getFloatingPointType(
+          fpa_get_ebits(z3context, pSort), fpa_get_sbits(z3context, pSort));
+    } else if (sortKind == Z3_ROUNDING_MODE_SORT) {
+      return FormulaType.FloatingPointRoundingModeType;
     }
-    throw new IllegalArgumentException("Unknown formula type");
+    throw new IllegalArgumentException(
+        "Unknown formula type " + sort_to_string(z3context, pSort) + " with kind " + sortKind);
   }
 
   @Override
@@ -253,6 +284,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) storePhantomReference(new Z3RationalFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isFloatingPointType()) {
+      return (T) storePhantomReference(new Z3FloatingPointFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isFloatingPointRoundingModeType()) {
+      return (T)
+          storePhantomReference(new Z3FloatingPointRoundingModeFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)
@@ -279,6 +315,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointType();
+    cleanupReferences();
+    return storePhantomReference(new Z3FloatingPointFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
   public Long getArrayType(Long pIndexType, Long pElementType) {
     Long allocatedArraySort = allocatedArraySorts.get(pIndexType, pElementType);
     if (allocatedArraySort == null) {
@@ -299,7 +342,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
-    throw new UnsupportedOperationException("FloatingPoint theory is not supported by Z3");
+    long fpSort = Z3NativeApi.mk_fpa_sort(getEnv(), type.getExponentSize(), type.getMantissaSize());
+    inc_ref(getEnv(), sort_to_ast(getEnv(), fpSort));
+    return fpSort;
   }
 
   private void cleanupReferences() {
@@ -358,10 +403,16 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
         if (arity == 0) {
 
-          // true/false.
-          long declKind = get_decl_kind(environment, get_app_decl(environment, f));
-          if (declKind == Z3_OP_TRUE || declKind == Z3_OP_FALSE) {
-            return visitor.visitConstant(formula, declKind == Z3_OP_TRUE);
+          // constants
+          int declKind = get_decl_kind(environment, get_app_decl(environment, f));
+          Object value = Z3_CONSTANTS.get(declKind);
+          if (value != null) {
+            return visitor.visitConstant(formula, value);
+
+          } else if (declKind == Z3_OP_FPA_NUM
+              || get_sort_kind(environment, get_sort(environment, f)) == Z3_ROUNDING_MODE_SORT) {
+            return visitor.visitConstant(formula, convertValue(f));
+
           } else {
 
             // Has to be a variable otherwise.
@@ -478,6 +529,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   public Object convertValue(Long value) {
     inc_ref(environment, value);
+
+    Object constantValue =
+        Z3_CONSTANTS.get(get_decl_kind(environment, get_app_decl(environment, value)));
+    if (constantValue != null) {
+      return constantValue;
+    }
+
     try {
       FormulaType<?> type = getFormulaType(value);
       if (type.isBooleanType()) {
@@ -488,6 +546,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return Rational.ofString(get_numeral_string(environment, value));
       } else if (type.isBitvectorType()) {
         return new BigInteger(get_numeral_string(environment, value));
+      } else if (type.isFloatingPointType()) {
+        // Converting to Rational and reading that is easier.
+        return convertValue(simplify(environment, mk_fpa_to_real(environment, value)));
+
       } else {
 
         // Unknown type --- return string serialization.

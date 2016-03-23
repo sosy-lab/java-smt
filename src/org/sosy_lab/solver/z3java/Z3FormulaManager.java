@@ -26,7 +26,6 @@ import static org.sosy_lab.solver.z3java.Z3NumeralFormulaManager.toAE;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
@@ -59,6 +58,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
       Z3IntegerFormulaManager pIntegerManager,
       Z3RationalFormulaManager pRationalManager,
       Z3BitvectorFormulaManager pBitpreciseManager,
+      Z3FloatingPointFormulaManager pFloatingPointManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager) {
     super(
@@ -68,7 +68,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
         pIntegerManager,
         pRationalManager,
         pBitpreciseManager,
-        null,
+        pFloatingPointManager,
         pQuantifiedManager,
         pArrayManager);
   }

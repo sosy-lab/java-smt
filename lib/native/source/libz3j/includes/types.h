@@ -1,6 +1,7 @@
 
 // aliases for Z3 types
 typedef void jvoid;
+typedef signed jsigned;
 typedef unsigned int junsigned;
 typedef unsigned long long junsigned_int64;
 typedef unsigned long long j__uint64;
@@ -12,6 +13,7 @@ typedef long long int64;
 #define __uint64 unsigned long long
 #endif
 #define __uint64 unsigned long long
+typedef __uint64 juint64;
 
 typedef jboolean jJ_bool;
 typedef jint jJ_lbool;
@@ -30,22 +32,28 @@ typedef jint jJ_goal_prec;
 
 
 
+#define SIGNED_ARG(num)         SIMPLE_ARG(jsigned, num)
 #define UNSIGNED_ARG(num)       SIMPLE_ARG(junsigned, num)
 #define UNSIGNED_INT64_ARG(num) SIMPLE_ARG(junsigned_int64, num)
+#define FLOAT_ARG(num)          SIMPLE_ARG(jfloat, num)
 #define DOUBLE_ARG(num)         SIMPLE_ARG(double, num)
 #define BOOL_ARG(num)           SIMPLE_ARG(Z3_bool, num)
 #define INT_ARG(num)            SIMPLE_ARG(jint, num)
 #define INT64_ARG(num)          SIMPLE_ARG(jint64, num)
+#define UINT64_ARG(num)         SIMPLE_ARG(juint64, num)
 #define ERROR_CODE_ARG(num)     SIMPLE_ARG(jint, num)
 #define AST_PRINT_MODE_ARG(num) SIMPLE_ARG(jint, num)
 
 
+#define CLEAN_SIGNED_ARG(num)         CLEAN_SIMPLE_ARG(num)
 #define CLEAN_UNSIGNED_ARG(num)       CLEAN_SIMPLE_ARG(num)
 #define CLEAN_UNSIGNED_INT64_ARG(num) CLEAN_SIMPLE_ARG(num)
+#define CLEAN_FLOAT_ARG(num)          CLEAN_SIMPLE_ARG(num)
 #define CLEAN_DOUBLE_ARG(num)         CLEAN_SIMPLE_ARG(num)
 #define CLEAN_BOOL_ARG(num)           CLEAN_SIMPLE_ARG(num)
 #define CLEAN_INT_ARG(num)            CLEAN_SIMPLE_ARG(num)
 #define CLEAN_INT64_ARG(num)          CLEAN_SIMPLE_ARG(num)
+#define CLEAN_UINT64_ARG(num)         CLEAN_SIMPLE_ARG(num)
 #define CLEAN_ERROR_CODE_ARG(num)     CLEAN_SIMPLE_ARG(num)
 #define CLEAN_AST_PRINT_MODE_ARG(num) CLEAN_SIMPLE_ARG(num)
 

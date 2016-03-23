@@ -69,6 +69,15 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   public Long makeNumberImpl(double pN, FloatingPointType pType) {
+    if (Double.isNaN(pN)) {
+      return makeNaNImpl(pType);
+    } else if (Double.isInfinite(pN)) {
+      if (pN > 0.0) {
+        return makePlusInfinityImpl(pType);
+      } else {
+        return makeMinusInfinityImpl(pType);
+      }
+    }
     return makeNumberImpl(Double.toString(pN), pType);
   }
 
@@ -153,12 +162,13 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   private Long genericCast(Long pNumber, FormulaType<?> pTargetType) {
-    long argType = msat_term_get_type(pNumber);
+    long msatArgType = msat_term_get_type(pNumber);
+    FormulaType<?> argType = getFormulaCreator().getFormulaType(pNumber);
     long castFuncDecl =
         ffmgr.createFunctionImpl(
             "__cast_" + argType + "_to_" + pTargetType,
             toSolverType(pTargetType),
-            new long[] {argType});
+            new long[] {msatArgType});
     return ffmgr.createUIFCallImpl(castFuncDecl, new long[] {pNumber});
   }
 

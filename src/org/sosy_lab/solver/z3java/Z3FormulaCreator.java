@@ -24,12 +24,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
-
 import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.BitVecSort;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FPExpr;
+import com.microsoft.z3.FPSort;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntSymbol;
 import com.microsoft.z3.Sort;
@@ -40,8 +42,6 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.api.ArrayFormula;
-import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -54,8 +54,20 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
+
+  private static final Map<Z3_decl_kind, Object> Z3_CONSTANTS =
+      ImmutableMap.<Z3_decl_kind, Object>builder()
+          .put(Z3_decl_kind.Z3_OP_TRUE, true)
+          .put(Z3_decl_kind.Z3_OP_FALSE, false)
+          .put(Z3_decl_kind.Z3_OP_FPA_PLUS_ZERO, +0.0)
+          .put(Z3_decl_kind.Z3_OP_FPA_MINUS_ZERO, -0.0)
+          .put(Z3_decl_kind.Z3_OP_FPA_PLUS_INF, Double.POSITIVE_INFINITY)
+          .put(Z3_decl_kind.Z3_OP_FPA_MINUS_INF, Double.NEGATIVE_INFINITY)
+          .put(Z3_decl_kind.Z3_OP_FPA_NAN, Double.NaN)
+          .build();
 
   private final Table<Sort, Sort, Sort> allocatedArraySorts = HashBasedTable.create();
 
@@ -79,12 +91,8 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    if (pFormula instanceof ArrayFormula<?, ?> || pFormula instanceof BitvectorFormula) {
-      Expr term = extractInfo(pFormula);
-      return (FormulaType<T>) getFormulaType(term);
-    }
-
-    return super.getFormulaType(pFormula);
+    Expr term = extractInfo(pFormula);
+    return (FormulaType<T>) getFormulaType(term);
   }
 
   public FormulaType<?> getFormulaTypeFromSort(Sort pSort) {
@@ -103,8 +111,15 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
       case Z3_BV_SORT:
         Preconditions.checkArgument(pSort instanceof BitVecSort);
         return FormulaType.getBitvectorTypeWithSize(((BitVecSort) pSort).getSize());
+      case Z3_FLOATING_POINT_SORT:
+        Preconditions.checkArgument(pSort instanceof FPSort);
+        FPSort fpSort = (FPSort) pSort;
+        return FormulaType.getFloatingPointType(fpSort.getEBits(), fpSort.getSBits());
+      case Z3_ROUNDING_MODE_SORT:
+        return FormulaType.FloatingPointRoundingModeType;
       default:
-        throw new IllegalArgumentException("Unknown formula type");
+        throw new IllegalArgumentException(
+            "Unknown formula type " + pSort + " with kind " + pSort.getSortKind());
     }
   }
 
@@ -131,7 +146,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
 
   @Override
   public Sort getFloatingPointType(FormulaType.FloatingPointType type) {
-    throw new UnsupportedOperationException("FloatingPoint theory is not supported by Z3");
+    return getEnv().mkFPSort(type.getExponentSize(), type.getMantissaSize());
   }
 
   private String getName(Expr t) {
@@ -170,10 +185,16 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
 
         if (arity == 0) {
 
-          // true/false.
+          // constants
           Z3_decl_kind declKind = f.getFuncDecl().getDeclKind();
-          if (declKind == Z3_decl_kind.Z3_OP_TRUE || declKind == Z3_decl_kind.Z3_OP_FALSE) {
-            return visitor.visitConstant(formula, declKind == Z3_decl_kind.Z3_OP_TRUE);
+          Object value = Z3_CONSTANTS.get(declKind);
+          if (value != null) {
+            return visitor.visitConstant(formula, value);
+
+          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM
+              || f.getSort().getSortKind() == Z3_sort_kind.Z3_ROUNDING_MODE_SORT) {
+            return visitor.visitConstant(formula, convertValue(f));
+
           } else {
 
             // Has to be a variable otherwise.
@@ -290,6 +311,11 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
   }
 
   public Object convertValue(Expr pF) {
+    Object constantValue = Z3_CONSTANTS.get(pF.getFuncDecl().getDeclKind());
+    if (constantValue != null) {
+      return constantValue;
+    }
+
     FormulaType<?> type = getFormulaType(pF);
     if (type.isBooleanType()) {
       return pF.isTrue();
@@ -304,6 +330,11 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
       return Rational.ofString(pF.toString());
     } else if (type.isBitvectorType()) {
       return interpretBitvector(pF);
+    } else if (type.isFloatingPointType() && pF instanceof FPExpr) {
+      // Converting to Rational and reading that is easier.
+      FPExpr fpExpr = (FPExpr) pF;
+      return convertValue(getEnv().mkFPToReal(fpExpr).simplify());
+
     } else {
 
       // Unknown type --- return string serialization.

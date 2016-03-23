@@ -84,6 +84,7 @@ def process_text(text):
         if "set_error_handler" in line: continue # not supported
         if "_interpolation_problem" in line: continue # not supported
         if "_check_interpolant" in line: continue # not supported
+        if " __uint64 * " in line: continue # not supported
         if line.startswith("typedef"): continue
         line = line.replace(" Z3_API ", " ")
         line = line.replace("const ", " ")
@@ -287,29 +288,23 @@ def process_text(text):
     if DEBUG: open("out4","w").write(tmp4)
     return tmp4
 
-def main():
+def process_file(filename):
     # TODO: replace with running cpp on z3.h and parsing the output.
-    o = lambda f: open(os.path.join(sys.argv[1], f)).read()
+    with open(os.path.join(sys.argv[1], filename)) as f:
+        header = f.read()
+    return process_text(header)
 
-    api = o("z3_api.h")
-    interp_api = o("z3_interp.h")
-    containers_api = o("z3_ast_containers.h")
-    optimization_api = o("z3_optimization.h")
-
-    result_text = process_text(api)
-    result_interp = process_text(interp_api)
-    result_containers = process_text(containers_api)
-    result_opt = process_text(optimization_api)
-
-    # Write result
+def main():
     print(HEADER)
-    print(result_text)
+    print(process_file("z3_api.h"))
     print('\n\n// INTERPOLATION\n\n')
-    print(result_interp)
+    print(process_file("z3_interp.h"))
     print('\n\n// AST CONTAINERS\n\n')
-    print(result_containers)
+    print(process_file("z3_ast_containers.h"))
     print('\n\n// OPTIMIZATION \n\n')
-    print(result_opt)
+    print(process_file("z3_optimization.h"))
+    print('\n\n// FLOATING-POINT \n\n')
+    print(process_file("z3_fpa.h"))
 
 def getType(typ):
     return typ.replace("Z3","J")

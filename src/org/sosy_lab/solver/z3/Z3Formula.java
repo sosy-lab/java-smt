@@ -22,6 +22,8 @@ package org.sosy_lab.solver.z3;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.FloatingPointFormula;
+import org.sosy_lab.solver.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -94,6 +96,21 @@ abstract class Z3Formula implements Formula {
   static final class Z3BitvectorFormula extends Z3Formula implements BitvectorFormula {
 
     Z3BitvectorFormula(long z3context, long z3expr) {
+      super(z3context, z3expr);
+    }
+  }
+
+  static final class Z3FloatingPointFormula extends Z3Formula implements FloatingPointFormula {
+
+    Z3FloatingPointFormula(long z3context, long z3expr) {
+      super(z3context, z3expr);
+    }
+  }
+
+  static final class Z3FloatingPointRoundingModeFormula extends Z3Formula
+      implements FloatingPointRoundingModeFormula {
+
+    Z3FloatingPointRoundingModeFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }

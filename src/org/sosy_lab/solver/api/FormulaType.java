@@ -49,6 +49,10 @@ public abstract class FormulaType<T extends Formula> {
     return false;
   }
 
+  public boolean isFloatingPointRoundingModeType() {
+    return false;
+  }
+
   public boolean isNumeralType() {
     return false;
   }
@@ -172,6 +176,74 @@ public abstract class FormulaType<T extends Formula> {
     return DOUBLE_PRECISION_FP_TYPE;
   }
 
+  public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
+
+    private final int exponentSize;
+    private final int mantissaSize;
+
+    private FloatingPointType(int pExponentSize, int pMantissaSize) {
+      exponentSize = pExponentSize;
+      mantissaSize = pMantissaSize;
+    }
+
+    @Override
+    public boolean isFloatingPointType() {
+      return true;
+    }
+
+    public int getExponentSize() {
+      return exponentSize;
+    }
+
+    public int getMantissaSize() {
+      return mantissaSize;
+    }
+
+    @Override
+    public int hashCode() {
+      return (31 + exponentSize) * 31 + mantissaSize;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof FloatingPointType)) {
+        return false;
+      }
+      FloatingPointType other = (FloatingPointType) obj;
+      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
+    }
+
+    @Override
+    public String toString() {
+      return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
+    }
+  }
+
+  public static final FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
+      new FloatingPointRoundingModeType();
+
+  private static class FloatingPointRoundingModeType
+      extends FormulaType<FloatingPointRoundingModeFormula> {
+
+    @Override
+    public boolean isFloatingPointRoundingModeType() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return "FloatingPointRoundingMode";
+    }
+  }
+
+  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
+      FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
+    return new ArrayFormulaType<>(pDomainSort, pRangeSort);
+  }
+
   public static final class ArrayFormulaType<TI extends Formula, TE extends Formula>
       extends FormulaType<ArrayFormula<TI, TE>> {
 
@@ -226,57 +298,6 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
-
-    private final int exponentSize;
-    private final int mantissaSize;
-
-    private FloatingPointType(int pExponentSize, int pMantissaSize) {
-      exponentSize = pExponentSize;
-      mantissaSize = pMantissaSize;
-    }
-
-    @Override
-    public boolean isFloatingPointType() {
-      return true;
-    }
-
-    public int getExponentSize() {
-      return exponentSize;
-    }
-
-    public int getMantissaSize() {
-      return mantissaSize;
-    }
-
-    @Override
-    public int hashCode() {
-      return (31 + exponentSize) * 31 + mantissaSize;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof FloatingPointType)) {
-        return false;
-      }
-      FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
-    }
-
-    @Override
-    public String toString() {
-      return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
-    }
-  }
-
-  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
-      FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
-    return new ArrayFormulaType<>(pDomainSort, pRangeSort);
-  }
-
   /**
    * Parse a string and return the corresponding type.
    * This method is the counterpart of {@link #toString()}.
@@ -288,6 +309,8 @@ public abstract class FormulaType<T extends Formula> {
       return IntegerType;
     } else if (RationalType.toString().equals(t)) {
       return RationalType;
+    } else if (FloatingPointRoundingModeType.toString().equals(t)) {
+      return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {
       // FloatingPoint<exp=11,mant=52>
       String[] exman = t.substring(14, t.length() - 1).split(",");
