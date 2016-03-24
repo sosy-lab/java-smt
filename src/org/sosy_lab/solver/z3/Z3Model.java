@@ -35,6 +35,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
@@ -91,7 +92,14 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     PointerToLong out = new PointerToLong();
     boolean status = model_eval(z3context, model, f, false, out);
     Verify.verify(status, "Error during model evaluation");
-    if (out.value == 0) {
+
+    // Unfortunately, Z3 signals irrelevancy by returning identity.
+    // We partially mitigate it by checking whether the return value is constant already (which we
+    // can return).
+    if ((out.value == 0 || out.value == f) &&
+        !(is_numeral_ast(z3context, out.value)
+            || Z3NativeApiConstants.isOP(z3context, out.value, Z3NativeApiConstants.Z3_OP_TRUE)
+            || Z3NativeApiConstants.isOP(z3context, out.value, Z3NativeApiConstants.Z3_OP_FALSE))) {
       return null;
     }
     return creator.convertValue(out.value);

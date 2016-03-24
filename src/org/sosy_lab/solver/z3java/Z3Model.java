@@ -60,6 +60,10 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
   @Override
   public Object evaluateImpl(Expr f) {
     Expr value = model.eval(f, false);
+    if (value.equals(f) && !(value.isNumeral() || value.isTrue() || value.isFalse())) {
+      return null;
+    }
+    return creator.convertValue(value);
   }
 
   @Override

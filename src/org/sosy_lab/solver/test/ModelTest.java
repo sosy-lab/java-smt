@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 
@@ -53,7 +54,7 @@ public class ModelTest extends SolverBasedTest0 {
     return Solvers.values();
   }
 
-  @Parameter(0)
+  @Parameter()
   public Solvers solver;
 
   @Override
@@ -163,7 +164,32 @@ public class ModelTest extends SolverBasedTest0 {
         bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
   }
 
-  @SuppressWarnings("unused")
+  @Test
+  public void testPartialModels() throws Exception {
+    assume().withFailureMessage(
+        "As of now, only Z3 and Princess support partial models"
+    ).that(solver).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      IntegerFormula x = imgr.makeVariable("x");
+      prover.push(imgr.equal(x, x));
+      assertThatEnvironment(prover).isSatisfiable();
+      Model m = prover.getModel();
+      assertThat(m.evaluate(x)).isEqualTo(null);
+      assertThat(m).isEmpty();
+    }
+  }
+
+  @Test
+  public void testEvaluatingConstants() throws Exception {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeVariable("b"));
+      prover.isUnsat();
+      Model m = prover.getModel();
+      assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
+      assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+    }
+  }
+
   @Test
   public void testGetArrays() throws Exception {
     requireArrays();
