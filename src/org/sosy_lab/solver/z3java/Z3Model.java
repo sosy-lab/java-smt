@@ -59,7 +59,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
   @Nullable
   @Override
   public Object evaluateImpl(Expr f) {
-    return creator.convertValue(model.eval(f, true));
+    Expr value = model.eval(f, false);
   }
 
   @Override
