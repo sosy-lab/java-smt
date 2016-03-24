@@ -125,15 +125,13 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       inc_ref(z3context, value);
 
       long symbol = get_decl_name(z3context, keyDecl);
-      assert get_symbol_kind(z3context, symbol) == Z3NativeApiConstants.Z3_STRING_SYMBOL;
-      String name = get_symbol_string(z3context, symbol);
       Object lValue = creator.convertValue(value);
 
       // cleanup outdated data
       dec_ref(z3context, keyDecl);
       dec_ref(z3context, value);
 
-      out.add(new ValueAssignment(key, name, lValue, ImmutableList.of()));
+      out.add(new ValueAssignment(key, symbolToString(symbol), lValue, ImmutableList.of()));
     }
 
     // Iterate through function applications.
@@ -142,17 +140,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       inc_ref(z3context, funcDecl);
 
       long symbol = get_decl_name(z3context, funcDecl);
-      String name;
-      switch (get_symbol_kind(z3context, symbol)) {
-        case Z3NativeApiConstants.Z3_STRING_SYMBOL:
-          name = get_symbol_string(z3context, symbol);
-          break;
-        case Z3NativeApiConstants.Z3_INT_SYMBOL:
-          name = "#" + get_symbol_int(z3context, symbol);
-          break;
-        default:
-          throw new AssertionError("Unknown symbol kind " + get_symbol_kind(z3context, symbol));
-      }
 
       long interp = model_get_func_interp(z3context, model, funcDecl);
       func_interp_inc_ref(z3context, interp);
@@ -181,11 +168,23 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
         }
         func_entry_dec_ref(z3context, entry);
 
-        out.add(new ValueAssignment(formula, name, value, argumentInterpretation));
+        out.add(new ValueAssignment(formula, symbolToString(symbol), value, argumentInterpretation));
       }
       func_interp_dec_ref(z3context, interp);
       dec_ref(z3context, funcDecl);
     }
     return out.build();
+  }
+
+  private String symbolToString(long symbol) {
+    switch (get_symbol_kind(z3context, symbol)) {
+      case Z3NativeApiConstants.Z3_STRING_SYMBOL:
+        return get_symbol_string(z3context, symbol);
+      case Z3NativeApiConstants.Z3_INT_SYMBOL:
+        return "#" + get_symbol_int(z3context, symbol);
+      default:
+        throw new AssertionError("Unknown symbol kind " + get_symbol_kind(z3context, symbol));
+    }
+
   }
 }
