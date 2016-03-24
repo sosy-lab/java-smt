@@ -19,16 +19,18 @@
  */
 package org.sosy_lab.solver.z3java;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableList.Builder;
+
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.FuncDecl;
+import com.microsoft.z3.FuncInterp;
 import com.microsoft.z3.Sort;
 
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
-import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +41,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   private final com.microsoft.z3.Model model;
   private final ImmutableList<BooleanFormula> trackedConstraints;
+  private @Nullable List<ValueAssignment> assignments = null;
 
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
@@ -61,22 +64,43 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    return new TermExtractionModelIterator<>(
-        creator,
-        new Function<Expr, Object>() {
-          @Override
-          public Object apply(Expr input) {
-            return evaluateImpl(input);
-          }
-        },
-        Iterables.transform(
-            trackedConstraints,
-            new Function<BooleanFormula, Expr>() {
-              @Override
-              public Expr apply(BooleanFormula input) {
-                return creator.extractInfo(input);
-              }
-            }));
+    if (assignments ==null) {
+      assignments = modelToList();
+    }
+    return assignments.iterator();
+  }
+
+  private List<ValueAssignment> modelToList() {
+    Builder<ValueAssignment> out = ImmutableList.builder();
+    for (FuncDecl constDecl : model.getConstDecls()) {
+      Expr value = model.getConstInterp(constDecl);
+      assert constDecl.getArity() == 0;
+      Formula key = creator.encapsulateWithTypeOf(constDecl.apply());
+      String name = constDecl.getName().toString();
+      out.add(new ValueAssignment(
+          key,
+          name,
+          creator.convertValue(value),
+          ImmutableList.of()
+      ));
+    }
+
+    for (FuncDecl funcDecl : model.getFuncDecls()) {
+      FuncInterp interp = model.getFuncInterp(funcDecl);
+      String funcName = funcDecl.getName().toString();
+      for (FuncInterp.Entry valueEntry : interp.getEntries()) {
+        ImmutableList.Builder<Object> args = ImmutableList.builder();
+        for (Expr arg : valueEntry.getArgs()) {
+          args.add(creator.convertValue(arg));
+        }
+        Object value = creator.convertValue(valueEntry.getValue());
+        Formula f = creator.encapsulateWithTypeOf(funcDecl.apply(valueEntry.getArgs()));
+        out.add(new ValueAssignment(
+           f, funcName,  value, args.build()
+        ));
+      }
+    }
+    return out.build();
   }
 
   @Override
