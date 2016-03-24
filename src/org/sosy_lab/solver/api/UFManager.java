@@ -56,4 +56,7 @@ public interface UFManager {
    */
   <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs);
+
+  <T extends Formula> T declareAndCallUF(
+      String name, FormulaType<T> pReturnType, Formula... pArgs);
 }

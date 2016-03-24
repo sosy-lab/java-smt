@@ -24,6 +24,7 @@ import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -111,5 +112,11 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
             .toList();
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     return callUF(func, pArgs);
+  }
+
+  @Override
+  public <T extends Formula> T declareAndCallUF(
+      String name, FormulaType<T> pReturnType, Formula... pArgs) {
+    return declareAndCallUF(name, pReturnType, Lists.newArrayList(pArgs));
   }
 }
