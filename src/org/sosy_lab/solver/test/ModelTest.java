@@ -180,6 +180,24 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testPartialModelsUF() throws Exception {
+    assume().withFailureMessage(
+        "As of now, only Z3 and Princess support partial models"
+    ).that(solver).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      IntegerFormula x = imgr.makeVariable("x");
+      IntegerFormula f = fmgr.declareAndCallUF("f", FormulaType.IntegerType, x);
+
+      prover.push(imgr.equal(x, imgr.makeNumber(1)));
+      assertThatEnvironment(prover).isSatisfiable();
+
+      Model m = prover.getModel();
+      assertThat(m.evaluate(fmgr.declareAndCallUF("f", FormulaType.IntegerType, x)))
+          .isEqualTo(null);
+    }
+  }
+
+  @Test
   public void testEvaluatingConstants() throws Exception {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));

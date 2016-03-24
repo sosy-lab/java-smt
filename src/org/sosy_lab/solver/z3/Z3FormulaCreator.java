@@ -45,6 +45,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_algebraic_number;
+import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
@@ -528,10 +530,22 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /**
+   * @param value Z3_ast
+   * @return Whether the value is a constant and can be passed to {@link #convertValue(long)}.
+   */
+  public boolean isConstant(long value) {
+    return is_numeral_ast(environment, value)
+        || is_algebraic_number(environment, value)
+        || isOP(environment, value, Z3_OP_TRUE)
+        || isOP(environment, value, Z3_OP_FALSE);
+  }
+
+  /**
    * @param value Z3_ast representing a *value*.
    * @return BigInteger|Double|Rational.
    */
-  public Object convertValue(Long value) {
+  public Object convertValue(long value) {
+    assert isConstant(value);
     inc_ref(environment, value);
 
     Object constantValue =

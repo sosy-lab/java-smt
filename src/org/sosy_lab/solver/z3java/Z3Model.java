@@ -60,10 +60,12 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
   @Override
   public Object evaluateImpl(Expr f) {
     Expr value = model.eval(f, false);
-    if (value.equals(f) && !(value.isNumeral() || value.isTrue() || value.isFalse())) {
-      return null;
+    if (value.isAlgebraicNumber() || value.isTrue() || value.isFalse() || value.isNumeral()) {
+      return creator.convertValue(value);
     }
-    return creator.convertValue(value);
+
+    // Unfortunately, no other way to detect partial models.
+    return null;
   }
 
   @Override
