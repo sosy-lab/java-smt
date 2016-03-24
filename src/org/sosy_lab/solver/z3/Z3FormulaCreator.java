@@ -527,6 +527,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
+  /**
+   * @param value Z3_ast representing a *value*.
+   * @return BigInteger|Double|Rational.
+   */
   public Object convertValue(Long value) {
     inc_ref(environment, value);
 
