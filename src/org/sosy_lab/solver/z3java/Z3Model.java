@@ -68,7 +68,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    if (assignments ==null) {
+    if (assignments == null) {
       assignments = modelToList();
     }
     return assignments.iterator();

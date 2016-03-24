@@ -96,8 +96,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     // Unfortunately, Z3 signals irrelevancy by returning identity.
     // We partially mitigate it by checking whether the return value is constant already (which we
     // can return).
-    if ((out.value == 0 || out.value == f) &&
-        !(is_numeral_ast(z3context, out.value)
+    if ((out.value == 0 || out.value == f)
+        && !(is_numeral_ast(z3context, out.value)
             || Z3NativeApiConstants.isOP(z3context, out.value, Z3NativeApiConstants.Z3_OP_TRUE)
             || Z3NativeApiConstants.isOP(z3context, out.value, Z3NativeApiConstants.Z3_OP_FALSE))) {
       return null;
@@ -176,7 +176,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
         }
         func_entry_dec_ref(z3context, entry);
 
-        out.add(new ValueAssignment(formula, symbolToString(symbol), value, argumentInterpretation));
+        out.add(
+            new ValueAssignment(formula, symbolToString(symbol), value, argumentInterpretation));
       }
       func_interp_dec_ref(z3context, interp);
       dec_ref(z3context, funcDecl);

@@ -54,7 +54,7 @@ public class ModelTest extends SolverBasedTest0 {
     return Solvers.values();
   }
 
-  @Parameter()
+  @Parameter
   public Solvers solver;
 
   @Override
