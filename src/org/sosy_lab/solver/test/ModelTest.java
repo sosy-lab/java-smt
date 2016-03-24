@@ -192,8 +192,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThatEnvironment(prover).isSatisfiable();
 
       Model m = prover.getModel();
-      assertThat(m.evaluate(fmgr.declareAndCallUF("f", FormulaType.IntegerType, x)))
-          .isEqualTo(null);
+      assertThat(m.evaluate(f)).isEqualTo(null);
     }
   }
 
