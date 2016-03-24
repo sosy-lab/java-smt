@@ -170,7 +170,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
         for (int k = 0; k < noArgs; k++) {
           long arg = func_entry_get_arg(z3context, entry, k);
           inc_ref(z3context, arg);
-          argumentInterpretation.add(evaluateImpl(arg));
+          argumentInterpretation.add(creator.convertValue(arg));
           args[k] = arg;
         }
         Formula formula = creator.encapsulateWithTypeOf(mk_app(z3context, funcDecl, args));
