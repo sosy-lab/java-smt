@@ -183,7 +183,7 @@ public class ModelTest extends SolverBasedTest0 {
   public void testEvaluatingConstants() throws Exception {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
-      prover.isUnsat();
+      assertThat(prover.isUnsat()).isFalse();
       Model m = prover.getModel();
       assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
       assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
