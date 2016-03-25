@@ -182,7 +182,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testPartialModelsUF() throws Exception {
     assume().withFailureMessage(
-        "As of now, only Z3 and Princess support partial models"
+        "As of now, only Z3 and Princess support partial model evaluation"
     ).that(solver).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");

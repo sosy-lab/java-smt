@@ -93,14 +93,10 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Verify.verify(status, "Error during model evaluation");
     long outValue = out.value;
 
-    if (!creator.isConstant(outValue)) {
-
-      // Unfortunately Z3 does not signal to us whether the
-      // queried AST is irrelevant.
-      // We have to find it out ourselves: for those values, the AST stays unchanged.
-      return null;
+    if (creator.isConstant(outValue)) {
+      return creator.convertValue(outValue);
     }
-    return creator.convertValue(outValue);
+    return null;
   }
 
   @Override

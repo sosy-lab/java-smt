@@ -83,12 +83,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
       assert constDecl.getArity() == 0;
       Formula key = creator.encapsulateWithTypeOf(constDecl.apply());
       String name = constDecl.getName().toString();
-      out.add(new ValueAssignment(
-          key,
-          name,
-          creator.convertValue(value),
-          ImmutableList.of()
-      ));
+      out.add(new ValueAssignment(key, name, creator.convertValue(value), ImmutableList.of()));
     }
 
     for (FuncDecl funcDecl : model.getFuncDecls()) {
