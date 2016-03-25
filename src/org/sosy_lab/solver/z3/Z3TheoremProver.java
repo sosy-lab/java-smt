@@ -38,6 +38,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check_assumptions;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_num_scopes;
+import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_reason_unknown;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_unsat_core;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
@@ -140,8 +141,10 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     Preconditions.checkState(!closed);
     int result = solver_check(z3context, z3solver);
     shutdownNotifier.shutdownIfNecessary();
-    Preconditions.checkArgument(
-        result != Z3_LBOOL.Z3_L_UNDEF.status, "Solver returned UNDEFINED status");
+    if (result == Z3_LBOOL.Z3_L_UNDEF.status) {
+      throw new IllegalStateException("Solver returned 'unknown' status, reason: " +
+          solver_get_reason_unknown(z3context, z3solver));
+    }
     return result == Z3_LBOOL.Z3_L_FALSE.status;
   }
 
@@ -153,10 +156,11 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
         assumptions, creator.infoExtractor
     )));
     shutdownNotifier.shutdownIfNecessary();
-    Preconditions.checkArgument(
-        result != Z3_LBOOL.Z3_L_UNDEF.status, "Solver returned UNDEFINED status");
+    if (result == Z3_LBOOL.Z3_L_UNDEF.status) {
+      throw new IllegalStateException("Solver returned 'unknown' status, reason: " +
+          solver_get_reason_unknown(z3context, z3solver));
+    }
     return result == Z3_LBOOL.Z3_L_FALSE.status;
-
   }
 
   @Override

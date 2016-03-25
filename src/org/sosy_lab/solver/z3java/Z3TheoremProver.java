@@ -22,6 +22,7 @@ package org.sosy_lab.solver.z3java;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Params;
@@ -124,7 +125,10 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       throw e;
     }
     shutdownNotifier.shutdownIfNecessary();
-    Preconditions.checkArgument(result != Status.UNKNOWN);
+    if (result == Status.UNKNOWN) {
+      throw new IllegalStateException("Solver returned 'unknown' status, reason = " +
+          z3solver.getReasonUnknown());
+    }
     return result == Status.UNSATISFIABLE;
   }
 
@@ -224,6 +228,10 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
         Lists.transform(assumptions, creator.infoExtractor).toArray(new Expr[assumptions.size()])
     );
     shutdownNotifier.shutdownIfNecessary();
+    if (result == Status.UNKNOWN) {
+      throw new IllegalStateException("Solver returned 'unknown' status, reason = " +
+        z3solver.getReasonUnknown());
+    }
     Preconditions.checkArgument(result != Status.UNKNOWN);
     return result == Status.UNSATISFIABLE;
   }
