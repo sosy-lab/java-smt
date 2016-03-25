@@ -56,6 +56,16 @@ public interface QuantifiedFormulaManager {
   BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
+   * Syntax sugar, see {@link #forall(List, BooleanFormula)}.
+   */
+  BooleanFormula forall(BooleanFormula pBody, Formula... quantifiedArgs);
+
+  /**
+   * Syntax sugar, see {@link #exists(List, BooleanFormula)}.
+   */
+  BooleanFormula exists(BooleanFormula pBody, Formula... quantifiedArgs);
+
+  /**
    * @return A quantified formula
    *
    * @param q           Quantifier type

@@ -46,11 +46,21 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return wrap(exists(Lists.transform(pVariables, extractor), extractInfo(pBody)));
   }
 
+  @Override
+  public BooleanFormula exists(BooleanFormula pBody, Formula... quantifiedArgs) {
+    return exists(Lists.newArrayList(quantifiedArgs), pBody);
+  }
+
   protected abstract TFormulaInfo exists(List<TFormulaInfo> pVariables, TFormulaInfo pBody);
 
   @Override
   public final BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
     return wrap(forall(Lists.transform(pVariables, extractor), extractInfo(pBody)));
+  }
+
+  @Override
+  public BooleanFormula forall(BooleanFormula pBody, Formula... quantifiedArgs) {
+    return forall(Lists.newArrayList(quantifiedArgs), pBody);
   }
 
   protected abstract TFormulaInfo forall(List<TFormulaInfo> pVariables, TFormulaInfo pBody);
