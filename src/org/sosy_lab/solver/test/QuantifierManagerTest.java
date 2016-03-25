@@ -41,6 +41,7 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 
 import java.util.List;
@@ -275,6 +276,23 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     BooleanFormula f2 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
 
     assertThat(f1).isEqualTo(f2);
+  }
+
+  @Test
+  public void testQELight() throws SolverException, InterruptedException {
+    assume().that(solverToUse()).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA));
+    assert qmgr != null;
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    BooleanFormula f1 = qmgr.exists(
+        bmgr.and(
+            imgr.equal(y, imgr.makeNumber(4)),
+            imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))
+        ),
+        y
+    );
+    BooleanFormula out = mgr.applyTactic(f1, Tactic.QE_LIGHT);
+    assertThat(out).isEqualTo(imgr.equal(x, imgr.makeNumber(7)));
   }
 
   @Test
