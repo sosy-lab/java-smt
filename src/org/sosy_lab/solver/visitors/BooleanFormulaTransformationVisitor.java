@@ -19,12 +19,16 @@
  */
 package org.sosy_lab.solver.visitors;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -58,39 +62,70 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitNot(BooleanFormula pOperand) {
-    return bfmgr.not(pOperand);
+  public BooleanFormula visitNot(BooleanFormula processedOperand) {
+    return bfmgr.not(processedOperand);
   }
 
   @Override
-  public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
-    return bfmgr.and(pOperands);
+  public BooleanFormula visitAnd(List<BooleanFormula> processedOperands) {
+    for (BooleanFormula op : processedOperands) {
+      if (bfmgr.isFalse(op)) {
+        return bfmgr.makeBoolean(false);
+      }
+    }
+
+    // Filtered collections avoid extra allocations.
+    Collection<BooleanFormula> filtered =
+        Collections2.filter(processedOperands, new Predicate<BooleanFormula>() {
+          @Override
+          public boolean apply(BooleanFormula input) {
+            return !bfmgr.isTrue(input);
+          }
+        });
+    return bfmgr.and(filtered);
   }
 
   @Override
-  public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
-    return bfmgr.or(pOperands);
+  public BooleanFormula visitOr(List<BooleanFormula> processedOperands) {
+    for (BooleanFormula op : processedOperands) {
+      if (bfmgr.isTrue(op)) {
+        return bfmgr.makeBoolean(true);
+      }
+    }
+    Collection<BooleanFormula> filtered =
+        Collections2.filter(processedOperands, new Predicate<BooleanFormula>() {
+          @Override
+          public boolean apply(BooleanFormula input) {
+            return !bfmgr.isFalse(input);
+          }
+        });
+    return bfmgr.or(filtered);
   }
 
   @Override
-  public BooleanFormula visitXor(BooleanFormula operand1, BooleanFormula operand2) {
-    return bfmgr.xor(operand1, operand2);
+  public BooleanFormula visitXor(BooleanFormula processedOperand1,
+                                 BooleanFormula processedOperand2) {
+    return bfmgr.xor(processedOperand1, processedOperand2);
   }
 
   @Override
-  public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    return bfmgr.equivalence(pOperand1, pOperand2);
+  public BooleanFormula visitEquivalence(BooleanFormula processedOperand1,
+                                         BooleanFormula processedOperand2) {
+    return bfmgr.equivalence(processedOperand1, processedOperand2);
   }
 
   @Override
-  public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    return bfmgr.implication(pOperand1, pOperand2);
+  public BooleanFormula visitImplication(BooleanFormula processedOperand1,
+                                         BooleanFormula processedOperand2) {
+    return bfmgr.implication(processedOperand1, processedOperand2);
   }
 
   @Override
   public BooleanFormula visitIfThenElse(
-      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-    return bfmgr.ifThenElse(pCondition, pThenFormula, pElseFormula);
+      BooleanFormula processedCondition,
+      BooleanFormula processedThenFormula,
+      BooleanFormula processedElseFormula) {
+    return bfmgr.ifThenElse(processedCondition, processedThenFormula, processedElseFormula);
   }
 
   @Override
@@ -98,7 +133,7 @@ public abstract class BooleanFormulaTransformationVisitor
       Quantifier quantifier,
       BooleanFormula quantifiedAST,
       List<Formula> boundVars,
-      BooleanFormula body) {
+      BooleanFormula processedBody) {
     return quantifiedAST;
   }
 }

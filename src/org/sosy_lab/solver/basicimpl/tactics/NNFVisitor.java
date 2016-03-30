@@ -20,13 +20,13 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   }
 
   @Override
-  public BooleanFormula visitNot(BooleanFormula pOperand) {
-    return bfmgr.visit(insideNotVisitor, pOperand);
+  public BooleanFormula visitNot(BooleanFormula processedOperand) {
+    return bfmgr.visit(insideNotVisitor, processedOperand);
   }
 
   @Override
-  public BooleanFormula visitXor(BooleanFormula operand1, BooleanFormula operand2) {
-    return bfmgr.visit(this, rewriteXor(operand1, operand2));
+  public BooleanFormula visitXor(BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
+    return bfmgr.visit(this, rewriteXor(processedOperand1, processedOperand2));
   }
 
   private BooleanFormula rewriteXor(BooleanFormula operand1, BooleanFormula operand2) {
@@ -35,8 +35,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   }
 
   @Override
-  public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    return bfmgr.visit(this, rewriteEquivalence(pOperand1, pOperand2));
+  public BooleanFormula visitEquivalence(BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
+    return bfmgr.visit(this, rewriteEquivalence(processedOperand1, processedOperand2));
   }
 
   private BooleanFormula rewriteEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
@@ -45,8 +45,8 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
   }
 
   @Override
-  public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-    return bfmgr.visit(this, rewriteImplication(pOperand1, pOperand2));
+  public BooleanFormula visitImplication(BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
+    return bfmgr.visit(this, rewriteImplication(processedOperand1, processedOperand2));
   }
 
   private BooleanFormula rewriteImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
@@ -55,8 +55,9 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   @Override
   public BooleanFormula visitIfThenElse(
-      BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-    return bfmgr.visit(this, rewriteIfThenElse(pCondition, pThenFormula, pElseFormula));
+      BooleanFormula processedCondition, BooleanFormula processedThenFormula, BooleanFormula processedElseFormula) {
+    return bfmgr.visit(this, rewriteIfThenElse(processedCondition, processedThenFormula,
+        processedElseFormula));
   }
 
   private BooleanFormula rewriteIfThenElse(
@@ -83,14 +84,14 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitNot(BooleanFormula pOperand) {
-      return bfmgr.visit(NNFVisitor.this, pOperand);
+    public BooleanFormula visitNot(BooleanFormula processedOperand) {
+      return bfmgr.visit(NNFVisitor.this, processedOperand);
     }
 
     @Override
-    public BooleanFormula visitAnd(List<BooleanFormula> pOperands) {
+    public BooleanFormula visitAnd(List<BooleanFormula> processedOperands) {
       List<BooleanFormula> newOperands = new ArrayList<>();
-      for (BooleanFormula f : pOperands) {
+      for (BooleanFormula f : processedOperands) {
         newOperands.add(bfmgr.visit(this, f));
       }
 
@@ -98,9 +99,9 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitOr(List<BooleanFormula> pOperands) {
+    public BooleanFormula visitOr(List<BooleanFormula> processedOperands) {
       List<BooleanFormula> newOperands = new ArrayList<>();
-      for (BooleanFormula f : pOperands) {
+      for (BooleanFormula f : processedOperands) {
         newOperands.add(bfmgr.visit(this, f));
       }
 
@@ -108,26 +109,27 @@ class NNFVisitor extends BooleanFormulaTransformationVisitor {
     }
 
     @Override
-    public BooleanFormula visitXor(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-      return bfmgr.visit(this, rewriteXor(pOperand1, pOperand2));
+    public BooleanFormula visitXor(BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
+      return bfmgr.visit(this, rewriteXor(processedOperand1, processedOperand2));
     }
 
     @Override
-    public BooleanFormula visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
-      return bfmgr.visit(this, rewriteEquivalence(pOperand1, pOperand2));
+    public BooleanFormula visitEquivalence(BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
+      return bfmgr.visit(this, rewriteEquivalence(processedOperand1, processedOperand2));
     }
 
     @Override
-    public BooleanFormula visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
+    public BooleanFormula visitImplication(BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
 
       // Rewrite using primitives.
-      return bfmgr.visit(this, bfmgr.or(bfmgr.not(pOperand1), pOperand2));
+      return bfmgr.visit(this, bfmgr.or(bfmgr.not(processedOperand1), processedOperand2));
     }
 
     @Override
     public BooleanFormula visitIfThenElse(
-        BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
-      return bfmgr.visit(this, rewriteIfThenElse(pCondition, pThenFormula, pElseFormula));
+        BooleanFormula processedCondition, BooleanFormula processedThenFormula, BooleanFormula processedElseFormula) {
+      return bfmgr.visit(this, rewriteIfThenElse(processedCondition, processedThenFormula,
+          processedElseFormula));
     }
   }
 }
