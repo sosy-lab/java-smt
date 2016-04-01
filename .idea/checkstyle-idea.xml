@@ -10,7 +10,7 @@
         <entry key="location-1" value="LOCAL_FILE:$PRJ_DIR$/.settings/checkstyle.test.xml:Sosy-Lab Checkstyle Tests" />
         <entry key="location-2" value="CLASSPATH:/sun_checks.xml:The default Checkstyle rules" />
         <entry key="suppress-errors" value="false" />
-        <entry key="thirdparty-classpath" value="$PRJ_DIR$/lib/java/checkstyle/sevntu-checks.jar" />
+        <entry key="thirdparty-classpath" value="$PROJECT_DIR$/lib/java/checkstyle/sevntu-checks.jar" />
       </map>
     </option>
   </component>
