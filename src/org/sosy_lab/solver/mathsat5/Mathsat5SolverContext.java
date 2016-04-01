@@ -90,16 +90,14 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("checkstyle:parameternumber")
   public Mathsat5SolverContext(
-      Configuration config,
       LogManager logger,
       long mathsatConfig,
       Mathsat5Settings settings,
       long randomSeed,
       final ShutdownNotifier shutdownNotifier,
       Mathsat5FormulaManager manager,
-      Mathsat5FormulaCreator creator)
-      throws InvalidConfigurationException {
-    super(config, logger, manager);
+      Mathsat5FormulaCreator creator) {
+    super(manager);
     this.logger = logger;
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
@@ -173,7 +171,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             floatingPointTheory,
             arrayTheory);
     return new Mathsat5SolverContext(
-        config, logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
+        logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }
 
   long createEnvironment(long cfg) {

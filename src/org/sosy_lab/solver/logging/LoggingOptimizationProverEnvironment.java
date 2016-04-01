@@ -38,12 +38,12 @@ import javax.annotation.Nullable;
 /**
  * Wrapper for an optimizing solver.
  */
-public class LoggingOptimizationProverEnvironment implements OptimizationProverEnvironment {
+class LoggingOptimizationProverEnvironment implements OptimizationProverEnvironment {
 
   private final OptimizationProverEnvironment wrapped;
   private final LogManager logger;
 
-  public LoggingOptimizationProverEnvironment(LogManager logger, OptimizationProverEnvironment oe) {
+  LoggingOptimizationProverEnvironment(LogManager logger, OptimizationProverEnvironment oe) {
     this.wrapped = checkNotNull(oe);
     this.logger = checkNotNull(logger);
   }

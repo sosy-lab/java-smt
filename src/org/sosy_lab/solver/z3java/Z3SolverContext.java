@@ -86,7 +86,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       LogManager pLogger,
       Z3FormulaManager pManager)
       throws InvalidConfigurationException {
-    super(config, pLogger, pManager);
+    super(pManager);
 
     creator = pFormulaCreator;
     config.inject(this);

@@ -31,14 +31,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-public class LoggingInterpolatingProverEnvironment<T>
+class LoggingInterpolatingProverEnvironment<T>
     implements InterpolatingProverEnvironmentWithAssumptions<T> {
 
   private final InterpolatingProverEnvironmentWithAssumptions<T> wrapped;
   private final LogManager logger;
   int level = 0;
 
-  public LoggingInterpolatingProverEnvironment(
+  LoggingInterpolatingProverEnvironment(
       LogManager logger, InterpolatingProverEnvironmentWithAssumptions<T> ipe) {
     this.wrapped = checkNotNull(ipe);
     this.logger = checkNotNull(logger);

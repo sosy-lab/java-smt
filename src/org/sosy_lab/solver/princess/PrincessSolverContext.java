@@ -6,7 +6,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
@@ -42,13 +41,10 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   private final PrincessFormulaCreator creator;
 
   private PrincessSolverContext(
-      Configuration config,
-      LogManager logger,
       ShutdownNotifier shutdownNotifier,
       PrincessFormulaManager manager,
-      PrincessFormulaCreator creator)
-      throws InvalidConfigurationException {
-    super(config, logger, manager);
+      PrincessFormulaCreator creator) {
+    super(manager);
     this.shutdownNotifier = shutdownNotifier;
     this.manager = manager;
     this.creator = creator;
@@ -56,7 +52,6 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   public static SolverContext create(
       Configuration config,
-      LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate)
       throws InvalidConfigurationException {
@@ -75,7 +70,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, arrayTheory, quantifierTheory);
-    return new PrincessSolverContext(config, logger, pShutdownNotifier, manager, creator);
+    return new PrincessSolverContext(pShutdownNotifier, manager, creator);
   }
 
   @Override

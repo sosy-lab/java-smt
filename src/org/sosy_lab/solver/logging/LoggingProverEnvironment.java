@@ -33,13 +33,13 @@ import java.util.logging.Level;
 /**
  * Wraps a prover environment with a logging object.
  */
-public class LoggingProverEnvironment implements ProverEnvironment {
+class LoggingProverEnvironment implements ProverEnvironment {
 
   private final ProverEnvironment wrapped;
   private final LogManager logger;
   int level = 0;
 
-  public LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
+  LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
     this.wrapped = checkNotNull(pe);
     this.logger = checkNotNull(logger);
   }

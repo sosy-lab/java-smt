@@ -36,6 +36,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.log.NullLogManager;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.logging.LoggingSolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.solver.princess.PrincessSolverContext;
 import org.sosy_lab.solver.z3.Z3SolverContext;
@@ -84,6 +85,9 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Which SMT solver to use.")
   private Solvers solver = Solvers.SMTINTERPOL;
 
+  @Option(secure = true, name = "useLogger", description = "Log solver actions, this may be slow!")
+  private boolean useLogger = false;
+
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
@@ -111,30 +115,38 @@ public class SolverContextFactory {
   /**
    * Create new context with solver name supplied.
    */
+  @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
+    SolverContext context;
     try {
       switch (solverToCreate) {
         case SMTINTERPOL:
 
           // Loading SmtInterpol is difficult as it requires its own class
           // loader.
-          return loadSmtInterpol().create(config, logger, shutdownNotifier, logfile, randomSeed);
+          context = loadSmtInterpol().create(config, logger, shutdownNotifier, logfile, randomSeed);
+          break;
 
         case MATHSAT5:
-          return Mathsat5SolverContext.create(
-              logger, config, shutdownNotifier, logfile, randomSeed);
+          context =
+              Mathsat5SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
+          break;
 
         case Z3:
-          return Z3SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
+          context = Z3SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
+          break;
 
         case Z3JAVA:
-          return org.sosy_lab.solver.z3java.Z3SolverContext.create(
-              logger, config, shutdownNotifier, logfile, randomSeed);
+          context =
+              org.sosy_lab.solver.z3java.Z3SolverContext.create(
+                  logger, config, shutdownNotifier, logfile, randomSeed);
+          break;
 
         case PRINCESS:
           // TODO: pass randomSeed to Princess
-          return PrincessSolverContext.create(config, logger, shutdownNotifier, logfile);
+          context = PrincessSolverContext.create(config, shutdownNotifier, logfile);
+          break;
 
         default:
           throw new AssertionError("no solver selected");
@@ -150,6 +162,11 @@ public class SolverContextFactory {
               e.getMessage()),
           e);
     }
+
+    if (useLogger) {
+      context = new LoggingSolverContext(logger, context);
+    }
+    return context;
   }
 
   /**
