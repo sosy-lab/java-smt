@@ -56,6 +56,13 @@
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 
+    <target name="all-checks" description="Run all tests and checks">
+        <!-- We have to use antcall here to run clean twice. -->
+        <antcall target="clean"/>
+        <antcall target="build-project-ecj"/>
+        <antcall target="clean"/>
+        <antcall target="standard-checks"/>
+    </target>
 
     <!-- Auxiliary targets -->
 
@@ -66,5 +73,5 @@
 
     <target name="build-dependencies" depends="init, resolve-dependencies"/>
 
-    <target name="all-checks" depends="clean, tests, findbugs, checkstyle, javadoc" description="Run all tests and checks"/>
+    <target name="standard-checks" depends="tests, findbugs, checkstyle, javadoc"/>
 </project>
