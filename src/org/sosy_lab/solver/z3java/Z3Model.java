@@ -21,14 +21,12 @@ package org.sosy_lab.solver.z3java;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.FuncInterp;
 import com.microsoft.z3.Sort;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
@@ -40,20 +38,15 @@ import javax.annotation.Nullable;
 class Z3Model extends AbstractModel<Expr, Sort, Context> {
 
   private final com.microsoft.z3.Model model;
-  private final ImmutableList<BooleanFormula> trackedConstraints;
   private @Nullable List<ValueAssignment> assignments = null;
 
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
 
-  Z3Model(
-      com.microsoft.z3.Model pModel,
-      Z3FormulaCreator pCreator,
-      List<BooleanFormula> pTrackedConstraints) {
+  Z3Model(com.microsoft.z3.Model pModel, Z3FormulaCreator pCreator) {
     super(pCreator);
     model = pModel;
     creator = pCreator;
-    trackedConstraints = ImmutableList.copyOf(pTrackedConstraints);
   }
 
   @Nullable

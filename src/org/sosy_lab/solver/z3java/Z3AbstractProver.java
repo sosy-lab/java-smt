@@ -27,13 +27,9 @@ import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final Z3FormulaCreator creator;
   protected final Context z3context;
-  protected final List<BooleanFormula> storedConstraints;
 
   protected boolean closed = false;
   protected final ShutdownNotifier shutdownNotifier;
@@ -41,7 +37,6 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected Z3AbstractProver(Z3FormulaCreator creator, ShutdownNotifier pShutdownNotifier) {
     this.creator = creator;
     z3context = creator.getEnv();
-    storedConstraints = new ArrayList<>();
     shutdownNotifier = pShutdownNotifier;
   }
 
@@ -50,7 +45,7 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
-    return new Z3Model(getZ3Model(), creator, storedConstraints);
+    return new Z3Model(getZ3Model(), creator);
   }
 
   @Override
@@ -58,9 +53,5 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(!closed);
     push();
     return addConstraint(f);
-  }
-
-  void trackConstraint(BooleanFormula f) {
-    storedConstraints.add(f);
   }
 }

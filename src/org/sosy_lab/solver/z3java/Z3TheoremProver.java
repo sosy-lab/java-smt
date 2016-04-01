@@ -55,7 +55,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
 
   private static final String UNSAT_CORE_TEMP_VARNAME = "UNSAT_CORE_%d";
 
-  @SuppressWarnings("hiding")
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3TheoremProver(
@@ -87,7 +86,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Nullable
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
-    trackConstraint(f);
     BoolExpr e = (BoolExpr) creator.extractInfo(f);
 
     if (storedConstraints != null) { // Unsat core generation is on.
@@ -137,7 +135,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);
-    return new Z3Model(getZ3Model(), creator, super.storedConstraints);
+    return new Z3Model(getZ3Model(), creator);
   }
 
   @Override
