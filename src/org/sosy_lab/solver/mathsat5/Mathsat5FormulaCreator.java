@@ -319,11 +319,6 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return msat_term_repr(term);
   }
 
-  private Long replaceArgs(Long t, List<Long> newArgs) {
-    long tDecl = msat_term_get_decl(t);
-    return msat_make_term(environment, tDecl, Longs.toArray(newArgs));
-  }
-
   private FunctionDeclarationKind getDeclarationKind(long pF) {
     if (msat_term_is_uf(environment, pF)) {
       return FunctionDeclarationKind.UF;

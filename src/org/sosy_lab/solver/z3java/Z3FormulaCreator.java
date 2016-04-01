@@ -166,13 +166,6 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
     }
   }
 
-  private Expr replaceArgs(Expr t, List<Expr> newArgs) {
-    Preconditions.checkState(t.getNumArgs() == newArgs.size());
-    Expr[] newParams = newArgs.toArray(new Expr[newArgs.size()]);
-    // TODO check equality of sort of each oldArg and newArg
-    return environment.mkApp(t.getFuncDecl(), newParams);
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Expr f) {

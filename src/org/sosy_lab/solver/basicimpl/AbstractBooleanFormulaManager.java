@@ -260,6 +260,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     );
   }
 
+  @Override
   public BooleanFormula transformRecursively(
       BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f) {
     return formulaCreator.transformRecursively(

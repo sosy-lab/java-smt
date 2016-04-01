@@ -48,7 +48,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.is_algebraic_number;
 import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
 import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_const;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_real;
@@ -103,7 +102,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -381,14 +379,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       model_dec_ref(environment, z3model);
     }
     cleanupTimer.stop();
-  }
-
-  private Long replaceArgs(Long t, List<Long> newArgs) {
-    Preconditions.checkState(get_app_num_args(environment, t) == newArgs.size());
-    long[] newParams = Longs.toArray(newArgs);
-    // TODO check equality of sort of each oldArg and newArg
-    long funcDecl = get_app_decl(environment, t);
-    return mk_app(environment, funcDecl, newParams);
   }
 
   @Override

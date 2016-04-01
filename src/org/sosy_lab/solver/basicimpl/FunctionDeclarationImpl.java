@@ -71,6 +71,7 @@ public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDe
   /**
    * Get type of the declaration.
    */
+  @Override
   public FunctionDeclarationKind getKind() {
     return kind;
   }
@@ -88,6 +89,7 @@ public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDe
    * For default theories, it is the operator name (e.g. {@code "ITE"} for the
    * if-then-else operator.)
    */
+  @Override
   public String getName() {
     return name;
   }

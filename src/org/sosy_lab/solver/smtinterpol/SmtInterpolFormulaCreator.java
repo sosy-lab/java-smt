@@ -136,27 +136,6 @@ class SmtInterpolFormulaCreator extends
     return s;
   }
 
-  private Term replaceArgs(Term pT, List<Term> newArgs) {
-    Term[] newParams = newArgs.toArray(new Term[newArgs.size()]);
-    if (pT instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) pT;
-      Term[] oldParams = at.getParameters();
-
-      assert oldParams.length == newParams.length;
-      for (int i = 0; i < newParams.length; i++) {
-        assert oldParams[i].getSort() == newParams[i].getSort()
-            : "Cannot replace " + oldParams[i] + " with " + newParams[i] + ".";
-      }
-
-      FunctionSymbol funcSymb = at.getFunction();
-      return getEnv().term(funcSymb.getName(), funcSymb.getIndices(), null, newParams);
-    } else {
-      // ConstantTerm:            numeral, nothing to replace
-      // AnnotatedTerm, LetTerm:  should not happen here
-      return pT;
-    }
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) {
     checkArgument(

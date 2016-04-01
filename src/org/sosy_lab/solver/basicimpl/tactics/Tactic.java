@@ -21,6 +21,7 @@ package org.sosy_lab.solver.basicimpl.tactics;
 
 import com.google.common.collect.Iterables;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.FormulaManager;
@@ -152,6 +153,7 @@ public enum Tactic {
    *
    * @param pFmgr The formula manager that created the given formula.
    * @param pF The formula to rewrite.
+   * @throws InterruptedException If solver is interrupted by the {@link ShutdownNotifier}.
    */
   public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF)
       throws InterruptedException {

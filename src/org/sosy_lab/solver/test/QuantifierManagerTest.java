@@ -279,7 +279,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testQELight() throws SolverException, InterruptedException {
+  public void testQELight() throws InterruptedException {
     assume().that(solverToUse()).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA));
     assert qmgr != null;
     IntegerFormula y = imgr.makeVariable("y");

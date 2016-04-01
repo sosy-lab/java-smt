@@ -286,21 +286,23 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   /**
    * Default implementation for {@link #substitute(Formula, Map)}.
    */
-  protected final <T1 extends Formula, T2 extends Formula> T1 substituteUsingMap(
-      T1 pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
+  protected final <T extends Formula> T substituteUsingMap(
+      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
     Map<TFormulaInfo, TFormulaInfo> mapping = new HashMap<>(pFromToMapping.size());
     for (Map.Entry<? extends Formula, ? extends Formula> entry : pFromToMapping.entrySet()) {
       mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
     }
 
     TFormulaInfo result = substituteUsingMapImpl(extractInfo(pF), mapping, pF, pFromToMapping);
-    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
+    FormulaType<T> type = getFormulaCreator().getFormulaType(pF);
     return getFormulaCreator().encapsulate(type, result);
   }
 
   protected TFormulaInfo substituteUsingMapImpl(
-      TFormulaInfo expr,
-      Map<TFormulaInfo, TFormulaInfo> memoization,
+      // TODO It looks extremely suspicious that substituteUsingMap() creates these parameters
+      // but they are not used here.
+      @SuppressWarnings("unused") TFormulaInfo expr,
+      @SuppressWarnings("unused") Map<TFormulaInfo, TFormulaInfo> memoization,
       Formula f,
       final Map<? extends Formula, ? extends Formula> fromToMapping) {
 

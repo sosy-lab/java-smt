@@ -223,7 +223,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThatEnvironment(prover).isSatisfiable();
       Model m = prover.getModel();
 
-      for (ValueAssignment assignment : m) {
+      for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
         // Check that we can iterate through with no crashes.
       }
       assertThat(m.evaluate(amgr.select(updated, imgr.makeNumber(1)))).isEqualTo(BigInteger.ONE);
