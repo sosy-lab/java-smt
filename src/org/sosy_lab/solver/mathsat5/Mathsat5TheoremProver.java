@@ -98,7 +98,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     long[] terms = msat_get_unsat_core(curEnv);
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {
-      result.add(context.getFormulaManager().encapsulateBooleanFormula(t));
+      result.add(creator.encapsulateBoolean(t));
     }
     return result;
   }
@@ -139,7 +139,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
           new LongArrayBackedList<BooleanFormula>(model) {
             @Override
             protected BooleanFormula convert(long pE) {
-              return context.getFormulaManager().encapsulateBooleanFormula(pE);
+              return creator.encapsulateBoolean(pE);
             }
           });
     }

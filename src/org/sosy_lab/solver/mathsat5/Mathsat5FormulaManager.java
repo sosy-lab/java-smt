@@ -74,15 +74,10 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
     return ((Mathsat5Formula) pT).getTerm();
   }
 
-  BooleanFormula encapsulateBooleanFormula(long t) {
-    return getFormulaCreator().encapsulateBoolean(t);
-  }
-
-
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
     long f = msat_from_smtlib2(getEnvironment(), pS);
-    return encapsulateBooleanFormula(f);
+    return getFormulaCreator().encapsulateBoolean(f);
   }
 
   @Override
