@@ -30,7 +30,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -56,14 +55,13 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       Mathsat5SolverContext pMgr,
       ShutdownNotifier pShutdownNotifier,
       Mathsat5FormulaCreator creator,
-      ProverOptions... options) {
+      Set<ProverOptions> options) {
 
     super(pMgr, createConfig(options), creator);
     shutdownNotifier = pShutdownNotifier;
   }
 
-  private static Map<String, String> createConfig(ProverOptions... options) {
-    Set<ProverOptions> opts = Sets.newHashSet(options);
+  private static Map<String, String> createConfig(Set<ProverOptions> opts) {
     return ImmutableMap.<String, String>builder()
         .put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false")
         .put("unsat_core_generation", opts.contains(ProverOptions.GENERATE_UNSAT_CORE) ? "1" : "0")

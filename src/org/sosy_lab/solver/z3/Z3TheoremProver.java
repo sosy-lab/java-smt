@@ -50,7 +50,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -87,13 +86,12 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Z3FormulaManager pMgr,
       long z3params,
       ShutdownNotifier pShutdownNotifier,
-      ProverOptions... options) {
+      Set<ProverOptions> opts) {
     super(creator, pShutdownNotifier);
     mgr = pMgr;
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
-    Set<ProverOptions> opts = Sets.newHashSet(options);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {

@@ -28,6 +28,7 @@ import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -191,17 +192,12 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public Z3FormulaManager getFormulaManager() {
-    return manager;
-  }
-
-  @Override
-  public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
+  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     return new Z3TheoremProver(creator, manager, z3params, shutdownNotifier, options);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new Z3InterpolatingProver(creator, z3params, shutdownNotifier);
   }
 

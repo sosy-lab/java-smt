@@ -6,12 +6,13 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
+
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -74,17 +75,12 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public FormulaManager getFormulaManager() {
-    return manager;
-  }
-
-  @Override
-  public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
+  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     return new PrincessTheoremProver(manager, shutdownNotifier, creator);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new PrincessInterpolatingProver(manager, creator);
   }
 

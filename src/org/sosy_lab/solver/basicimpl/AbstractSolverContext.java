@@ -6,6 +6,10 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 public abstract class AbstractSolverContext implements SolverContext {
 
   private final FormulaManager fmgr;
@@ -15,11 +19,18 @@ public abstract class AbstractSolverContext implements SolverContext {
   }
 
   @Override
-  public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
-    return newProverEnvironment0(options);
+  public final FormulaManager getFormulaManager() {
+    return fmgr;
   }
 
-  public abstract ProverEnvironment newProverEnvironment0(ProverOptions... options);
+  @Override
+  public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
+    Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
+    Collections.addAll(opts, options);
+    return newProverEnvironment0(opts);
+  }
+
+  protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
 
   @SuppressWarnings("resource")
   @Override
@@ -38,5 +49,5 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
-  public abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
+  protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
 }

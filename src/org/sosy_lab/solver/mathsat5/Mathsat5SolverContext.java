@@ -31,6 +31,7 @@ import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.TerminationTest;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.annotation.Nullable;
@@ -85,7 +86,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   private final ShutdownNotifier shutdownNotifier;
   private final TerminationTest terminationTest;
-  private final Mathsat5FormulaManager manager;
   private final Mathsat5FormulaCreator creator;
 
   @SuppressWarnings("checkstyle:parameternumber")
@@ -103,7 +103,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     this.settings = settings;
     this.randomSeed = randomSeed;
     this.shutdownNotifier = shutdownNotifier;
-    this.manager = manager;
     this.creator = creator;
 
     terminationTest =
@@ -210,17 +209,12 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public Mathsat5FormulaManager getFormulaManager() {
-    return manager;
-  }
-
-  @Override
-  public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
+  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new Mathsat5InterpolatingProver(this, creator);
   }
 

@@ -21,8 +21,6 @@ package org.sosy_lab.solver.z3java;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Params;
@@ -65,12 +63,11 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Z3FormulaManager pMgr,
       Params z3params,
       ShutdownNotifier pShutdownNotifier,
-      ProverOptions... options) {
+      Set<ProverOptions> opts) {
     super(creator, pShutdownNotifier);
     mgr = pMgr;
     z3solver = z3context.mkSolver();
     z3solver.setParameters(z3params);
-    Set<ProverOptions> opts = Sets.newHashSet(options);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {

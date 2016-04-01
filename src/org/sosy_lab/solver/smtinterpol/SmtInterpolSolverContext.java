@@ -7,11 +7,12 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
+
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -52,7 +53,7 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(ProverOptions... options) {
+  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     checkState(
         environment.getStackDepth() == 0,
         "Not allowed to create a new prover environment while solver stack is still non-empty, "
@@ -61,18 +62,13 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return environment.getInterpolator(manager);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment() {
     throw new UnsupportedOperationException("SMTInterpol does not support optimization");
-  }
-
-  @Override
-  public FormulaManager getFormulaManager() {
-    return manager;
   }
 
   @Override
