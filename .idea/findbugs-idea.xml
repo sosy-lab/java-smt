@@ -213,6 +213,11 @@
         <entry key="STYLE" value="true" />
       </map>
     </option>
+    <option name="_excludeFilters">
+      <list>
+        <option value="$PROJECT_DIR$/.settings/FindBugs.exclude.xml" />
+      </list>
+    </option>
     <option name="_annotationTypeSettings">
       <map>
         <entry key="ExpPriority" value="-4473925;-12828863;-8355712;WAVE_UNDERSCORE;0;" />
