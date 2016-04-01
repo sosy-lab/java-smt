@@ -193,7 +193,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       try {
         Files.createParentDirs(filename);
       } catch (IOException e) {
-        logger.logException(Level.WARNING, e, "Cannot create directory for MathSAT logfile");
+        logger.logUserException(Level.WARNING, e, "Cannot create directory for MathSAT logfile");
       }
 
       msat_set_option_checked(cfg, "debug.api_call_trace", "1");
