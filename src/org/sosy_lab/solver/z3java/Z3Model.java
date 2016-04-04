@@ -101,4 +101,9 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
   public String toString() {
     return model.toString();
   }
+
+  @Override
+  public void close() {
+    model.dispose();
+  }
 }

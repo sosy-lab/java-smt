@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.mathsat5;
 
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
@@ -53,10 +54,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   static Mathsat5Model create(long model, Mathsat5FormulaCreator creator) {
-    Mathsat5Model out = new Mathsat5Model(model, creator);
-    creator.storeModelPhantomReference(out, model);
-    creator.cleanupModelReferences();
-    return out;
+    return new Mathsat5Model(model, creator);
   }
 
   @Override
@@ -98,5 +96,10 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     }
     msat_destroy_model_iterator(modelIterator);
     return assignments.build();
+  }
+
+  @Override
+  public void close() {
+    msat_destroy_model(model);
   }
 }

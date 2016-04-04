@@ -355,40 +355,41 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
       assertThatEnvironment(prover).isSatisfiable();
 
-      Model model = prover.getModel();
+      try (Model model = prover.getModel()) {
 
-      Object zeroValue = model.evaluate(zeroVar);
-      ValueAssignment zeroAssignment =
-          new ValueAssignment(zeroVar, "zero", zeroValue, ImmutableList.of());
-      assertThat(zeroValue)
-          .isAnyOf(ExtendedRational.ZERO, Rational.ZERO, BigDecimal.ZERO, 0.0, 0.0f);
+        Object zeroValue = model.evaluate(zeroVar);
+        ValueAssignment zeroAssignment =
+            new ValueAssignment(zeroVar, "zero", zeroValue, ImmutableList.of());
+        assertThat(zeroValue)
+            .isAnyOf(ExtendedRational.ZERO, Rational.ZERO, BigDecimal.ZERO, 0.0, 0.0f);
 
-      Object oneValue = model.evaluate(oneVar);
-      ValueAssignment oneAssignment =
-          new ValueAssignment(oneVar, "one", oneValue, ImmutableList.of());
-      assertThat(oneValue)
-          .isAnyOf(new ExtendedRational(Rational.ONE), Rational.ONE, BigDecimal.ONE, 1.0, 1.0f);
+        Object oneValue = model.evaluate(oneVar);
+        ValueAssignment oneAssignment =
+            new ValueAssignment(oneVar, "one", oneValue, ImmutableList.of());
+        assertThat(oneValue)
+            .isAnyOf(new ExtendedRational(Rational.ONE), Rational.ONE, BigDecimal.ONE, 1.0, 1.0f);
 
-      Object nanValue = model.evaluate(nanVar);
-      ValueAssignment nanAssignment =
-          new ValueAssignment(nanVar, "nan", nanValue, ImmutableList.of());
-      assertThat(nanValue).isAnyOf(ExtendedRational.NaN, Double.NaN, Float.NaN);
+        Object nanValue = model.evaluate(nanVar);
+        ValueAssignment nanAssignment =
+            new ValueAssignment(nanVar, "nan", nanValue, ImmutableList.of());
+        assertThat(nanValue).isAnyOf(ExtendedRational.NaN, Double.NaN, Float.NaN);
 
-      Object posInfValue = model.evaluate(posInfVar);
-      ValueAssignment posInfAssignment =
-          new ValueAssignment(posInfVar, "posInf", posInfValue, ImmutableList.of());
-      assertThat(posInfValue)
-          .isAnyOf(ExtendedRational.INFTY, Double.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+        Object posInfValue = model.evaluate(posInfVar);
+        ValueAssignment posInfAssignment =
+            new ValueAssignment(posInfVar, "posInf", posInfValue, ImmutableList.of());
+        assertThat(posInfValue)
+            .isAnyOf(ExtendedRational.INFTY, Double.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
 
-      Object negInfValue = model.evaluate(negInfVar);
-      ValueAssignment negInfAssignment =
-          new ValueAssignment(negInfVar, "negInf", negInfValue, ImmutableList.of());
-      assertThat(negInfValue)
-          .isAnyOf(ExtendedRational.NEG_INFTY, Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+        Object negInfValue = model.evaluate(negInfVar);
+        ValueAssignment negInfAssignment =
+            new ValueAssignment(negInfVar, "negInf", negInfValue, ImmutableList.of());
+        assertThat(negInfValue)
+            .isAnyOf(ExtendedRational.NEG_INFTY, Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
 
-      assertThat(model)
-          .containsExactly(
-              zeroAssignment, oneAssignment, nanAssignment, posInfAssignment, negInfAssignment);
+        assertThat(model)
+            .containsExactly(
+                zeroAssignment, oneAssignment, nanAssignment, posInfAssignment, negInfAssignment);
+      }
     }
   }
 

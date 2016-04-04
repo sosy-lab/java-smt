@@ -92,4 +92,7 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
           "unhandled model value " + value + " of type " + value.getClass());
     }
   }
+
+  @Override
+  public void close() {}
 }

@@ -107,4 +107,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
       return value.toString();
     }
   }
+
+  @Override
+  public void close() {}
 }

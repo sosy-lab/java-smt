@@ -117,14 +117,15 @@ public class OptimizationTest extends SolverBasedTest0 {
       // Check the value.
       assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
-      Model model = prover.getModel();
-      BigInteger xValue = model.evaluate(x);
-      BigInteger objValue = model.evaluate(obj);
-      BigInteger yValue = model.evaluate(y);
+      try (Model model = prover.getModel()) {
+        BigInteger xValue = model.evaluate(x);
+        BigInteger objValue = model.evaluate(obj);
+        BigInteger yValue = model.evaluate(y);
 
-      assertThat(objValue).isEqualTo(BigInteger.valueOf(19));
-      assertThat(xValue).isEqualTo(BigInteger.valueOf(10));
-      assertThat(yValue).isEqualTo(BigInteger.valueOf(9));
+        assertThat(objValue).isEqualTo(BigInteger.valueOf(19));
+        assertThat(xValue).isEqualTo(BigInteger.valueOf(10));
+        assertThat(yValue).isEqualTo(BigInteger.valueOf(9));
+      }
     }
   }
 

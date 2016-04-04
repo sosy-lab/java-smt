@@ -36,6 +36,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
+import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
@@ -79,10 +80,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
-    Z3Model model = new Z3Model(z3context, z3model, pCreator);
-    pCreator.storeModelPhantomReference(model, z3model);
-    pCreator.cleanupModelReferences();
-    return model;
+    return new Z3Model(z3context, z3model, pCreator);
   }
 
   @Nullable
@@ -189,5 +187,10 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
         throw new AssertionError("Unknown symbol kind " + get_symbol_kind(z3context, symbol));
     }
 
+  }
+
+  @Override
+  public void close() {
+    model_dec_ref(z3context, model);
   }
 }

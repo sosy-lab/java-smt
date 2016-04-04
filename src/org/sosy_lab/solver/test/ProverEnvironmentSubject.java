@@ -76,8 +76,9 @@ public class ProverEnvironmentSubject
     }
 
     // get model for failure message
-    final Model model = getSubject().getModel();
-    failWithBadResults("is", "unsatisfiable", "has counterexample", model);
+    try (final Model model = getSubject().getModel()) {
+      failWithBadResults("is", "unsatisfiable", "has counterexample", model);
+    }
   }
 
   /**

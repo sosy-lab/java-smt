@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 /**
  * A model returned from the satisfiable solver environment.
  */
-public interface Model extends Iterable<ValueAssignment> {
+public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   /**
    * Evaluate a given formula substituting the values from the model.
@@ -89,6 +89,14 @@ public interface Model extends Iterable<ValueAssignment> {
    */
   @Override
   String toString();
+
+  /**
+   * Free resources associated with this model
+   * (existing {@link ValueAssignment} instances stay valid,
+   * but {@link #evaluate(Formula)} etc. and {@link #iterator()} must not be called again).
+   */
+  @Override
+  void close();
 
   final class ValueAssignment {
     private final Formula key;

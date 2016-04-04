@@ -134,24 +134,25 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(imgr.equal(arg2, imgr.makeNumber(4)));
 
       assertThatEnvironment(prover).isSatisfiable();
-      Model m = prover.getModel();
 
-      assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
-      assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
-      assertThat(m)
-          .containsExactly(
-              new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
-              new ValueAssignment(arg1, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
-              new ValueAssignment(
-                  fmgr.callUF(declaration, imgr.makeNumber(3)),
-                  "UF",
-                  BigInteger.valueOf(1),
-                  ImmutableList.of(BigInteger.valueOf(3))),
-              new ValueAssignment(
-                  fmgr.callUF(declaration, imgr.makeNumber(4)),
-                  "UF",
-                  BigInteger.valueOf(2),
-                  ImmutableList.of(BigInteger.valueOf(4))));
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
+        assertThat(m)
+            .containsExactly(
+                new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
+                new ValueAssignment(arg1, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
+                new ValueAssignment(
+                    fmgr.callUF(declaration, imgr.makeNumber(3)),
+                    "UF",
+                    BigInteger.valueOf(1),
+                    ImmutableList.of(BigInteger.valueOf(3))),
+                new ValueAssignment(
+                    fmgr.callUF(declaration, imgr.makeNumber(4)),
+                    "UF",
+                    BigInteger.valueOf(2),
+                    ImmutableList.of(BigInteger.valueOf(4))));
+      }
     }
   }
 
@@ -173,9 +174,10 @@ public class ModelTest extends SolverBasedTest0 {
       IntegerFormula x = imgr.makeVariable("x");
       prover.push(imgr.equal(x, x));
       assertThatEnvironment(prover).isSatisfiable();
-      Model m = prover.getModel();
-      assertThat(m.evaluate(x)).isEqualTo(null);
-      assertThat(m).isEmpty();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(x)).isEqualTo(null);
+        assertThat(m).isEmpty();
+      }
     }
   }
 
@@ -191,8 +193,9 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(imgr.equal(x, imgr.makeNumber(1)));
       assertThatEnvironment(prover).isSatisfiable();
 
-      Model m = prover.getModel();
-      assertThat(m.evaluate(f)).isEqualTo(null);
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(f)).isEqualTo(null);
+      }
     }
   }
 
@@ -201,9 +204,10 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
-      Model m = prover.getModel();
-      assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
-      assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+      }
     }
   }
 
@@ -221,12 +225,13 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(imgr.equal(amgr.select(updated, imgr.makeNumber(1)), imgr.makeNumber(1)));
 
       assertThatEnvironment(prover).isSatisfiable();
-      Model m = prover.getModel();
 
-      for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
-        // Check that we can iterate through with no crashes.
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m.evaluate(amgr.select(updated, imgr.makeNumber(1)))).isEqualTo(BigInteger.ONE);
       }
-      assertThat(m.evaluate(amgr.select(updated, imgr.makeNumber(1)))).isEqualTo(BigInteger.ONE);
     }
   }
 
@@ -236,16 +241,18 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(mgr.makeEqual(value, variable));
       assertThatEnvironment(prover).isSatisfiable();
-      Model m = prover.getModel();
-      assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
-      boolean found = false;
-      for (ValueAssignment assignment : m) {
-        if (assignment.getName().equals(varName)) {
-          found = true;
-          assertThat(assignment.getValue()).isEqualTo(expectedValue);
+
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
+        boolean found = false;
+        for (ValueAssignment assignment : m) {
+          if (assignment.getName().equals(varName)) {
+            found = true;
+            assertThat(assignment.getValue()).isEqualTo(expectedValue);
+          }
         }
+        assertThat(found).isTrue();
       }
-      assertThat(found).isTrue();
     }
   }
 }
