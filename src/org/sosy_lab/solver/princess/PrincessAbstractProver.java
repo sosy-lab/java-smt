@@ -24,10 +24,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import ap.parser.IExpression;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
@@ -63,6 +65,13 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
 
   @Override
   public abstract Model getModel() throws SolverException;
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    try (Model model = getModel()) {
+      return ImmutableList.copyOf(model);
+    }
+  }
 
   @Override
   public void close() {

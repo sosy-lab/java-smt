@@ -80,6 +80,8 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   /**
    * Iterate over all values present in the model.
+   * Note that iterating multiple times may be inefficient for some solvers, it is recommended
+   * to use {@link BasicProverEnvironment#getModelAssignments()} instead in this case.
    */
   @Override
   Iterator<ValueAssignment> iterator();

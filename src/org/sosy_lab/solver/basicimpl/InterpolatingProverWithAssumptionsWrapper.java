@@ -2,6 +2,7 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.SolverException;
@@ -106,6 +107,11 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   @Override
   public Model getModel() throws SolverException {
     return delegate.getModel();
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    return delegate.getModelAssignments();
   }
 
   @Override

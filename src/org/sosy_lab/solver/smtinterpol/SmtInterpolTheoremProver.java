@@ -22,6 +22,7 @@ package org.sosy_lab.solver.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -31,6 +32,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
@@ -78,6 +80,13 @@ class SmtInterpolTheoremProver implements ProverEnvironment {
   public Model getModel() {
     Preconditions.checkState(!closed);
     return new SmtInterpolModel(env.getModel(), creator, assertedTerms);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    try (Model model = getModel()) {
+      return ImmutableList.copyOf(model);
+    }
   }
 
   @Override

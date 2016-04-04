@@ -20,11 +20,14 @@
 package org.sosy_lab.solver.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final Z3FormulaCreator creator;
@@ -45,6 +48,14 @@ abstract class Z3AbstractProver<T> implements BasicProverEnvironment<T> {
   public Model getModel() {
     Preconditions.checkState(!closed);
     return Z3Model.create(z3context, getZ3Model(), creator);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    Preconditions.checkState(!closed);
+    try (Z3Model model = Z3Model.create(z3context, getZ3Model(), creator)) {
+      return model.modelToList();
+    }
   }
 
   @Override

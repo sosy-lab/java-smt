@@ -24,16 +24,17 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
-import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,7 +94,14 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return Mathsat5Model.create(msat_get_model(curEnv), creator);
+    return Mathsat5Model.create(creator, curEnv);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    try (Mathsat5Model model = Mathsat5Model.create(creator, curEnv)) {
+      return model.generateAssignments();
+    }
   }
 
   @Override

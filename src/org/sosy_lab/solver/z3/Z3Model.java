@@ -107,7 +107,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     return assignments.iterator();
   }
 
-  private ImmutableList<ValueAssignment> modelToList() {
+  ImmutableList<ValueAssignment> modelToList() {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.

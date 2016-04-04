@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.solver.SolverException;
@@ -70,6 +71,17 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * that returned <code>false</code>.
    */
   Model getModel() throws SolverException;
+
+  /**
+   * Get a list of satisfying assignments.
+   * This is equivalent to <code>ImmutableList.copyOf(getModel())</code>,
+   * but removes the need for calling {@link Model#close()}.
+   *
+   * <p>Note that if you need to iterate multiple times over the model
+   * it may be more efficient to use this method instead of {@link #getModel()}
+   * (depending on the solver).
+   */
+  ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException;
 
   /**
    * Closes the prover environment.

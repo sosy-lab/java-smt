@@ -21,6 +21,7 @@ package org.sosy_lab.solver.mathsat5;
 
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
@@ -53,8 +54,8 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     formulaCreator = creator;
   }
 
-  static Mathsat5Model create(long model, Mathsat5FormulaCreator creator) {
-    return new Mathsat5Model(model, creator);
+  static Mathsat5Model create(Mathsat5FormulaCreator creator, long msatEnv) {
+    return new Mathsat5Model(msat_get_model(msatEnv), creator);
   }
 
   @Override
@@ -71,7 +72,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     return modelAssignments.iterator();
   }
 
-  private ImmutableList<ValueAssignment> generateAssignments() {
+  ImmutableList<ValueAssignment> generateAssignments() {
     Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);

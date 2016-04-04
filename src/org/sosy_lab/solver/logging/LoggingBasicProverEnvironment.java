@@ -21,11 +21,14 @@ package org.sosy_lab.solver.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 import java.util.logging.Level;
 
@@ -78,6 +81,13 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   @Override
   public Model getModel() throws SolverException {
     Model m = wrapped.getModel();
+    logger.log(Level.FINE, "model", m);
+    return m;
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
     return m;
   }

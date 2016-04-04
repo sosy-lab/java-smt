@@ -166,6 +166,19 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testGetModelAssignments() throws Exception {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y")));
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+      }
+    }
+  }
+
+  @Test
   public void testPartialModels() throws Exception {
     assume().withFailureMessage(
         "As of now, only Z3 and Princess support partial models"

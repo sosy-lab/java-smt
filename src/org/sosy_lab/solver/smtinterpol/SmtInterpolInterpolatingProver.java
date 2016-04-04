@@ -24,6 +24,7 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -33,6 +34,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.Model;
+import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -235,6 +237,13 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     assert assertedFormulas.size() == annotatedTerms.size();
 
     return new SmtInterpolModel(env.getModel(), mgr.getFormulaCreator(), annotatedTerms.values());
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    try (Model model = getModel()) {
+      return ImmutableList.copyOf(model);
+    }
   }
 
   private static String generateTermName() {

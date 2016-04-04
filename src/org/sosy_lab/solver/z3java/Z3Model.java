@@ -69,7 +69,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
     return assignments.iterator();
   }
 
-  private List<ValueAssignment> modelToList() {
+  ImmutableList<ValueAssignment> modelToList() {
     Builder<ValueAssignment> out = ImmutableList.builder();
     for (FuncDecl constDecl : model.getConstDecls()) {
       Expr value = model.getConstInterp(constDecl);
