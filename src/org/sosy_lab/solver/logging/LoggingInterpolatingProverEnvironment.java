@@ -25,57 +25,20 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
-import org.sosy_lab.solver.api.Model;
 
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-class LoggingInterpolatingProverEnvironment<T>
+class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnvironment<T>
     implements InterpolatingProverEnvironmentWithAssumptions<T> {
 
   private final InterpolatingProverEnvironmentWithAssumptions<T> wrapped;
-  private final LogManager logger;
-  int level = 0;
 
   LoggingInterpolatingProverEnvironment(
       LogManager logger, InterpolatingProverEnvironmentWithAssumptions<T> ipe) {
+    super(ipe, logger);
     this.wrapped = checkNotNull(ipe);
-    this.logger = checkNotNull(logger);
-  }
-
-  @Override
-  public T push(BooleanFormula f) {
-    level++;
-    logger.log(Level.FINER, "up to level " + level);
-    logger.log(Level.FINE, "formula pushed:", f);
-    T result = wrapped.push(f);
-    return result;
-  }
-
-  @Override
-  public void pop() {
-    level--;
-    logger.log(Level.FINER, "down to level " + level);
-    wrapped.pop();
-  }
-
-  @Override
-  public T addConstraint(BooleanFormula constraint) {
-    return wrapped.addConstraint(constraint);
-  }
-
-  @Override
-  public void push() {
-    logger.log(Level.FINER, "up to level " + ++level);
-    wrapped.push();
-  }
-
-  @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    boolean result = wrapped.isUnsat();
-    logger.log(Level.FINE, "unsat-check returned:", result);
-    return result;
   }
 
   @Override
@@ -114,18 +77,5 @@ class LoggingInterpolatingProverEnvironment<T>
     List<BooleanFormula> bf = wrapped.getTreeInterpolants(partitionedFormulas, startOfSubTree);
     logger.log(Level.FINE, "interpolants:", bf);
     return bf;
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    Model m = wrapped.getModel();
-    logger.log(Level.FINE, "model", m);
-    return m;
-  }
-
-  @Override
-  public void close() {
-    wrapped.close();
-    logger.log(Level.FINER, "closed");
   }
 }

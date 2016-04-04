@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.List;
@@ -33,46 +32,14 @@ import java.util.logging.Level;
 /**
  * Wraps a prover environment with a logging object.
  */
-class LoggingProverEnvironment implements ProverEnvironment {
+class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
+    implements ProverEnvironment {
 
   private final ProverEnvironment wrapped;
-  private final LogManager logger;
-  int level = 0;
 
   LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
+    super(pe, logger);
     this.wrapped = checkNotNull(pe);
-    this.logger = checkNotNull(logger);
-  }
-
-  @Override
-  public Void push(BooleanFormula f) {
-    logger.log(Level.FINE, "up to level " + level++);
-    logger.log(Level.FINE, "formula pushed:", f);
-    return wrapped.push(f);
-  }
-
-  @Override
-  public void pop() {
-    logger.log(Level.FINER, "down to level " + level--);
-    wrapped.pop();
-  }
-
-  @Override
-  public Void addConstraint(BooleanFormula constraint) {
-    return wrapped.addConstraint(constraint);
-  }
-
-  @Override
-  public void push() {
-    logger.log(Level.FINE, "up to level " + level++);
-    wrapped.push();
-  }
-
-  @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    boolean result = wrapped.isUnsat();
-    logger.log(Level.FINE, "unsat-check returned:", result);
-    return result;
   }
 
   @Override
@@ -81,13 +48,6 @@ class LoggingProverEnvironment implements ProverEnvironment {
     boolean result = wrapped.isUnsatWithAssumptions(assumptions);
     logger.log(Level.FINE, "unsat-check returned:", result);
     return result;
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    Model m = wrapped.getModel();
-    logger.log(Level.FINE, "model", m);
-    return m;
   }
 
   @Override
@@ -103,11 +63,5 @@ class LoggingProverEnvironment implements ProverEnvironment {
     T result = wrapped.allSat(callback, important);
     logger.log(Level.FINE, "allsat-result:", result);
     return result;
-  }
-
-  @Override
-  public void close() {
-    wrapped.close();
-    logger.log(Level.FINER, "closed");
   }
 }

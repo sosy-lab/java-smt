@@ -26,75 +26,41 @@ import com.google.common.base.Optional;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 
 import java.util.logging.Level;
 
-import javax.annotation.Nullable;
-
 /**
  * Wrapper for an optimizing solver.
  */
-class LoggingOptimizationProverEnvironment implements OptimizationProverEnvironment {
+class LoggingOptimizationProverEnvironment extends LoggingBasicProverEnvironment<Void>
+    implements OptimizationProverEnvironment {
 
   private final OptimizationProverEnvironment wrapped;
-  private final LogManager logger;
 
   LoggingOptimizationProverEnvironment(LogManager logger, OptimizationProverEnvironment oe) {
+    super(oe, logger);
     this.wrapped = checkNotNull(oe);
-    this.logger = checkNotNull(logger);
-  }
-
-  @Override
-  public Void addConstraint(BooleanFormula constraint) {
-    logger.log(Level.FINE, "Asserting: " + constraint);
-    return wrapped.addConstraint(constraint);
   }
 
   @Override
   public int maximize(Formula objective) {
-    logger.log(Level.FINE, "Maximizing: " + objective);
+    logger.log(Level.FINE, "Maximizing:", objective);
     return wrapped.maximize(objective);
   }
 
   @Override
   public int minimize(Formula objective) {
-    logger.log(Level.FINE, "Minimizing: " + objective);
+    logger.log(Level.FINE, "Minimizing:", objective);
     return wrapped.minimize(objective);
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    logger.log(Level.FINE, "Performing optimization");
-    return wrapped.check();
-  }
-
-  @Override
-  public void push() {
-    logger.log(Level.FINE, "Creating backtracking point");
-    wrapped.push();
-  }
-
-  @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    logger.log(Level.FINE, "Checking satisfiability");
-    return wrapped.isUnsat();
-  }
-
-  @Nullable
-  @Override
-  public Void push(BooleanFormula f) {
-    logger.log(Level.FINE, "Pushing", f, "and creating a backtracking point");
-    return wrapped.push(f);
-  }
-
-  @Override
-  public void pop() {
-    logger.log(Level.FINE, "Backtracking one level");
-    wrapped.pop();
+    OptStatus result = wrapped.check();
+    logger.log(Level.FINE, "optimization returned", result);
+    return result;
   }
 
   @Override
@@ -105,16 +71,5 @@ class LoggingOptimizationProverEnvironment implements OptimizationProverEnvironm
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
     return wrapped.lower(handle, epsilon);
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    return wrapped.getModel();
-  }
-
-  @Override
-  public void close() {
-    wrapped.close();
-    logger.log(Level.FINER, "closed");
   }
 }
