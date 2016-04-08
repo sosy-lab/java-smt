@@ -25,7 +25,7 @@ public interface SolverContext extends AutoCloseable {
      * Whether the solver should generate models (i.e., satisfying assignments)
      * for satisfiable formulas.
      */
-    MODELS,
+    GENERATE_MODELS,
 
     /**
      * Whether the solver should generate an unsat core
@@ -34,14 +34,14 @@ public interface SolverContext extends AutoCloseable {
      * with {@link ProverEnvironment#addConstraint(BooleanFormula)}
      * or {@link ProverEnvironment#push(BooleanFormula)}.
      */
-    UNSAT_CORE,
+    GENERATE_UNSAT_CORE,
 
     /**
      * Whether the solver should generate an unsat core
      * for unsatisfiable formulas <b>only</b> over the assumptions
      * explicitly passed to the solver.
      */
-    UNSAT_CORE_ASSUMPTIONS
+    GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS
   }
 
   /**

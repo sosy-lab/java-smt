@@ -74,7 +74,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.absent()}),
    * over the chosen assumptions.
-   * Does NOT require the {@link ProverOptions#UNSAT_CORE} option to work.
+   * Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    *
    * @param assumptions Selected assumptions
    * @return Empty optional if the constraints with assumptions are satisfiable,

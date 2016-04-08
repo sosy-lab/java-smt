@@ -68,7 +68,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
     checkNotNull(env);
     List<ProverOptions> optionsSet = Lists.newArrayList(options);
     annotatedTerms = new HashMap<>();
-    generateUnsatCores = optionsSet.contains(ProverOptions.UNSAT_CORE);
+    generateUnsatCores = optionsSet.contains(ProverOptions.GENERATE_UNSAT_CORE);
   }
 
   @Override

@@ -346,7 +346,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     FloatingPointFormula negInfVar = fpmgr.makeVariable("negInf", singlePrecType);
     BooleanFormula negInfEq = fpmgr.assignment(negInfVar, negInf);
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(zeroEq);
       prover.push(oneEq);
       prover.push(nanEq);
