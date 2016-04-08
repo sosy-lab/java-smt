@@ -192,5 +192,4 @@ public interface BooleanFormulaManager {
    * @param flatten If {@code true}, flatten recursively.
    */
   Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten);
-
 }

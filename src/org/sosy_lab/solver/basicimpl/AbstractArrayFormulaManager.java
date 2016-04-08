@@ -27,11 +27,11 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> implements
-                                                                     ArrayFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    implements ArrayFormulaManager {
 
-  public AbstractArrayFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl>
-                                         pFormulaCreator) {
+  public AbstractArrayFormulaManager(
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
     super(pFormulaCreator);
   }
 

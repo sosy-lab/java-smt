@@ -65,9 +65,12 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   private static Map<String, String> createConfig(Set<ProverOptions> opts) {
     return ImmutableMap.<String, String>builder()
         .put("model_generation", opts.contains(ProverOptions.MODELS) ? "true" : "false")
-        .put("unsat_core_generation", opts.contains(ProverOptions.UNSAT_CORE) ||
-                                       opts.contains(ProverOptions.UNSAT_CORE_ASSUMPTIONS)
-                                      ? "1" : "0")
+        .put(
+            "unsat_core_generation",
+            opts.contains(ProverOptions.UNSAT_CORE)
+                    || opts.contains(ProverOptions.UNSAT_CORE_ASSUMPTIONS)
+                ? "1"
+                : "0")
         .build();
   }
 
@@ -152,9 +155,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     Preconditions.checkState(!closed);
     try {
       return !msat_check_sat_with_assumptions(
-          curEnv,
-          Longs.toArray(Lists.transform(assumptions, creator.infoExtractor))
-      );
+          curEnv, Longs.toArray(Lists.transform(assumptions, creator.infoExtractor)));
     } catch (IllegalStateException e) {
       handleSolverExceptionInUnsatCheck(e);
       throw e;
@@ -164,7 +165,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Mathsat5 does not support finding UNSAT core over "
-        + "assumptions");
+    throw new UnsupportedOperationException(
+        "Mathsat5 does not support finding UNSAT core over " + "assumptions");
   }
 }

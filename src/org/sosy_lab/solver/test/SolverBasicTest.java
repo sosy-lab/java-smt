@@ -106,10 +106,8 @@ public class SolverBasicTest extends SolverBasedTest0 {
         // UninterpretedFunctionDeclarations should not compare equal to Formulas,
         // but declaring one twice needs to return the same UIF.
         .addEqualityGroup(
-            fmgr.declareUF(
-                "f_a", FormulaType.IntegerType, FormulaType.IntegerType),
-            fmgr.declareUF(
-                "f_a", FormulaType.IntegerType, FormulaType.IntegerType))
+            fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType),
+            fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
         .addEqualityGroup(f_b)
         .addEqualityGroup(fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(0))))
         .addEqualityGroup(
@@ -160,8 +158,10 @@ public class SolverBasicTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTest() throws Exception {
-    assume().withFailureMessage("Princess does not support unsat core generation").that
-        (solverToUse()).isNotEqualTo(PRINCESS);
+    assume()
+        .withFailureMessage("Princess does not support unsat core generation")
+        .that(solverToUse())
+        .isNotEqualTo(PRINCESS);
     try (ProverEnvironment pe = context.newProverEnvironment(UNSAT_CORE)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
@@ -169,27 +169,24 @@ public class SolverBasicTest extends SolverBasedTest0 {
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       assertThatEnvironment(pe).isUnsatisfiable();
       List<BooleanFormula> unsatCore = pe.getUnsatCore();
-      assertThat(unsatCore).containsExactly(
-          imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
-          imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1))
-      );
+      assertThat(unsatCore)
+          .containsExactly(
+              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
+              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
     }
   }
 
   @Test
   public void unsatCoreWithAssumptionsTest() throws Exception {
-    assume().withFailureMessage("Princess and Mathsat5 do not support unsat core generation").that
-        (solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.MATHSAT5);
+    assume()
+        .withFailureMessage("Princess and Mathsat5 do not support unsat core generation")
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.MATHSAT5);
     try (ProverEnvironment pe = context.newProverEnvironment(UNSAT_CORE_ASSUMPTIONS)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       BooleanFormula selector = bmgr.makeVariable("b");
-      pe.addConstraint(
-          bmgr.or(
-              selector,
-              imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1))
-          )
-      );
+      pe.addConstraint(bmgr.or(selector, imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1))));
       Optional<List<BooleanFormula>> res =
           pe.unsatCoreOverAssumptions(ImmutableList.of(bmgr.not(selector)));
       assertThat(res).isPresent();

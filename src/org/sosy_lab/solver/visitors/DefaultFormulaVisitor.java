@@ -52,9 +52,7 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
 
   @Override
   public R visitFunction(
-      Formula f,
-      List<Formula> args,
-      FunctionDeclaration<?> functionDeclaration) {
+      Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
     return visitDefault(f);
   }
 

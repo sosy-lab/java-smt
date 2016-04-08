@@ -30,7 +30,7 @@ abstract class PrincessNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
         IExpression, PrincessTermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType,
-    PrincessFunctionDeclaration> {
+        PrincessFunctionDeclaration> {
 
   PrincessNumeralFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);

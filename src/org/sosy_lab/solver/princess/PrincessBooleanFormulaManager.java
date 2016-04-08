@@ -34,8 +34,8 @@ import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 import scala.Enumeration;
 
 class PrincessBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<IExpression, PrincessTermType, PrincessEnvironment,
-    PrincessFunctionDeclaration> {
+    extends AbstractBooleanFormulaManager<
+        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   PrincessBooleanFormulaManager(PrincessFormulaCreator creator) {
     super(creator);

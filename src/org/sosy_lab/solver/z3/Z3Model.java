@@ -186,7 +186,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       default:
         throw new AssertionError("Unknown symbol kind " + get_symbol_kind(z3context, symbol));
     }
-
   }
 
   @Override

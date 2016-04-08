@@ -36,16 +36,17 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
 
   protected final PrincessStack stack;
   protected final PrincessFormulaManager mgr;
-  protected final
-    FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
+  protected final FormulaCreator<
+          IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
       creator;
   protected boolean closed = false;
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
       boolean useForInterpolation,
-      FormulaCreator<IExpression,
-          PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> creator) {
+      FormulaCreator<
+              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
+          creator) {
     this.mgr = pMgr;
     this.creator = creator;
     this.stack = checkNotNull(mgr.getEnvironment().getNewStack(useForInterpolation));

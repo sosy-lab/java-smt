@@ -169,7 +169,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
   protected Expr substituteUsingListsImpl(Expr t, List<Expr> changeFrom, List<Expr> changeTo) {
     int size = changeFrom.size();
     Preconditions.checkState(size == changeTo.size());
-    return t.substitute(changeFrom.toArray(new Expr[changeFrom.size()]),
+    return t.substitute(
+        changeFrom.toArray(new Expr[changeFrom.size()]),
         changeTo.toArray(new Expr[changeTo.size()]));
   }
 

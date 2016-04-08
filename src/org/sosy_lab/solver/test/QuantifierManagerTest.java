@@ -283,13 +283,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA));
     assert qmgr != null;
     IntegerFormula y = imgr.makeVariable("y");
-    BooleanFormula f1 = qmgr.exists(
-        bmgr.and(
-            imgr.equal(y, imgr.makeNumber(4)),
-            imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))
-        ),
-        y
-    );
+    BooleanFormula f1 =
+        qmgr.exists(
+            bmgr.and(
+                imgr.equal(y, imgr.makeNumber(4)), imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))),
+            y);
     BooleanFormula out = mgr.applyTactic(f1, Tactic.QE_LIGHT);
     assertThat(out).isEqualTo(imgr.equal(x, imgr.makeNumber(7)));
   }

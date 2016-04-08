@@ -32,8 +32,8 @@ import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
 
 import java.util.List;
 
-class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Expr, Sort, Context,
-    FuncDecl> {
+class Z3QuantifiedFormulaManager
+    extends AbstractQuantifiedFormulaManager<Expr, Sort, Context, FuncDecl> {
 
   private final Context z3context;
 

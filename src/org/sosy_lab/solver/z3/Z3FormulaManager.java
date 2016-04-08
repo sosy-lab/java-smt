@@ -224,5 +224,4 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     }
     return super.translate(other, otherContext);
   }
-
 }

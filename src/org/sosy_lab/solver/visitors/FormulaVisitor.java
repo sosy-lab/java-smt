@@ -80,10 +80,7 @@ public interface FormulaVisitor<R> {
    *                            a new instance of the same function with different
    *                            arguments.
    */
-  R visitFunction(
-      Formula f,
-      List<Formula> args,
-      FunctionDeclaration<?> functionDeclaration);
+  R visitFunction(Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration);
 
   /**
    * Visit a quantified node.

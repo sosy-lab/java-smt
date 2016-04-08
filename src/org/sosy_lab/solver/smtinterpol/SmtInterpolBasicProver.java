@@ -72,7 +72,6 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
     return !env.checkSat();
   }
 
-
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);

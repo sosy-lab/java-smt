@@ -43,8 +43,8 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   FormulaTransformationVisitorImpl(
       FormulaVisitor<? extends Formula> delegate,
-      Deque<Formula> toProcess, Map<Formula, Formula>
-      pCache) {
+      Deque<Formula> toProcess,
+      Map<Formula, Formula> pCache) {
     this.toProcess = toProcess;
     this.pCache = pCache;
     this.delegate = Preconditions.checkNotNull(delegate);
@@ -72,9 +72,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   @Override
   public Void visitFunction(
-      Formula f,
-      List<Formula> args,
-      FunctionDeclaration<?> functionDeclaration) {
+      Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
 
     boolean allArgumentsTransformed = true;
 
@@ -99,8 +97,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
       // Create an processed version of the
       // function application.
       toProcess.pop();
-      Formula out =
-          delegate.visitFunction(f, newArgs, functionDeclaration);
+      Formula out = delegate.visitFunction(f, newArgs, functionDeclaration);
       Formula prev = pCache.put(f, out);
       assert prev == null;
     }

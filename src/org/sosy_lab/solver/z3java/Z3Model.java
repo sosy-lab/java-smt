@@ -89,9 +89,7 @@ class Z3Model extends AbstractModel<Expr, Sort, Context> {
         }
         Object value = creator.convertValue(valueEntry.getValue());
         Formula f = creator.encapsulateWithTypeOf(funcDecl.apply(valueEntry.getArgs()));
-        out.add(new ValueAssignment(
-           f, funcName,  value, args.build()
-        ));
+        out.add(new ValueAssignment(f, funcName, value, args.build()));
       }
     }
     return out.build();

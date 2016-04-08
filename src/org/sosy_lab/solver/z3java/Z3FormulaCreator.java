@@ -210,12 +210,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
             formula,
             args.build(),
             FunctionDeclarationImpl.of(
-                name,
-                getDeclarationKind(f),
-                argTypes.build(),
-                getFormulaType(f),
-                f.getFuncDecl()
-            ));
+                name, getDeclarationKind(f), argTypes.build(), getFormulaType(f), f.getFuncDecl()));
       case Z3_VAR_AST:
         int deBruijnIdx = f.getIndex();
         return visitor.visitBoundVariable(formula, deBruijnIdx);
@@ -343,8 +338,7 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
   }
 
   @Override
-  public Expr callFunctionImpl(
-      FunctionDeclarationImpl<?, FuncDecl> declaration, List<Expr> args) {
+  public Expr callFunctionImpl(FunctionDeclarationImpl<?, FuncDecl> declaration, List<Expr> args) {
     return declaration.getSolverDeclaration().apply(args.toArray(new Expr[args.size()]));
   }
 

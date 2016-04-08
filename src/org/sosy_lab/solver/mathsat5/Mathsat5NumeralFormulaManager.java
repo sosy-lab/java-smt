@@ -34,8 +34,8 @@ import java.math.BigInteger;
 
 abstract class Mathsat5NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-    extends
-    AbstractNumeralFormulaManager<Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
+    extends AbstractNumeralFormulaManager<
+        Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
 
   private final long mathsatEnv;
 

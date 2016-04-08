@@ -243,19 +243,17 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   @SuppressWarnings("checkstyle:visibilitymodifier")
   public final Function<Formula, TFormulaInfo> infoExtractor =
       new Function<Formula, TFormulaInfo>() {
-    @Override
-    public TFormulaInfo apply(Formula formula) {
-      return extractInfo(formula);
-    }
-  };
+        @Override
+        public TFormulaInfo apply(Formula formula) {
+          return extractInfo(formula);
+        }
+      };
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, infoExtractor);
   }
 
-  public void visitRecursively(
-      FormulaVisitor<TraversalProcess> pFormulaVisitor,
-      Formula pF) {
+  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
     visitRecursively(pFormulaVisitor, pF, Predicates.alwaysTrue());
   }
 
@@ -343,9 +341,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
           @Override
           public TraversalProcess visitFunction(
-              Formula f,
-              List<Formula> args,
-              FunctionDeclaration<?> functionDeclaration) {
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
 
             if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
               found.put(functionDeclaration.getName(), f);
@@ -365,16 +361,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   @SuppressWarnings("unchecked")
   public final <T extends Formula> T callFunction(
-      FunctionDeclaration<T> declaration,
-      List<? extends Formula> args) {
-    return encapsulate(declaration.getType(), callFunctionImpl(
-        (FunctionDeclarationImpl<T, TFuncDecl>) declaration, extractInfo(args)
-    ));
+      FunctionDeclaration<T> declaration, List<? extends Formula> args) {
+    return encapsulate(
+        declaration.getType(),
+        callFunctionImpl((FunctionDeclarationImpl<T, TFuncDecl>) declaration, extractInfo(args)));
   }
 
   public abstract TFormulaInfo callFunctionImpl(
-      FunctionDeclarationImpl<?, TFuncDecl> declaration,
-      List<TFormulaInfo> args);
+      FunctionDeclarationImpl<?, TFuncDecl> declaration, List<TFormulaInfo> args);
 
   public TFuncDecl getBooleanVarDeclaration(BooleanFormula var) {
     return getBooleanVarDeclarationImpl(extractInfo(var));

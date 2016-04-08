@@ -288,14 +288,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
       String name = msat_decl_get_name(msat_term_get_decl(f));
       return visitor.visitFunction(
-          formula, args.build(), FunctionDeclarationImpl.of(
+          formula,
+          args.build(),
+          FunctionDeclarationImpl.of(
               name,
               getDeclarationKind(f),
               argTypes.build(),
               getFormulaType(f),
-              msat_term_get_decl(f)
-          )
-      );
+              msat_term_get_decl(f)));
     }
   }
 

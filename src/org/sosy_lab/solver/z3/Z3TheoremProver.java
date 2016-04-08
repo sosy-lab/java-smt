@@ -142,8 +142,9 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     int result = solver_check(z3context, z3solver);
     shutdownNotifier.shutdownIfNecessary();
     if (result == Z3_LBOOL.Z3_L_UNDEF.status) {
-      throw new IllegalStateException("Solver returned 'unknown' status, reason: "
-          + solver_get_reason_unknown(z3context, z3solver));
+      throw new IllegalStateException(
+          "Solver returned 'unknown' status, reason: "
+              + solver_get_reason_unknown(z3context, z3solver));
     }
     return result == Z3_LBOOL.Z3_L_FALSE.status;
   }
@@ -152,13 +153,16 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    int result = solver_check_assumptions(z3context, z3solver, Longs.toArray(Lists.transform(
-        assumptions, creator.infoExtractor
-    )));
+    int result =
+        solver_check_assumptions(
+            z3context,
+            z3solver,
+            Longs.toArray(Lists.transform(assumptions, creator.infoExtractor)));
     shutdownNotifier.shutdownIfNecessary();
     if (result == Z3_LBOOL.Z3_L_UNDEF.status) {
-      throw new IllegalStateException("Solver returned 'unknown' status, reason: "
-          + solver_get_reason_unknown(z3context, z3solver));
+      throw new IllegalStateException(
+          "Solver returned 'unknown' status, reason: "
+              + solver_get_reason_unknown(z3context, z3solver));
     }
     return result == Z3_LBOOL.Z3_L_FALSE.status;
   }

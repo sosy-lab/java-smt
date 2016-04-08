@@ -45,8 +45,8 @@ import java.util.List;
 
 abstract class Z3NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-    extends AbstractNumeralFormulaManager<Long, Long, Long, ParamFormulaType, ResultFormulaType,
-    Long> {
+    extends AbstractNumeralFormulaManager<
+        Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
 
   protected final long z3context;
 

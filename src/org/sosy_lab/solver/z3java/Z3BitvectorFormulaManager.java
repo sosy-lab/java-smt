@@ -29,8 +29,8 @@ import org.sosy_lab.solver.basicimpl.AbstractBitvectorFormulaManager;
 
 import java.math.BigInteger;
 
-class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Expr, Sort, Context,
-    FuncDecl> {
+class Z3BitvectorFormulaManager
+    extends AbstractBitvectorFormulaManager<Expr, Sort, Context, FuncDecl> {
 
   private final Context z3context;
 

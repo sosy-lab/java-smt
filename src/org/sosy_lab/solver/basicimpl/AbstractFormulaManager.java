@@ -60,8 +60,8 @@ import javax.annotation.Nullable;
  * Simplifies building a solver from the specific theories.
  * @param <TFormulaInfo> The solver specific type.
  */
-public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> implements
-                                                                          FormulaManager {
+public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    implements FormulaManager {
 
   private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       arrayManager;
@@ -316,9 +316,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
               @Override
               public Formula visitFunction(
-                  Formula f,
-                  List<Formula> newArgs,
-                  FunctionDeclaration<?> functionDeclaration) {
+                  Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
                 Formula out = fromToMapping.get(f);
                 if (out == null) {
                   return makeApplication(functionDeclaration, newArgs);
@@ -444,8 +442,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Formula> T makeApplication(
-      FunctionDeclaration<T> declaration,
-      List<? extends Formula> args) {
+      FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     return formulaCreator.callFunction(declaration, args);
   }
 
@@ -454,7 +451,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       FunctionDeclaration<T> declaration, Formula... args) {
     return makeApplication(declaration, Arrays.asList(args));
   }
-
 
   @Override
   public <T extends Formula> T substitute(

@@ -47,8 +47,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void>
-    implements ProverEnvironment {
+class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements ProverEnvironment {
 
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
@@ -89,8 +88,9 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void>
       throws SolverException, InterruptedException {
 
     push();
-    Preconditions.checkState(annotatedTerms.isEmpty(), "Empty environment required for UNSAT core"
-        + " over assumptions.");
+    Preconditions.checkState(
+        annotatedTerms.isEmpty(),
+        "Empty environment required for UNSAT core" + " over assumptions.");
     for (BooleanFormula assumption : assumptions) {
       String termName = generateTermName();
       Term t = mgr.extractInfo(assumption);
@@ -144,12 +144,14 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void>
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
     Term[] terms = env.getUnsatCore();
-    return Lists.transform(Arrays.asList(terms), new Function<Term, BooleanFormula>() {
-      @Override
-      public BooleanFormula apply(Term input) {
-        return creator.encapsulateBoolean(annotatedTerms.get(input.toString()));
-      }
-    });
+    return Lists.transform(
+        Arrays.asList(terms),
+        new Function<Term, BooleanFormula>() {
+          @Override
+          public BooleanFormula apply(Term input) {
+            return creator.encapsulateBoolean(annotatedTerms.get(input.toString()));
+          }
+        });
   }
 
   @Override

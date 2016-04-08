@@ -52,8 +52,8 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> implements
-                                                                     BooleanFormulaManager {
+    extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+    implements BooleanFormulaManager {
 
   protected AbstractBooleanFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
@@ -256,18 +256,14 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     formulaCreator.visitRecursively(
         new DelegatingFormulaVisitor<>(pFormulaVisitor),
         pF,
-        Predicates.instanceOf(BooleanFormula.class)
-    );
+        Predicates.instanceOf(BooleanFormula.class));
   }
 
   @Override
   public BooleanFormula transformRecursively(
       BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f) {
     return formulaCreator.transformRecursively(
-        new DelegatingFormulaVisitor<>(pVisitor),
-        f,
-        Predicates.instanceOf(BooleanFormula.class)
-    );
+        new DelegatingFormulaVisitor<>(pVisitor), f, Predicates.instanceOf(BooleanFormula.class));
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
@@ -284,13 +280,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       assert f instanceof BooleanFormula;
       BooleanFormula casted = (BooleanFormula) f;
       return delegate.visitAtom(
-           casted, FunctionDeclarationImpl.of(
+          casted,
+          FunctionDeclarationImpl.of(
               name,
               FunctionDeclarationKind.VAR,
               ImmutableList.<FormulaType<?>>of(),
               FormulaType.BooleanType,
-              formulaCreator.getBooleanVarDeclaration(casted)
-          ));
+              formulaCreator.getBooleanVarDeclaration(casted)));
     }
 
     @Override
@@ -315,9 +311,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     @Override
     public R visitFunction(
-        Formula f,
-        List<Formula> args,
-        FunctionDeclaration<?> functionDeclaration) {
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
           Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
@@ -388,8 +382,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
 
     @SuppressWarnings("unchecked")
-    private FunctionDeclaration<BooleanFormula> toBooleanDeclaration(
-        FunctionDeclaration<?> decl) {
+    private FunctionDeclaration<BooleanFormula> toBooleanDeclaration(FunctionDeclaration<?> decl) {
       return (FunctionDeclaration<BooleanFormula>) decl;
     }
   }

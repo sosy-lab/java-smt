@@ -92,7 +92,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
     Preconditions.checkState(!closed);
     Status result;
     try {
-     result = z3solver.check();
+      result = z3solver.check();
     } catch (Z3Exception e) {
       if ("canceled".equals(e.getMessage())) {
         shutdownNotifier.shutdownIfNecessary();

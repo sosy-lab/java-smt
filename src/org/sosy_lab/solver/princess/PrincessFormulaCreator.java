@@ -65,8 +65,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class PrincessFormulaCreator
-    extends FormulaCreator<IExpression,
-      PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
+    extends FormulaCreator<
+        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   PrincessFormulaCreator(
       PrincessEnvironment pEnv, PrincessTermType pBoolType, PrincessTermType pIntegerType) {
@@ -200,13 +200,14 @@ class PrincessFormulaCreator
       }
 
       return visitor.visitFunction(
-          f, args.build(), FunctionDeclarationImpl.of(
+          f,
+          args.build(),
+          FunctionDeclarationImpl.of(
               getName(input),
               getDeclarationKind(input),
               argTypes.build(),
               getFormulaType(f),
-              solverDeclaration
-          ));
+              solverDeclaration));
     }
   }
 

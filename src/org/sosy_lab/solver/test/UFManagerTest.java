@@ -58,9 +58,9 @@ public class UFManagerTest extends SolverBasedTest0 {
   public void testDeclareAndCallUF() {
     List<String> names = ImmutableList.of("Func", "|Func|", "(Func)");
     for (String name : names) {
-      Formula f = fmgr.declareAndCallUF(
-          name, FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeNumber(1))
-      );
+      Formula f =
+          fmgr.declareAndCallUF(
+              name, FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeNumber(1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
       Truth.assertThat(declaration.getName()).isEqualTo(name);
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
@@ -69,12 +69,14 @@ public class UFManagerTest extends SolverBasedTest0 {
   }
 
   private FunctionDeclaration<?> getDeclaration(Formula f) {
-    return mgr.visit(new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
-      @Override
-      public FunctionDeclaration<?> visitFunction(
-          Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-        return functionDeclaration;
-      }
-    }, f);
+    return mgr.visit(
+        new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
+          @Override
+          public FunctionDeclaration<?> visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            return functionDeclaration;
+          }
+        },
+        f);
   }
 }

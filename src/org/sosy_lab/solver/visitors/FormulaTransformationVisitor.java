@@ -64,9 +64,7 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
    */
   @Override
   public Formula visitFunction(
-      Formula f,
-      List<Formula> newArgs,
-      FunctionDeclaration<?> functionDeclaration) {
+      Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
     return fmgr.makeApplication(functionDeclaration, newArgs);
   }
 

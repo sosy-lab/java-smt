@@ -545,8 +545,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   @Test
   public void testUfWithBoolType() throws SolverException, InterruptedException {
     FunctionDeclaration<BooleanFormula> uf =
-        fmgr.declareUF(
-            "fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
+        fmgr.declareUF("fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula uf0 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(0)));
     BooleanFormula uf1 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(1)));
     BooleanFormula uf2 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(2)));
@@ -570,12 +569,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     // Thus this test is disabled and the following is enabled.
 
     FunctionDeclaration<IntegerFormula> uf =
-        fmgr.declareUF(
-            "fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
-    IntegerFormula ufTrue =
-        fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(true)));
-    IntegerFormula ufFalse =
-        fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(false)));
+        fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
+    IntegerFormula ufTrue = fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(true)));
+    IntegerFormula ufFalse = fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(false)));
 
     BooleanFormula f = bmgr.not(imgr.equal(ufTrue, ufFalse));
     assertThat(f.toString()).isEmpty();

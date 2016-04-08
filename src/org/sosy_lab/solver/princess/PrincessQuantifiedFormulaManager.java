@@ -38,14 +38,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrincessQuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<IExpression, PrincessTermType, PrincessEnvironment,
-    PrincessFunctionDeclaration> {
+    extends AbstractQuantifiedFormulaManager<
+        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessEnvironment env;
 
   protected PrincessQuantifiedFormulaManager(
-      FormulaCreator<IExpression,
-          PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> pCreator) {
+      FormulaCreator<
+              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
+          pCreator) {
     super(pCreator);
     env = getFormulaCreator().getEnv();
   }

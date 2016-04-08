@@ -276,11 +276,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula int2 = imgr.makeNumber(2);
 
     FunctionDeclaration<IntegerFormula> funA =
-        fmgr.declareUF(
-            "fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
+        fmgr.declareUF("fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
     FunctionDeclaration<IntegerFormula> funB =
-        fmgr.declareUF(
-            "fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
+        fmgr.declareUF("fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUF(funA, ImmutableList.of(int1));
     IntegerFormula res2 = fmgr.callUF(funB, ImmutableList.of(int2));
 
@@ -299,8 +297,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula int2 = imgr.makeNumber(2);
 
     FunctionDeclaration<IntegerFormula> funA =
-        fmgr.declareUF(
-            "fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
+        fmgr.declareUF("fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula res1 = fmgr.callUF(funA, ImmutableList.of(int1));
     IntegerFormula res2 = fmgr.callUF(funA, ImmutableList.of(int2));
 
@@ -405,8 +402,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   private BooleanFormula functionExprGen() {
     IntegerFormula arg = imgr.makeNumber(1);
     FunctionDeclaration<BooleanFormula> funA =
-        fmgr.declareUF(
-            "fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
+        fmgr.declareUF("fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula res1 = fmgr.callUF(funA, ImmutableList.of(arg));
     return bmgr.and(res1, bmgr.makeBoolean(true));
   }

@@ -121,10 +121,8 @@ abstract class PrincessFunctionDeclaration {
     }
 
     @Override
-    public IExpression makeApp(
-        PrincessEnvironment env, List<IExpression> args) {
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       return example.update(scala.collection.JavaConversions.asScalaBuffer(args));
     }
   }
-
 }

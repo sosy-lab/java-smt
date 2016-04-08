@@ -76,12 +76,14 @@ public abstract class BooleanFormulaTransformationVisitor
 
     // Filtered collections avoid extra allocations.
     Collection<BooleanFormula> filtered =
-        Collections2.filter(processedOperands, new Predicate<BooleanFormula>() {
-          @Override
-          public boolean apply(BooleanFormula input) {
-            return !bfmgr.isTrue(input);
-          }
-        });
+        Collections2.filter(
+            processedOperands,
+            new Predicate<BooleanFormula>() {
+              @Override
+              public boolean apply(BooleanFormula input) {
+                return !bfmgr.isTrue(input);
+              }
+            });
     return bfmgr.and(filtered);
   }
 
@@ -93,30 +95,32 @@ public abstract class BooleanFormulaTransformationVisitor
       }
     }
     Collection<BooleanFormula> filtered =
-        Collections2.filter(processedOperands, new Predicate<BooleanFormula>() {
-          @Override
-          public boolean apply(BooleanFormula input) {
-            return !bfmgr.isFalse(input);
-          }
-        });
+        Collections2.filter(
+            processedOperands,
+            new Predicate<BooleanFormula>() {
+              @Override
+              public boolean apply(BooleanFormula input) {
+                return !bfmgr.isFalse(input);
+              }
+            });
     return bfmgr.or(filtered);
   }
 
   @Override
-  public BooleanFormula visitXor(BooleanFormula processedOperand1,
-                                 BooleanFormula processedOperand2) {
+  public BooleanFormula visitXor(
+      BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
     return bfmgr.xor(processedOperand1, processedOperand2);
   }
 
   @Override
-  public BooleanFormula visitEquivalence(BooleanFormula processedOperand1,
-                                         BooleanFormula processedOperand2) {
+  public BooleanFormula visitEquivalence(
+      BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
     return bfmgr.equivalence(processedOperand1, processedOperand2);
   }
 
   @Override
-  public BooleanFormula visitImplication(BooleanFormula processedOperand1,
-                                         BooleanFormula processedOperand2) {
+  public BooleanFormula visitImplication(
+      BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
     return bfmgr.implication(processedOperand1, processedOperand2);
   }
 

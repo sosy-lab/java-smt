@@ -32,8 +32,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
 
-  protected AbstractQuantifiedFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl>
-                                                 pCreator) {
+  protected AbstractQuantifiedFormulaManager(
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
   }
 

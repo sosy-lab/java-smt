@@ -82,8 +82,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (BooleanFormula bf : Lists.newArrayList(t, f, x, y, z, and, or, ite, impl, eq, not)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
-          new BooleanFormulaTransformationVisitor(
-              mgr.getBooleanFormulaManager()) {
+          new BooleanFormulaTransformationVisitor(mgr.getBooleanFormulaManager()) {
             // we need a subclass, because the original class is 'abstract'
           };
       assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
@@ -103,8 +102,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (IntegerFormula f : Lists.newArrayList(a, b, n12, neg, ite)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
-          new BooleanFormulaTransformationVisitor(
-              mgr.getBooleanFormulaManager()) {
+          new BooleanFormulaTransformationVisitor(mgr.getBooleanFormulaManager()) {
             // we need a subclass, because the original class is 'abstract'
           };
       BooleanFormula bf = imgr.equal(n12, f);
@@ -157,9 +155,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
         bmgr.visit(
-            new BooleanFormulaTransformationVisitor(
-                mgr.getBooleanFormulaManager()) {},
-            constraint);
+            new BooleanFormulaTransformationVisitor(mgr.getBooleanFormulaManager()) {}, constraint);
     assertThatFormula(newConstraint).isUnsatisfiable();
   }
 
@@ -205,9 +201,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
           @Override
           public TraversalProcess visitFunction(
-              Formula f,
-              List<Formula> args,
-              FunctionDeclaration<?> functionDeclaration) {
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
 
             found.add(functionDeclaration.getName());
 
@@ -261,21 +255,23 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                     bmgr.makeVariable("d"),
                     imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5)))));
     final Set<String> foundVars = new HashSet<>();
-    bmgr.visitRecursively(new DefaultBooleanFormulaVisitor<TraversalProcess>() {
-      @Override
-      protected TraversalProcess visitDefault() {
-        return TraversalProcess.CONTINUE;
-      }
+    bmgr.visitRecursively(
+        new DefaultBooleanFormulaVisitor<TraversalProcess>() {
+          @Override
+          protected TraversalProcess visitDefault() {
+            return TraversalProcess.CONTINUE;
+          }
 
-      @Override
-      public TraversalProcess visitAtom(
-          BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
-        if (funcDecl.getKind() == FunctionDeclarationKind.VAR) {
-          foundVars.add(funcDecl.getName());
-        }
-        return TraversalProcess.CONTINUE;
-      }
-    }, f);
+          @Override
+          public TraversalProcess visitAtom(
+              BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
+            if (funcDecl.getKind() == FunctionDeclarationKind.VAR) {
+              foundVars.add(funcDecl.getName());
+            }
+            return TraversalProcess.CONTINUE;
+          }
+        },
+        f);
     assertThat(foundVars).containsExactly("x", "y", "z", "d");
   }
 }

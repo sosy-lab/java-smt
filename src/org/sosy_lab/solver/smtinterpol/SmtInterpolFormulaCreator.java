@@ -43,8 +43,8 @@ import org.sosy_lab.solver.visitors.FormulaVisitor;
 
 import java.util.List;
 
-class SmtInterpolFormulaCreator extends
-                                FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
+class SmtInterpolFormulaCreator
+    extends FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
 
   private final Sort booleanSort;
   private final Sort integerSort;
@@ -183,13 +183,14 @@ class SmtInterpolFormulaCreator extends
 
         // Any function application.
         return visitor.visitFunction(
-            f, args, FunctionDeclarationImpl.of(
+            f,
+            args,
+            FunctionDeclarationImpl.of(
                 name,
                 getDeclarationKind(app),
                 argTypes.build(),
                 getFormulaType(f),
-                app.getFunction()
-            ));
+                app.getFunction()));
       }
 
     } else {
@@ -303,9 +304,7 @@ class SmtInterpolFormulaCreator extends
   public Term callFunctionImpl(
       FunctionDeclarationImpl<?, FunctionSymbol> declaration, List<Term> args) {
     return environment.term(
-        declaration.getSolverDeclaration().getName(),
-        args.toArray(new Term[args.size()])
-    );
+        declaration.getSolverDeclaration().getName(), args.toArray(new Term[args.size()]));
   }
 
   @Override

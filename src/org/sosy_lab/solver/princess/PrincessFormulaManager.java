@@ -40,8 +40,8 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 import java.util.List;
 
 final class PrincessFormulaManager
-    extends AbstractFormulaManager<IExpression, PrincessTermType, PrincessEnvironment,
-    PrincessFunctionDeclaration> {
+    extends AbstractFormulaManager<
+        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessFormulaCreator creator;
 

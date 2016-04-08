@@ -156,7 +156,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           .put(Z3_OP_FPA_NAN, Double.NaN)
           .build();
 
-
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
 
@@ -399,13 +398,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             formula,
             args.build(),
             FunctionDeclarationImpl.of(
-                name,
-                getDeclarationKind(f),
-                argTypes.build(),
-                getFormulaType(f),
-                funcDecl
-            )
-        );
+                name, getDeclarationKind(f), argTypes.build(), getFormulaType(f), funcDecl));
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(environment, f);
         return visitor.visitBoundVariable(formula, deBruijnIdx);
@@ -544,13 +537,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public Long callFunctionImpl(
-      FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
-    return Z3NativeApi.mk_app(
-        environment,
-        declaration.getSolverDeclaration(),
-        Longs.toArray(args)
-    );
+  public Long callFunctionImpl(FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
+    return Z3NativeApi.mk_app(environment, declaration.getSolverDeclaration(), Longs.toArray(args));
   }
 
   @Override

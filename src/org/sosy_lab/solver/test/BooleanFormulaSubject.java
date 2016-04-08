@@ -109,8 +109,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
-    try (ProverEnvironment prover =
-            context.newProverEnvironment(ProverOptions.UNSAT_CORE)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.UNSAT_CORE)) {
       prover.push(getSubject());
       if (!prover.isUnsat()) {
         return; // success
