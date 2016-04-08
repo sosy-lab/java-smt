@@ -72,7 +72,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     push(mgr.getBooleanFormulaManager().and(assumptions));
@@ -84,7 +84,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
 
     push();

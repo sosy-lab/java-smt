@@ -21,6 +21,7 @@ package org.sosy_lab.solver.z3java;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
@@ -40,6 +41,7 @@ import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -218,12 +220,12 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Status result =
         z3solver.check(
-            Lists.transform(assumptions, creator.infoExtractor)
+            Collections2.transform(assumptions, creator.infoExtractor)
                 .toArray(new Expr[assumptions.size()]));
     shutdownNotifier.shutdownIfNecessary();
     if (result == Status.UNKNOWN) {
@@ -235,7 +237,8 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.absent();

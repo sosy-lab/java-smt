@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,7 +69,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    *
    * @param assumptions A list of literals.
    */
-  boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 
   /**
@@ -80,7 +81,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    * @return Empty optional if the constraints with assumptions are satisfiable,
    * subset of assumptions which is unsatisfiable with the original constraints otherwise.
    */
-  Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+  Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 
   /**

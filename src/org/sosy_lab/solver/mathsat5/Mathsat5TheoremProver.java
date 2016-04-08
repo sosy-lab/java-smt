@@ -29,8 +29,8 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -42,6 +42,7 @@ import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -150,12 +151,12 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     try {
       return !msat_check_sat_with_assumptions(
-          curEnv, Longs.toArray(Lists.transform(assumptions, creator.infoExtractor)));
+          curEnv, Longs.toArray(Collections2.transform(assumptions, creator.infoExtractor)));
     } catch (IllegalStateException e) {
       handleSolverExceptionInUnsatCheck(e);
       throw e;
@@ -163,7 +164,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
         "Mathsat5 does not support finding UNSAT core over " + "assumptions");

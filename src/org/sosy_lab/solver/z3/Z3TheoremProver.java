@@ -50,7 +50,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -64,6 +65,7 @@ import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
 import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,14 +152,14 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     int result =
         solver_check_assumptions(
             z3context,
             z3solver,
-            Longs.toArray(Lists.transform(assumptions, creator.infoExtractor)));
+            Longs.toArray(Collections2.transform(assumptions, creator.infoExtractor)));
     shutdownNotifier.shutdownIfNecessary();
     if (result == Z3_LBOOL.Z3_L_UNDEF.status) {
       throw new IllegalStateException(
@@ -168,7 +170,8 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.absent();
