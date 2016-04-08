@@ -48,6 +48,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -77,7 +78,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final FormulaManager mgr;
 
-  private static final String UNSAT_CORE_TEMP_VARNAME = "UNSAT_CORE_%d";
+  private static final String UNSAT_CORE_TEMP_VARNAME = "Z3_UNSAT_CORE_%d";
 
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
@@ -92,6 +93,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     z3solver = mk_solver(z3context);
     solver_inc_ref(z3context, z3solver);
     solver_set_params(z3context, z3solver, z3params);
+    Set<ProverOptions> opts = Sets.newHashSet(options);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {
@@ -159,6 +161,23 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
           + solver_get_reason_unknown(z3context, z3solver));
     }
     return result == Z3_LBOOL.Z3_L_FALSE.status;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    if (!isUnsatWithAssumptions(assumptions)) {
+      return Optional.absent();
+    }
+    List<BooleanFormula> core = new ArrayList<>();
+    long unsatCore = solver_get_unsat_core(z3context, z3solver);
+    ast_vector_inc_ref(z3context, unsatCore);
+    for (int i = 0; i < ast_vector_size(z3context, unsatCore); i++) {
+      long ast = ast_vector_get(z3context, unsatCore, i);
+      core.add(creator.encapsulateBoolean(ast));
+    }
+    ast_vector_dec_ref(z3context, unsatCore);
+    return Optional.of(core);
   }
 
   @Override

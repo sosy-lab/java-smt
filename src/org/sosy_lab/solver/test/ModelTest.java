@@ -127,7 +127,7 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula app1 = fmgr.callUF(declaration, arg1);
     IntegerFormula app2 = fmgr.callUF(declaration, arg2);
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
       prover.push(imgr.equal(app1, imgr.makeNumber(1)));
       prover.push(imgr.equal(app2, imgr.makeNumber(2)));
       prover.push(imgr.equal(arg1, imgr.makeNumber(3)));
@@ -183,7 +183,7 @@ public class ModelTest extends SolverBasedTest0 {
     assume().withFailureMessage(
         "As of now, only Z3 and Princess support partial models"
     ).that(solver).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       prover.push(imgr.equal(x, x));
       assertThatEnvironment(prover).isSatisfiable();
@@ -199,7 +199,7 @@ public class ModelTest extends SolverBasedTest0 {
     assume().withFailureMessage(
         "As of now, only Z3 and Princess support partial model evaluation"
     ).that(solver).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula f = fmgr.declareAndCallUF("f", FormulaType.IntegerType, x);
 
@@ -214,7 +214,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testEvaluatingConstants() throws Exception {
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
@@ -234,7 +234,7 @@ public class ModelTest extends SolverBasedTest0 {
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
         amgr.store(array, imgr.makeNumber(1), imgr.makeNumber(1));
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
       prover.push(imgr.equal(amgr.select(updated, imgr.makeNumber(1)), imgr.makeNumber(1)));
 
       assertThatEnvironment(prover).isSatisfiable();
@@ -251,7 +251,7 @@ public class ModelTest extends SolverBasedTest0 {
   private void testModelGetters(
       Formula variable, Formula value, Object expectedValue, String varName) throws Exception {
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
       prover.push(mgr.makeEqual(value, variable));
       assertThatEnvironment(prover).isSatisfiable();
 

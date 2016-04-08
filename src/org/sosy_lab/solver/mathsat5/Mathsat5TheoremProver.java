@@ -27,6 +27,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_unsat_core
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -63,8 +64,10 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   private static Map<String, String> createConfig(Set<ProverOptions> opts) {
     return ImmutableMap.<String, String>builder()
-        .put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false")
-        .put("unsat_core_generation", opts.contains(ProverOptions.GENERATE_UNSAT_CORE) ? "1" : "0")
+        .put("model_generation", opts.contains(ProverOptions.MODELS) ? "true" : "false")
+        .put("unsat_core_generation", opts.contains(ProverOptions.UNSAT_CORE) ||
+                                       opts.contains(ProverOptions.UNSAT_CORE_ASSUMPTIONS)
+                                      ? "1" : "0")
         .build();
   }
 
@@ -156,5 +159,12 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       handleSolverExceptionInUnsatCheck(e);
       throw e;
     }
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException("Mathsat5 does not support finding UNSAT core over "
+        + "assumptions");
   }
 }

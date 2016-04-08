@@ -21,6 +21,8 @@ package org.sosy_lab.solver.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Optional;
+
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -48,6 +50,22 @@ class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
     boolean result = wrapped.isUnsatWithAssumptions(assumptions);
     logger.log(Level.FINE, "unsat-check returned:", result);
     return result;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+          List<BooleanFormula> assumptions
+          ) throws SolverException, InterruptedException {
+    Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);
+    logger.log(Level.FINE, "unsat-check returned:", !result.isPresent());
+    return result;
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    Model m = wrapped.getModel();
+    logger.log(Level.FINE, "model", m);
+    return m;
   }
 
   @Override

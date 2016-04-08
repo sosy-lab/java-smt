@@ -28,6 +28,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.INot;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -145,5 +146,11 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
     boolean out = isUnsat();
     pop();
     return out;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }
 }

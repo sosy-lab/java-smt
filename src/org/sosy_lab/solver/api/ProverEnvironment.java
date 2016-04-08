@@ -19,7 +19,10 @@
  */
 package org.sosy_lab.solver.api;
 
+import com.google.common.base.Optional;
+
 import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 
 import java.util.List;
 
@@ -63,11 +66,22 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    * Check whether the conjunction of all formulas on the stack together with the
    * list of assumptions is satisfiable.
    *
-   * @param assumptions Must be a list of literals.
+   * @param assumptions A list of literals.
    */
   boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 
+  /**
+   * Returns an UNSAT core (if it exists, otherwise {@code Optional.absent()}),
+   * over the chosen assumptions.
+   * Does NOT require the {@link ProverOptions#UNSAT_CORE} option to work.
+   *
+   * @param assumptions Selected assumptions
+   * @return Empty optional if the constraints with assumptions are satisfiable,
+   * subset of assumptions which is unsatisfiable with the original constraints otherwise.
+   */
+  Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
 
   /**
    * Interface for the {@link #allSat} callback.
@@ -81,7 +95,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
      * If the predicate is assigned {@code true} in the model, it is returned
      * as-is in the list,
      * and otherwise it is negated.
-     * todo: this interface would not work properly for negated predicates.
+     * TODO: this interface does not work properly for negated predicates.
      */
     void apply(List<BooleanFormula> model);
 

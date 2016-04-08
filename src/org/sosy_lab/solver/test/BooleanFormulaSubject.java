@@ -74,7 +74,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   private void checkIsUnsat(final BooleanFormula subject, final String verb, final Object expected)
       throws SolverException, InterruptedException {
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.MODELS)) {
 
       prover.push(subject);
       if (prover.isUnsat()) {
@@ -110,7 +110,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
     }
 
     try (ProverEnvironment prover =
-            context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+            context.newProverEnvironment(ProverOptions.UNSAT_CORE)) {
       prover.push(getSubject());
       if (!prover.isUnsat()) {
         return; // success

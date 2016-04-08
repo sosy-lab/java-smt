@@ -22,6 +22,7 @@ package org.sosy_lab.solver.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -68,7 +69,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void>
     checkNotNull(env);
     List<ProverOptions> optionsSet = Lists.newArrayList(options);
     annotatedTerms = new HashMap<>();
-    generateUnsatCores = optionsSet.contains(ProverOptions.GENERATE_UNSAT_CORE);
+    generateUnsatCores = optionsSet.contains(ProverOptions.UNSAT_CORE);
   }
 
   @Override
@@ -82,6 +83,28 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void>
   }
 
 
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+
+    push();
+    Preconditions.checkState(annotatedTerms.isEmpty(), "Empty environment required for UNSAT core"
+        + " over assumptions.");
+    for (BooleanFormula assumption : assumptions) {
+      String termName = generateTermName();
+      Term t = mgr.extractInfo(assumption);
+      Term annotated = env.annotate(t, new Annotation(":named", termName));
+      annotatedTerms.put(termName, t);
+      env.assertTerm(annotated);
+    }
+    if (!isUnsat()) {
+      return Optional.absent();
+    }
+    List<BooleanFormula> out = getUnsatCore();
+    pop();
+    return Optional.of(out);
+  }
 
   @Override
   public void pop() {

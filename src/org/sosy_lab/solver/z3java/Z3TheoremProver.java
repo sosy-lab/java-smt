@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.z3java;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.BoolExpr;
@@ -67,6 +68,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     mgr = pMgr;
     z3solver = z3context.mkSolver();
     z3solver.setParameters(z3params);
+    Set<ProverOptions> opts = Sets.newHashSet(options);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {
@@ -229,5 +231,21 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     }
     Preconditions.checkArgument(result != Status.UNKNOWN);
     return result == Status.UNSATISFIABLE;
+  }
+
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    if (!isUnsatWithAssumptions(assumptions)) {
+      return Optional.absent();
+    }
+
+    BoolExpr[] unsatCore = z3solver.getUnsatCore();
+    List<BooleanFormula> out = new ArrayList<>(unsatCore.length);
+    for (BoolExpr ast : unsatCore) {
+      out.add(creator.encapsulateBoolean(ast));
+    }
+    return Optional.of(out);
   }
 }
