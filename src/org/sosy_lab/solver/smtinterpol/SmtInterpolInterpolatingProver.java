@@ -29,51 +29,33 @@ import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.Model;
-import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<String> {
+class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
+    implements InterpolatingProverEnvironment<String> {
 
-  protected final SmtInterpolFormulaManager mgr;
+  private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
 
   private final List<String> assertedFormulas; // Collection of termNames
   private final Map<String, Term> annotatedTerms; // Collection of termNames
 
-  // Set to "true" after closing.
-  private boolean closed = false;
-  private static final String PREFIX = "term_"; // for termnames
-  private static final UniqueIdGenerator termIdGenerator =
-      new UniqueIdGenerator(); // for different termnames
-
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
+    super(pMgr);
     mgr = pMgr;
     env = mgr.createEnvironment();
     assertedFormulas = new ArrayList<>();
     annotatedTerms = new HashMap<>();
-  }
-
-  @Override
-  public String push(BooleanFormula f) {
-    push();
-    return addConstraint(f);
-  }
-
-  protected void pushAndAssert(Term annotatedTerm) {
-    Preconditions.checkState(!closed);
-    push();
-    env.assertTerm(annotatedTerm);
   }
 
   @Override
@@ -96,18 +78,6 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     annotatedTerms.put(termName, t);
     assert assertedFormulas.size() == annotatedTerms.size();
     return termName;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    env.push(1);
-  }
-
-  @Override
-  public boolean isUnsat() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    return !env.checkSat();
   }
 
   @Override
@@ -231,22 +201,7 @@ class SmtInterpolInterpolatingProver implements InterpolatingProverEnvironment<S
     closed = true;
   }
 
-  @Override
-  public Model getModel() {
-    Preconditions.checkState(!closed);
-    assert assertedFormulas.size() == annotatedTerms.size();
-
-    return new SmtInterpolModel(env.getModel(), mgr.getFormulaCreator(), annotatedTerms.values());
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (Model model = getModel()) {
-      return ImmutableList.copyOf(model);
-    }
-  }
-
-  private static String generateTermName() {
-    return PREFIX + termIdGenerator.getFreshId();
+  protected Collection<Term> getAssertedTerms() {
+    return annotatedTerms.values();
   }
 }

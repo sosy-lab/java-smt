@@ -38,13 +38,6 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  protected void pushAndAssert(Term pTerm) {
-    out.println("(push 1)");
-    out.println(mgr.dumpFormula(pTerm));
-    super.pushAndAssert(pTerm);
-  }
-
-  @Override
   public void pop() {
     out.println("(pop 1)");
     super.pop();

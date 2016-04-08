@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * An interface to an incremental SMT solver
- * with methods for pushing and popping formulas as well as sat checks.
+ * with methods for pushing and popping formulas as well as SAT checks.
  * Instances of this class can be used once for a series of related queries.
  * After that, the {@link #close} method should be called
  * (preferably using the try-with-resources syntax).

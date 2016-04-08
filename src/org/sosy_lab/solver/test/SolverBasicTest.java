@@ -20,6 +20,8 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.solver.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.testing.EqualsTester;
@@ -35,9 +37,11 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class SolverBasicTest extends SolverBasedTest0 {
@@ -137,5 +141,23 @@ public class SolverBasicTest extends SolverBasedTest0 {
         .containsExactly("uf1", "uf2", "x", "y");
 
     assertThat(mgr.extractVariables(constraint).keySet()).containsExactly("x", "y");
+  }
+
+  @Test
+  public void unsatCoreTest() throws Exception {
+    assume().withFailureMessage("Princess does not support unsat core generation").that
+        (solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+    try (ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+      pe.push();
+      pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+      pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
+      pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
+      assertThatEnvironment(pe).isUnsatisfiable();
+      List<BooleanFormula> unsatCore = pe.getUnsatCore();
+      assertThat(unsatCore).containsExactly(
+          imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
+          imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1))
+      );
+    }
   }
 }
