@@ -70,7 +70,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     mgr = pMgr;
     z3solver = z3context.mkSolver();
     z3solver.setParameters(z3params);
-    Set<ProverOptions> opts = Sets.newHashSet(options);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {

@@ -26,8 +26,10 @@ import com.google.common.base.Optional;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -45,7 +47,7 @@ class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     boolean result = wrapped.isUnsatWithAssumptions(assumptions);
     logger.log(Level.FINE, "unsat-check returned:", result);
@@ -54,7 +56,7 @@ class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-          List<BooleanFormula> assumptions
+          Collection<BooleanFormula> assumptions
           ) throws SolverException, InterruptedException {
     Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);
     logger.log(Level.FINE, "unsat-check returned:", !result.isPresent());

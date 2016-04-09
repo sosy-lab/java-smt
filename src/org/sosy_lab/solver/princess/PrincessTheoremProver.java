@@ -40,6 +40,7 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import scala.Option;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -140,7 +141,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     push(mgr.getBooleanFormulaManager().and(assumptions));
     boolean out = isUnsat();
@@ -149,7 +150,8 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(List<BooleanFormula> assumptions)
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }

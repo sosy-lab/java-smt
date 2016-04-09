@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
@@ -44,6 +43,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -59,16 +59,15 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   SmtInterpolTheoremProver(
       SmtInterpolFormulaManager pMgr,
       FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> pCreator,
-      ProverOptions... options) {
+      Set<ProverOptions> options) {
     super(pMgr);
     mgr = pMgr;
     assertedTerms = new ArrayList<>();
     env = mgr.createEnvironment();
     creator = pCreator;
     checkNotNull(env);
-    List<ProverOptions> optionsSet = Lists.newArrayList(options);
     annotatedTerms = new HashMap<>();
-    generateUnsatCores = optionsSet.contains(ProverOptions.GENERATE_UNSAT_CORE);
+    generateUnsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
   }
 
   @Override
@@ -84,8 +83,8 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
 
     push();
     Preconditions.checkState(
