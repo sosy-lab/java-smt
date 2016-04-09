@@ -200,6 +200,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
     closed = true;
   }
 
+  @Override
   protected Collection<Term> getAssertedTerms() {
     return annotatedTerms.values();
   }
