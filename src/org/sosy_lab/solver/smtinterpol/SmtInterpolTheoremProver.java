@@ -80,8 +80,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
     return out;
   }
 
-
-
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {

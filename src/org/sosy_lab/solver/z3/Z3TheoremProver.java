@@ -169,8 +169,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.absent();
     }

@@ -165,8 +165,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
         "Mathsat5 does not support finding UNSAT core over " + "assumptions");
   }

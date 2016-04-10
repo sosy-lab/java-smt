@@ -300,8 +300,8 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula() throws Exception {
-    try (BasicProverEnvironment<?> stack = newEnvironmentForTest(
-        ProverOptions.GENERATE_UNSAT_CORE)) {
+    try (BasicProverEnvironment<?> stack =
+            newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE)) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       assertThatEnvironment(stack).isUnsatisfiable();
