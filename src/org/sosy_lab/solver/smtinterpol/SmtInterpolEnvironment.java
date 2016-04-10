@@ -133,7 +133,6 @@ class SmtInterpolEnvironment {
       script = smtInterpol;
     }
 
-    try {
       script.setOption(":random-seed", randomSeed);
       script.setOption(":produce-interpolants", true);
       script.setOption(":produce-models", true);
@@ -144,9 +143,6 @@ class SmtInterpolEnvironment {
         script.setOption(":model-check-mode", true);
       }
       script.setLogic(Logics.QF_AUFLIRA);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
 
     for (String option : furtherOptions) {
       try {
@@ -275,21 +271,13 @@ class SmtInterpolEnvironment {
           public void printSuccess() {}
         };
 
-    try {
       parseEnv.parseStream(new StringReader(s), "<stdin>");
-    } catch (SMTLIBException e) {
-      throw new IllegalArgumentException("Could not parse term:" + e.getMessage(), e);
-    }
 
     return parseScript.getAssertedTerms();
   }
 
   public void setOption(String opt, Object value) {
-    try {
       script.setOption(opt, value);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function declares a new functionSymbol, that has a given (result-) sort.
@@ -313,12 +301,8 @@ class SmtInterpolEnvironment {
 
   public void push(int levels) {
     checkArgument(levels > 0);
-    try {
       script.push(levels);
       stackDepth += levels;
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function pops levels from the assertion-stack.
@@ -326,22 +310,14 @@ class SmtInterpolEnvironment {
   public void pop(int levels) {
     checkArgument(levels >= 0);
     checkState(stackDepth >= levels, "not enough levels to remove");
-    try {
       script.pop(levels);
       stackDepth -= levels;
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function adds the term on top of the stack. */
   public void assertTerm(Term term) {
     checkState(stackDepth > 0, "assertions should be on higher levels");
-    try {
       script.assertTerm(term);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function causes the SatSolver to check all the terms on the stack,
@@ -349,7 +325,6 @@ class SmtInterpolEnvironment {
    */
   public boolean checkSat() throws InterruptedException {
     checkState(stackDepth > 0, "checkSat should be on higher levels");
-    try {
       // We actually terminate SmtInterpol during the analysis
       // by using a shutdown listener. However, SmtInterpol resets the
       // mStopEngine flag in DPLLEngine before starting to solve,
@@ -383,13 +358,9 @@ class SmtInterpolEnvironment {
         default:
           throw new SMTLIBException("checkSat returned " + result);
       }
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Iterable<Term[]> checkAllSat(Term[] importantPredicates) throws InterruptedException {
-    try {
       // We actually terminate SmtInterpol during the analysis
       // by using a shutdown listener. However, SmtInterpol resets the
       // mStopEngine flag in DPLLEngine before starting to solve,
@@ -397,9 +368,6 @@ class SmtInterpolEnvironment {
       shutdownNotifier.shutdownIfNecessary();
 
       return script.checkAllsat(importantPredicates);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function returns a map,
@@ -426,112 +394,60 @@ class SmtInterpolEnvironment {
 
   /** This function returns an n-ary sort with given parameters. */
   Sort sort(String sortname, Sort... params) {
-    try {
       return script.sort(sortname, params);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term term(String funcname, Term... params) {
-    try {
       return script.term(funcname, params);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term term(
       String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
-    try {
       return script.term(funcname, indices, returnSort, params);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public TermVariable variable(String varname, Sort sort) {
-    try {
       return script.variable(varname, sort);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term quantifier(int quantor, TermVariable[] vars, Term body, Term[]... patterns) {
-    try {
       return script.quantifier(quantor, vars, body, patterns);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term let(TermVariable[] pVars, Term[] pValues, Term pBody) {
-    try {
       return script.let(pVars, pValues, pBody);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term annotate(Term t, Annotation... annotations) {
-    try {
       return script.annotate(t, annotations);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** returns a number of type INT or REAL */
   public Term numeral(BigInteger num) {
-    try {
       return script.numeral(num);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** returns a number of type INT or REAL */
   public Term numeral(String num) {
-    try {
       return script.numeral(num);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** returns a number of type REAL */
   public Term decimal(String num) {
-    try {
       return script.decimal(num);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** returns a number of type REAL */
   public Term decimal(BigDecimal num) {
-    try {
       return script.decimal(num);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term hexadecimal(String hex) {
-    try {
       return script.hexadecimal(hex);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term binary(String bin) {
-    try {
       return script.binary(bin);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function returns a list of interpolants for the partitions.
@@ -606,20 +522,12 @@ class SmtInterpolEnvironment {
 
   public Term[] getUnsatCore() {
     checkState(stackDepth > 0, "unsat core should be on higher levels");
-    try {
       return script.getUnsatCore();
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   public Term simplify(Term input) {
-    try {
       SimplifyDDA s = new SimplifyDDA(script, true);
       return s.getSimplifiedTerm(input);
-    } catch (SMTLIBException e) {
-      throw new AssertionError(e);
-    }
   }
 
   /** This function returns the version of SmtInterpol, for logging. */
