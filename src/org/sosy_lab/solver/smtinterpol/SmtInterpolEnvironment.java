@@ -133,16 +133,16 @@ class SmtInterpolEnvironment {
       script = smtInterpol;
     }
 
-      script.setOption(":random-seed", randomSeed);
-      script.setOption(":produce-interpolants", true);
-      script.setOption(":produce-models", true);
-      script.setOption(":produce-unsat-cores", true);
-      if (checkResults) {
-        script.setOption(":interpolant-check-mode", true);
-        script.setOption(":unsat-core-check-mode", true);
-        script.setOption(":model-check-mode", true);
-      }
-      script.setLogic(Logics.QF_AUFLIRA);
+    script.setOption(":random-seed", randomSeed);
+    script.setOption(":produce-interpolants", true);
+    script.setOption(":produce-models", true);
+    script.setOption(":produce-unsat-cores", true);
+    if (checkResults) {
+      script.setOption(":interpolant-check-mode", true);
+      script.setOption(":unsat-core-check-mode", true);
+      script.setOption(":model-check-mode", true);
+    }
+    script.setLogic(Logics.QF_AUFLIRA);
 
     for (String option : furtherOptions) {
       try {
@@ -271,13 +271,13 @@ class SmtInterpolEnvironment {
           public void printSuccess() {}
         };
 
-      parseEnv.parseStream(new StringReader(s), "<stdin>");
+    parseEnv.parseStream(new StringReader(s), "<stdin>");
 
     return parseScript.getAssertedTerms();
   }
 
   public void setOption(String opt, Object value) {
-      script.setOption(opt, value);
+    script.setOption(opt, value);
   }
 
   /** This function declares a new functionSymbol, that has a given (result-) sort.
@@ -301,8 +301,8 @@ class SmtInterpolEnvironment {
 
   public void push(int levels) {
     checkArgument(levels > 0);
-      script.push(levels);
-      stackDepth += levels;
+    script.push(levels);
+    stackDepth += levels;
   }
 
   /** This function pops levels from the assertion-stack.
@@ -310,14 +310,14 @@ class SmtInterpolEnvironment {
   public void pop(int levels) {
     checkArgument(levels >= 0);
     checkState(stackDepth >= levels, "not enough levels to remove");
-      script.pop(levels);
-      stackDepth -= levels;
+    script.pop(levels);
+    stackDepth -= levels;
   }
 
   /** This function adds the term on top of the stack. */
   public void assertTerm(Term term) {
     checkState(stackDepth > 0, "assertions should be on higher levels");
-      script.assertTerm(term);
+    script.assertTerm(term);
   }
 
   /** This function causes the SatSolver to check all the terms on the stack,
@@ -325,49 +325,47 @@ class SmtInterpolEnvironment {
    */
   public boolean checkSat() throws InterruptedException {
     checkState(stackDepth > 0, "checkSat should be on higher levels");
-      // We actually terminate SmtInterpol during the analysis
-      // by using a shutdown listener. However, SmtInterpol resets the
-      // mStopEngine flag in DPLLEngine before starting to solve,
-      // so we check here, too.
-      shutdownNotifier.shutdownIfNecessary();
+    // We actually terminate SmtInterpol during the analysis
+    // by using a shutdown listener. However, SmtInterpol resets the
+    // mStopEngine flag in DPLLEngine before starting to solve,
+    // so we check here, too.
+    shutdownNotifier.shutdownIfNecessary();
 
-      LBool result = script.checkSat();
-      switch (result) {
-        case SAT:
-          return true;
-        case UNSAT:
-          return false;
-        case UNKNOWN:
-          Object reason = script.getInfo(":reason-unknown");
-          if (!(reason instanceof ReasonUnknown)) {
-            throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
-          }
-          switch ((ReasonUnknown) reason) {
-            case MEMOUT:
-              // SMTInterpol catches OOM, but we want to have it thrown.
-              throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
-            case CANCELLED:
-              shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
-              throw new SMTLIBException(
-                  "checkSat returned UNKNOWN with unexpected reason " + reason);
-            default:
-              throw new SMTLIBException(
-                  "checkSat returned UNKNOWN with unexpected reason " + reason);
-          }
+    LBool result = script.checkSat();
+    switch (result) {
+      case SAT:
+        return true;
+      case UNSAT:
+        return false;
+      case UNKNOWN:
+        Object reason = script.getInfo(":reason-unknown");
+        if (!(reason instanceof ReasonUnknown)) {
+          throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
+        }
+        switch ((ReasonUnknown) reason) {
+          case MEMOUT:
+            // SMTInterpol catches OOM, but we want to have it thrown.
+            throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
+          case CANCELLED:
+            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
+            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+          default:
+            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+        }
 
-        default:
-          throw new SMTLIBException("checkSat returned " + result);
-      }
+      default:
+        throw new SMTLIBException("checkSat returned " + result);
+    }
   }
 
   public Iterable<Term[]> checkAllSat(Term[] importantPredicates) throws InterruptedException {
-      // We actually terminate SmtInterpol during the analysis
-      // by using a shutdown listener. However, SmtInterpol resets the
-      // mStopEngine flag in DPLLEngine before starting to solve,
-      // so we check here, too.
-      shutdownNotifier.shutdownIfNecessary();
+    // We actually terminate SmtInterpol during the analysis
+    // by using a shutdown listener. However, SmtInterpol resets the
+    // mStopEngine flag in DPLLEngine before starting to solve,
+    // so we check here, too.
+    shutdownNotifier.shutdownIfNecessary();
 
-      return script.checkAllsat(importantPredicates);
+    return script.checkAllsat(importantPredicates);
   }
 
   /** This function returns a map,
@@ -394,60 +392,60 @@ class SmtInterpolEnvironment {
 
   /** This function returns an n-ary sort with given parameters. */
   Sort sort(String sortname, Sort... params) {
-      return script.sort(sortname, params);
+    return script.sort(sortname, params);
   }
 
   public Term term(String funcname, Term... params) {
-      return script.term(funcname, params);
+    return script.term(funcname, params);
   }
 
   public Term term(
       String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
-      return script.term(funcname, indices, returnSort, params);
+    return script.term(funcname, indices, returnSort, params);
   }
 
   public TermVariable variable(String varname, Sort sort) {
-      return script.variable(varname, sort);
+    return script.variable(varname, sort);
   }
 
   public Term quantifier(int quantor, TermVariable[] vars, Term body, Term[]... patterns) {
-      return script.quantifier(quantor, vars, body, patterns);
+    return script.quantifier(quantor, vars, body, patterns);
   }
 
   public Term let(TermVariable[] pVars, Term[] pValues, Term pBody) {
-      return script.let(pVars, pValues, pBody);
+    return script.let(pVars, pValues, pBody);
   }
 
   public Term annotate(Term t, Annotation... annotations) {
-      return script.annotate(t, annotations);
+    return script.annotate(t, annotations);
   }
 
   /** returns a number of type INT or REAL */
   public Term numeral(BigInteger num) {
-      return script.numeral(num);
+    return script.numeral(num);
   }
 
   /** returns a number of type INT or REAL */
   public Term numeral(String num) {
-      return script.numeral(num);
+    return script.numeral(num);
   }
 
   /** returns a number of type REAL */
   public Term decimal(String num) {
-      return script.decimal(num);
+    return script.decimal(num);
   }
 
   /** returns a number of type REAL */
   public Term decimal(BigDecimal num) {
-      return script.decimal(num);
+    return script.decimal(num);
   }
 
   public Term hexadecimal(String hex) {
-      return script.hexadecimal(hex);
+    return script.hexadecimal(hex);
   }
 
   public Term binary(String bin) {
-      return script.binary(bin);
+    return script.binary(bin);
   }
 
   /** This function returns a list of interpolants for the partitions.
@@ -522,12 +520,12 @@ class SmtInterpolEnvironment {
 
   public Term[] getUnsatCore() {
     checkState(stackDepth > 0, "unsat core should be on higher levels");
-      return script.getUnsatCore();
+    return script.getUnsatCore();
   }
 
   public Term simplify(Term input) {
-      SimplifyDDA s = new SimplifyDDA(script, true);
-      return s.getSimplifiedTerm(input);
+    SimplifyDDA s = new SimplifyDDA(script, true);
+    return s.getSimplifiedTerm(input);
   }
 
   /** This function returns the version of SmtInterpol, for logging. */
