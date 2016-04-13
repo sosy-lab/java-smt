@@ -183,7 +183,7 @@ public class SolverBasicTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.MATHSAT5);
     try (ProverEnvironment pe =
-            context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       BooleanFormula selector = bmgr.makeVariable("b");

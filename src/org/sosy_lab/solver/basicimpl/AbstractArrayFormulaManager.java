@@ -74,7 +74,10 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
   }
 
   @Override
-  public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>,
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
 

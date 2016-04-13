@@ -405,8 +405,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula f1 = fpmgr.equalWithFPSemantics(var, zero);
     BooleanFormula f2 = bmgr.not(fpmgr.isZero(var));
     try (InterpolatingProverEnvironment<Object> prover =
-            (InterpolatingProverEnvironment<Object>)
-                context.newProverEnvironmentWithInterpolation()) {
+        (InterpolatingProverEnvironment<Object>) context.newProverEnvironmentWithInterpolation()) {
       Object itpGroup1 = prover.push(f1);
       prover.push(f2);
 
