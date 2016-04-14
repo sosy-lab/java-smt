@@ -88,7 +88,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
         .isNotEqualTo(Solvers.PRINCESS);
 
     x = imgr.makeVariable("x");
-    a = amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
+    a = amgr.makeArray("a", FormulaType.IntegerType, FormulaType.IntegerType);
 
     a_at_x_eq_1 = imgr.equal(amgr.select(a, x), imgr.makeNumber(1));
     a_at_x_eq_0 = imgr.equal(amgr.select(a, x), imgr.makeNumber(0));
@@ -365,6 +365,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
     // An empty list of quantified variables throws an exception.
     @SuppressWarnings("unused")
-    BooleanFormula quantified = qmgr.exists(ImmutableList.<Formula>of(), bmgr.makeVariable("x"));
+    BooleanFormula quantified = qmgr.exists(ImmutableList.<Formula>of(), bmgr.makeVariable("b"));
   }
 }
