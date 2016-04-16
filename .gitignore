@@ -39,3 +39,5 @@ lib/native/source/*/*.o
 build.properties
 /.apt-generated/
 /repository
+
+pom.xml
