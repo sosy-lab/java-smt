@@ -293,16 +293,26 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
     }
 
-    TFormulaInfo result = substituteUsingMapImpl(extractInfo(pF), mapping, pF, pFromToMapping);
+    TFormulaInfo result = substituteUsingMapImpl(
+        extractInfo(pF),
+        mapping,
+        pF,
+        pFromToMapping);
     FormulaType<T> type = getFormulaCreator().getFormulaType(pF);
     return getFormulaCreator().encapsulate(type, result);
   }
 
+  /**
+   * @param expr Native representation of the formula to perform substitution on.
+   * @param fromToMappingNative Mapping from {@code from} to {@code to} formulas on native
+   *                            objects.
+   * @param f JavaSMT representation of the formula to perform substitution on.
+   * @param fromToMapping Mapping from {@code from} to {@code to} formulas.
+   * @return {@code expr} with substitution applied.
+   */
   protected TFormulaInfo substituteUsingMapImpl(
-      // TODO It looks extremely suspicious that substituteUsingMap() creates these parameters
-      // but they are not used here.
-      @SuppressWarnings("unused") TFormulaInfo expr,
-      @SuppressWarnings("unused") Map<TFormulaInfo, TFormulaInfo> memoization,
+      TFormulaInfo expr,
+      Map<TFormulaInfo, TFormulaInfo> fromToMappingNative,
       Formula f,
       final Map<? extends Formula, ? extends Formula> fromToMapping) {
 

@@ -59,6 +59,7 @@ import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
@@ -202,6 +203,28 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     Preconditions.checkState(size == changeTo.size());
     return Z3NativeApi.substitute(
         getFormulaCreator().getEnv(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
+  }
+
+  @Override
+  protected Long substituteUsingMapImpl(
+      Long expr,
+      Map<Long, Long> fromToMappingNative,
+      Formula f,
+      final Map<? extends Formula, ? extends Formula> fromToMapping) {
+    long[] changeFrom = new long[fromToMapping.size()];
+    long[] changeTo = new long[fromToMapping.size()];
+    int idx = 0;
+    for (Entry<Long, Long> e : fromToMappingNative.entrySet()) {
+      changeFrom[idx] = e.getKey();
+      changeTo[idx] = e.getValue();
+      idx++;
+    }
+    return Z3NativeApi.substitute(
+        getFormulaCreator().getEnv(),
+        expr,
+        idx,
+        changeFrom,
+        changeTo);
   }
 
   @Override
