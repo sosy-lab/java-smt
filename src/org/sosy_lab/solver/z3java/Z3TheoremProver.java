@@ -111,7 +111,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Status result;
     try {
@@ -120,13 +120,9 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       if ("canceled".equals(e.getMessage())) {
         shutdownNotifier.shutdownIfNecessary();
       }
-      throw e;
+      throw new SolverException("Z3 Solver Exception", e);
     }
-    shutdownNotifier.shutdownIfNecessary();
-    if (result == Status.UNKNOWN) {
-      throw new IllegalStateException(
-          "Solver returned 'unknown' status, reason = " + z3solver.getReasonUnknown());
-    }
+    undefinedStatusToException(result);
     return result == Status.UNSATISFIABLE;
   }
 
@@ -226,11 +222,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
         z3solver.check(
             Collections2.transform(assumptions, creator.infoExtractor)
                 .toArray(new Expr[assumptions.size()]));
-    shutdownNotifier.shutdownIfNecessary();
-    if (result == Status.UNKNOWN) {
-      throw new IllegalStateException(
-          "Solver returned 'unknown' status, reason = " + z3solver.getReasonUnknown());
-    }
+    undefinedStatusToException(result);
     Preconditions.checkArgument(result != Status.UNKNOWN);
     return result == Status.UNSATISFIABLE;
   }
@@ -248,5 +240,13 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       out.add(creator.encapsulateBoolean(ast));
     }
     return Optional.of(out);
+  }
+
+  private void undefinedStatusToException(Status result) throws SolverException {
+    if (result == Status.UNKNOWN) {
+      throw new SolverException(
+          "Solver returned 'unknown' status, reason: "
+              + z3solver.getReasonUnknown());
+    }
   }
 }
