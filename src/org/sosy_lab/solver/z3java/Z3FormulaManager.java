@@ -23,7 +23,6 @@ import static org.sosy_lab.solver.z3java.Z3BitvectorFormulaManager.toBV;
 import static org.sosy_lab.solver.z3java.Z3BooleanFormulaManager.toBool;
 import static org.sosy_lab.solver.z3java.Z3NumeralFormulaManager.toAE;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.BoolExpr;
@@ -48,6 +47,7 @@ import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context, FuncDecl> {
 
@@ -161,17 +161,20 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
 
   @Override
   public <T extends Formula> T substitute(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    return substituteUsingLists(pF, pFromToMapping);
-  }
-
-  @Override
-  protected Expr substituteUsingListsImpl(Expr t, List<Expr> changeFrom, List<Expr> changeTo) {
-    int size = changeFrom.size();
-    Preconditions.checkState(size == changeTo.size());
-    return t.substitute(
-        changeFrom.toArray(new Expr[changeFrom.size()]),
-        changeTo.toArray(new Expr[changeTo.size()]));
+      final T f,
+      final Map<? extends Formula, ? extends Formula> fromToMapping) {
+    Expr[] changeFrom = new Expr[fromToMapping.size()];
+    Expr[] changeTo = new Expr[fromToMapping.size()];
+    int idx = 0;
+    for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+      changeFrom[idx] = extractInfo(e.getKey());
+      changeTo[idx] = extractInfo(e.getValue());
+      idx++;
+    }
+    FormulaType<T> type = getFormulaType(f);
+    return getFormulaCreator().encapsulate(type, extractInfo(f).substitute(
+        changeFrom,
+        changeTo));
   }
 
   @Override

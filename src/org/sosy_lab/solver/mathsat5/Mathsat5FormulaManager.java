@@ -32,9 +32,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_equal;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -45,6 +43,7 @@ import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
@@ -127,15 +126,22 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public <T extends Formula> T substitute(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    return substituteUsingLists(pF, pFromToMapping);
-  }
-
-  @Override
-  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
-    int size = changeFrom.size();
-    Preconditions.checkState(size == changeTo.size());
-    return msat_apply_substitution(
-        getEnvironment(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
+      final T f,
+      final Map<? extends Formula, ? extends Formula> fromToMapping) {
+    long[] changeFrom = new long[fromToMapping.size()];
+    long[] changeTo = new long[fromToMapping.size()];
+    int idx = 0;
+    for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+      changeFrom[idx] = extractInfo(e.getKey());
+      changeTo[idx] = extractInfo(e.getValue());
+      idx++;
+    }
+    FormulaType<T> type = getFormulaType(f);
+    return getFormulaCreator().encapsulate(type, msat_apply_substitution(
+        getFormulaCreator().getEnv(),
+        extractInfo(f),
+        fromToMapping.size(),
+        changeFrom,
+        changeTo));
   }
 }

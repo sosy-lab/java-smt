@@ -48,9 +48,7 @@ import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -283,103 +281,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
 
-  /**
-   * Default implementation for {@link #substitute(Formula, Map)}.
-   */
-  protected final <T extends Formula> T substituteUsingMap(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    Map<TFormulaInfo, TFormulaInfo> mapping = new HashMap<>(pFromToMapping.size());
-    for (Map.Entry<? extends Formula, ? extends Formula> entry : pFromToMapping.entrySet()) {
-      mapping.put(extractInfo(entry.getKey()), extractInfo(entry.getValue()));
-    }
-
-    TFormulaInfo result = substituteUsingMapImpl(
-        extractInfo(pF),
-        mapping,
-        pF,
-        pFromToMapping);
-    FormulaType<T> type = getFormulaCreator().getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, result);
-  }
-
-  /**
-   * @param expr Native representation of the formula to perform substitution on.
-   * @param fromToMappingNative Mapping from {@code from} to {@code to} formulas on native
-   *                            objects.
-   * @param f JavaSMT representation of the formula to perform substitution on.
-   * @param fromToMapping Mapping from {@code from} to {@code to} formulas.
-   * @return {@code expr} with substitution applied.
-   */
-  protected TFormulaInfo substituteUsingMapImpl(
-      TFormulaInfo expr,
-      Map<TFormulaInfo, TFormulaInfo> fromToMappingNative,
-      Formula f,
-      final Map<? extends Formula, ? extends Formula> fromToMapping) {
-
-    return formulaCreator.extractInfo(
-        transformRecursively(
-            new FormulaTransformationVisitor(this) {
-              @Override
-              public Formula visitFreeVariable(Formula f, String name) {
-                return replace(f);
-              }
-
-              @Override
-              public Formula visitFunction(
-                  Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
-                Formula out = fromToMapping.get(f);
-                if (out == null) {
-                  return makeApplication(functionDeclaration, newArgs);
-                } else {
-                  return out;
-                }
-              }
-
-              private Formula replace(Formula f) {
-                Formula out = fromToMapping.get(f);
-                if (out == null) {
-                  return f;
-                } else {
-                  return out;
-                }
-              }
-            },
-            f));
-  }
-
-  /**
-   * Default implementation for {@link #substitute(Formula, Map)} for solvers that provide
-   * an internal substitute operation that takes two lists instead of a map.
-   *
-   * <p>If this is called, one needs to overwrite
-   * {@link #substitute(Formula, Map)}.
-   */
-  protected final <T1 extends Formula> T1 substituteUsingLists(
-      T1 pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    List<TFormulaInfo> substituteFrom = new ArrayList<>(pFromToMapping.size());
-    List<TFormulaInfo> substituteTo = new ArrayList<>(pFromToMapping.size());
-    for (Map.Entry<? extends Formula, ? extends Formula> entry : pFromToMapping.entrySet()) {
-      substituteFrom.add(extractInfo(entry.getKey()));
-      substituteTo.add(extractInfo(entry.getValue()));
-    }
-
-    TFormulaInfo result = substituteUsingListsImpl(extractInfo(pF), substituteFrom, substituteTo);
-    FormulaType<T1> type = getFormulaCreator().getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, result);
-  }
-
-  /**
-   * Backend for {@link #substituteUsingLists(Formula, Map)}.
-   * @param pF The formula to change.
-   * @param substituteFrom The list of parts that should be replaced.
-   * @param substituteTo The list of replacement parts, in same order.
-   * @return The formula with th replacements applied.
-   */
-  protected TFormulaInfo substituteUsingListsImpl(
-      TFormulaInfo pF, List<TFormulaInfo> substituteFrom, List<TFormulaInfo> substituteTo) {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
     return parse(otherContext.getFormulaManager().dumpFormula(other).toString());
@@ -464,7 +365,34 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public <T extends Formula> T substitute(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    return substituteUsingMap(pF, pFromToMapping);
+      final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
+    return transformRecursively(
+        new FormulaTransformationVisitor(this) {
+          @Override
+          public Formula visitFreeVariable(Formula f, String name) {
+            return replace(f);
+          }
+
+          @Override
+          public Formula visitFunction(
+              Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
+            Formula out = pFromToMapping.get(f);
+            if (out == null) {
+              return makeApplication(functionDeclaration, newArgs);
+            } else {
+              return out;
+            }
+          }
+
+          private Formula replace(Formula f) {
+            Formula out = pFromToMapping.get(f);
+            if (out == null) {
+              return f;
+            } else {
+              return out;
+            }
+          }
+        },
+        pF);
   }
 }

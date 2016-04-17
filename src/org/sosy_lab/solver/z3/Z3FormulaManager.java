@@ -41,10 +41,8 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -193,38 +191,23 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
   @Override
   public <T extends Formula> T substitute(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    return substituteUsingLists(pF, pFromToMapping);
-  }
-
-  @Override
-  protected Long substituteUsingListsImpl(Long t, List<Long> changeFrom, List<Long> changeTo) {
-    int size = changeFrom.size();
-    Preconditions.checkState(size == changeTo.size());
-    return Z3NativeApi.substitute(
-        getFormulaCreator().getEnv(), t, size, Longs.toArray(changeFrom), Longs.toArray(changeTo));
-  }
-
-  @Override
-  protected Long substituteUsingMapImpl(
-      Long expr,
-      Map<Long, Long> fromToMappingNative,
-      Formula f,
+      final T f,
       final Map<? extends Formula, ? extends Formula> fromToMapping) {
     long[] changeFrom = new long[fromToMapping.size()];
     long[] changeTo = new long[fromToMapping.size()];
     int idx = 0;
-    for (Entry<Long, Long> e : fromToMappingNative.entrySet()) {
-      changeFrom[idx] = e.getKey();
-      changeTo[idx] = e.getValue();
+    for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+      changeFrom[idx] = extractInfo(e.getKey());
+      changeTo[idx] = extractInfo(e.getValue());
       idx++;
     }
-    return Z3NativeApi.substitute(
+    FormulaType<T> type = getFormulaType(f);
+    return getFormulaCreator().encapsulate(type, Z3NativeApi.substitute(
         getFormulaCreator().getEnv(),
-        expr,
-        idx,
+        extractInfo(f),
+        fromToMapping.size(),
         changeFrom,
-        changeTo);
+        changeTo));
   }
 
   @Override
