@@ -51,14 +51,17 @@ class Z3NativeApiHelpers {
    * @param tactic Z3 Tactic Name
    * @param pOverallResult Z3_ast
    * @return Z3_ast
+   *
+   * @throws InterruptedException can be thrown by the native code.
    */
-  static BoolExpr applyTactic(Context pContext, BoolExpr pOverallResult, String tactic) {
-    Tactic tseitinTactic = pContext.mkTactic(tactic);
+  static BoolExpr applyTactic(Context pContext, BoolExpr pOverallResult, String tactic)
+      throws InterruptedException{
+    Tactic tacticObject = pContext.mkTactic(tactic);
 
     Goal goal = pContext.mkGoal(true, false, false);
     goal.add(pOverallResult);
 
-    ApplyResult result = tseitinTactic.apply(goal);
+    ApplyResult result = tacticObject.apply(goal);
     return applyResultToAST(pContext, result);
   }
 

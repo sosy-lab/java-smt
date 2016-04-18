@@ -223,6 +223,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
   }
 
+  /**
+   * @throws InterruptedException Can be thrown by the native code.
+   */
   protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
 
     // Returning the untouched formula is valid according to QE_LIGHT contract.
@@ -230,13 +233,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return pF;
   }
 
+  /**
+   * @param pF Input to apply the CNF transformation to.
+   * @throws InterruptedException Can be thrown by the native code.
+   */
   protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
 
     // TODO: generic implementation.
     throw new UnsupportedOperationException(
-        "Currently there is no generic implementation for CNF" + " conversion");
+        "Currently there is no generic implementation for CNF conversion");
   }
 
+  /**
+   * @throws InterruptedException Can be thrown by the native code.
+   */
   protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
     return getBooleanFormulaManager().transformRecursively(new NNFVisitor(this), input);
   }
