@@ -38,10 +38,12 @@ public enum Tactic {
   /**
    * Convert the formula to CNF (conjunctive normal form), using extra fresh variables
    * to avoid the size explosion.
+   * The resulting formula is not <i>equivalent</i> but only <i>equisatisfiable</i> to the
+   * original one.
    *
    * <p>NB: currently this tactic does not have default implementation.
    */
-  CNF,
+  TSEITIN_CNF,
 
   /**
    * Perform "best-effort" quantifier elimination:

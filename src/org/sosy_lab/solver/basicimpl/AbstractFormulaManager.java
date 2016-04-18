@@ -214,7 +214,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     switch (tactic) {
       case NNF:
         return applyNNFImpl(f);
-      case CNF:
+      case TSEITIN_CNF:
         return applyCNFImpl(f);
       case QE_LIGHT:
         return applyQELightImpl(f);

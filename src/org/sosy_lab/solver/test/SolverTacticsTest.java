@@ -93,13 +93,13 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula equiv_a_b = bmgr.equivalence(a, b);
     BooleanFormula not_equiv_a_b = bmgr.not(equiv_a_b);
 
-    BooleanFormula cnf_equiv_a_b = mgr.applyTactic(equiv_a_b, Tactic.CNF);
+    BooleanFormula cnf_equiv_a_b = mgr.applyTactic(equiv_a_b, Tactic.TSEITIN_CNF);
     assertThatFormula(cnf_equiv_a_b).isEquisatisfiableTo(equiv_a_b);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf_equiv_a_b);
     assertThat(checker.isInCNF()).isTrue();
 
-    BooleanFormula cnf_not_equiv_a_b = mgr.applyTactic(not_equiv_a_b, Tactic.CNF);
+    BooleanFormula cnf_not_equiv_a_b = mgr.applyTactic(not_equiv_a_b, Tactic.TSEITIN_CNF);
     assertThatFormula(cnf_not_equiv_a_b).isEquisatisfiableTo(not_equiv_a_b);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_equiv_a_b);
@@ -115,13 +115,13 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula ITE_a_b_c = bmgr.ifThenElse(a, b, c);
     BooleanFormula not_ITE_a_b_c = bmgr.not(bmgr.ifThenElse(a, b, c));
 
-    BooleanFormula cnf_ITE_a_b_c = mgr.applyTactic(ITE_a_b_c, Tactic.CNF);
+    BooleanFormula cnf_ITE_a_b_c = mgr.applyTactic(ITE_a_b_c, Tactic.TSEITIN_CNF);
     assertThatFormula(cnf_ITE_a_b_c).isEquisatisfiableTo(ITE_a_b_c);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf_ITE_a_b_c);
     assertThat(checker.isInCNF()).isTrue();
 
-    BooleanFormula cnf_not_ITE_a_b_c = mgr.applyTactic(not_ITE_a_b_c, Tactic.CNF);
+    BooleanFormula cnf_not_ITE_a_b_c = mgr.applyTactic(not_ITE_a_b_c, Tactic.TSEITIN_CNF);
 
     assertThatFormula(cnf_not_ITE_a_b_c).isEquisatisfiableTo(not_ITE_a_b_c);
     checker = new CNFChecker(mgr);
@@ -145,7 +145,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     disjuncts.add(bmgr.and(u, v));
     BooleanFormula f = bmgr.or(disjuncts);
 
-    BooleanFormula cnf = mgr.applyTactic(f, Tactic.CNF);
+    BooleanFormula cnf = mgr.applyTactic(f, Tactic.TSEITIN_CNF);
     assertThatFormula(cnf).isEquisatisfiableTo(f);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf);
