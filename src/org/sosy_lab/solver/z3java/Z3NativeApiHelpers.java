@@ -55,7 +55,7 @@ class Z3NativeApiHelpers {
    * @throws InterruptedException can be thrown by the native code.
    */
   static BoolExpr applyTactic(Context pContext, BoolExpr pOverallResult, String tactic)
-      throws InterruptedException{
+      throws InterruptedException {
     Tactic tacticObject = pContext.mkTactic(tactic);
 
     Goal goal = pContext.mkGoal(true, false, false);
