@@ -43,6 +43,7 @@ import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
@@ -210,12 +211,34 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
-    return formulaCreator.encapsulateBoolean(applyTacticImpl(extractInfo(f), tactic));
+    switch (tactic) {
+      case NNF:
+        return applyNNFImpl(f);
+      case CNF:
+        return applyCNFImpl(f);
+      case QE_LIGHT:
+        return applyQELightImpl(f);
+      default:
+        throw new UnsupportedOperationException("Unexpected enum value");
+    }
   }
 
-  protected TFormulaInfo applyTacticImpl(TFormulaInfo f, Tactic tactic)
-      throws InterruptedException {
-    return extractInfo(tactic.applyDefault(this, formulaCreator.encapsulateBoolean(f)));
+  protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
+
+    // Returning the untouched formula is valid according to QE_LIGHT contract.
+    // TODO: substitution-based implementation.
+    return pF;
+  }
+
+  protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
+
+    // TODO: generic implementation.
+    throw new UnsupportedOperationException(
+        "Currently there is no generic implementation for CNF" + " conversion");
+  }
+
+  protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
+    return getBooleanFormulaManager().transformRecursively(new NNFVisitor(this), input);
   }
 
   @Override

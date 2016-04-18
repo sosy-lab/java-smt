@@ -126,8 +126,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public <T extends Formula> T substitute(
-      final T f,
-      final Map<? extends Formula, ? extends Formula> fromToMapping) {
+      final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
     long[] changeFrom = new long[fromToMapping.size()];
     long[] changeTo = new long[fromToMapping.size()];
     int idx = 0;
@@ -137,11 +136,14 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       idx++;
     }
     FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator().encapsulate(type, msat_apply_substitution(
-        getFormulaCreator().getEnv(),
-        extractInfo(f),
-        fromToMapping.size(),
-        changeFrom,
-        changeTo));
+    return getFormulaCreator()
+        .encapsulate(
+            type,
+            msat_apply_substitution(
+                getFormulaCreator().getEnv(),
+                extractInfo(f),
+                fromToMapping.size(),
+                changeFrom,
+                changeTo));
   }
 }

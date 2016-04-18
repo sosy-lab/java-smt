@@ -245,8 +245,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   private void undefinedStatusToException(Status result) throws SolverException {
     if (result == Status.UNKNOWN) {
       throw new SolverException(
-          "Solver returned 'unknown' status, reason: "
-              + z3solver.getReasonUnknown());
+          "Solver returned 'unknown' status, reason: " + z3solver.getReasonUnknown());
     }
   }
 }

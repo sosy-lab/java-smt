@@ -42,7 +42,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -52,7 +51,6 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
 import java.io.IOException;
 import java.util.List;
@@ -107,23 +105,26 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
-  private static final ImmutableMap<Tactic, String> Z3_TACTICS =
-      ImmutableMap.<Tactic, String>builder()
-          .put(Tactic.NNF, "nnf")
-          .put(Tactic.CNF, "cnf")
-          .put(Tactic.TSEITIN_CNF, "tseitin-cnf")
-          .put(Tactic.QE, "qe")
-          .put(Tactic.QE_LIGHT, "qe-light")
-          .build();
+  @Override
+  protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
+    return applyTacticImpl(pF, "qe-light");
+  }
 
   @Override
-  protected Long applyTacticImpl(Long input, Tactic tactic) throws InterruptedException {
-    String z3TacticName = Z3_TACTICS.get(tactic);
-    if (z3TacticName != null) {
-      return Z3NativeApiHelpers.applyTactic(getFormulaCreator().getEnv(), input, z3TacticName);
-    } else {
-      return super.applyTacticImpl(input, tactic);
-    }
+  protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
+    return applyTacticImpl(pF, "tseitin-cnf");
+  }
+
+  @Override
+  protected BooleanFormula applyNNFImpl(BooleanFormula pF) throws InterruptedException {
+    return applyTacticImpl(pF, "nnf");
+  }
+
+  private BooleanFormula applyTacticImpl(BooleanFormula pF, String tacticName)
+      throws InterruptedException {
+    long out =
+        Z3NativeApiHelpers.applyTactic(getFormulaCreator().getEnv(), extractInfo(pF), tacticName);
+    return getFormulaCreator().encapsulateBoolean(out);
   }
 
   @Override
@@ -191,8 +192,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
   @Override
   public <T extends Formula> T substitute(
-      final T f,
-      final Map<? extends Formula, ? extends Formula> fromToMapping) {
+      final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
     long[] changeFrom = new long[fromToMapping.size()];
     long[] changeTo = new long[fromToMapping.size()];
     int idx = 0;
@@ -202,12 +202,15 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       idx++;
     }
     FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator().encapsulate(type, Z3NativeApi.substitute(
-        getFormulaCreator().getEnv(),
-        extractInfo(f),
-        fromToMapping.size(),
-        changeFrom,
-        changeTo));
+    return getFormulaCreator()
+        .encapsulate(
+            type,
+            Z3NativeApi.substitute(
+                getFormulaCreator().getEnv(),
+                extractInfo(f),
+                fromToMapping.size(),
+                changeFrom,
+                changeTo));
   }
 
   @Override

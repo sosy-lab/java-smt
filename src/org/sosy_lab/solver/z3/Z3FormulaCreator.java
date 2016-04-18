@@ -42,6 +42,7 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
+import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
@@ -96,7 +97,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ROUNDING_MODE_SORT;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_SORT_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_STRING_SYMBOL;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
 import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
@@ -362,8 +362,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_APP_AST:
         long funcDecl = get_app_decl(environment, f);
         long symbol = get_decl_name(environment, funcDecl);
-        assert get_symbol_kind(environment, symbol) == Z3_STRING_SYMBOL;
-        String name = get_symbol_string(environment, symbol);
+        String name = symbolToString(symbol);
         int arity = get_app_num_args(environment, f);
 
         if (arity == 0) {
@@ -413,6 +412,17 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       default:
         throw new UnsupportedOperationException(
             "Input should be a formula AST, " + "got unexpected type instead");
+    }
+  }
+
+  protected String symbolToString(long symbol) {
+    switch (get_symbol_kind(environment, symbol)) {
+      case Z3NativeApiConstants.Z3_STRING_SYMBOL:
+        return get_symbol_string(environment, symbol);
+      case Z3NativeApiConstants.Z3_INT_SYMBOL:
+        return "#" + get_symbol_int(environment, symbol);
+      default:
+        throw new AssertionError("Unknown symbol kind " + get_symbol_kind(environment, symbol));
     }
   }
 

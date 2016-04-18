@@ -9,11 +9,11 @@ import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
-class NNFVisitor extends BooleanFormulaTransformationVisitor {
+public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   private final NNFInsideNotVisitor insideNotVisitor;
   private final BooleanFormulaManager bfmgr;
 
-  NNFVisitor(FormulaManager pFmgr) {
+  public NNFVisitor(FormulaManager pFmgr) {
     super(pFmgr.getBooleanFormulaManager());
     bfmgr = pFmgr.getBooleanFormulaManager();
     insideNotVisitor = new NNFInsideNotVisitor(pFmgr);

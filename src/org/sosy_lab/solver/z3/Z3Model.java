@@ -31,9 +31,6 @@ import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_get_num_entries;
 import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
 import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
 import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
 import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
 import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
@@ -131,7 +128,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       dec_ref(z3context, keyDecl);
       dec_ref(z3context, value);
 
-      out.add(new ValueAssignment(key, symbolToString(symbol), lValue, ImmutableList.of()));
+      out.add(new ValueAssignment(key, creator.symbolToString(symbol), lValue, ImmutableList.of()));
     }
 
     // Iterate through function applications.
@@ -169,23 +166,13 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
         func_entry_dec_ref(z3context, entry);
 
         out.add(
-            new ValueAssignment(formula, symbolToString(symbol), value, argumentInterpretation));
+            new ValueAssignment(
+                formula, creator.symbolToString(symbol), value, argumentInterpretation));
       }
       func_interp_dec_ref(z3context, interp);
       dec_ref(z3context, funcDecl);
     }
     return out.build();
-  }
-
-  private String symbolToString(long symbol) {
-    switch (get_symbol_kind(z3context, symbol)) {
-      case Z3NativeApiConstants.Z3_STRING_SYMBOL:
-        return get_symbol_string(z3context, symbol);
-      case Z3NativeApiConstants.Z3_INT_SYMBOL:
-        return "#" + get_symbol_int(z3context, symbol);
-      default:
-        throw new AssertionError("Unknown symbol kind " + get_symbol_kind(z3context, symbol));
-    }
   }
 
   @Override

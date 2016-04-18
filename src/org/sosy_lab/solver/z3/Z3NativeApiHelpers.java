@@ -70,14 +70,14 @@ class Z3NativeApiHelpers {
    * @return Z3_ast
    */
   static long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
-    long tseitinTactic = mk_tactic(z3context, tactic);
-    tactic_inc_ref(z3context, tseitinTactic);
+    long tacticObject = mk_tactic(z3context, tactic);
+    tactic_inc_ref(z3context, tacticObject);
 
     long goal = mk_goal(z3context, true, false, false);
     goal_inc_ref(z3context, goal);
     goal_assert(z3context, goal, pF);
 
-    long result = tactic_apply(z3context, tseitinTactic, goal);
+    long result = tactic_apply(z3context, tacticObject, goal);
     apply_result_inc_ref(z3context, result);
 
     try {
@@ -85,7 +85,7 @@ class Z3NativeApiHelpers {
     } finally {
       apply_result_dec_ref(z3context, result);
       goal_dec_ref(z3context, goal);
-      tactic_dec_ref(z3context, tseitinTactic);
+      tactic_dec_ref(z3context, tacticObject);
     }
   }
 

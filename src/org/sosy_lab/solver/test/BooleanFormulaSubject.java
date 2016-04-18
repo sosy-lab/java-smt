@@ -158,6 +158,12 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
     checkIsUnsat(f, "is equivalent to", expected);
   }
 
+  public void isEquisatisfiableTo(BooleanFormula other)
+      throws SolverException, InterruptedException {
+    BooleanFormulaManager bfmgr = context.getFormulaManager().getBooleanFormulaManager();
+    checkIsUnsat(bfmgr.and(getSubject(), bfmgr.not(other)), " is not equisatisfiable with ", other);
+  }
+
   /**
    * Check that the subject implies a given formula,
    * i.e. {@code subject => expected} always holds.

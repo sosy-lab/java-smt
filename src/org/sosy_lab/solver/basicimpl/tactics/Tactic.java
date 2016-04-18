@@ -19,147 +19,34 @@
  */
 package org.sosy_lab.solver.basicimpl.tactics;
 
-import com.google.common.collect.Iterables;
-
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.BooleanFormulaManager;
-import org.sosy_lab.solver.api.FormulaManager;
-
-import java.util.List;
-
 /**
- * Enum that holds all the values for tactics that are either supported with a
- * default implementation in java-smt or with a solver-specific version e.g.
- * via z3.
+ * Tactic is a generic formula to formula transformation.
+ *
+ * <p>Depending on whether the chosen solver supports the transformation,
+ * at runtime switches between solver-provided implementation and our own generic
+ * visitor-based one.
+ *
+ * <p>Tactics can be applied using {@link org.sosy_lab.solver.api.FormulaManager#applyTactic}
  */
 public enum Tactic {
 
   /**
-   * Convert the formula to NNF. Equivalence, ITE and implications are resolved"
-   * by replacing them with appropriate formulas consisting of and/or/not.
-   *
-   * <p>This tactic has a default implementation.</p>
+   * Convert the formula to NNF (negated normal form).
    */
-  NNF(
-      "nnf",
-      "Convert the formula to NNF. Equivalence, ITE and implications are resolved"
-          + " by replacing them with appropriate formulas consisting of and/or/not") {
-    @Override
-    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      return pFmgr.getBooleanFormulaManager().visit(new NNFVisitor(pFmgr), pF);
-    }
-  },
+  NNF,
 
   /**
-   * Convert the formula to an approximated CNF. This tactic creates a CNF formula
-   * but still may have some 'ands' which are deeper stacked in the formula and
-   * thus would create too much conjuncts when creating a full CNF.
+   * Convert the formula to CNF (conjunctive normal form), using extra fresh variables
+   * to avoid the size explosion.
    *
-   * <p>This tactic has a default implementation.</p>
+   * <p>NB: currently this tactic does not have default implementation.
    */
-  CNF_LIGHT(
-      "cnf",
-      "Convert the formula to an approximated CNF. This tactic creates a CNF formula"
-          + " but still may have some 'ands' which are deeper stacked in the formula and"
-          + " thus would create too much conjuncts when creating a full CNF.") {
-    @Override
-    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      BooleanFormulaManager bfmgr = pFmgr.getBooleanFormulaManager();
-      BooleanFormula nnf = bfmgr.visit(new NNFVisitor(pFmgr), pF);
-      // TODO make the maximum depth configurable
-      List<BooleanFormula> conjuncts = bfmgr.visit(new CNFVisitor(bfmgr, 3), nnf);
-      if (conjuncts.size() == 1) {
-        return Iterables.getOnlyElement(conjuncts);
-      } else {
-        return pFmgr.getBooleanFormulaManager().and(conjuncts);
-      }
-    }
-  },
+  CNF,
 
   /**
-   * Convert the formula to CNF. This tactic creates a formula which is
-   * in some cases exponentially bigger. E.g. (x /\ y) \/ (z /\ w) will have
-   * 2^n clauses in CNF afterwards.
-   *
-   * <p>This tactic has a default implementation.</p>
+   * Perform "best-effort" quantifier elimination:
+   * when the bound variable can be "cheaply" eliminated using a pattern-matching
+   * approach, eliminate it, and otherwise leave it as-is.
    */
-  CNF(
-      "cnf",
-      "Convert the formula to CNF. This tactic creates a formula which is"
-          + " in some cases exponentially bigger. E.g. (x /\\ y) \\/ (z /\\ w) will have"
-          + " 2^n clauses in CNF afterwards.") {
-    @Override
-    public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF) {
-      BooleanFormulaManager bfmgr = pFmgr.getBooleanFormulaManager();
-      BooleanFormula nnf = bfmgr.visit(new NNFVisitor(pFmgr), pF);
-      List<BooleanFormula> conjuncts = bfmgr.visit(new CNFVisitor(bfmgr, -1), nnf);
-      if (conjuncts.size() == 1) {
-        return Iterables.getOnlyElement(conjuncts);
-      } else {
-        return pFmgr.getBooleanFormulaManager().and(conjuncts);
-      }
-    }
-  },
-
-  /**
-   * Convert the formula to CNF using Tseitin encoding. Note that the resulting
-   * formula is not equivalent but only equisatisfiable.
-   *
-   * <p>This tactic has no default implementation.</p>
-   */
-  TSEITIN_CNF(
-      "tseitin-cnf",
-      "Convert the formula to CNF using Tseitin encoding. Note that the resulting"
-          + " formula is not equivalent but only equisatisfiable."),
-
-  /**
-   * Perform light quantifier elimination.
-   *
-   * <p>This tactic has no default implementation.</p>
-   */
-  QE_LIGHT("qe-light", "Perform light quantifier elimination"),
-
-  /**
-   * Perform quantifier elimination.
-   *
-   * <p>This tactic has no default implementation.</p>
-   */
-  QE("qe", "Perform quantifier elimination");
-
-  private final String name;
-  private final String description;
-
-  Tactic(String pName, String pDescription) {
-    name = pName;
-    description = pDescription;
-  }
-
-  public String getTacticName() {
-    return name;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Applies the default implementation for the tactic on the given Formula
-   * and returns the result. Note that this may lead to different results and
-   * may be not as efficient as using solver-specific tactic implementations by
-   * calling {@code FormulaManager#applyTactic(BooleanFormula, Tactic)}.
-   *
-   * <p>Thus calling this method is discouraged.
-   *
-   * @param pFmgr The formula manager that created the given formula.
-   * @param pF The formula to rewrite.
-   * @throws InterruptedException If solver is interrupted by the {@link ShutdownNotifier}.
-   */
-  public BooleanFormula applyDefault(FormulaManager pFmgr, BooleanFormula pF)
-      throws InterruptedException {
-    throw new UnsupportedOperationException(
-        String.format(
-            "The tactic %s is not supported by the current solver has no default implementation.",
-            getTacticName()));
-  }
+  QE_LIGHT,
 }

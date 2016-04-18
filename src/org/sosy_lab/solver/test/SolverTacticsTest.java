@@ -21,6 +21,8 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.truth.TruthJUnit;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -51,6 +53,11 @@ public class SolverTacticsTest extends SolverBasedTest0 {
   @Parameter(0)
   public Solvers solver;
 
+  @Override
+  protected Solvers solverToUse() {
+    return solver;
+  }
+
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("a");
@@ -80,19 +87,20 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void cnfTacticDefaultTest1() throws SolverException, InterruptedException {
+    TruthJUnit.assume().that(solver).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula equiv_a_b = bmgr.equivalence(a, b);
     BooleanFormula not_equiv_a_b = bmgr.not(equiv_a_b);
 
     BooleanFormula cnf_equiv_a_b = mgr.applyTactic(equiv_a_b, Tactic.CNF);
-    assertThatFormula(cnf_equiv_a_b).isEquivalentTo(equiv_a_b);
+    assertThatFormula(cnf_equiv_a_b).isEquisatisfiableTo(equiv_a_b);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf_equiv_a_b);
     assertThat(checker.isInCNF()).isTrue();
 
     BooleanFormula cnf_not_equiv_a_b = mgr.applyTactic(not_equiv_a_b, Tactic.CNF);
-    assertThatFormula(cnf_not_equiv_a_b).isEquivalentTo(not_equiv_a_b);
+    assertThatFormula(cnf_not_equiv_a_b).isEquisatisfiableTo(not_equiv_a_b);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_equiv_a_b);
     assertThat(checker.isInCNF()).isTrue();
@@ -100,6 +108,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void cnfTacticDefaultTest2() throws SolverException, InterruptedException {
+    TruthJUnit.assume().that(solver).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
@@ -107,14 +116,14 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula not_ITE_a_b_c = bmgr.not(bmgr.ifThenElse(a, b, c));
 
     BooleanFormula cnf_ITE_a_b_c = mgr.applyTactic(ITE_a_b_c, Tactic.CNF);
-    assertThatFormula(cnf_ITE_a_b_c).isEquivalentTo(ITE_a_b_c);
+    assertThatFormula(cnf_ITE_a_b_c).isEquisatisfiableTo(ITE_a_b_c);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf_ITE_a_b_c);
     assertThat(checker.isInCNF()).isTrue();
 
     BooleanFormula cnf_not_ITE_a_b_c = mgr.applyTactic(not_ITE_a_b_c, Tactic.CNF);
 
-    assertThatFormula(cnf_not_ITE_a_b_c).isEquivalentTo(not_ITE_a_b_c);
+    assertThatFormula(cnf_not_ITE_a_b_c).isEquisatisfiableTo(not_ITE_a_b_c);
     checker = new CNFChecker(mgr);
     checker.visit(cnf_not_ITE_a_b_c);
     assertThat(checker.isInCNF()).isTrue();
@@ -122,6 +131,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void cnfTacticDefaultTest3() throws SolverException, InterruptedException {
+    TruthJUnit.assume().that(solver).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
     // testcase that shows the exponential explosion of clauses when creating a cnf
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
@@ -136,7 +146,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula f = bmgr.or(disjuncts);
 
     BooleanFormula cnf = mgr.applyTactic(f, Tactic.CNF);
-    assertThatFormula(cnf).isEquivalentTo(f);
+    assertThatFormula(cnf).isEquisatisfiableTo(f);
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf);
     assertThat(checker.isInCNF()).isTrue();
