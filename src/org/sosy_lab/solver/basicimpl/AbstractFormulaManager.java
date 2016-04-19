@@ -42,7 +42,6 @@ import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.RationalFormulaManager;
-import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
@@ -315,8 +314,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
 
   @Override
-  public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
-    return parse(otherContext.getFormulaManager().dumpFormula(other).toString());
+  public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherContext) {
+    return parse(otherContext.dumpFormula(other).toString());
   }
 
   @Override

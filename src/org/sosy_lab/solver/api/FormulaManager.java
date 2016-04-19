@@ -239,11 +239,11 @@ public interface FormulaManager {
    * but each solver may implement more efficient translation between its own
    * contexts.
    *
-   * @param other Formula belonging to {@code otherContext}.
-   * @param otherContext A different context
+   * @param formula Formula belonging to {@code otherContext}.
+   * @param otherContext Formula manager belonging to the other context.
    * @return Formula belonging to {@code this} context.
    */
-  BooleanFormula translate(BooleanFormula other, SolverContext otherContext);
+  BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
 
   /**
    * For a numeral (i.e., non-boolean) equality "x = y",

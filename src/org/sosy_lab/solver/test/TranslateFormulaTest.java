@@ -104,7 +104,7 @@ public class TranslateFormulaTest {
   @Test
   public void testTranslating() throws Exception {
     BooleanFormula input = createTestFormula(managerFrom);
-    BooleanFormula parsed = managerTo.translate(input, from);
+    BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
 
     assertThatFormula(createTestFormula(managerTo), to).isEquivalentTo(parsed);
   }

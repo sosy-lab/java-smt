@@ -39,7 +39,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
 import java.io.IOException;
@@ -176,8 +175,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
   }
 
   @Override
-  public BooleanFormula translate(BooleanFormula other, SolverContext otherContext) {
-    FormulaManager otherManager = otherContext.getFormulaManager();
+  public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherManager) {
     if (otherManager instanceof Z3FormulaManager) {
       Z3FormulaManager o = (Z3FormulaManager) otherManager;
       Context otherZ3Context = o.getEnvironment();
@@ -192,6 +190,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
         return getFormulaCreator().encapsulateBoolean(translatedAST);
       }
     }
-    return super.translate(other, otherContext);
+    return super.translateFrom(other, otherManager);
   }
 }
