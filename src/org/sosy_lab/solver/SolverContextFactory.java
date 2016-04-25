@@ -190,9 +190,9 @@ public class SolverContextFactory {
     System.setProperty("java.library.path", newPath);
     try {
       Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-      fieldSysPath.setAccessible( true );
-      fieldSysPath.set( null, null );
-    } catch (NoSuchFieldException|IllegalAccessException pE) {
+      fieldSysPath.setAccessible(true);
+      fieldSysPath.set(null, null);
+    } catch (NoSuchFieldException | IllegalAccessException pE) {
       throw new UnsupportedOperationException("Failed changing java.library.path", pE);
     }
   }
