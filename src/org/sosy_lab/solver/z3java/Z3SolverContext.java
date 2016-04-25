@@ -121,6 +121,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       NativeLibraries.loadLibrary("libz3java");
     }
 
+    NativeLibraries.loadLibrary("z3j");
     NativeLibraries.loadLibrary("z3java");
 
     if (extraOptions.log != null) {

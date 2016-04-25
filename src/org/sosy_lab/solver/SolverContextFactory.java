@@ -25,6 +25,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -44,6 +45,7 @@ import org.sosy_lab.solver.z3.Z3SolverContext;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -87,6 +89,8 @@ public class SolverContextFactory {
 
   @Option(secure = true, name = "useLogger", description = "Log solver actions, this may be slow!")
   private boolean useLogger = false;
+
+  private final String libraryPathProperty = "java.library.path";
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -138,8 +142,8 @@ public class SolverContextFactory {
           break;
 
         case Z3JAVA:
-          context =
-              org.sosy_lab.solver.z3java.Z3SolverContext.create(
+          modifyJavaLibraryPath();
+          context = org.sosy_lab.solver.z3java.Z3SolverContext.create(
                   logger, config, shutdownNotifier, logfile, randomSeed);
           break;
 
@@ -167,6 +171,30 @@ public class SolverContextFactory {
       context = new LoggingSolverContext(logger, context);
     }
     return context;
+  }
+
+  /**
+   * A hack to modify java.library.path to allow load of Z3JAVA.
+   *
+   * <p>Taken from http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/.
+   */
+  private void modifyJavaLibraryPath() {
+
+    String prevPath = System.getProperty(libraryPathProperty);
+    String newPath = NativeLibraries.getPathToJar().getAbsolutePath();
+    if (!prevPath.isEmpty()) {
+
+      // TODO: OS-independent way.
+      newPath = newPath + ":" + prevPath;
+    }
+    System.setProperty("java.library.path", newPath);
+    try {
+      Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+      fieldSysPath.setAccessible( true );
+      fieldSysPath.set( null, null );
+    } catch (NoSuchFieldException|IllegalAccessException pE) {
+      throw new UnsupportedOperationException("Failed changing java.library.path", pE);
+    }
   }
 
   /**

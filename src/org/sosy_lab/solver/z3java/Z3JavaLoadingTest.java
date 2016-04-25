@@ -17,17 +17,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.z3;
+package org.sosy_lab.solver.z3java;
 
 import org.junit.Test;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.test.SolverBasedTest0;
 
-public class Z3Test extends SolverBasedTest0 {
+public class Z3JavaLoadingTest extends SolverBasedTest0 {
 
   @Override
   protected Solvers solverToUse() {
-    return Solvers.Z3;
+    return Solvers.Z3JAVA;
   }
 
   @Test(expected = Exception.class)
