@@ -45,7 +45,6 @@
                 <exclude name="org/sosy_lab/solver/smtinterpol/*"/>
                 <exclude name="org/sosy_lab/solver/z3/*"/>
             </fileset>
-            <link href="https://jsr-305.googlecode.com/svn/trunk/javadoc/"/>
             <link href="http://docs.oracle.com/javase/7/docs/api/"/>
             <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/"/>
             <link href="https://google.github.io/truth/api/latest/"/>
