@@ -20,20 +20,16 @@
 package org.sosy_lab.solver.z3java;
 
 import org.junit.Test;
+import org.sosy_lab.solver.SolverContextFactory;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
-import org.sosy_lab.solver.test.SolverBasedTest0;
 
-public class Z3JavaLoadingTest extends SolverBasedTest0 {
+public class Z3JavaLoadingTest {
 
-  @Override
-  protected Solvers solverToUse() {
-    return Solvers.Z3JAVA;
-  }
-
-  @Test(expected = Exception.class)
+  @Test
   @SuppressWarnings("CheckReturnValue")
   public void testErrorHandling() throws Exception {
-    // Will exit(1) without an exception handler.
-    rmgr.makeNumber("not-a-number");
+
+    // Test that Z3Java can be loaded correctly.
+    SolverContextFactory.createSolverContext(Solvers.Z3JAVA);
   }
 }
