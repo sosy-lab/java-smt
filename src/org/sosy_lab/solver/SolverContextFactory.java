@@ -26,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.NativeLibraries.OS;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -91,6 +92,7 @@ public class SolverContextFactory {
   private boolean useLogger = false;
 
   private final String libraryPathProperty = "java.library.path";
+  private boolean libraryPathPatched = false;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -179,21 +181,27 @@ public class SolverContextFactory {
    * <p>Taken from http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/.
    */
   private void modifyJavaLibraryPath() {
+    if (libraryPathPatched) {
+
+      // Only need to modify library path once.
+      return;
+    }
 
     String prevPath = System.getProperty(libraryPathProperty);
     String newPath = NativeLibraries.getPathToJar().getAbsolutePath();
+    String separator = NativeLibraries.OS.guessOperatingSystem() != OS.WINDOWS ? ":" : ";";
     if (!prevPath.isEmpty()) {
-
-      // TODO: OS-independent way.
-      newPath = newPath + ":" + prevPath;
+      newPath = newPath + separator + prevPath;
     }
     System.setProperty("java.library.path", newPath);
     try {
       Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
       fieldSysPath.setAccessible(true);
       fieldSysPath.set(null, null);
+      libraryPathPatched = true;
     } catch (NoSuchFieldException | IllegalAccessException pE) {
-      throw new UnsupportedOperationException("Failed changing java.library.path", pE);
+      throw new UnsupportedOperationException("Failed changing java.library.path for loading "
+          + "Z3Java, try using Z3 solver instead.", pE);
     }
   }
 
