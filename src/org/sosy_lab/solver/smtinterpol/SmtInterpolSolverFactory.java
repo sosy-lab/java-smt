@@ -39,9 +39,6 @@ import javax.annotation.Nullable;
  */
 public class SmtInterpolSolverFactory implements InnerUtilFactory {
 
-  // Needs to have default constructor because FormulaManagerFactory
-  // calls it reflectively
-
   @Override
   public SolverContext create(
       Configuration pConfig,
