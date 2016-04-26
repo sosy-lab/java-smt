@@ -94,6 +94,29 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
+  public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
+    requireInterpolation();
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      IntegerFormula x, y, z;
+      x = imgr.makeVariable("x");
+      y = imgr.makeVariable("y");
+      z = imgr.makeVariable("z");
+      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
+      BooleanFormula f2 =
+          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      T id1 = prover.push(f1);
+      T id2 = prover.push(f2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      BooleanFormula emptyB = prover.getInterpolant(Lists.newArrayList(id1, id2));
+      assertThat(bmgr.isFalse(emptyB)).isTrue();
+      BooleanFormula emptyA = prover.getInterpolant(Lists.<T>newArrayList());
+      assertThat(bmgr.isTrue(emptyA)).isTrue();
+    }
+  }
+
+  @Test
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
     requireInterpolation();

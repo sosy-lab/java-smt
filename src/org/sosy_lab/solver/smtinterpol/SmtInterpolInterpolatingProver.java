@@ -24,6 +24,7 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterators;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -83,6 +84,14 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
   public BooleanFormula getInterpolant(List<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+
+    // SMTInterpol is not able to handle the trivial cases
+    // so we need to check them explicitly
+    if (pTermNamesOfA.isEmpty()) {
+      return mgr.getBooleanFormulaManager().makeBoolean(true);
+    } else if (pTermNamesOfA.equals(assertedFormulas)) {
+      return mgr.getBooleanFormulaManager().makeBoolean(false);
+    }
 
     Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
 
@@ -174,17 +183,19 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
 
   private Term buildConjunctionOfNamedTerms(Set<String> termNames) {
     Preconditions.checkState(!closed);
+    Preconditions.checkArgument(!termNames.isEmpty());
+
     Term[] terms = new Term[termNames.size()];
     int i = 0;
     for (String termName : termNames) {
       terms[i] = env.term(termName);
       i++;
     }
+
     if (terms.length > 1) {
       return env.term("and", terms);
     } else {
-      assert terms.length != 0;
-      return terms[0];
+      return Iterators.getOnlyElement(Iterators.forArray(terms));
     }
   }
 

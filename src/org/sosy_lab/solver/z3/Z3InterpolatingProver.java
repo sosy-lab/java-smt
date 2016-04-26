@@ -150,7 +150,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
     // build conjunction of each partition
     for (int i = 0; i < partitionedFormulas.size(); i++) {
-      Preconditions.checkState(!partitionedFormulas.get(i).isEmpty());
       long conjunction = mk_and(z3context, Longs.toArray(partitionedFormulas.get(i)));
       inc_ref(z3context, conjunction);
       conjunctionFormulas[i] = conjunction;

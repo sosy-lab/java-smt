@@ -148,7 +148,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
 
       // build conjunction of each partition
       for (int i = 0; i < partitionedFormulas.size(); i++) {
-        Preconditions.checkState(!partitionedFormulas.get(i).isEmpty());
         BoolExpr conjunction = z3context.mkAnd(toBool(partitionedFormulas.get(i)));
         conjunctionFormulas[i] = conjunction;
       }
