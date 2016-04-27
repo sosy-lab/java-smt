@@ -35,26 +35,19 @@ import javax.annotation.Nullable;
  *
  * <p>Do not access this class directly, it needs to be loaded via
  * {@link SolverContextFactory}
- * because SmtInterpol needs to have it's own class loader.
+ * because SmtInterpol needs to have its own class loader.
  */
-public class SmtInterpolSolverFactory implements InnerUtilFactory {
+public class SmtInterpolSolverFactory extends InnerUtilFactory {
 
   @Override
-  public SolverContext create(
+  public SolverContext generateSolverContext(
       Configuration pConfig,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed)
       throws InvalidConfigurationException {
-    final Thread currentThread = Thread.currentThread();
-    final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-    try {
-      currentThread.setContextClassLoader(SmtInterpolSolverFactory.class.getClassLoader());
-      return SmtInterpolSolverContext.create(
-          pConfig, pLogger, pShutdownNotifier, solverLogfile, randomSeed);
-    } finally {
-      currentThread.setContextClassLoader(contextClassLoader);
-    }
+    return SmtInterpolSolverContext.create(
+        pConfig, pLogger, pShutdownNotifier, solverLogfile, randomSeed);
   }
 }
