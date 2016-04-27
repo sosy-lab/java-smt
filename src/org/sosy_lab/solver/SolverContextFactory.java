@@ -142,7 +142,8 @@ public class SolverContextFactory {
     return context;
   }
 
-  private SolverContext generateContext0(Solvers solverToCreate) throws InvalidConfigurationException {
+  private SolverContext generateContext0(Solvers solverToCreate)
+      throws InvalidConfigurationException {
     switch (solverToCreate) {
       case SMTINTERPOL:
 
@@ -400,7 +401,7 @@ public class SolverContextFactory {
      * @param pUrls         The sources where this class loader should load classes from.
      * @param pParent       The parent class loader.
      */
-    public CustomLibraryPathClassLoader(
+    CustomLibraryPathClassLoader(
         Pattern pClassPattern,
         URL[] pUrls,
         ClassLoader pParent) {
