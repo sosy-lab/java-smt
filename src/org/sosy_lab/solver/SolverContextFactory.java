@@ -323,6 +323,7 @@ public class SolverContextFactory {
 
     URL[] urls;
     if (parentClassLoader instanceof URLClassLoader) {
+      @SuppressWarnings("resource")
       URLClassLoader uParentClassLoader = (URLClassLoader) parentClassLoader;
       urls = uParentClassLoader.getURLs();
     } else {
