@@ -142,7 +142,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   public void close() {
     Preconditions.checkState(!closed);
     popIfNecessary();
-    if (!assertedTerms.isEmpty()) {
+    if (env.getStackDepth() > 0) {
       env.pop(env.getStackDepth());
       assertedTerms.clear();
     }
