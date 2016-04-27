@@ -19,7 +19,11 @@
  */
 package org.sosy_lab.solver.test;
 
+import static com.google.common.truth.Truth.assertThat;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +33,13 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @RunWith(Parameterized.class)
 public class FormulaManagerTest extends SolverBasedTest0 {
@@ -64,5 +75,80 @@ public class FormulaManagerTest extends SolverBasedTest0 {
             bmgr.or(
                 bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
                 bmgr.makeVariable("e")));
+  }
+
+  @Test
+  public void formulaEqualsAndHashCode() {
+    FunctionDeclaration<IntegerFormula> f_b =
+        fmgr.declareUF("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
+
+    new EqualsTester()
+        .addEqualityGroup(bmgr.makeBoolean(true))
+        .addEqualityGroup(bmgr.makeBoolean(false))
+        .addEqualityGroup(bmgr.makeVariable("bool_a"))
+        .addEqualityGroup(imgr.makeVariable("int_a"))
+
+        // Way of creating numbers should not make a difference.
+        .addEqualityGroup(
+            imgr.makeNumber(0.0),
+            imgr.makeNumber(0L),
+            imgr.makeNumber(BigInteger.ZERO),
+            imgr.makeNumber(BigDecimal.ZERO),
+            imgr.makeNumber("0"))
+        .addEqualityGroup(
+            imgr.makeNumber(1.0),
+            imgr.makeNumber(1L),
+            imgr.makeNumber(BigInteger.ONE),
+            imgr.makeNumber(BigDecimal.ONE),
+            imgr.makeNumber("1"))
+
+        // The same formula when created twice should compare equal.
+        .addEqualityGroup(bmgr.makeVariable("bool_b"), bmgr.makeVariable("bool_b"))
+        .addEqualityGroup(
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")),
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")))
+        .addEqualityGroup(
+            imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")),
+            imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")))
+
+        // UninterpretedFunctionDeclarations should not compare equal to Formulas,
+        // but declaring one twice needs to return the same UIF.
+        .addEqualityGroup(
+            fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType),
+            fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
+        .addEqualityGroup(f_b)
+        .addEqualityGroup(fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(0))))
+        .addEqualityGroup(
+            fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(1))),
+            fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(1))))
+        .testEquals();
+  }
+
+  @Test
+  public void variableNameExtractorTest() throws Exception {
+    BooleanFormula constr =
+        bmgr.or(
+            imgr.equal(
+                imgr.subtract(
+                    imgr.add(imgr.makeVariable("x"), imgr.makeVariable("z")), imgr.makeNumber(10)),
+                imgr.makeVariable("y")),
+            imgr.equal(imgr.makeVariable("xx"), imgr.makeVariable("zz")));
+    assertThat(mgr.extractVariables(constr).keySet()).containsExactly("x", "y", "z", "xx", "zz");
+    assertThat(mgr.extractVariablesAndUFs(constr)).isEqualTo(mgr.extractVariables(constr));
+  }
+
+  @Test
+  public void ufNameExtractorTest() throws Exception {
+    BooleanFormula constraint =
+        imgr.equal(
+            fmgr.declareAndCallUF(
+                "uf1", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("x"))),
+            fmgr.declareAndCallUF(
+                "uf2", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("y"))));
+
+    assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
+        .containsExactly("uf1", "uf2", "x", "y");
+
+    assertThat(mgr.extractVariables(constraint).keySet()).containsExactly("x", "y");
   }
 }

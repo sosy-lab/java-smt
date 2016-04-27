@@ -25,6 +25,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -56,6 +57,9 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
 
+  // Next modification to assertion stack should pop before doing anything.
+  private transient boolean shouldPop = false;
+
   SmtInterpolTheoremProver(
       SmtInterpolFormulaManager pMgr,
       FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> pCreator,
@@ -71,12 +75,19 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   }
 
   @Override
+  @CanIgnoreReturnValue
+  public Void push(BooleanFormula f) {
+    popIfNecessary();
+    return super.push(f);
+  }
+
+  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     push(mgr.getBooleanFormulaManager().and(assumptions));
     boolean out = isUnsat();
-    pop();
+    shouldPop = true;
     return out;
   }
 
@@ -106,6 +117,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    popIfNecessary();
     assertedTerms.remove(assertedTerms.size() - 1); // remove last term
     env.pop(1);
   }
@@ -114,6 +126,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
+    popIfNecessary();
     Term t = mgr.extractInfo(constraint);
     if (generateUnsatCores) {
       String termName = generateTermName();
@@ -130,6 +143,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public void close() {
     Preconditions.checkState(!closed);
+    popIfNecessary();
     if (!assertedTerms.isEmpty()) {
       env.pop(env.getStackDepth());
       assertedTerms.clear();
@@ -164,6 +178,13 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
       callback.apply(Lists.transform(Arrays.asList(model), creator.encapsulateBoolean));
     }
     return callback.getResult();
+  }
+
+  private void popIfNecessary() {
+    if (shouldPop) {
+      shouldPop = false;
+      pop();
+    }
   }
 
   @Override
