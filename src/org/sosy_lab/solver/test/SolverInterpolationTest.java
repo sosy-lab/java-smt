@@ -165,8 +165,10 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    checkItpSequence(stack, Lists.newArrayList(A, B, C, D), Lists.newArrayList(itpA, itpAB, itpABC));
-    checkItpSequence(stack, Lists.newArrayList(D, C, B, A), Lists.newArrayList(itpD, itpDC, itpDCB));
+    checkItpSequence(
+        stack, Lists.newArrayList(A, B, C, D), Lists.newArrayList(itpA, itpAB, itpABC));
+    checkItpSequence(
+        stack, Lists.newArrayList(D, C, B, A), Lists.newArrayList(itpD, itpDC, itpDCB));
   }
 
   @Test
@@ -256,9 +258,12 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     List<BooleanFormula> itps2 = stack.getSeqInterpolants(Lists.newArrayList(TD, TC, TB, TA));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants(Lists.newArrayList(TA, TC, TB, TD));
 
-    List<BooleanFormula> itps4 = stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TA, TB, TC, TD, TD));
-    List<BooleanFormula> itps5 = stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TB, TC, TD, TA, TD));
-    List<BooleanFormula> itps6 = stack.getSeqInterpolants(Lists.newArrayList(TB, TC, TD, TA, TA, TA, TD));
+    List<BooleanFormula> itps4 =
+        stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TA, TB, TC, TD, TD));
+    List<BooleanFormula> itps5 =
+        stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TB, TC, TD, TA, TD));
+    List<BooleanFormula> itps6 =
+        stack.getSeqInterpolants(Lists.newArrayList(TB, TC, TD, TA, TA, TA, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
