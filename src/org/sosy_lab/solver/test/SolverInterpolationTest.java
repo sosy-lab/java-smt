@@ -141,22 +141,69 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     T TA = stack.push(A);
     T TB = stack.push(B);
     T TC = stack.push(C);
-    stack.push(D);
+    T TD = stack.push(D);
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
+    BooleanFormula itp = stack.getInterpolant(Lists.<T>newArrayList());
     BooleanFormula itpA = stack.getInterpolant(Lists.newArrayList(TA));
-    BooleanFormula itpB = stack.getInterpolant(Lists.newArrayList(TA, TB));
-    BooleanFormula itpC = stack.getInterpolant(Lists.newArrayList(TA, TB, TC));
+    BooleanFormula itpAB = stack.getInterpolant(Lists.newArrayList(TA, TB));
+    BooleanFormula itpABC = stack.getInterpolant(Lists.newArrayList(TA, TB, TC));
+    BooleanFormula itpD = stack.getInterpolant(Lists.newArrayList(TD));
+    BooleanFormula itpDC = stack.getInterpolant(Lists.newArrayList(TD, TC));
+    BooleanFormula itpDCB = stack.getInterpolant(Lists.newArrayList(TD, TC, TB));
+    BooleanFormula itpABCD = stack.getInterpolant(Lists.newArrayList(TA, TB, TC, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
     stack.pop();
     stack.pop();
 
+    // special cases: start and end of sequence might need special handling in the solver
+    assertThat(bmgr.makeBoolean(true)).isEqualTo(itp);
+    assertThat(bmgr.makeBoolean(false)).isEqualTo(itpABCD);
+
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    checkItpSequence(stack, Lists.newArrayList(A, B, C, D), Lists.newArrayList(itpA, itpB, itpC));
+    checkItpSequence(stack, Lists.newArrayList(A, B, C, D), Lists.newArrayList(itpA, itpAB, itpABC));
+    checkItpSequence(stack, Lists.newArrayList(D, C, B, A), Lists.newArrayList(itpD, itpDC, itpDCB));
+  }
+
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
+  public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
+    requireInterpolation();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    // build formula:  1 = A = B = C = 0
+    BooleanFormula A = bmgr.makeBoolean(false);
+    BooleanFormula B = bmgr.makeBoolean(false);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThatEnvironment(stack).isUnsatisfiable();
+
+    BooleanFormula itp0 = stack.getInterpolant(Lists.<T>newArrayList());
+    BooleanFormula itpA = stack.getInterpolant(Lists.newArrayList(TA));
+    BooleanFormula itpB = stack.getInterpolant(Lists.newArrayList(TA));
+    BooleanFormula itpAB = stack.getInterpolant(Lists.newArrayList(TA, TB));
+
+    stack.pop(); // clear stack, such that we can re-use the solver
+    stack.pop();
+
+    // special cases: start and end of sequence might need special handling in the solver
+    assertThat(bmgr.makeBoolean(true)).isEqualTo(itp0);
+    assertThat(bmgr.makeBoolean(false)).isEqualTo(itpAB);
+
+    // want to see non-determinism in all solvers? try this:
+    // System.out.println(solver + ": " + itpA);
+
+    // we check here the stricter properties for sequential interpolants,
+    // but this simple example should work for all solvers
+    checkItpSequence(stack, Lists.newArrayList(A, B), Lists.newArrayList(itpA));
+    checkItpSequence(stack, Lists.newArrayList(B, A), Lists.newArrayList(itpB));
   }
 
   private void requireSequentialItp() {
@@ -205,14 +252,25 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps = stack.getSeqInterpolants(Lists.newArrayList(TA, TB, TC, TD));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants(Lists.newArrayList(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants(Lists.newArrayList(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants(Lists.newArrayList(TA, TC, TB, TD));
+
+    List<BooleanFormula> itps4 = stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TA, TB, TC, TD, TD));
+    List<BooleanFormula> itps5 = stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TB, TC, TD, TA, TD));
+    List<BooleanFormula> itps6 = stack.getSeqInterpolants(Lists.newArrayList(TB, TC, TD, TA, TA, TA, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
     stack.pop();
     stack.pop();
 
-    checkItpSequence(stack, Lists.newArrayList(A, B, C, D), itps);
+    checkItpSequence(stack, Lists.newArrayList(A, B, C, D), itps1);
+    checkItpSequence(stack, Lists.newArrayList(D, C, B, A), itps2);
+    checkItpSequence(stack, Lists.newArrayList(A, C, B, D), itps3);
+    checkItpSequence(stack, Lists.newArrayList(A, A, A, C, B, D, D), itps4);
+    checkItpSequence(stack, Lists.newArrayList(A, A, B, C, D, A, D), itps5);
+    checkItpSequence(stack, Lists.newArrayList(B, C, D, A, A, A, D), itps6);
   }
 
   @Test
