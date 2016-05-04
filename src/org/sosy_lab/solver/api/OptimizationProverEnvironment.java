@@ -73,8 +73,20 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    * Status of the optimization problem.
    */
   enum OptStatus {
-    OPT, // All good, the solution was found (may be unbounded).
-    UNSAT, // SMT problem is unsatisfiable.
-    UNDEF // The result is unknown.
+
+    /**
+     * The solution was found (may be unbounded).
+     */
+    OPT,
+
+    /**
+     * The set of constraints is unsatisfiable.
+     */
+    UNSAT,
+
+    /**
+     * The result is unknown.
+     */
+    UNDEF
   }
 }
