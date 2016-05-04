@@ -119,7 +119,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
       if (msg.contains("impossible to build a suitable congruence graph")
           || msg.contains("can't build ie-local interpolant")
           || msg.contains("splitting of AB-mixed terms not supported")
-          || msg.contains("Hypothesis belongs neither to A nor to B")) {
+          || msg.contains("Hypothesis belongs neither to A nor to B")
+          || msg.contains("FP<->BV combination unsupported by the current configuration")) {
         // This is not a bug in our code,
         // but a problem of MathSAT which happens during interpolation
         throw new SolverException(e.getMessage(), e);
