@@ -124,7 +124,7 @@
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.1" conf="build->default, runtime"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.2" conf="build->default"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.0.5"/>
