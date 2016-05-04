@@ -23,5 +23,6 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/SoSy-Lab Common/lib/java/build/auto-value.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
