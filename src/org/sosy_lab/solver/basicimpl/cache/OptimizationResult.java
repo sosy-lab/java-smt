@@ -28,7 +28,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment.OptStatus;
 
 import java.util.HashMap;
@@ -53,7 +52,7 @@ public abstract class OptimizationResult {
   /**
    * Cached stored model.
    */
-  public abstract Optional<Model> model();
+  public abstract Optional<CachedModel> model();
 
   public OptimizationResult withObjectiveValue(int handle, Optional<Rational> value) {
     Map<Integer, Optional<Rational>> map = new HashMap<>(objectiveValues());
@@ -62,12 +61,12 @@ public abstract class OptimizationResult {
     return new AutoValue_OptimizationResult(result(), ImmutableMap.copyOf(map), model());
   }
 
-  public OptimizationResult withModel(Model pModel) {
+  public OptimizationResult withModel(CachedModel pModel) {
     return new AutoValue_OptimizationResult(result(), objectiveValues(), Optional.of(pModel));
   }
 
   static OptimizationResult of(OptStatus result) {
     return new AutoValue_OptimizationResult(
-        result, ImmutableMap.<Integer, Optional<Rational>>of(), Optional.<Model>absent());
+        result, ImmutableMap.<Integer, Optional<Rational>>of(), Optional.<CachedModel>absent());
   }
 }
