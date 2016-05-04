@@ -141,6 +141,16 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
     return out;
   }
 
+  private OptStatus forceCheck() {
+    try {
+      return delegate.check();
+    } catch (InterruptedException|SolverException pE) {
+      throw new UnsupportedOperationException("Solver exception", pE);
+    } finally {
+      checkPerformed = true;
+    }
+  }
+
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
     OptimizationResult cachedResult = optimizationCache.get(currentQuery);
@@ -149,6 +159,9 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
     assert cachedResult != null;
     if (epsilon.equals(Rational.ZERO) && cachedResult.objectiveValues().containsKey(handle)) {
       return cachedResult.objectiveValues().get(handle);
+    }
+    if (!checkPerformed) {
+      forceCheck();
     }
     Optional<Rational> out = delegate.upper(handle, epsilon);
     optimizationCache.put(currentQuery, cachedResult.withObjectiveValue(handle, out));
@@ -167,6 +180,9 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
     assert cachedResult != null;
     if (epsilon.equals(Rational.ZERO) && cachedResult.objectiveValues().containsKey(handle)) {
       return cachedResult.objectiveValues().get(handle);
+    }
+    if (!checkPerformed) {
+      forceCheck();
     }
     Optional<Rational> out = delegate.lower(handle, epsilon);
     optimizationCache.put(currentQuery, cachedResult.withObjectiveValue(handle, out));
@@ -191,11 +207,7 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
     // If the previous check call was cached, yet no model is available, we would need
     // to re-compute the check.
     if (!checkPerformed) {
-      try {
-        check();
-      } catch (InterruptedException pE) {
-        throw new SolverException("Interrupted while solving", pE);
-      }
+      forceCheck();
     }
 
     Model model = delegate.getModel();
@@ -207,6 +219,10 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     return ImmutableList.copyOf(getModel().iterator());
+  }
+
+  public String toString() {
+    return delegate.toString();
   }
 
   @Override
