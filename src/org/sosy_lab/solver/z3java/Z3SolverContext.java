@@ -21,6 +21,7 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
@@ -214,6 +215,11 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   public String getVersion() {
     return "Z3 " + Version.getString();
+  }
+
+  @Override
+  public Solvers getSolverName() {
+    return Solvers.Z3JAVA;
   }
 
   @Override

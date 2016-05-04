@@ -23,6 +23,7 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
@@ -226,6 +227,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   @Override
   public String getVersion() {
     return msat_get_version();
+  }
+
+  @Override
+  public Solvers getSolverName() {
+    return Solvers.MATHSAT5;
   }
 
   @Override

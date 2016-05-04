@@ -3,19 +3,29 @@ package org.sosy_lab.solver.basicimpl;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
+import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.cache.CachingOptimizationProverEnvironment;
+import org.sosy_lab.solver.basicimpl.cache.OptimizationQuery;
+import org.sosy_lab.solver.basicimpl.cache.OptimizationResult;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSolverContext implements SolverContext {
 
   private final FormulaManager fmgr;
+  private final Map<OptimizationQuery, OptimizationResult> optimizationCache;
+  private final SolverContextStatistics statistics;
 
   protected AbstractSolverContext(FormulaManager fmgr) {
     this.fmgr = fmgr;
+    optimizationCache = new HashMap<>();
+    statistics = new SolverContextStatistics();
   }
 
   @Override
@@ -50,4 +60,17 @@ public abstract class AbstractSolverContext implements SolverContext {
   }
 
   protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
+
+  @Override
+  public final OptimizationProverEnvironment newCachedOptimizationProverEnvironment() {
+    return new CachingOptimizationProverEnvironment(
+        newOptimizationProverEnvironment(),
+        optimizationCache,
+        statistics.getOptimizationCacheStatistics());
+  }
+
+  @Override
+  public SolverContextStatistics getStatistics() {
+    return statistics;
+  }
 }

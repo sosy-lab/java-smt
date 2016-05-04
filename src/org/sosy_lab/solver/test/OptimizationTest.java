@@ -183,4 +183,47 @@ public class OptimizationTest extends SolverBasedTest0 {
       prover.pop();
     }
   }
+
+  @Test
+  public void testCaching() throws Exception {
+    IntegerFormula x, y, obj;
+    x = imgr.makeVariable("x");
+    y = imgr.makeVariable("y");
+    obj = imgr.makeVariable("obj");
+    List<BooleanFormula> constraints =
+        ImmutableList.of(
+            imgr.lessOrEquals(x, imgr.makeNumber(10)),
+            imgr.lessOrEquals(y, imgr.makeNumber(15)),
+            imgr.equal(obj, imgr.add(x, y)),
+            imgr.greaterOrEquals(imgr.subtract(x, y), imgr.makeNumber(1)));
+
+    int noIterations = 5000;
+
+    for (int i = 0; i < noIterations; i++) {
+      try (OptimizationProverEnvironment prover =
+          context.newCachedOptimizationProverEnvironment()) {
+        prover.addConstraint(bmgr.and(constraints));
+        int handle = prover.maximize(obj);
+        assertThat(prover.check()).isEqualTo(OptStatus.OPT);
+        assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of("19"));
+
+        try (Model m = prover.getModel()) {
+          assertThat(m.evaluate(obj)).isEqualTo(BigInteger.valueOf(19));
+        }
+
+        prover.push();
+
+        handle = prover.maximize(x);
+        OptStatus response = prover.check();
+        assertThat(response).isEqualTo(OptStatus.OPT);
+        assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
+
+        prover.pop();
+      }
+    }
+
+    // All iterations but the first one should be cached.
+    assertThat(context.getStatistics().getOptimizationCacheStatistics().getCacheHits())
+        .isEqualTo((noIterations - 1) * 2);
+  }
 }

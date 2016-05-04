@@ -74,9 +74,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void assumptionsWithModelTest() throws Exception {
-    assume().withFailureMessage(
-        "MathSAT can't construct models for SAT check with assumptions"
-    ).that(solver).isNotEqualTo(MATHSAT5);
+    assume()
+        .withFailureMessage("MathSAT can't construct models for SAT check with assumptions")
+        .that(solver)
+        .isNotEqualTo(MATHSAT5);
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 

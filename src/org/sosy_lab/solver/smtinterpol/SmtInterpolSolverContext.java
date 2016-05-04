@@ -7,6 +7,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
@@ -73,6 +74,11 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   public String getVersion() {
     return environment.getVersion();
+  }
+
+  @Override
+  public Solvers getSolverName() {
+    return Solvers.SMTINTERPOL;
   }
 
   @Override

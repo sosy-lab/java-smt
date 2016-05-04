@@ -22,11 +22,13 @@ package org.sosy_lab.solver.logging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.solver.basicimpl.SolverContextStatistics;
 
 /**
  * {@link SolverContext} that wrapps all prover environments in their logging versions.
@@ -64,8 +66,23 @@ public final class LoggingSolverContext implements SolverContext {
   }
 
   @Override
+  public OptimizationProverEnvironment newCachedOptimizationProverEnvironment() {
+    return delegate.newCachedOptimizationProverEnvironment();
+  }
+
+  @Override
   public String getVersion() {
     return delegate.getVersion();
+  }
+
+  @Override
+  public Solvers getSolverName() {
+    return delegate.getSolverName();
+  }
+
+  @Override
+  public SolverContextStatistics getStatistics() {
+    return delegate.getStatistics();
   }
 
   @Override

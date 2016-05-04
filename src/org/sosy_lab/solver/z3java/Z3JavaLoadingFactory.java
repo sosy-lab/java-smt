@@ -49,8 +49,8 @@ public class Z3JavaLoadingFactory extends InnerUtilFactory {
       LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed) throws InvalidConfigurationException {
-      return Z3SolverContext.create(
-          logger, config, pShutdownNotifier, solverLogfile, randomSeed);
+      long randomSeed)
+      throws InvalidConfigurationException {
+    return Z3SolverContext.create(logger, config, pShutdownNotifier, solverLogfile, randomSeed);
   }
 }

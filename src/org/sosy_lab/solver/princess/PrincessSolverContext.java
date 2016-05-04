@@ -6,6 +6,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
@@ -92,6 +93,11 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   @Override
   public String getVersion() {
     return creator.getEnv().getVersion();
+  }
+
+  @Override
+  public Solvers getSolverName() {
+    return Solvers.PRINCESS;
   }
 
   @Override

@@ -35,6 +35,7 @@ import org.sosy_lab.common.io.Files;
 import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
@@ -245,6 +246,11 @@ public final class Z3SolverContext extends AbstractSolverContext {
     PointerToInt revision = new PointerToInt();
     get_version(major, minor, build, revision);
     return "Z3 " + major.value + "." + minor.value + "." + build.value + "." + revision.value;
+  }
+
+  @Override
+  public Solvers getSolverName() {
+    return Solvers.Z3;
   }
 
   @Override

@@ -149,22 +149,20 @@ public class SolverContextFactory {
 
         // Loading SmtInterpol is difficult as it requires its own class
         // loader for fiddling with Java_CUP versions.
-        return getFactoryForSolver(
-            createSmtInterpolClassLoader(logger),
-            SMTINTERPOL_FACTORY_CLASS
-        ).create(config, logger, shutdownNotifier, logfile, randomSeed);
+        return getFactoryForSolver(createSmtInterpolClassLoader(logger), SMTINTERPOL_FACTORY_CLASS)
+            .create(config, logger, shutdownNotifier, logfile, randomSeed);
 
       case MATHSAT5:
         return Mathsat5SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
 
-      // Z3 and Z3Java also require their own custom class loader to perform trickery with the
-      // java.library.path without affecting the main class loader.
+        // Z3 and Z3Java also require their own custom class loader to perform trickery with the
+        // java.library.path without affecting the main class loader.
       case Z3:
-        return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS).create(
-            config, logger, shutdownNotifier, logfile, randomSeed);
+        return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
+            .create(config, logger, shutdownNotifier, logfile, randomSeed);
       case Z3JAVA:
-        return getFactoryForSolver(z3ClassLoader, Z3JAVA_FACTORY_CLASS).create(
-            config, logger, shutdownNotifier, logfile, randomSeed);
+        return getFactoryForSolver(z3ClassLoader, Z3JAVA_FACTORY_CLASS)
+            .create(config, logger, shutdownNotifier, logfile, randomSeed);
 
       case PRINCESS:
         // TODO: pass randomSeed to Princess
@@ -173,7 +171,6 @@ public class SolverContextFactory {
       default:
         throw new AssertionError("no solver selected");
     }
-
   }
 
   /**
@@ -228,7 +225,6 @@ public class SolverContextFactory {
    */
   public static abstract class InnerUtilFactory {
 
-
     public SolverContext create(
         Configuration config,
         LogManager logger,
@@ -240,20 +236,20 @@ public class SolverContextFactory {
       final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
       try {
         currentThread.setContextClassLoader(this.getClass().getClassLoader());
-        return generateSolverContext(
-            config, logger, pShutdownNotifier, solverLogfile, randomSeed);
+        return generateSolverContext(config, logger, pShutdownNotifier, solverLogfile, randomSeed);
       } finally {
         currentThread.setContextClassLoader(contextClassLoader);
       }
     }
+
     protected abstract SolverContext generateSolverContext(
         Configuration config,
         LogManager logger,
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed) throws InvalidConfigurationException;
+        long randomSeed)
+        throws InvalidConfigurationException;
   }
-
 
   // ---- Custom class loaders ----
 
@@ -265,7 +261,8 @@ public class SolverContextFactory {
   private static final Pattern SMTINTERPOL_CLASSES =
       Pattern.compile(
           "^("
-              + Pattern.quote(solverPathPrefix) + "\\.smtinterpol|"
+              + Pattern.quote(solverPathPrefix)
+              + "\\.smtinterpol|"
               + "de\\.uni_freiburg\\.informatik\\.ultimate|"
               + "java_cup\\.runtime|"
               + "org\\.apache\\.log4j"
@@ -279,23 +276,20 @@ public class SolverContextFactory {
   // and we have to force it to look in the correct directory.
   private static final String Z3JAVA_FACTORY_CLASS =
       solverPathPrefix + ".z3java.Z3JavaLoadingFactory";
-  private static final String Z3_FACTORY_CLASS =
-      solverPathPrefix + ".z3.Z3LoadingFactory";
-  private static final Pattern Z3_CLASSES = Pattern.compile(
-      "^("
-          + "com\\.microsoft\\.z3|"
-          + Pattern.quote(solverPathPrefix) + "\\.z3java|"
-          + Pattern.quote(solverPathPrefix) + "\\.z3"
-          + ")\\..*"
-  );
+  private static final String Z3_FACTORY_CLASS = solverPathPrefix + ".z3.Z3LoadingFactory";
+  private static final Pattern Z3_CLASSES =
+      Pattern.compile(
+          "^("
+              + "com\\.microsoft\\.z3|"
+              + Pattern.quote(solverPathPrefix)
+              + "\\.z3java|"
+              + Pattern.quote(solverPathPrefix)
+              + "\\.z3"
+              + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
-  private static final Set<String> expectedLibrariesToLoad = ImmutableSet.of(
-      "libz3java",
-      "libz3j",
-      "z3j",
-      "z3java"
-  );
+  private static final Set<String> expectedLibrariesToLoad =
+      ImmutableSet.of("libz3java", "libz3j", "z3j", "z3java");
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
   private static final ClassLoader z3ClassLoader = createZ3ClassLoader();
@@ -305,8 +299,7 @@ public class SolverContextFactory {
   private static WeakReference<ClassLoader> smtInterpolClassLoader = new WeakReference<>(null);
   private static final AtomicInteger smtInterpolLoadingCount = new AtomicInteger(0);
 
-  private InnerUtilFactory getFactoryForSolver(ClassLoader pClassLoader,
-                                               String factoryClassName) {
+  private InnerUtilFactory getFactoryForSolver(ClassLoader pClassLoader, String factoryClassName) {
     try {
       @SuppressWarnings("unchecked")
       Class<? extends InnerUtilFactory> factoryClass =
@@ -327,9 +320,10 @@ public class SolverContextFactory {
       URLClassLoader uParentClassLoader = (URLClassLoader) parentClassLoader;
       urls = uParentClassLoader.getURLs();
     } else {
-      urls = new URL[] {
-          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
-      };
+      urls =
+          new URL[] {
+            SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
+          };
     }
     return new CustomLibraryPathClassLoader(Z3_CLASSES, urls, parentClassLoader);
   }
@@ -353,23 +347,17 @@ public class SolverContextFactory {
     // so the class loader should not load java-cup classes from any other place.
     String classFile = SMTINTERPOL_CLASS.replace('.', File.separatorChar) + ".class";
     URL url = classLoader.getResource(classFile);
-    if (url != null
-        && url.getProtocol().equals("jar")
-        && url.getFile().contains("!")) {
+    if (url != null && url.getProtocol().equals("jar") && url.getFile().contains("!")) {
       try {
-        url =
-            new URL(
-                url.getFile().substring(0, url.getFile().lastIndexOf('!')));
+        url = new URL(url.getFile().substring(0, url.getFile().lastIndexOf('!')));
 
         URL[] urls = {
-          url,
-          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
+          url, SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
         };
 
         // By using ChildFirstPatternClassLoader we ensure that classes
         // do not get loaded by the parent class loader.
-        classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls,
-            classLoader);
+        classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls, classLoader);
 
       } catch (MalformedURLException e) {
         logger.logUserException(
@@ -399,10 +387,7 @@ public class SolverContextFactory {
      * @param pUrls         The sources where this class loader should load classes from.
      * @param pParent       The parent class loader.
      */
-    CustomLibraryPathClassLoader(
-        Pattern pClassPattern,
-        URL[] pUrls,
-        ClassLoader pParent) {
+    CustomLibraryPathClassLoader(Pattern pClassPattern, URL[] pUrls, ClassLoader pParent) {
       super(pClassPattern, pUrls, pParent);
     }
 

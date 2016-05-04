@@ -1,5 +1,8 @@
 package org.sosy_lab.solver.api;
 
+import org.sosy_lab.solver.SolverContextFactory.Solvers;
+import org.sosy_lab.solver.basicimpl.SolverContextStatistics;
+
 /**
  * Instances of this interface provide access to an SMT solver.
  * A single SolverContext should be used only from a single thread.
@@ -70,9 +73,24 @@ public interface SolverContext extends AutoCloseable {
   OptimizationProverEnvironment newOptimizationProverEnvironment();
 
   /**
+   * Create a fresh new {@link OptimizationProverEnvironment} with caching.
+   */
+  OptimizationProverEnvironment newCachedOptimizationProverEnvironment();
+
+  /**
    * Get version information out of the solver.
    */
   String getVersion();
+
+  /**
+   * Get solver name (MATHSAT5/Z3/etc...).
+   */
+  Solvers getSolverName();
+
+  /**
+   * Get statistics information on solver usage.
+   */
+  SolverContextStatistics getStatistics();
 
   /**
    * Close the solver context.

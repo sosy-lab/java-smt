@@ -41,8 +41,7 @@ public class ExceptionHandlerTest extends SolverBasedTest0 {
     return Solvers.values();
   }
 
-  @Parameter
-  public Solvers solver;
+  @Parameter public Solvers solver;
 
   @Override
   protected Solvers solverToUse() {
