@@ -29,9 +29,11 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
@@ -54,8 +56,19 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     formulaCreator = creator;
   }
 
-  static Mathsat5Model create(Mathsat5FormulaCreator creator, long msatEnv) {
-    return new Mathsat5Model(msat_get_model(msatEnv), creator);
+  static Mathsat5Model create(Mathsat5FormulaCreator creator, long msatEnv) throws SolverException {
+    long msatModel;
+    try {
+      msatModel = msat_get_model(msatEnv);
+    } catch (IllegalArgumentException e) {
+      String msg = Strings.nullToEmpty(e.getMessage());
+      if (msg.contains("non-integer model value")) {
+        // This is not a bug in our code, but a problem of MathSAT
+        throw new SolverException(e.getMessage(), e);
+      }
+      throw e;
+    }
+    return new Mathsat5Model(msatModel, creator);
   }
 
   @Override
