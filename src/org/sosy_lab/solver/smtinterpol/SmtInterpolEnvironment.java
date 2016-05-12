@@ -51,8 +51,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
@@ -63,6 +62,8 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -229,7 +230,8 @@ class SmtInterpolEnvironment {
       Path logfile = smtLogfile.getFreshPath();
 
       try {
-        PrintWriter out = new PrintWriter(Files.openOutputFile(logfile));
+        PrintWriter out =
+            new PrintWriter(MoreFiles.openOutputFile(logfile, Charset.defaultCharset()));
 
         out.println("(set-option :random-seed " + script.getOption(":random-seed") + ")");
         out.println("(set-option :produce-interpolants true)");

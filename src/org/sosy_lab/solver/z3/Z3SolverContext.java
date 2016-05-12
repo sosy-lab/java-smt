@@ -31,8 +31,7 @@ import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.Files;
-import org.sosy_lab.common.io.Path;
+import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
@@ -43,6 +42,8 @@ import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 import org.sosy_lab.solver.z3.Z3NativeApi.PointerToInt;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -142,7 +143,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       Path absolutePath = extraOptions.log.toAbsolutePath();
       try {
         // Z3 segfaults if it cannot write to the file, thus we write once first
-        Files.writeFile(absolutePath, "");
+        MoreFiles.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
 
         open_log(absolutePath.toString());
       } catch (IOException e) {

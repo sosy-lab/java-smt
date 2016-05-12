@@ -34,7 +34,6 @@ import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.log.NullLogManager;
@@ -49,6 +48,8 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -398,12 +399,12 @@ public class SolverContextFactory {
 
         // Use the directory-specific folder.
         Path outFile = NativeLibraries.getNativeLibraryPath().resolve(mappedName);
-        if (!outFile.exists()) {
+        if (!Files.exists(outFile)) {
 
           // If fails, use the same directory as the JAR.
           outFile = NativeLibraries.getPathToJar().resolve(mappedName);
         }
-        if (!outFile.exists()) {
+        if (!Files.exists(outFile)) {
 
           // If that fails as well, use standard loading.
           return super.findLibrary(libname);

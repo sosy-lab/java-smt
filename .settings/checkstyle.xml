@@ -129,7 +129,7 @@
     </module>
     <module name="IllegalType">
       <property name="tokens" value="METHOD_DEF,PARAMETER_DEF,VARIABLE_DEF"/>
-      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector, java.nio.file.Path, java.nio.file.Paths"/>
+      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector"/>
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>

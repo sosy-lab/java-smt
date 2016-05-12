@@ -42,10 +42,11 @@ import ap.terfor.ConstantTerm;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.io.Path;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.solver.princess.PrincessSolverContext.PrincessOptions;
 
@@ -56,6 +57,7 @@ import scala.collection.Seq;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -149,12 +151,13 @@ class PrincessEnvironment {
     return stack;
   }
 
+  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   private SimpleAPI getNewApi(boolean useForInterpolation) {
     final SimpleAPI newApi;
     if (basicLogfile != null) {
       Path logPath = basicLogfile.getFreshPath();
-      String fileName = logPath.getName();
-      String absPath = logPath.getAbsolutePath();
+      String fileName = logPath.getFileName().toString();
+      String absPath = logPath.toAbsolutePath().toString();
       File directory = new File(absPath.substring(0, absPath.length() - fileName.length()));
       newApi = SimpleAPI.spawnWithLogNoSanitise(fileName, directory);
     } else {
