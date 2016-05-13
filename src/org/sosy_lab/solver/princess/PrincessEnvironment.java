@@ -175,14 +175,14 @@ class PrincessEnvironment {
     allStacks.remove(stack);
   }
 
-  public List<IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
+  public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
     Tuple3<
             Seq<IFormula>, scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>>
         triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
 
-    List<IExpression> formula = castToExpression(seqAsJavaList(triple._1()));
+    List<? extends IExpression> formula = seqAsJavaList(triple._1());
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
     Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
@@ -228,14 +228,6 @@ class PrincessEnvironment {
     } else {
       return PrincessTermType.Integer;
     }
-  }
-
-  private List<IExpression> castToExpression(List<IFormula> formula) {
-    List<IExpression> retVal = new ArrayList<>(formula.size());
-    for (IFormula f : formula) {
-      retVal.add(f);
-    }
-    return retVal;
   }
 
   public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
