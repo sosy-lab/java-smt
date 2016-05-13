@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.visitors;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -76,14 +75,7 @@ public abstract class BooleanFormulaTransformationVisitor
 
     // Filtered collections avoid extra allocations.
     Collection<BooleanFormula> filtered =
-        Collections2.filter(
-            processedOperands,
-            new Predicate<BooleanFormula>() {
-              @Override
-              public boolean apply(BooleanFormula input) {
-                return !bfmgr.isTrue(input);
-              }
-            });
+        Collections2.filter(processedOperands, input -> !bfmgr.isTrue(input));
     return bfmgr.and(filtered);
   }
 
@@ -95,14 +87,7 @@ public abstract class BooleanFormulaTransformationVisitor
       }
     }
     Collection<BooleanFormula> filtered =
-        Collections2.filter(
-            processedOperands,
-            new Predicate<BooleanFormula>() {
-              @Override
-              public boolean apply(BooleanFormula input) {
-                return !bfmgr.isFalse(input);
-              }
-            });
+        Collections2.filter(processedOperands, input -> !bfmgr.isFalse(input));
     return bfmgr.or(filtered);
   }
 
