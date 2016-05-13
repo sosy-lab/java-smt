@@ -24,7 +24,6 @@ import ap.SimpleAPI.ModelValue;
 import ap.SimpleAPI.PartialModel;
 import ap.parser.IExpression;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.basicimpl.AbstractModel;

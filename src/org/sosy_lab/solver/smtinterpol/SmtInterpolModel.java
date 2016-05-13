@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;

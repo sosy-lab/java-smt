@@ -26,7 +26,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_interpolan
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
