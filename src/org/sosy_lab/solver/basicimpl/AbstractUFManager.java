@@ -103,12 +103,8 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     List<FormulaType<?>> argTypes =
         from(pArgs)
             .transform(
-                new Function<Formula, FormulaType<?>>() {
-                  @Override
-                  public FormulaType<?> apply(Formula pArg0) {
-                    return getFormulaCreator().getFormulaType(pArg0);
-                  }
-                })
+                (Function<Formula, FormulaType<?>>)
+                    pArg0 -> getFormulaCreator().getFormulaType(pArg0))
             .toList();
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     return callUF(func, pArgs);

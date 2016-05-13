@@ -61,29 +61,11 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
       "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert  (or e (and (xor a b) d)))";
   private static final String Z3_DUMP2 =
       "(declare-fun b () Int)\n(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and (and (or $x35 u) q) (and $x9 $x35)))))";
-  private Supplier<BooleanFormula> boolExprGen1 =
-      new Supplier<BooleanFormula>() {
-        @Override
-        public BooleanFormula get() {
-          return genBoolExpr();
-        }
-      };
+  private Supplier<BooleanFormula> boolExprGen1 = this::genBoolExpr;
 
-  private Supplier<BooleanFormula> boolExprGen2 =
-      new Supplier<BooleanFormula>() {
-        @Override
-        public BooleanFormula get() {
-          return redundancyExprGen();
-        }
-      };
+  private Supplier<BooleanFormula> boolExprGen2 = this::redundancyExprGen;
 
-  private Supplier<BooleanFormula> boolExprGen3 =
-      new Supplier<BooleanFormula>() {
-        @Override
-        public BooleanFormula get() {
-          return functionExprGen();
-        }
-      };
+  private Supplier<BooleanFormula> boolExprGen3 = this::functionExprGen;
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {

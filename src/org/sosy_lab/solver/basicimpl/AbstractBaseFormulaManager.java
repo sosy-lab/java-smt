@@ -33,13 +33,7 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
 
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
-  final Function<Formula, TFormulaInfo> extractor =
-      new Function<Formula, TFormulaInfo>() {
-        @Override
-        public TFormulaInfo apply(Formula pInput) {
-          return extractInfo(pInput);
-        }
-      };
+  final Function<Formula, TFormulaInfo> extractor = this::extractInfo;
 
   AbstractBaseFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
     this.formulaCreator = pFormulaCreator;

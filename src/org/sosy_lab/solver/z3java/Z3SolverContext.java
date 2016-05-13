@@ -146,13 +146,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     // final Context context = new Context(cfg);
     final Context context = new InterpolationContext(cfg);
 
-    ShutdownNotifier.ShutdownRequestListener interruptListener =
-        new ShutdownNotifier.ShutdownRequestListener() {
-          @Override
-          public void shutdownRequested(String reason) {
-            context.interrupt();
-          }
-        };
+    ShutdownNotifier.ShutdownRequestListener interruptListener = reason -> context.interrupt();
 
     Sort boolSort = context.getBoolSort();
     Sort integerSort = context.getIntSort();

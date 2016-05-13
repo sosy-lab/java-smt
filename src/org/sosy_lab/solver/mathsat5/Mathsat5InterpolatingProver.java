@@ -85,15 +85,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     Preconditions.checkState(!closed);
     try {
       long[] assumptions =
-          Longs.toArray(
-              Lists.transform(
-                  pAssumptions,
-                  new Function<BooleanFormula, Long>() {
-                    @Override
-                    public Long apply(BooleanFormula pInput) {
-                      return Mathsat5FormulaManager.getMsatTerm(pInput);
-                    }
-                  }));
+          Longs.toArray(Lists.transform(pAssumptions, Mathsat5FormulaManager::getMsatTerm));
       return !msat_check_sat_with_assumptions(curEnv, assumptions);
     } catch (IllegalStateException e) {
       handleSolverExceptionInUnsatCheck(e);

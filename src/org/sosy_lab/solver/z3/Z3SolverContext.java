@@ -161,13 +161,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     // TODO add some other params, memory-limit?
     final long context = mk_context_rc(cfg);
-    ShutdownNotifier.ShutdownRequestListener interruptListener =
-        new ShutdownNotifier.ShutdownRequestListener() {
-          @Override
-          public void shutdownRequested(String reason) {
-            interrupt(context);
-          }
-        };
+    ShutdownNotifier.ShutdownRequestListener interruptListener = reason -> interrupt(context);
     del_config(cfg);
 
     long boolSort = mk_bool_sort(context);

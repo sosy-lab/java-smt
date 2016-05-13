@@ -119,14 +119,7 @@ class SmtInterpolEnvironment {
     smtLogfile = pSmtLogfile;
 
     final SMTInterpol smtInterpol =
-        new SMTInterpol(
-            createLog4jLogger(logger),
-            new TerminationRequest() {
-              @Override
-              public boolean isTerminationRequested() {
-                return pShutdownNotifier.shouldShutdown();
-              }
-            });
+        new SMTInterpol(createLog4jLogger(logger), pShutdownNotifier::shouldShutdown);
 
     if (smtLogfile != null) {
       script = createLoggingWrapper(smtInterpol);

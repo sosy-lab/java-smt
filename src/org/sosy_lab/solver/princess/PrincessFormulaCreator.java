@@ -170,7 +170,7 @@ class PrincessFormulaCreator
           // so we can't get meaningful list here.
           // HOWEVER, passing this list to QuantifiedFormulaManager#mkQuantifier
           // works as expected.
-          new ArrayList<Formula>(),
+          new ArrayList<>(),
           body);
 
       // variable bound by a quantifier

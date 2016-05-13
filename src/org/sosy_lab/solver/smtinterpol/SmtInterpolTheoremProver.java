@@ -155,12 +155,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
     Term[] terms = env.getUnsatCore();
     return Lists.transform(
         Arrays.asList(terms),
-        new Function<Term, BooleanFormula>() {
-          @Override
-          public BooleanFormula apply(Term input) {
-            return creator.encapsulateBoolean(annotatedTerms.get(input.toString()));
-          }
-        });
+        input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
   }
 
   @Override

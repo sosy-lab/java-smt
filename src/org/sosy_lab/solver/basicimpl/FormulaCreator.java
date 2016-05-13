@@ -117,13 +117,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   // Functional helper.
   @SuppressWarnings("checkstyle:visibilitymodifier")
-  public Function<TFormulaInfo, BooleanFormula> encapsulateBoolean =
-      new Function<TFormulaInfo, BooleanFormula>() {
-        @Override
-        public BooleanFormula apply(TFormulaInfo pInput) {
-          return encapsulateBoolean(pInput);
-        }
-      };
+  public Function<TFormulaInfo, BooleanFormula> encapsulateBoolean = this::encapsulateBoolean;
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isBooleanType();
@@ -241,13 +235,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       FormulaVisitor<R> visitor, final Formula formula, final TFormulaInfo f);
 
   @SuppressWarnings("checkstyle:visibilitymodifier")
-  public final Function<Formula, TFormulaInfo> infoExtractor =
-      new Function<Formula, TFormulaInfo>() {
-        @Override
-        public TFormulaInfo apply(Formula formula) {
-          return extractInfo(formula);
-        }
-      };
+  public final Function<Formula, TFormulaInfo> infoExtractor = this::extractInfo;
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, infoExtractor);
@@ -315,13 +303,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public Map<String, TFormulaInfo> extractVariablesAndUFs(
       final TFormulaInfo pFormula, final boolean extractUFs) {
     return Maps.transformValues(
-        extractVariablesAndUFs(encapsulateWithTypeOf(pFormula), extractUFs),
-        new Function<Formula, TFormulaInfo>() {
-          @Override
-          public TFormulaInfo apply(Formula input) {
-            return extractInfo(input);
-          }
-        });
+        extractVariablesAndUFs(encapsulateWithTypeOf(pFormula), extractUFs), this::extractInfo);
   }
 
   /**

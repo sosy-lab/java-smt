@@ -107,12 +107,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     this.creator = creator;
 
     terminationTest =
-        new TerminationTest() {
-          @Override
-          public boolean shouldTerminate() throws InterruptedException {
-            shutdownNotifier.shutdownIfNecessary();
-            return false;
-          }
+        () -> {
+          shutdownNotifier.shutdownIfNecessary();
+          return false;
         };
   }
 
