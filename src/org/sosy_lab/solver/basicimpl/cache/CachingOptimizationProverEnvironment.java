@@ -221,6 +221,7 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
     return ImmutableList.copyOf(getModel().iterator());
   }
 
+  @Override
   public String toString() {
     return delegate.toString();
   }
