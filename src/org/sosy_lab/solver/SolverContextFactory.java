@@ -64,7 +64,7 @@ import javax.annotation.Nullable;
  *
  * <p>Main entry point for JavaSMT.
  */
-@Options(prefix = "solver", deprecatedPrefix = "cpa.predicate")
+@Options(prefix = "solver")
 public class SolverContextFactory {
 
   @VisibleForTesting
