@@ -205,18 +205,14 @@ public class SolverTacticsTest extends SolverBasedTest0 {
       } else {
         containsMoreAnd = true;
       }
-      for (BooleanFormula op : pOperands) {
-        visit(op);
-      }
+      pOperands.forEach(this::visit);
       return null;
     }
 
     @Override
     public Void visitOr(List<BooleanFormula> pOperands) {
       if (started) {
-        for (BooleanFormula op : pOperands) {
-          visit(op);
-        }
+        pOperands.forEach(this::visit);
       }
       return null;
     }
@@ -318,9 +314,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {
-        for (BooleanFormula op : pOperands) {
-          visit(op);
-        }
+        pOperands.forEach(this::visit);
       }
       return null;
     }
@@ -330,9 +324,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
       if (wasLastVisitNot) {
         notOnlyAtAtoms = false;
       } else {
-        for (BooleanFormula op : pOperands) {
-          visit(op);
-        }
+        pOperands.forEach(this::visit);
       }
       return null;
     }

@@ -133,18 +133,10 @@ class PrincessEnvironment {
             this, newApi, useForInterpolation, shutdownNotifier, princessOptions);
 
     // add all symbols, that are available until now
-    for (IFormula s : boolVariablesCache.values()) {
-      stack.addSymbol(s);
-    }
-    for (ITerm s : intVariablesCache.values()) {
-      stack.addSymbol(s);
-    }
-    for (ITerm s : arrayVariablesCache.values()) {
-      stack.addSymbol(s);
-    }
-    for (IFunction s : functionsCache.values()) {
-      stack.addSymbol(s);
-    }
+    boolVariablesCache.values().forEach(stack::addSymbol);
+    intVariablesCache.values().forEach(stack::addSymbol);
+    arrayVariablesCache.values().forEach(stack::addSymbol);
+    functionsCache.values().forEach(stack::addSymbol);
 
     registeredStacks.add(stack);
     allStacks.add(stack);
@@ -283,9 +275,7 @@ class PrincessEnvironment {
             todoAbbrevs.add(name);
             Set<IExpression> varsFromAbbrev =
                 new HashSet<>(creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
-            for (IExpression addVar : Sets.difference(varsFromAbbrev, allVars)) {
-              declaredFunctions.push(addVar);
-            }
+            Sets.difference(varsFromAbbrev, allVars).forEach(declaredFunctions::push);
             allVars.addAll(varsFromAbbrev);
           } else {
             out.append("(declare-fun ").append(name);
