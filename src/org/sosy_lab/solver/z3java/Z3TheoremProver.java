@@ -198,7 +198,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
           }
         }
 
-        callback.apply(Lists.transform(Arrays.asList(valuesOfModel), creator.encapsulateBoolean));
+        callback.apply(Lists.transform(Arrays.asList(valuesOfModel), creator::encapsulateBoolean));
 
         BoolExpr negatedModel = z3context.mkNot(z3context.mkAnd(valuesOfModel));
         z3solver.add(negatedModel);

@@ -21,7 +21,6 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -168,7 +167,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
       importantTerms[i++] = mgr.extractInfo(impF);
     }
     for (Term[] model : env.checkAllSat(importantTerms)) {
-      callback.apply(Lists.transform(Arrays.asList(model), creator.encapsulateBoolean));
+      callback.apply(Lists.transform(Arrays.asList(model), creator::encapsulateBoolean));
     }
     return callback.getResult();
   }

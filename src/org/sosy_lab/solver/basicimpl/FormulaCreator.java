@@ -115,10 +115,6 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
-  // Functional helper.
-  @SuppressWarnings("checkstyle:visibilitymodifier")
-  public Function<TFormulaInfo, BooleanFormula> encapsulateBoolean = this::encapsulateBoolean;
-
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isBooleanType();
     return new BooleanFormulaImpl<>(pTerm);
