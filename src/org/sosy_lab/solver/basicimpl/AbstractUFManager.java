@@ -20,9 +20,7 @@
 package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.FluentIterable.from;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -32,9 +30,9 @@ import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.UFManager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class simplifies the implementation of the FunctionFormulaManager by converting the types
@@ -62,10 +60,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
         !pArgTypes.contains(FormulaType.BooleanType),
         "Uninterpreted functions with boolean arguments are currently not supported in JavaSMT.");
 
-    List<TType> argTypes = new ArrayList<>(pArgTypes.size());
-    for (FormulaType<?> argtype : pArgTypes) {
-      argTypes.add(toSolverType(argtype));
-    }
+    List<TType> argTypes = pArgTypes.stream().map(this::toSolverType).collect(Collectors.toList());
 
     return FunctionDeclarationImpl.of(
         pName,
@@ -99,13 +94,8 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
-
     List<FormulaType<?>> argTypes =
-        from(pArgs)
-            .transform(
-                (Function<Formula, FormulaType<?>>)
-                    pArg0 -> getFormulaCreator().getFormulaType(pArg0))
-            .toList();
+        pArgs.stream().map(getFormulaCreator()::getFormulaType).collect(Collectors.toList());
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     return callUF(func, pArgs);
   }

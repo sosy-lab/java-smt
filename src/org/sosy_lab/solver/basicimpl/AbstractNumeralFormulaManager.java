@@ -167,7 +167,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
-    return wrap(sumImpl(Lists.transform(operands, extractor)));
+    return wrap(sumImpl(Lists.transform(operands, this::extractInfo)));
   }
 
   protected TFormulaInfo sumImpl(List<TFormulaInfo> operands) {

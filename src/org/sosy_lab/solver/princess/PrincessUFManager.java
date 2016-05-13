@@ -20,11 +20,8 @@
 package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.FluentIterable.from;
 
 import ap.parser.IExpression;
-
-import com.google.common.base.Predicates;
 
 import org.sosy_lab.solver.basicimpl.AbstractUFManager;
 import org.sosy_lab.solver.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
@@ -55,7 +52,7 @@ class PrincessUFManager
         pReturnType == PrincessTermType.Integer || pReturnType == PrincessTermType.Boolean,
         "Princess does not support return types of UFs other than Integer");
     checkArgument(
-        from(args).allMatch(Predicates.equalTo(PrincessTermType.Integer)),
+        args.stream().allMatch(PrincessTermType.Integer::equals),
         "Princess does not support argument types of UFs other than Integer");
 
     return new PrincessIFunctionDeclaration(

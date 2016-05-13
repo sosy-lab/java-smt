@@ -21,7 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
@@ -230,11 +229,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public abstract <R> R visit(
       FormulaVisitor<R> visitor, final Formula formula, final TFormulaInfo f);
 
-  @SuppressWarnings("checkstyle:visibilitymodifier")
-  public final Function<Formula, TFormulaInfo> infoExtractor = this::extractInfo;
-
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
-    return Lists.transform(input, infoExtractor);
+    return Lists.transform(input, this::extractInfo);
   }
 
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {

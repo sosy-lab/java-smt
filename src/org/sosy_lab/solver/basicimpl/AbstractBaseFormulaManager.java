@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.solver.basicimpl;
 
-import com.google.common.base.Function;
-
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -32,8 +30,6 @@ import org.sosy_lab.solver.api.FormulaType;
 abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
-
-  final Function<Formula, TFormulaInfo> extractor = this::extractInfo;
 
   AbstractBaseFormulaManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
     this.formulaCreator = pFormulaCreator;

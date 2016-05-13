@@ -220,7 +220,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     Preconditions.checkState(!closed);
     Status result =
         z3solver.check(
-            Collections2.transform(assumptions, creator.infoExtractor)
+            Collections2.transform(assumptions, creator::extractInfo)
                 .toArray(new Expr[assumptions.size()]));
     undefinedStatusToException(result);
     Preconditions.checkArgument(result != Status.UNKNOWN);

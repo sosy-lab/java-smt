@@ -104,7 +104,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (pBits.size() == 1) {
       return Iterables.getOnlyElement(pBits);
     }
-    TFormulaInfo result = andImpl(Collections2.transform(pBits, extractor));
+    TFormulaInfo result = andImpl(Collections2.transform(pBits, this::extractInfo));
     return wrap(result);
   }
 
@@ -116,7 +116,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (pBits.length == 1) {
       return pBits[0];
     }
-    TFormulaInfo result = andImpl(Collections2.transform(Lists.newArrayList(pBits), extractor));
+    TFormulaInfo result =
+        andImpl(Collections2.transform(Lists.newArrayList(pBits), this::extractInfo));
     return wrap(result);
   }
 
@@ -144,7 +145,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (pBits.length == 1) {
       return pBits[0];
     }
-    TFormulaInfo result = orImpl(Collections2.transform(Lists.newArrayList(pBits), extractor));
+    TFormulaInfo result =
+        orImpl(Collections2.transform(Lists.newArrayList(pBits), this::extractInfo));
     return wrap(result);
   }
 
@@ -166,7 +168,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (pBits.size() == 1) {
       return Iterables.getOnlyElement(pBits);
     }
-    TFormulaInfo result = orImpl(Collections2.transform(pBits, extractor));
+    TFormulaInfo result = orImpl(Collections2.transform(pBits, this::extractInfo));
     return wrap(result);
   }
 

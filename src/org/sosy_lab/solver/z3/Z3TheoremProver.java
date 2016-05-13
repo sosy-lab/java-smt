@@ -152,7 +152,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
         solver_check_assumptions(
             z3context,
             z3solver,
-            Longs.toArray(Collections2.transform(assumptions, creator.infoExtractor)));
+            Longs.toArray(Collections2.transform(assumptions, creator::extractInfo)));
     undefinedStatusToException(result);
     return result == Z3_LBOOL.Z3_L_FALSE.status;
   }

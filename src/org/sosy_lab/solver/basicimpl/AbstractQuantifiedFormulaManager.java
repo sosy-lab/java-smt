@@ -43,7 +43,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(exists(Lists.transform(pVariables, extractor), extractInfo(pBody)));
+    return wrap(exists(Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
   }
 
   @Override
@@ -55,7 +55,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public final BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(forall(Lists.transform(pVariables, extractor), extractInfo(pBody)));
+    return wrap(forall(Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
   }
 
   @Override
@@ -77,7 +77,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(mkQuantifier(q, Lists.transform(pVariables, extractor), extractInfo(pBody)));
+    return wrap(
+        mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
   }
 
   public abstract TFormulaInfo mkQuantifier(
