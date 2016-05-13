@@ -354,15 +354,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
+  private String getAppName(long f) {
+    long funcDecl = get_app_decl(environment, f);
+    long symbol = get_decl_name(environment, funcDecl);
+    return symbolToString(symbol);
+  }
+
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (get_ast_kind(environment, f)) {
       case Z3_NUMERAL_AST:
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
-        long funcDecl = get_app_decl(environment, f);
-        long symbol = get_decl_name(environment, funcDecl);
-        String name = symbolToString(symbol);
         int arity = get_app_num_args(environment, f);
 
         if (arity == 0) {
@@ -381,7 +384,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
             // Has to be a variable otherwise.
             // TODO: assert that.
-            return visitor.visitFreeVariable(formula, name);
+            return visitor.visitFreeVariable(formula, getAppName(f));
           }
         }
 
@@ -397,7 +400,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             formula,
             args.build(),
             FunctionDeclarationImpl.of(
-                name, getDeclarationKind(f), argTypes.build(), getFormulaType(f), funcDecl));
+                getAppName(f),
+                getDeclarationKind(f),
+                argTypes.build(),
+                getFormulaType(f),
+                get_app_decl(environment, f)));
       case Z3_VAR_AST:
         int deBruijnIdx = get_index_value(environment, f);
         return visitor.visitBoundVariable(formula, deBruijnIdx);
@@ -420,6 +427,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3NativeApiConstants.Z3_STRING_SYMBOL:
         return get_symbol_string(environment, symbol);
       case Z3NativeApiConstants.Z3_INT_SYMBOL:
+
+        // Bound variable.
         return "#" + get_symbol_int(environment, symbol);
       default:
         throw new AssertionError("Unknown symbol kind " + get_symbol_kind(environment, symbol));
