@@ -26,6 +26,8 @@ package org.sosy_lab.solver.mathsat5;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
+import org.sosy_lab.solver.SolverException;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -156,17 +158,21 @@ class Mathsat5NativeApi {
   /**
    * Solve environment and check for satisfiability.
    * Return true if sat, false if unsat.
+   * @throws SolverException if a mathsat problem occured
+   * @throws IllegalStateException in all other problematic cases
    */
-  public static boolean msat_check_sat(long e) throws InterruptedException {
+  public static boolean msat_check_sat(long e)
+      throws InterruptedException, IllegalStateException, SolverException {
     return processSolveResult(e, msat_solve(e));
   }
 
   public static boolean msat_check_sat_with_assumptions(long e, long[] assumptions)
-      throws InterruptedException {
+      throws InterruptedException, IllegalStateException, SolverException {
     return processSolveResult(e, msat_solve_with_assumptions(e, assumptions, assumptions.length));
   }
 
-  private static boolean processSolveResult(long e, int resultCode) throws IllegalStateException {
+  private static boolean processSolveResult(long e, int resultCode)
+      throws IllegalStateException, SolverException {
     switch (resultCode) {
       case MSAT_SAT:
         return true;
@@ -174,6 +180,12 @@ class Mathsat5NativeApi {
         return false;
       default:
         String msg = Strings.emptyToNull(msat_last_error_message(e));
+
+        if (msg != null && msg.contains("non-integer model value")) {
+          //·This·is·not·a·bug·in·our·code,·but·a·problem·of·MathSAT
+          throw new SolverException(msg);
+        }
+
         String code = (resultCode == MSAT_UNKNOWN) ? "\"unknown\"" : resultCode + "";
         throw new IllegalStateException(
             "msat_solve returned " + code + (msg != null ? ": " + msg : ""));

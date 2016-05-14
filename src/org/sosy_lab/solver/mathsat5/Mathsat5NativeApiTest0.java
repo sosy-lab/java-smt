@@ -48,6 +48,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.solver.SolverException;
 
 /**
  * This class is not part of the normal JavaSMT test suite because
@@ -105,7 +106,8 @@ public class Mathsat5NativeApiTest0 {
   }
 
   @Test
-  public void modularCongruence() throws InterruptedException {
+  public void modularCongruence()
+      throws InterruptedException, IllegalStateException, SolverException {
     long type = msat_get_integer_type(env);
 
     long v1 = msat_declare_function(env, "v1", type);
