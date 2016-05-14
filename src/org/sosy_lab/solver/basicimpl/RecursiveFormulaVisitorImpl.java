@@ -58,11 +58,7 @@ final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProce
   }
 
   private void addToQueueIfNecessary(TraversalProcess result, List<? extends Formula> pOperands) {
-    for (Formula operand : pOperands) {
-      if (result.contains(operand)) {
-        addToQueue(operand);
-      }
-    }
+    pOperands.stream().filter(result::contains).forEach(this::addToQueue);
   }
 
   Formula pop() {
