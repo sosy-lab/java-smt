@@ -144,7 +144,7 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
   private OptStatus forceCheck() {
     try {
       return delegate.check();
-    } catch (InterruptedException|SolverException pE) {
+    } catch (InterruptedException | SolverException pE) {
       throw new UnsupportedOperationException("Solver exception", pE);
     } finally {
       checkPerformed = true;
