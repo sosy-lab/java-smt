@@ -31,7 +31,6 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.log.TestLogManager;
 import org.sosy_lab.solver.SolverContextFactory;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
@@ -83,7 +82,7 @@ import javax.annotation.Nullable;
 public abstract class SolverBasedTest0 {
 
   protected Configuration config;
-  protected final LogManager logger = TestLogManager.getInstance();
+  protected final LogManager logger = LogManager.createTestLogManager();
 
   protected SolverContextFactory factory;
   protected SolverContext context;

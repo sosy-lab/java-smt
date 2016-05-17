@@ -31,7 +31,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.log.TestLogManager;
 import org.sosy_lab.solver.SolverContextFactory;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -47,7 +46,7 @@ import org.sosy_lab.solver.api.SolverContext;
 @RunWith(Parameterized.class)
 public class TranslateFormulaTest {
 
-  private final LogManager logger = TestLogManager.getInstance();
+  private final LogManager logger = LogManager.createTestLogManager();
 
   private SolverContext from;
   private SolverContext to;

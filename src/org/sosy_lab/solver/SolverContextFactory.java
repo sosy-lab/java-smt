@@ -36,7 +36,6 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.log.NullLogManager;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.logging.LoggingSolverContext;
 import org.sosy_lab.solver.mathsat5.Mathsat5SolverContext;
@@ -212,7 +211,7 @@ public class SolverContextFactory {
       throws InvalidConfigurationException {
     return new SolverContextFactory(
             Configuration.defaultConfiguration(),
-            NullLogManager.getInstance(),
+            LogManager.createNullLogManager(),
             ShutdownNotifier.createDummy())
         .generateContext(solver);
   }
