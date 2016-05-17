@@ -108,23 +108,17 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    try {
-      int status = optimize_check(z3context, z3optContext);
-      if (status == Z3_LBOOL.Z3_L_FALSE.status) {
-        return OptStatus.UNSAT;
-      } else if (status == Z3_LBOOL.Z3_L_UNDEF.status) {
-        logger.log(
-            Level.INFO,
-            "Solver returned an unknown status, explanation: ",
-            optimize_get_reason_unknown(z3context, z3optContext));
-        return OptStatus.UNDEF;
-      } else {
-        return OptStatus.OPT;
-      }
-    } catch (Z3SolverException e) {
-      // check if it's a timeout
-      shutdownNotifier.shutdownIfNecessary();
-      throw e;
+    int status = optimize_check(z3context, z3optContext);
+    if (status == Z3_LBOOL.Z3_L_FALSE.status) {
+      return OptStatus.UNSAT;
+    } else if (status == Z3_LBOOL.Z3_L_UNDEF.status) {
+      logger.log(
+          Level.INFO,
+          "Solver returned an unknown status, explanation: ",
+          optimize_get_reason_unknown(z3context, z3optContext));
+      return OptStatus.UNDEF;
+    } else {
+      return OptStatus.OPT;
     }
   }
 
