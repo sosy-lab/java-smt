@@ -37,27 +37,12 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
 
   @Override
   protected Long select(Long pArray, Long pIndex) {
-    try {
-      final long term = Z3NativeApi.mk_select(z3context, pArray, pIndex);
-      Z3NativeApi.inc_ref(z3context, term);
-
-      return term;
-
-    } catch (IllegalArgumentException ae) {
-      int errorCode = Z3NativeApi.get_error_code(z3context);
-      throw new IllegalArgumentException(
-          String.format(
-              "Errorcode: %d, msg: %s",
-              errorCode,
-              Z3NativeApi.get_error_msg_ex(z3context, errorCode)));
-    }
+    return Z3NativeApi.mk_select(z3context, pArray, pIndex);
   }
 
   @Override
   protected Long store(Long pArray, Long pIndex, Long pValue) {
-    final long term = Z3NativeApi.mk_store(z3context, pArray, pIndex, pValue);
-    Z3NativeApi.inc_ref(z3context, term);
-    return term;
+    return Z3NativeApi.mk_store(z3context, pArray, pIndex, pValue);
   }
 
   @Override
@@ -68,16 +53,11 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
         FormulaType.getArrayType(pIndexType, pElementType);
     final Long z3ArrayType = toSolverType(arrayFormulaType);
 
-    final long arrayTerm = getFormulaCreator().makeVariable(z3ArrayType, pName);
-    Z3NativeApi.inc_ref(z3context, arrayTerm);
-
-    return arrayTerm;
+    return getFormulaCreator().makeVariable(z3ArrayType, pName);
   }
 
   @Override
   protected Long equivalence(Long pArray1, Long pArray2) {
-    final long term = mk_eq(z3context, pArray1, pArray2);
-    Z3NativeApi.inc_ref(z3context, term);
-    return term;
+    return mk_eq(z3context, pArray1, pArray2);
   }
 }
