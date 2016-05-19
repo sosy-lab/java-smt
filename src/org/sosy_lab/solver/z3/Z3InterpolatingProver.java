@@ -19,37 +19,18 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_get;
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_interpolant;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_interpolant;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_params;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_num_scopes;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_proof;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -68,29 +49,29 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   Z3InterpolatingProver(
       Z3FormulaCreator creator, long z3params, ShutdownNotifier pShutdownNotifier) {
     super(creator, pShutdownNotifier);
-    this.z3solver = mk_solver(z3context);
-    solver_inc_ref(z3context, z3solver);
-    solver_set_params(z3context, z3solver, z3params);
+    this.z3solver = Native.mkSolver(z3context);
+    Native.solverIncRef(z3context, z3solver);
+    Native.solverSetParams(z3context, z3solver, z3params);
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(solver_get_num_scopes(z3context, z3solver) >= 1);
+    Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
     level--;
 
     assertedFormulas.removeLast();
-    solver_pop(z3context, z3solver, 1);
+    Native.solverPop(z3context, z3solver, 1);
   }
 
   @Override
   public Long addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
-    inc_ref(z3context, e);
-    solver_assert(z3context, z3solver, e);
+    Native.incRef(z3context, e);
+    Native.solverAssert(z3context, z3solver, e);
     assertedFormulas.addLast(e);
-    dec_ref(z3context, e);
+    Native.decRef(z3context, e);
     return e;
   }
 
@@ -98,16 +79,16 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   public void push() {
     Preconditions.checkState(!closed);
     level++;
-    solver_push(z3context, z3solver);
+    Native.solverPush(z3context, z3solver);
   }
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    int result = solver_check(z3context, z3solver);
+    int result = Native.solverCheck(z3context, z3solver);
     shutdownNotifier.shutdownIfNecessary();
-    Preconditions.checkState(result != Z3_LBOOL.Z3_L_UNDEF.status);
-    return result == Z3_LBOOL.Z3_L_FALSE.status;
+    Preconditions.checkState(result != Z3_lbool.Z3_L_UNDEF.toInt());
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
@@ -127,7 +108,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(
         getSeqInterpolants(
-            ImmutableList.<Set<Long>>of(
+            ImmutableList.of(
                 Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
   }
 
@@ -150,8 +131,11 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
     // build conjunction of each partition
     for (int i = 0; i < partitionedFormulas.size(); i++) {
-      long conjunction = mk_and(z3context, Longs.toArray(partitionedFormulas.get(i)));
-      inc_ref(z3context, conjunction);
+      long conjunction = Native.mkAnd(
+          z3context,
+          partitionedFormulas.get(i).size(),
+          Longs.toArray(partitionedFormulas.get(i)));
+      Native.incRef(z3context, conjunction);
       conjunctionFormulas[i] = conjunction;
     }
 
@@ -175,7 +159,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
           children.add(0, stack.pollLast().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
-        conjunction = mk_and(z3context, Longs.toArray(children));
+        conjunction = Native.mkAnd(z3context, 2, Longs.toArray(children));
       }
 
       final long interpolationPoint;
@@ -185,10 +169,10 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
         Preconditions.checkState(currentSubtree == 0, "subtree of root should start at 0.");
         Preconditions.checkState(stack.isEmpty(), "root should be the last element in the stack.");
       } else {
-        interpolationPoint = mk_interpolant(z3context, conjunction);
+        interpolationPoint = Native.mkInterpolant(z3context, conjunction);
       }
 
-      inc_ref(z3context, interpolationPoint);
+      Native.incRef(z3context, interpolationPoint);
       interpolationFormulas[i] = interpolationPoint;
       stack.addLast(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
       lastSubtree = currentSubtree;
@@ -200,15 +184,15 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     Preconditions.checkState(
         stack.isEmpty(), "root should have been the last element in the stack.");
 
-    final long proof = solver_get_proof(z3context, z3solver);
-    inc_ref(z3context, proof);
+    final long proof = Native.solverGetProof(z3context, z3solver);
+    Native.incRef(z3context, proof);
 
     long interpolationResult =
-        get_interpolant(
+        Native.getInterpolant(
             z3context,
             proof, //refutation of premises := proof
             root, // last element is end of chain (root of tree), pattern := interpolation tree
-            mk_params(z3context));
+            Native.mkParams(z3context));
 
     shutdownNotifier.shutdownIfNecessary();
 
@@ -217,16 +201,17 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // so we only need to copy them
     final List<BooleanFormula> result = new ArrayList<>();
     for (int i = 0; i < partitionedFormulas.size() - 1; i++) {
-      result.add(creator.encapsulateBoolean(ast_vector_get(z3context, interpolationResult, i)));
+      result.add(creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult,
+          i)));
     }
 
     // cleanup
-    dec_ref(z3context, proof);
+    Native.decRef(z3context, proof);
     for (long partition : conjunctionFormulas) {
-      dec_ref(z3context, partition);
+      Native.decRef(z3context, partition);
     }
     for (long partition : interpolationFormulas) {
-      dec_ref(z3context, partition);
+      Native.decRef(z3context, partition);
     }
 
     return result;
@@ -234,7 +219,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   @Override
   protected long getZ3Model() {
-    return solver_get_model(z3context, z3solver);
+    return Native.solverGetModel(z3context, z3solver);
   }
 
   @Override
@@ -247,7 +232,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     assertedFormulas.clear();
 
     //TODO solver_reset(z3context, z3solver);
-    solver_dec_ref(z3context, z3solver);
+    Native.solverDecRef(z3context, z3solver);
     closed = true;
   }
 
@@ -272,6 +257,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   @Override
   public String toString() {
     Preconditions.checkState(!closed);
-    return solver_to_string(z3context, z3solver);
+    return Native.solverToString(z3context, z3solver);
   }
 }

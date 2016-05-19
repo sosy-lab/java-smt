@@ -19,38 +19,8 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_add;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_div;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_eq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_geq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_gt;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_inf;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_is_infinite;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_is_nan;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_is_subnormal;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_is_zero;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_leq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_lt;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_mul;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_nan;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_neg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_numeral_double;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_round_nearest_ties_to_even;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_sub;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_fp_float;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_fp_real;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_fp_signed;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_fp_unsigned;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_real;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_sbv;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_numeral;
-import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
-
 import com.google.common.collect.ImmutableList;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
@@ -72,8 +42,8 @@ class Z3FloatingPointFormulaManager
     super(creator);
     z3context = creator.getEnv();
     ufmgr = pUFMgr;
-    roundingMode = mk_fpa_round_nearest_ties_to_even(z3context);
-    inc_ref(z3context, roundingMode);
+    roundingMode = Native.mkFpaRoundNearestTiesToEven(z3context);
+    Native.incRef(z3context, roundingMode);
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -83,7 +53,7 @@ class Z3FloatingPointFormulaManager
   @Override
   public Long makeNumberImpl(double pN, FloatingPointType pType) {
     if (Double.isNaN(pN) || Double.isInfinite(pN)) {
-      return mk_fpa_numeral_double(z3context, pN, mkFpaSort(pType));
+      return Native.mkFpaNumeralDouble(z3context, pN, mkFpaSort(pType));
     }
     // Z3 has problems with rounding when giving a double value, so we go via Strings
     return makeNumberImpl(Double.toString(pN), pType);
@@ -104,16 +74,16 @@ class Z3FloatingPointFormulaManager
     if (pType.getExponentSize() <= highPrec.getExponentSize()
         || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
 
-      long highPrecNumber = mk_numeral(z3context, pN, mkFpaSort(highPrec));
-      inc_ref(z3context, highPrecNumber);
+      long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
+      Native.incRef(z3context, highPrecNumber);
       long smallPrecNumber = castToImpl(highPrecNumber, pType);
-      inc_ref(z3context, smallPrecNumber);
-      long result = simplify(z3context, smallPrecNumber);
-      dec_ref(z3context, highPrecNumber);
-      dec_ref(z3context, smallPrecNumber);
+      Native.incRef(z3context, smallPrecNumber);
+      long result = Native.simplify(z3context, smallPrecNumber);
+      Native.decRef(z3context, highPrecNumber);
+      Native.decRef(z3context, smallPrecNumber);
       return result;
     }
-    return mk_numeral(z3context, pN, mkFpaSort(pType));
+    return Native.mkNumeral(z3context, pN, mkFpaSort(pType));
   }
 
   @Override
@@ -123,31 +93,31 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long makePlusInfinityImpl(FloatingPointType pType) {
-    return mk_fpa_inf(z3context, mkFpaSort(pType), false);
+    return Native.mkFpaInf(z3context, mkFpaSort(pType), false);
   }
 
   @Override
   protected Long makeMinusInfinityImpl(FloatingPointType pType) {
-    return mk_fpa_inf(z3context, mkFpaSort(pType), true);
+    return Native.mkFpaInf(z3context, mkFpaSort(pType), true);
   }
 
   @Override
   protected Long makeNaNImpl(FloatingPointType pType) {
-    return mk_fpa_nan(z3context, mkFpaSort(pType));
+    return Native.mkFpaNan(z3context, mkFpaSort(pType));
   }
 
   @Override
   protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
-      return mk_fpa_to_fp_float(z3context, roundingMode, pNumber, mkFpaSort(targetType));
+      return Native.mkFpaToFpFloat(z3context, roundingMode, pNumber, mkFpaSort(targetType));
 
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
-      return mk_fpa_to_sbv(z3context, roundingMode, pNumber, targetType.getSize());
+      return Native.mkFpaToSbv(z3context, roundingMode, pNumber, targetType.getSize());
 
     } else if (pTargetType.isRationalType()) {
-      return mk_fpa_to_real(z3context, pNumber);
+      return Native.mkFpaToReal(z3context, pNumber);
 
     } else {
       return genericCast(pNumber, pTargetType);
@@ -163,13 +133,13 @@ class Z3FloatingPointFormulaManager
 
     } else if (formulaType.isBitvectorType()) {
       if (signed) {
-        return mk_fpa_to_fp_signed(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
+        return Native.mkFpaToFpSigned(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
       } else {
-        return mk_fpa_to_fp_unsigned(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
+        return Native.mkFpaToFpUnsigned(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
       }
 
     } else if (formulaType.isRationalType()) {
-      return mk_fpa_to_fp_real(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
+      return Native.mkFpaToFpReal(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
 
     } else {
       return genericCast(pNumber, pTargetType);
@@ -183,81 +153,81 @@ class Z3FloatingPointFormulaManager
             "__cast_" + argType + "_to_" + pTargetType,
             toSolverType(pTargetType),
             ImmutableList.of(toSolverType(argType)));
-    return mk_app(z3context, castFuncDecl, new long[] {pNumber});
+    return Native.mkApp(z3context, castFuncDecl, 1, new long[] {pNumber});
   }
 
   @Override
   public Long negate(Long pNumber) {
-    return mk_fpa_neg(z3context, pNumber);
+    return Native.mkFpaNeg(z3context, pNumber);
   }
 
   @Override
   public Long add(Long pNumber1, Long pNumber2) {
-    return mk_fpa_add(z3context, roundingMode, pNumber1, pNumber2);
+    return Native.mkFpaAdd(z3context, roundingMode, pNumber1, pNumber2);
   }
 
   @Override
   public Long subtract(Long pNumber1, Long pNumber2) {
-    return mk_fpa_sub(z3context, roundingMode, pNumber1, pNumber2);
+    return Native.mkFpaSub(z3context, roundingMode, pNumber1, pNumber2);
   }
 
   @Override
   public Long multiply(Long pNumber1, Long pNumber2) {
-    return mk_fpa_mul(z3context, roundingMode, pNumber1, pNumber2);
+    return Native.mkFpaMul(z3context, roundingMode, pNumber1, pNumber2);
   }
 
   @Override
   protected Long divide(Long pNumber1, Long pNumber2) {
-    return mk_fpa_div(z3context, roundingMode, pNumber1, pNumber2);
+    return Native.mkFpaDiv(z3context, roundingMode, pNumber1, pNumber2);
   }
 
   @Override
   protected Long assignment(Long pNumber1, Long pNumber2) {
-    return mk_eq(z3context, pNumber1, pNumber2);
+    return Native.mkEq(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
-    return mk_fpa_eq(z3context, pNumber1, pNumber2);
+    return Native.mkFpaEq(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long greaterThan(Long pNumber1, Long pNumber2) {
-    return mk_fpa_gt(z3context, pNumber1, pNumber2);
+    return Native.mkFpaGt(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long greaterOrEquals(Long pNumber1, Long pNumber2) {
-    return mk_fpa_geq(z3context, pNumber1, pNumber2);
+    return Native.mkFpaGeq(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long lessThan(Long pNumber1, Long pNumber2) {
-    return mk_fpa_lt(z3context, pNumber1, pNumber2);
+    return Native.mkFpaLt(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long lessOrEquals(Long pNumber1, Long pNumber2) {
-    return mk_fpa_leq(z3context, pNumber1, pNumber2);
+    return Native.mkFpaLeq(z3context, pNumber1, pNumber2);
   }
 
   @Override
   protected Long isNaN(Long pParam) {
-    return mk_fpa_is_nan(z3context, pParam);
+    return Native.mkFpaIsNan(z3context, pParam);
   }
 
   @Override
   protected Long isInfinity(Long pParam) {
-    return mk_fpa_is_infinite(z3context, pParam);
+    return Native.mkFpaIsInfinite(z3context, pParam);
   }
 
   @Override
   protected Long isZero(Long pParam) {
-    return mk_fpa_is_zero(z3context, pParam);
+    return Native.mkFpaIsZero(z3context, pParam);
   }
 
   @Override
   protected Long isSubnormal(Long pParam) {
-    return mk_fpa_is_subnormal(z3context, pParam);
+    return Native.mkFpaIsSubnormal(z3context, pParam);
   }
 }

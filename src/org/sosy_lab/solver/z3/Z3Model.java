@@ -19,38 +19,14 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_get_arg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_get_num_args;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_get_value;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_entry_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_get_entry;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_get_num_entries;
-import static org.sosy_lab.solver.z3.Z3NativeApi.func_interp_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_eval;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_func_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_func_interp;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_consts;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_num_funcs;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_inc_ref;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
-import org.sosy_lab.solver.z3.Z3NativeApi.PointerToLong;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,7 +46,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
-    model_inc_ref(z3context, z3model);
+    Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     creator = pCreator;
@@ -83,8 +59,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   @Nullable
   @Override
   public Object evaluateImpl(Long f) {
-    PointerToLong out = new PointerToLong();
-    boolean status = model_eval(z3context, model, f, false, out);
+    Native.LongPtr out = new Native.LongPtr();
+    boolean status = Native.modelEval(z3context, model, f, false, out);
     Verify.verify(status, "Error during model evaluation");
     long outValue = out.value;
 
@@ -108,75 +84,76 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
-    for (int i = 0; i < model_get_num_consts(z3context, model); i++) {
-      long keyDecl = model_get_const_decl(z3context, model, i);
-      inc_ref(z3context, keyDecl);
+    for (int i = 0; i < Native.modelGetNumConsts(z3context, model); i++) {
+      long keyDecl = Native.modelGetConstDecl(z3context, model, i);
+      Native.incRef(z3context, keyDecl);
 
       Preconditions.checkArgument(
-          get_arity(z3context, keyDecl) == 0, "Declaration is not a constant");
+          Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
-      long var = mk_app(z3context, keyDecl);
+      long var = Native.mkApp(z3context, keyDecl, 0, new long[]{});
       Formula key = creator.encapsulateWithTypeOf(var);
 
-      long value = model_get_const_interp(z3context, model, keyDecl);
-      inc_ref(z3context, value);
+      long value = Native.modelGetConstInterp(z3context, model, keyDecl);
+      Native.incRef(z3context, value);
 
-      long symbol = get_decl_name(z3context, keyDecl);
+      long symbol = Native.getDeclName(z3context, keyDecl);
       Object lValue = creator.convertValue(value);
 
       // cleanup outdated data
-      dec_ref(z3context, keyDecl);
-      dec_ref(z3context, value);
+      Native.decRef(z3context, keyDecl);
+      Native.decRef(z3context, value);
 
       out.add(new ValueAssignment(key, creator.symbolToString(symbol), lValue, ImmutableList.of()));
     }
 
     // Iterate through function applications.
-    for (int funcIdx = 0; funcIdx < model_get_num_funcs(z3context, model); funcIdx++) {
-      long funcDecl = model_get_func_decl(z3context, model, funcIdx);
-      inc_ref(z3context, funcDecl);
+    for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
+      long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
+      Native.incRef(z3context, funcDecl);
 
-      long symbol = get_decl_name(z3context, funcDecl);
+      long symbol = Native.getDeclName(z3context, funcDecl);
 
-      long interp = model_get_func_interp(z3context, model, funcDecl);
-      func_interp_inc_ref(z3context, interp);
+      long interp = Native.modelGetFuncInterp(z3context, model, funcDecl);
+      Native.funcInterpIncRef(z3context, interp);
 
-      int numInterpretations = func_interp_get_num_entries(z3context, interp);
+      int numInterpretations = Native.funcInterpGetNumEntries(z3context, interp);
       for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
-        long entry = func_interp_get_entry(z3context, interp, interpIdx);
-        func_entry_inc_ref(z3context, entry);
+        long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
+        Native.funcEntryIncRef(z3context, entry);
 
-        Object value = creator.convertValue(func_entry_get_value(z3context, entry));
-        int noArgs = func_entry_get_num_args(z3context, entry);
+        Object value = creator.convertValue(Native.funcEntryGetValue(z3context, entry));
+        int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
         long[] args = new long[noArgs];
         List<Object> argumentInterpretation = new ArrayList<>();
 
         for (int k = 0; k < noArgs; k++) {
-          long arg = func_entry_get_arg(z3context, entry, k);
-          inc_ref(z3context, arg);
+          long arg = Native.funcEntryGetArg(z3context, entry, k);
+          Native.incRef(z3context, arg);
           argumentInterpretation.add(creator.convertValue(arg));
           args[k] = arg;
         }
-        Formula formula = creator.encapsulateWithTypeOf(mk_app(z3context, funcDecl, args));
+        Formula formula = creator.encapsulateWithTypeOf(
+            Native.mkApp(z3context, funcDecl, args.length, args));
 
         // Clean up memory.
         for (long arg : args) {
-          dec_ref(z3context, arg);
+          Native.decRef(z3context, arg);
         }
-        func_entry_dec_ref(z3context, entry);
+        Native.funcEntryDecRef(z3context, entry);
 
         out.add(
             new ValueAssignment(
                 formula, creator.symbolToString(symbol), value, argumentInterpretation));
       }
-      func_interp_dec_ref(z3context, interp);
-      dec_ref(z3context, funcDecl);
+      Native.funcInterpDecRef(z3context, interp);
+      Native.decRef(z3context, funcDecl);
     }
     return out.build();
   }
 
   @Override
   public void close() {
-    model_dec_ref(z3context, model);
+    Native.modelDecRef(z3context, model);
   }
 }

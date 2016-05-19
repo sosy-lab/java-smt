@@ -19,12 +19,8 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_app;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_func_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
-
 import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.basicimpl.AbstractUFManager;
 
@@ -41,17 +37,17 @@ class Z3UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 
   @Override
   protected Long createUninterpretedFunctionCallImpl(Long funcDecl, List<Long> pArgs) {
-    return mk_app(z3context, funcDecl, Longs.toArray(pArgs));
+    return Native.mkApp(z3context, funcDecl, pArgs.size(), Longs.toArray(pArgs));
   }
 
   @Override
   protected Long declareUninterpretedFunctionImpl(
       String pName, Long returnType, List<Long> pArgTypes) {
 
-    long symbol = mk_string_symbol(z3context, pName);
+    long symbol = Native.mkStringSymbol(z3context, pName);
     long[] sorts = Longs.toArray(pArgTypes);
-    long func = mk_func_decl(z3context, symbol, sorts, returnType);
-    inc_ref(z3context, func);
+    long func = Native.mkFuncDecl(z3context, symbol, sorts.length, sorts, returnType);
+    Native.incRef(z3context, func);
     return func;
   }
 }

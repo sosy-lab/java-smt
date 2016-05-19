@@ -19,20 +19,11 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_false;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_implies;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ite;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_xor;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
+import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
 
 import org.sosy_lab.solver.basicimpl.AbstractBooleanFormulaManager;
 
@@ -56,64 +47,64 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   @Override
   protected Long makeBooleanImpl(boolean pValue) {
     if (pValue) {
-      return mk_true(z3context);
+      return Native.mkTrue(z3context);
     } else {
-      return mk_false(z3context);
+      return Native.mkFalse(z3context);
     }
   }
 
   @Override
   protected Long not(Long pParam) {
-    return mk_not(z3context, pParam);
+    return Native.mkNot(z3context, pParam);
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    return mk_and(z3context, pParam1, pParam2);
+    return Native.mkAnd(z3context, 2, new long[]{pParam1, pParam2});
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    return mk_or(z3context, pParam1, pParam2);
+    return Native.mkOr(z3context, 2, new long[]{pParam1, pParam2});
   }
 
   @Override
   protected Long orImpl(Collection<Long> params) {
-    return mk_or(z3context, params.size(), Longs.toArray(params));
+    return Native.mkOr(z3context, params.size(), Longs.toArray(params));
   }
 
   @Override
   protected Long andImpl(Collection<Long> params) {
-    return mk_and(z3context, params.size(), Longs.toArray(params));
+    return Native.mkAnd(z3context, params.size(), Longs.toArray(params));
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
-    return mk_xor(z3context, pParam1, pParam2);
+    return Native.mkXor(z3context, pParam1, pParam2);
   }
 
   @Override
   protected Long equivalence(Long pBits1, Long pBits2) {
-    return mk_eq(z3context, pBits1, pBits2);
+    return Native.mkEq(z3context, pBits1, pBits2);
   }
 
   @Override
   protected Long implication(Long pBits1, Long pBits2) {
-    return mk_implies(z3context, pBits1, pBits2);
+    return Native.mkImplies(z3context, pBits1, pBits2);
   }
 
   @Override
   protected boolean isTrue(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_TRUE);
+    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_TRUE.toInt());
   }
 
   @Override
   protected boolean isFalse(Long pParam) {
-    return isOP(z3context, pParam, Z3_OP_FALSE);
+    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_FALSE.toInt());
   }
 
   @Override
   protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
-    return mk_ite(z3context, pCond, pF1, pF2);
+    return Native.mkIte(z3context, pCond, pF1, pF2);
   }
 }

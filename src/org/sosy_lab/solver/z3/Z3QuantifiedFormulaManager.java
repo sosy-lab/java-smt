@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.z3;
 
 import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.basicimpl.AbstractQuantifiedFormulaManager;
@@ -47,7 +48,10 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> pVariables, Long pBody) {
-    return Z3NativeApi.mk_quantifier_const(
+    if (pVariables.size() == 0) {
+      throw new IllegalArgumentException("List of quantified variables can not be empty");
+    }
+    return Native.mkQuantifierConst(
         z3context,
         q == Quantifier.FORALL,
         0,

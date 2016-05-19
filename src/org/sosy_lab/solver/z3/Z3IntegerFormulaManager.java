@@ -19,11 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_div;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_mod;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_mul;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
@@ -60,7 +56,8 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
 
   @Override
   public Long modulo(Long pNumber1, Long pNumber2) {
-    return mk_mod(z3context, pNumber1, pNumber2);
+    return Native.mkMod(z3context, pNumber1,
+        pNumber2);
   }
 
   @Override
@@ -69,8 +66,9 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
     if (pModulo > 0) {
       long n = makeNumberImpl(pModulo);
       long x = subtract(pNumber1, pNumber2);
-      return mk_eq(z3context, x, mk_mul(z3context, n, mk_div(z3context, x, n)));
+      return Native.mkEq(
+          z3context, x, Native.mkMul(z3context, 2, new long[]{n, Native.mkDiv(z3context, x, n)}));
     }
-    return mk_true(z3context);
+    return Native.mkTrue(z3context);
   }
 }

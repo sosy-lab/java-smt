@@ -20,86 +20,6 @@
 package org.sosy_lab.solver.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.fpa_get_ebits;
-import static org.sosy_lab.solver.z3.Z3NativeApi.fpa_get_sbits;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_arity;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_array_sort_domain;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_array_sort_range;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_ast_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_bv_sort_size;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_decl_name;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_index_value;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_body;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_name;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_bound_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_quantifier_num_bound;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_int;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_symbol_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_algebraic_number;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_numeral_ast;
-import static org.sosy_lab.solver.z3.Z3NativeApi.is_quantifier_forall;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_const;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_fpa_to_real;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
-import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
-import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_ast;
-import static org.sosy_lab.solver.z3.Z3NativeApi.sort_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_APP_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ARRAY_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BOOL_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FLOATING_POINT_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_FUNC_DECL_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_NUMERAL_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ADD;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_AND;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_DISTINCT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_DIV;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_MINUS_INF;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_MINUS_ZERO;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_NAN;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_NUM;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_PLUS_INF;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FPA_PLUS_ZERO;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_GT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IFF;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_IMPLIES;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_ITE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_LE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_LT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_MOD;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_MUL;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_NOT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_OR;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_SELECT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_STORE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_SUB;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_TRUE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_UNINTERPRETED;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_XOR;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_QUANTIFIER_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_ROUNDING_MODE_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_SORT_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_UNKNOWN_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_VAR_AST;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -107,6 +27,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_ast_kind;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
+import com.microsoft.z3.enumerations.Z3_sort_kind;
+import com.microsoft.z3.enumerations.Z3_symbol_kind;
 
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -147,13 +72,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private static final Map<Integer, Object> Z3_CONSTANTS =
       ImmutableMap.<Integer, Object>builder()
-          .put(Z3_OP_TRUE, true)
-          .put(Z3_OP_FALSE, false)
-          .put(Z3_OP_FPA_PLUS_ZERO, +0.0)
-          .put(Z3_OP_FPA_MINUS_ZERO, -0.0)
-          .put(Z3_OP_FPA_PLUS_INF, Double.POSITIVE_INFINITY)
-          .put(Z3_OP_FPA_MINUS_INF, Double.NEGATIVE_INFINITY)
-          .put(Z3_OP_FPA_NAN, Double.NaN)
+          .put(Z3_decl_kind.Z3_OP_TRUE.toInt(), true)
+          .put(Z3_decl_kind.Z3_OP_FALSE.toInt(), false)
+          .put(Z3_decl_kind.Z3_OP_FPA_PLUS_ZERO.toInt(), +0.0)
+          .put(Z3_decl_kind.Z3_OP_FPA_MINUS_ZERO.toInt(), -0.0)
+          .put(Z3_decl_kind.Z3_OP_FPA_PLUS_INF.toInt(), Double.POSITIVE_INFINITY)
+          .put(Z3_decl_kind.Z3_OP_FPA_MINUS_INF.toInt(), Double.NEGATIVE_INFINITY)
+          .put(Z3_decl_kind.Z3_OP_FPA_NAN.toInt(), Double.NaN)
           .build();
 
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
@@ -181,8 +106,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public Long makeVariable(Long type, String varName) {
     long z3context = getEnv();
-    long symbol = mk_string_symbol(z3context, varName);
-    return mk_const(z3context, symbol, type);
+    long symbol = Native.mkStringSymbol(z3context, varName);
+    return Native.mkConst(z3context, symbol, type);
   }
 
   @Override
@@ -199,33 +124,45 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   public FormulaType<?> getFormulaTypeFromSort(Long pSort) {
     long z3context = getEnv();
-    long sortKind = get_sort_kind(z3context, pSort);
-    if (sortKind == Z3_BOOL_SORT) {
-      return FormulaType.BooleanType;
-    } else if (sortKind == Z3_INT_SORT) {
-      return FormulaType.IntegerType;
-    } else if (sortKind == Z3_ARRAY_SORT) {
-      long domainSort = get_array_sort_domain(z3context, pSort);
-      long rangeSort = get_array_sort_range(z3context, pSort);
-      return FormulaType.getArrayType(
-          getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
-    } else if (sortKind == Z3_REAL_SORT) {
-      return FormulaType.RationalType;
-    } else if (sortKind == Z3_BV_SORT) {
-      return FormulaType.getBitvectorTypeWithSize(get_bv_sort_size(z3context, pSort));
-    } else if (sortKind == Z3_FLOATING_POINT_SORT) {
-      return FormulaType.getFloatingPointType(
-          fpa_get_ebits(z3context, pSort), fpa_get_sbits(z3context, pSort));
-    } else if (sortKind == Z3_ROUNDING_MODE_SORT) {
-      return FormulaType.FloatingPointRoundingModeType;
+    Z3_sort_kind sortKind = Z3_sort_kind.fromInt(Native.getSortKind(z3context, pSort));
+    switch (sortKind) {
+      case Z3_BOOL_SORT:
+        return FormulaType.BooleanType;
+      case Z3_INT_SORT:
+        return FormulaType.IntegerType;
+      case Z3_REAL_SORT:
+        return FormulaType.RationalType;
+      case Z3_BV_SORT:
+        return FormulaType.getBitvectorTypeWithSize(Native.getBvSortSize(z3context, pSort));
+      case Z3_ARRAY_SORT:
+        long domainSort = Native.getArraySortDomain(z3context, pSort);
+        long rangeSort = Native.getArraySortRange(z3context, pSort);
+        return FormulaType.getArrayType(
+            getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
+      case Z3_FLOATING_POINT_SORT:
+        return FormulaType.getFloatingPointType(
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
+      case Z3_ROUNDING_MODE_SORT:
+        return FormulaType.FloatingPointRoundingModeType;
+      case Z3_DATATYPE_SORT:
+      case Z3_RELATION_SORT:
+      case Z3_FINITE_DOMAIN_SORT:
+      case Z3_SEQ_SORT:
+      case Z3_RE_SORT:
+      case Z3_UNKNOWN_SORT:
+      case Z3_UNINTERPRETED_SORT:
+        // TODO: support for remaining sorts.
+        throw new IllegalArgumentException(
+            "Unknown formula type " + Native.sortToString(z3context, pSort) + " with kind " +
+                sortKind);
+      default:
+        throw new UnsupportedOperationException("Unexpected state.");
     }
-    throw new IllegalArgumentException(
-        "Unknown formula type " + sort_to_string(z3context, pSort) + " with kind " + sortKind);
   }
 
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
-    long sort = get_sort(getEnv(), pFormula);
+    long sort = Native.getSort(getEnv(), pFormula);
     return getFormulaTypeFromSort(sort);
   }
 
@@ -316,8 +253,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public Long getArrayType(Long pIndexType, Long pElementType) {
     Long allocatedArraySort = allocatedArraySorts.get(pIndexType, pElementType);
     if (allocatedArraySort == null) {
-      allocatedArraySort = Z3NativeApi.mk_array_sort(getEnv(), pIndexType, pElementType);
-      Z3NativeApi.inc_ref(getEnv(), allocatedArraySort);
+      allocatedArraySort = Native.mkArraySort(getEnv(), pIndexType, pElementType);
+      Native.incRef(getEnv(), allocatedArraySort);
       allocatedArraySorts.put(pIndexType, pElementType, allocatedArraySort);
     }
     return allocatedArraySort;
@@ -326,15 +263,15 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public Long getBitvectorType(int pBitwidth) {
     checkArgument(pBitwidth > 0, "Cannot use bitvector type with size %s", pBitwidth);
-    long bvSort = mk_bv_sort(getEnv(), pBitwidth);
-    inc_ref(getEnv(), sort_to_ast(getEnv(), bvSort));
+    long bvSort = Native.mkBvSort(getEnv(), pBitwidth);
+    Native.incRef(getEnv(), Native.sortToAst(getEnv(), bvSort));
     return bvSort;
   }
 
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
-    long fpSort = Z3NativeApi.mk_fpa_sort(getEnv(), type.getExponentSize(), type.getMantissaSize());
-    inc_ref(getEnv(), sort_to_ast(getEnv(), fpSort));
+    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize());
+    Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
 
@@ -347,7 +284,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       Reference<? extends Z3Formula> ref;
       while ((ref = referenceQueue.poll()) != null) {
         long z3ast = referenceMap.remove(ref);
-        dec_ref(environment, z3ast);
+        Native.decRef(environment, z3ast);
       }
     } finally {
       cleanupTimer.stop();
@@ -355,29 +292,30 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private String getAppName(long f) {
-    long funcDecl = get_app_decl(environment, f);
-    long symbol = get_decl_name(environment, funcDecl);
+    long funcDecl = Native.getAppDecl(environment, f);
+    long symbol = Native.getDeclName(environment, funcDecl);
     return symbolToString(symbol);
   }
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
-    switch (get_ast_kind(environment, f)) {
+    switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
       case Z3_NUMERAL_AST:
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
-        int arity = get_app_num_args(environment, f);
+        int arity = Native.getAppNumArgs(environment, f);
 
         if (arity == 0) {
 
           // constants
-          int declKind = get_decl_kind(environment, get_app_decl(environment, f));
+          int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
           Object value = Z3_CONSTANTS.get(declKind);
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
-          } else if (declKind == Z3_OP_FPA_NUM
-              || get_sort_kind(environment, get_sort(environment, f)) == Z3_ROUNDING_MODE_SORT) {
+          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
+              || Native.getSortKind(environment,
+                  Native.getSort(environment, f)) == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
           } else {
@@ -391,7 +329,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         for (int i = 0; i < arity; i++) {
-          long arg = get_app_arg(environment, f, i);
+          long arg = Native.getAppArg(environment, f, i);
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
@@ -404,13 +342,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
                 getDeclarationKind(f),
                 argTypes.build(),
                 getFormulaType(f),
-                get_app_decl(environment, f)));
+                Native.getAppDecl(environment, f)));
       case Z3_VAR_AST:
-        int deBruijnIdx = get_index_value(environment, f);
+        int deBruijnIdx = Native.getIndexValue(environment, f);
         return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
-        BooleanFormula body = encapsulateBoolean(get_quantifier_body(environment, f));
-        Quantifier q = is_quantifier_forall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
+        BooleanFormula body = encapsulateBoolean(Native.getQuantifierBody(environment, f));
+        Quantifier q = Native.isQuantifierForall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
         return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(f), body);
 
       case Z3_SORT_AST:
@@ -423,35 +361,37 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   protected String symbolToString(long symbol) {
-    switch (get_symbol_kind(environment, symbol)) {
-      case Z3NativeApiConstants.Z3_STRING_SYMBOL:
-        return get_symbol_string(environment, symbol);
-      case Z3NativeApiConstants.Z3_INT_SYMBOL:
+    switch (Z3_symbol_kind.fromInt(Native.getSymbolKind(environment, symbol))) {
+      case Z3_STRING_SYMBOL:
+
+        return Native.getSymbolString(environment, symbol);
+      case Z3_INT_SYMBOL:
 
         // Bound variable.
-        return "#" + get_symbol_int(environment, symbol);
+        return "#" + Native.getSymbolInt(environment, symbol);
       default:
-        throw new AssertionError("Unknown symbol kind " + get_symbol_kind(environment, symbol));
+        throw new AssertionError("Unknown symbol kind " + Native.getSymbolKind(environment, symbol));
     }
   }
 
   private List<Formula> getBoundVars(long f) {
-    int numBound = get_quantifier_num_bound(environment, f);
+    int numBound = Native.getQuantifierNumBound(environment, f);
     List<Formula> boundVars = new ArrayList<>(numBound);
     for (int i = 0; i < numBound; i++) {
-      long varName = get_quantifier_bound_name(environment, f, i);
-      long varSort = get_quantifier_bound_sort(environment, f, i);
+      long varName = Native.getQuantifierBoundName(environment, f, i);
+      long varSort = Native.getQuantifierBoundSort(environment, f, i);
       boundVars.add(
-          encapsulate(getFormulaTypeFromSort(varSort), mk_const(environment, varName, varSort)));
+          encapsulate(getFormulaTypeFromSort(varSort), Native.mkConst(environment, varName,
+              varSort)));
     }
     return boundVars;
   }
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
-    int decl = get_decl_kind(environment, get_app_decl(environment, f));
-
-    assert get_arity(environment, get_app_decl(environment, f)) > 0
-        : "Variables should be handled somewhere else.";
+    assert Native.getArity(environment, Native.getAppDecl(environment, f)) > 0
+        : "Variables should be handled in other branch.";
+    Z3_decl_kind decl = Z3_decl_kind.fromInt(
+        Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
     switch (decl) {
       case Z3_OP_AND:
         return FunctionDeclarationKind.AND;
@@ -500,6 +440,22 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_OP_SELECT:
         return FunctionDeclarationKind.SELECT;
 
+      case Z3_OP_TRUE:
+      case Z3_OP_FALSE:
+      case Z3_OP_ANUM:
+      case Z3_OP_AGNUM:
+        throw new UnsupportedOperationException("Unexpected state: constants not expected");
+      case Z3_OP_OEQ:
+        throw new UnsupportedOperationException("Unexpected state: not a proof");
+      case Z3_OP_INTERP:
+        // TODO: should we treat those separately?
+        throw new UnsupportedOperationException("Unexpected state: interpolant marks not expected");
+      case Z3_OP_UMINUS:
+        return FunctionDeclarationKind.UMINUS;
+      case Z3_OP_IDIV:
+
+        // TODO: different handling for integer division?
+        return FunctionDeclarationKind.DIV;
       default:
         return FunctionDeclarationKind.OTHER;
     }
@@ -510,10 +466,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return Whether the value is a constant and can be passed to {@link #convertValue(long)}.
    */
   public boolean isConstant(long value) {
-    return is_numeral_ast(environment, value)
-        || is_algebraic_number(environment, value)
-        || isOP(environment, value, Z3_OP_TRUE)
-        || isOP(environment, value, Z3_OP_FALSE);
+    return Native.isNumeralAst(environment, value)
+        || Native.isAlgebraicNumber(environment, value)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
   }
 
   /**
@@ -522,10 +478,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    */
   public Object convertValue(long value) {
     assert isConstant(value);
-    inc_ref(environment, value);
+    Native.incRef(environment, value);
 
     Object constantValue =
-        Z3_CONSTANTS.get(get_decl_kind(environment, get_app_decl(environment, value)));
+        Z3_CONSTANTS.get(Native.getDeclKind(environment, Native.getAppDecl(environment, value)));
     if (constantValue != null) {
       return constantValue;
     }
@@ -533,35 +489,46 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       FormulaType<?> type = getFormulaType(value);
       if (type.isBooleanType()) {
-        return isOP(environment, value, Z3_OP_TRUE);
+        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt());
       } else if (type.isIntegerType()) {
-        return new BigInteger(get_numeral_string(environment, value));
+        return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
-        return Rational.ofString(get_numeral_string(environment, value));
+        return Rational.ofString(Native.getNumeralString(environment, value));
       } else if (type.isBitvectorType()) {
-        return new BigInteger(get_numeral_string(environment, value));
+        return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
         // Converting to Rational and reading that is easier.
-        return convertValue(simplify(environment, mk_fpa_to_real(environment, value)));
+        return convertValue(Native.simplify(environment, Native.mkFpaToReal(environment, value)));
 
       } else {
 
         // Unknown type --- return string serialization.
-        return ast_to_string(environment, value);
+        return Native.astToString(environment, value);
       }
 
     } finally {
-      dec_ref(environment, value);
+      Native.decRef(environment, value);
     }
   }
 
   @Override
   public Long callFunctionImpl(FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
-    return Z3NativeApi.mk_app(environment, declaration.getSolverDeclaration(), Longs.toArray(args));
+    return Native.mkApp(environment, declaration.getSolverDeclaration(), args.size(),
+        Longs.toArray(args));
   }
 
   @Override
   protected Long getBooleanVarDeclarationImpl(Long pLong) {
-    return get_app_decl(getEnv(), pLong);
+    return Native.getAppDecl(getEnv(), pLong);
+  }
+
+  /** returns, if the function of the expression is the given operation. */
+  static boolean isOP(long z3context, long expr, int op) {
+    if (!Native.isApp(z3context, expr)) {
+      return false;
+    }
+
+    long decl = Native.getAppDecl(z3context, expr);
+    return Native.getDeclKind(z3context, decl) == op;
   }
 }

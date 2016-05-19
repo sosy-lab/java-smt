@@ -19,29 +19,12 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_arg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_num_args;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_sort_kind;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvuge;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvule;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_ge;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_le;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
-import static org.sosy_lab.solver.z3.Z3NativeApi.parse_smtlib2_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_BV_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_INT_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_EQ;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_REAL_SORT;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
+import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.collect.ImmutableList;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
+import com.microsoft.z3.enumerations.Z3_sort_kind;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -91,7 +74,15 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     long[] sorts = new long[0];
     long[] declSymbols = new long[0];
     long[] decls = new long[0];
-    long e = parse_smtlib2_string(getEnvironment(), str, sortSymbols, sorts, declSymbols, decls);
+    long e = Native.parseSmtlib2String(
+        getEnvironment(),
+        str,
+        sorts.length,
+        sortSymbols,
+        sorts,
+        declSymbols.length,
+        declSymbols,
+        decls);
 
     return getFormulaCreator().encapsulateBoolean(e);
   }
@@ -138,11 +129,11 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
         // Serializing a solver is a simplest way to dump a formula in Z3,
         // cf https://github.com/Z3Prover/z3/issues/397
-        long z3solver = mk_solver(getEnvironment());
-        solver_inc_ref(getEnvironment(), z3solver);
-        solver_assert(getEnvironment(), z3solver, expr);
-        String serialized = solver_to_string(getEnvironment(), z3solver);
-        solver_dec_ref(getEnvironment(), z3solver);
+        long z3solver = Native.mkSolver(getEnvironment());
+        Native.solverIncRef(getEnvironment(), z3solver);
+        Native.solverAssert(getEnvironment(), z3solver, expr);
+        String serialized = Native.solverToString(getEnvironment(), z3solver);
+        Native.solverDecRef(getEnvironment(), z3solver);
         out.append(serialized);
       }
     };
@@ -150,40 +141,41 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
   @Override
   protected Long simplify(Long pF) {
-    return Z3NativeApi.simplify(getFormulaCreator().getEnv(), pF);
+    return Native.simplify(getFormulaCreator().getEnv(), pF);
   }
 
   @Override
   protected List<? extends Long> splitNumeralEqualityIfPossible(Long pF) {
     long z3context = getFormulaCreator().getEnv();
-    if (isOP(z3context, pF, Z3_OP_EQ) && get_app_num_args(z3context, pF) == 2) {
-      long arg0 = get_app_arg(z3context, pF, 0);
-      inc_ref(z3context, arg0);
-      long arg1 = get_app_arg(z3context, pF, 1);
-      inc_ref(z3context, arg1);
+    if (isOP(z3context, pF, Z3_decl_kind.Z3_OP_EQ.toInt()) && Native.getAppNumArgs(z3context, pF) == 2) {
+      long arg0 = Native.getAppArg(z3context, pF, 0);
+      Native.incRef(z3context, arg0);
+      long arg1 = Native.getAppArg(z3context, pF, 1);
+      Native.incRef(z3context, arg1);
 
       try {
-        long sortKind = get_sort_kind(z3context, get_sort(z3context, arg0));
-        assert sortKind == get_sort_kind(z3context, get_sort(z3context, arg1));
-        if (sortKind == Z3_BV_SORT) {
+        long sortKind = Native.getSortKind(z3context, Native.getSort(z3context, arg0));
+        assert sortKind == Native.getSortKind(z3context, Native.getSort(z3context, arg1));
+        if (sortKind == Z3_sort_kind.Z3_BV_SORT.toInt()) {
 
-          long out1 = mk_bvule(z3context, arg0, arg1);
-          inc_ref(z3context, out1);
-          long out2 = mk_bvuge(z3context, arg0, arg1);
-          inc_ref(z3context, out2);
+          long out1 = Native.mkBvule(z3context, arg0, arg1);
+          Native.incRef(z3context, out1);
+          long out2 = Native.mkBvuge(z3context, arg0, arg1);
+          Native.incRef(z3context, out2);
 
           return ImmutableList.of(out1, out2);
-        } else if (sortKind == Z3_INT_SORT || sortKind == Z3_REAL_SORT) {
+        } else if (sortKind == Z3_sort_kind.Z3_INT_SORT.toInt()
+            || sortKind == Z3_sort_kind.Z3_REAL_SORT.toInt()) {
 
-          long out1 = mk_le(z3context, arg0, arg1);
-          inc_ref(z3context, out1);
-          long out2 = mk_ge(z3context, arg0, arg1);
-          inc_ref(z3context, out2);
+          long out1 = Native.mkLe(z3context, arg0, arg1);
+          Native.incRef(z3context, out1);
+          long out2 = Native.mkGe(z3context, arg0, arg1);
+          Native.incRef(z3context, out2);
           return ImmutableList.of(out1, out2);
         }
       } finally {
-        dec_ref(z3context, arg0);
-        dec_ref(z3context, arg1);
+        Native.decRef(z3context, arg0);
+        Native.decRef(z3context, arg1);
       }
     }
     return ImmutableList.of(pF);
@@ -204,7 +196,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     return getFormulaCreator()
         .encapsulate(
             type,
-            Z3NativeApi.substitute(
+            Native.substitute(
                 getFormulaCreator().getEnv(),
                 extractInfo(f),
                 fromToMapping.size(),
@@ -225,7 +217,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
         // Z3-to-Z3 translation.
         long translatedAST =
-            Z3NativeApi.translate(otherZ3Context, extractInfo(other), getEnvironment());
+            Native.translate(otherZ3Context, extractInfo(other), getEnvironment());
         return getFormulaCreator().encapsulateBoolean(translatedAST);
       }
     }

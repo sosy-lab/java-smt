@@ -19,31 +19,11 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_numeral_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_optimize;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_params;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_string_symbol;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_assert;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_check;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_lower;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_model;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_reason_unknown;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_get_upper;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_maximize;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_minimize;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_pop;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_push;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_set_params;
-import static org.sosy_lab.solver.z3.Z3NativeApi.optimize_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.params_set_symbol;
-import static org.sosy_lab.solver.z3.Z3NativeApi.simplify;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
@@ -55,7 +35,6 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
-import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.logging.Level;
 
@@ -77,8 +56,8 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     super(creator, pShutdownNotifier);
     this.mgr = mgr;
     rfmgr = mgr.getRationalFormulaManager();
-    z3optContext = mk_optimize(z3context);
-    optimize_inc_ref(z3context, z3optContext);
+    z3optContext = Native.mkOptimize(z3context);
+    Native.optimizeIncRef(z3context, z3optContext);
     logger = pLogger;
   }
 
@@ -87,7 +66,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     long z3Constraint = creator.extractInfo(constraint);
-    optimize_assert(z3context, z3optContext, z3Constraint);
+    Native.optimizeAssert(z3context, z3optContext, z3Constraint);
     return null;
   }
 
@@ -95,27 +74,27 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   public int maximize(Formula objective) {
     Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
-    return optimize_maximize(z3context, z3optContext, z3Objective.getFormulaInfo());
+    return Native.optimizeMaximize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
   public int minimize(Formula objective) {
     Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
-    return optimize_minimize(z3context, z3optContext, z3Objective.getFormulaInfo());
+    return Native.optimizeMinimize(z3context, z3optContext, z3Objective.getFormulaInfo());
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    int status = optimize_check(z3context, z3optContext);
-    if (status == Z3_LBOOL.Z3_L_FALSE.status) {
+    int status = Native.optimizeCheck(z3context, z3optContext);
+    if (status == Z3_lbool.Z3_L_FALSE.toInt()) {
       return OptStatus.UNSAT;
-    } else if (status == Z3_LBOOL.Z3_L_UNDEF.status) {
+    } else if (status == Z3_lbool.Z3_L_UNDEF.toInt()) {
       logger.log(
           Level.INFO,
           "Solver returned an unknown status, explanation: ",
-          optimize_get_reason_unknown(z3context, z3optContext));
+          Native.optimizeGetReasonUnknown(z3context, z3optContext));
       return OptStatus.UNDEF;
     } else {
       return OptStatus.OPT;
@@ -125,13 +104,13 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    optimize_push(z3context, z3optContext);
+    Native.optimizePush(z3context, z3optContext);
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    optimize_pop(z3context, z3optContext);
+    Native.optimizePop(z3context, z3optContext);
   }
 
   @Override
@@ -143,7 +122,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
     Preconditions.checkState(!closed);
-    long ast = optimize_get_upper(z3context, z3optContext, handle);
+    long ast = Native.optimizeGetUpper(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
       return Optional.absent();
     }
@@ -153,7 +132,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
     Preconditions.checkState(!closed);
-    long ast = optimize_get_lower(z3context, z3optContext, handle);
+    long ast = Native.optimizeGetLower(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
       return Optional.absent();
     }
@@ -162,26 +141,26 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
 
   @Override
   protected long getZ3Model() {
-    return optimize_get_model(z3context, z3optContext);
+    return Native.optimizeGetModel(z3context, z3optContext);
   }
 
   void setParam(String key, String value) {
-    long keySymbol = mk_string_symbol(z3context, key);
-    long valueSymbol = mk_string_symbol(z3context, value);
-    long params = mk_params(z3context);
-    params_set_symbol(z3context, params, keySymbol, valueSymbol);
-    optimize_set_params(z3context, z3optContext, params);
+    long keySymbol = Native.mkStringSymbol(z3context, key);
+    long valueSymbol = Native.mkStringSymbol(z3context, value);
+    long params = Native.mkParams(z3context);
+    Native.paramsSetSymbol(z3context, params, keySymbol, valueSymbol);
+    Native.optimizeSetParams(z3context, z3optContext, params);
   }
 
   @Override
   public void close() {
     Preconditions.checkState(!closed);
-    optimize_dec_ref(z3context, z3optContext);
+    Native.optimizeDecRef(z3context, z3optContext);
     closed = true;
   }
 
   private boolean isInfinity(long ast) {
-    return ast_to_string(z3context, ast).contains(Z3_INFINITY_REPRESENTATION);
+    return Native.astToString(z3context, ast).contains(Z3_INFINITY_REPRESENTATION);
   }
 
   /**
@@ -196,11 +175,11 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
         mgr.substitute(
             z,
             ImmutableMap.<Formula, Formula>of(epsFormula, rfmgr.makeNumber(newValue.toString())));
-    return simplify(z3context, out.getFormulaInfo());
+    return Native.simplify(z3context, out.getFormulaInfo());
   }
 
   private Rational rationalFromZ3AST(long ast) {
-    return Rational.ofString(get_numeral_string(z3context, ast));
+    return Rational.ofString(Native.getNumeralString(z3context, ast));
   }
 
   /**
@@ -210,6 +189,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public String toString() {
     Preconditions.checkState(!closed);
-    return optimize_to_string(z3context, z3optContext);
+    return Native.optimizeToString(z3context, z3optContext);
   }
 }

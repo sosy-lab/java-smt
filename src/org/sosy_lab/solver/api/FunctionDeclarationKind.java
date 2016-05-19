@@ -37,6 +37,12 @@ public enum FunctionDeclarationKind {
 
   // Simple arithmetic,
   // they work across integers and rationals.
+
+  /**
+   * Unary minus.
+   */
+  UMINUS,
+
   /**
    * Subtraction over integers and rationals.
    */

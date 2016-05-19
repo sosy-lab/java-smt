@@ -19,34 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bv_sort;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvadd;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvand;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvashr;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvlshr;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvmul;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvneg;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvnot;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvor;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsdiv;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvshl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsle;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvslt;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsrem;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvsub;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvudiv;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvule;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvult;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvurem;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_bvxor;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_concat;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_extract;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_int64;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_numeral;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_sign_ext;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_true;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_zero_ext;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.basicimpl.AbstractBitvectorFormulaManager;
 
@@ -63,33 +36,33 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
 
   @Override
   public Long concat(Long pFirst, Long pSecond) {
-    return mk_concat(z3context, pFirst, pSecond);
+    return Native.mkConcat(z3context, pFirst, pSecond);
   }
 
   @Override
   public Long extract(Long pFirst, int pMsb, int pLsb, boolean pSigned) {
-    return mk_extract(z3context, pMsb, pLsb, pFirst);
+    return Native.mkExtract(z3context, pMsb, pLsb, pFirst);
   }
 
   @Override
   public Long extend(Long pNumber, int pExtensionBits, boolean pSigned) {
     if (pSigned) {
-      return mk_sign_ext(z3context, pExtensionBits, pNumber);
+      return Native.mkSignExt(z3context, pExtensionBits, pNumber);
     } else {
-      return mk_zero_ext(z3context, pExtensionBits, pNumber);
+      return Native.mkZeroExt(z3context, pExtensionBits, pNumber);
     }
   }
 
   @Override
   public Long makeBitvectorImpl(int pLength, long pI) {
-    long sort = mk_bv_sort(z3context, pLength);
-    return mk_int64(z3context, pI, sort);
+    long sort = Native.mkBvSort(z3context, pLength);
+    return Native.mkInt64(z3context, pI, sort);
   }
 
   @Override
   protected Long makeBitvectorImpl(int pLength, BigInteger pI) {
-    long sort = mk_bv_sort(z3context, pLength);
-    return mk_numeral(z3context, pI.toString(), sort);
+    long sort = Native.mkBvSort(z3context, pLength);
+    return Native.mkNumeral(z3context, pI.toString(), sort);
   }
 
   @Override
@@ -104,100 +77,100 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   @Override
   public Long shiftRight(Long number, Long toShift, boolean signed) {
     if (signed) {
-      return mk_bvashr(z3context, number, toShift);
+      return Native.mkBvashr(z3context, number, toShift);
     } else {
-      return mk_bvlshr(z3context, number, toShift);
+      return Native.mkBvlshr(z3context, number, toShift);
     }
   }
 
   @Override
   public Long shiftLeft(Long number, Long toShift) {
-    return mk_bvshl(z3context, number, toShift);
+    return Native.mkBvshl(z3context, number, toShift);
   }
 
   @Override
   public Long not(Long pBits) {
-    return mk_bvnot(z3context, pBits);
+    return Native.mkBvnot(z3context, pBits);
   }
 
   @Override
   public Long and(Long pBits1, Long pBits2) {
-    return mk_bvand(z3context, pBits1, pBits2);
+    return Native.mkBvand(z3context, pBits1, pBits2);
   }
 
   @Override
   public Long or(Long pBits1, Long pBits2) {
-    return mk_bvor(z3context, pBits1, pBits2);
+    return Native.mkBvor(z3context, pBits1, pBits2);
   }
 
   @Override
   public Long xor(Long pBits1, Long pBits2) {
-    return mk_bvxor(z3context, pBits1, pBits2);
+    return Native.mkBvxor(z3context, pBits1, pBits2);
   }
 
   @Override
   public Long negate(Long pNumber) {
-    return mk_bvneg(z3context, pNumber);
+    return Native.mkBvneg(z3context, pNumber);
   }
 
   @Override
   public Long add(Long pNumber1, Long pNumber2) {
-    return mk_bvadd(z3context, pNumber1, pNumber2);
+    return Native.mkBvadd(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long subtract(Long pNumber1, Long pNumber2) {
-    return mk_bvsub(z3context, pNumber1, pNumber2);
+    return Native.mkBvsub(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long divide(Long pNumber1, Long pNumber2, boolean signed) {
     if (signed) {
-      return mk_bvsdiv(z3context, pNumber1, pNumber2);
+      return Native.mkBvsdiv(z3context, pNumber1, pNumber2);
     } else {
-      return mk_bvudiv(z3context, pNumber1, pNumber2);
+      return Native.mkBvudiv(z3context, pNumber1, pNumber2);
     }
   }
 
   @Override
   public Long modulo(Long pNumber1, Long pNumber2, boolean signed) {
     if (signed) {
-      return mk_bvsrem(z3context, pNumber1, pNumber2);
+      return Native.mkBvsrem(z3context, pNumber1, pNumber2);
     } else {
-      return mk_bvurem(z3context, pNumber1, pNumber2);
+      return Native.mkBvurem(z3context, pNumber1, pNumber2);
     }
   }
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    return mk_true(z3context);
+    return Native.mkTrue(z3context);
   }
 
   @Override
   public Long multiply(Long pNumber1, Long pNumber2) {
-    return mk_bvmul(z3context, pNumber1, pNumber2);
+    return Native.mkBvmul(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long equal(Long pNumber1, Long pNumber2) {
-    return mk_eq(z3context, pNumber1, pNumber2);
+    return Native.mkEq(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long lessThan(Long pNumber1, Long pNumber2, boolean signed) {
     if (signed) {
-      return mk_bvslt(z3context, pNumber1, pNumber2);
+      return Native.mkBvslt(z3context, pNumber1, pNumber2);
     } else {
-      return mk_bvult(z3context, pNumber1, pNumber2);
+      return Native.mkBvult(z3context, pNumber1, pNumber2);
     }
   }
 
   @Override
   public Long lessOrEquals(Long pNumber1, Long pNumber2, boolean signed) {
     if (signed) {
-      return mk_bvsle(z3context, pNumber1, pNumber2);
+      return Native.mkBvsle(z3context, pNumber1, pNumber2);
     } else {
-      return mk_bvule(z3context, pNumber1, pNumber2);
+      return Native.mkBvule(z3context, pNumber1, pNumber2);
     }
   }
 

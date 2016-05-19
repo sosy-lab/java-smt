@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.z3;
 
+import com.microsoft.z3.Native;
+
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -42,12 +44,12 @@ abstract class Z3Formula implements Formula {
     this.z3expr = z3expr;
     this.z3context = z3context;
 
-    Z3NativeApi.inc_ref(z3context, z3expr);
+    Native.incRef(z3context, z3expr);
   }
 
   @Override
   public final String toString() {
-    return Z3NativeApi.ast_to_string(z3context, z3expr);
+    return Native.astToString(z3context, z3expr);
   }
 
   @Override
@@ -56,13 +58,13 @@ abstract class Z3Formula implements Formula {
       return false;
     }
     Z3Formula other = (Z3Formula) obj;
-    return (z3context == other.z3context) && Z3NativeApi.is_eq_ast(z3context, z3expr, other.z3expr);
+    return (z3context == other.z3context) && Native.isEqAst(z3context, z3expr, other.z3expr);
   }
 
   @Override
   public final int hashCode() {
     if (hashCache == 0) {
-      hashCache = Z3NativeApi.get_ast_hash(z3context, z3expr);
+      hashCache = Native.getAstHash(z3context, z3expr);
     }
     return hashCache;
   }

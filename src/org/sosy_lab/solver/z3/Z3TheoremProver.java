@@ -19,39 +19,13 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_get;
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.ast_vector_size;
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.get_app_decl;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_not;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_solver;
-import static org.sosy_lab.solver.z3.Z3NativeApi.model_get_const_interp;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_assert_and_track;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_check_assumptions;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_model;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_num_scopes;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_reason_unknown;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_get_unsat_core;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_pop;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_push;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_set_params;
-import static org.sosy_lab.solver.z3.Z3NativeApi.solver_to_string;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_OP_FALSE;
-import static org.sosy_lab.solver.z3.Z3NativeApiConstants.isOP;
+import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
+import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -61,7 +35,6 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 import org.sosy_lab.solver.basicimpl.LongArrayBackedList;
-import org.sosy_lab.solver.z3.Z3NativeApiConstants.Z3_LBOOL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,9 +64,9 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Set<ProverOptions> opts) {
     super(creator, pShutdownNotifier);
     mgr = pMgr;
-    z3solver = mk_solver(z3context);
-    solver_inc_ref(z3context, z3solver);
-    solver_set_params(z3context, z3solver, z3params);
+    z3solver = Native.mkSolver(z3context);
+    Native.solverIncRef(z3context, z3solver);
+    Native.solverSetParams(z3context, z3solver, z3params);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {
@@ -104,9 +77,9 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(solver_get_num_scopes(z3context, z3solver) >= 1);
+    Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
     level--;
-    solver_pop(z3context, z3solver, 1);
+    Native.solverPop(z3context, z3solver, 1);
   }
 
   @Override
@@ -114,18 +87,18 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     long e = Z3FormulaManager.getZ3Expr(f);
-    inc_ref(z3context, e);
+    Native.incRef(z3context, e);
 
     if (storedConstraints != null) { // Unsat core generation is on.
       String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
       BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
-      solver_assert_and_track(z3context, z3solver, e, creator.extractInfo(t));
+      Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
       storedConstraints.put(varName, f);
     } else {
-      solver_assert(z3context, z3solver, e);
+      Native.solverAssert(z3context, z3solver, e);
     }
-    dec_ref(z3context, e);
+    Native.decRef(z3context, e);
     return null;
   }
 
@@ -133,28 +106,30 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   public void push() {
     Preconditions.checkState(!closed);
     level++;
-    solver_push(z3context, z3solver);
+    Native.solverPush(z3context, z3solver);
   }
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    int result = solver_check(z3context, z3solver);
+    int result = Native.solverCheck(z3context, z3solver);
     undefinedStatusToException(result);
-    return result == Z3_LBOOL.Z3_L_FALSE.status;
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    int result =
-        solver_check_assumptions(
+
+    int result = Native.solverCheckAssumptions(
             z3context,
             z3solver,
-            Longs.toArray(Collections2.transform(assumptions, creator::extractInfo)));
+            assumptions.size(),
+            assumptions.stream().mapToLong(creator::extractInfo).toArray()
+        );
     undefinedStatusToException(result);
-    return result == Z3_LBOOL.Z3_L_FALSE.status;
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
@@ -164,19 +139,19 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       return Optional.absent();
     }
     List<BooleanFormula> core = new ArrayList<>();
-    long unsatCore = solver_get_unsat_core(z3context, z3solver);
-    ast_vector_inc_ref(z3context, unsatCore);
-    for (int i = 0; i < ast_vector_size(z3context, unsatCore); i++) {
-      long ast = ast_vector_get(z3context, unsatCore, i);
+    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
+    Native.astVectorIncRef(z3context, unsatCore);
+    for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
+      long ast = Native.astVectorGet(z3context, unsatCore, i);
       core.add(creator.encapsulateBoolean(ast));
     }
-    ast_vector_dec_ref(z3context, unsatCore);
+    Native.astVectorDecRef(z3context, unsatCore);
     return Optional.of(core);
   }
 
   @Override
   protected long getZ3Model() {
-    return solver_get_model(z3context, z3solver);
+    return Native.solverGetModel(z3context, z3solver);
   }
 
   @Override
@@ -189,16 +164,16 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     }
 
     List<BooleanFormula> constraints = new ArrayList<>();
-    long unsatCore = solver_get_unsat_core(z3context, z3solver);
-    ast_vector_inc_ref(z3context, unsatCore);
-    for (int i = 0; i < ast_vector_size(z3context, unsatCore); i++) {
-      long ast = ast_vector_get(z3context, unsatCore, i);
-      inc_ref(z3context, ast);
-      String varName = ast_to_string(z3context, ast);
-      dec_ref(z3context, ast);
+    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
+    Native.astVectorIncRef(z3context, unsatCore);
+    for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
+      long ast = Native.astVectorGet(z3context, unsatCore, i);
+      Native.incRef(z3context, ast);
+      String varName = Native.astToString(z3context, ast);
+      Native.decRef(z3context, ast);
       constraints.add(storedConstraints.get(varName));
     }
-    ast_vector_dec_ref(z3context, unsatCore);
+    Native.astVectorDecRef(z3context, unsatCore);
     return constraints;
   }
 
@@ -206,13 +181,13 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   public void close() {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
-        solver_get_num_scopes(z3context, z3solver) >= 0,
+        Native.solverGetNumScopes(z3context, z3solver) >= 0,
         "a negative number of scopes is not allowed");
 
     while (level > 0) {
       pop();
     }
-    solver_dec_ref(z3context, z3solver);
+    Native.solverDecRef(z3context, z3solver);
 
     closed = true;
   }
@@ -229,19 +204,19 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       importantFormulas[i++] = Z3FormulaManager.getZ3Expr(impF);
     }
 
-    solver_push(z3context, z3solver);
+    Native.solverPush(z3context, z3solver);
 
-    while (solver_check(z3context, z3solver) == Z3_LBOOL.Z3_L_TRUE.status) {
+    while (Native.solverCheck(z3context, z3solver) == Z3_lbool.Z3_L_TRUE.toInt()) {
       long[] valuesOfModel = new long[importantFormulas.length];
-      long z3model = solver_get_model(z3context, z3solver);
+      long z3model = Native.solverGetModel(z3context, z3solver);
 
       for (int j = 0; j < importantFormulas.length; j++) {
-        long funcDecl = get_app_decl(z3context, importantFormulas[j]);
-        long valueOfExpr = model_get_const_interp(z3context, z3model, funcDecl);
+        long funcDecl = Native.getAppDecl(z3context, importantFormulas[j]);
+        long valueOfExpr = Native.modelGetConstInterp(z3context, z3model, funcDecl);
 
-        if (isOP(z3context, valueOfExpr, Z3_OP_FALSE)) {
-          valuesOfModel[j] = mk_not(z3context, importantFormulas[j]);
-          inc_ref(z3context, valuesOfModel[j]);
+        if (isOP(z3context, valueOfExpr, Z3_decl_kind.Z3_OP_FALSE.toInt())) {
+          valuesOfModel[j] = Native.mkNot(z3context, importantFormulas[j]);
+          Native.incRef(z3context, valuesOfModel[j]);
         } else {
           valuesOfModel[j] = importantFormulas[j];
         }
@@ -255,27 +230,28 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
             }
           });
 
-      long negatedModel = mk_not(z3context, mk_and(z3context, valuesOfModel));
-      inc_ref(z3context, negatedModel);
-      solver_assert(z3context, z3solver, negatedModel);
+      long negatedModel = Native.mkNot(z3context, Native.mkAnd(
+          z3context, valuesOfModel.length, valuesOfModel));
+      Native.incRef(z3context, negatedModel);
+      Native.solverAssert(z3context, z3solver, negatedModel);
     }
 
     // we pushed some levels on assertionStack, remove them and delete solver
-    solver_pop(z3context, z3solver, 1);
+    Native.solverPop(z3context, z3solver, 1);
     return callback.getResult();
   }
 
   @Override
   public String toString() {
     Preconditions.checkState(!closed);
-    return solver_to_string(z3context, z3solver);
+    return Native.solverToString(z3context, z3solver);
   }
 
   private void undefinedStatusToException(int solverStatus) throws Z3SolverException {
-    if (solverStatus == Z3_LBOOL.Z3_L_UNDEF.status) {
+    if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
       throw new Z3SolverException(
           "Solver returned 'unknown' status, reason: "
-              + solver_get_reason_unknown(z3context, z3solver));
+              + Native.solverGetReasonUnknown(z3context, z3solver));
     }
   }
 }

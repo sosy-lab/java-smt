@@ -19,24 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_get_num_subgoals;
-import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_get_subgoal;
-import static org.sosy_lab.solver.z3.Z3NativeApi.apply_result_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.goal_assert;
-import static org.sosy_lab.solver.z3.Z3NativeApi.goal_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.goal_formula;
-import static org.sosy_lab.solver.z3.Z3NativeApi.goal_inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.goal_size;
-import static org.sosy_lab.solver.z3.Z3NativeApi.inc_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_and;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_goal;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_or;
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_tactic;
-import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_apply;
-import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_dec_ref;
-import static org.sosy_lab.solver.z3.Z3NativeApi.tactic_inc_ref;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.SolverException;
 
@@ -54,7 +37,7 @@ class Z3NativeApiHelpers {
     for (String tactic : pTactics) {
       long tacticResult = applyTactic(z3context, overallResult, tactic);
       if (overallResult != pF) {
-        dec_ref(z3context, overallResult);
+        Native.decRef(z3context, overallResult);
       }
       overallResult = tacticResult;
     }
@@ -68,65 +51,67 @@ class Z3NativeApiHelpers {
    * @param tactic Z3 Tactic Name
    * @param pF Z3_ast
    * @return Z3_ast
+   *
+   * @throws InterruptedException If execution gets interrupted.
    */
   static long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
-    long tacticObject = mk_tactic(z3context, tactic);
-    tactic_inc_ref(z3context, tacticObject);
+    long tacticObject = Native.mkTactic(z3context, tactic);
+    Native.tacticIncRef(z3context, tacticObject);
 
-    long goal = mk_goal(z3context, true, false, false);
-    goal_inc_ref(z3context, goal);
-    goal_assert(z3context, goal, pF);
+    long goal = Native.mkGoal(z3context, true, false, false);
+    Native.goalIncRef(z3context, goal);
+    Native.goalAssert(z3context, goal, pF);
 
-    long result = tactic_apply(z3context, tacticObject, goal);
-    apply_result_inc_ref(z3context, result);
+    long result = Native.tacticApply(z3context, tacticObject, goal);
+    Native.applyResultIncRef(z3context, result);
 
     try {
       return applyResultToAST(z3context, result);
     } finally {
-      apply_result_dec_ref(z3context, result);
-      goal_dec_ref(z3context, goal);
-      tactic_dec_ref(z3context, tacticObject);
+      Native.applyResultDecRef(z3context, result);
+      Native.goalDecRef(z3context, goal);
+      Native.tacticDecRef(z3context, tacticObject);
     }
   }
 
   private static long applyResultToAST(long z3context, long applyResult) {
-    int subgoalsCount = apply_result_get_num_subgoals(z3context, applyResult);
+    int subgoalsCount = Native.applyResultGetNumSubgoals(z3context, applyResult);
     long[] goalFormulas = new long[subgoalsCount];
 
     for (int i = 0; i < subgoalsCount; i++) {
-      long subgoal = apply_result_get_subgoal(z3context, applyResult, i);
-      goal_inc_ref(z3context, subgoal);
+      long subgoal = Native.applyResultGetSubgoal(z3context, applyResult, i);
+      Native.goalIncRef(z3context, subgoal);
       long subgoalAst = goalToAST(z3context, subgoal);
-      inc_ref(z3context, subgoalAst);
+      Native.incRef(z3context, subgoalAst);
       goalFormulas[i] = subgoalAst;
-      goal_dec_ref(z3context, subgoal);
+      Native.goalDecRef(z3context, subgoal);
     }
     try {
       return goalFormulas.length == 1
           ? goalFormulas[0]
-          : mk_or(z3context, goalFormulas.length, goalFormulas);
+          : Native.mkOr(z3context, goalFormulas.length, goalFormulas);
     } finally {
       for (int i = 0; i < subgoalsCount; i++) {
-        dec_ref(z3context, goalFormulas[i]);
+        Native.decRef(z3context, goalFormulas[i]);
       }
     }
   }
 
   private static long goalToAST(long z3context, long goal) {
-    int subgoalFormulasCount = goal_size(z3context, goal);
+    int subgoalFormulasCount = Native.goalSize(z3context, goal);
     long[] subgoalFormulas = new long[subgoalFormulasCount];
     for (int k = 0; k < subgoalFormulasCount; k++) {
-      long f = goal_formula(z3context, goal, k);
-      inc_ref(z3context, f);
+      long f = Native.goalFormula(z3context, goal, k);
+      Native.incRef(z3context, f);
       subgoalFormulas[k] = f;
     }
     try {
       return subgoalFormulas.length == 1
           ? subgoalFormulas[0]
-          : mk_and(z3context, subgoalFormulas.length, subgoalFormulas);
+          : Native.mkAnd(z3context, subgoalFormulas.length, subgoalFormulas);
     } finally {
       for (int k = 0; k < subgoalFormulasCount; k++) {
-        dec_ref(z3context, subgoalFormulas[k]);
+        Native.decRef(z3context, subgoalFormulas[k]);
       }
     }
   }

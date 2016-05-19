@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3NativeApi.mk_eq;
+import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -37,12 +37,12 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
 
   @Override
   protected Long select(Long pArray, Long pIndex) {
-    return Z3NativeApi.mk_select(z3context, pArray, pIndex);
+    return Native.mkSelect(z3context, pArray, pIndex);
   }
 
   @Override
   protected Long store(Long pArray, Long pIndex, Long pValue) {
-    return Z3NativeApi.mk_store(z3context, pArray, pIndex, pValue);
+    return Native.mkStore(z3context, pArray, pIndex, pValue);
   }
 
   @Override
@@ -58,6 +58,6 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
 
   @Override
   protected Long equivalence(Long pArray1, Long pArray2) {
-    return mk_eq(z3context, pArray1, pArray2);
+    return Native.mkEq(z3context, pArray1, pArray2);
   }
 }

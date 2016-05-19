@@ -113,7 +113,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     // we have to handle equal formulas on the stack,
     // so we copy the whole stack and remove the formulas of A once.
-    final List<Expr> formulasOfB = Lists.<Expr>newLinkedList(assertedFormulas);
+    final List<Expr> formulasOfB = Lists.newLinkedList(assertedFormulas);
     for (Expr af : formulasOfA) {
       boolean check = formulasOfB.remove(af); // remove only first occurrence
       assert check : "formula from A must be part of all asserted formulas";
@@ -122,7 +122,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(
         getSeqInterpolants(
-            ImmutableList.<Set<Expr>>of(
+            ImmutableList.of(
                 Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
   }
 
