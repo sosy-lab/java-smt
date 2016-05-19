@@ -67,6 +67,6 @@ public abstract class OptimizationResult {
 
   static OptimizationResult of(OptStatus result) {
     return new AutoValue_OptimizationResult(
-        result, ImmutableMap.<Integer, Optional<Rational>>of(), Optional.<CachedModel>absent());
+        result, ImmutableMap.of(), Optional.absent());
   }
 }

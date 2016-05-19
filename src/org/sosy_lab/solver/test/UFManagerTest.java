@@ -60,7 +60,7 @@ public class UFManagerTest extends SolverBasedTest0 {
     for (String name : names) {
       Formula f =
           fmgr.declareAndCallUF(
-              name, FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeNumber(1)));
+              name, FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
       Truth.assertThat(declaration.getName()).isEqualTo(name);
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));

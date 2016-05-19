@@ -111,7 +111,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
       BooleanFormula emptyB = prover.getInterpolant(Lists.newArrayList(id1, id2));
       assertThat(bmgr.isFalse(emptyB)).isTrue();
-      BooleanFormula emptyA = prover.getInterpolant(Lists.<T>newArrayList());
+      BooleanFormula emptyA = prover.getInterpolant(Lists.newArrayList());
       assertThat(bmgr.isTrue(emptyA)).isTrue();
     }
   }
@@ -145,7 +145,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    BooleanFormula itp = stack.getInterpolant(Lists.<T>newArrayList());
+    BooleanFormula itp = stack.getInterpolant(Lists.newArrayList());
     BooleanFormula itpA = stack.getInterpolant(Lists.newArrayList(TA));
     BooleanFormula itpAB = stack.getInterpolant(Lists.newArrayList(TA, TB));
     BooleanFormula itpABC = stack.getInterpolant(Lists.newArrayList(TA, TB, TC));
@@ -187,7 +187,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    BooleanFormula itp0 = stack.getInterpolant(Lists.<T>newArrayList());
+    BooleanFormula itp0 = stack.getInterpolant(Lists.newArrayList());
     BooleanFormula itpA = stack.getInterpolant(Lists.newArrayList(TA));
     BooleanFormula itpB = stack.getInterpolant(Lists.newArrayList(TA));
     BooleanFormula itpAB = stack.getInterpolant(Lists.newArrayList(TA, TB));

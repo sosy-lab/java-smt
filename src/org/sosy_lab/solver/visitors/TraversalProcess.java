@@ -38,19 +38,19 @@ public class TraversalProcess {
    * Continue traversal and recurse into current formula subtree.
    */
   public static final TraversalProcess CONTINUE =
-      new TraversalProcess(TraversalType.CONTINUE_TYPE, ImmutableSet.<Formula>of());
+      new TraversalProcess(TraversalType.CONTINUE_TYPE, ImmutableSet.of());
 
   /**
    * Continue traversal, but do not recurse into current formula subtree.
    */
   public static final TraversalProcess SKIP =
-      new TraversalProcess(TraversalType.SKIP_TYPE, ImmutableSet.<Formula>of());
+      new TraversalProcess(TraversalType.SKIP_TYPE, ImmutableSet.of());
 
   /**
    * Immediately abort traversal and return to caller.
    */
   public static final TraversalProcess ABORT =
-      new TraversalProcess(TraversalType.ABORT_TYPE, ImmutableSet.<Formula>of());
+      new TraversalProcess(TraversalType.ABORT_TYPE, ImmutableSet.of());
 
   /**
    * Traverse only the given children.

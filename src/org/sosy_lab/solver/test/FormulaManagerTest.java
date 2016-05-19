@@ -33,7 +33,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -142,9 +141,9 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula constraint =
         imgr.equal(
             fmgr.declareAndCallUF(
-                "uf1", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("x"))),
+                "uf1", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("x"))),
             fmgr.declareAndCallUF(
-                "uf2", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("y"))));
+                "uf2", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("y"))));
 
     assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
         .containsExactly("uf1", "uf2", "x", "y");

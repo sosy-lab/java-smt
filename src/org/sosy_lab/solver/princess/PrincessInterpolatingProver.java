@@ -137,7 +137,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     Preconditions.checkState(!closed);
     Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
     assert assertedFormulas.size() == annotatedTerms.size();
-    final List<IExpression> values = Lists.<IExpression>newArrayList(annotatedTerms.values());
+    final List<IExpression> values = Lists.newArrayList(annotatedTerms.values());
     return new PrincessModel(stack.getPartialModel(), creator, values);
   }
 }

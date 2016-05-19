@@ -365,6 +365,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
     // An empty list of quantified variables throws an exception.
     @SuppressWarnings("unused")
-    BooleanFormula quantified = qmgr.exists(ImmutableList.<Formula>of(), bmgr.makeVariable("b"));
+    BooleanFormula quantified = qmgr.exists(ImmutableList.of(), bmgr.makeVariable("b"));
   }
 }

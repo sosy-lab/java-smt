@@ -115,7 +115,7 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetUFs() throws Exception {
     IntegerFormula x =
         fmgr.declareAndCallUF(
-            "UF", FormulaType.IntegerType, ImmutableList.<Formula>of(imgr.makeVariable("arg")));
+            "UF", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
     testModelGetters(x, imgr.makeNumber(1), BigInteger.ONE, "UF");
   }
 

@@ -286,7 +286,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
           FunctionDeclarationImpl.of(
               name,
               FunctionDeclarationKind.VAR,
-              ImmutableList.<FormulaType<?>>of(),
+              ImmutableList.of(),
               FormulaType.BooleanType,
               formulaCreator.getBooleanVarDeclaration(casted)));
     }
