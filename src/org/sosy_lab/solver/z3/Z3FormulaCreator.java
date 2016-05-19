@@ -153,8 +153,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_UNINTERPRETED_SORT:
         // TODO: support for remaining sorts.
         throw new IllegalArgumentException(
-            "Unknown formula type " + Native.sortToString(z3context, pSort) + " with kind " +
-                sortKind);
+            "Unknown formula type " + Native.sortToString(z3context, pSort)
+                + " with sort " + sortKind);
       default:
         throw new UnsupportedOperationException("Unexpected state.");
     }
@@ -348,7 +348,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
         BooleanFormula body = encapsulateBoolean(Native.getQuantifierBody(environment, f));
-        Quantifier q = Native.isQuantifierForall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
+        Quantifier q =
+            Native.isQuantifierForall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
         return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(f), body);
 
       case Z3_SORT_AST:
@@ -370,7 +371,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         // Bound variable.
         return "#" + Native.getSymbolInt(environment, symbol);
       default:
-        throw new AssertionError("Unknown symbol kind " + Native.getSymbolKind(environment, symbol));
+        throw new UnsupportedOperationException("Unexpected state");
     }
   }
 

@@ -147,7 +147,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   @Override
   protected List<? extends Long> splitNumeralEqualityIfPossible(Long pF) {
     long z3context = getFormulaCreator().getEnv();
-    if (isOP(z3context, pF, Z3_decl_kind.Z3_OP_EQ.toInt()) && Native.getAppNumArgs(z3context, pF) == 2) {
+    if (isOP(z3context, pF, Z3_decl_kind.Z3_OP_EQ.toInt())
+        && Native.getAppNumArgs(z3context, pF) == 2) {
       long arg0 = Native.getAppArg(z3context, pF, 0);
       Native.incRef(z3context, arg0);
       long arg1 = Native.getAppArg(z3context, pF, 1);
