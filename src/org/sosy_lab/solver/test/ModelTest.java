@@ -19,10 +19,12 @@
  */
 package org.sosy_lab.solver.test;
 
+import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -258,14 +260,12 @@ public class ModelTest extends SolverBasedTest0 {
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
-        boolean found = false;
-        for (ValueAssignment assignment : m) {
-          if (assignment.getName().equals(varName)) {
-            found = true;
-            assertThat(assignment.getValue()).isEqualTo(expectedValue);
-          }
-        }
-        assertThat(found).isTrue();
+
+        Iterable<ValueAssignment> relevantAssignments =
+            from(m).filter(assignment -> assignment.getName().equals(varName));
+        assertThat(relevantAssignments).hasSize(1);
+        ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
+        assertThat(assignment.getValue()).isEqualTo(expectedValue);
       }
     }
   }
