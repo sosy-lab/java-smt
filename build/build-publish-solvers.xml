@@ -26,7 +26,7 @@
             <arg value="describe" />
         </exec>
         <copy file="lib/native/source/libz3j/libz3j.so" tofile="libz3j-${z3.version}.so"/>
-        <copy file="${z3.path}/build/libz3.so" tofile="libz3-${z3.version}.so"/>
+        <copy file="lib/native/source/libz3j/libz3.so" tofile="libz3-${z3.version}.so"/>
     </target>
 
     <target name="package-z3java" depends=""
@@ -35,7 +35,7 @@
         <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
             <arg value="describe" />
         </exec>
-        <copy file="${z3.path}/build/libz3.so" tofile="libz3-${z3.version}.so"/>
+        <copy file="lib/native/source/libz3j/libz3.so" tofile="libz3-${z3.version}.so"/>
         <copy file="${z3.path}/build/libz3java.so" tofile="libz3java-${z3.version}.so"/>
         <copy file="${z3.path}/build/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
