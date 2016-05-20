@@ -54,7 +54,6 @@ public abstract class OptimizationQuery {
   }
 
   public static OptimizationQuery empty() {
-    return new AutoValue_OptimizationQuery(
-        ImmutableSet.of(), ImmutableMap.of());
+    return new AutoValue_OptimizationQuery(ImmutableSet.of(), ImmutableMap.of());
   }
 }

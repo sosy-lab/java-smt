@@ -74,12 +74,12 @@ abstract class Z3NumeralFormulaManager<
   public Long negate(Long pNumber) {
     long sort = Native.getSort(z3context, pNumber);
     long minusOne = Native.mkInt(z3context, -1, sort);
-    return Native.mkMul(z3context, 2, new long[]{minusOne, pNumber});
+    return Native.mkMul(z3context, 2, new long[] {minusOne, pNumber});
   }
 
   @Override
   public Long add(Long pNumber1, Long pNumber2) {
-    return Native.mkAdd(z3context, 2, new long[]{pNumber1, pNumber2});
+    return Native.mkAdd(z3context, 2, new long[] {pNumber1, pNumber2});
   }
 
   @Override
@@ -89,18 +89,17 @@ abstract class Z3NumeralFormulaManager<
 
   @Override
   public Long subtract(Long pNumber1, Long pNumber2) {
-    return Native.mkSub(z3context, 2, new long[]{pNumber1, pNumber2});
+    return Native.mkSub(z3context, 2, new long[] {pNumber1, pNumber2});
   }
 
   @Override
   public Long divide(Long pNumber1, Long pNumber2) {
-    return Native.mkDiv(z3context, pNumber1,
-        pNumber2);
+    return Native.mkDiv(z3context, pNumber1, pNumber2);
   }
 
   @Override
   public Long multiply(Long pNumber1, Long pNumber2) {
-    return Native.mkMul(z3context, 2, new long[]{pNumber1, pNumber2});
+    return Native.mkMul(z3context, 2, new long[] {pNumber1, pNumber2});
   }
 
   @Override
@@ -110,8 +109,7 @@ abstract class Z3NumeralFormulaManager<
 
   @Override
   public Long equal(Long pNumber1, Long pNumber2) {
-    return Native.mkEq(z3context, pNumber1,
-        pNumber2);
+    return Native.mkEq(z3context, pNumber1, pNumber2);
   }
 
   @Override

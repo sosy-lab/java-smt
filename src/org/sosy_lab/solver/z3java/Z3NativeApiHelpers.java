@@ -62,7 +62,6 @@ class Z3NativeApiHelpers {
     Goal goal = pContext.mkGoal(true, false, false);
     goal.add(pOverallResult);
 
-
     ApplyResult result;
     try {
       result = tacticObject.apply(goal);

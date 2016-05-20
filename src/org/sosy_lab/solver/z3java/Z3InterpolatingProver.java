@@ -122,8 +122,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Expr>
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(
         getSeqInterpolants(
-            ImmutableList.of(
-                Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
+            ImmutableList.of(Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
   }
 
   @Override

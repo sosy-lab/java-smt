@@ -60,12 +60,12 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    return Native.mkAnd(z3context, 2, new long[]{pParam1, pParam2});
+    return Native.mkAnd(z3context, 2, new long[] {pParam1, pParam2});
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    return Native.mkOr(z3context, 2, new long[]{pParam1, pParam2});
+    return Native.mkOr(z3context, 2, new long[] {pParam1, pParam2});
   }
 
   @Override

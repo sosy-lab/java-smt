@@ -108,8 +108,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(
         getSeqInterpolants(
-            ImmutableList.of(
-                Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
+            ImmutableList.of(Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
   }
 
   @Override
@@ -131,10 +130,11 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
     // build conjunction of each partition
     for (int i = 0; i < partitionedFormulas.size(); i++) {
-      long conjunction = Native.mkAnd(
-          z3context,
-          partitionedFormulas.get(i).size(),
-          Longs.toArray(partitionedFormulas.get(i)));
+      long conjunction =
+          Native.mkAnd(
+              z3context,
+              partitionedFormulas.get(i).size(),
+              Longs.toArray(partitionedFormulas.get(i)));
       Native.incRef(z3context, conjunction);
       conjunctionFormulas[i] = conjunction;
     }
@@ -201,8 +201,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // so we only need to copy them
     final List<BooleanFormula> result = new ArrayList<>();
     for (int i = 0; i < partitionedFormulas.size() - 1; i++) {
-      result.add(creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult,
-          i)));
+      result.add(
+          creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult, i)));
     }
 
     // cleanup

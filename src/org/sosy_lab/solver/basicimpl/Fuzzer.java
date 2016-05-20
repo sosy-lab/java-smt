@@ -44,52 +44,41 @@ public class Fuzzer {
     idGenerator = new UniqueIdGenerator();
   }
 
-  public BooleanFormula fuzz(
-      int formulaSize, int maxNoVars
-  ) {
+  public BooleanFormula fuzz(int formulaSize, int maxNoVars) {
     vars = new BooleanFormula[maxNoVars];
     populateVars(maxNoVars);
     return recFuzz(formulaSize, maxNoVars);
   }
 
-  private BooleanFormula recFuzz(
-      int formulaSize, int maxNoVars) {
+  private BooleanFormula recFuzz(int formulaSize, int maxNoVars) {
     if (formulaSize == 1) {
       return getVar(maxNoVars);
     } else {
       int pivot = formulaSize / 2;
       switch (r.nextInt(3)) {
         case 0:
-          return bfmgr.or(
-              recFuzz(pivot, maxNoVars),
-              recFuzz(pivot, maxNoVars));
+          return bfmgr.or(recFuzz(pivot, maxNoVars), recFuzz(pivot, maxNoVars));
         case 1:
-          return bfmgr.and(
-              recFuzz(pivot, maxNoVars),
-              recFuzz(pivot, maxNoVars));
+          return bfmgr.and(recFuzz(pivot, maxNoVars), recFuzz(pivot, maxNoVars));
         case 2:
-          return bfmgr.not(
-              recFuzz(formulaSize - 1, maxNoVars)
-          );
+          return bfmgr.not(recFuzz(formulaSize - 1, maxNoVars));
         default:
           throw new UnsupportedOperationException("Unexpected state");
       }
     }
   }
 
-
   private BooleanFormula getVar(int maxNoVars) {
     return vars[r.nextInt(maxNoVars)];
   }
 
   private void populateVars(int maxNoVars) {
-    for (int i=0; i<maxNoVars; i++) {
+    for (int i = 0; i < maxNoVars; i++) {
       vars[i] = getNewVar();
     }
   }
 
   private BooleanFormula getNewVar() {
-    return bfmgr.makeVariable(varNameTemplate
-        + idGenerator.getFreshId());
+    return bfmgr.makeVariable(varNameTemplate + idGenerator.getFreshId());
   }
 }

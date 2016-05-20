@@ -153,8 +153,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_UNINTERPRETED_SORT:
         // TODO: support for remaining sorts.
         throw new IllegalArgumentException(
-            "Unknown formula type " + Native.sortToString(z3context, pSort)
-                + " with sort " + sortKind);
+            "Unknown formula type "
+                + Native.sortToString(z3context, pSort)
+                + " with sort "
+                + sortKind);
       default:
         throw new UnsupportedOperationException("Unexpected state.");
     }
@@ -314,8 +316,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             return visitor.visitConstant(formula, value);
 
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
-              || Native.getSortKind(environment,
-                  Native.getSort(environment, f)) == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+              || Native.getSortKind(environment, Native.getSort(environment, f))
+                  == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
           } else {
@@ -364,7 +366,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   protected String symbolToString(long symbol) {
     switch (Z3_symbol_kind.fromInt(Native.getSymbolKind(environment, symbol))) {
       case Z3_STRING_SYMBOL:
-
         return Native.getSymbolString(environment, symbol);
       case Z3_INT_SYMBOL:
 
@@ -382,8 +383,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long varName = Native.getQuantifierBoundName(environment, f, i);
       long varSort = Native.getQuantifierBoundSort(environment, f, i);
       boundVars.add(
-          encapsulate(getFormulaTypeFromSort(varSort), Native.mkConst(environment, varName,
-              varSort)));
+          encapsulate(
+              getFormulaTypeFromSort(varSort), Native.mkConst(environment, varName, varSort)));
     }
     return boundVars;
   }
@@ -391,8 +392,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private FunctionDeclarationKind getDeclarationKind(long f) {
     assert Native.getArity(environment, Native.getAppDecl(environment, f)) > 0
         : "Variables should be handled in other branch.";
-    Z3_decl_kind decl = Z3_decl_kind.fromInt(
-        Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
+    Z3_decl_kind decl =
+        Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
     switch (decl) {
       case Z3_OP_AND:
         return FunctionDeclarationKind.AND;
@@ -514,8 +515,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long callFunctionImpl(FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
-    return Native.mkApp(environment, declaration.getSolverDeclaration(), args.size(),
-        Longs.toArray(args));
+    return Native.mkApp(
+        environment, declaration.getSolverDeclaration(), args.size(), Longs.toArray(args));
   }
 
   @Override

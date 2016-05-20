@@ -74,15 +74,16 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     long[] sorts = new long[0];
     long[] declSymbols = new long[0];
     long[] decls = new long[0];
-    long e = Native.parseSmtlib2String(
-        getEnvironment(),
-        str,
-        sorts.length,
-        sortSymbols,
-        sorts,
-        declSymbols.length,
-        declSymbols,
-        decls);
+    long e =
+        Native.parseSmtlib2String(
+            getEnvironment(),
+            str,
+            sorts.length,
+            sortSymbols,
+            sorts,
+            declSymbols.length,
+            declSymbols,
+            decls);
 
     return getFormulaCreator().encapsulateBoolean(e);
   }
@@ -217,8 +218,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       } else {
 
         // Z3-to-Z3 translation.
-        long translatedAST =
-            Native.translate(otherZ3Context, extractInfo(other), getEnvironment());
+        long translatedAST = Native.translate(otherZ3Context, extractInfo(other), getEnvironment());
         return getFormulaCreator().encapsulateBoolean(translatedAST);
       }
     }

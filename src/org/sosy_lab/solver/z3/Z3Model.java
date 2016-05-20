@@ -91,7 +91,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       Preconditions.checkArgument(
           Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
-      long var = Native.mkApp(z3context, keyDecl, 0, new long[]{});
+      long var = Native.mkApp(z3context, keyDecl, 0, new long[] {});
       Formula key = creator.encapsulateWithTypeOf(var);
 
       long value = Native.modelGetConstInterp(z3context, model, keyDecl);
@@ -133,8 +133,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
           argumentInterpretation.add(creator.convertValue(arg));
           args[k] = arg;
         }
-        Formula formula = creator.encapsulateWithTypeOf(
-            Native.mkApp(z3context, funcDecl, args.length, args));
+        Formula formula =
+            creator.encapsulateWithTypeOf(Native.mkApp(z3context, funcDecl, args.length, args));
 
         // Clean up memory.
         for (long arg : args) {

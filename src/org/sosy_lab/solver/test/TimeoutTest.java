@@ -62,23 +62,25 @@ public class TimeoutTest extends SolverBasedTest0 {
     return solver;
   }
 
-  @Test(expected=InterruptedException.class)
+  @Test(expected = InterruptedException.class)
   public void testTacticTimeout() throws Exception {
-    TruthJUnit.assume().withFailureMessage(
-        "Only Z3 has native tactics"
-    ).that(solverToUse()).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
+    TruthJUnit.assume()
+        .withFailureMessage("Only Z3 has native tactics")
+        .that(solverToUse())
+        .isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
 
     BooleanFormula test = fuzzer.fuzz(20, 3);
     (new Thread() {
-      public void run() {
-        try {
-          sleep(1);
-          shutdownManager.requestShutdown("Test");
-        } catch (InterruptedException pE) {
-          throw new UnsupportedOperationException("Unexpected fail");
-        }
-      }
-    }).run();
+          public void run() {
+            try {
+              sleep(1);
+              shutdownManager.requestShutdown("Test");
+            } catch (InterruptedException pE) {
+              throw new UnsupportedOperationException("Unexpected fail");
+            }
+          }
+        })
+        .run();
     BooleanFormula out = mgr.applyTactic(test, Tactic.NNF);
   }
 }

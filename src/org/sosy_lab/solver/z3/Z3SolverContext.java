@@ -161,8 +161,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     long z3params = Native.mkParams(context);
     Native.paramsIncRef(context, z3params);
-    Native.paramsSetUint(context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int)
-        randomSeed);
+    Native.paramsSetUint(
+        context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config);

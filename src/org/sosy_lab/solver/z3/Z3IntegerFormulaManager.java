@@ -56,8 +56,7 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
 
   @Override
   public Long modulo(Long pNumber1, Long pNumber2) {
-    return Native.mkMod(z3context, pNumber1,
-        pNumber2);
+    return Native.mkMod(z3context, pNumber1, pNumber2);
   }
 
   @Override
@@ -67,7 +66,7 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
       long n = makeNumberImpl(pModulo);
       long x = subtract(pNumber1, pNumber2);
       return Native.mkEq(
-          z3context, x, Native.mkMul(z3context, 2, new long[]{n, Native.mkDiv(z3context, x, n)}));
+          z3context, x, Native.mkMul(z3context, 2, new long[] {n, Native.mkDiv(z3context, x, n)}));
     }
     return Native.mkTrue(z3context);
   }

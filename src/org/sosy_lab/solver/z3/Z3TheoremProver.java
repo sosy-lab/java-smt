@@ -122,12 +122,12 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
-    int result = Native.solverCheckAssumptions(
+    int result =
+        Native.solverCheckAssumptions(
             z3context,
             z3solver,
             assumptions.size(),
-            assumptions.stream().mapToLong(creator::extractInfo).toArray()
-        );
+            assumptions.stream().mapToLong(creator::extractInfo).toArray());
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
@@ -230,8 +230,8 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
             }
           });
 
-      long negatedModel = Native.mkNot(z3context, Native.mkAnd(
-          z3context, valuesOfModel.length, valuesOfModel));
+      long negatedModel =
+          Native.mkNot(z3context, Native.mkAnd(z3context, valuesOfModel.length, valuesOfModel));
       Native.incRef(z3context, negatedModel);
       Native.solverAssert(z3context, z3solver, negatedModel);
     }
