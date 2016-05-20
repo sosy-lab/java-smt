@@ -20,6 +20,7 @@
 package org.sosy_lab.solver.z3;
 
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 
 import org.sosy_lab.solver.SolverException;
 
@@ -62,7 +63,15 @@ class Z3NativeApiHelpers {
     Native.goalIncRef(z3context, goal);
     Native.goalAssert(z3context, goal, pF);
 
-    long result = Native.tacticApply(z3context, tacticObject, goal);
+    long result;
+    try {
+      result = Native.tacticApply(z3context, tacticObject, goal);
+    } catch (Z3Exception exp) {
+      if (exp.getMessage().equals("canceled")) {
+        throw new InterruptedException("Z3 Calculation cancelled");
+      }
+      throw exp;
+    }
     Native.applyResultIncRef(z3context, result);
 
     try {
