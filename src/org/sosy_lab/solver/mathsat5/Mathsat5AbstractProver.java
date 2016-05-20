@@ -85,6 +85,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     if (msg.contains("too many iterations")
         || msg.contains("impossible to build a suitable congruence graph!")
         || msg.contains("can't produce proofs")
+        || msg.contains("FP<->BV combination unsupported by the current configuration")
         || msg.equals("msat_solve returned \"unknown\": unsupported")) {
       // This is not a bug in our code, but a problem of MathSAT which happens during interpolation
       throw new SolverException(e.getMessage(), e);
