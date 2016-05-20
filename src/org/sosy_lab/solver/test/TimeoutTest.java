@@ -31,7 +31,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.basicimpl.Fuzzer;
@@ -43,7 +42,6 @@ import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
   private Fuzzer fuzzer;
-  private ShutdownManager manager;
 
   @Before
   public void setUp() {
@@ -71,16 +69,16 @@ public class TimeoutTest extends SolverBasedTest0 {
 
     BooleanFormula test = fuzzer.fuzz(20, 3);
     (new Thread() {
-          public void run() {
-            try {
-              sleep(1);
-              shutdownManager.requestShutdown("Test");
-            } catch (InterruptedException pE) {
-              throw new UnsupportedOperationException("Unexpected fail");
-            }
-          }
-        })
-        .run();
+      @Override
+      public void run() {
+        try {
+          sleep(1);
+          shutdownManager.requestShutdown("Test");
+        } catch (InterruptedException pE) {
+          throw new UnsupportedOperationException("Unexpected fail");
+        }
+      }
+    }).run();
     BooleanFormula out = mgr.applyTactic(test, Tactic.NNF);
   }
 }
