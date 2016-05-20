@@ -115,9 +115,11 @@ public final class Z3SolverContext extends AbstractSolverContext {
     if (NativeLibraries.OS.guessOperatingSystem() == NativeLibraries.OS.WINDOWS) {
       // Z3 itself
       System.loadLibrary("libz3");
+      System.loadLibrary("libz3java");
     }
 
-    System.loadLibrary("z3j");
+    System.loadLibrary("z3");
+    System.loadLibrary("z3java");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();

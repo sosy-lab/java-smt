@@ -289,7 +289,7 @@ public class SolverContextFactory {
 
   // Libraries for which we have to supply a custom path.
   private static final Set<String> expectedLibrariesToLoad =
-      ImmutableSet.of("libz3java", "libz3j", "z3j", "z3java");
+      ImmutableSet.of("z3", "libz3", "libz3java", "z3java");
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
   private static final ClassLoader z3ClassLoader = createZ3ClassLoader();
