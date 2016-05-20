@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.After;
 import org.junit.Before;
 import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.log.LogManager;
@@ -95,6 +96,11 @@ public abstract class SolverBasedTest0 {
   protected @Nullable QuantifiedFormulaManager qmgr;
   protected @Nullable ArrayFormulaManager amgr;
   protected @Nullable FloatingPointFormulaManager fpmgr;
+  protected ShutdownManager shutdownManager = ShutdownManager.create();
+
+  protected ShutdownNotifier shutdownNotifierToUse() {
+    return shutdownManager.getNotifier();
+  }
 
   /**
    * Return the solver to use in this test.
@@ -113,7 +119,7 @@ public abstract class SolverBasedTest0 {
   public final void initSolver() throws Exception {
     config = createTestConfigBuilder().build();
 
-    factory = new SolverContextFactory(config, logger, ShutdownManager.create().getNotifier());
+    factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     context = factory.generateContext();
     mgr = context.getFormulaManager();
 
