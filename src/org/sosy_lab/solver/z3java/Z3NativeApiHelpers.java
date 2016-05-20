@@ -24,6 +24,7 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Goal;
 import com.microsoft.z3.Tactic;
+import com.microsoft.z3.Z3Exception;
 
 import org.sosy_lab.solver.SolverException;
 
@@ -61,7 +62,16 @@ class Z3NativeApiHelpers {
     Goal goal = pContext.mkGoal(true, false, false);
     goal.add(pOverallResult);
 
-    ApplyResult result = tacticObject.apply(goal);
+
+    ApplyResult result;
+    try {
+      result = tacticObject.apply(goal);
+    } catch (Z3Exception exp) {
+      if (exp.getMessage().equals("canceled")) {
+        throw new InterruptedException("Z3 Calculation cancelled");
+      }
+      throw exp;
+    }
     return applyResultToAST(pContext, result);
   }
 
