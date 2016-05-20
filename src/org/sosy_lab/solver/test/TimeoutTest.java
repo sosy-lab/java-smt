@@ -61,6 +61,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @Test(expected = InterruptedException.class)
+  @SuppressWarnings("CheckReturnValue")
   public void testTacticTimeout() throws Exception {
     TruthJUnit.assume()
         .withFailureMessage("Only Z3 has native tactics")
@@ -79,6 +80,6 @@ public class TimeoutTest extends SolverBasedTest0 {
         }
       }
     }).run();
-    BooleanFormula out = mgr.applyTactic(test, Tactic.NNF);
+    mgr.applyTactic(test, Tactic.NNF);
   }
 }
