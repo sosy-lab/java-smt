@@ -37,7 +37,7 @@ import org.sosy_lab.solver.basicimpl.Fuzzer;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
 /**
- * Check that timeout is handled gracefully
+ * Check that timeout is handled gracefully.
  */
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
@@ -67,19 +67,8 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withFailureMessage("Only Z3 has native tactics")
         .that(solverToUse())
         .isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
-
     BooleanFormula test = fuzzer.fuzz(20, 3);
-    (new Thread() {
-      @Override
-      public void run() {
-        try {
-          sleep(1);
-          shutdownManager.requestShutdown("Test");
-        } catch (InterruptedException pE) {
-          throw new UnsupportedOperationException("Unexpected fail");
-        }
-      }
-    }).run();
+    shutdownManager.requestShutdown("Test");
     mgr.applyTactic(test, Tactic.NNF);
   }
 }
