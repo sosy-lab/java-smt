@@ -22,6 +22,7 @@ package org.sosy_lab.solver;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import org.sosy_lab.common.ChildFirstPatternClassLoader;
@@ -47,7 +48,6 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -394,21 +394,10 @@ public class SolverContextFactory {
     @Override
     protected String findLibrary(String libname) {
       if (expectedLibrariesToLoad.contains(libname)) {
-        String mappedName = System.mapLibraryName(libname);
-
-        // Use the directory-specific folder.
-        Path outFile = NativeLibraries.getNativeLibraryPath().resolve(mappedName);
-        if (!Files.exists(outFile)) {
-
-          // If fails, use the same directory as the JAR.
-          outFile = NativeLibraries.getPathToJar().resolve(mappedName);
+        Optional<Path> path = NativeLibraries.findPathForLibrary(libname);
+        if (path.isPresent()) {
+          return path.get().toAbsolutePath().toString();
         }
-        if (!Files.exists(outFile)) {
-
-          // If that fails as well, use standard loading.
-          return super.findLibrary(libname);
-        }
-        return outFile.toAbsolutePath().toString();
       }
       return super.findLibrary(libname);
     }
