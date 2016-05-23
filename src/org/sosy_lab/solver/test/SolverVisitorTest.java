@@ -25,6 +25,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.truth.TruthJUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,7 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.solver.basicimpl.Fuzzer;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.solver.visitors.DefaultBooleanFormulaVisitor;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
@@ -274,5 +277,32 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         },
         f);
     assertThat(foundVars).containsExactly("x", "y", "z", "d");
+  }
+
+  @Test
+  public void testTransformationInsideQuantifiers() throws Exception {
+    requireQuantifiers();
+    TruthJUnit.assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+    assert qmgr != null;
+    List<BooleanFormula> usedVars = ImmutableList.of("a", "b", "c", "d", "e", "f").stream().map(
+        var -> bmgr.makeVariable(var)).collect(Collectors.toList());
+    Fuzzer fuzzer = new Fuzzer(bmgr);
+    List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
+    BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
+    BooleanFormula f = qmgr.forall(quantifiedVars, body);
+    BooleanFormula transformed = bmgr.transformRecursively(
+        new BooleanFormulaTransformationVisitor(bmgr) {
+      @Override
+      public BooleanFormula visitAtom(
+          BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
+        if (decl.getKind() == FunctionDeclarationKind.VAR) {
+          // Uppercase all variables.
+          return bmgr.makeVariable(decl.getName().toUpperCase());
+        } else {
+          return pAtom;
+        }
+      }
+    }, f);
+    assertThat(mgr.extractVariables(transformed).keySet()).containsExactly("B", "C", "D", "E", "F");
   }
 }
