@@ -37,39 +37,45 @@ public class Fuzzer {
   private final UniqueIdGenerator idGenerator;
   private static final String varNameTemplate = "VAR_";
   private BooleanFormula[] vars = new BooleanFormula[0];
-  private final Random r = new Random();
+  private final Random r;
 
   public Fuzzer(BooleanFormulaManager pBfmgr) {
     bfmgr = pBfmgr;
     idGenerator = new UniqueIdGenerator();
+    r = new Random();
   }
 
   public BooleanFormula fuzz(int formulaSize, int maxNoVars) {
     vars = new BooleanFormula[maxNoVars];
     populateVars(maxNoVars);
-    return recFuzz(formulaSize, maxNoVars);
+    return recFuzz(formulaSize);
   }
 
-  private BooleanFormula recFuzz(int formulaSize, int maxNoVars) {
+  public BooleanFormula fuzz(int formulaSize, BooleanFormula... pVars) {
+    vars = pVars;
+    return recFuzz(formulaSize);
+  }
+
+  private BooleanFormula recFuzz(int formulaSize) {
     if (formulaSize == 1) {
-      return getVar(maxNoVars);
+      return getVar();
     } else {
       int pivot = formulaSize / 2;
       switch (r.nextInt(3)) {
         case 0:
-          return bfmgr.or(recFuzz(pivot, maxNoVars), recFuzz(pivot, maxNoVars));
+          return bfmgr.or(recFuzz(pivot), recFuzz(pivot));
         case 1:
-          return bfmgr.and(recFuzz(pivot, maxNoVars), recFuzz(pivot, maxNoVars));
+          return bfmgr.and(recFuzz(pivot), recFuzz(pivot));
         case 2:
-          return bfmgr.not(recFuzz(formulaSize - 1, maxNoVars));
+          return bfmgr.not(recFuzz(formulaSize - 1));
         default:
           throw new UnsupportedOperationException("Unexpected state");
       }
     }
   }
 
-  private BooleanFormula getVar(int maxNoVars) {
-    return vars[r.nextInt(maxNoVars)];
+  private BooleanFormula getVar() {
+    return vars[r.nextInt(vars.length)];
   }
 
   private void populateVars(int maxNoVars) {
