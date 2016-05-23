@@ -14,7 +14,7 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   private final BooleanFormulaManager bfmgr;
 
   public NNFVisitor(FormulaManager pFmgr) {
-    super(pFmgr.getBooleanFormulaManager());
+    super(pFmgr);
     bfmgr = pFmgr.getBooleanFormulaManager();
     insideNotVisitor = new NNFInsideNotVisitor(pFmgr);
   }
@@ -74,7 +74,7 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   private class NNFInsideNotVisitor extends BooleanFormulaTransformationVisitor {
 
     protected NNFInsideNotVisitor(FormulaManager pFmgr) {
-      super(pFmgr.getBooleanFormulaManager());
+      super(pFmgr);
     }
 
     @Override

@@ -142,7 +142,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   class RemoveAssumptionsFromFormulaVisitor extends BooleanFormulaTransformationVisitor {
 
     private RemoveAssumptionsFromFormulaVisitor() {
-      super(fmgr.getBooleanFormulaManager());
+      super(fmgr);
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.google.common.collect.Collections2;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
+import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 
@@ -39,10 +40,12 @@ import java.util.List;
 public abstract class BooleanFormulaTransformationVisitor
     implements BooleanFormulaVisitor<BooleanFormula> {
 
+  private final FormulaManager mgr;
   private final BooleanFormulaManager bfmgr;
 
-  protected BooleanFormulaTransformationVisitor(BooleanFormulaManager pBfmgr) {
-    bfmgr = pBfmgr;
+  protected BooleanFormulaTransformationVisitor(FormulaManager pMgr) {
+    mgr = pMgr;
+    bfmgr = mgr.getBooleanFormulaManager();
   }
 
   @Override
@@ -123,6 +126,6 @@ public abstract class BooleanFormulaTransformationVisitor
       BooleanFormula quantifiedAST,
       List<Formula> boundVars,
       BooleanFormula processedBody) {
-    return quantifiedAST;
+    return mgr.getQuantifiedFormulaManager().mkQuantifier(quantifier, boundVars, processedBody);
   }
 }

@@ -85,7 +85,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (BooleanFormula bf : Lists.newArrayList(t, f, x, y, z, and, or, ite, impl, eq, not)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
-          new BooleanFormulaTransformationVisitor(mgr.getBooleanFormulaManager()) {
+          new BooleanFormulaTransformationVisitor(mgr) {
             // we need a subclass, because the original class is 'abstract'
           };
       assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
@@ -105,7 +105,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (IntegerFormula f : Lists.newArrayList(a, b, n12, neg, ite)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
-          new BooleanFormulaTransformationVisitor(mgr.getBooleanFormulaManager()) {
+          new BooleanFormulaTransformationVisitor(mgr) {
             // we need a subclass, because the original class is 'abstract'
           };
       BooleanFormula bf = imgr.equal(n12, f);
@@ -157,8 +157,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
-        bmgr.visit(
-            new BooleanFormulaTransformationVisitor(mgr.getBooleanFormulaManager()) {}, constraint);
+        bmgr.visit(new BooleanFormulaTransformationVisitor(mgr) {}, constraint);
     assertThatFormula(newConstraint).isUnsatisfiable();
   }
 
@@ -290,19 +289,22 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
     BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
     BooleanFormula f = qmgr.forall(quantifiedVars, body);
-    BooleanFormula transformed = bmgr.transformRecursively(
-        new BooleanFormulaTransformationVisitor(bmgr) {
-      @Override
-      public BooleanFormula visitAtom(
-          BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
-        if (decl.getKind() == FunctionDeclarationKind.VAR) {
-          // Uppercase all variables.
-          return bmgr.makeVariable(decl.getName().toUpperCase());
-        } else {
-          return pAtom;
-        }
-      }
-    }, f);
-    assertThat(mgr.extractVariables(transformed).keySet()).containsExactly("B", "C", "D", "E", "F");
+    BooleanFormula transformed =
+        bmgr.transformRecursively(
+            new BooleanFormulaTransformationVisitor(mgr) {
+              @Override
+              public BooleanFormula visitAtom(
+                  BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
+                if (decl.getKind() == FunctionDeclarationKind.VAR) {
+                  // Uppercase all variables.
+                  return bmgr.makeVariable(decl.getName().toUpperCase());
+                } else {
+                  return pAtom;
+                }
+              }
+            },
+            f);
+    assertThat(mgr.extractVariables(transformed).keySet().stream().allMatch(
+        pS -> pS.equals(pS.toUpperCase()))).isTrue();
   }
 }
