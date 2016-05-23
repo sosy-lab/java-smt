@@ -105,9 +105,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (IntegerFormula f : Lists.newArrayList(a, b, n12, neg, ite)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
-          new BooleanFormulaTransformationVisitor(mgr) {
-            // we need a subclass, because the original class is 'abstract'
-          };
+          new BooleanFormulaTransformationVisitor(mgr) { };
       BooleanFormula bf = imgr.equal(n12, f);
       assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
     }
