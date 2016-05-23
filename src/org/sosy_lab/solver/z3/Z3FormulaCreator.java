@@ -28,17 +28,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.common.time.Timer;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -95,11 +98,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
+  private final ShutdownNotifier shutdownNotifier;
 
   Z3FormulaCreator(
-      long pEnv, long pBoolType, long pIntegerType, long pRealType, Configuration config)
+      long pEnv,
+      long pBoolType,
+      long pIntegerType,
+      long pRealType,
+      Configuration config,
+      ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
     super(pEnv, pBoolType, pIntegerType, pRealType);
+    shutdownNotifier = pShutdownNotifier;
     config.inject(this);
   }
 
@@ -532,5 +542,101 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     long decl = Native.getAppDecl(z3context, expr);
     return Native.getDeclKind(z3context, decl) == op;
+  }
+
+  /**
+   * Apply multiple tactics in sequence.
+   * @throws InterruptedException thrown by JNI code in case of termination request
+   * @throws SolverException thrown by JNI code in case of error
+   */
+  public long applyTactics(long z3context, final Long pF, String... pTactics)
+      throws InterruptedException, SolverException {
+    long overallResult = pF;
+    for (String tactic : pTactics) {
+      long tacticResult = applyTactic(z3context, overallResult, tactic);
+      if (overallResult != pF) {
+        Native.decRef(z3context, overallResult);
+      }
+      overallResult = tacticResult;
+    }
+    return overallResult;
+  }
+
+  /**
+   * Apply tactic on a Z3_ast object, convert the result back to Z3_ast.
+   *
+   * @param z3context Z3_context
+   * @param tactic Z3 Tactic Name
+   * @param pF Z3_ast
+   * @return Z3_ast
+   *
+   * @throws InterruptedException If execution gets interrupted.
+   */
+  public long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
+    long tacticObject = Native.mkTactic(z3context, tactic);
+    Native.tacticIncRef(z3context, tacticObject);
+
+    long goal = Native.mkGoal(z3context, true, false, false);
+    Native.goalIncRef(z3context, goal);
+    Native.goalAssert(z3context, goal, pF);
+
+    long result;
+    try {
+      result = Native.tacticApply(z3context, tacticObject, goal);
+    } catch (Z3Exception exp) {
+      shutdownNotifier.shutdownIfNecessary();
+      throw exp;
+    }
+    Native.applyResultIncRef(z3context, result);
+
+    try {
+      return applyResultToAST(z3context, result);
+    } finally {
+      Native.applyResultDecRef(z3context, result);
+      Native.goalDecRef(z3context, goal);
+      Native.tacticDecRef(z3context, tacticObject);
+    }
+  }
+
+  private long applyResultToAST(long z3context, long applyResult) {
+    int subgoalsCount = Native.applyResultGetNumSubgoals(z3context, applyResult);
+    long[] goalFormulas = new long[subgoalsCount];
+
+    for (int i = 0; i < subgoalsCount; i++) {
+      long subgoal = Native.applyResultGetSubgoal(z3context, applyResult, i);
+      Native.goalIncRef(z3context, subgoal);
+      long subgoalAst = goalToAST(z3context, subgoal);
+      Native.incRef(z3context, subgoalAst);
+      goalFormulas[i] = subgoalAst;
+      Native.goalDecRef(z3context, subgoal);
+    }
+    try {
+      return goalFormulas.length == 1
+          ? goalFormulas[0]
+          : Native.mkOr(z3context, goalFormulas.length, goalFormulas);
+    } finally {
+      for (int i = 0; i < subgoalsCount; i++) {
+        Native.decRef(z3context, goalFormulas[i]);
+      }
+    }
+  }
+
+  private long goalToAST(long z3context, long goal) {
+    int subgoalFormulasCount = Native.goalSize(z3context, goal);
+    long[] subgoalFormulas = new long[subgoalFormulasCount];
+    for (int k = 0; k < subgoalFormulasCount; k++) {
+      long f = Native.goalFormula(z3context, goal, k);
+      Native.incRef(z3context, f);
+      subgoalFormulas[k] = f;
+    }
+    try {
+      return subgoalFormulas.length == 1
+          ? subgoalFormulas[0]
+          : Native.mkAnd(z3context, subgoalFormulas.length, subgoalFormulas);
+    } finally {
+      for (int k = 0; k < subgoalFormulasCount; k++) {
+        Native.decRef(z3context, subgoalFormulas[k]);
+      }
+    }
   }
 }

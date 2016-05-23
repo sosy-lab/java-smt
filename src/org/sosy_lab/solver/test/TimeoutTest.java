@@ -26,7 +26,9 @@ package org.sosy_lab.solver.test;
 import com.google.common.truth.TruthJUnit;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -60,15 +62,20 @@ public class TimeoutTest extends SolverBasedTest0 {
     return solver;
   }
 
-  @Test(expected = InterruptedException.class)
+  @Rule public ExpectedException expectedEx = ExpectedException.none();
+
+  @Test
   @SuppressWarnings("CheckReturnValue")
   public void testTacticTimeout() throws Exception {
     TruthJUnit.assume()
         .withFailureMessage("Only Z3 has native tactics")
         .that(solverToUse())
         .isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
+    String msg = "ShutdownRequest";
+    expectedEx.expect(InterruptedException.class);
+    expectedEx.expectMessage(msg);
     BooleanFormula test = fuzzer.fuzz(20, 3);
-    shutdownManager.requestShutdown("Test");
+    shutdownManager.requestShutdown(msg);
     mgr.applyTactic(test, Tactic.NNF);
   }
 }

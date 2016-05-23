@@ -48,6 +48,8 @@ import java.util.Map.Entry;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context, FuncDecl> {
 
+  private final Z3FormulaCreator formulaCreator;
+
   @SuppressWarnings("checkstyle:parameternumber")
   Z3FormulaManager(
       Z3FormulaCreator pFormulaCreator,
@@ -69,6 +71,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
         pFloatingPointManager,
         pQuantifiedManager,
         pArrayManager);
+    formulaCreator = pFormulaCreator;
   }
 
   @Override
@@ -104,7 +107,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Expr, Sort, Context,
   private BooleanFormula applyTacticImpl(BooleanFormula pF, String tacticName)
       throws InterruptedException {
     Expr out =
-        Z3NativeApiHelpers.applyTactic(
+        formulaCreator.applyTactic(
             getFormulaCreator().getEnv(), toBool(extractInfo(pF)), tacticName);
     return getFormulaCreator().encapsulateBoolean(out);
   }

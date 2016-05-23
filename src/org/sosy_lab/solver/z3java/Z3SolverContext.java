@@ -160,7 +160,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Params z3params = context.mkParams();
     z3params.add(":random-seed", (int) randomSeed);
 
-    Z3FormulaCreator creator = new Z3FormulaCreator(context, boolSort, integerSort, realSort);
+    Z3FormulaCreator creator =
+        new Z3FormulaCreator(context, boolSort, integerSort, realSort, pShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);

@@ -30,10 +30,12 @@ import java.util.List;
 class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
+  private final Z3FormulaCreator formulaCreator;
 
   Z3QuantifiedFormulaManager(Z3FormulaCreator creator) {
     super(creator);
     this.z3context = creator.getEnv();
+    formulaCreator = creator;
   }
 
   @Override
@@ -71,6 +73,6 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
 
     // One might want to run the tactic "ctx-solver-simplify" on the result.
 
-    return Z3NativeApiHelpers.applyTactics(z3context, pExtractInfo, "qe-light", "qe");
+    return formulaCreator.applyTactics(z3context, pExtractInfo, "qe-light", "qe");
   }
 }

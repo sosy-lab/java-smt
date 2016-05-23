@@ -26,22 +26,29 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
+import com.microsoft.z3.ApplyResult;
 import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.BitVecSort;
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FPSort;
 import com.microsoft.z3.FuncDecl;
+import com.microsoft.z3.Goal;
 import com.microsoft.z3.IntSymbol;
 import com.microsoft.z3.Sort;
 import com.microsoft.z3.StringSymbol;
 import com.microsoft.z3.Symbol;
+import com.microsoft.z3.Tactic;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
@@ -70,9 +77,16 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
           .build();
 
   private final Table<Sort, Sort, Sort> allocatedArraySorts = HashBasedTable.create();
+  private final ShutdownNotifier shutdownNotifier;
 
-  Z3FormulaCreator(Context pEnv, Sort pBoolType, Sort pIntegerType, Sort pRealType) {
+  Z3FormulaCreator(
+      Context pEnv,
+      Sort pBoolType,
+      Sort pIntegerType,
+      Sort pRealType,
+      ShutdownNotifier pShutdownNotifier) {
     super(pEnv, pBoolType, pIntegerType, pRealType);
+    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
@@ -345,5 +359,62 @@ class Z3FormulaCreator extends FormulaCreator<Expr, Sort, Context, FuncDecl> {
   @Override
   protected FuncDecl getBooleanVarDeclarationImpl(Expr pExpr) {
     return pExpr.getFuncDecl();
+  }
+
+  /**
+   * Apply multiple tactics in sequence.
+   * @throws InterruptedException thrown by JNI code in case of termination request
+   * @throws SolverException thrown by JNI code in case of error
+   */
+  public BoolExpr applyTactics(Context z3context, final BoolExpr pF, String... pTactics)
+      throws InterruptedException, SolverException {
+    BoolExpr overallResult = pF;
+    for (String tactic : pTactics) {
+      overallResult = applyTactic(z3context, overallResult, tactic);
+    }
+    return overallResult;
+  }
+
+  /**
+   * Apply tactic on a Z3_ast object, convert the result back to Z3_ast.
+   *
+   * @param pContext Z3_context
+   * @param tactic Z3 Tactic Name
+   * @param pOverallResult Z3_ast
+   * @return Z3_ast
+   *
+   * @throws InterruptedException can be thrown by the native code.
+   */
+  public BoolExpr applyTactic(Context pContext, BoolExpr pOverallResult, String tactic)
+      throws InterruptedException {
+    Tactic tacticObject = pContext.mkTactic(tactic);
+
+    Goal goal = pContext.mkGoal(true, false, false);
+    goal.add(pOverallResult);
+
+    ApplyResult result;
+    try {
+      result = tacticObject.apply(goal);
+    } catch (Z3Exception exp) {
+      shutdownNotifier.shutdownIfNecessary();
+      throw exp;
+    }
+    return applyResultToAST(pContext, result);
+  }
+
+  private BoolExpr applyResultToAST(Context pContext, ApplyResult pResult) {
+    int subgoalsCount = pResult.getNumSubgoals();
+    BoolExpr[] goalFormulas = new BoolExpr[subgoalsCount];
+    Goal[] subGoals = pResult.getSubgoals();
+
+    for (int i = 0; i < subgoalsCount; i++) {
+      goalFormulas[i] = goalToAST(pContext, subGoals[i]);
+    }
+    return goalFormulas.length == 1 ? goalFormulas[0] : pContext.mkOr(goalFormulas);
+  }
+
+  private BoolExpr goalToAST(Context pContext, Goal pSubGoals) {
+    BoolExpr[] subgoalFormulas = pSubGoals.getFormulas();
+    return subgoalFormulas.length == 1 ? subgoalFormulas[0] : pContext.mkAnd(subgoalFormulas);
   }
 }
