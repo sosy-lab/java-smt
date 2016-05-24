@@ -102,6 +102,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     expectedEx.expect(InterruptedException.class);
     Thread t =
         new Thread() {
+          @Override
           public void run() {
             try {
               sleep(1);

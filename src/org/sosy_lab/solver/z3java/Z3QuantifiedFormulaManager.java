@@ -36,12 +36,12 @@ class Z3QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Expr, Sort, Context, FuncDecl> {
 
   private final Context z3context;
-  private final Z3FormulaCreator formulaCreator;
+  private final Z3FormulaCreator z3FormulaCreator;
 
   Z3QuantifiedFormulaManager(Z3FormulaCreator creator) {
     super(creator);
     this.z3context = creator.getEnv();
-    formulaCreator = creator;
+    z3FormulaCreator = creator;
   }
 
   @Override
@@ -83,6 +83,6 @@ class Z3QuantifiedFormulaManager
     // "qe" does not perform a "qe-light" as a preprocessing on its own!
 
     // One might want to run the tactic "ctx-solver-simplify" on the result.
-    return formulaCreator.applyTactics(z3context, toBool(pExtractInfo), "qe-light", "qe");
+    return z3FormulaCreator.applyTactics(z3context, toBool(pExtractInfo), "qe-light", "qe");
   }
 }
