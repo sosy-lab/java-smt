@@ -45,6 +45,12 @@ public class Fuzzer {
     r = new Random();
   }
 
+  public Fuzzer(BooleanFormulaManager pBfmgr, Random pRandom) {
+    bfmgr = pBfmgr;
+    idGenerator = new UniqueIdGenerator();
+    r = pRandom;
+  }
+
   public BooleanFormula fuzz(int formulaSize, int maxNoVars) {
     vars = new BooleanFormula[maxNoVars];
     populateVars(maxNoVars);
