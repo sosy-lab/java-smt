@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -116,10 +117,8 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     Status result;
     try {
       result = z3solver.check();
+      shutdownNotifier.shutdownIfNecessary();
     } catch (Z3Exception e) {
-      if ("canceled".equals(e.getMessage())) {
-        shutdownNotifier.shutdownIfNecessary();
-      }
       throw new SolverException("Z3 Solver Exception", e);
     }
     undefinedStatusToException(result);
@@ -222,6 +221,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
         z3solver.check(
             Collections2.transform(assumptions, creator::extractInfo)
                 .toArray(new Expr[assumptions.size()]));
+    shutdownNotifier.shutdownIfNecessary();
     undefinedStatusToException(result);
     Preconditions.checkArgument(result != Status.UNKNOWN);
     return result == Status.UNSATISFIABLE;

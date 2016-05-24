@@ -113,6 +113,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     int result = Native.solverCheck(z3context, z3solver);
+    shutdownNotifier.shutdownIfNecessary();
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
@@ -128,6 +129,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
             z3solver,
             assumptions.size(),
             assumptions.stream().mapToLong(creator::extractInfo).toArray());
+    shutdownNotifier.shutdownIfNecessary();
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
