@@ -141,7 +141,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
     }
     Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
 
-    // TODO add some other params, memory-limit?
     final long context = Native.mkContextRc(cfg);
     ShutdownNotifier.ShutdownRequestListener interruptListener =
         reason -> Native.interrupt(context);
