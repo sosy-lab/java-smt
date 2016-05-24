@@ -34,6 +34,7 @@ import com.microsoft.z3.Optimize.Handle;
 import com.microsoft.z3.Params;
 import com.microsoft.z3.RatNum;
 import com.microsoft.z3.Status;
+import com.microsoft.z3.Z3Exception;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
@@ -117,7 +118,13 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    Status status = z3optContext.Check();
+    Status status;
+    try {
+      status = z3optContext.Check();
+    } catch (Z3Exception ex) {
+      shutdownNotifier.shutdownIfNecessary();
+      throw ex;
+    }
     if (status == Status.UNSATISFIABLE) {
       return OptStatus.UNSAT;
     } else if (status == Status.UNKNOWN) {

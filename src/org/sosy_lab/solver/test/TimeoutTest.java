@@ -68,7 +68,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withFailureMessage("Only Z3 has native tactics")
         .that(solverToUse())
         .isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
-    Fuzzer fuzzer = new Fuzzer(bmgr, new Random(0));
+    Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     String msg = "ShutdownRequest";
     expectedEx.expect(InterruptedException.class);
     expectedEx.expectMessage(msg);
@@ -95,10 +95,16 @@ public class TimeoutTest extends SolverBasedTest0 {
     testBasicProverTimeout(() -> context.newProverEnvironmentWithInterpolation());
   }
 
+  @Test
+  public void testOptimizationProverTimeout() throws Exception {
+    requireOptimization();
+    testBasicProverTimeout(() -> context.newOptimizationProverEnvironment());
+  }
+
   @SuppressWarnings("CheckReturnValue")
   private void testBasicProverTimeout(Supplier<BasicProverEnvironment<?>> proverConstructor)
       throws Exception {
-    Fuzzer f = new Fuzzer(bmgr, new Random(0));
+    Fuzzer f = new Fuzzer(mgr, new Random(0));
     expectedEx.expect(InterruptedException.class);
     Thread t =
         new Thread() {

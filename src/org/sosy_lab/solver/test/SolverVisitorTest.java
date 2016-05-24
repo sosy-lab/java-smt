@@ -50,6 +50,7 @@ import org.sosy_lab.solver.visitors.TraversalProcess;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,8 +62,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     return Solvers.values();
   }
 
-  @Parameter(0)
-  public Solvers solver;
+  @Parameter public Solvers solver;
 
   @Override
   protected Solvers solverToUse() {
@@ -286,7 +286,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             .stream()
             .map(var -> bmgr.makeVariable(var))
             .collect(Collectors.toList());
-    Fuzzer fuzzer = new Fuzzer(bmgr);
+    Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
     BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
     BooleanFormula f = qmgr.forall(quantifiedVars, body);

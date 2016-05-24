@@ -23,6 +23,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -87,7 +88,13 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    int status = Native.optimizeCheck(z3context, z3optContext);
+    int status;
+    try {
+      status = Native.optimizeCheck(z3context, z3optContext);
+    } catch (Z3Exception ex) {
+      shutdownNotifier.shutdownIfNecessary();
+      throw ex;
+    }
     if (status == Z3_lbool.Z3_L_FALSE.toInt()) {
       return OptStatus.UNSAT;
     } else if (status == Z3_lbool.Z3_L_UNDEF.toInt()) {

@@ -26,6 +26,7 @@ package org.sosy_lab.solver.basicimpl;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
+import org.sosy_lab.solver.api.FormulaManager;
 
 import java.util.Random;
 
@@ -34,26 +35,22 @@ import java.util.Random;
  */
 public class Fuzzer {
   private final BooleanFormulaManager bfmgr;
+
   private final UniqueIdGenerator idGenerator;
-  private static final String varNameTemplate = "VAR_";
   private BooleanFormula[] vars = new BooleanFormula[0];
   private final Random r;
 
-  public Fuzzer(BooleanFormulaManager pBfmgr) {
-    bfmgr = pBfmgr;
-    idGenerator = new UniqueIdGenerator();
-    r = new Random();
-  }
+  private static final String varNameTemplate = "VAR_";
 
-  public Fuzzer(BooleanFormulaManager pBfmgr, Random pRandom) {
-    bfmgr = pBfmgr;
+  public Fuzzer(FormulaManager pFmgr, Random pRandom) {
+    bfmgr = pFmgr.getBooleanFormulaManager();
     idGenerator = new UniqueIdGenerator();
     r = pRandom;
   }
 
   public BooleanFormula fuzz(int formulaSize, int maxNoVars) {
     vars = new BooleanFormula[maxNoVars];
-    populateVars(maxNoVars);
+    populateVars();
     return recFuzz(formulaSize);
   }
 
@@ -84,8 +81,8 @@ public class Fuzzer {
     return vars[r.nextInt(vars.length)];
   }
 
-  private void populateVars(int maxNoVars) {
-    for (int i = 0; i < maxNoVars; i++) {
+  private void populateVars() {
+    for (int i = 0; i < vars.length; i++) {
       vars[i] = getNewVar();
     }
   }
