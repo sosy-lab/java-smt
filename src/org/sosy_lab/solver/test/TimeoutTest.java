@@ -81,7 +81,8 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void testProverTimeout() throws Exception {
     TruthJUnit.assume()
         .withFailureMessage("Princess does not support interruption")
-        .that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeout(() -> context.newProverEnvironment());
   }
 
@@ -89,7 +90,8 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void testInterpolationProverTimeout() throws Exception {
     TruthJUnit.assume()
         .withFailureMessage("Princess does not support interruption")
-        .that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeout(() -> context.newProverEnvironmentWithInterpolation());
   }
 
@@ -98,16 +100,17 @@ public class TimeoutTest extends SolverBasedTest0 {
       throws Exception {
     Fuzzer f = new Fuzzer(bmgr, new Random(0));
     expectedEx.expect(InterruptedException.class);
-    Thread t = new Thread() {
-      public void run() {
-        try {
-          sleep(1);
-          shutdownManager.requestShutdown("Shutdown Request");
-        } catch (InterruptedException pE) {
-          throw new UnsupportedOperationException("Unexpected interrupt");
-        }
-      }
-    };
+    Thread t =
+        new Thread() {
+          public void run() {
+            try {
+              sleep(1);
+              shutdownManager.requestShutdown("Shutdown Request");
+            } catch (InterruptedException pE) {
+              throw new UnsupportedOperationException("Unexpected interrupt");
+            }
+          }
+        };
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
       pe.push(f.fuzz(10000, 100));
       t.start();

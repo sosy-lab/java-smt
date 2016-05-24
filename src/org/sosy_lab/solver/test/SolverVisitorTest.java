@@ -105,7 +105,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (IntegerFormula f : Lists.newArrayList(a, b, n12, neg, ite)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
-          new BooleanFormulaTransformationVisitor(mgr) { };
+          new BooleanFormulaTransformationVisitor(mgr) {};
       BooleanFormula bf = imgr.equal(n12, f);
       assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
     }
@@ -281,8 +281,11 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireQuantifiers();
     TruthJUnit.assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     assert qmgr != null;
-    List<BooleanFormula> usedVars = ImmutableList.of("a", "b", "c", "d", "e", "f").stream().map(
-        var -> bmgr.makeVariable(var)).collect(Collectors.toList());
+    List<BooleanFormula> usedVars =
+        ImmutableList.of("a", "b", "c", "d", "e", "f")
+            .stream()
+            .map(var -> bmgr.makeVariable(var))
+            .collect(Collectors.toList());
     Fuzzer fuzzer = new Fuzzer(bmgr);
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
     BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
@@ -302,7 +305,11 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               }
             },
             f);
-    assertThat(mgr.extractVariables(transformed).keySet().stream().allMatch(
-        pS -> pS.equals(pS.toUpperCase()))).isTrue();
+    assertThat(
+            mgr.extractVariables(transformed)
+                .keySet()
+                .stream()
+                .allMatch(pS -> pS.equals(pS.toUpperCase())))
+        .isTrue();
   }
 }
