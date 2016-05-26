@@ -67,7 +67,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withFailureMessage("Only Z3 has native tactics")
         .that(solverToUse())
-        .isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
+        .isEqualTo(Solvers.Z3);
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     String msg = "ShutdownRequest";
     expectedEx.expect(InterruptedException.class);

@@ -280,7 +280,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testQELight() throws InterruptedException {
-    assume().that(solverToUse()).isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA));
+    assume().that(solverToUse()).isEqualTo(Solvers.Z3);
     assert qmgr != null;
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =

@@ -184,7 +184,7 @@ public class ModelTest extends SolverBasedTest0 {
     assume()
         .withFailureMessage("As of now, only Z3 and Princess support partial models")
         .that(solver)
-        .isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
+        .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       prover.push(imgr.equal(x, x));
@@ -201,7 +201,7 @@ public class ModelTest extends SolverBasedTest0 {
     assume()
         .withFailureMessage("As of now, only Z3 and Princess support partial model evaluation")
         .that(solver)
-        .isIn(ImmutableList.of(Solvers.Z3, Solvers.Z3JAVA, Solvers.PRINCESS));
+        .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula f = fmgr.declareAndCallUF("f", FormulaType.IntegerType, x);

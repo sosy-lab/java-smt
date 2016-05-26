@@ -221,7 +221,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     assume()
         .withFailureMessage("Solver does not support tree-interpolation.")
         .that(solver)
-        .isAnyOf(Solvers.Z3, Solvers.Z3JAVA, Solvers.SMTINTERPOL);
+        .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL);
   }
 
   @Test

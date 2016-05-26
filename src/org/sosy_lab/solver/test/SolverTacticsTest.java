@@ -50,8 +50,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     return Solvers.values();
   }
 
-  @Parameter(0)
-  public Solvers solver;
+  @Parameter public Solvers solver;
 
   @Override
   protected Solvers solverToUse() {
@@ -87,7 +86,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void cnfTacticDefaultTest1() throws SolverException, InterruptedException {
-    TruthJUnit.assume().that(solver).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
+    TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula equiv_a_b = bmgr.equivalence(a, b);
@@ -108,7 +107,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void cnfTacticDefaultTest2() throws SolverException, InterruptedException {
-    TruthJUnit.assume().that(solver).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
+    TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
@@ -131,8 +130,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void cnfTacticDefaultTest3() throws SolverException, InterruptedException {
-    TruthJUnit.assume().that(solver).isAnyOf(Solvers.Z3, Solvers.Z3JAVA);
-    // testcase that shows the exponential explosion of clauses when creating a cnf
+    TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
     BooleanFormula z = bmgr.makeVariable("z");

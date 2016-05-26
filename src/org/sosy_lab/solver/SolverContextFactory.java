@@ -71,7 +71,6 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
-    Z3JAVA,
     PRINCESS
   }
 
@@ -155,13 +154,10 @@ public class SolverContextFactory {
       case MATHSAT5:
         return Mathsat5SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
 
-        // Z3 and Z3Java also require their own custom class loader to perform trickery with the
+        // Z3 requires its own custom class loader to perform trickery with the
         // java.library.path without affecting the main class loader.
       case Z3:
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
-            .create(config, logger, shutdownNotifier, logfile, randomSeed);
-      case Z3JAVA:
-        return getFactoryForSolver(z3ClassLoader, Z3JAVA_FACTORY_CLASS)
             .create(config, logger, shutdownNotifier, logfile, randomSeed);
 
       case PRINCESS:
@@ -274,18 +270,10 @@ public class SolverContextFactory {
 
   // For Z3 we need a custom class loader as it's JAR file calls "System.loadLibrary",
   // and we have to force it to look in the correct directory.
-  private static final String Z3JAVA_FACTORY_CLASS =
-      solverPathPrefix + ".z3java.Z3JavaLoadingFactory";
   private static final String Z3_FACTORY_CLASS = solverPathPrefix + ".z3.Z3LoadingFactory";
   private static final Pattern Z3_CLASSES =
       Pattern.compile(
-          "^("
-              + "com\\.microsoft\\.z3|"
-              + Pattern.quote(solverPathPrefix)
-              + "\\.z3java|"
-              + Pattern.quote(solverPathPrefix)
-              + "\\.z3"
-              + ")\\..*");
+          "^(" + "com\\.microsoft\\.z3|" + Pattern.quote(solverPathPrefix) + "\\.z3" + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
   private static final Set<String> expectedLibrariesToLoad =
@@ -293,9 +281,6 @@ public class SolverContextFactory {
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
   private static final ClassLoader z3ClassLoader = createZ3ClassLoader();
-
-  // We keep the class loader for SmtInterpol around
-  // in case someone creates a second instance of FormulaManagerFactory
   private static WeakReference<ClassLoader> smtInterpolClassLoader = new WeakReference<>(null);
   private static final AtomicInteger smtInterpolLoadingCount = new AtomicInteger(0);
 
