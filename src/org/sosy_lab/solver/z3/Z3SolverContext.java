@@ -126,7 +126,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
       try {
         // Z3 segfaults if it cannot write to the file, thus we write once first
         MoreFiles.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
-
         Native.openLog(absolutePath.toString());
       } catch (IOException e) {
         logger.logUserException(Level.WARNING, e, "Cannot write Z3 log file");
@@ -235,6 +234,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   public void close() {
     long context = creator.getEnv();
     Native.paramsDecRef(context, z3params);
+    Native.closeLog();
     Native.delContext(context);
   }
 }
