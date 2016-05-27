@@ -205,8 +205,8 @@ through all of the returned data, or by querying for the variables we need:
 ### Z3
 
  - Z3 interpolation procedure might require a large amount of stack memory.
-If you get segmentation fault on interpolation, try increasing your `-stack`
-parameter.
+If you get segmentation fault on interpolation, try increasing the stack size 
+with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
 
 ## Authors
 
