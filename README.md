@@ -196,6 +196,18 @@ through all of the returned data, or by querying for the variables we need:
     BigInteger value = model.evaluate(a);
 ```
 
+## Known Solver Issues
+
+### SMTInterpol
+
+ - SMTInterpol does not support multiple concurrent stacks under the same context.
+
+### Z3
+
+ - Z3 interpolation procedure might require a large amount of stack memory.
+If you get segmentation fault on interpolation, try increasing your `-stack`
+parameter.
+
 ## Authors
 
  - Project maintainer: George Karpenkov
