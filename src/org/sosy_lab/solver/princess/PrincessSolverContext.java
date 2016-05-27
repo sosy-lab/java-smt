@@ -77,6 +77,10 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+    if (options.contains(ProverOptions.GENERATE_UNSAT_CORE)
+        || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      throw new UnsupportedOperationException("Princess does not support unsat core generation");
+    }
     return new PrincessTheoremProver(manager, shutdownNotifier, creator);
   }
 

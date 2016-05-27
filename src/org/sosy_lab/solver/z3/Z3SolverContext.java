@@ -177,7 +177,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
 
     // Set the custom error handling
-    // which will throw java Exception
+    // which will throw Z3Exception
     // instead of exit(1).
     Native.setInternalErrorHandler(context);
 
