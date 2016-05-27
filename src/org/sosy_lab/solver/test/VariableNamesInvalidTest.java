@@ -23,6 +23,8 @@
 
 package org.sosy_lab.solver.test;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -34,6 +36,7 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.FloatingPointType;
 
 @RunWith(Parameterized.class)
+@SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesInvalidTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")

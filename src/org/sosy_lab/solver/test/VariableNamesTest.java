@@ -25,6 +25,8 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(Parameterized.class)
+@SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesTest extends SolverBasedTest0 {
 
   private final static String[] NAMES =
