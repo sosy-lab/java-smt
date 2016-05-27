@@ -66,7 +66,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
         " this is a quoted symbol ",
         " so is \n  this one ",
         " \" can occur too ",
-        " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984"
+        " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984",
       };
 
   private final static String[] SPECIAL_NAMES =
@@ -126,7 +126,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
         "| \" can occur too |",
         " \" can occur too ",
         "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|",
-        " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984"
+        " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984",
       };
 
   @Parameters(name = "{0} with varname {1}")
