@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.solver.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
@@ -110,13 +109,16 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
-    try (ProverEnvironment prover = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
       prover.push(getSubject());
       if (!prover.isUnsat()) {
         return; // success
       }
+    }
 
-      // get unsat core for failure message
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+      // Try to report unsat core for failure message if the solver supports it.
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
       if (unsatCore.isEmpty() || (unsatCore.size() == 1 && getSubject().equals(unsatCore.get(0)))) {
         // empty or trivial unsat core
@@ -124,6 +126,10 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       } else {
         failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
       }
+    } catch (UnsupportedOperationException ex) {
+
+      // Otherwise just fail.
+      fail("is", "satisfiable");
     }
   }
 
