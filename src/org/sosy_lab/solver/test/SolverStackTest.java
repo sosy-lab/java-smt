@@ -107,7 +107,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void simpleStackTestBool() throws SolverException, InterruptedException {
-    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
     BooleanFormula a = bmgr.makeVariable("bool_a" + i);
@@ -153,7 +153,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void singleStackTestInteger() throws Exception {
-    BasicProverEnvironment<?> env = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(imgr, env);
   }
 
@@ -162,7 +162,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     requireRationals();
     assert rmgr != null;
 
-    BasicProverEnvironment<?> env = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(rmgr, env);
   }
 
@@ -212,7 +212,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void stackTest() {
-    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
     thrown.expect(RuntimeException.class);
     stack.pop();
   }
@@ -224,10 +224,10 @@ public class SolverStackTest extends SolverBasedTest0 {
     BooleanFormula a = bmgr.makeVariable("bool_a");
     BooleanFormula not = bmgr.not(a);
 
-    BasicProverEnvironment<?> stack1 = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(a); // L1
     stack1.push(a); // L2
-    BasicProverEnvironment<?> stack2 = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> stack2 = newEnvironmentForTest();
     stack1.pop(); // L1
     stack1.pop(); // L0
 
@@ -248,8 +248,8 @@ public class SolverStackTest extends SolverBasedTest0 {
     BooleanFormula a = bmgr.makeVariable("bool_a");
     BooleanFormula not = bmgr.not(a);
 
-    BasicProverEnvironment<?> stack1 = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
-    BasicProverEnvironment<?> stack2 = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
+    BasicProverEnvironment<?> stack2 = newEnvironmentForTest();
     stack1.push(a); // L1
     stack1.push(bmgr.makeBoolean(true)); // L2
     assertThatEnvironment(stack1).isSatisfiable();
@@ -278,7 +278,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     requireMultipleStackSupport();
 
     // Create non-empty stack
-    BasicProverEnvironment<?> stack1 = newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE);
+    BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeVariable("bool_a"));
 
     // Declare b while non-empty stack exists
@@ -300,8 +300,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula() throws Exception {
-    try (BasicProverEnvironment<?> stack =
-        newEnvironmentForTest(ProverOptions.GENERATE_UNSAT_CORE)) {
+    try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       assertThatEnvironment(stack).isUnsatisfiable();
