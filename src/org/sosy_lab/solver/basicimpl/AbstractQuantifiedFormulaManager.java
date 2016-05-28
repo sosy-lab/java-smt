@@ -51,7 +51,9 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return exists(Lists.newArrayList(quantifiedArgs), pBody);
   }
 
-  protected abstract TFormulaInfo exists(List<TFormulaInfo> pVariables, TFormulaInfo pBody);
+  private TFormulaInfo exists(List<TFormulaInfo> pVariables, TFormulaInfo pBody) {
+    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
+  }
 
   @Override
   public final BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
@@ -63,7 +65,9 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return forall(Lists.newArrayList(quantifiedArgs), pBody);
   }
 
-  protected abstract TFormulaInfo forall(List<TFormulaInfo> pVariables, TFormulaInfo pBody);
+  private TFormulaInfo forall(List<TFormulaInfo> pVariables, TFormulaInfo pBody) {
+    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
+  }
 
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)

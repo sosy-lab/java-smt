@@ -52,16 +52,6 @@ public class PrincessQuantifiedFormulaManager
   }
 
   @Override
-  protected IExpression exists(List<IExpression> pVariables, IExpression pBody) {
-    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
-  }
-
-  @Override
-  protected IExpression forall(List<IExpression> pVariables, IExpression pBody) {
-    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
-  }
-
-  @Override
   public IExpression mkQuantifier(Quantifier q, List<IExpression> vars, IExpression body) {
     checkArgument(body instanceof IFormula);
     ap.terfor.conjunctions.Quantifier pq = (q == Quantifier.FORALL) ? ALL$.MODULE$ : EX$.MODULE$;
