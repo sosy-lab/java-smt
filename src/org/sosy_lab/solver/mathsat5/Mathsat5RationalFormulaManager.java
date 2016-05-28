@@ -24,7 +24,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_times;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.RationalFormulaManager;
@@ -42,11 +41,6 @@ class Mathsat5RationalFormulaManager
   @Override
   protected long getNumeralType() {
     return getFormulaCreator().getRationalType();
-  }
-
-  @Override
-  public FormulaType<RationalFormula> getFormulaType() {
-    return FormulaType.RationalType;
   }
 
   @Override

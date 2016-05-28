@@ -25,7 +25,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_times;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_true;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
@@ -42,11 +41,6 @@ class Mathsat5IntegerFormulaManager
   @Override
   protected long getNumeralType() {
     return getFormulaCreator().getIntegerType();
-  }
-
-  @Override
-  public FormulaType<IntegerFormula> getFormulaType() {
-    return FormulaType.IntegerType;
   }
 
   @Override

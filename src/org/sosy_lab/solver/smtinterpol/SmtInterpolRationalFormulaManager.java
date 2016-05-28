@@ -23,7 +23,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.RationalFormulaManager;
@@ -37,11 +36,6 @@ class SmtInterpolRationalFormulaManager
 
   SmtInterpolRationalFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);
-  }
-
-  @Override
-  public FormulaType<RationalFormula> getFormulaType() {
-    return FormulaType.RationalType;
   }
 
   @Override

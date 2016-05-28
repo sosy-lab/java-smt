@@ -26,7 +26,6 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.BitShiftMultiplication;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
@@ -40,11 +39,6 @@ class PrincessIntegerFormulaManager
 
   PrincessIntegerFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);
-  }
-
-  @Override
-  public FormulaType<IntegerFormula> getFormulaType() {
-    return FormulaType.IntegerType;
   }
 
   @Override

@@ -8,4 +8,10 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
  * <p>Integer formulas always take integral formulas as arguments.
  */
 public interface IntegerFormulaManager
-    extends NumeralFormulaManager<IntegerFormula, IntegerFormula> {}
+    extends NumeralFormulaManager<IntegerFormula, IntegerFormula> {
+
+  @Override
+  default FormulaType<IntegerFormula> getFormulaType() {
+    return FormulaType.IntegerType;
+  }
+}

@@ -21,7 +21,6 @@ package org.sosy_lab.solver.z3;
 
 import com.microsoft.z3.Native;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
@@ -32,11 +31,6 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
 
   Z3IntegerFormulaManager(Z3FormulaCreator pCreator) {
     super(pCreator);
-  }
-
-  @Override
-  public FormulaType<IntegerFormula> getFormulaType() {
-    return FormulaType.IntegerType;
   }
 
   @Override
