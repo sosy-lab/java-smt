@@ -83,6 +83,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {
+    checkVariableName(pVar);
     return wrap(makeVariableImpl(pVar, pType));
   }
 

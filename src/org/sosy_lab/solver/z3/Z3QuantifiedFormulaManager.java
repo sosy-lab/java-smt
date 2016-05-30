@@ -39,16 +39,6 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   }
 
   @Override
-  protected Long exists(List<Long> pVariables, Long pBody) {
-    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
-  }
-
-  @Override
-  protected Long forall(List<Long> pVariables, Long pBody) {
-    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
-  }
-
-  @Override
   public Long mkQuantifier(Quantifier q, List<Long> pVariables, Long pBody) {
     if (pVariables.size() == 0) {
       throw new IllegalArgumentException("List of quantified variables can not be empty");

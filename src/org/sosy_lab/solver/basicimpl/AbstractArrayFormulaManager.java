@@ -80,7 +80,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
-
+    checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
     return getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
   }

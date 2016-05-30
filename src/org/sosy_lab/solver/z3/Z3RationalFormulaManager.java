@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.z3;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.NumeralFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.solver.api.RationalFormulaManager;
@@ -31,11 +30,6 @@ class Z3RationalFormulaManager extends Z3NumeralFormulaManager<NumeralFormula, R
 
   Z3RationalFormulaManager(Z3FormulaCreator pCreator) {
     super(pCreator);
-  }
-
-  @Override
-  public FormulaType<RationalFormula> getFormulaType() {
-    return FormulaType.RationalType;
   }
 
   @Override

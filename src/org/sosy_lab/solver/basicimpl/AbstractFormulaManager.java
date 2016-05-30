@@ -355,6 +355,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
+    AbstractBaseFormulaManager.checkVariableName(name);
     Formula t;
     if (formulaType.isBooleanType()) {
       t = booleanManager.makeVariable(name);

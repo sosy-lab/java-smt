@@ -22,7 +22,6 @@ package org.sosy_lab.solver.smtinterpol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
@@ -35,11 +34,6 @@ class SmtInterpolIntegerFormulaManager
 
   SmtInterpolIntegerFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);
-  }
-
-  @Override
-  public FormulaType<IntegerFormula> getFormulaType() {
-    return FormulaType.IntegerType;
   }
 
   @Override
