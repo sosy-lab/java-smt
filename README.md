@@ -205,6 +205,29 @@ single context are performed from a single thread.
 Interruption using [ShutdownNotifier][] may be used to interrupt a
 a solver from any thread.
 
+## Garbage Collection in Native Solvers
+
+JavaSMT exposes an API for performing garbage collection on solvers
+implemented in a native language.
+As a native solver has no way of knowing whether the created formula
+object is still referenced by the client application, this API is
+necessary to avoid leaking memory.
+Note that due to the _hash consing_ usage inside the solvers, there is
+never more than one copy of an identical formula object in memory.
+Consequently, if all created formulas are later re-used (or re-created)
+in the application, it is not necessary to perform any garbage
+collection at all.
+
+### Z3
+
+The parameter `solver.z3.usePhantomReferences` may be used to control
+whether JavaSMT will attempt to decrease references on Z3 formula
+objects once they are no longer referenced.
+
+### MathSAT5
+
+Currently we do not support performing garbage collection for MathSAT5.
+
 ## Known Solver Issues
 
 ### SMTInterpol
