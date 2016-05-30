@@ -122,15 +122,15 @@ public class TestApp {
 JavaSMT relies on three dependencies from the SoSy-Lab [common](common) library.
 These dependencies are:
 
- - [Configuration](Configuration): SMT solvers expose many different
+ - [Configuration][]: SMT solvers expose many different
     configuration options, and using the configuration object they can be
     easily populated by the client, either from the command line or from 
     `.properties` file.
- - [LogManager](LogManager): JavaSMT can be configured to provide extensive
+ - [LogManager][]: JavaSMT can be configured to provide extensive
     logging for the operations related to all SMT queries.
     If you already use your own logging framework, you just have to create a
     wrapper implementing `LogManager` interface.
- - [ShutdownNotifier](ShutdownNotifier): Many SMT queries can take a very
+ - [ShutdownNotifier][]: Many SMT queries can take a very
     long time, potentially more than the user is willing to wait.
     What's more, for a solver implemented in the native code usual ways of
     interrupting a Java process (e.g. interrupt signal) would not work.
@@ -196,6 +196,15 @@ through all of the returned data, or by querying for the variables we need:
     BigInteger value = model.evaluate(a);
 ```
 
+## Multithreading Support
+
+All included solvers fully support multithreading, provided that
+different threads use different contexts, and _all_ operations on a
+single context are performed from a single thread.
+
+Interruption using [ShutdownNotifier][] may be used to interrupt a
+a solver from any thread.
+
 ## Known Solver Issues
 
 ### SMTInterpol
@@ -218,6 +227,7 @@ parameter.
 
  - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
 
+[common]: https://github.com/sosy-lab/java-common-lib
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
 [Configuration]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html
