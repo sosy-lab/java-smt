@@ -249,6 +249,7 @@ with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
 ## Further Documentation
 
  - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
+ - [Documentation For Developers](https://github.com/sosy-lab/java-smt/blob/master/Developers.md)
 
 [common]: https://github.com/sosy-lab/java-common-lib
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
