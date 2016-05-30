@@ -198,8 +198,8 @@ through all of the returned data, or by querying for the variables we need:
 
 ## Multithreading Support
 
-All included solvers fully support multithreading, provided that
-different threads use different contexts, and _all_ operations on a
+All solvers except for MathSAT5 fully support multithreading, provided
+that different threads use different contexts, and _all_ operations on a
 single context are performed from a single thread.
 
 Interruption using [ShutdownNotifier][] may be used to interrupt a
