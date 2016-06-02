@@ -24,6 +24,10 @@ ECJ and javac, and [FindBugs](http://findbugs.sourceforge.net/) errors.
 Currently, releases are pushed to two software repositories:
 [Ivy Repository][] and
 [Maven Central](http://search.maven.org/).
+The release version number is derived from the `git describe` command,
+which output is either a git tag (if the release version corresponds exactly
+to the tagged commit), or a latest git tag together with a distance measured
+in number of commits and a git hash corresponding to the current revision.
 
 ### Release to Ivy
 
@@ -50,13 +54,13 @@ The following steps are required:
 
 Publishing of MathSAT5 and Z3 to the [Ivy Repository][] is handled through
 JavaSMT.
-To publish Z3, run the task `ant publish-z3 $Z3_DIR` where `$Z3_DIR` is a
+To publish Z3, run the task `ant publish-z3 -Dz3.path=$Z3_DIR` where `$Z3_DIR` is a
 directory with a latest checkout of compiled 64-bit Z3 Solver.
 
 For publishing MathSAT5, a following command-line is required:
 
 ```
-ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$MATHSAT_VERSION
+ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dmathsat.version=$MATHSAT_VERSION
 ```
 
 Unlike Z3, we produce our own shared object for MathSAT5, and a different
