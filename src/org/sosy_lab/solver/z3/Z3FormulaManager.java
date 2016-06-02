@@ -23,6 +23,7 @@ import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 
@@ -144,8 +145,13 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  protected Long simplify(Long pF) {
-    return Native.simplify(getFormulaCreator().getEnv(), pF);
+  protected Long simplify(Long pF) throws InterruptedException {
+    try {
+      return Native.simplify(getFormulaCreator().getEnv(), pF);
+    } catch (Z3Exception exp) {
+      formulaCreator.shutdownNotifier.shutdownIfNecessary();
+      throw exp;
+    }
   }
 
   @Override

@@ -98,7 +98,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
-  private final ShutdownNotifier shutdownNotifier;
+  protected final ShutdownNotifier shutdownNotifier;
 
   Z3FormulaCreator(
       long pEnv,

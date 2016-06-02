@@ -251,11 +251,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public <T extends Formula> T simplify(T f) {
+  public <T extends Formula> T simplify(T f) throws InterruptedException {
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), simplify(extractInfo(f)));
   }
 
-  protected TFormulaInfo simplify(TFormulaInfo f) {
+  /**
+   * @throws InterruptedException Can be thrown by the native code.
+   */
+  protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException {
     return f;
   }
 

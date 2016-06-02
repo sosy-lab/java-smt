@@ -169,7 +169,7 @@ public interface FormulaManager {
    * @param input The input formula
    * @return Simplified version of the formula
    */
-  <T extends Formula> T simplify(T input);
+  <T extends Formula> T simplify(T input) throws InterruptedException;
 
   /**
    * Visit the formula with a given visitor.
