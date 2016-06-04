@@ -34,6 +34,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.ArrayFormula;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
@@ -65,25 +66,41 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegers() throws Exception {
-    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(10), BigInteger.valueOf(10), "x");
+    testModelGetters(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.makeVariable("x"),
+        BigInteger.valueOf(10),
+        "x");
   }
 
   @Test
   public void testGetNegativeIntegers() throws Exception {
-    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(-10), BigInteger.valueOf(-10), "x");
+    testModelGetters(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
+        imgr.makeVariable("x"),
+        BigInteger.valueOf(-10),
+        "x");
   }
 
   @Test
   public void testGetLargeIntegers() throws Exception {
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
-    testModelGetters(imgr.makeVariable("x"), imgr.makeNumber(large), large, "x");
+    testModelGetters(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(large)),
+        imgr.makeVariable("x"),
+        large,
+        "x");
   }
 
   @Test
   public void testGetSmallIntegralRationals() throws Exception {
     requireRationals();
     assert rmgr != null;
-    testModelGetters(rmgr.makeVariable("x"), rmgr.makeNumber(1), Rational.ONE, "x");
+    testModelGetters(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
+        rmgr.makeVariable("x"),
+        Rational.ONE,
+        "x");
   }
 
   @Test
@@ -92,7 +109,10 @@ public class ModelTest extends SolverBasedTest0 {
     assert rmgr != null;
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
-        rmgr.makeVariable("x"), rmgr.makeNumber(large), Rational.ofBigInteger(large), "x");
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(large)),
+        rmgr.makeVariable("x"),
+        Rational.ofBigInteger(large),
+        "x");
   }
 
   @Test
@@ -100,8 +120,8 @@ public class ModelTest extends SolverBasedTest0 {
     requireRationals();
     assert rmgr != null;
     testModelGetters(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
         rmgr.makeVariable("x"),
-        rmgr.makeNumber(Rational.ofString("1/3")),
         Rational.ofString("1/3"),
         "x");
   }
@@ -116,7 +136,7 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula x =
         fmgr.declareAndCallUF(
             "UF", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
-    testModelGetters(x, imgr.makeNumber(1), BigInteger.ONE, "UF");
+    testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
   }
 
   @Test
@@ -163,7 +183,10 @@ public class ModelTest extends SolverBasedTest0 {
     assert bvmgr != null;
 
     testModelGetters(
-        bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE), BigInteger.ONE, "x");
+        bvmgr.equal(bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE)),
+        bvmgr.makeVariable(1, "x"),
+        BigInteger.ONE,
+        "x");
   }
 
   @Test
@@ -252,10 +275,11 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   private void testModelGetters(
-      Formula variable, Formula value, Object expectedValue, String varName) throws Exception {
+      BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
+      throws Exception {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(mgr.makeEqual(value, variable));
+      prover.push(constraint);
       assertThatEnvironment(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {

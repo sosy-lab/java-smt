@@ -95,12 +95,6 @@ public interface FormulaManager {
   QuantifiedFormulaManager getQuantifiedFormulaManager();
 
   /**
-   * Create a formula representing equality between two formulas of the same
-   * type.
-   */
-  <T extends Formula> BooleanFormula makeEqual(T pLhs, T pRhs);
-
-  /**
    * Create variable of the type equal to {@code formulaType}.
    *
    * @param formulaType the type of the variable.
