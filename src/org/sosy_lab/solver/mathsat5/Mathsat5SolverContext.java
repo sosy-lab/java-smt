@@ -89,6 +89,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private final TerminationTest terminationTest;
   private final Mathsat5FormulaCreator creator;
 
+  private static boolean loaded = false;
+
   @SuppressWarnings("checkstyle:parameternumber")
   public Mathsat5SolverContext(
       LogManager logger,
@@ -99,6 +101,15 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       Mathsat5FormulaManager manager,
       Mathsat5FormulaCreator creator) {
     super(manager);
+
+    if (!loaded) { // Avoid logging twice.
+      logger.log(Level.WARNING,
+          "MathSAT5 is available for research and evaluation purposes only. It can not be used in"
+              + " a commercial environment, particularly as part of a commercial product, without"
+              + "written permission. MathSAT5 is provided as is, without any warranty."
+              + "Please write to mathsat@fbk.eu for additional questions regarding licensing "
+              + "MathSAT5 or obtaining more up-to-date versions.");
+    }
     this.logger = logger;
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
@@ -210,7 +221,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     if (options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       throw new UnsupportedOperationException(
-          "Mathsat5 does not support generating UNSAT core " + "over assumptions");
+          "Mathsat5 does not support generating UNSAT core over assumptions");
     }
     return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
   }
