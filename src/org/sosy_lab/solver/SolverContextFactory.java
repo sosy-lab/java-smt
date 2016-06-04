@@ -154,9 +154,10 @@ public class SolverContextFactory {
       case MATHSAT5:
         return Mathsat5SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
 
+      case Z3:
+
         // Z3 requires its own custom class loader to perform trickery with the
         // java.library.path without affecting the main class loader.
-      case Z3:
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
             .create(config, logger, shutdownNotifier, logfile, randomSeed);
 
