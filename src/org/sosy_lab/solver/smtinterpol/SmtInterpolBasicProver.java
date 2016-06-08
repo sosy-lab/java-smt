@@ -25,7 +25,6 @@ package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -34,7 +33,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
@@ -70,13 +68,6 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
   public void pop() {
     Preconditions.checkState(!closed);
     env.pop(1);
-  }
-
-  @Override
-  @CanIgnoreReturnValue
-  public T push(BooleanFormula f) {
-    push();
-    return addConstraint(f);
   }
 
   @Override

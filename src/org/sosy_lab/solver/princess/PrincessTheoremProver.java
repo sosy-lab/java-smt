@@ -90,14 +90,6 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   }
 
   @Override
-  public Void push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    addConstraint(f);
-    return null;
-  }
-
-  @Override
   public List<BooleanFormula> getUnsatCore() {
     throw new UnsupportedOperationException();
   }

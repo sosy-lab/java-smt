@@ -61,13 +61,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   }
 
   @Override
-  public Integer push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    return addConstraint(f);
-  }
-
-  @Override
   public void pop() {
     Preconditions.checkState(!closed);
     Integer removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
