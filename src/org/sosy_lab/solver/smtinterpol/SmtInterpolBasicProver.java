@@ -107,6 +107,7 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
   @Override
   public void close() {
     Preconditions.checkState(!closed);
+    env.pop(env.getStackDepth());
     closed = true;
   }
 }

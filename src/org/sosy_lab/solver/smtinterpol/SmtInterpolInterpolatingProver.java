@@ -201,11 +201,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
   @Override
   public void close() {
     assert assertedFormulas.size() == annotatedTerms.size();
-    if (!assertedFormulas.isEmpty()) {
-      env.pop(env.getStackDepth());
-      assertedFormulas.clear();
-      annotatedTerms.clear();
-    }
+    assertedFormulas.clear();
+    annotatedTerms.clear();
     super.close();
   }
 

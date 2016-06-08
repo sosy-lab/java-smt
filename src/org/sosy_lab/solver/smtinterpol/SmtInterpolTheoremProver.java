@@ -55,7 +55,11 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
 
-  // Next modification to assertion stack should pop before doing anything.
+  /**
+   * This flag is used to know whether the next modification to assertion stack
+   * should pop before doing anything. The flag is needed for getting an
+   * unsat-core or model after checking the stack with assumptions.
+   */
   private transient boolean shouldPop = false;
 
   SmtInterpolTheoremProver(
@@ -139,10 +143,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public void close() {
     popIfNecessary();
-    if (env.getStackDepth() > 0) {
-      env.pop(env.getStackDepth());
-      assertedTerms.clear();
-    }
+    assertedTerms.clear();
     super.close();
   }
 
