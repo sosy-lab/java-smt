@@ -152,6 +152,6 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    return Optional.absent();
+    throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }
 }
