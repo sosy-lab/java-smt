@@ -81,7 +81,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     push(mgr.getBooleanFormulaManager().and(assumptions));
     boolean out = isUnsat();
     shouldPop = true;
@@ -113,16 +113,15 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
   @Override
   public void pop() {
-    Preconditions.checkState(!closed);
     popIfNecessary();
     assertedTerms.remove(assertedTerms.size() - 1); // remove last term
-    env.pop(1);
+    super.pop();
   }
 
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     popIfNecessary();
     Term t = mgr.extractInfo(constraint);
     if (generateUnsatCores) {
@@ -139,18 +138,17 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
     popIfNecessary();
     if (env.getStackDepth() > 0) {
       env.pop(env.getStackDepth());
       assertedTerms.clear();
     }
-    closed = true;
+    super.close();
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Term[] terms = env.getUnsatCore();
     return Lists.transform(
         Arrays.asList(terms),
@@ -160,7 +158,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

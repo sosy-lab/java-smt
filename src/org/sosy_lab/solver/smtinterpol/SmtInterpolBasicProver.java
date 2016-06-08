@@ -43,7 +43,7 @@ import java.util.Collection;
 
 public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironment<T> {
 
-  protected boolean closed = false;
+  private boolean closed = false;
   private final SmtInterpolEnvironment env;
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
 
@@ -56,10 +56,20 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
     creator = pMgr.getFormulaCreator();
   }
 
+  protected boolean isClosed() {
+    return closed;
+  }
+
   @Override
   public void push() {
     Preconditions.checkState(!closed);
     env.push(1);
+  }
+
+  @Override
+  public void pop() {
+    Preconditions.checkState(!closed);
+    env.pop(1);
   }
 
   @Override
@@ -93,4 +103,10 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
   }
 
   protected abstract Collection<Term> getAssertedTerms();
+
+  @Override
+  public void close() {
+    Preconditions.checkState(!closed);
+    closed = true;
+  }
 }
