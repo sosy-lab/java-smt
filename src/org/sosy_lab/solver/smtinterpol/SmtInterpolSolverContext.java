@@ -12,6 +12,8 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
+import org.sosy_lab.solver.reusableStack.ReusableStackInterpolatingProver;
+import org.sosy_lab.solver.reusableStack.ReusableStackTheoremProver;
 
 import java.util.Set;
 
@@ -52,18 +54,20 @@ class SmtInterpolSolverContext extends AbstractSolverContext {
     return new SmtInterpolSolverContext(creator, manager);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     checkState(
         environment.getStackDepth() == 0,
         "Not allowed to create a new prover environment while solver stack is still non-empty, "
             + "parallel stacks are not supported.");
-    return new SmtInterpolTheoremProver(manager, manager.getFormulaCreator(), options);
+    return new ReusableStackTheoremProver(
+        new SmtInterpolTheoremProver(manager, manager.getFormulaCreator(), options));
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return environment.getInterpolator(manager);
+    return new ReusableStackInterpolatingProver<>(environment.getInterpolator(manager));
   }
 
   @Override
