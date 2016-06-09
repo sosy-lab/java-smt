@@ -85,7 +85,7 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   @Override
   public void push() {
     api.push();
-    trackingStack.addLast(new Level());
+    trackingStack.push(new Level());
   }
 
   /** This function pops levels from the assertion-stack. */
@@ -93,13 +93,13 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   public void pop() {
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
     api.pop();
-    Level level = trackingStack.removeLast();
+    Level level = trackingStack.pop();
 
     api.addBooleanVariables(iterableAsScalaIterable(level.booleanSymbols));
     api.addConstants(iterableAsScalaIterable(level.intSymbols));
     level.functionSymbols.forEach(api::addFunction);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().mergeWithHigher(level);
+      trackingStack.peek().mergeWithHigher(level);
     }
   }
 
