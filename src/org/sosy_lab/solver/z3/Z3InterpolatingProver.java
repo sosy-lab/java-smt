@@ -22,7 +22,6 @@ package org.sosy_lab.solver.z3;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
@@ -35,6 +34,7 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +44,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   private final long z3solver;
 
   private int level = 0;
-  private final Deque<Long> assertedFormulas = new ArrayDeque<>();
+  private final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
 
   Z3InterpolatingProver(
       Z3FormulaCreator creator, long z3params, ShutdownNotifier pShutdownNotifier) {
@@ -60,7 +60,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
     level--;
 
-    assertedFormulas.removeLast();
+    assertedFormulas.pop();
     Native.solverPop(z3context, z3solver, 1);
   }
 
@@ -70,7 +70,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
     Native.solverAssert(z3context, z3solver, e);
-    assertedFormulas.addLast(e);
+    assertedFormulas.peek().add(e);
     Native.decRef(z3context, e);
     return e;
   }
@@ -79,6 +79,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   public void push() {
     Preconditions.checkState(!closed);
     level++;
+    assertedFormulas.push(new ArrayList<>());
     Native.solverPush(z3context, z3solver);
   }
 
@@ -99,7 +100,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     // we have to handle equal formulas on the stack,
     // so we copy the whole stack and remove the formulas of A once.
-    final List<Long> formulasOfB = Lists.newLinkedList(assertedFormulas);
+    final List<Long> formulasOfB = new LinkedList<>();
+    assertedFormulas.forEach(formulasOfB::addAll);
     for (long af : formulasOfA) {
       boolean check = formulasOfB.remove(af); // remove only first occurrence
       assert check : "formula from A must be part of all asserted formulas";
@@ -229,7 +231,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     while (level > 0) {
       pop();
     }
-    assertedFormulas.clear();
+    Preconditions.checkState(assertedFormulas.isEmpty());
 
     //TODO solver_reset(z3context, z3solver);
     Native.solverDecRef(z3context, z3solver);
