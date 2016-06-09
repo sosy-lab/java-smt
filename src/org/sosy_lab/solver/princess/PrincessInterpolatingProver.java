@@ -66,7 +66,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     Integer removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
     annotatedTerms.remove(removed);
     assert assertedFormulas.size() == annotatedTerms.size();
-    stack.pop(1);
+    stack.pop();
   }
 
   @Override
@@ -85,7 +85,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    stack.push(1);
+    stack.push();
   }
 
   @Override

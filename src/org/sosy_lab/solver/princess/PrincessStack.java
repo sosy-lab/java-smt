@@ -36,9 +36,9 @@ import java.util.Set;
  * One PrincessEnvironment can manage several stacks. */
 interface PrincessStack {
 
-  void push(int levels);
+  void push();
 
-  void pop(int levels);
+  void pop();
 
   void assertTerm(IFormula booleanFormula);
 

@@ -70,7 +70,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   public void pop() {
     Preconditions.checkState(!closed);
     assertedTerms.remove(assertedTerms.size() - 1); // remove last term
-    stack.pop(1);
+    stack.pop();
   }
 
   @Override
@@ -86,7 +86,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    stack.push(1);
+    stack.push();
   }
 
   @Override
@@ -105,7 +105,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
       importantFormulas.add((IFormula) mgr.extractInfo(impF));
     }
 
-    stack.push(1);
+    stack.push();
     while (stack.checkSat()) {
       shutdownNotifier.shutdownIfNecessary();
 
@@ -127,7 +127,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
       stack.assertTerm(new INot(newFormula));
     }
     shutdownNotifier.shutdownIfNecessary();
-    stack.pop(1);
+    stack.pop();
 
     return callback.getResult();
   }
