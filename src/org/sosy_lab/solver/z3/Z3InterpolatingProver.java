@@ -52,14 +52,17 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     this.z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
     Native.solverSetParams(z3context, z3solver, z3params);
+
+    // add basic level, needed for addConstraints(f) without previous push()
+    assertedFormulas.push(new ArrayList<>());
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
+    Preconditions.checkState(level == assertedFormulas.size() - 1);
     level--;
-
     assertedFormulas.pop();
     Native.solverPop(z3context, z3solver, 1);
   }
@@ -78,6 +81,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   @Override
   public void push() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(level == assertedFormulas.size() - 1);
     level++;
     assertedFormulas.push(new ArrayList<>());
     Native.solverPush(z3context, z3solver);
@@ -231,7 +235,9 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     while (level > 0) {
       pop();
     }
-    Preconditions.checkState(assertedFormulas.isEmpty());
+
+    Preconditions.checkState(assertedFormulas.size() == 1);
+    assertedFormulas.clear();
 
     //TODO solver_reset(z3context, z3solver);
     Native.solverDecRef(z3context, z3solver);
