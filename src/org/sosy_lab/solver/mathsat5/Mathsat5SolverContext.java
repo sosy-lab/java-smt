@@ -103,7 +103,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     super(manager);
 
     if (!loaded) { // Avoid logging twice.
-      logger.log(Level.WARNING,
+      logger.log(
+          Level.WARNING,
           "MathSAT5 is available for research and evaluation purposes only. It can not be used in"
               + " a commercial environment, particularly as part of a commercial product, without"
               + "written permission. MathSAT5 is provided as is, without any warranty."
