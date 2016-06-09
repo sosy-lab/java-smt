@@ -218,6 +218,40 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void stackTest2() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.pop();
+  }
+
+  @Test
+  public void stackTest3() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.pop();
+    stack.push();
+    stack.pop();
+  }
+
+  @Test
+  public void stackTest4() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.push();
+    stack.pop();
+    stack.pop();
+  }
+
+  @Test
+  public void stackTest5() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.pop();
+    thrown.expect(RuntimeException.class);
+    stack.pop();
+  }
+
+  @Test
   public void dualStackTest() throws Exception {
     requireMultipleStackSupport();
 
