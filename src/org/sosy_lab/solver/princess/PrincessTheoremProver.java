@@ -34,7 +34,6 @@ import com.google.common.base.Preconditions;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
 import scala.Option;
@@ -45,9 +44,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-class PrincessTheoremProver extends PrincessAbstractProver<Void> implements ProverEnvironment {
+class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
+    implements ProverEnvironment {
 
-  private final List<IExpression> assertedTerms = new ArrayList<>();
   private final ShutdownNotifier shutdownNotifier;
 
   PrincessTheoremProver(
@@ -59,26 +58,11 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
-
-    return new PrincessModel(stack.getPartialModel(), creator, assertedTerms);
-  }
-
-  @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    assertedTerms.remove(assertedTerms.size() - 1); // remove last term
-    stack.pop();
-  }
-
-  @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    assertedTerms.add(t);
+    assertedFormulas.peek().add(t);
     stack.assertTerm(t);
     return null;
   }
@@ -139,5 +123,12 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
+  }
+
+  @Override
+  protected Collection<? extends IExpression> getAssertedFormulas() {
+    List<IExpression> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
   }
 }
