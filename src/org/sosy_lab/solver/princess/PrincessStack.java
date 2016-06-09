@@ -52,5 +52,11 @@ interface PrincessStack {
 
   List<IFormula> getInterpolants(List<Set<Integer>> partitions);
 
+  /**
+   * Clean the stack, such that it can be re-used.
+   * The caller has to guarantee, that a stack not used by several provers
+   * after calling {@link #close()}, because there is a dependency
+   * from 'one' prover to 'one' (reusable) stack.
+   */
   void close();
 }

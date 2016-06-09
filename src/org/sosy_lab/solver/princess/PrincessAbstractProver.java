@@ -84,7 +84,9 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
   public void close() {
     checkNotNull(stack);
     checkNotNull(mgr);
-    stack.close();
+    if (!closed) {
+      stack.close();
+    }
     closed = true;
   }
 }
