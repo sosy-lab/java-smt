@@ -46,11 +46,11 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements ProverEnvironment {
+class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
+    implements ProverEnvironment {
 
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
-  private final List<Term> assertedTerms;
   private final Map<String, Term> annotatedTerms; // Collection of termNames
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
@@ -68,7 +68,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
       Set<ProverOptions> options) {
     super(pMgr);
     mgr = pMgr;
-    assertedTerms = new ArrayList<>();
     env = mgr.createEnvironment();
     creator = pCreator;
     checkNotNull(env);
@@ -118,7 +117,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public void pop() {
     popIfNecessary();
-    assertedTerms.remove(assertedTerms.size() - 1); // remove last term
     super.pop();
   }
 
@@ -136,14 +134,13 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
     } else {
       env.assertTerm(t);
     }
-    assertedTerms.add(t);
+    assertedFormulas.peek().add(t);
     return null;
   }
 
   @Override
   public void close() {
     popIfNecessary();
-    assertedTerms.clear();
     super.close();
   }
 
@@ -180,6 +177,8 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
   @Override
   protected Collection<Term> getAssertedTerms() {
-    return assertedTerms;
+    List<Term> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
   }
 }

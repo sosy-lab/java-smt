@@ -41,28 +41,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
+class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
 
-  private final List<String> assertedFormulas; // Collection of termNames
   private final Map<String, Term> annotatedTerms; // Collection of termNames
 
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
     super(pMgr);
     mgr = pMgr;
     env = mgr.createEnvironment();
-    assertedFormulas = new ArrayList<>();
     annotatedTerms = new HashMap<>();
   }
 
   @Override
   public void pop() {
-    String removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
-    annotatedTerms.remove(removed);
-    assert assertedFormulas.size() == annotatedTerms.size();
+    for (String removed : assertedFormulas.peek()) {
+      annotatedTerms.remove(removed);
+    }
     super.pop();
   }
 
@@ -73,9 +71,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
     Term t = mgr.extractInfo(f);
     Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
     env.assertTerm(annotatedTerm);
-    assertedFormulas.add(termName);
+    assertedFormulas.peek().add(termName);
     annotatedTerms.put(termName, t);
-    assert assertedFormulas.size() == annotatedTerms.size();
     return termName;
   }
 
@@ -88,14 +85,14 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
     // so we need to check them explicitly
     if (pTermNamesOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
-    } else if (pTermNamesOfA.equals(assertedFormulas)) {
+    } else if (pTermNamesOfA.containsAll(annotatedTerms.keySet())) {
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
 
     Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<String> termNamesOfB = from(assertedFormulas).filter(not(in(termNamesOfA))).toSet();
+    Set<String> termNamesOfB = from(annotatedTerms.keySet()).filter(not(in(termNamesOfA))).toSet();
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     Term termA = buildConjunctionOfNamedTerms(termNamesOfA);
@@ -200,7 +197,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
 
   @Override
   public void close() {
-    assert assertedFormulas.size() == annotatedTerms.size();
     assertedFormulas.clear();
     annotatedTerms.clear();
     super.close();
