@@ -62,6 +62,12 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
   }
 
   @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    stack.push();
+  }
+
+  @Override
   public abstract void pop();
 
   @Override

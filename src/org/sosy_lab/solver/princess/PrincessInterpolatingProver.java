@@ -83,12 +83,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    stack.push();
-  }
-
-  @Override
   public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) {
     Preconditions.checkState(!closed);
     Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
