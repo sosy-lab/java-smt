@@ -36,8 +36,8 @@ import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
-import java.util.logging.Level;
 import java.util.Optional;
+import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
