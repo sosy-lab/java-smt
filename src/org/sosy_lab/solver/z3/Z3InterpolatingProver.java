@@ -165,7 +165,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
           children.add(0, stack.pollLast().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
-        conjunction = Native.mkAnd(z3context, 2, Longs.toArray(children));
+        conjunction = Native.mkAnd(z3context, children.size(), Longs.toArray(children));
       }
 
       final long interpolationPoint;
