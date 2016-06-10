@@ -27,7 +27,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_unsat_core
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -45,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;

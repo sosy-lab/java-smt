@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.solver.z3;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
@@ -38,6 +37,7 @@ import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
 import java.util.logging.Level;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -127,11 +127,11 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public java.util.Optional<Rational> upper(int handle, Rational epsilon) {
     Preconditions.checkState(!closed);
     long ast = Native.optimizeGetUpper(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
-      return Optional.absent();
+      return Optional.empty();
     }
     return Optional.of(rationalFromZ3AST(replaceEpsilon(ast, epsilon)));
   }
@@ -141,7 +141,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     Preconditions.checkState(!closed);
     long ast = Native.optimizeGetLower(z3context, z3optContext, handle);
     if (isInfinity(ast)) {
-      return Optional.absent();
+      return Optional.empty();
     }
     return Optional.of(rationalFromZ3AST(replaceEpsilon(ast, epsilon)));
   }

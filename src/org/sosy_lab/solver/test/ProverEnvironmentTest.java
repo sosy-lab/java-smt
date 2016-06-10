@@ -26,7 +26,6 @@ import static org.sosy_lab.solver.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.solver.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.solver.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
@@ -40,6 +39,7 @@ import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.List;
+import java.util.Optional;
 
 @RunWith(Parameterized.class)
 public class ProverEnvironmentTest extends SolverBasedTest0 {
@@ -128,7 +128,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
       pe.addConstraint(bmgr.or(selector, imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1))));
       Optional<List<BooleanFormula>> res =
           pe.unsatCoreOverAssumptions(ImmutableList.of(bmgr.not(selector)));
-      assertThat(res).isPresent();
+      assertThatOptional(res).isPresent();
       List<BooleanFormula> unsatCore = res.get();
       assertThat(unsatCore).containsExactly(bmgr.not(selector));
     }

@@ -21,7 +21,6 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -42,6 +41,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -104,7 +104,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
       env.assertTerm(annotated);
     }
     if (!isUnsat()) {
-      return Optional.absent();
+      return Optional.empty();
     }
     List<BooleanFormula> out = getUnsatCore();
     pop();

@@ -23,6 +23,9 @@ import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.solver.test.ProverEnvironmentSubject.proverEnvironment;
 
+import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.SubjectFactory;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.After;
@@ -46,6 +49,8 @@ import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.api.UFManager;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -252,5 +257,18 @@ public abstract class SolverBasedTest0 {
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
     return assert_().about(proverEnvironment()).that(prover);
+  }
+
+  protected final JavaOptionalSubject assertThatOptional(Optional<?> pOptional) {
+    return assert_()
+        .about(
+            new SubjectFactory<JavaOptionalSubject, Optional<?>>() {
+              @Override
+              public JavaOptionalSubject getSubject(
+                  FailureStrategy pFailureStrategy, Optional<?> pOptional) {
+                return new JavaOptionalSubject(pFailureStrategy, pOptional);
+              }
+            })
+        .that(pOptional);
   }
 }

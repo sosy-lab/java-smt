@@ -28,7 +28,6 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.INot;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.common.ShutdownNotifier;
@@ -42,6 +41,7 @@ import scala.Option;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -103,7 +103,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   }
 
   @Override
-  public <T> T allSat(ProverEnvironment.AllSatCallback<T> callback, List<BooleanFormula> important)
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 

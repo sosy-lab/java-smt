@@ -19,10 +19,6 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.FluentIterable.from;
-
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
@@ -43,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
@@ -101,7 +98,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<Integer> indexesOfB = from(assertedFormulas).filter(not(in(indexesOfA))).toSet();
+    Set<Integer> indexesOfB =
+        assertedFormulas.stream().filter(f -> !indexesOfA.contains(f)).collect(Collectors.toSet());
 
     // get interpolant of groups
     List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indexesOfA, indexesOfB));

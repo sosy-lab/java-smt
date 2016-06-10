@@ -19,10 +19,6 @@
  */
 package org.sosy_lab.solver.smtinterpol;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.FluentIterable.from;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 
@@ -40,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
     implements InterpolatingProverEnvironment<String> {
@@ -96,7 +93,11 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
     Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<String> termNamesOfB = from(assertedFormulas).filter(not(in(termNamesOfA))).toSet();
+    Set<String> termNamesOfB =
+        assertedFormulas
+            .stream()
+            .filter(n -> !termNamesOfA.contains(n))
+            .collect(Collectors.toSet());
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     Term termA = buildConjunctionOfNamedTerms(termNamesOfA);

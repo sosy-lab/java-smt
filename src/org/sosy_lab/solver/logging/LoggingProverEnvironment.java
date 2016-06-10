@@ -21,8 +21,6 @@ package org.sosy_lab.solver.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Optional;
-
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -31,6 +29,7 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 /**

@@ -22,7 +22,6 @@
  */
 package org.sosy_lab.solver.basicimpl.cache;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.rationals.Rational;
@@ -36,6 +35,7 @@ import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -152,7 +152,7 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
   }
 
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public java.util.Optional<Rational> upper(int handle, Rational epsilon) {
     OptimizationResult cachedResult = optimizationCache.get(currentQuery);
 
     // Previous call to {@code check} must create the cached result.

@@ -21,7 +21,6 @@ package org.sosy_lab.solver.z3;
 
 import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
@@ -41,6 +40,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -138,7 +138,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     if (!isUnsatWithAssumptions(assumptions)) {
-      return Optional.absent();
+      return Optional.empty();
     }
     List<BooleanFormula> core = new ArrayList<>();
     long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);

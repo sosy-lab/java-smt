@@ -63,7 +63,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(obj);
       OptStatus response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThat(prover.upper(handle, Rational.ZERO)).isAbsent();
+      assertThatOptional(prover.upper(handle, Rational.ZERO)).isAbsent();
     }
   }
 
@@ -115,7 +115,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       assertThat(response).isEqualTo(OptStatus.OPT);
 
       // Check the value.
-      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
+      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
       try (Model model = prover.getModel()) {
         BigInteger xValue = model.evaluate(x);
@@ -162,7 +162,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(obj);
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
+      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
       prover.pop();
       prover.push();
@@ -170,7 +170,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       handle = prover.maximize(x);
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
+      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
 
       prover.pop();
       prover.push();
@@ -178,7 +178,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       handle = prover.maximize(rmgr.makeVariable("y"));
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("9"));
+      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("9"));
 
       prover.pop();
     }
@@ -205,7 +205,7 @@ public class OptimizationTest extends SolverBasedTest0 {
         prover.addConstraint(bmgr.and(constraints));
         int handle = prover.maximize(obj);
         assertThat(prover.check()).isEqualTo(OptStatus.OPT);
-        assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of("19"));
+        assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of("19"));
 
         try (Model m = prover.getModel()) {
           assertThat(m.evaluate(obj)).isEqualTo(BigInteger.valueOf(19));
@@ -216,7 +216,7 @@ public class OptimizationTest extends SolverBasedTest0 {
         handle = prover.maximize(x);
         OptStatus response = prover.check();
         assertThat(response).isEqualTo(OptStatus.OPT);
-        assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
+        assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
 
         prover.pop();
       }

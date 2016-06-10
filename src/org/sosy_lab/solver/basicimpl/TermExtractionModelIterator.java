@@ -21,7 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.base.Verify;
 import com.google.common.collect.UnmodifiableIterator;
 
@@ -36,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 /**
  * Helper class for writing model iterators.

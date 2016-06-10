@@ -19,10 +19,10 @@
  */
 package org.sosy_lab.solver.api;
 
-import com.google.common.base.Optional;
-
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.SolverException;
+
+import java.util.Optional;
 
 /**
  * Interface for optimization modulo SMT.

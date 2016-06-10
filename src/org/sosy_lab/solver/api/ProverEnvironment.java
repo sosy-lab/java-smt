@@ -19,13 +19,13 @@
  */
 package org.sosy_lab.solver.api;
 
-import com.google.common.base.Optional;
-
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An interface to an incremental SMT solver
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * <p>All solving methods are expected to throw {@link SolverException} if the solver
  * fails to solve the given query, and {@link InterruptedException} if a thread interrupt
- * was requested or a shutdown request via the {@link org.sosy_lab.common.ShutdownNotifier}.
+ * was requested or a shutdown request via the {@link ShutdownNotifier}.
  * It is not guaranteed, though, that solvers respond in a timely manner (or at all)
  * to shutdown or interrupt requests.
  */

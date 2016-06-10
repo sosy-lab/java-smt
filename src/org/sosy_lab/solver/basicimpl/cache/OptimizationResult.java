@@ -24,7 +24,6 @@
 package org.sosy_lab.solver.basicimpl.cache;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.rationals.Rational;
@@ -32,6 +31,7 @@ import org.sosy_lab.solver.api.OptimizationProverEnvironment.OptStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Result of the optimization query.
@@ -47,7 +47,7 @@ public abstract class OptimizationResult {
   /**
    * Cached values of the objective functions.
    */
-  public abstract ImmutableMap<Integer, Optional<Rational>> objectiveValues();
+  public abstract ImmutableMap<Integer, java.util.Optional<Rational>> objectiveValues();
 
   /**
    * Cached stored model.
@@ -66,6 +66,6 @@ public abstract class OptimizationResult {
   }
 
   static OptimizationResult of(OptStatus result) {
-    return new AutoValue_OptimizationResult(result, ImmutableMap.of(), Optional.absent());
+    return new AutoValue_OptimizationResult(result, ImmutableMap.of(), Optional.empty());
   }
 }

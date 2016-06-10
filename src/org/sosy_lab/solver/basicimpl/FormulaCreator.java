@@ -21,8 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -55,6 +53,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -234,7 +233,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    visitRecursively(pFormulaVisitor, pF, Predicates.alwaysTrue());
+    visitRecursively(pFormulaVisitor, pF, t -> true);
   }
 
   public void visitRecursively(
@@ -245,7 +244,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     recVisitor.addToQueue(pF);
     while (!recVisitor.isQueueEmpty()) {
       Formula tt = recVisitor.pop();
-      if (shouldProcess.apply(tt)) {
+      if (shouldProcess.test(tt)) {
         TraversalProcess process = checkNotNull(visit(recVisitor, tt));
         if (process == TraversalProcess.ABORT) {
           return;
@@ -256,7 +255,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public <T extends Formula> T transformRecursively(
       FormulaVisitor<? extends Formula> pFormulaVisitor, T pF) {
-    return transformRecursively(pFormulaVisitor, pF, Predicates.alwaysTrue());
+    return transformRecursively(pFormulaVisitor, pF, t -> true);
   }
 
   public <T extends Formula> T transformRecursively(
@@ -277,7 +276,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         continue;
       }
 
-      if (shouldProcess.apply(tt)) {
+      if (shouldProcess.test(tt)) {
         visit(recVisitor, tt);
       } else {
         pCache.put(tt, tt);

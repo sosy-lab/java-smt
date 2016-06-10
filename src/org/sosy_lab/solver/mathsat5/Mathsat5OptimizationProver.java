@@ -16,7 +16,6 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_maximize;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_push_minimize;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_model;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -33,6 +32,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -151,7 +151,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     long objective = objectives.get(objectiveMap.get(handle));
     int isUnbounded = msat_objective_value_is_unbounded(curEnv, objective, MSAT_OPTIMUM);
     if (isUnbounded == 1) {
-      return Optional.absent();
+      return Optional.empty();
     }
     assert isUnbounded == 0;
     String objectiveValue = msat_objective_value_repr(curEnv, objective, MSAT_OPTIMUM);

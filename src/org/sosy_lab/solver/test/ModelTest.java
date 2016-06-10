@@ -22,7 +22,6 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -45,6 +44,8 @@ import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext.ProverOptions;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Test that values from models are appropriately parsed.
@@ -285,8 +286,12 @@ public class ModelTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
 
-        Iterable<ValueAssignment> relevantAssignments =
-            FluentIterable.from(m).filter(assignment -> assignment.getName().equals(varName));
+        List<ValueAssignment> relevantAssignments =
+            prover
+                .getModelAssignments()
+                .stream()
+                .filter(assignment -> assignment.getName().equals(varName))
+                .collect(Collectors.toList());
         assertThat(relevantAssignments).hasSize(1);
         ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
         assertThat(assignment.getValue()).isEqualTo(expectedValue);

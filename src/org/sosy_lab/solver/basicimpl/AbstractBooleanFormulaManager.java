@@ -259,14 +259,14 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     formulaCreator.visitRecursively(
         new DelegatingFormulaVisitor<>(pFormulaVisitor),
         pF,
-        Predicates.instanceOf(BooleanFormula.class));
+        Predicates.instanceOf(BooleanFormula.class)::apply);
   }
 
   @Override
   public BooleanFormula transformRecursively(
       BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f) {
     return formulaCreator.transformRecursively(
-        new DelegatingFormulaVisitor<>(pVisitor), f, Predicates.instanceOf(BooleanFormula.class));
+        new DelegatingFormulaVisitor<>(pVisitor), f, p -> p instanceof BooleanFormula);
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {
