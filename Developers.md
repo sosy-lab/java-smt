@@ -29,6 +29,16 @@ which output is either a git tag (if the release version corresponds exactly
 to the tagged commit), or a latest git tag together with a distance measured
 in number of commits and a git hash corresponding to the current revision.
 
+### Creating new release numbers
+
+New JavaSMT version is defined by creating a new git tag with a version number.
+Git tags should be signed (`git tag -s` command).
+When creating a new version number, populate the `CHANGELOG.md` file with the
+changes which are exposed by the new release.
+
+[Semantic versioning][] guidelines should be followed when defining a new
+version.
+
 ### Release to Ivy
 
 If you have write permission to the [Ivy Repository][] you can perform the
@@ -50,6 +60,8 @@ The following steps are required:
  - Login to [Nexus Repository Manager](https://oss.sonatype.org/)
  - Run `close` and `release` tasks on the pushed bundle.
 
+Additional instructions are available at the official [OSSRH][] page.
+
 ## Releasing Solvers
 
 Publishing of MathSAT5 and Z3 to the [Ivy Repository][] is handled through
@@ -69,3 +81,5 @@ shared object can not be used together with JavaSMT.
 
 [Travis]: https://travis-ci.org/sosy-lab/java-smt
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
+[OSSRH]: http://central.sonatype.org/pages/ossrh-guide.html
+[Semantic Versioning]: http://semver.org/
