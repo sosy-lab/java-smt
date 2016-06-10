@@ -160,9 +160,9 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       } else { // if (currentSubtree <= lastSubtree) {
         // merge-point in tree, several children at a node -> pop from stack and conjunct
         final List<Long> children = new ArrayList<>();
-        while (!stack.isEmpty() && currentSubtree <= stack.peekLast().getRootOfTree()) {
+        while (!stack.isEmpty() && currentSubtree <= stack.peek().getRootOfTree()) {
           // adding at front is important for tree-structure!
-          children.add(0, stack.pollLast().getInterpolationPoint());
+          children.add(0, stack.pop().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
         conjunction = Native.mkAnd(z3context, children.size(), Longs.toArray(children));
@@ -180,13 +180,13 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
       Native.incRef(z3context, interpolationPoint);
       interpolationFormulas[i] = interpolationPoint;
-      stack.addLast(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
+      stack.push(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
       lastSubtree = currentSubtree;
     }
 
     Preconditions.checkState(
-        stack.peekLast().getRootOfTree() == 0, "subtree of root should start at 0.");
-    long root = stack.pollLast().getInterpolationPoint();
+        stack.peek().getRootOfTree() == 0, "subtree of root should start at 0.");
+    long root = stack.pop().getInterpolationPoint();
     Preconditions.checkState(
         stack.isEmpty(), "root should have been the last element in the stack.");
 
