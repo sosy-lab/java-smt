@@ -41,14 +41,14 @@ public class JavaOptionalSubject extends Subject<JavaOptionalSubject, Optional<?
   }
 
   public void isPresent() {
-    if(this.getSubject() == null || !((Optional)this.getSubject()).isPresent()) {
+    if(this.getSubject() == null || !this.getSubject().isPresent()) {
       this.failWithoutSubject("is present");
     }
 
   }
 
   public void isAbsent() {
-    if(this.getSubject() == null || ((Optional)this.getSubject()).isPresent()) {
+    if(this.getSubject() == null || this.getSubject().isPresent()) {
       this.fail("is absent");
     }
 
@@ -58,8 +58,8 @@ public class JavaOptionalSubject extends Subject<JavaOptionalSubject, Optional<?
     if(expected == null) {
       throw new NullPointerException("Optional cannot have a null value.");
     } else {
-      if(this.getSubject() != null && ((Optional)this.getSubject()).isPresent()) {
-        Object actual = ((Optional)this.getSubject()).get();
+      if(this.getSubject() != null && (this.getSubject()).isPresent()) {
+        Object actual = this.getSubject().get();
         if(!actual.equals(expected)) {
           this.fail("has value", expected);
         }

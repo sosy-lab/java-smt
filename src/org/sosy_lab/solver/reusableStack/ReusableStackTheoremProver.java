@@ -19,14 +19,13 @@
  */
 package org.sosy_lab.solver.reusableStack;
 
-import com.google.common.base.Optional;
-
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.ProverEnvironment;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class ReusableStackTheoremProver extends ReusableStackAbstractProver<Void, ProverEnvironment>
     implements ProverEnvironment {
