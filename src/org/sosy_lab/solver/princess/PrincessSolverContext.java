@@ -12,6 +12,8 @@ import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
+import org.sosy_lab.solver.reusableStack.ReusableStackInterpolatingProver;
+import org.sosy_lab.solver.reusableStack.ReusableStackTheoremProver;
 
 import java.util.Set;
 
@@ -75,18 +77,22 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     return new PrincessSolverContext(pShutdownNotifier, manager, creator);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     if (options.contains(ProverOptions.GENERATE_UNSAT_CORE)
         || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       throw new UnsupportedOperationException("Princess does not support unsat core generation");
     }
-    return new PrincessTheoremProver(manager, shutdownNotifier, creator);
+    return new ReusableStackTheoremProver(
+        new PrincessTheoremProver(manager, shutdownNotifier, creator));
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new PrincessInterpolatingProver(manager, creator);
+    return new ReusableStackInterpolatingProver<>(
+        new PrincessInterpolatingProver(manager, creator));
   }
 
   @Override

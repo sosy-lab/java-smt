@@ -218,6 +218,100 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void stackTest2() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.pop();
+  }
+
+  @Test
+  public void stackTest3() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.pop();
+    stack.push();
+    stack.pop();
+  }
+
+  @Test
+  public void stackTest4() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.push();
+    stack.pop();
+    stack.pop();
+  }
+
+  @Test
+  public void stackTest5() {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.push();
+    stack.pop();
+    thrown.expect(RuntimeException.class);
+    stack.pop();
+  }
+
+  @Test
+  public void constraintTestBool1() throws SolverException, InterruptedException {
+    BooleanFormula a = bmgr.makeVariable("bool_a");
+
+    try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      stack.addConstraint(a);
+      assertThatEnvironment(stack).isSatisfiable();
+    }
+
+    try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
+      stack2.addConstraint(bmgr.not(a));
+      assertThatEnvironment(stack2).isSatisfiable();
+    }
+  }
+
+  @Test
+  public void constraintTestBool2() throws SolverException, InterruptedException {
+    BooleanFormula a = bmgr.makeVariable("bool_a");
+
+    try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      stack.push(a);
+      assertThatEnvironment(stack).isSatisfiable();
+    }
+
+    try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
+      stack2.addConstraint(bmgr.not(a));
+      assertThatEnvironment(stack2).isSatisfiable();
+    }
+  }
+
+  @Test
+  public void constraintTestBool3() throws SolverException, InterruptedException {
+    BooleanFormula a = bmgr.makeVariable("bool_a");
+
+    try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      stack.push(a);
+      assertThatEnvironment(stack).isSatisfiable();
+    }
+
+    try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
+      thrown.expect(RuntimeException.class);
+      stack2.pop();
+    }
+  }
+
+  @Test
+  public void constraintTestBool4() throws SolverException, InterruptedException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    stack.addConstraint(bmgr.makeVariable("bool_a"));
+    assertThatEnvironment(stack).isSatisfiable();
+    thrown.expect(RuntimeException.class);
+    stack.pop();
+  }
+
+  @Test
+  public void satTestBool5() throws SolverException, InterruptedException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    assertThatEnvironment(stack).isSatisfiable();
+  }
+
+  @Test
   public void dualStackTest() throws Exception {
     requireMultipleStackSupport();
 

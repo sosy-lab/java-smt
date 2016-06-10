@@ -44,7 +44,7 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
   PrincessModel(
       PartialModel partialModel,
       FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment, ?> creator,
-      Collection<IExpression> assertedTerms) {
+      Collection<? extends IExpression> assertedTerms) {
     super(creator);
     this.model = partialModel;
     this.assertedTerms = ImmutableList.copyOf(assertedTerms);

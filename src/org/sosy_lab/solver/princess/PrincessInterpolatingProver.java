@@ -24,16 +24,14 @@ import ap.parser.IFormula;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,10 +39,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
+class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Integer>
     implements InterpolatingProverEnvironment<Integer> {
 
-  private final List<Integer> assertedFormulas = new ArrayList<>(); // Collection of termNames
   private final Map<Integer, IFormula> annotatedTerms = new HashMap<>(); // Collection of termNames
   private static final UniqueIdGenerator counter = new UniqueIdGenerator(); // for different indices
 
@@ -58,19 +55,12 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   }
 
   @Override
-  public Integer push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    return addConstraint(f);
-  }
-
-  @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    Integer removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
-    annotatedTerms.remove(removed);
-    assert assertedFormulas.size() == annotatedTerms.size();
-    stack.pop(1);
+    for (Integer removed : assertedFormulas.peek()) {
+      annotatedTerms.remove(removed);
+    }
+    super.pop();
   }
 
   @Override
@@ -80,16 +70,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     IFormula t = (IFormula) mgr.extractInfo(f);
     stack.assertTermInPartition(t, termIndex);
 
-    assertedFormulas.add(termIndex);
+    assertedFormulas.peek().add(termIndex);
     annotatedTerms.put(termIndex, t);
-    assert assertedFormulas.size() == annotatedTerms.size();
     return termIndex;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    stack.push(1);
   }
 
   @Override
@@ -99,7 +82,11 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
     Set<Integer> indexesOfB =
-        assertedFormulas.stream().filter(f -> !indexesOfA.contains(f)).collect(Collectors.toSet());
+        annotatedTerms
+            .keySet()
+            .stream()
+            .filter(f -> !indexesOfA.contains(f))
+            .collect(Collectors.toSet());
 
     // get interpolant of groups
     List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
@@ -131,11 +118,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
-    assert assertedFormulas.size() == annotatedTerms.size();
-    final List<IExpression> values = Lists.newArrayList(annotatedTerms.values());
-    return new PrincessModel(stack.getPartialModel(), creator, values);
+  protected Collection<? extends IExpression> getAssertedFormulas() {
+    return annotatedTerms.values();
   }
 }

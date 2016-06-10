@@ -83,29 +83,23 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   }
 
   @Override
-  public void push(int levels) {
-    for (int i = 0; i < levels; i++) {
-      api.push();
-      trackingStack.addLast(new Level());
-    }
+  public void push() {
+    api.push();
+    trackingStack.push(new Level());
   }
 
   /** This function pops levels from the assertion-stack. */
   @Override
-  public void pop(int levels) {
+  public void pop() {
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
-    final Deque<Level> toAdd = new ArrayDeque<>(levels);
-    for (int i = 0; i < levels; i++) {
-      api.pop();
-      toAdd.add(trackingStack.removeLast());
-    }
-    for (Level level : toAdd) {
-      api.addBooleanVariables(iterableAsScalaIterable(level.booleanSymbols));
-      api.addConstants(iterableAsScalaIterable(level.intSymbols));
-      level.functionSymbols.forEach(api::addFunction);
-      if (!trackingStack.isEmpty()) {
-        trackingStack.getLast().mergeWithHigher(level);
-      }
+    api.pop();
+    Level level = trackingStack.pop();
+
+    api.addBooleanVariables(iterableAsScalaIterable(level.booleanSymbols));
+    api.addConstants(iterableAsScalaIterable(level.intSymbols));
+    level.functionSymbols.forEach(api::addFunction);
+    if (!trackingStack.isEmpty()) {
+      trackingStack.peek().mergeWithHigher(level);
     }
   }
 
@@ -185,7 +179,9 @@ class SymbolTrackingPrincessStack implements PrincessStack {
       env.removeStack(this);
       api.shutDown();
     } else {
-      pop(trackingStack.size());
+      for (int i = 0; i < trackingStack.size(); i++) {
+        pop();
+      }
       env.unregisterStack(this);
     }
   }

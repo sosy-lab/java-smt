@@ -28,6 +28,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 
 import java.io.PrintWriter;
 
+// reason: not maintained, some implementations for methods are missing
 class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProver {
 
   private final PrintWriter out;

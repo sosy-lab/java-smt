@@ -310,7 +310,11 @@ class SmtInterpolEnvironment {
 
   /** This function adds the term on top of the stack. */
   public void assertTerm(Term term) {
-    checkState(stackDepth > 0, "assertions should be on higher levels");
+    checkState(
+        stackDepth > 0,
+        "assertions should be on higher levels, "
+            + "because we might need to remove the term again and "
+            + "we have a shared environment for all provers.");
     script.assertTerm(term);
   }
 
@@ -318,7 +322,6 @@ class SmtInterpolEnvironment {
    * if their conjunction is SAT or UNSAT.
    */
   public boolean checkSat() throws InterruptedException {
-    checkState(stackDepth > 0, "checkSat should be on higher levels");
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,

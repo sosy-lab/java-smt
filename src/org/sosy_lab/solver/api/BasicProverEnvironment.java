@@ -41,7 +41,10 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   @Nullable
   @CanIgnoreReturnValue
-  T push(BooleanFormula f);
+  default T push(BooleanFormula f) {
+    push();
+    return addConstraint(f);
+  }
 
   /**
    * Remove one formula from the environment stack.

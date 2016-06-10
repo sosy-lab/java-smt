@@ -32,10 +32,18 @@ import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
-abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
+
+abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E> {
 
   protected final PrincessStack stack;
   protected final PrincessFormulaManager mgr;
+  protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
+
   protected final FormulaCreator<
           IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
       creator;
@@ -62,10 +70,27 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
   }
 
   @Override
-  public abstract void pop();
+  public final void push() {
+    Preconditions.checkState(!closed);
+    assertedFormulas.push(new ArrayList<>());
+    stack.push();
+  }
 
   @Override
-  public abstract Model getModel() throws SolverException;
+  public void pop() {
+    Preconditions.checkState(!closed);
+    assertedFormulas.pop();
+    stack.pop();
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
+    return new PrincessModel(stack.getPartialModel(), creator, getAssertedFormulas());
+  }
+
+  protected abstract Collection<? extends IExpression> getAssertedFormulas();
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
@@ -78,7 +103,9 @@ abstract class PrincessAbstractProver<E> implements BasicProverEnvironment<E> {
   public void close() {
     checkNotNull(stack);
     checkNotNull(mgr);
-    stack.close();
+    if (!closed) {
+      stack.close();
+    }
     closed = true;
   }
 }

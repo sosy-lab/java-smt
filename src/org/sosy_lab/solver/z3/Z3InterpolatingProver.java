@@ -22,7 +22,6 @@ package org.sosy_lab.solver.z3;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
@@ -35,6 +34,7 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +44,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   private final long z3solver;
 
   private int level = 0;
-  private final Deque<Long> assertedFormulas = new ArrayDeque<>();
+  private final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
 
   Z3InterpolatingProver(
       Z3FormulaCreator creator, long z3params, ShutdownNotifier pShutdownNotifier) {
@@ -52,15 +52,18 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     this.z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
     Native.solverSetParams(z3context, z3solver, z3params);
+
+    // add basic level, needed for addConstraints(f) without previous push()
+    assertedFormulas.push(new ArrayList<>());
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
+    Preconditions.checkState(level == assertedFormulas.size() - 1);
     level--;
-
-    assertedFormulas.removeLast();
+    assertedFormulas.pop();
     Native.solverPop(z3context, z3solver, 1);
   }
 
@@ -70,7 +73,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
     Native.solverAssert(z3context, z3solver, e);
-    assertedFormulas.addLast(e);
+    assertedFormulas.peek().add(e);
     Native.decRef(z3context, e);
     return e;
   }
@@ -78,7 +81,9 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   @Override
   public void push() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(level == assertedFormulas.size() - 1);
     level++;
+    assertedFormulas.push(new ArrayList<>());
     Native.solverPush(z3context, z3solver);
   }
 
@@ -99,7 +104,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     // we have to handle equal formulas on the stack,
     // so we copy the whole stack and remove the formulas of A once.
-    final List<Long> formulasOfB = Lists.newLinkedList(assertedFormulas);
+    final List<Long> formulasOfB = new LinkedList<>();
+    assertedFormulas.forEach(formulasOfB::addAll);
     for (long af : formulasOfA) {
       boolean check = formulasOfB.remove(af); // remove only first occurrence
       assert check : "formula from A must be part of all asserted formulas";
@@ -154,12 +160,12 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       } else { // if (currentSubtree <= lastSubtree) {
         // merge-point in tree, several children at a node -> pop from stack and conjunct
         final List<Long> children = new ArrayList<>();
-        while (!stack.isEmpty() && currentSubtree <= stack.peekLast().getRootOfTree()) {
+        while (!stack.isEmpty() && currentSubtree <= stack.peek().getRootOfTree()) {
           // adding at front is important for tree-structure!
-          children.add(0, stack.pollLast().getInterpolationPoint());
+          children.add(0, stack.pop().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
-        conjunction = Native.mkAnd(z3context, 2, Longs.toArray(children));
+        conjunction = Native.mkAnd(z3context, children.size(), Longs.toArray(children));
       }
 
       final long interpolationPoint;
@@ -174,13 +180,13 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
       Native.incRef(z3context, interpolationPoint);
       interpolationFormulas[i] = interpolationPoint;
-      stack.addLast(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
+      stack.push(new Z3TreeInterpolant(currentSubtree, interpolationPoint));
       lastSubtree = currentSubtree;
     }
 
     Preconditions.checkState(
-        stack.peekLast().getRootOfTree() == 0, "subtree of root should start at 0.");
-    long root = stack.pollLast().getInterpolationPoint();
+        stack.peek().getRootOfTree() == 0, "subtree of root should start at 0.");
+    long root = stack.pop().getInterpolationPoint();
     Preconditions.checkState(
         stack.isEmpty(), "root should have been the last element in the stack.");
 
@@ -229,6 +235,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     while (level > 0) {
       pop();
     }
+
+    Preconditions.checkState(assertedFormulas.size() == 1);
     assertedFormulas.clear();
 
     //TODO solver_reset(z3context, z3solver);

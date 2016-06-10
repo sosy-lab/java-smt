@@ -56,13 +56,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public Integer push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    return addConstraint(f);
-  }
-
-  @Override
   public Integer addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
     int group = msat_create_itp_group(curEnv);

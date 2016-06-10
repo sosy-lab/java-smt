@@ -46,16 +46,20 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements ProverEnvironment {
+class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
+    implements ProverEnvironment {
 
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
-  private final List<Term> assertedTerms;
   private final Map<String, Term> annotatedTerms; // Collection of termNames
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
 
-  // Next modification to assertion stack should pop before doing anything.
+  /**
+   * This flag is used to know whether the next modification to assertion stack
+   * should pop before doing anything. The flag is needed for getting an
+   * unsat-core or model after checking the stack with assumptions.
+   */
   private transient boolean shouldPop = false;
 
   SmtInterpolTheoremProver(
@@ -64,7 +68,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
       Set<ProverOptions> options) {
     super(pMgr);
     mgr = pMgr;
-    assertedTerms = new ArrayList<>();
     env = mgr.createEnvironment();
     creator = pCreator;
     checkNotNull(env);
@@ -81,7 +84,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     push(mgr.getBooleanFormulaManager().and(assumptions));
     boolean out = isUnsat();
     shouldPop = true;
@@ -113,16 +116,14 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
   @Override
   public void pop() {
-    Preconditions.checkState(!closed);
     popIfNecessary();
-    assertedTerms.remove(assertedTerms.size() - 1); // remove last term
-    env.pop(1);
+    super.pop();
   }
 
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     popIfNecessary();
     Term t = mgr.extractInfo(constraint);
     if (generateUnsatCores) {
@@ -133,24 +134,19 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
     } else {
       env.assertTerm(t);
     }
-    assertedTerms.add(t);
+    assertedFormulas.peek().add(t);
     return null;
   }
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
     popIfNecessary();
-    if (env.getStackDepth() > 0) {
-      env.pop(env.getStackDepth());
-      assertedTerms.clear();
-    }
-    closed = true;
+    super.close();
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Term[] terms = env.getUnsatCore();
     return Lists.transform(
         Arrays.asList(terms),
@@ -160,7 +156,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {
@@ -181,6 +177,8 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void> implements P
 
   @Override
   protected Collection<Term> getAssertedTerms() {
-    return assertedTerms;
+    List<Term> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
   }
 }

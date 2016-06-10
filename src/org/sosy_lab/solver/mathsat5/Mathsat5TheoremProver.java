@@ -76,14 +76,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   @Override
-  public @Nullable Void push(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    push();
-    addConstraint(f);
-    return null;
-  }
-
-  @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);

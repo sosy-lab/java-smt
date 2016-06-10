@@ -199,13 +199,13 @@ class PrincessEnvironment {
           intVariablesCache.put(var.toString(), (ITerm) var);
         }
 
-        for (SymbolTrackingPrincessStack stack : registeredStacks) {
+        for (SymbolTrackingPrincessStack stack : allStacks) {
           stack.addSymbol((IConstant) var);
         }
 
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
-        for (SymbolTrackingPrincessStack stack : registeredStacks) {
+        for (SymbolTrackingPrincessStack stack : allStacks) {
           stack.addSymbol((IAtom) var);
         }
       } else if (var instanceof IFunApp) {
@@ -213,7 +213,7 @@ class PrincessEnvironment {
         functionsCache.put(fun.name(), fun);
 
         functionsReturnTypes.put(fun, convertToTermType(functionTypes.get(fun)));
-        for (SymbolTrackingPrincessStack stack : registeredStacks) {
+        for (SymbolTrackingPrincessStack stack : allStacks) {
           stack.addSymbol(fun);
         }
       }

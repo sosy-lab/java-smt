@@ -38,55 +38,51 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
+class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
   private final SmtInterpolFormulaManager mgr;
   private final SmtInterpolEnvironment env;
 
-  private final List<String> assertedFormulas; // Collection of termNames
   private final Map<String, Term> annotatedTerms; // Collection of termNames
 
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
     super(pMgr);
     mgr = pMgr;
     env = mgr.createEnvironment();
-    assertedFormulas = new ArrayList<>();
     annotatedTerms = new HashMap<>();
   }
 
   @Override
   public void pop() {
-    Preconditions.checkState(!closed);
-    String removed = assertedFormulas.remove(assertedFormulas.size() - 1); // remove last term
-    annotatedTerms.remove(removed);
-    assert assertedFormulas.size() == annotatedTerms.size();
-    env.pop(1);
+    for (String removed : assertedFormulas.peek()) {
+      annotatedTerms.remove(removed);
+    }
+    super.pop();
   }
 
   @Override
   public String addConstraint(BooleanFormula f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     String termName = generateTermName();
     Term t = mgr.extractInfo(f);
     Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
     env.assertTerm(annotatedTerm);
-    assertedFormulas.add(termName);
+    assertedFormulas.peek().add(termName);
     annotatedTerms.put(termName, t);
-    assert assertedFormulas.size() == annotatedTerms.size();
     return termName;
   }
 
   @Override
   public BooleanFormula getInterpolant(List<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     // SMTInterpol is not able to handle the trivial cases
     // so we need to check them explicitly
     if (pTermNamesOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
-    } else if (pTermNamesOfA.equals(assertedFormulas)) {
+    } else if (pTermNamesOfA.containsAll(annotatedTerms.keySet())) {
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
 
@@ -94,7 +90,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
     Set<String> termNamesOfB =
-        assertedFormulas
+        annotatedTerms
+            .keySet()
             .stream()
             .filter(n -> !termNamesOfA.contains(n))
             .collect(Collectors.toSet());
@@ -109,7 +106,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<String>> partitionedTermNames)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
     for (int i = 0; i < formulas.length; i++) {
@@ -130,7 +127,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
   public List<BooleanFormula> getTreeInterpolants(
       List<Set<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
     for (int i = 0; i < formulas.length; i++) {
@@ -174,7 +171,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
 
   protected BooleanFormula getInterpolant(Term termA, Term termB)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     // get interpolant of groups
     Term[] itp = env.getInterpolants(new Term[] {termA, termB});
     assert itp.length == 1; // 2 groups -> 1 interpolant
@@ -183,7 +180,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
   }
 
   private Term buildConjunctionOfNamedTerms(Set<String> termNames) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(!termNames.isEmpty());
 
     Term[] terms = new Term[termNames.size()];
@@ -202,14 +199,9 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String>
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
-    assert assertedFormulas.size() == annotatedTerms.size();
-    if (!assertedFormulas.isEmpty()) {
-      env.pop(env.getStackDepth());
-      assertedFormulas.clear();
-      annotatedTerms.clear();
-    }
-    closed = true;
+    assertedFormulas.clear();
+    annotatedTerms.clear();
+    super.close();
   }
 
   @Override

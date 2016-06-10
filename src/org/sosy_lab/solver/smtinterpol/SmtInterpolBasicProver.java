@@ -25,7 +25,6 @@ package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -34,18 +33,22 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
 
-public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironment<T> {
+public abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
 
-  protected boolean closed = false;
+  private boolean closed = false;
   private final SmtInterpolEnvironment env;
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
@@ -56,17 +59,22 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
     creator = pMgr.getFormulaCreator();
   }
 
+  protected boolean isClosed() {
+    return closed;
+  }
+
   @Override
-  public void push() {
+  public final void push() {
     Preconditions.checkState(!closed);
+    assertedFormulas.push(new ArrayList<>());
     env.push(1);
   }
 
   @Override
-  @CanIgnoreReturnValue
-  public T push(BooleanFormula f) {
-    push();
-    return addConstraint(f);
+  public void pop() {
+    Preconditions.checkState(!closed);
+    assertedFormulas.pop();
+    env.pop(1);
   }
 
   @Override
@@ -93,4 +101,12 @@ public abstract class SmtInterpolBasicProver<T> implements BasicProverEnvironmen
   }
 
   protected abstract Collection<Term> getAssertedTerms();
+
+  @Override
+  public void close() {
+    Preconditions.checkState(!closed);
+    assertedFormulas.clear();
+    env.pop(env.getStackDepth());
+    closed = true;
+  }
 }
