@@ -243,9 +243,9 @@ with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
 
 ## Authors
 
- - Project maintainer: George Karpenkov
- - Initial codebase, many design decisions: Philipp Wendler
- - Contributions: Thomas Stieglmaier, Karlheinz Friedberger
+ - Project maintainer: [George Karpenkov][]
+ - Initial codebase, many design decisions: [Philipp Wendler][]
+ - Contributions: [Thomas Stieglmaier][], [Karlheinz Friedberger][], and others.
 
 ## Further Documentation
 
@@ -259,3 +259,7 @@ with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
 [LogManager]: https://sosy-lab.github.io/java-common-lib/api/index.html?org/sosy_lab/common/configuration/package-summary.html
 [FormulaManagerFactory]: http://sosy-lab.github.io/java-smt/api/org/sosy_lab/solver/FormulaManagerFactory.html
 [IvyRepository]: http://www.sosy-lab.org/ivy
+[George Karpenkov]: http://metaworld.me
+[Philipp Wendler]: http://www.philippwendler.de/
+[Thomas Stieglmaier]: https://stieglmaier.me/
+[Karlheinz Friedberger]: http://www.sosy-lab.org/people-friedberger.php
