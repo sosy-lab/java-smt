@@ -32,9 +32,9 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
+import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.RationalFormulaManager;
-import org.sosy_lab.solver.z3.Z3Formula.Z3RationalFormula;
 
 import java.util.Optional;
 import java.util.logging.Level;
@@ -174,15 +174,10 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
    * Replace the epsilon in the returned formula with a numeric value.
    */
   private long replaceEpsilon(long ast, Rational newValue) {
-    Z3Formula z = new Z3RationalFormula(z3context, ast);
-
-    Z3Formula epsFormula = (Z3Formula) rfmgr.makeVariable("epsilon");
-
-    Z3Formula out =
-        mgr.substitute(
-            z,
-            ImmutableMap.<Formula, Formula>of(epsFormula, rfmgr.makeNumber(newValue.toString())));
-    return Native.simplify(z3context, out.getFormulaInfo());
+    Formula z = creator.encapsulate(FormulaType.RationalType, ast);
+    Formula epsFormula = rfmgr.makeVariable("epsilon");
+    Formula out = mgr.substitute(z, ImmutableMap.of(epsFormula, rfmgr.makeNumber(newValue)));
+    return Native.simplify(z3context, creator.extractInfo(out));
   }
 
   private Rational rationalFromZ3AST(long ast) {
