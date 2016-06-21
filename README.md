@@ -33,7 +33,7 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>0.51</version>
+  <version>0.60</version>
 </dependency>
 ```
 
@@ -41,7 +41,7 @@ Or for Gradle:
 
 ```
 dependencies {
-  compile 'org.sosy-lab:common:0.51'
+  compile 'org.sosy-lab:common:0.60'
 }
 ```
 
@@ -60,7 +60,7 @@ After the repository URL is configured, you only need to add the following
 dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt" rev="latest.integration" />
+<dependency org="org.sosy_lab" name="javasmt" rev="0.60" />
 ```
 
 ### Manual Installation using JAR files
