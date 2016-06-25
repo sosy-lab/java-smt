@@ -303,7 +303,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void UFtest() throws SolverException, InterruptedException {
+  public void ufTest() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireBitvectors();
     // only Z3 fulfills these requirements

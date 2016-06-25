@@ -143,7 +143,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     return lst;
   }
 
-  /** get a ValueAssignment for an entry (= one evaluation) of an uninterpreted function in the model */
+  /** get a ValueAssignment for an entry (= one evaluation)
+   * of an uninterpreted function in the model */
   private ValueAssignment getFunctionAssignment(String functionName, long funcDecl, long entry) {
     Object value = creator.convertValue(Native.funcEntryGetValue(z3context, entry));
     int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
