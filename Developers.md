@@ -66,18 +66,25 @@ Additional instructions are available at the official [OSSRH][] page.
 
 Publishing of MathSAT5 and Z3 to the [Ivy Repository][] is handled through
 JavaSMT.
-To publish Z3, run the task `ant publish-z3 -Dz3.path=$Z3_DIR` where `$Z3_DIR` is a
-directory with a latest checkout of compiled 64-bit Z3 Solver.
 
-For publishing MathSAT5, a following command-line is required:
+### Publishing Z3 ###
+To publish Z3, [download it](https://github.com/Z3Prover/z3) and build it with the following command in its directory on a 64bit system:
+```
+./configure --staticlib --java && cd build && make -j 2
+```
 
+Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
+```
+ant publish-z3 -Dz3.path=$Z3_DIR
+```
+Finally follow the instructions shown in the message at the end.
+
+### Publish MathSAT5 ###
+For publishing MathSAT5, [download the binary release](http://mathsat.fbk.eu/download.html), unpack it, and execute the following command in the JavaSMT directory, where `$MATHSAT_PATH` is the path to the MathSAT directory, and `$MATHSAT_VERSION` is the version number of MathSAT:
 ```
 ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dmathsat.version=$MATHSAT_VERSION
 ```
-
-Unlike Z3, we produce our own shared object for MathSAT5, and a different
-shared object can not be used together with JavaSMT.
-
+Finally follow the instructions shown in the message at the end.
 
 [Travis]: https://travis-ci.org/sosy-lab/java-smt
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
