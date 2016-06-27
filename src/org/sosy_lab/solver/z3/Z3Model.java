@@ -135,6 +135,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     int numInterpretations = Native.funcInterpGetNumEntries(z3context, interp);
     for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
       long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
+      Native.funcEntryIncRef(z3context, entry);
       lst.add(getFunctionAssignment(functionName, funcDecl, entry));
       Native.funcEntryDecRef(z3context, entry);
     }
