@@ -22,9 +22,9 @@ package org.sosy_lab.solver.z3;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.api.BooleanFormula;
 
 abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
@@ -33,9 +33,8 @@ abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
 
   private int level = 0;
 
-  Z3SolverBasedProver(
-      Z3FormulaCreator pCreator, long z3params, ShutdownNotifier pShutdownNotifier) {
-    super(pCreator, pShutdownNotifier);
+  Z3SolverBasedProver(Z3FormulaCreator pCreator, long z3params) {
+    super(pCreator);
 
     z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
@@ -45,14 +44,20 @@ abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    int result = Native.solverCheck(z3context, z3solver);
-    shutdownNotifier.shutdownIfNecessary();
+    int result;
+    try {
+      result = Native.solverCheck(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
-  protected final void undefinedStatusToException(int solverStatus) throws Z3SolverException {
+  protected final void undefinedStatusToException(int solverStatus)
+      throws Z3SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
+      creator.shutdownNotifier.shutdownIfNecessary();
       throw new Z3SolverException(
           "Solver returned 'unknown' status, reason: "
               + Native.solverGetReasonUnknown(z3context, z3solver));

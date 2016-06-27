@@ -113,6 +113,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     config.inject(this);
   }
 
+  final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
+    if ("canceled".equals(e.getMessage())) {
+      shutdownNotifier.shutdownIfNecessary();
+    }
+    throw e;
+  }
+
   @Override
   public Long makeVariable(Long type, String varName) {
     long z3context = getEnv();
@@ -584,8 +591,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       result = Native.tacticApply(z3context, tacticObject, goal);
     } catch (Z3Exception exp) {
-      shutdownNotifier.shutdownIfNecessary();
-      throw exp;
+      throw handleZ3Exception(exp);
     }
     Native.applyResultIncRef(z3context, result);
 

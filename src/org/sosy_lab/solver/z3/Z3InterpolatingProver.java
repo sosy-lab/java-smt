@@ -25,8 +25,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
@@ -42,9 +42,8 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   private final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
 
-  Z3InterpolatingProver(
-      Z3FormulaCreator creator, long z3params, ShutdownNotifier pShutdownNotifier) {
-    super(creator, z3params, pShutdownNotifier);
+  Z3InterpolatingProver(Z3FormulaCreator creator, long z3params) {
+    super(creator, z3params);
 
     // add basic level, needed for addConstraints(f) without previous push()
     assertedFormulas.push(new ArrayList<>());
@@ -168,14 +167,17 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     final long proof = Native.solverGetProof(z3context, z3solver);
     Native.incRef(z3context, proof);
 
-    long interpolationResult =
-        Native.getInterpolant(
-            z3context,
-            proof, //refutation of premises := proof
-            root, // last element is end of chain (root of tree), pattern := interpolation tree
-            Native.mkParams(z3context));
-
-    shutdownNotifier.shutdownIfNecessary();
+    long interpolationResult;
+    try {
+      interpolationResult =
+          Native.getInterpolant(
+              z3context,
+              proof, //refutation of premises := proof
+              root, // last element is end of chain (root of tree), pattern := interpolation tree
+              Native.mkParams(z3context));
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
 
     // n partitions -> n-1 interpolants
     // the given tree interpolants are sorted in post-order,

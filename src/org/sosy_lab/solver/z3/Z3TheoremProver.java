@@ -23,10 +23,10 @@ import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_lbool;
 
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -58,9 +58,8 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
       Z3FormulaCreator creator,
       Z3FormulaManager pMgr,
       long z3params,
-      ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> opts) {
-    super(creator, z3params, pShutdownNotifier);
+    super(creator, z3params);
     mgr = pMgr;
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
@@ -94,13 +93,17 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
       throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
-    int result =
-        Native.solverCheckAssumptions(
-            z3context,
-            z3solver,
-            assumptions.size(),
-            assumptions.stream().mapToLong(creator::extractInfo).toArray());
-    shutdownNotifier.shutdownIfNecessary();
+    int result;
+    try {
+      result =
+          Native.solverCheckAssumptions(
+              z3context,
+              z3solver,
+              assumptions.size(),
+              assumptions.stream().mapToLong(creator::extractInfo).toArray());
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
