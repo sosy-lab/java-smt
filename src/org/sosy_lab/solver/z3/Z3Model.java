@@ -97,7 +97,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
       Native.incRef(z3context, funcDecl);
       String functionName = creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-      out.addAll(getFunctionAssigments(funcDecl, funcDecl, functionName));
+      out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
       Native.decRef(z3context, funcDecl);
     }
 
@@ -131,7 +131,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
    * @param funcDecl function declaration where the function name comes from
    * @param functionName the name of the funcDecl
    */
-  private Collection<ValueAssignment> getFunctionAssigments(
+  private Collection<ValueAssignment> getFunctionAssignments(
       long evalDecl, long funcDecl, String functionName) {
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
     Native.funcInterpIncRef(z3context, interp);
@@ -149,7 +149,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       if (creator.symbolToString(Native.getDeclName(z3context, aliasDecl)).contains("!")) {
         // The symbol "!" is part of temporary symbols used for quantified formulas.
         // This is only a heuristic, because the user can also create a symbol containing "!".
-        lst.addAll(getFunctionAssigments(aliasDecl, funcDecl, functionName));
+        lst.addAll(getFunctionAssignments(aliasDecl, funcDecl, functionName));
         // TODO Can we guarantee termination of this recursive call?
         //      A chain of aliases should end after several steps.
       } else {
