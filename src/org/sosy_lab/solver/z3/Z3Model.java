@@ -96,7 +96,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
       long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
       Native.incRef(z3context, funcDecl);
-      out.addAll(getFunctionAssigments(funcDecl));
+      String functionName = creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+      out.addAll(getFunctionAssigments(funcDecl, funcDecl, functionName));
       Native.decRef(z3context, funcDecl);
     }
 
@@ -123,21 +124,46 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     return new ValueAssignment(key, creator.symbolToString(symbol), lValue, ImmutableList.of());
   }
 
-  /** get all ValueAssignments for a function declaration in the model */
-  private Collection<ValueAssignment> getFunctionAssigments(long funcDecl) {
-    String functionName = creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-
-    long interp = Native.modelGetFuncInterp(z3context, model, funcDecl);
+  /**
+   * get all ValueAssignments for a function declaration in the model
+   *
+   * @param evalDecl function declaration where the evaluation comes from
+   * @param funcDecl function declaration where the function name comes from
+   * @param functionName the name of the funcDecl
+   */
+  private Collection<ValueAssignment> getFunctionAssigments(long evalDecl, long funcDecl, String functionName) {
+    long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
     Native.funcInterpIncRef(z3context, interp);
 
     List<ValueAssignment> lst = new ArrayList<>();
 
     int numInterpretations = Native.funcInterpGetNumEntries(z3context, interp);
-    for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
-      long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
-      Native.funcEntryIncRef(z3context, entry);
-      lst.add(getFunctionAssignment(functionName, funcDecl, entry));
-      Native.funcEntryDecRef(z3context, entry);
+
+    if (numInterpretations == 0) {
+      // we found an alias in the model, follow the alias
+      long elseInterp = Native.funcInterpGetElse(z3context, interp);
+      Native.incRef(z3context, elseInterp);
+      long aliasDecl = Native.getAppDecl(z3context, elseInterp);
+      Native.incRef(z3context, aliasDecl);
+      if (creator.symbolToString(Native.getDeclName(z3context, aliasDecl)).contains("!")) {
+        // The symbol "!" is part of temporary symbols used for quantified formulas.
+        // This is only a heuristic, because the user can also create a symbol containing "!".
+        lst.addAll(getFunctionAssigments(aliasDecl, funcDecl, functionName));
+        // TODO Can we guarantee termination of this recursive call?
+        //      A chain of aliases should end after several steps.
+      } else {
+        // ignore functionDeclarations like "ite", "and",...
+      }
+      Native.decRef(z3context, aliasDecl);
+      Native.decRef(z3context, elseInterp);
+
+    } else {
+      for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
+        long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
+        Native.funcEntryIncRef(z3context, entry);
+        lst.add(getFunctionAssignment(functionName, funcDecl, entry));
+        Native.funcEntryDecRef(z3context, entry);
+      }
     }
 
     Native.funcInterpDecRef(z3context, interp);
