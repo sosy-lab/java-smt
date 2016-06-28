@@ -344,7 +344,38 @@ public class ModelTest extends SolverBasedTest0 {
         // TODO the model is not correct for Z3, check this!
 
         // dummy-check for TRUE, such that the JUnit-test is not useless :-)
-        assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+        assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+      }
+    }
+  }
+
+  @Test
+  public void quantifierTestShort() throws SolverException, InterruptedException {
+    requireQuantifiers();
+
+    IntegerFormula ctr = imgr.makeVariable("x");
+    BooleanFormula body = imgr.equal(ctr, imgr.makeNumber(0));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+      // exists x : x==0
+      prover.push(qmgr.exists(body, ctr));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        for (ValueAssignment v : m) {
+          // a value-assignment might have a different name, but the value should be "0".
+          assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
+        }
+      }
+      prover.pop();
+
+      // x==0
+      prover.push(body);
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        ValueAssignment v = m.iterator().next();
+        assertThat("x".equals(v.getName())).isTrue();
+        assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
       }
     }
   }
