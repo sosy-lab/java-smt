@@ -55,10 +55,7 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3TheoremProver(
-      Z3FormulaCreator creator,
-      Z3FormulaManager pMgr,
-      long z3params,
-      Set<ProverOptions> opts) {
+      Z3FormulaCreator creator, Z3FormulaManager pMgr, long z3params, Set<ProverOptions> opts) {
     super(creator, z3params);
     mgr = pMgr;
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {

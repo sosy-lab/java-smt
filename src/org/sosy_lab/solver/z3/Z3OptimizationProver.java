@@ -48,10 +48,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final long z3optContext;
 
-  Z3OptimizationProver(
-      FormulaManager mgr,
-      Z3FormulaCreator creator,
-      LogManager pLogger) {
+  Z3OptimizationProver(FormulaManager mgr, Z3FormulaCreator creator, LogManager pLogger) {
     super(creator);
     this.mgr = mgr;
     rfmgr = mgr.getRationalFormulaManager();

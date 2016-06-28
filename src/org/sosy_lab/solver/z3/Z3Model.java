@@ -131,7 +131,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
    * @param funcDecl function declaration where the function name comes from
    * @param functionName the name of the funcDecl
    */
-  private Collection<ValueAssignment> getFunctionAssigments(long evalDecl, long funcDecl, String functionName) {
+  private Collection<ValueAssignment> getFunctionAssigments(
+      long evalDecl, long funcDecl, String functionName) {
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
     Native.funcInterpIncRef(z3context, interp);
 
