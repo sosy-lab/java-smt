@@ -27,6 +27,7 @@ import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
@@ -72,7 +73,8 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
-  public BooleanFormula getInterpolant(final List<Long> formulasOfA) throws InterruptedException {
+  public BooleanFormula getInterpolant(final List<Long> formulasOfA)
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
@@ -93,7 +95,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
         partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
@@ -104,7 +106,8 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Long>> partitionedFormulas, int[] startOfSubTree) throws InterruptedException {
+      List<Set<Long>> partitionedFormulas, int[] startOfSubTree)
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
@@ -176,6 +179,9 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
               root, // last element is end of chain (root of tree), pattern := interpolation tree
               Native.mkParams(z3context));
     } catch (Z3Exception e) {
+      if ("theory not supported by interpolation or bad proof".equals(e.getMessage())) {
+        throw new SolverException(e.getMessage(), e);
+      }
       throw creator.handleZ3Exception(e);
     }
 
