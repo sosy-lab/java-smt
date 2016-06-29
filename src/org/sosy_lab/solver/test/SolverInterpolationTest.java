@@ -23,7 +23,7 @@ import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import org.junit.Test;
@@ -109,9 +109,9 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
 
-      BooleanFormula emptyB = prover.getInterpolant(Lists.newArrayList(id1, id2));
+      BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
       assertThat(bmgr.isFalse(emptyB)).isTrue();
-      BooleanFormula emptyA = prover.getInterpolant(Lists.newArrayList());
+      BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
       assertThat(bmgr.isTrue(emptyA)).isTrue();
     }
   }
@@ -145,14 +145,14 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    BooleanFormula itp = stack.getInterpolant(Lists.newArrayList());
-    BooleanFormula itpA = stack.getInterpolant(Lists.newArrayList(TA));
-    BooleanFormula itpAB = stack.getInterpolant(Lists.newArrayList(TA, TB));
-    BooleanFormula itpABC = stack.getInterpolant(Lists.newArrayList(TA, TB, TC));
-    BooleanFormula itpD = stack.getInterpolant(Lists.newArrayList(TD));
-    BooleanFormula itpDC = stack.getInterpolant(Lists.newArrayList(TD, TC));
-    BooleanFormula itpDCB = stack.getInterpolant(Lists.newArrayList(TD, TC, TB));
-    BooleanFormula itpABCD = stack.getInterpolant(Lists.newArrayList(TA, TB, TC, TD));
+    BooleanFormula itp = stack.getInterpolant(ImmutableList.of());
+    BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
+    BooleanFormula itpAB = stack.getInterpolant(ImmutableList.of(TA, TB));
+    BooleanFormula itpABC = stack.getInterpolant(ImmutableList.of(TA, TB, TC));
+    BooleanFormula itpD = stack.getInterpolant(ImmutableList.of(TD));
+    BooleanFormula itpDC = stack.getInterpolant(ImmutableList.of(TD, TC));
+    BooleanFormula itpDCB = stack.getInterpolant(ImmutableList.of(TD, TC, TB));
+    BooleanFormula itpABCD = stack.getInterpolant(ImmutableList.of(TA, TB, TC, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -165,10 +165,8 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    checkItpSequence(
-        stack, Lists.newArrayList(A, B, C, D), Lists.newArrayList(itpA, itpAB, itpABC));
-    checkItpSequence(
-        stack, Lists.newArrayList(D, C, B, A), Lists.newArrayList(itpD, itpDC, itpDCB));
+    checkItpSequence(stack, ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
+    checkItpSequence(stack, ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
 
   @Test
@@ -187,10 +185,10 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    BooleanFormula itp0 = stack.getInterpolant(Lists.newArrayList());
-    BooleanFormula itpA = stack.getInterpolant(Lists.newArrayList(TA));
-    BooleanFormula itpB = stack.getInterpolant(Lists.newArrayList(TA));
-    BooleanFormula itpAB = stack.getInterpolant(Lists.newArrayList(TA, TB));
+    BooleanFormula itp0 = stack.getInterpolant(ImmutableList.of());
+    BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
+    BooleanFormula itpB = stack.getInterpolant(ImmutableList.of(TA));
+    BooleanFormula itpAB = stack.getInterpolant(ImmutableList.of(TA, TB));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -204,8 +202,8 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    checkItpSequence(stack, Lists.newArrayList(A, B), Lists.newArrayList(itpA));
-    checkItpSequence(stack, Lists.newArrayList(B, A), Lists.newArrayList(itpB));
+    checkItpSequence(stack, ImmutableList.of(A, B), ImmutableList.of(itpA));
+    checkItpSequence(stack, ImmutableList.of(B, A), ImmutableList.of(itpB));
   }
 
   private void requireSequentialItp() {
@@ -254,28 +252,28 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
     assertThatEnvironment(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps1 = stack.getSeqInterpolants(Lists.newArrayList(TA, TB, TC, TD));
-    List<BooleanFormula> itps2 = stack.getSeqInterpolants(Lists.newArrayList(TD, TC, TB, TA));
-    List<BooleanFormula> itps3 = stack.getSeqInterpolants(Lists.newArrayList(TA, TC, TB, TD));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants(ImmutableList.of(TA, TC, TB, TD));
 
     List<BooleanFormula> itps4 =
-        stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TA, TB, TC, TD, TD));
+        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
     List<BooleanFormula> itps5 =
-        stack.getSeqInterpolants(Lists.newArrayList(TA, TA, TB, TC, TD, TA, TD));
+        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
     List<BooleanFormula> itps6 =
-        stack.getSeqInterpolants(Lists.newArrayList(TB, TC, TD, TA, TA, TA, TD));
+        stack.getSeqInterpolants(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
     stack.pop();
     stack.pop();
 
-    checkItpSequence(stack, Lists.newArrayList(A, B, C, D), itps1);
-    checkItpSequence(stack, Lists.newArrayList(D, C, B, A), itps2);
-    checkItpSequence(stack, Lists.newArrayList(A, C, B, D), itps3);
-    checkItpSequence(stack, Lists.newArrayList(A, A, A, C, B, D, D), itps4);
-    checkItpSequence(stack, Lists.newArrayList(A, A, B, C, D, A, D), itps5);
-    checkItpSequence(stack, Lists.newArrayList(B, C, D, A, A, A, D), itps6);
+    checkItpSequence(stack, ImmutableList.of(A, B, C, D), itps1);
+    checkItpSequence(stack, ImmutableList.of(D, C, B, A), itps2);
+    checkItpSequence(stack, ImmutableList.of(A, C, B, D), itps3);
+    checkItpSequence(stack, ImmutableList.of(A, A, A, C, B, D, D), itps4);
+    checkItpSequence(stack, ImmutableList.of(A, A, B, C, D, A, D), itps5);
+    checkItpSequence(stack, ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
 
   @Test
@@ -370,7 +368,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // C
     List<BooleanFormula> itps =
         stack.getTreeInterpolants(
-            Lists.newArrayList(TA, TB, TD, TE, TC), // post-order
+            ImmutableList.of(TA, TB, TD, TE, TC), // post-order
             new int[] {0, 0, 2, 2, 0}); // left-most node in current subtree
 
     stack.pop(); // clear stack, such that we can re-use the solver
@@ -409,7 +407,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     //  E
     List<BooleanFormula> itps =
         stack.getTreeInterpolants(
-            Lists.newArrayList(TA, TB, TC, TD, TE), // post-order
+            ImmutableList.of(TA, TB, TC, TD, TE), // post-order
             new int[] {0, 1, 2, 3, 0}); // left-most node in current subtree
 
     stack.pop(); // clear stack, such that we can re-use the solver
@@ -457,7 +455,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // E
     List<BooleanFormula> itps =
         stack.getTreeInterpolants(
-            Lists.newArrayList(TA, TB, TC, TD, TE), // post-order
+            ImmutableList.of(TA, TB, TC, TD, TE), // post-order
             new int[] {0, 0, 0, 0, 0}); // left-most node in current subtree
 
     stack.pop(); // clear stack, such that we can re-use the solver
@@ -519,7 +517,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // R2
     List<BooleanFormula> itps =
         stack.getTreeInterpolants(
-            Lists.newArrayList(TA, TB, TC, TR1, TD, TR2), // post-order
+            ImmutableList.of(TA, TB, TC, TR1, TD, TR2), // post-order
             new int[] {0, 0, 2, 0, 4, 0}); // left-most node in current subtree
 
     stack.pop(); // clear stack, such that we can re-use the solver

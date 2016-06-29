@@ -23,7 +23,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,7 +35,6 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.NumeralType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
@@ -597,7 +595,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BooleanFormula gt_bMinusC_1000 = imgr.greaterThan(minus_b_c, num_1000);
     BooleanFormula and_cEq2_bMinusCgt1000 = bmgr.and(eq_c_2, gt_bMinusC_1000);
 
-    BooleanFormula f = qmgr.exists(Lists.<Formula>newArrayList(var_C), and_cEq2_bMinusCgt1000);
+    BooleanFormula f = qmgr.exists(ImmutableList.of(var_C), and_cEq2_bMinusCgt1000);
     BooleanFormula result = qmgr.eliminateQuantifiers(f);
     assertThat(result.toString()).doesNotContain("exists");
     assertThat(result.toString()).doesNotContain("c");
@@ -628,7 +626,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BooleanFormula fm = bmgr.and(i1_eq_1_plus_a1, not_j1_eq_minus1, j1_eq_j2_plus_a1);
 
-    BooleanFormula q = qmgr.exists(Lists.<Formula>newArrayList(j1), fm);
+    BooleanFormula q = qmgr.exists(ImmutableList.of(j1), fm);
     BooleanFormula result = qmgr.eliminateQuantifiers(q);
     assertThat(result.toString()).doesNotContain("exists");
     assertThat(result.toString()).doesNotContain("j@1");
