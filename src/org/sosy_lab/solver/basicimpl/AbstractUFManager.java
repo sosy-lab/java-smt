@@ -21,9 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
@@ -82,7 +79,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    return formulaCreator.callFunction(funcType, ImmutableList.copyOf(args));
+    return formulaCreator.callFunction(funcType, Arrays.asList(args));
   }
 
   @Override
@@ -103,6 +100,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    return declareAndCallUF(name, pReturnType, Lists.newArrayList(pArgs));
+    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
 }
