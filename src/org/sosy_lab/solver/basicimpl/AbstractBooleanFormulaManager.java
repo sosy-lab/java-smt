@@ -51,9 +51,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements BooleanFormulaManager {
+
+  private @Nullable BooleanFormula trueFormula = null;
+  private @Nullable BooleanFormula falseFormula = null;
 
   protected AbstractBooleanFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
@@ -73,8 +78,24 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
 
   @Override
+  public BooleanFormula makeTrue() {
+    if (trueFormula == null) {
+      trueFormula = wrap(makeBooleanImpl(true));
+    }
+    return trueFormula;
+  }
+
+  @Override
+  public BooleanFormula makeFalse() {
+    if (falseFormula == null) {
+      falseFormula = wrap(makeBooleanImpl(false));
+    }
+    return falseFormula;
+  }
+
+  @Override
   public BooleanFormula makeBoolean(boolean value) {
-    return wrap(makeBooleanImpl(value));
+    return value ? makeTrue() : makeFalse();
   }
 
   protected abstract TFormulaInfo makeBooleanImpl(boolean value);

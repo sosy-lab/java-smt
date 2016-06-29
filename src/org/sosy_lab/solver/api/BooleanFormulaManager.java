@@ -41,6 +41,16 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula makeBoolean(boolean value);
 
+  /**
+   * Shortcut for {@code makeBoolean(true)}.
+   */
+  BooleanFormula makeTrue();
+
+  /**
+   * Shortcut for {@code makeBoolean(false)}.
+   */
+  BooleanFormula makeFalse();
+
   BooleanFormula makeVariable(String pVar);
 
   /**
