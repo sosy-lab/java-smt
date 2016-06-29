@@ -119,6 +119,10 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     final Object lValue;
     if (creator.isConstant(value)) {
       lValue = creator.convertValue(value);
+
+    } else if (Native.isAsArray(z3context, value)) {
+      lValue = getArrayAssignment(symbol, value);
+
     } else {
       // fall back to simple String
       lValue = Native.astToString(z3context, value);
@@ -128,6 +132,58 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Native.decRef(z3context, value);
 
     return new ValueAssignment(key, creator.symbolToString(symbol), lValue, ImmutableList.of());
+  }
+
+  /** Z3 models an array as uninterpreted function.
+   * We try to produce a proper array representation.
+   * There are several possibilities to model an array in Java-SMT:
+   * <ul>
+   * <li> as direct array like "[0,0,?,?,0]" (not useful, if many cells are empty or unused)
+   * <li> as map like "{1:0, 2:0, 5:0}" (human-readable)
+   * <li> as array formula like "(store (store (store arrSymbol 1 0) 2 0) 5 0)"
+   *  (based on formulas, our choice)
+   * </ul>
+   */
+  private Formula getArrayAssignment(long arraySymbol, long value) {
+    long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
+    Native.incRef(z3context, evalDecl);
+    long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
+    Native.funcInterpIncRef(z3context, interp);
+
+    long array = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
+    Native.incRef(z3context, array);
+
+    // get all assignments for the array
+    int numInterpretations = Native.funcInterpGetNumEntries(z3context, interp);
+    for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
+      long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
+      Native.funcEntryIncRef(z3context, entry);
+      long newArray = storeAssignment(array, entry);
+      Native.decRef(z3context, array);
+      Native.funcEntryDecRef(z3context, entry);
+      array = newArray;
+    }
+
+    Native.funcInterpDecRef(z3context, interp);
+    Native.decRef(z3context, evalDecl);
+    return creator.encapsulateWithTypeOf(array);
+  }
+
+  /** returns a new array formula "(store array index value)".
+   *
+   * @param array the basic array
+   * @param entry where index and value are extracted from */
+  private long storeAssignment(long array, long entry) {
+    long arrayValue = Native.funcEntryGetValue(z3context, entry);
+    Native.incRef(z3context, arrayValue);
+    int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
+    assert noArgs == 1 : "array modelled as UF is expected to have only one parameter, aka index";
+    long arrayIndex = Native.funcEntryGetArg(z3context, entry, 0);
+    Native.incRef(z3context, arrayIndex);
+
+    long newArray = Native.mkStore(z3context, array, arrayIndex, arrayValue);
+    Native.incRef(z3context, newArray);
+    return newArray;
   }
 
   /**
