@@ -532,10 +532,9 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkImplies(stack, A, itps.get(0));
     checkImplies(stack, bmgr.and(itps.get(0), B), itps.get(1));
     checkImplies(stack, C, itps.get(2));
-    checkImplies(stack, bmgr.and(Lists.newArrayList(itps.get(1), itps.get(2), R1)), itps.get(3));
+    checkImplies(stack, bmgr.and(itps.get(1), itps.get(2), R1), itps.get(3));
     checkImplies(stack, D, itps.get(4));
-    checkImplies(
-        stack, bmgr.and(Lists.newArrayList(itps.get(3), itps.get(4), R2)), bmgr.makeBoolean(false));
+    checkImplies(stack, bmgr.and(itps.get(3), itps.get(4), R2), bmgr.makeBoolean(false));
   }
 
   private void checkItpSequence(
