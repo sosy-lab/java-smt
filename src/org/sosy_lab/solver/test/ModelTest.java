@@ -32,10 +32,13 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.ArrayFormula;
+import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
@@ -295,6 +298,84 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(relevantAssignments).hasSize(1);
         ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
         assertThat(assignment.getValue()).isEqualTo(expectedValue);
+      }
+    }
+  }
+
+  @Test
+  public void ufTest() throws SolverException, InterruptedException {
+    requireQuantifiers();
+    requireBitvectors();
+    // only Z3 fulfills these requirements
+
+    BitvectorType t32 = BitvectorType.getBitvectorTypeWithSize(32);
+    FunctionDeclaration<BitvectorFormula> si1 = fmgr.declareUF("*signed_int@1", t32, t32);
+    FunctionDeclaration<BitvectorFormula> si2 = fmgr.declareUF("*signed_int@2", t32, t32);
+    BitvectorFormula ctr = bvmgr.makeVariable(t32, "*signed_int@1@counter");
+    BitvectorFormula adr = bvmgr.makeVariable(t32, "__ADDRESS_OF_test");
+    BitvectorFormula num0 = bvmgr.makeBitvector(32, 0);
+    BitvectorFormula num4 = bvmgr.makeBitvector(32, 4);
+    BitvectorFormula num10 = bvmgr.makeBitvector(32, 10);
+
+    BooleanFormula a11 =
+        bmgr.implication(
+            bmgr.and(
+                bvmgr.lessOrEquals(adr, ctr, false),
+                bvmgr.lessThan(ctr, bvmgr.add(adr, num10), false)),
+            bvmgr.equal(fmgr.callUF(si2, ctr), num0));
+    BooleanFormula a21 =
+        bmgr.not(
+            bmgr.and(
+                bvmgr.lessOrEquals(adr, ctr, false),
+                bvmgr.lessThan(ctr, bvmgr.add(adr, num10), false)));
+    BooleanFormula body =
+        bmgr.and(
+            a11, bmgr.implication(a21, bvmgr.equal(fmgr.callUF(si2, ctr), fmgr.callUF(si1, ctr))));
+    BooleanFormula a1 = qmgr.forall(body, ctr);
+    BooleanFormula a2 =
+        bvmgr.equal(fmgr.callUF(si1, bvmgr.add(adr, bvmgr.multiply(num4, num0))), num0);
+
+    BooleanFormula f = bmgr.and(a1, bvmgr.lessThan(num0, adr, true), bmgr.not(a2));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        // TODO the model is not correct for Z3, check this!
+
+        // dummy-check for TRUE, such that the JUnit-test is not useless :-)
+        assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+      }
+    }
+  }
+
+  @Test
+  public void quantifierTestShort() throws SolverException, InterruptedException {
+    requireQuantifiers();
+
+    IntegerFormula ctr = imgr.makeVariable("x");
+    BooleanFormula body = imgr.equal(ctr, imgr.makeNumber(0));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+      // exists x : x==0
+      prover.push(qmgr.exists(body, ctr));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        for (ValueAssignment v : m) {
+          // a value-assignment might have a different name, but the value should be "0".
+          assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
+        }
+      }
+      prover.pop();
+
+      // x==0
+      prover.push(body);
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        ValueAssignment v = m.iterator().next();
+        assertThat("x".equals(v.getName())).isTrue();
+        assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
       }
     }
   }

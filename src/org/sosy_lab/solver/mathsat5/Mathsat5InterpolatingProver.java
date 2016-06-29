@@ -104,7 +104,10 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           || msg.contains("can't build ie-local interpolant")
           || msg.contains("splitting of AB-mixed terms not supported")
           || msg.contains("Hypothesis belongs neither to A nor to B")
-          || msg.contains("FP<->BV combination unsupported by the current configuration")) {
+          || msg.contains("FP<->BV combination unsupported by the current configuration")
+          || msg.contains("cur_eq unknown to the classifier")
+          || msg.contains("unknown constraint in the ItpMapper")
+          || msg.contains("AB-mixed term not found in eq_itp map")) {
         // This is not a bug in our code,
         // but a problem of MathSAT which happens during interpolation
         throw new SolverException(e.getMessage(), e);

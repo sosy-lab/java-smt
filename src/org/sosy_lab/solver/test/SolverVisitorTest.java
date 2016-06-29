@@ -23,7 +23,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.truth.TruthJUnit;
 
@@ -83,7 +82,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula eq = bmgr.equivalence(t, y);
     BooleanFormula not = bmgr.not(eq);
 
-    for (BooleanFormula bf : Lists.newArrayList(t, f, x, y, z, and, or, ite, impl, eq, not)) {
+    for (BooleanFormula bf : ImmutableList.of(t, f, x, y, z, and, or, ite, impl, eq, not)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
           new BooleanFormulaTransformationVisitor(mgr) {
             // we need a subclass, because the original class is 'abstract'
@@ -103,7 +102,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula eq = imgr.equal(n12, a);
     IntegerFormula ite = bmgr.ifThenElse(eq, sum, diff);
 
-    for (IntegerFormula f : Lists.newArrayList(a, b, n12, neg, ite)) {
+    for (IntegerFormula f : ImmutableList.of(a, b, n12, neg, ite)) {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
           new BooleanFormulaTransformationVisitor(mgr) {};
       BooleanFormula bf = imgr.equal(n12, f);

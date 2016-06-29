@@ -26,6 +26,7 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -48,7 +49,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula exists(BooleanFormula pBody, Formula... quantifiedArgs) {
-    return exists(Lists.newArrayList(quantifiedArgs), pBody);
+    return exists(Arrays.asList(quantifiedArgs), pBody);
   }
 
   private TFormulaInfo exists(List<TFormulaInfo> pVariables, TFormulaInfo pBody) {
@@ -62,7 +63,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula forall(BooleanFormula pBody, Formula... quantifiedArgs) {
-    return forall(Lists.newArrayList(quantifiedArgs), pBody);
+    return forall(Arrays.asList(quantifiedArgs), pBody);
   }
 
   private TFormulaInfo forall(List<TFormulaInfo> pVariables, TFormulaInfo pBody) {

@@ -23,10 +23,10 @@ import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_lbool;
 
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -45,10 +45,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
+class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnvironment {
 
-  private final long z3solver;
-  private int level = 0;
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final FormulaManager mgr;
 
@@ -57,16 +55,9 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3TheoremProver(
-      Z3FormulaCreator creator,
-      Z3FormulaManager pMgr,
-      long z3params,
-      ShutdownNotifier pShutdownNotifier,
-      Set<ProverOptions> opts) {
-    super(creator, pShutdownNotifier);
+      Z3FormulaCreator creator, Z3FormulaManager pMgr, long z3params, Set<ProverOptions> opts) {
+    super(creator, z3params);
     mgr = pMgr;
-    z3solver = Native.mkSolver(z3context);
-    Native.solverIncRef(z3context, z3solver);
-    Native.solverSetParams(z3context, z3solver, z3params);
     if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new HashMap<>();
     } else {
@@ -75,47 +66,23 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
-    level--;
-    Native.solverPop(z3context, z3solver, 1);
-  }
-
-  @Override
   @Nullable
   public Void addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
-    long e = Z3FormulaManager.getZ3Expr(f);
-    Native.incRef(z3context, e);
 
     if (storedConstraints != null) { // Unsat core generation is on.
+      long e = Z3FormulaManager.getZ3Expr(f);
+      Native.incRef(z3context, e);
       String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
       BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
       Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
       storedConstraints.put(varName, f);
+      Native.decRef(z3context, e);
     } else {
-      Native.solverAssert(z3context, z3solver, e);
+      super.addConstraint0(f);
     }
-    Native.decRef(z3context, e);
     return null;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    level++;
-    Native.solverPush(z3context, z3solver);
-  }
-
-  @Override
-  public boolean isUnsat() throws Z3SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    int result = Native.solverCheck(z3context, z3solver);
-    shutdownNotifier.shutdownIfNecessary();
-    undefinedStatusToException(result);
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
@@ -123,13 +90,17 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
-    int result =
-        Native.solverCheckAssumptions(
-            z3context,
-            z3solver,
-            assumptions.size(),
-            assumptions.stream().mapToLong(creator::extractInfo).toArray());
-    shutdownNotifier.shutdownIfNecessary();
+    int result;
+    try {
+      result =
+          Native.solverCheckAssumptions(
+              z3context,
+              z3solver,
+              assumptions.size(),
+              assumptions.stream().mapToLong(creator::extractInfo).toArray());
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
@@ -149,11 +120,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return Optional.of(core);
-  }
-
-  @Override
-  protected long getZ3Model() {
-    return Native.solverGetModel(z3context, z3solver);
   }
 
   @Override
@@ -180,21 +146,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   }
 
   @Override
-  public void close() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkArgument(
-        Native.solverGetNumScopes(z3context, z3solver) >= 0,
-        "a negative number of scopes is not allowed");
-
-    while (level > 0) {
-      pop();
-    }
-    Native.solverDecRef(z3context, z3solver);
-
-    closed = true;
-  }
-
-  @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
@@ -208,7 +159,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
 
     Native.solverPush(z3context, z3solver);
 
-    while (Native.solverCheck(z3context, z3solver) == Z3_lbool.Z3_L_TRUE.toInt()) {
+    while (!isUnsat()) {
       long[] valuesOfModel = new long[importantFormulas.length];
       long z3model = Native.solverGetModel(z3context, z3solver);
 
@@ -241,19 +192,5 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     // we pushed some levels on assertionStack, remove them and delete solver
     Native.solverPop(z3context, z3solver, 1);
     return callback.getResult();
-  }
-
-  @Override
-  public String toString() {
-    Preconditions.checkState(!closed);
-    return Native.solverToString(z3context, z3solver);
-  }
-
-  private void undefinedStatusToException(int solverStatus) throws Z3SolverException {
-    if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      throw new Z3SolverException(
-          "Solver returned 'unknown' status, reason: "
-              + Native.solverGetReasonUnknown(z3context, z3solver));
-    }
   }
 }

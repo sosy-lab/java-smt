@@ -39,7 +39,7 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -423,12 +423,12 @@ class PrincessEnvironment {
   }
 
   public ITerm makeSelect(ITerm array, ITerm index) {
-    List<ITerm> args = Lists.newArrayList(array, index);
+    List<ITerm> args = ImmutableList.of(array, index);
     return api.select(iterableAsScalaIterable(args).toSeq());
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
-    List<ITerm> args = Lists.newArrayList(array, index, value);
+    List<ITerm> args = ImmutableList.of(array, index, value);
     return api.store(iterableAsScalaIterable(args).toSeq());
   }
 

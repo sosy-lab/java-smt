@@ -72,6 +72,9 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get a satisfying assignment.
    * This should be called only immediately after an {@link #isUnsat()} call
    * that returned <code>false</code>.
+   * A model might contain additional symbols with their evaluation,
+   * if a solver uses its own temporary symbols.
+   * There should be at least an value-assignment for each free symbol.
    */
   Model getModel() throws SolverException;
 

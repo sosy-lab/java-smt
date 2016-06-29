@@ -49,7 +49,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   private final ShutdownRequestListener interruptListener;
   private final long z3params;
-  private final ShutdownNotifier shutdownNotifier;
   private final LogManager logger;
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
@@ -90,7 +89,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
     z3params = pZ3params;
     interruptListener = pInterruptListener;
     pShutdownNotifier.register(interruptListener);
-    shutdownNotifier = pShutdownNotifier;
     logger = pLogger;
     manager = pManager;
   }
@@ -198,18 +196,17 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    return new Z3TheoremProver(creator, manager, z3params, shutdownNotifier, options);
+    return new Z3TheoremProver(creator, manager, z3params, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new Z3InterpolatingProver(creator, z3params, shutdownNotifier);
+    return new Z3InterpolatingProver(creator, z3params);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    Z3OptimizationProver out =
-        new Z3OptimizationProver(getFormulaManager(), creator, shutdownNotifier, logger);
+    Z3OptimizationProver out = new Z3OptimizationProver(getFormulaManager(), creator, logger);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;

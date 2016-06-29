@@ -22,7 +22,7 @@ package org.sosy_lab.solver.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,13 +100,13 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
 
       assertThat(
               env.isUnsatWithAssumptions(
-                  Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
+                  ImmutableList.of(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
           .isTrue();
       assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
           .doesNotContain("suffix");
       assertThat(
               env.isUnsatWithAssumptions(
-                  Lists.newArrayList(bmgr.not(suffix1), bmgr.not(suffix3), suffix2)))
+                  ImmutableList.of(bmgr.not(suffix1), bmgr.not(suffix3), suffix2)))
           .isTrue();
       assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
           .doesNotContain("suffix");

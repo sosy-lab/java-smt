@@ -23,7 +23,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -144,9 +143,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (not exists x . not b[x] = 0) AND (b[123] = 1) is UNSAT
     BooleanFormula f =
         bmgr.and(
-            Lists.newArrayList(
-                bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
-                imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1))));
+            bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
+            imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     assertThatFormula(f).isUnsatisfiable();
   }
 
@@ -187,9 +185,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (not exists x . not b[x] = 0) OR (b[123] = 1) is SAT
     BooleanFormula f =
         bmgr.or(
-            Lists.newArrayList(
-                bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
-                imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1))));
+            bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
+            imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     assertThatFormula(f).isSatisfiable();
   }
 

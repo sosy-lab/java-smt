@@ -149,8 +149,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     try {
       return Native.simplify(getFormulaCreator().getEnv(), pF);
     } catch (Z3Exception exp) {
-      formulaCreator.shutdownNotifier.shutdownIfNecessary();
-      throw exp;
+      throw formulaCreator.handleZ3Exception(exp);
     }
   }
 

@@ -25,7 +25,6 @@ import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.solver.SolverException;
@@ -49,12 +48,8 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final long z3optContext;
 
-  Z3OptimizationProver(
-      FormulaManager mgr,
-      Z3FormulaCreator creator,
-      ShutdownNotifier pShutdownNotifier,
-      LogManager pLogger) {
-    super(creator, pShutdownNotifier);
+  Z3OptimizationProver(FormulaManager mgr, Z3FormulaCreator creator, LogManager pLogger) {
+    super(creator);
     this.mgr = mgr;
     rfmgr = mgr.getRationalFormulaManager();
     z3optContext = Native.mkOptimize(z3context);
@@ -92,12 +87,12 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     try {
       status = Native.optimizeCheck(z3context, z3optContext);
     } catch (Z3Exception ex) {
-      shutdownNotifier.shutdownIfNecessary();
-      throw ex;
+      throw creator.handleZ3Exception(ex);
     }
     if (status == Z3_lbool.Z3_L_FALSE.toInt()) {
       return OptStatus.UNSAT;
     } else if (status == Z3_lbool.Z3_L_UNDEF.toInt()) {
+      creator.shutdownNotifier.shutdownIfNecessary();
       logger.log(
           Level.INFO,
           "Solver returned an unknown status, explanation: ",

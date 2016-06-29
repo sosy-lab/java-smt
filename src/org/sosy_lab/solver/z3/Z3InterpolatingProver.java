@@ -25,9 +25,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-import com.microsoft.z3.enumerations.Z3_lbool;
+import com.microsoft.z3.Z3Exception;
 
-import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
@@ -38,20 +38,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-class Z3InterpolatingProver extends Z3AbstractProver<Long>
+class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     implements InterpolatingProverEnvironment<Long> {
 
-  private final long z3solver;
-
-  private int level = 0;
   private final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
 
-  Z3InterpolatingProver(
-      Z3FormulaCreator creator, long z3params, ShutdownNotifier pShutdownNotifier) {
-    super(creator, pShutdownNotifier);
-    this.z3solver = Native.mkSolver(z3context);
-    Native.solverIncRef(z3context, z3solver);
-    Native.solverSetParams(z3context, z3solver, z3params);
+  Z3InterpolatingProver(Z3FormulaCreator creator, long z3params) {
+    super(creator, z3params);
 
     // add basic level, needed for addConstraints(f) without previous push()
     assertedFormulas.push(new ArrayList<>());
@@ -59,46 +52,29 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   @Override
   public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
-    Preconditions.checkState(level == assertedFormulas.size() - 1);
-    level--;
+    Preconditions.checkState(getLevel() == assertedFormulas.size() - 1);
+    super.pop();
     assertedFormulas.pop();
-    Native.solverPop(z3context, z3solver, 1);
   }
 
   @Override
   public Long addConstraint(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    long e = creator.extractInfo(f);
-    Native.incRef(z3context, e);
-    Native.solverAssert(z3context, z3solver, e);
+    long e = super.addConstraint0(f);
     assertedFormulas.peek().add(e);
-    Native.decRef(z3context, e);
     return e;
   }
 
   @Override
   public void push() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(level == assertedFormulas.size() - 1);
-    level++;
+    Preconditions.checkState(getLevel() == assertedFormulas.size() - 1);
+    super.push();
     assertedFormulas.push(new ArrayList<>());
-    Native.solverPush(z3context, z3solver);
-  }
-
-  @Override
-  public boolean isUnsat() throws Z3SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    int result = Native.solverCheck(z3context, z3solver);
-    shutdownNotifier.shutdownIfNecessary();
-    Preconditions.checkState(result != Z3_lbool.Z3_L_UNDEF.toInt());
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
-  public BooleanFormula getInterpolant(final List<Long> formulasOfA) throws InterruptedException {
+  public BooleanFormula getInterpolant(final List<Long> formulasOfA)
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
@@ -119,7 +95,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
         partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
@@ -130,7 +106,8 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Long>> partitionedFormulas, int[] startOfSubTree) throws InterruptedException {
+      List<Set<Long>> partitionedFormulas, int[] startOfSubTree)
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
@@ -193,14 +170,20 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     final long proof = Native.solverGetProof(z3context, z3solver);
     Native.incRef(z3context, proof);
 
-    long interpolationResult =
-        Native.getInterpolant(
-            z3context,
-            proof, //refutation of premises := proof
-            root, // last element is end of chain (root of tree), pattern := interpolation tree
-            Native.mkParams(z3context));
-
-    shutdownNotifier.shutdownIfNecessary();
+    long interpolationResult;
+    try {
+      interpolationResult =
+          Native.getInterpolant(
+              z3context,
+              proof, //refutation of premises := proof
+              root, // last element is end of chain (root of tree), pattern := interpolation tree
+              Native.mkParams(z3context));
+    } catch (Z3Exception e) {
+      if ("theory not supported by interpolation or bad proof".equals(e.getMessage())) {
+        throw new SolverException(e.getMessage(), e);
+      }
+      throw creator.handleZ3Exception(e);
+    }
 
     // n partitions -> n-1 interpolants
     // the given tree interpolants are sorted in post-order,
@@ -224,24 +207,10 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   }
 
   @Override
-  protected long getZ3Model() {
-    return Native.solverGetModel(z3context, z3solver);
-  }
-
-  @Override
   public void close() {
-    Preconditions.checkState(!closed);
-
-    while (level > 0) {
-      pop();
-    }
-
+    super.close();
     Preconditions.checkState(assertedFormulas.size() == 1);
     assertedFormulas.clear();
-
-    //TODO solver_reset(z3context, z3solver);
-    Native.solverDecRef(z3context, z3solver);
-    closed = true;
   }
 
   private static class Z3TreeInterpolant {
@@ -260,11 +229,5 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     private long getInterpolationPoint() {
       return interpolationPoint;
     }
-  }
-
-  @Override
-  public String toString() {
-    Preconditions.checkState(!closed);
-    return Native.solverToString(z3context, z3solver);
   }
 }

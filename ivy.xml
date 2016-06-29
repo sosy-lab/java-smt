@@ -99,26 +99,26 @@
         <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.0" conf="format-source->default"/>
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.17.0" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu.checkstyle" name="sevntu-checks" rev="1.21.0" conf="checkstyle->default"/>
 
         <!-- FindBugs -->
         <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-238-g1f06d6a" conf="runtime-smtinterpol->runtime; contrib->sources">
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-255-gcdd5908" conf="runtime-smtinterpol->runtime; contrib->sources">
           <artifact name="smtinterpol" e:classifier="comp" conf="runtime-smtinterpol"/>
           <artifact name="smtinterpol" e:classifier="sources" conf="contrib" ext="zip"/>
         </dependency>
 
         <!-- Princess -->
-        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-02-29-r2569" conf="runtime-princess->runtime; contrib->sources">
+        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-06-27-r2652" conf="runtime-princess->runtime; contrib->sources">
           <artifact name="princess" e:classifier="assertionless" conf="runtime-princess"/>
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-1394-gd12efb6" conf="runtime-z3->solver-z3" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-1530-gf786ab1" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.11" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.3.10" conf="runtime-optimathsat->solver-optimathsat" />
 
