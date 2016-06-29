@@ -278,6 +278,41 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
+  @Test
+  public void testGetArrays2() throws Exception {
+    requireArrays();
+
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun |pi@2| () Int)\n"
+                + "(declare-fun *unsigned_int@1 () (Array Int Int))\n"
+                + "(declare-fun |z2@2| () Int)\n"
+                + "(declare-fun |z1@2| () Int)\n"
+                + "(declare-fun |t@2| () Int)\n"
+                + "(declare-fun |__ADDRESS_OF_t| () Int)\n"
+                + "(declare-fun *char@1 () (Array Int Int))\n"
+                + "(assert"
+                + "    (and (= |t@2| 50)"
+                + "        (not (<= |__ADDRESS_OF_t| 0))"
+                + "        (= |z1@2| |__ADDRESS_OF_t|)"
+                + "        (= (select *char@1 |__ADDRESS_OF_t|) |t@2|)"
+                + "        (= |z2@2| |z1@2|)"
+                + "        (= |pi@2| |z2@2|)"
+                + "        (not (= (select *unsigned_int@1 |pi@2|) 50))))");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+      }
+    }
+  }
+
   private void testModelGetters(
       BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
       throws Exception {

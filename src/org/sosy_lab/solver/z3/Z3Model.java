@@ -116,7 +116,13 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Native.incRef(z3context, value);
 
     long symbol = Native.getDeclName(z3context, keyDecl);
-    Object lValue = creator.convertValue(value);
+    final Object lValue;
+    if (creator.isConstant(value)) {
+      lValue = creator.convertValue(value);
+    } else {
+      // fall back to simple String
+      lValue = Native.astToString(z3context, value);
+    }
 
     // cleanup outdated data
     Native.decRef(z3context, value);
