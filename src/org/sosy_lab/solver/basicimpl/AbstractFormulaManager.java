@@ -21,7 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.Appender;
@@ -301,12 +300,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public <T extends Formula> List<T> splitNumeralEqualityIfPossible(final T pF) {
     return Lists.transform(
         splitNumeralEqualityIfPossible(extractInfo(pF)),
-        new Function<TFormulaInfo, T>() {
-          @Override
-          public T apply(TFormulaInfo input) {
-            return encapsulateWithTypeOf(pF, input);
-          }
-        });
+        input -> encapsulateWithTypeOf(pF, input));
   }
 
   protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
