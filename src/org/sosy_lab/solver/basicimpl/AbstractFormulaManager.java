@@ -299,8 +299,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public <T extends Formula> List<T> splitNumeralEqualityIfPossible(final T pF) {
     return Lists.transform(
-        splitNumeralEqualityIfPossible(extractInfo(pF)),
-        input -> encapsulateWithTypeOf(pF, input));
+        splitNumeralEqualityIfPossible(extractInfo(pF)), input -> encapsulateWithTypeOf(pF, input));
   }
 
   protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
