@@ -22,6 +22,7 @@ package org.sosy_lab.solver.z3;
 import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.VerifyException;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
@@ -166,6 +167,18 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
       for (int j = 0; j < importantFormulas.length; j++) {
         long funcDecl = Native.getAppDecl(z3context, importantFormulas[j]);
         long valueOfExpr = Native.modelGetConstInterp(z3context, z3model, funcDecl);
+        if (valueOfExpr == 0) {
+          // In theory, this is a legal return value for modelGetConstInterp and means
+          // that the value doesn't matter.
+          // However, we have never seen this value so far except in case of shutdowns.
+          creator.shutdownNotifier.shutdownIfNecessary();
+          // If it ever happens in a legitimate usecase, we need to remove the following
+          // exception and handle it by passing a partial model to the callback.
+          throw new VerifyException(
+              "Z3 claims that the value of "
+                  + Native.astToString(z3context, importantFormulas[j])
+                  + " does not matter in allSat call.");
+        }
 
         if (isOP(z3context, valueOfExpr, Z3_decl_kind.Z3_OP_FALSE.toInt())) {
           valuesOfModel[j] = Native.mkNot(z3context, importantFormulas[j]);
