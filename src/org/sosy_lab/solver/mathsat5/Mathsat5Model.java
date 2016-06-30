@@ -22,12 +22,16 @@ package org.sosy_lab.solver.mathsat5;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_get_model;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_is_array_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_make_array_read;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_model_iterator_next;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_get_type;
+import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_array_write;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -38,6 +42,8 @@ import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -95,21 +101,44 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
       if (msat_model_iterator_next(modelIterator, key, value)) {
         throw new NoSuchElementException();
       }
-      Formula fKey = creator.encapsulateWithTypeOf(key[0]);
-      Object fValue = formulaCreator.convertValue(key[0], value[0]);
-      List<Object> argumentInterpretation = new ArrayList<>();
 
-      for (int i = 0; i < msat_term_arity(key[0]); i++) {
-        long arg = msat_term_get_arg(key[0], i);
-        argumentInterpretation.add(evaluateImpl(arg));
+      if (msat_is_array_type(creator.getEnv(), msat_term_get_type(value[0]))) {
+        assignments.addAll(getArrayAssignments(key[0], value[0]));
+      } else {
+        assignments.add(getAssignment(key[0], value[0]));
       }
-
-      assignments.add(
-          new ValueAssignment(
-              fKey, formulaCreator.getName(key[0]), fValue, argumentInterpretation));
     }
     msat_destroy_model_iterator(modelIterator);
     return assignments.build();
+  }
+
+  private ValueAssignment getAssignment(long key, long value) {
+    Formula fKey = creator.encapsulateWithTypeOf(key);
+    Object fValue = formulaCreator.convertValue(key, value);
+    List<Object> argumentInterpretation = new ArrayList<>();
+
+    for (int i = 0; i < msat_term_arity(key); i++) {
+      long arg = msat_term_get_arg(key, i);
+      argumentInterpretation.add(evaluateImpl(arg));
+    }
+
+    return new ValueAssignment(fKey, formulaCreator.getName(key), fValue, argumentInterpretation);
+  }
+
+  /** split an array-assignment into several assignments for all positions */
+  private Collection<ValueAssignment> getArrayAssignments(long key, long array) {
+    Collection<ValueAssignment> assignments = new ArrayList<>();
+    while (msat_term_is_array_write(creator.getEnv(), array)) {
+      long index = msat_term_get_arg(array, 1);
+      long content = msat_term_get_arg(array, 2);
+      Formula select =
+          creator.encapsulateWithTypeOf(msat_make_array_read(creator.getEnv(), key, index));
+      assignments.add(
+          new ValueAssignment(
+              select, formulaCreator.getName(key), evaluateImpl(content), Collections.emptyList()));
+      array = msat_term_get_arg(array, 0);
+    }
+    return assignments;
   }
 
   @Override
