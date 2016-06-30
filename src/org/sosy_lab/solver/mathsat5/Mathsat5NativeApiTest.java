@@ -48,13 +48,14 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.solver.SolverException;
 
-/**
- * This class is not part of the normal JavaSMT test suite because
- * the java.library.path needs to be defined in order to execute the tests.
- */
-public class Mathsat5NativeApiTest0 {
+public class Mathsat5NativeApiTest {
+
+  static {
+    NativeLibraries.loadLibrary("mathsat5j");
+  }
 
   private long env;
 
