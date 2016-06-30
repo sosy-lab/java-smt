@@ -94,8 +94,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
       }
     } else {
 
-      // Return string serialization for unknown values.
-      return value.toString();
+      throw new AssertionError("unexpected value: " + value);
     }
   }
 

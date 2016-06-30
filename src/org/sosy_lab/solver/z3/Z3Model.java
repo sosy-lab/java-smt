@@ -124,8 +124,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       lValue = getArrayAssignment(symbol, value);
 
     } else {
-      // fall back to simple String
-      lValue = Native.astToString(z3context, value);
+      throw new AssertionError("unexpected value: " + Native.astToString(z3context, value));
     }
 
     // cleanup outdated data
