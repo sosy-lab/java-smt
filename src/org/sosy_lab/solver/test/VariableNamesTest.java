@@ -96,6 +96,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
         "get-model",
         "exit",
         "(exit)",
+        "select",
+        "store",
         "|",
         "||",
         "|||",
