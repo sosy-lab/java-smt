@@ -164,8 +164,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
    * However, we create a list of assignments "a[1]=0; a[2]=0; a[5]=0",
    * because we want to have a nice right-hand-side.
    */
-  private Collection<ValueAssignment> getArrayAssignments(long arraySymbol,
-      long arrayFormula, long value, List<Object> upperIndices) {
+  private Collection<ValueAssignment> getArrayAssignments(
+      long arraySymbol, long arrayFormula, long value, List<Object> upperIndices) {
     long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
     Native.incRef(z3context, evalDecl);
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
@@ -274,7 +274,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   /** get a ValueAssignment for an entry (= one evaluation)
    * of an uninterpreted function in the model */
-  private ValueAssignment getFunctionAssignment(String functionName, long funcDecl, long entry, long entryValue) {
+  private ValueAssignment getFunctionAssignment(
+      String functionName, long funcDecl, long entry, long entryValue) {
     Object value = creator.convertValue(entryValue);
     int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
     long[] args = new long[noArgs];

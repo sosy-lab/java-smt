@@ -70,7 +70,8 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Nullable
   @Override
   public final Object evaluate(Formula f) {
-    Preconditions.checkArgument(!(f instanceof ArrayFormula),
+    Preconditions.checkArgument(
+        !(f instanceof ArrayFormula),
         "cannot compute a simple constant evaluation for an array-formula");
     return evaluateImpl(creator.extractInfo(f));
   }
