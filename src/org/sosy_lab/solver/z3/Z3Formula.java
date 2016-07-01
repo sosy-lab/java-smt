@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.solver.z3;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.ArrayFormula;
@@ -41,6 +43,8 @@ abstract class Z3Formula implements Formula {
   private int hashCache = 0;
 
   private Z3Formula(long z3context, long z3expr) {
+    checkArgument(z3context != 0, "Z3 context is null");
+    checkArgument(z3expr != 0, "Z3 formula is null");
     this.z3expr = z3expr;
     this.z3context = z3context;
 

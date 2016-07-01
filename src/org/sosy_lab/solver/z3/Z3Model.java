@@ -21,6 +21,7 @@ package org.sosy_lab.solver.z3;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.microsoft.z3.Native;
@@ -114,6 +115,12 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Formula key = creator.encapsulateWithTypeOf(var);
 
     long value = Native.modelGetConstInterp(z3context, model, keyDecl);
+    if (value == 0) {
+      throw new VerifyException(
+          "Z3 unexpectedly claims that the value of "
+              + Native.funcDeclToString(z3context, keyDecl)
+              + " does not matter in model.");
+    }
     Native.incRef(z3context, value);
 
     try {
@@ -155,6 +162,12 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
     Native.incRef(z3context, evalDecl);
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
+    if (value == 0) {
+      throw new VerifyException(
+          "Z3 unexpectedly claims that the value of "
+              + Native.funcDeclToString(z3context, evalDecl)
+              + " does not matter in model.");
+    }
     Native.funcInterpIncRef(z3context, interp);
 
     long array = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
@@ -207,6 +220,12 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private Collection<ValueAssignment> getFunctionAssignments(
       long evalDecl, long funcDecl, String functionName) {
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
+    if (interp == 0) {
+      throw new VerifyException(
+          "Z3 unexpectedly claims that the value of "
+              + Native.funcDeclToString(z3context, evalDecl)
+              + " does not matter in model.");
+    }
     Native.funcInterpIncRef(z3context, interp);
 
     List<ValueAssignment> lst = new ArrayList<>();
