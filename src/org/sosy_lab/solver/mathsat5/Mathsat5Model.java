@@ -132,7 +132,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     Collection<ValueAssignment> assignments = new ArrayList<>();
     while (msat_term_is_array_write(creator.getEnv(), array)) {
       long index = msat_term_get_arg(array, 1);
-      ArrayList<Object> innerIndices = Lists.newArrayList(upperIndices);
+      List<Object> innerIndices = Lists.newArrayList(upperIndices);
       innerIndices.add(evaluateImpl(index));
       long content = msat_term_get_arg(array, 2);
       long select = msat_make_array_read(creator.getEnv(), key, index);
