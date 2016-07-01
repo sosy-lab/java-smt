@@ -36,6 +36,7 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_term_is_array_
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.Formula;
@@ -103,7 +104,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
       }
 
       if (msat_is_array_type(creator.getEnv(), msat_term_get_type(value[0]))) {
-        assignments.addAll(getArrayAssignments(key[0], value[0]));
+        assignments.addAll(getArrayAssignments(key[0], key[0], value[0], Collections.emptyList()));
       } else {
         assignments.add(getAssignment(key[0], value[0]));
       }
@@ -126,16 +127,25 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   /** split an array-assignment into several assignments for all positions */
-  private Collection<ValueAssignment> getArrayAssignments(long key, long array) {
+  private Collection<ValueAssignment> getArrayAssignments(
+      long symbol, long key, long array, List<Object> upperIndices) {
     Collection<ValueAssignment> assignments = new ArrayList<>();
     while (msat_term_is_array_write(creator.getEnv(), array)) {
       long index = msat_term_get_arg(array, 1);
+      ArrayList<Object> innerIndices = Lists.newArrayList(upperIndices);
+      innerIndices.add(evaluateImpl(index));
       long content = msat_term_get_arg(array, 2);
-      Formula select =
-          creator.encapsulateWithTypeOf(msat_make_array_read(creator.getEnv(), key, index));
-      assignments.add(
-          new ValueAssignment(
-              select, formulaCreator.getName(key), evaluateImpl(content), Collections.emptyList()));
+      long select = msat_make_array_read(creator.getEnv(), key, index);
+      if (msat_is_array_type(creator.getEnv(), msat_term_get_type(content))) {
+        assignments.addAll(getArrayAssignments(symbol, select, content, innerIndices));
+      } else {
+        assignments.add(
+            new ValueAssignment(
+                creator.encapsulateWithTypeOf(select),
+                formulaCreator.getName(symbol),
+                evaluateImpl(content),
+                innerIndices));
+      }
       array = msat_term_get_arg(array, 0);
     }
     return assignments;
