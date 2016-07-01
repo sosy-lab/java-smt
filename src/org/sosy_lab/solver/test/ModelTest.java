@@ -39,6 +39,7 @@ import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.Model;
@@ -359,6 +360,25 @@ public class ModelTest extends SolverBasedTest0 {
                 + "    (= (select (select (select arr 5) 3) 1) x)"
                 + "    (= x 123)"
                 + "))");
+
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    ArrayFormulaType<
+            IntegerFormula,
+            ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
+        arrType =
+            ArrayFormulaType.getArrayType(
+                IntegerType,
+                ArrayFormulaType.getArrayType(
+                    IntegerType, ArrayFormulaType.getArrayType(IntegerType, IntegerType)));
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.select(
+                amgr.select(amgr.makeArray("arr", arrType), imgr.makeNumber(5)),
+                imgr.makeNumber(3)),
+            imgr.makeNumber(1)),
+        BigInteger.valueOf(123),
+        "arr");
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
