@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.truth.TruthJUnit;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -43,6 +44,7 @@ import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -81,10 +83,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assert amgr != null;
     requireArrays();
     requireQuantifiers();
-    assume()
-        .withFailureMessage("Quantifier support in Princess is currently not complete.")
-        .that(solverUnderTest)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     x = imgr.makeVariable("x");
     a = amgr.makeArray("a", FormulaType.IntegerType, FormulaType.IntegerType);
@@ -93,6 +91,16 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     a_at_x_eq_0 = imgr.equal(amgr.select(a, x), imgr.makeNumber(0));
 
     forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
+  }
+
+  private SolverException handleSolverException(SolverException e) throws SolverException {
+    // The tests in this class use quantifiers and thus solver failures are expected.
+    // We do not ignore all SolverExceptions in order to not hide bugs,
+    // but only for Princess which is known to not be able to solve all tests here.
+    if (solverUnderTest == Solvers.PRINCESS) {
+      TruthJUnit.throwAssumptionError().fail(e.getMessage());
+    }
+    throw e;
   }
 
   @Test
@@ -112,7 +120,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
         bmgr.and(
             qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
             imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
-    assertThatFormula(f).isSatisfiable();
+    try {
+      assertThatFormula(f).isSatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
@@ -125,7 +137,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
                 imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
                 imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
 
-    assertThatFormula(f).isSatisfiable();
+    try {
+      assertThatFormula(f).isSatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
@@ -145,7 +161,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
         bmgr.and(
             bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
             imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
-    assertThatFormula(f).isUnsatisfiable();
+    try {
+      assertThatFormula(f).isUnsatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
@@ -155,7 +175,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
         bmgr.and(
             bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
             imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
-    assertThatFormula(f).isSatisfiable();
+    try {
+      assertThatFormula(f).isSatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
@@ -177,7 +201,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
             bmgr.or(
                 imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
                 imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
-    assertThatFormula(f).isSatisfiable();
+    try {
+      assertThatFormula(f).isSatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
@@ -213,7 +241,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 0) AND  (forall x . b[x] = 0) is SAT
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0), forall_x_a_at_x_eq_0);
-    assertThatFormula(f).isSatisfiable();
+    try {
+      assertThatFormula(f).isSatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
@@ -328,7 +360,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
     final AtomicBoolean isForall = new AtomicBoolean(false);
-    final AtomicInteger numBound = new AtomicInteger(0);
+    final List<Formula> boundVars = new ArrayList<>();
 
     // Test introspection with visitors.
     mgr.visit(
@@ -344,21 +376,31 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
               Quantifier quantifier,
               List<Formula> boundVariables,
               BooleanFormula body) {
+            assertThat(isQuantifier.get()).isFalse();
             isForall.set(quantifier == Quantifier.FORALL);
             isQuantifier.set(true);
-            numBound.set(boundVariables.size());
+            boundVars.addAll(boundVariables);
             return null;
           }
         },
         exists);
     assertThat(isQuantifier.get()).isTrue();
     assertThat(isForall.get()).isFalse();
-    assertThat(numBound.get()).isEqualTo(1);
+
+    assume()
+        .withFailureMessage(
+            "Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+    assertThat(boundVars).hasSize(1);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testEmpty() {
-    assert qmgr != null;
+    assume()
+        .withFailureMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // An empty list of quantified variables throws an exception.
     @SuppressWarnings("unused")
