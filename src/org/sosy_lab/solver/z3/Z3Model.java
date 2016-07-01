@@ -115,12 +115,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Formula key = creator.encapsulateWithTypeOf(var);
 
     long value = Native.modelGetConstInterp(z3context, model, keyDecl);
-    if (value == 0) {
-      throw new VerifyException(
-          "Z3 unexpectedly claims that the value of "
-              + Native.funcDeclToString(z3context, keyDecl)
-              + " does not matter in model.");
-    }
+    checkReturnValue(value, keyDecl);
     Native.incRef(z3context, value);
 
     try {
@@ -162,12 +157,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
     Native.incRef(z3context, evalDecl);
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
-    if (value == 0) {
-      throw new VerifyException(
-          "Z3 unexpectedly claims that the value of "
-              + Native.funcDeclToString(z3context, evalDecl)
-              + " does not matter in model.");
-    }
+    checkReturnValue(value, evalDecl);
     Native.funcInterpIncRef(z3context, interp);
 
     long array = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
@@ -186,6 +176,15 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     Native.funcInterpDecRef(z3context, interp);
     Native.decRef(z3context, evalDecl);
     return lst;
+  }
+
+  private void checkReturnValue(long value, long funcDecl) {
+    if (value == 0) {
+      throw new VerifyException(
+          "Z3 unexpectedly claims that the value of "
+              + Native.funcDeclToString(z3context, funcDecl)
+              + " does not matter in model.");
+    }
   }
 
   /** returns an assignment for one position in the array.
@@ -220,12 +219,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   private Collection<ValueAssignment> getFunctionAssignments(
       long evalDecl, long funcDecl, String functionName) {
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
-    if (interp == 0) {
-      throw new VerifyException(
-          "Z3 unexpectedly claims that the value of "
-              + Native.funcDeclToString(z3context, evalDecl)
-              + " does not matter in model.");
-    }
+    checkReturnValue(interp, evalDecl);
     Native.funcInterpIncRef(z3context, interp);
 
     List<ValueAssignment> lst = new ArrayList<>();
