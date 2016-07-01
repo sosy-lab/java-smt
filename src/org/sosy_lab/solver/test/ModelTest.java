@@ -21,6 +21,7 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -177,6 +178,38 @@ public class ModelTest extends SolverBasedTest0 {
                     "UF",
                     BigInteger.valueOf(2),
                     ImmutableList.of(BigInteger.valueOf(4))));
+      }
+    }
+  }
+
+  @Test
+  public void testQuantifiedUF() throws Exception {
+    requireQuantifiers();
+
+    IntegerFormula var = imgr.makeVariable("var");
+    BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
+    IntegerFormula boundVar = imgr.makeVariable("boundVar");
+    BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(0));
+
+    String func = "func";
+    IntegerFormula funcAtZero = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(0));
+    IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
+
+    BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
+    BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m)
+            .contains(
+                new ValueAssignment(
+                    funcAtZero, func, BigInteger.ONE, ImmutableList.of(BigInteger.ZERO)));
       }
     }
   }
