@@ -20,8 +20,10 @@
 package org.sosy_lab.solver.basicimpl;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
@@ -68,6 +70,8 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Nullable
   @Override
   public final Object evaluate(Formula f) {
+    Preconditions.checkArgument(!(f instanceof ArrayFormula),
+        "cannot compute a simple constant evaluation for an array-formula");
     return evaluateImpl(creator.extractInfo(f));
   }
 
