@@ -496,7 +496,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return BigInteger|Double|Rational.
    */
   public Object convertValue(long value) {
-    assert isConstant(value);
+    assert isConstant(value) : "value is not constant: " + Native.astToString(environment,  value);
     Native.incRef(environment, value);
 
     Object constantValue =
