@@ -283,6 +283,11 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
+  public String toString() {
+    return Native.modelToString(z3context, model);
+  }
+
+  @Override
   public void close() {
     Native.modelDecRef(z3context, model);
   }
