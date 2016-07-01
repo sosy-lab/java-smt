@@ -112,7 +112,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   /** The symbol "!" is part of temporary symbols used for quantified formulas or aliases.
    * This method is only a heuristic, because the user can also create a symbol containing "!". */
   private boolean isInternalSymbol(long funcDecl) {
-    return creator.symbolToString(Native.getDeclName(z3context, funcDecl)).contains("!");
+    return creator.symbolToString(Native.getDeclName(z3context, funcDecl)).matches("^.*![0-9]+$");
   }
 
   /** get ValueAssignments for a constant declaration in the model */
