@@ -24,6 +24,7 @@ import com.google.common.base.Verify;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.Formula;
@@ -98,12 +99,20 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
       long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
       Native.incRef(z3context, funcDecl);
-      String functionName = creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-      out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+      if (!isInternalSymbol(funcDecl)) {
+        String functionName = creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+        out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+      }
       Native.decRef(z3context, funcDecl);
     }
 
     return out.build();
+  }
+
+  /** The symbol "!" is part of temporary symbols used for quantified formulas or aliases.
+   * This method is only a heuristic, because the user can also create a symbol containing "!". */
+  private boolean isInternalSymbol(long funcDecl) {
+    return creator.symbolToString(Native.getDeclName(z3context, funcDecl)).contains("!");
   }
 
   /** get ValueAssignments for a constant declaration in the model */
@@ -129,7 +138,9 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
                 ImmutableList.of()));
 
       } else if (Native.isAsArray(z3context, value)) {
-        return getArrayAssignments(symbol, value);
+        long arrayFormula = Native.mkConst(z3context, symbol, Native.getSort(z3context, value));
+        Native.incRef(z3context, arrayFormula);
+        return getArrayAssignments(symbol, arrayFormula, value, Collections.emptyList());
 
       } else {
         throw new UnsupportedOperationException(
@@ -153,15 +164,14 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
    * However, we create a list of assignments "a[1]=0; a[2]=0; a[5]=0",
    * because we want to have a nice right-hand-side.
    */
-  private Collection<ValueAssignment> getArrayAssignments(long arraySymbol, long value) {
+  private Collection<ValueAssignment> getArrayAssignments(long arraySymbol,
+      long arrayFormula, long value, List<Object> upperIndices) {
     long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
     Native.incRef(z3context, evalDecl);
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
-    checkReturnValue(value, evalDecl);
+    checkReturnValue(interp, evalDecl);
     Native.funcInterpIncRef(z3context, interp);
 
-    long array = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
-    Native.incRef(z3context, array);
     Collection<ValueAssignment> lst = new ArrayList<>();
 
     // get all assignments for the array
@@ -169,7 +179,31 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
     for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
       long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
       Native.funcEntryIncRef(z3context, entry);
-      lst.add(getAssignment(arraySymbol, array, entry));
+      long arrayValue = Native.funcEntryGetValue(z3context, entry);
+      Native.incRef(z3context, arrayValue);
+      int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
+      assert noArgs == 1 : "array modelled as UF is expected to have only one parameter, aka index";
+      long arrayIndex = Native.funcEntryGetArg(z3context, entry, 0);
+      Native.incRef(z3context, arrayIndex);
+      long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
+      Native.incRef(z3context, select);
+
+      List<Object> innerIndices = Lists.newArrayList(upperIndices);
+      innerIndices.add(evaluateImpl(arrayIndex));
+
+      if (creator.isConstant(arrayValue)) {
+        lst.add(
+            new ValueAssignment(
+                creator.encapsulateWithTypeOf(arrayFormula),
+                creator.symbolToString(arraySymbol),
+                creator.convertValue(arrayValue),
+                innerIndices));
+
+      } else if (Native.isAsArray(z3context, value)) {
+        lst.addAll(getArrayAssignments(arraySymbol, arrayFormula, arrayValue, innerIndices));
+      }
+
+      Native.decRef(z3context, arrayIndex);
       Native.funcEntryDecRef(z3context, entry);
     }
 
@@ -185,28 +219,6 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
               + Native.funcDeclToString(z3context, funcDecl)
               + " does not matter in model.");
     }
-  }
-
-  /** returns an assignment for one position in the array.
-   *
-   * @param arraySymbol the name of the array
-   * @param entry where index and value are extracted from */
-  private ValueAssignment getAssignment(long arraySymbol, long array, long entry) {
-    long arrayValue = Native.funcEntryGetValue(z3context, entry);
-    Native.incRef(z3context, arrayValue);
-    int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
-    assert noArgs == 1 : "array modelled as UF is expected to have only one parameter, aka index";
-    long arrayIndex = Native.funcEntryGetArg(z3context, entry, 0);
-    Native.incRef(z3context, arrayIndex);
-
-    long select = Native.mkSelect(z3context, array, arrayIndex);
-    Native.incRef(z3context, select);
-    Native.decRef(z3context, arrayIndex);
-    return new ValueAssignment(
-        creator.encapsulateWithTypeOf(select),
-        creator.symbolToString(arraySymbol),
-        creator.convertValue(arrayValue),
-        Collections.singletonList(creator.convertValue(arrayIndex)));
   }
 
   /**
@@ -232,9 +244,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       Native.incRef(z3context, elseInterp);
       long aliasDecl = Native.getAppDecl(z3context, elseInterp);
       Native.incRef(z3context, aliasDecl);
-      if (creator.symbolToString(Native.getDeclName(z3context, aliasDecl)).contains("!")) {
-        // The symbol "!" is part of temporary symbols used for quantified formulas.
-        // This is only a heuristic, because the user can also create a symbol containing "!".
+      if (isInternalSymbol(aliasDecl)) {
         lst.addAll(getFunctionAssignments(aliasDecl, funcDecl, functionName));
         // TODO Can we guarantee termination of this recursive call?
         //      A chain of aliases should end after several steps.
@@ -248,7 +258,12 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       for (int interpIdx = 0; interpIdx < numInterpretations; interpIdx++) {
         long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
         Native.funcEntryIncRef(z3context, entry);
-        lst.add(getFunctionAssignment(functionName, funcDecl, entry));
+        long entryValue = Native.funcEntryGetValue(z3context, entry);
+        if (creator.isConstant(entryValue)) {
+          lst.add(getFunctionAssignment(functionName, funcDecl, entry, entryValue));
+        } else {
+          // ignore values of complex types, e.g. Arrays
+        }
         Native.funcEntryDecRef(z3context, entry);
       }
     }
@@ -259,8 +274,8 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
 
   /** get a ValueAssignment for an entry (= one evaluation)
    * of an uninterpreted function in the model */
-  private ValueAssignment getFunctionAssignment(String functionName, long funcDecl, long entry) {
-    Object value = creator.convertValue(Native.funcEntryGetValue(z3context, entry));
+  private ValueAssignment getFunctionAssignment(String functionName, long funcDecl, long entry, long entryValue) {
+    Object value = creator.convertValue(entryValue);
     int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
     long[] args = new long[noArgs];
     List<Object> argumentInterpretation = new ArrayList<>();
