@@ -40,22 +40,18 @@ import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Nullable;
-
-class Mathsat5Model extends AbstractModel<Long, Long, Long> {
+class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
-  private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
 
   private Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
     super(creator);
@@ -85,14 +81,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public Iterator<ValueAssignment> iterator() {
-    if (modelAssignments == null) {
-      modelAssignments = generateAssignments();
-    }
-    return modelAssignments.iterator();
-  }
-
-  ImmutableList<ValueAssignment> generateAssignments() {
+  protected ImmutableList<ValueAssignment> modelToList() {
     Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);

@@ -101,7 +101,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     try (Mathsat5Model model = Mathsat5Model.create(creator, curEnv)) {
-      return model.generateAssignments();
+      return model.modelToList();
     }
   }
 

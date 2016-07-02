@@ -28,17 +28,16 @@ import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
 
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-class Z3Model extends AbstractModel<Long, Long, Long> {
+class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
@@ -75,16 +74,7 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public Iterator<ValueAssignment> iterator() {
-    if (assignments == null) {
-
-      // Cache model values.
-      assignments = modelToList();
-    }
-    return assignments.iterator();
-  }
-
-  ImmutableList<ValueAssignment> modelToList() {
+  protected ImmutableList<ValueAssignment> modelToList() {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
