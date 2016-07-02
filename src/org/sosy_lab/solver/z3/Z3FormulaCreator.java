@@ -114,7 +114,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
-    if ("canceled".equals(e.getMessage())) {
+    if ("canceled".equals(e.getMessage())
+        // This occurs on interrupts during interpolation (cf. Z3 commit 654780b)
+        || "interpolation cannot proceed without a model".equals(e.getMessage())) {
       shutdownNotifier.shutdownIfNecessary();
     }
     throw e;
