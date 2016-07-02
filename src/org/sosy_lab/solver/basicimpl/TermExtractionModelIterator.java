@@ -22,6 +22,7 @@ package org.sosy_lab.solver.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Verify;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.UnmodifiableIterator;
 
 import org.sosy_lab.solver.api.Formula;
@@ -44,33 +45,33 @@ public abstract class TermExtractionModelIterator<E> extends UnmodifiableIterato
   private final FormulaCreator<E, ?, ?, ?> creator;
 
   public TermExtractionModelIterator(
-      FormulaCreator<E, ?, ?, ?> creator,
-      Iterable<E> assertedTerms) {
+      FormulaCreator<E, ?, ?, ?> creator, Iterable<E> assertedTerms) {
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
 
     Map<E, Object> values = new HashMap<>();
     for (E t : assertedTerms) {
       for (E key : creator.extractVariablesAndUFs(t, true).values()) {
-        Object value = evaluate(key);
-        if (value == null) {
-          continue;
+        for (Entry<E, Object> assignment : evaluate(key).entrySet()) {
+          if (assignment.getValue() == null) {
+            continue;
+          }
+          Object existingValue = values.get(assignment.getKey());
+          Verify.verify(
+              existingValue == null || assignment.getValue().equals(existingValue),
+              "Duplicate values for model entry %s: %s and %s",
+              assignment.getKey(),
+              existingValue,
+              assignment.getValue());
+          values.put(assignment.getKey(), assignment.getValue());
         }
-        Object existingValue = values.get(key);
-        Verify.verify(
-            existingValue == null || value.equals(existingValue),
-            "Duplicate values for model entry %s: %s and %s",
-            key,
-            existingValue,
-            value);
-        values.put(key, value);
       }
     }
     valuesIterator = values.entrySet().iterator();
   }
 
   /** returns a numeric evaluation for the given key. */
-  public abstract Object evaluate(E key);
+  public abstract Map<E, Object> evaluate(E key);
 
   @Override
   public boolean hasNext() {
@@ -98,7 +99,9 @@ public abstract class TermExtractionModelIterator<E> extends UnmodifiableIterato
 
                 // Populate argument interpretation.
                 for (Formula arg : args) {
-                  varInterpretation.add(evaluate(creator.extractInfo(arg)));
+                  Object evaluation =
+                      Iterables.getOnlyElement(evaluate(creator.extractInfo(arg)).values());
+                  varInterpretation.add(evaluation);
                 }
                 return functionDeclaration.getName();
               }

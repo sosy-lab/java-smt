@@ -33,7 +33,9 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -65,10 +67,11 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
     return new TermExtractionModelIterator<Term>(creator, assertedTerms) {
 
       @Override
-      public Object evaluate(Term key) {
-        return evaluateImpl(key);
+      public Map<Term, Object> evaluate(Term key) {
+        Map<Term, Object> assignments = new HashMap<>();
+        assignments.put(key, evaluateImpl(key));
+        return assignments;
       }
-
     };
   }
 

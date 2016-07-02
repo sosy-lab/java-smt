@@ -33,7 +33,9 @@ import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
 import scala.Option;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -66,10 +68,11 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
     return new TermExtractionModelIterator<IExpression>(creator, assertedTerms) {
 
       @Override
-      public Object evaluate(IExpression key) {
-        return evaluateImpl(key);
+      public Map<IExpression, Object> evaluate(IExpression key) {
+        Map<IExpression, Object> assignments = new HashMap<>();
+        assignments.put(key, evaluateImpl(key));
+        return assignments;
       }
-
     };
   }
 
