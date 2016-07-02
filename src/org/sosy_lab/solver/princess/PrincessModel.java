@@ -63,7 +63,14 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    return new TermExtractionModelIterator<>(creator, this::evaluateImpl, assertedTerms);
+    return new TermExtractionModelIterator<IExpression>(creator, assertedTerms) {
+
+      @Override
+      public Object evaluate(IExpression key) {
+        return evaluateImpl(key);
+      }
+
+    };
   }
 
   @Override

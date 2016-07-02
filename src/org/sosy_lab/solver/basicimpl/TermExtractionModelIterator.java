@@ -35,28 +35,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
 
 /**
  * Helper class for writing model iterators.
  */
-public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAssignment> {
+public abstract class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAssignment> {
   private final Iterator<Entry<E, Object>> valuesIterator;
   private final FormulaCreator<E, ?, ?, ?> creator;
-  private final Function<E, Object> evaluator;
 
   public TermExtractionModelIterator(
       FormulaCreator<E, ?, ?, ?> creator,
-      Function<E, Object> evaluator,
       Iterable<E> assertedTerms) {
     checkNotNull(assertedTerms);
     this.creator = checkNotNull(creator);
-    this.evaluator = checkNotNull(evaluator);
 
     Map<E, Object> values = new HashMap<>();
     for (E t : assertedTerms) {
       for (E key : creator.extractVariablesAndUFs(t, true).values()) {
-        Object value = evaluator.apply(key);
+        Object value = evaluate(key);
         if (value == null) {
           continue;
         }
@@ -72,6 +68,9 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
     }
     valuesIterator = values.entrySet().iterator();
   }
+
+  /** returns a numeric evaluation for the given key. */
+  public abstract Object evaluate(E key);
 
   @Override
   public boolean hasNext() {
@@ -99,7 +98,7 @@ public class TermExtractionModelIterator<E> extends UnmodifiableIterator<ValueAs
 
                 // Populate argument interpretation.
                 for (Formula arg : args) {
-                  varInterpretation.add(evaluator.apply(creator.extractInfo(arg)));
+                  varInterpretation.add(evaluate(creator.extractInfo(arg)));
                 }
                 return functionDeclaration.getName();
               }

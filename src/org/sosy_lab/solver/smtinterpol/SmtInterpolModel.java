@@ -62,7 +62,14 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    return new TermExtractionModelIterator<>(creator, this::evaluateImpl, assertedTerms);
+    return new TermExtractionModelIterator<Term>(creator, assertedTerms) {
+
+      @Override
+      public Object evaluate(Term key) {
+        return evaluateImpl(key);
+      }
+
+    };
   }
 
   @Override
