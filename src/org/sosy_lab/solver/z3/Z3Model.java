@@ -194,13 +194,13 @@ class Z3Model extends AbstractModel<Long, Long, Long> {
       if (creator.isConstant(arrayValue)) {
         lst.add(
             new ValueAssignment(
-                creator.encapsulateWithTypeOf(arrayFormula),
+                creator.encapsulateWithTypeOf(select),
                 creator.symbolToString(arraySymbol),
                 creator.convertValue(arrayValue),
                 innerIndices));
 
-      } else if (Native.isAsArray(z3context, value)) {
-        lst.addAll(getArrayAssignments(arraySymbol, arrayFormula, arrayValue, innerIndices));
+      } else if (Native.isAsArray(z3context, arrayValue)) {
+        lst.addAll(getArrayAssignments(arraySymbol, select, arrayValue, innerIndices));
       }
 
       Native.decRef(z3context, arrayIndex);
