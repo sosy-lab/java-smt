@@ -361,6 +361,18 @@ public class ModelTest extends SolverBasedTest0 {
                 + "    (= x 123)"
                 + "))");
 
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+      }
+    }
+
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
     ArrayFormulaType<
             IntegerFormula,
@@ -379,18 +391,6 @@ public class ModelTest extends SolverBasedTest0 {
             imgr.makeNumber(1)),
         BigInteger.valueOf(123),
         "arr");
-
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(f);
-
-      assertThatEnvironment(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
-          // Check that we can iterate through with no crashes.
-        }
-      }
-    }
   }
 
   @Test
