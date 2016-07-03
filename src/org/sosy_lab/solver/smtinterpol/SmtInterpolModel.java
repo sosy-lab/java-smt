@@ -21,20 +21,24 @@ package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
 
+import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
 import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-import org.sosy_lab.solver.basicimpl.ValueAssignmentExtractor;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -63,18 +67,28 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
 
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
-    ValueAssignmentExtractor<Term> extractor =
-        new ValueAssignmentExtractor<Term>() {
 
-          @Override
-          public Map<Term, Object> evaluate(Term key) {
-            Map<Term, Object> assignments = new HashMap<>();
-            assignments.put(key, evaluateImpl(key));
-            return assignments;
-          }
-        };
+    Set<ValueAssignment> assignments = new LinkedHashSet<>();
 
-    return ImmutableList.copyOf(extractor.getAssignments(creator, assertedTerms));
+    for (Term t : assertedTerms) {
+      for (Entry<String, Term> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
+        assignments.add(getAssignment(entry.getKey(), (ApplicationTerm) entry.getValue()));
+      }
+    }
+
+    return ImmutableList.copyOf(assignments);
+  }
+
+  private ValueAssignment getAssignment(String key, ApplicationTerm term) {
+    Formula fKey = creator.encapsulateWithTypeOf(term);
+    Object fValue = evaluateImpl(term);
+    List<Object> argumentInterpretation = new ArrayList<>();
+
+    for (Term param : term.getParameters()) {
+      argumentInterpretation.add(evaluateImpl(param));
+    }
+
+    return new ValueAssignment(fKey, key, fValue, argumentInterpretation);
   }
 
   @Override
