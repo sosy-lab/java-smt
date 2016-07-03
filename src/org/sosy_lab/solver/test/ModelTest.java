@@ -390,7 +390,8 @@ public class ModelTest extends SolverBasedTest0 {
                 imgr.makeNumber(3)),
             imgr.makeNumber(1)),
         BigInteger.valueOf(123),
-        "arr");
+        "arr",
+        true);
   }
 
   @Test
@@ -426,11 +427,22 @@ public class ModelTest extends SolverBasedTest0 {
             amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)),
             imgr.makeNumber(5)),
         BigInteger.valueOf(123),
-        "arr");
+        "arr",
+        true);
   }
 
   private void testModelGetters(
       BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
+      throws Exception {
+    testModelGetters(constraint, variable, expectedValue, varName, false);
+  }
+
+  private void testModelGetters(
+      BooleanFormula constraint,
+      Formula variable,
+      Object expectedValue,
+      String varName,
+      boolean isArray)
       throws Exception {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -446,10 +458,24 @@ public class ModelTest extends SolverBasedTest0 {
                 .stream()
                 .filter(assignment -> assignment.getName().equals(varName))
                 .collect(Collectors.toList());
-        assertThat(relevantAssignments).hasSize(1);
-        ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
-        assertThat(assignment.getValue()).isEqualTo(expectedValue);
-        assertThat(m.evaluate(assignment.getKey())).isEqualTo(expectedValue);
+        assertThat(relevantAssignments).isNotEmpty();
+
+        if (isArray) {
+          List<ValueAssignment> arrayAssignments =
+              relevantAssignments
+                  .stream()
+                  .filter(assignment -> expectedValue.equals(assignment.getValue()))
+                  .collect(Collectors.toList());
+          assertThat(arrayAssignments)
+              .isNotEmpty(); // at least one assignment should have the wanted value
+
+        } else {
+          // normal variables or UFs have exactly one evaluation assigned to their name
+          assertThat(relevantAssignments).hasSize(1);
+          ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
+          assertThat(assignment.getValue()).isEqualTo(expectedValue);
+          assertThat(m.evaluate(assignment.getKey())).isEqualTo(expectedValue);
+        }
       }
     }
   }
