@@ -26,15 +26,18 @@ import ap.parser.IExpression;
 
 import com.google.common.collect.ImmutableList;
 
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-import org.sosy_lab.solver.basicimpl.ValueAssignmentExtractor;
 
 import scala.Option;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -65,18 +68,35 @@ class PrincessModel
 
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
-    ValueAssignmentExtractor<IExpression> extractor =
-        new ValueAssignmentExtractor<IExpression>() {
 
-          @Override
-          public Map<IExpression, Object> evaluate(IExpression key) {
-            Map<IExpression, Object> assignments = new HashMap<>();
-            assignments.put(key, evaluateImpl(key));
-            return assignments;
-          }
-        };
+    Set<ValueAssignment> assignments = new LinkedHashSet<>();
 
-    return ImmutableList.copyOf(extractor.getAssignments(creator, assertedTerms));
+    for (IExpression t : assertedTerms) {
+      for (Entry<String, IExpression> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
+        ValueAssignment assignment = getAssignment(entry.getKey(), entry.getValue());
+        if (assignment == null) {
+          // for a partial model some assignments are NULL
+        } else {
+          assignments.add(assignment);
+        }
+      }
+    }
+
+    return ImmutableList.copyOf(assignments);
+  }
+
+  private @Nullable ValueAssignment getAssignment(String key, IExpression expr) {
+    Formula fKey = creator.encapsulateWithTypeOf(expr);
+    Object fValue = evaluateImpl(expr);
+    if (fValue == null) {
+      return null; // partial model
+    }
+
+    List<Object> argumentInterpretation = new ArrayList<>();
+    for (int i = 0; i < expr.length(); i++) {
+      argumentInterpretation.add(evaluateImpl(expr.apply(i)));
+    }
+    return new ValueAssignment(fKey, key, fValue, argumentInterpretation);
   }
 
   @Override
