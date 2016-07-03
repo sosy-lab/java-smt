@@ -20,9 +20,11 @@
 package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
+import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
 import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -35,6 +37,7 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -72,11 +75,57 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
 
     for (Term t : assertedTerms) {
       for (Entry<String, Term> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
-        assignments.add(getAssignment(entry.getKey(), (ApplicationTerm) entry.getValue()));
+        if (entry.getValue().getSort().isArraySort()) {
+          assignments.addAll(
+              getArrayAssignment(
+                  entry.getKey(), entry.getValue(), entry.getValue(), Collections.emptyList()));
+        } else {
+          assignments.add(getAssignment(entry.getKey(), (ApplicationTerm) entry.getValue()));
+        }
       }
     }
 
     return ImmutableList.copyOf(assignments);
+  }
+
+  private Collection<ValueAssignment> getArrayAssignment(
+      String symbol, Term key, Term array, List<Object> upperIndices) {
+    assert array.getSort().isArraySort();
+    Collection<ValueAssignment> assignments = new ArrayList<>();
+    Term evaluation = model.evaluate(array);
+
+    // get all assignments for the current array
+    while (evaluation instanceof ApplicationTerm) {
+      ApplicationTerm arrayEval = (ApplicationTerm) evaluation;
+      FunctionSymbol funcDecl = arrayEval.getFunction();
+      Term[] params = arrayEval.getParameters();
+      if (funcDecl.isIntern() && "store".equals(funcDecl.getName())) {
+        Term index = params[1];
+        Term content = params[2];
+
+        List<Object> innerIndices = Lists.newArrayList(upperIndices);
+        innerIndices.add(evaluateImpl(index));
+
+        Term select = creator.getEnv().term("select", key, index);
+        if (content.getSort().isArraySort()) {
+          assignments.addAll(getArrayAssignment(symbol, select, content, innerIndices));
+        } else {
+          assignments.add(
+              new ValueAssignment(
+                  creator.encapsulateWithTypeOf(select),
+                  symbol,
+                  evaluateImpl(content),
+                  innerIndices));
+        }
+
+        evaluation = params[0]; // unwrap recursive for more values
+      } else {
+        // we found the basis of the array
+        break;
+      }
+    }
+
+    return assignments;
   }
 
   private ValueAssignment getAssignment(String key, ApplicationTerm term) {
