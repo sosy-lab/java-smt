@@ -413,6 +413,7 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(relevantAssignments).hasSize(1);
         ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
         assertThat(assignment.getValue()).isEqualTo(expectedValue);
+        assertThat(m.evaluate(assignment.getKey())).isEqualTo(expectedValue);
       }
     }
   }
