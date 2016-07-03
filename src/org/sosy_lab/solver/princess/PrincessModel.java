@@ -26,20 +26,20 @@ import ap.parser.IExpression;
 
 import com.google.common.collect.ImmutableList;
 
-import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
+import org.sosy_lab.solver.basicimpl.ValueAssignmentExtractor;
 
 import scala.Option;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class PrincessModel extends AbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
+class PrincessModel
+    extends CachingAbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
   private final PartialModel model;
   private final ImmutableList<IExpression> assertedTerms;
 
@@ -64,16 +64,19 @@ class PrincessModel extends AbstractModel<IExpression, PrincessTermType, Princes
   }
 
   @Override
-  public Iterator<ValueAssignment> iterator() {
-    return new TermExtractionModelIterator<IExpression>(creator, assertedTerms) {
+  protected ImmutableList<ValueAssignment> modelToList() {
+    ValueAssignmentExtractor<IExpression> extractor =
+        new ValueAssignmentExtractor<IExpression>() {
 
-      @Override
-      public Map<IExpression, Object> evaluate(IExpression key) {
-        Map<IExpression, Object> assignments = new HashMap<>();
-        assignments.put(key, evaluateImpl(key));
-        return assignments;
-      }
-    };
+          @Override
+          public Map<IExpression, Object> evaluate(IExpression key) {
+            Map<IExpression, Object> assignments = new HashMap<>();
+            assignments.put(key, evaluateImpl(key));
+            return assignments;
+          }
+        };
+
+    return ImmutableList.copyOf(extractor.getAssignments(creator, assertedTerms));
   }
 
   @Override

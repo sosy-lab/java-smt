@@ -28,18 +28,17 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 import org.sosy_lab.solver.api.FormulaType;
-import org.sosy_lab.solver.basicimpl.AbstractModel;
+import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
-import org.sosy_lab.solver.basicimpl.TermExtractionModelIterator;
+import org.sosy_lab.solver.basicimpl.ValueAssignmentExtractor;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
-class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
   private final Model model;
   private final ImmutableList<Term> assertedTerms;
@@ -63,16 +62,19 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, SmtInterpolEnvironment>
   }
 
   @Override
-  public Iterator<ValueAssignment> iterator() {
-    return new TermExtractionModelIterator<Term>(creator, assertedTerms) {
+  protected ImmutableList<ValueAssignment> modelToList() {
+    ValueAssignmentExtractor<Term> extractor =
+        new ValueAssignmentExtractor<Term>() {
 
-      @Override
-      public Map<Term, Object> evaluate(Term key) {
-        Map<Term, Object> assignments = new HashMap<>();
-        assignments.put(key, evaluateImpl(key));
-        return assignments;
-      }
-    };
+          @Override
+          public Map<Term, Object> evaluate(Term key) {
+            Map<Term, Object> assignments = new HashMap<>();
+            assignments.put(key, evaluateImpl(key));
+            return assignments;
+          }
+        };
+
+    return ImmutableList.copyOf(extractor.getAssignments(creator, assertedTerms));
   }
 
   @Override
