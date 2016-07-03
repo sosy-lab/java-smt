@@ -95,7 +95,7 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     }
 
     @Override
-    public Iterator<ValueAssignment> iterator() {
+    public final Iterator<ValueAssignment> iterator() {
       if (modelAssignments == null) {
         modelAssignments = modelToList();
       }
