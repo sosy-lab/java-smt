@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
@@ -84,7 +83,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
     return new PrincessModel(stack.getPartialModel(), creator, getAssertedFormulas());
@@ -94,8 +93,8 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (Model model = getModel()) {
-      return ImmutableList.copyOf(model);
+    try (PrincessModel model = getModel()) {
+      return model.modelToList();
     }
   }
 
