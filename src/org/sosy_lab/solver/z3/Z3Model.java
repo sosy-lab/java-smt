@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -41,6 +42,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
+  private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
@@ -102,7 +104,9 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   /** The symbol "!" is part of temporary symbols used for quantified formulas or aliases.
    * This method is only a heuristic, because the user can also create a symbol containing "!". */
   private boolean isInternalSymbol(long funcDecl) {
-    return creator.symbolToString(Native.getDeclName(z3context, funcDecl)).matches("^.*![0-9]+$");
+    return Z3_IRRELEVANT_MODEL_TERM_PATTERN
+        .matcher(creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
+        .matches();
   }
 
   /** get ValueAssignments for a constant declaration in the model */
