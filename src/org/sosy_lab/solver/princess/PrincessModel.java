@@ -25,6 +25,8 @@ import ap.SimpleAPI.PartialModel;
 import ap.parser.IExpression;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
@@ -34,10 +36,8 @@ import scala.Option;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -69,7 +69,7 @@ class PrincessModel
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
 
-    Set<ValueAssignment> assignments = new LinkedHashSet<>();
+    Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (IExpression t : assertedTerms) {
       for (Entry<String, IExpression> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
@@ -82,7 +82,7 @@ class PrincessModel
       }
     }
 
-    return ImmutableList.copyOf(assignments);
+    return assignments.build().asList();
   }
 
   private @Nullable ValueAssignment getAssignment(String key, IExpression expr) {

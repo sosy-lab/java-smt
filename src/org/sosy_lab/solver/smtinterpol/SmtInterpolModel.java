@@ -20,6 +20,8 @@
 package org.sosy_lab.solver.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Lists;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -38,10 +40,8 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -71,7 +71,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
 
-    Set<ValueAssignment> assignments = new LinkedHashSet<>();
+    Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (Term t : assertedTerms) {
       for (Entry<String, Term> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
@@ -85,7 +85,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
       }
     }
 
-    return ImmutableList.copyOf(assignments);
+    return assignments.build().asList();
   }
 
   private Collection<ValueAssignment> getArrayAssignment(
