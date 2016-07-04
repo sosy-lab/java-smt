@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
@@ -84,6 +85,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           .put(Z3_decl_kind.Z3_OP_FPA_NAN.toInt(), Double.NaN)
           .build();
 
+  // Set of error messages that might occur if Z3 is interrupted.
+  private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
+      ImmutableSet.of(
+          "canceled",
+          // These occur on interrupts during interpolation
+          "interpolation cannot proceed without a model", // cf. Z3 commit 654780b
+          "Proof error!");
+
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
 
@@ -114,9 +123,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
-    if ("canceled".equals(e.getMessage())
-        // This occurs on interrupts during interpolation (cf. Z3 commit 654780b)
-        || "interpolation cannot proceed without a model".equals(e.getMessage())) {
+    if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
       shutdownNotifier.shutdownIfNecessary();
     }
     throw e;
