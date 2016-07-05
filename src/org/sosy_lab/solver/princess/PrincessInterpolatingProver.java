@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
@@ -76,7 +77,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) {
+  public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
     Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
 
@@ -96,7 +97,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> pTermNamesOfA) {
+  public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> pTermNamesOfA)
+      throws SolverException {
     Preconditions.checkState(!closed);
 
     // get interpolant of groups

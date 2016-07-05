@@ -50,7 +50,7 @@ interface PrincessStack {
 
   Option<Object> evalPartial(IFormula pFormula);
 
-  List<IFormula> getInterpolants(List<Set<Integer>> partitions);
+  List<IFormula> getInterpolants(List<Set<Integer>> partitions) throws SolverException;
 
   /**
    * Clean the stack, such that it can be re-used.

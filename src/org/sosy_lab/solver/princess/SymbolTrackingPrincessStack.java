@@ -133,6 +133,9 @@ class SymbolTrackingPrincessStack implements PrincessStack {
       return true;
     } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
       return false;
+    } else if (result == SimpleAPI.ProverStatus$.MODULE$.OutOfMemory()) {
+      throw new SolverException(
+          "Princess ran out of stack or heap memory, try increasing their sizes.");
     } else {
       throw new SolverException("Princess' checkSat call returned " + result);
     }
@@ -152,7 +155,7 @@ class SymbolTrackingPrincessStack implements PrincessStack {
    * Each partition contains the indexes of its terms.
    * There will be (n-1) interpolants for n partitions. */
   @Override
-  public List<IFormula> getInterpolants(List<Set<Integer>> partitions) {
+  public List<IFormula> getInterpolants(List<Set<Integer>> partitions) throws SolverException {
 
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
@@ -161,7 +164,16 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     }
 
     // do the hard work
-    final Seq<IFormula> itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
+    final Seq<IFormula> itps;
+    try {
+      itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
+    } catch (StackOverflowError e) {
+      // Princess is recursive and thus produces stack overflows on large formulas.
+      // Princess itself also catches StackOverflowError and returns "OutOfMemory" in checkSat(),
+      // so we can do the same for getInterpolants().
+      throw new SolverException(
+          "Princess ran out of stack memory, try increasing the stack size.", e);
+    }
 
     assert itps.length() == partitions.size() - 1
         : "There should be (n-1) interpolants for n partitions";
