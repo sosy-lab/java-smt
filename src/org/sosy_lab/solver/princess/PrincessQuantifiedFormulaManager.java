@@ -37,13 +37,13 @@ import org.sosy_lab.solver.basicimpl.FormulaCreator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrincessQuantifiedFormulaManager
+class PrincessQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<
         IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessEnvironment env;
 
-  protected PrincessQuantifiedFormulaManager(
+  PrincessQuantifiedFormulaManager(
       FormulaCreator<
               IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
           pCreator) {

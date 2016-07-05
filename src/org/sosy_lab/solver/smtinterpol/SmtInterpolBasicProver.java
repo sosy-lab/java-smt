@@ -42,7 +42,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 
-public abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
+abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
 
   private boolean closed = false;
   private final SmtInterpolEnvironment env;

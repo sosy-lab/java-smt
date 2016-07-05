@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import javax.annotation.Nullable;
 
 @Options(prefix = "solver.z3")
-public final class Z3SolverContext extends AbstractSolverContext {
+final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings */
   @Option(
