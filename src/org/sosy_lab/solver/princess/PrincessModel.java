@@ -114,10 +114,8 @@ class PrincessModel
     while (it1.hasNext()) {
       Tuple2<ModelLocation, ModelValue> entry = it1.next();
       if (entry._1 instanceof ConstantLoc) {
-        ConstantLoc key = (ConstantLoc) entry._1;
-        ModelValue value = entry._2;
-        ITerm maybeArray = ITerm.i((key).c());
-        if (creator.getEnv().hasArrayType(maybeArray) && value instanceof IntValue) {
+        ITerm maybeArray = ITerm.i(((ConstantLoc) entry._1).c());
+        if (creator.getEnv().hasArrayType(maybeArray) && entry._2 instanceof IntValue) {
           arrays.put(((IntValue) entry._2).v(), maybeArray);
         }
       }
