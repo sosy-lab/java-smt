@@ -25,6 +25,7 @@ import static scala.collection.JavaConversions.seqAsJavaList;
 import ap.SimpleAPI;
 import ap.SimpleAPI.ConstantLoc;
 import ap.SimpleAPI.IntFunctionLoc;
+import ap.SimpleAPI.IntValue;
 import ap.SimpleAPI.ModelLocation;
 import ap.SimpleAPI.ModelValue;
 import ap.SimpleAPI.PartialModel;
@@ -49,7 +50,9 @@ import scala.collection.Iterator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -77,19 +80,53 @@ class PrincessModel
 
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
+    scala.collection.Map<ModelLocation, ModelValue> interpretation = model.interpretation();
 
+    // first get the addresses of arrays
+    Map<IdealInt, ITerm> arrays = getArrayAddresses(interpretation);
+
+    // then iterate over the model and generate the assignments
     Builder<ValueAssignment> assignments = ImmutableSet.builder();
-
-    Iterator<Tuple2<ModelLocation, ModelValue>> it = model.interpretation().iterator();
-    while (it.hasNext()) {
-      Tuple2<ModelLocation, ModelValue> entry = it.next();
-      assignments.add(getAssignment(entry._1, entry._2));
+    Iterator<Tuple2<ModelLocation, ModelValue>> it2 = interpretation.iterator();
+    while (it2.hasNext()) {
+      Tuple2<ModelLocation, ModelValue> entry = it2.next();
+      ValueAssignment assignment = getAssignment(entry._1, entry._2, arrays);
+      if (assignment != null) {
+        assignments.add(assignment);
+      }
     }
 
     return assignments.build().asList();
   }
 
-  private @Nullable ValueAssignment getAssignment(ModelLocation key, ModelValue value) {
+  /**
+   * Collect array-models, we need them to replace identifiers later.
+   * Princess models arrays as plain numeric "memory-addresses",
+   * and the model for an array-access at one of the addresses is the array-content.
+   * Example:
+   * "arr[5]=123" is modeled as "{arr=0, select(0,5)=123}" where "0" is the memory-address.
+   * The returned mapping contains the mapping of "0" (=address) to "arr" (=identifier).
+   */
+  private Map<IdealInt, ITerm> getArrayAddresses(
+      scala.collection.Map<ModelLocation, ModelValue> interpretation) {
+    Map<IdealInt, ITerm> arrays = new HashMap<>();
+    Iterator<Tuple2<ModelLocation, ModelValue>> it1 = interpretation.iterator();
+    while (it1.hasNext()) {
+      Tuple2<ModelLocation, ModelValue> entry = it1.next();
+      if (entry._1 instanceof ConstantLoc) {
+        ConstantLoc key = (ConstantLoc) entry._1;
+        ModelValue value = entry._2;
+        ITerm maybeArray = ITerm.i((key).c());
+        if (creator.getEnv().hasArrayType(maybeArray) && value instanceof IntValue) {
+          arrays.put(((IntValue) entry._2).v(), maybeArray);
+        }
+      }
+    }
+    return arrays;
+  }
+
+  private @Nullable ValueAssignment getAssignment(
+      ModelLocation key, ModelValue value, Map<IdealInt, ITerm> arrays) {
     Object fValue = getValue(value);
     if (key instanceof PredicateLoc) {
       Formula fKey =
@@ -98,19 +135,40 @@ class PrincessModel
       return new ValueAssignment(fKey, key.toString(), fValue, Collections.emptyList());
 
     } else if (key instanceof ConstantLoc) {
-      Formula fKey = creator.encapsulateWithTypeOf(IExpression.i(((ConstantLoc) key).c()));
-      return new ValueAssignment(fKey, key.toString(), fValue, Collections.emptyList());
+      ITerm term = ITerm.i(((ConstantLoc) key).c());
+      if (creator.getEnv().hasArrayType(term)) {
+        // array-access, for explanation see #getArrayAddresses
+        return null;
+      } else {
+        return new ValueAssignment(
+            creator.encapsulateWithTypeOf(term), key.toString(), fValue, Collections.emptyList());
+      }
 
     } else if (key instanceof IntFunctionLoc) {
       IntFunctionLoc cKey = (IntFunctionLoc) key;
-      List<Object> argumentInterpretation = new ArrayList<>();
-      List<ITerm> argTerms = new ArrayList<>();
-      for (IdealInt arg : seqAsJavaList(cKey.args())) {
-        argumentInterpretation.add(arg.bigIntValue());
-        argTerms.add(ITerm.i(arg));
+
+      if ("select/2".equals(cKey.f().toString())) {
+        // array-access, for explanation see #getArrayAddresses
+        IdealInt arrayId = cKey.args().apply(0);
+        IdealInt arrayIndex = cKey.args().apply(1);
+        ITerm arrayF = arrays.get(arrayId);
+        Formula select =
+            creator.encapsulateWithTypeOf(creator.getEnv().makeSelect(arrayF, ITerm.i(arrayIndex)));
+        return new ValueAssignment(
+            select, arrayF.toString(), fValue, Collections.singleton(arrayIndex.bigIntValue()));
+
+      } else {
+        // normal variable or UF
+        List<Object> argumentInterpretation = new ArrayList<>();
+        List<ITerm> argTerms = new ArrayList<>();
+        for (IdealInt arg : seqAsJavaList(cKey.args())) {
+          argumentInterpretation.add(arg.bigIntValue());
+          argTerms.add(ITerm.i(arg));
+        }
+        Formula fKey =
+            creator.encapsulateWithTypeOf(new IFunApp(cKey.f(), asScalaBuffer(argTerms)));
+        return new ValueAssignment(fKey, cKey.f().name(), fValue, argumentInterpretation);
       }
-      Formula fKey = creator.encapsulateWithTypeOf(new IFunApp(cKey.f(), asScalaBuffer(argTerms)));
-      return new ValueAssignment(fKey, cKey.f().name(), fValue, argumentInterpretation);
 
     } else {
       throw new AssertionError(
