@@ -12,8 +12,8 @@ import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
-import org.sosy_lab.solver.reusableStack.ReusableStackInterpolatingProver;
-import org.sosy_lab.solver.reusableStack.ReusableStackTheoremProver;
+import org.sosy_lab.solver.basicimpl.reusableStack.ReusableStackInterpolatingProver;
+import org.sosy_lab.solver.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 import java.util.Set;
 

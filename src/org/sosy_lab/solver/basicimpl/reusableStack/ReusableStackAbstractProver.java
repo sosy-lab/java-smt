@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.reusableStack;
+package org.sosy_lab.solver.basicimpl.reusableStack;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
