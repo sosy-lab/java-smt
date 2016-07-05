@@ -19,10 +19,21 @@
  */
 package org.sosy_lab.solver.princess;
 
+import static scala.collection.JavaConversions.asScalaBuffer;
+import static scala.collection.JavaConversions.seqAsJavaList;
+
 import ap.SimpleAPI;
+import ap.SimpleAPI.ConstantLoc;
+import ap.SimpleAPI.IntFunctionLoc;
+import ap.SimpleAPI.ModelLocation;
 import ap.SimpleAPI.ModelValue;
 import ap.SimpleAPI.PartialModel;
+import ap.SimpleAPI.PredicateLoc;
+import ap.basetypes.IdealInt;
+import ap.parser.IAtom;
 import ap.parser.IExpression;
+import ap.parser.IFunApp;
+import ap.parser.ITerm;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -33,11 +44,13 @@ import org.sosy_lab.solver.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import scala.Option;
+import scala.Tuple2;
+import scala.collection.Iterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
@@ -71,32 +84,42 @@ class PrincessModel
 
     Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
-    for (IExpression t : assertedTerms) {
-      for (Entry<String, IExpression> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
-        ValueAssignment assignment = getAssignment(entry.getKey(), entry.getValue());
-        if (assignment == null) {
-          // for a partial model some assignments are NULL
-        } else {
-          assignments.add(assignment);
-        }
-      }
+    Iterator<Tuple2<ModelLocation, ModelValue>> it = model.interpretation().iterator();
+    while (it.hasNext()) {
+      Tuple2<ModelLocation, ModelValue> entry = it.next();
+      assignments.add(getAssignment(entry._1, entry._2));
     }
 
     return assignments.build().asList();
   }
 
-  private @Nullable ValueAssignment getAssignment(String key, IExpression expr) {
-    Formula fKey = creator.encapsulateWithTypeOf(expr);
-    Object fValue = evaluateImpl(expr);
-    if (fValue == null) {
-      return null; // partial model
-    }
+  private @Nullable ValueAssignment getAssignment(ModelLocation key, ModelValue value) {
+    Object fValue = getValue(value);
+    if (key instanceof PredicateLoc) {
+      Formula fKey =
+          creator.encapsulateWithTypeOf(
+              new IAtom(((PredicateLoc) key).p(), asScalaBuffer(Collections.emptyList())));
+      return new ValueAssignment(fKey, key.toString(), fValue, Collections.emptyList());
 
-    List<Object> argumentInterpretation = new ArrayList<>();
-    for (int i = 0; i < expr.length(); i++) {
-      argumentInterpretation.add(evaluateImpl(expr.apply(i)));
+    } else if (key instanceof ConstantLoc) {
+      Formula fKey = creator.encapsulateWithTypeOf(IExpression.i(((ConstantLoc) key).c()));
+      return new ValueAssignment(fKey, key.toString(), fValue, Collections.emptyList());
+
+    } else if (key instanceof IntFunctionLoc) {
+      IntFunctionLoc cKey = (IntFunctionLoc) key;
+      List<Object> argumentInterpretation = new ArrayList<>();
+      List<ITerm> argTerms = new ArrayList<>();
+      for (IdealInt arg : seqAsJavaList(cKey.args())) {
+        argumentInterpretation.add(arg.bigIntValue());
+        argTerms.add(ITerm.i(arg));
+      }
+      Formula fKey = creator.encapsulateWithTypeOf(new IFunApp(cKey.f(), asScalaBuffer(argTerms)));
+      return new ValueAssignment(fKey, cKey.f().name(), fValue, argumentInterpretation);
+
+    } else {
+      throw new AssertionError(
+          String.format("unknown type of key: %s -> %s (%s)", key, value, key.getClass()));
     }
-    return new ValueAssignment(fKey, key, fValue, argumentInterpretation);
   }
 
   @Override
