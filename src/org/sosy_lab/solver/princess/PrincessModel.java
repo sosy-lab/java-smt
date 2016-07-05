@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2016  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,6 @@ import scala.Tuple2;
 import scala.collection.Iterator;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,15 +56,12 @@ import javax.annotation.Nullable;
 class PrincessModel
     extends CachingAbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
   private final PartialModel model;
-  private final ImmutableList<IExpression> assertedTerms;
 
   PrincessModel(
       PartialModel partialModel,
-      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment, ?> creator,
-      Collection<? extends IExpression> assertedTerms) {
+      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment, ?> creator) {
     super(creator);
     this.model = partialModel;
-    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
   }
 
   @Nullable

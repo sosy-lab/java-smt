@@ -86,7 +86,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
-    return new PrincessModel(stack.getPartialModel(), creator, getAssertedFormulas());
+    return new PrincessModel(stack.getPartialModel(), creator);
   }
 
   protected abstract Collection<? extends IExpression> getAssertedFormulas();
