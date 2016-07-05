@@ -418,6 +418,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private FunctionDeclarationKind getDeclarationKind(long f) {
     assert Native.getArity(environment, Native.getAppDecl(environment, f)) > 0
         : "Variables should be handled in other branch.";
+    if (getAppName(f).equals("div0")) {
+      // Z3 segfaults in getDeclKind for this term (cf. https://github.com/Z3Prover/z3/issues/669)
+      return FunctionDeclarationKind.OTHER;
+    }
     Z3_decl_kind decl =
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
     switch (decl) {
