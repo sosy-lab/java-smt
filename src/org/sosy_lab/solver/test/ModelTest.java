@@ -229,15 +229,10 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetModelAssignments() throws Exception {
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y")));
-      assertThatEnvironment(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
-      }
-    }
+    testModelIterator(
+        bmgr.and(
+            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)),
+            imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"))));
   }
 
   @Test
@@ -334,17 +329,7 @@ public class ModelTest extends SolverBasedTest0 {
                 + "        (= |pi@2| |z2@2|)"
                 + "        (not (= (select *unsigned_int@1 |pi@2|) 50))))");
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(f);
-
-      assertThatEnvironment(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
-          // Check that we can iterate through with no crashes.
-        }
-      }
-    }
+    testModelIterator(f);
   }
 
   @Test
@@ -365,18 +350,7 @@ public class ModelTest extends SolverBasedTest0 {
                 + "    (= x 123)"
                 + "))");
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(f);
-
-      assertThatEnvironment(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
-          // Check that we can iterate through with no crashes.
-        }
-      }
-    }
-
+    testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
     ArrayFormulaType<
             IntegerFormula,
@@ -412,18 +386,7 @@ public class ModelTest extends SolverBasedTest0 {
                 + "    (= x 123)"
                 + "))");
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(f);
-
-      assertThatEnvironment(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
-          // Check that we can iterate through with no crashes.
-        }
-      }
-    }
-
+    testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
     testModelGetters(
         f,
@@ -449,18 +412,7 @@ public class ModelTest extends SolverBasedTest0 {
                 + "    (= x 123)"
                 + "))");
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(f);
-
-      assertThatEnvironment(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
-          // Check that we can iterate through with no crashes.
-        }
-      }
-    }
-
+    testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
     testModelGetters(
         f,
@@ -470,6 +422,21 @@ public class ModelTest extends SolverBasedTest0 {
         BigInteger.valueOf(123),
         "arr",
         true);
+  }
+
+  private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+      }
+    }
   }
 
   private void testModelGetters(
