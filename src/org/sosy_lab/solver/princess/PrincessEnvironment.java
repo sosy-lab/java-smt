@@ -222,7 +222,7 @@ class PrincessEnvironment {
     return formula;
   }
 
-  private PrincessTermType convertToTermType(SMTFunctionType type) {
+  private static PrincessTermType convertToTermType(SMTFunctionType type) {
     SMTType resultType = type.result();
     if (resultType.equals(SMTParser2InputAbsy.SMTBool$.MODULE$)) {
       return PrincessTermType.Boolean;
@@ -328,7 +328,7 @@ class PrincessEnvironment {
     };
   }
 
-  private String getName(IExpression var) {
+  private static String getName(IExpression var) {
     if (var instanceof IAtom) {
       return ((IAtom) var).pred().name();
     } else if (var instanceof IConstant) {
@@ -341,7 +341,7 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  private String getType(IExpression var) {
+  private static String getType(IExpression var) {
     if (var instanceof IFormula) {
       return "Bool";
 

@@ -91,6 +91,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   }
 
   protected void addConstraint0(IFormula t) {
+    Preconditions.checkState(!closed);
     api.addAssertion(
         api.abbrevSharedExpressions(
             t, creator.getEnv().princessOptions.getMinAtomsForAbbreviation()));
@@ -108,11 +109,10 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   public void pop() {
     Preconditions.checkState(!closed);
     assertedFormulas.pop();
+    api.pop();
 
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
-    api.pop();
     Level level = trackingStack.pop();
-
     api.addBooleanVariables(iterableAsScalaIterable(level.booleanSymbols));
     api.addConstants(iterableAsScalaIterable(level.intSymbols));
     level.functionSymbols.forEach(api::addFunction);
@@ -163,6 +163,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   /** add external definition: boolean variable. */
   void addSymbol(IFormula f) {
+    Preconditions.checkState(!closed);
     if (!trackingStack.isEmpty()) {
       trackingStack.getLast().booleanSymbols.add(f);
     }
@@ -170,6 +171,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   /** add external definition: integer variable. */
   void addSymbol(ITerm f) {
+    Preconditions.checkState(!closed);
     if (!trackingStack.isEmpty()) {
       trackingStack.getLast().intSymbols.add(f);
     }
@@ -177,6 +179,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   /** add external definition: uninterpreted function. */
   void addSymbol(IFunction f) {
+    Preconditions.checkState(!closed);
     if (!trackingStack.isEmpty()) {
       trackingStack.getLast().functionSymbols.add(f);
     }
