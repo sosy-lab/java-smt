@@ -179,6 +179,8 @@ class PrincessEnvironment {
     registeredProvers.remove(stack);
     if (princessOptions.reuseProvers()) {
       reusableAPIs.add(usedAPI);
+    } else {
+      allAPIs.remove(usedAPI);
     }
   }
 
