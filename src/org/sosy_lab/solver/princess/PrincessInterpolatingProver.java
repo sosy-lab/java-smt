@@ -22,12 +22,14 @@ package org.sosy_lab.solver.princess;
 import static scala.collection.JavaConversions.asScalaSet;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
+import ap.SimpleAPI;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -56,9 +58,10 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
       PrincessFormulaManager pMgr,
       FormulaCreator<
               IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-          creator) {
-
-    super(pMgr, true, creator);
+          creator,
+      SimpleAPI pApi,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pMgr, creator, pApi, pShutdownNotifier);
   }
 
   @Override
@@ -77,12 +80,12 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     IFormula t = (IFormula) mgr.extractInfo(f);
 
     // set partition number and add formula
-    stack.api.setPartitionNumber(termIndex);
+    api.setPartitionNumber(termIndex);
     addConstraint0(t);
 
     // reset partition number to magic number -1,
     // which represents formulae belonging to all partitions.
-    stack.api.setPartitionNumber(-1);
+    api.setPartitionNumber(-1);
 
     assertedFormulas.peek().add(termIndex);
     annotatedTerms.put(termIndex, t);
@@ -123,7 +126,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     // do the hard work
     final Seq<IFormula> itps;
     try {
-      itps = stack.api.getInterpolants(args.toSeq(), stack.api.getInterpolants$default$2());
+      itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
     } catch (StackOverflowError e) {
       // Princess is recursive and thus produces stack overflows on large formulas.
       // Princess itself also catches StackOverflowError and returns "OutOfMemory" in checkSat(),

@@ -95,9 +95,10 @@ class PrincessEnvironment {
    * If a variable is declared, it is declared in the first api,
    * then copied into all registered APIs. Each API has its own stack for formulas. */
   private final SimpleAPI api;
-  private final List<SymbolTrackingPrincessStack> registeredStacks = new ArrayList<>();
-  private final List<SymbolTrackingPrincessStack> reusableStacks = new ArrayList<>();
-  private final Map<SymbolTrackingPrincessStack, Boolean> allStacks = new LinkedHashMap<>();
+  private final List<PrincessAbstractProver<?, ?>> registeredProvers =
+      new ArrayList<>(); // where an API is used
+  private final List<SimpleAPI> reusableAPIs = new ArrayList<>();
+  private final Map<SimpleAPI, Boolean> allAPIs = new LinkedHashMap<>();
 
   final PrincessOptions princessOptions;
 
@@ -115,32 +116,40 @@ class PrincessEnvironment {
 
   /** This method returns a new stack, that is registered in this environment.
    * All variables are shared in all registered stacks. */
-  SymbolTrackingPrincessStack getNewStack(boolean useForInterpolation) {
+  PrincessAbstractProver<?, ?> getNewProver(
+      boolean useForInterpolation, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
+
+    SimpleAPI newApi = null;
+
     // shortcut if we have a reusable stack
-    for (Iterator<SymbolTrackingPrincessStack> it = reusableStacks.iterator(); it.hasNext(); ) {
-      SymbolTrackingPrincessStack stack = it.next();
-      if (allStacks.get(stack) == useForInterpolation) {
-        registeredStacks.add(stack);
+    for (Iterator<SimpleAPI> it = reusableAPIs.iterator(); it.hasNext(); ) {
+      newApi = it.next();
+      if (allAPIs.get(newApi) == useForInterpolation) {
         it.remove();
-        return stack;
+        break;
       }
     }
 
-    // if not we have to create a new one
+    if (newApi == null) {
+      // if not we have to create a new one
+      newApi = getNewApi(useForInterpolation);
 
-    SimpleAPI newApi = getNewApi(useForInterpolation);
-    SymbolTrackingPrincessStack stack =
-        new SymbolTrackingPrincessStack(this, newApi, shutdownNotifier);
+      // add all symbols, that are available until now
+      boolVariablesCache.values().forEach(newApi::addBooleanVariable);
+      intVariablesCache.values().forEach(newApi::addConstant);
+      arrayVariablesCache.values().forEach(newApi::addConstant);
+      functionsCache.values().forEach(newApi::addFunction);
+      allAPIs.put(newApi, useForInterpolation);
+    }
 
-    // add all symbols, that are available until now
-    boolVariablesCache.values().forEach(stack::addSymbol);
-    intVariablesCache.values().forEach(stack::addSymbol);
-    arrayVariablesCache.values().forEach(stack::addSymbol);
-    functionsCache.values().forEach(stack::addSymbol);
-
-    registeredStacks.add(stack);
-    allStacks.put(stack, useForInterpolation);
-    return stack;
+    PrincessAbstractProver<?, ?> prover;
+    if (useForInterpolation) {
+      prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier);
+    } else {
+      prover = new PrincessTheoremProver(mgr, shutdownNotifier, creator, newApi);
+    }
+    registeredProvers.add(prover);
+    return prover;
   }
 
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
@@ -160,19 +169,20 @@ class PrincessEnvironment {
     if (useForInterpolation) {
       newApi.setConstructProofs(true); // needed for interpolation
     }
+
     return newApi;
   }
 
-  void unregisterStack(SymbolTrackingPrincessStack stack) {
-    assert registeredStacks.contains(stack) : "cannot unregister stack, it is not registered";
-    registeredStacks.remove(stack);
-    reusableStacks.add(stack);
+  void unregisterStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {
+    assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
+    registeredProvers.remove(stack);
+    reusableAPIs.add(usedAPI);
   }
 
-  void removeStack(SymbolTrackingPrincessStack stack) {
-    assert registeredStacks.contains(stack) : "cannot remove stack, it is not registered";
-    registeredStacks.remove(stack);
-    allStacks.remove(stack);
+  void removeStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {
+    assert registeredProvers.contains(stack) : "cannot remove stack, it is not registered";
+    registeredProvers.remove(stack);
+    allAPIs.remove(usedAPI);
   }
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
@@ -198,24 +208,15 @@ class PrincessEnvironment {
         } else {
           intVariablesCache.put(var.toString(), (ITerm) var);
         }
-
-        for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-          stack.addSymbol((IConstant) var);
-        }
-
+        addSymbol((IConstant) var);
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
-        for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-          stack.addSymbol((IAtom) var);
-        }
+        addSymbol((IAtom) var);
       } else if (var instanceof IFunApp) {
         IFunction fun = ((IFunApp) var).fun();
         functionsCache.put(fun.name(), fun);
-
         functionsReturnTypes.put(fun, convertToTermType(functionTypes.get(fun)));
-        for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-          stack.addSymbol(fun);
-        }
+        addFunction(fun);
       }
     }
     return formula;
@@ -360,9 +361,7 @@ class PrincessEnvironment {
             return boolVariablesCache.get(varname);
           } else {
             IFormula var = api.createBooleanVariable(varname);
-            for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-              stack.addSymbol(var);
-            }
+            addSymbol(var);
             boolVariablesCache.put(varname, var);
             return var;
           }
@@ -374,9 +373,7 @@ class PrincessEnvironment {
             return intVariablesCache.get(varname);
           } else {
             ITerm var = api.createConstant(varname);
-            for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-              stack.addSymbol(var);
-            }
+            addSymbol(var);
             intVariablesCache.put(varname, var);
             return var;
           }
@@ -387,9 +384,7 @@ class PrincessEnvironment {
             return arrayVariablesCache.get(varname);
           } else {
             ITerm var = api.createConstant(varname);
-            for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-              stack.addSymbol(var);
-            }
+            addSymbol(var);
             arrayVariablesCache.put(varname, var);
             return var;
           }
@@ -409,9 +404,7 @@ class PrincessEnvironment {
 
     } else {
       IFunction funcDecl = api.createFunction(name, nofArgs);
-      for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
-        stack.addSymbol(funcDecl);
-      }
+      addFunction(funcDecl);
       functionsCache.put(name, funcDecl);
       functionsReturnTypes.put(funcDecl, returnType);
       return funcDecl;
@@ -443,5 +436,32 @@ class PrincessEnvironment {
 
   public String getVersion() {
     return "Princess (unknown version)";
+  }
+
+  private void addSymbol(IFormula symbol) {
+    for (SimpleAPI otherAPI : allAPIs.keySet()) {
+      otherAPI.addBooleanVariable(symbol);
+    }
+    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+      prover.addSymbol(symbol);
+    }
+  }
+
+  private void addSymbol(ITerm symbol) {
+    for (SimpleAPI otherAPI : allAPIs.keySet()) {
+      otherAPI.addConstant(symbol);
+    }
+    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+      prover.addSymbol(symbol);
+    }
+  }
+
+  private void addFunction(IFunction funcDecl) {
+    for (SimpleAPI otherAPI : allAPIs.keySet()) {
+      otherAPI.addFunction(funcDecl);
+    }
+    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+      prover.addSymbol(funcDecl);
+    }
   }
 }

@@ -85,14 +85,14 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       throw new UnsupportedOperationException("Princess does not support unsat core generation");
     }
     return new ReusableStackTheoremProver(
-        new PrincessTheoremProver(manager, shutdownNotifier, creator));
+        (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator));
   }
 
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new ReusableStackInterpolatingProver<>(
-        new PrincessInterpolatingProver(manager, creator));
+        (PrincessInterpolatingProver) creator.getEnv().getNewProver(true, manager, creator));
   }
 
   @Override

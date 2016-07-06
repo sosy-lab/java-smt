@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import ap.SimpleAPI;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
@@ -47,14 +46,12 @@ import javax.annotation.Nullable;
 class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     implements ProverEnvironment {
 
-  private final ShutdownNotifier shutdownNotifier;
-
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,
-      PrincessFormulaCreator creator) {
-    super(pMgr, false, creator);
-    this.shutdownNotifier = checkNotNull(pShutdownNotifier);
+      PrincessFormulaCreator creator,
+      SimpleAPI pApi) {
+    super(pMgr, creator, pApi, pShutdownNotifier);
   }
 
   @Override
@@ -83,14 +80,14 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
       importantFormulas.add((IFormula) mgr.extractInfo(impF));
     }
 
-    stack.push();
+    api.push();
     while (!isUnsat()) {
       shutdownNotifier.shutdownIfNecessary();
 
       IFormula newFormula = new IBoolLit(true); // neutral element for AND
       List<BooleanFormula> wrappedPartialModel = new ArrayList<>(important.size());
       for (final IFormula f : importantFormulas) {
-        final Option<Object> value = stack.api.evalPartial(f);
+        final Option<Object> value = api.evalPartial(f);
         if (value.isDefined()) {
           final boolean isTrueValue = (boolean) value.get();
           final IFormula newElement = isTrueValue ? f : new INot(f);
@@ -105,7 +102,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
       addConstraint0(new INot(newFormula));
     }
     shutdownNotifier.shutdownIfNecessary();
-    stack.pop();
+    api.pop();
 
     return callback.getResult();
   }
