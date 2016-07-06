@@ -39,7 +39,7 @@ import java.util.List;
 
 abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E> {
 
-  protected final PrincessStack stack;
+  protected final SymbolTrackingPrincessStack stack;
   protected final PrincessFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
 

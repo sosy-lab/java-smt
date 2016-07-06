@@ -53,7 +53,7 @@ import java.util.Set;
  * (boolean or integer variables, uninterpreted functions),
  * because in SMTLIB symbols would be deleted after a pop-operation.
  * We track symbols in our own stack and recreate them after the pop-operation. */
-class SymbolTrackingPrincessStack implements PrincessStack {
+class SymbolTrackingPrincessStack {
 
   /** the wrapped api */
   private final PrincessEnvironment env;
@@ -82,14 +82,12 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     return usableForInterpolation;
   }
 
-  @Override
   public void push() {
     api.push();
     trackingStack.push(new Level());
   }
 
   /** This function pops levels from the assertion-stack. */
-  @Override
   public void pop() {
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
     api.pop();
@@ -104,7 +102,6 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   }
 
   /** This function adds the term on top of the stack. */
-  @Override
   public void assertTerm(IFormula booleanFormula) {
     api.addAssertion(
         api.abbrevSharedExpressions(booleanFormula, princessOptions.getMinAtomsForAbbreviation()));
@@ -112,7 +109,6 @@ class SymbolTrackingPrincessStack implements PrincessStack {
 
   /** This function sets a partition number for all the term,
    *  that are asserted  after calling this method, until a new partition number is set. */
-  @Override
   public void assertTermInPartition(IFormula booleanFormula, int index) {
     // set partition number and add formula
     api.setPartitionNumber(index);
@@ -126,7 +122,6 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   /** This function causes the SatSolver to check all the terms on the stack,
    * if their conjunction is SAT or UNSAT.
    */
-  @Override
   public boolean checkSat() throws SolverException {
     final Value result = api.checkSat(true);
     if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
@@ -141,12 +136,10 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     }
   }
 
-  @Override
   public SimpleAPI.PartialModel getPartialModel() {
     return api.partialModel();
   }
 
-  @Override
   public Option<Object> evalPartial(IFormula formula) {
     return api.evalPartial(formula);
   }
@@ -154,7 +147,6 @@ class SymbolTrackingPrincessStack implements PrincessStack {
   /** This function returns a list of interpolants for the partitions.
    * Each partition contains the indexes of its terms.
    * There will be (n-1) interpolants for n partitions. */
-  @Override
   public List<IFormula> getInterpolants(List<Set<Integer>> partitions) throws SolverException {
 
     // convert to needed data-structure
@@ -183,7 +175,12 @@ class SymbolTrackingPrincessStack implements PrincessStack {
     return seqAsJavaList(itps);
   }
 
-  @Override
+  /**
+   * Clean the stack, such that it can be re-used.
+   * The caller has to guarantee, that a stack not used by several provers
+   * after calling {@link #close()}, because there is a dependency
+   * from 'one' prover to 'one' (reusable) stack.
+   */
   public void close() {
     // if a timeout is reached we do not want to do possibly long lasting
     // pop operations (with copying variables to lower tiers of the stack)

@@ -114,7 +114,7 @@ class PrincessEnvironment {
 
   /** This method returns a new stack, that is registered in this environment.
    * All variables are shared in all registered stacks. */
-  PrincessStack getNewStack(boolean useForInterpolation) {
+  SymbolTrackingPrincessStack getNewStack(boolean useForInterpolation) {
     // shortcut if we have a reusable stack
     for (Iterator<SymbolTrackingPrincessStack> it = reusableStacks.iterator(); it.hasNext(); ) {
       SymbolTrackingPrincessStack stack = it.next();
