@@ -104,7 +104,8 @@ class PrincessModel
    * Princess models arrays as plain numeric "memory-addresses",
    * and the model for an array-access at one of the addresses is the array-content.
    * Example:
-   * "arr[5]=123" is modeled as "{arr=0, select(0,5)=123}" where "0" is the memory-address.
+   * "arr[5]=123" is modeled as "{arr=0, select(0,5)=123}" or "{arr=0, store(0,5,123)=0}",
+   * where "0" is the memory-address.
    * The returned mapping contains the mapping of "0" (=address) to "arr" (=identifier).
    */
   private Map<IdealInt, ITerm> getArrayAddresses(
@@ -154,6 +155,24 @@ class PrincessModel
             creator.encapsulateWithTypeOf(creator.getEnv().makeSelect(arrayF, ITerm.i(arrayIndex)));
         return new ValueAssignment(
             select, arrayF.toString(), fValue, Collections.singleton(arrayIndex.bigIntValue()));
+
+      } else if ("store/3".equals(cKey.f().toString())) {
+        // array-access, for explanation see #getArrayAddresses
+        IdealInt arrayId = cKey.args().apply(0);
+
+        // we expect "store(0,5,123)=0" where "0" is the arrayId
+        assert arrayId.bigIntValue().equals(fValue);
+
+        IdealInt arrayIndex = cKey.args().apply(1);
+        IdealInt arrayContent = cKey.args().apply(2);
+        ITerm arrayF = arrays.get(arrayId);
+        Formula select =
+            creator.encapsulateWithTypeOf(creator.getEnv().makeSelect(arrayF, ITerm.i(arrayIndex)));
+        return new ValueAssignment(
+            select,
+            arrayF.toString(),
+            arrayContent.bigIntValue(),
+            Collections.singleton(arrayIndex.bigIntValue()));
 
       } else {
         // normal variable or UF

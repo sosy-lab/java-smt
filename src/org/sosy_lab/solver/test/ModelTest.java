@@ -435,6 +435,43 @@ public class ModelTest extends SolverBasedTest0 {
         true);
   }
 
+  @Test
+  public void testGetArrays5() throws Exception {
+    requireArrays();
+
+    // create formula for "arr[5]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arr () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select (store arr 6 x) 5) x)"
+                + "    (= x 123)"
+                + "))");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+      }
+    }
+
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)),
+            imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "arr",
+        true);
+  }
+
   private void testModelGetters(
       BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
       throws Exception {
