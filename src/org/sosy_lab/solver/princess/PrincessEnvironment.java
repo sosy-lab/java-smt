@@ -114,22 +114,23 @@ class PrincessEnvironment {
     princessOptions = pOptions;
   }
 
-  /** This method returns a new stack, that is registered in this environment.
-   * All variables are shared in all registered stacks. */
+  /** This method returns a new prover, that is registered in this environment.
+   * All variables are shared in all registered APIs. */
   PrincessAbstractProver<?, ?> getNewProver(
       boolean useForInterpolation, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
 
     SimpleAPI newApi = null;
 
-    // shortcut if we have a reusable stack
-    for (Iterator<SimpleAPI> it = reusableAPIs.iterator(); it.hasNext(); ) {
-      newApi = it.next();
-      if (allAPIs.get(newApi) == useForInterpolation) {
-        it.remove();
-        break;
+    if (princessOptions.reuseProvers()) {
+      // shortcut if we have a reusable stack
+      for (Iterator<SimpleAPI> it = reusableAPIs.iterator(); it.hasNext(); ) {
+        newApi = it.next();
+        if (allAPIs.get(newApi) == useForInterpolation) {
+          it.remove();
+          break;
+        }
       }
     }
-
     if (newApi == null) {
       // if not we have to create a new one
       newApi = getNewApi(useForInterpolation);
@@ -176,7 +177,9 @@ class PrincessEnvironment {
   void unregisterStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {
     assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
     registeredProvers.remove(stack);
-    reusableAPIs.add(usedAPI);
+    if (princessOptions.reuseProvers()) {
+      reusableAPIs.add(usedAPI);
+    }
   }
 
   void removeStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {

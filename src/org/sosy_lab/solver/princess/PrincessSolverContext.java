@@ -31,6 +31,15 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     )
     private int minAtomsForAbbreviation = 100;
 
+    @Option(
+      secure = true,
+      description =
+          "Princess needs to copy all symbols for each new prover. "
+              + "This flag allows to reuse old unused provers and avoid the overhead."
+    )
+    // TODO someone should measure the overhead, perhaps it is negligible.
+    private boolean reuseProvers = true;
+
     PrincessOptions(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
     }
@@ -38,18 +47,17 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     public int getMinAtomsForAbbreviation() {
       return minAtomsForAbbreviation;
     }
+
+    boolean reuseProvers() {
+      return reuseProvers;
+    }
   }
 
-  private final ShutdownNotifier shutdownNotifier;
   private final PrincessFormulaManager manager;
   private final PrincessFormulaCreator creator;
 
-  private PrincessSolverContext(
-      ShutdownNotifier shutdownNotifier,
-      PrincessFormulaManager manager,
-      PrincessFormulaCreator creator) {
+  private PrincessSolverContext(PrincessFormulaManager manager, PrincessFormulaCreator creator) {
     super(manager);
-    this.shutdownNotifier = shutdownNotifier;
     this.manager = manager;
     this.creator = creator;
   }
@@ -74,7 +82,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, arrayTheory, quantifierTheory);
-    return new PrincessSolverContext(pShutdownNotifier, manager, creator);
+    return new PrincessSolverContext(manager, creator);
   }
 
   @SuppressWarnings("resource")
