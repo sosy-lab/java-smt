@@ -84,7 +84,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     }
 
     stack.push();
-    while (stack.checkSat()) {
+    while (!isUnsat()) {
       shutdownNotifier.shutdownIfNecessary();
 
       IFormula newFormula = new IBoolLit(true); // neutral element for AND

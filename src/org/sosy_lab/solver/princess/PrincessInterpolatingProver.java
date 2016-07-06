@@ -90,10 +90,10 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
             .collect(Collectors.toSet());
 
     // get interpolant of groups
-    List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
+    List<BooleanFormula> itp = getSeqInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
     assert itp.size() == 1; // 2 groups -> 1 interpolant
 
-    return mgr.encapsulateBooleanFormula(itp.get(0));
+    return itp.get(0);
   }
 
   @Override
