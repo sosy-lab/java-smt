@@ -58,6 +58,9 @@ import java.util.stream.Collectors;
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
 
+  private final static List<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
+
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -236,11 +239,46 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testEmptyStackModel() throws Exception {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThatEnvironment(prover).isSatisfiable();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
+        assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          // partial model should not return an evaluation
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
+        } else {
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testNonExistantSymbol() throws Exception {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeBoolean(true));
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          // partial model should not return an evaluation
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
+        } else {
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+        }
+      }
+    }
+  }
+
+  @Test
   public void testPartialModels() throws Exception {
     assume()
         .withFailureMessage("As of now, only Z3 and Princess support partial models")
         .that(solver)
-        .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
+        .isIn(SOLVERS_WITH_PARTIAL_MODEL);
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       prover.push(imgr.equal(x, x));
@@ -396,6 +434,33 @@ public class ModelTest extends SolverBasedTest0 {
         BigInteger.valueOf(123),
         "arr",
         true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetArrays4invalid() throws Exception {
+    requireArrays();
+
+    // create formula for "arr[5]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arr () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select arr 5) x)"
+                + "    (= x 123)"
+                + "))");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        @SuppressWarnings("unused")
+        Object evaluation =
+            m.evaluate(
+                amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)));
+      }
+    }
   }
 
   @Test
