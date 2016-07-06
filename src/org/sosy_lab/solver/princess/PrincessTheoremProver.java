@@ -63,7 +63,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     Preconditions.checkState(!closed);
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
     assertedFormulas.peek().add(t);
-    stack.assertTerm(t);
+    addConstraint0(t);
     return null;
   }
 
@@ -90,7 +90,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
       IFormula newFormula = new IBoolLit(true); // neutral element for AND
       List<BooleanFormula> wrappedPartialModel = new ArrayList<>(important.size());
       for (final IFormula f : importantFormulas) {
-        final Option<Object> value = stack.evalPartial(f);
+        final Option<Object> value = stack.api.evalPartial(f);
         if (value.isDefined()) {
           final boolean isTrueValue = (boolean) value.get();
           final IFormula newElement = isTrueValue ? f : new INot(f);
@@ -102,7 +102,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
       callback.apply(wrappedPartialModel);
 
       // add negation of current formula to get a new model in next iteration
-      stack.assertTerm(new INot(newFormula));
+      addConstraint0(new INot(newFormula));
     }
     shutdownNotifier.shutdownIfNecessary();
     stack.pop();

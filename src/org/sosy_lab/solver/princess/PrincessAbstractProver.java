@@ -21,7 +21,9 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import ap.SimpleAPI;
 import ap.parser.IExpression;
+import ap.parser.IFormula;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -30,6 +32,8 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+
+import scala.Enumeration.Value;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -65,7 +69,23 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
-    return !stack.checkSat();
+    final Value result = stack.api.checkSat(true);
+    if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
+      return false;
+    } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
+      return true;
+    } else if (result == SimpleAPI.ProverStatus$.MODULE$.OutOfMemory()) {
+      throw new SolverException(
+          "Princess ran out of stack or heap memory, try increasing their sizes.");
+    } else {
+      throw new SolverException("Princess' checkSat call returned " + result);
+    }
+  }
+
+  protected void addConstraint0(IFormula t) {
+    stack.api.addAssertion(
+        stack.api.abbrevSharedExpressions(
+            t, creator.getEnv().princessOptions.getMinAtomsForAbbreviation()));
   }
 
   @Override
@@ -86,7 +106,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
-    return new PrincessModel(stack.getPartialModel(), creator);
+    return new PrincessModel(stack.api.partialModel(), creator);
   }
 
   protected abstract Collection<? extends IExpression> getAssertedFormulas();

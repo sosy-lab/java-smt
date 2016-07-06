@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.solver.princess;
 
-import static scala.collection.JavaConversions.asScalaSet;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
-import static scala.collection.JavaConversions.seqAsJavaList;
 
 import ap.SimpleAPI;
 import ap.parser.IFormula;
@@ -29,19 +27,11 @@ import ap.parser.IFunction;
 import ap.parser.ITerm;
 
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.solver.SolverException;
-import org.sosy_lab.solver.princess.PrincessSolverContext.PrincessOptions;
-
-import scala.Enumeration.Value;
-import scala.Option;
-import scala.collection.Seq;
-import scala.collection.mutable.ArrayBuffer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Set;
 
 /** This is a Wrapper around some parts of the PrincessAPI.
  * It allows to have a stack with operations like:
@@ -57,22 +47,17 @@ class SymbolTrackingPrincessStack {
 
   /** the wrapped api */
   private final PrincessEnvironment env;
-  private final SimpleAPI api;
+  final SimpleAPI api;
   private final ShutdownNotifier shutdownNotifier;
-  private final PrincessOptions princessOptions;
 
   /** data-structures for tracking symbols */
   private final Deque<Level> trackingStack = new ArrayDeque<>();
 
   SymbolTrackingPrincessStack(
-      final PrincessEnvironment env,
-      final SimpleAPI api,
-      ShutdownNotifier shutdownNotifier,
-      PrincessOptions princessOptions) {
+      final PrincessEnvironment env, final SimpleAPI api, ShutdownNotifier shutdownNotifier) {
     this.env = env;
     this.api = api;
     this.shutdownNotifier = shutdownNotifier;
-    this.princessOptions = princessOptions;
   }
 
   public void push() {
@@ -92,80 +77,6 @@ class SymbolTrackingPrincessStack {
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().mergeWithHigher(level);
     }
-  }
-
-  /** This function adds the term on top of the stack. */
-  public void assertTerm(IFormula booleanFormula) {
-    api.addAssertion(
-        api.abbrevSharedExpressions(booleanFormula, princessOptions.getMinAtomsForAbbreviation()));
-  }
-
-  /** This function sets a partition number for all the term,
-   *  that are asserted  after calling this method, until a new partition number is set. */
-  public void assertTermInPartition(IFormula booleanFormula, int index) {
-    // set partition number and add formula
-    api.setPartitionNumber(index);
-    assertTerm(booleanFormula);
-
-    // reset partition number to magic number -1,
-    // which represents formulae belonging to all partitions.
-    api.setPartitionNumber(-1);
-  }
-
-  /** This function causes the SatSolver to check all the terms on the stack,
-   * if their conjunction is SAT or UNSAT.
-   */
-  public boolean checkSat() throws SolverException {
-    final Value result = api.checkSat(true);
-    if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
-      return true;
-    } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
-      return false;
-    } else if (result == SimpleAPI.ProverStatus$.MODULE$.OutOfMemory()) {
-      throw new SolverException(
-          "Princess ran out of stack or heap memory, try increasing their sizes.");
-    } else {
-      throw new SolverException("Princess' checkSat call returned " + result);
-    }
-  }
-
-  public SimpleAPI.PartialModel getPartialModel() {
-    return api.partialModel();
-  }
-
-  public Option<Object> evalPartial(IFormula formula) {
-    return api.evalPartial(formula);
-  }
-
-  /** This function returns a list of interpolants for the partitions.
-   * Each partition contains the indexes of its terms.
-   * There will be (n-1) interpolants for n partitions. */
-  public List<IFormula> getInterpolants(List<Set<Integer>> partitions) throws SolverException {
-
-    // convert to needed data-structure
-    final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
-    for (Set<Integer> partition : partitions) {
-      args.$plus$eq(asScalaSet(partition).toSet());
-    }
-
-    // do the hard work
-    final Seq<IFormula> itps;
-    try {
-      itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
-    } catch (StackOverflowError e) {
-      // Princess is recursive and thus produces stack overflows on large formulas.
-      // Princess itself also catches StackOverflowError and returns "OutOfMemory" in checkSat(),
-      // so we can do the same for getInterpolants().
-      throw new SolverException(
-          "Princess ran out of stack memory, try increasing the stack size.", e);
-    }
-
-    assert itps.length() == partitions.size() - 1
-        : "There should be (n-1) interpolants for n partitions";
-
-    // convert data-structure back
-    // TODO check that interpolants do not contain abbreviations we did not introduce ourselves
-    return seqAsJavaList(itps);
   }
 
   /**

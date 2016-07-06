@@ -99,7 +99,7 @@ class PrincessEnvironment {
   private final List<SymbolTrackingPrincessStack> reusableStacks = new ArrayList<>();
   private final Map<SymbolTrackingPrincessStack, Boolean> allStacks = new LinkedHashMap<>();
 
-  private final PrincessOptions princessOptions;
+  final PrincessOptions princessOptions;
 
   PrincessEnvironment(
       @Nullable final PathCounterTemplate pBasicLogfile,
@@ -130,8 +130,7 @@ class PrincessEnvironment {
 
     SimpleAPI newApi = getNewApi(useForInterpolation);
     SymbolTrackingPrincessStack stack =
-        new SymbolTrackingPrincessStack(
-            this, newApi, shutdownNotifier, princessOptions);
+        new SymbolTrackingPrincessStack(this, newApi, shutdownNotifier);
 
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(stack::addSymbol);
