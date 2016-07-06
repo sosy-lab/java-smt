@@ -58,7 +58,6 @@ class SymbolTrackingPrincessStack {
   /** the wrapped api */
   private final PrincessEnvironment env;
   private final SimpleAPI api;
-  private final boolean usableForInterpolation;
   private final ShutdownNotifier shutdownNotifier;
   private final PrincessOptions princessOptions;
 
@@ -68,18 +67,12 @@ class SymbolTrackingPrincessStack {
   SymbolTrackingPrincessStack(
       final PrincessEnvironment env,
       final SimpleAPI api,
-      boolean usableForInterpolation,
       ShutdownNotifier shutdownNotifier,
       PrincessOptions princessOptions) {
     this.env = env;
     this.api = api;
-    this.usableForInterpolation = usableForInterpolation;
     this.shutdownNotifier = shutdownNotifier;
     this.princessOptions = princessOptions;
-  }
-
-  public boolean canBeUsedForInterpolation() {
-    return usableForInterpolation;
   }
 
   public void push() {

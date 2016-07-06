@@ -64,6 +64,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -96,7 +97,7 @@ class PrincessEnvironment {
   private final SimpleAPI api;
   private final List<SymbolTrackingPrincessStack> registeredStacks = new ArrayList<>();
   private final List<SymbolTrackingPrincessStack> reusableStacks = new ArrayList<>();
-  private final List<SymbolTrackingPrincessStack> allStacks = new ArrayList<>();
+  private final Map<SymbolTrackingPrincessStack, Boolean> allStacks = new LinkedHashMap<>();
 
   private final PrincessOptions princessOptions;
 
@@ -118,7 +119,7 @@ class PrincessEnvironment {
     // shortcut if we have a reusable stack
     for (Iterator<SymbolTrackingPrincessStack> it = reusableStacks.iterator(); it.hasNext(); ) {
       SymbolTrackingPrincessStack stack = it.next();
-      if (stack.canBeUsedForInterpolation() == useForInterpolation) {
+      if (allStacks.get(stack) == useForInterpolation) {
         registeredStacks.add(stack);
         it.remove();
         return stack;
@@ -130,7 +131,7 @@ class PrincessEnvironment {
     SimpleAPI newApi = getNewApi(useForInterpolation);
     SymbolTrackingPrincessStack stack =
         new SymbolTrackingPrincessStack(
-            this, newApi, useForInterpolation, shutdownNotifier, princessOptions);
+            this, newApi, shutdownNotifier, princessOptions);
 
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(stack::addSymbol);
@@ -139,7 +140,7 @@ class PrincessEnvironment {
     functionsCache.values().forEach(stack::addSymbol);
 
     registeredStacks.add(stack);
-    allStacks.add(stack);
+    allStacks.put(stack, useForInterpolation);
     return stack;
   }
 
@@ -199,13 +200,13 @@ class PrincessEnvironment {
           intVariablesCache.put(var.toString(), (ITerm) var);
         }
 
-        for (SymbolTrackingPrincessStack stack : allStacks) {
+        for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
           stack.addSymbol((IConstant) var);
         }
 
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
-        for (SymbolTrackingPrincessStack stack : allStacks) {
+        for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
           stack.addSymbol((IAtom) var);
         }
       } else if (var instanceof IFunApp) {
@@ -213,7 +214,7 @@ class PrincessEnvironment {
         functionsCache.put(fun.name(), fun);
 
         functionsReturnTypes.put(fun, convertToTermType(functionTypes.get(fun)));
-        for (SymbolTrackingPrincessStack stack : allStacks) {
+        for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
           stack.addSymbol(fun);
         }
       }
@@ -360,7 +361,7 @@ class PrincessEnvironment {
             return boolVariablesCache.get(varname);
           } else {
             IFormula var = api.createBooleanVariable(varname);
-            for (SymbolTrackingPrincessStack stack : allStacks) {
+            for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
               stack.addSymbol(var);
             }
             boolVariablesCache.put(varname, var);
@@ -374,7 +375,7 @@ class PrincessEnvironment {
             return intVariablesCache.get(varname);
           } else {
             ITerm var = api.createConstant(varname);
-            for (SymbolTrackingPrincessStack stack : allStacks) {
+            for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
               stack.addSymbol(var);
             }
             intVariablesCache.put(varname, var);
@@ -387,7 +388,7 @@ class PrincessEnvironment {
             return arrayVariablesCache.get(varname);
           } else {
             ITerm var = api.createConstant(varname);
-            for (SymbolTrackingPrincessStack stack : allStacks) {
+            for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
               stack.addSymbol(var);
             }
             arrayVariablesCache.put(varname, var);
@@ -409,7 +410,7 @@ class PrincessEnvironment {
 
     } else {
       IFunction funcDecl = api.createFunction(name, nofArgs);
-      for (SymbolTrackingPrincessStack stack : allStacks) {
+      for (SymbolTrackingPrincessStack stack : allStacks.keySet()) {
         stack.addSymbol(funcDecl);
       }
       functionsCache.put(name, funcDecl);
