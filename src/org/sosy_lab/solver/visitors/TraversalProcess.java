@@ -70,7 +70,7 @@ public class TraversalProcess {
     return new TraversalProcess(TraversalType.CUSTOM_TYPE, ImmutableSet.of(pToTraverse));
   }
 
-  private enum TraversalType {
+  public enum TraversalType {
     CONTINUE_TYPE,
     SKIP_TYPE,
     ABORT_TYPE,
@@ -83,6 +83,10 @@ public class TraversalProcess {
   private TraversalProcess(TraversalType pType, ImmutableSet<? extends Formula> pToTraverse) {
     type = pType;
     toTraverse = pToTraverse;
+  }
+
+  public TraversalType getType() {
+    return type;
   }
 
   public boolean contains(Formula f) {

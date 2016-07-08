@@ -20,7 +20,6 @@
 
 package org.sosy_lab.solver.test;
 
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
@@ -34,7 +33,6 @@ import java.util.stream.IntStream;
 class IntegerTheoryFuzzer {
 
   private final IntegerFormulaManager ifmgr;
-  private final UniqueIdGenerator idGenerator;
   private IntegerFormula[] vars = new IntegerFormula[0];
   private final Random r;
   private static final String varNameTemplate = "VAR_";
@@ -46,7 +44,6 @@ class IntegerTheoryFuzzer {
       Random pR) {
     ifmgr = fmgr.getIntegerFormulaManager();
     r = pR;
-    idGenerator = new UniqueIdGenerator();
   }
 
   public IntegerFormula fuzz(int formulaSize, int maxConstant) {
@@ -97,7 +94,7 @@ class IntegerTheoryFuzzer {
   }
 
   private IntegerFormula getConstant() {
-    return ifmgr.makeNumber(r.nextInt(maxConstant));
+    return ifmgr.makeNumber(r.nextInt(2 * maxConstant) - maxConstant);
   }
 
   private IntegerFormula getVar() {

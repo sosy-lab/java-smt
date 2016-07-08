@@ -29,6 +29,7 @@ import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
+import org.sosy_lab.solver.visitors.TraversalProcess.TraversalType;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -58,7 +59,13 @@ final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProce
   }
 
   private void addToQueueIfNecessary(TraversalProcess result, List<? extends Formula> pOperands) {
-    pOperands.stream().filter(result::contains).forEach(this::addToQueue);
+    if (result == TraversalProcess.CONTINUE) {
+      for (Formula f : pOperands) {
+        addToQueue(f);
+      }
+    } else if (result.getType() == TraversalType.CUSTOM_TYPE) {
+      pOperands.stream().filter(result::contains).forEach(this::addToQueue);
+    }
   }
 
   Formula pop() {
