@@ -24,7 +24,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import com.google.common.truth.TruthJUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -144,10 +143,11 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void testBooleanFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
-
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-
-    assert qmgr != null;
+    // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
+    assume()
+        .withFailureMessage("Princess does not support quantifier over boolean variables")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -277,8 +277,12 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void testTransformationInsideQuantifiers() throws Exception {
     requireQuantifiers();
-    TruthJUnit.assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    assert qmgr != null;
+    // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
+    assume()
+        .withFailureMessage("Princess does not support quantifier over boolean variables")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     List<BooleanFormula> usedVars =
         ImmutableList.of("a", "b", "c", "d", "e", "f")
             .stream()

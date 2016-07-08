@@ -28,13 +28,13 @@ import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
-public class PrincessArrayFormulaManager
+class PrincessArrayFormulaManager
     extends AbstractArrayFormulaManager<
         IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessEnvironment env;
 
-  public PrincessArrayFormulaManager(
+  PrincessArrayFormulaManager(
       FormulaCreator<
               IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
           pFormulaCreator) {

@@ -19,16 +19,25 @@
  */
 package org.sosy_lab.solver.princess;
 
+import static scala.collection.JavaConversions.asScalaSet;
+import static scala.collection.JavaConversions.seqAsJavaList;
+
+import ap.SimpleAPI;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
+
+import scala.collection.Seq;
+import scala.collection.mutable.ArrayBuffer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,9 +58,10 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
       PrincessFormulaManager pMgr,
       FormulaCreator<
               IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-          creator) {
-
-    super(pMgr, true, creator);
+          creator,
+      SimpleAPI pApi,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pMgr, creator, pApi, pShutdownNotifier);
   }
 
   @Override
@@ -68,7 +78,14 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     Preconditions.checkState(!closed);
     int termIndex = counter.getFreshId();
     IFormula t = (IFormula) mgr.extractInfo(f);
-    stack.assertTermInPartition(t, termIndex);
+
+    // set partition number and add formula
+    api.setPartitionNumber(termIndex);
+    addConstraint0(t);
+
+    // reset partition number to magic number -1,
+    // which represents formulae belonging to all partitions.
+    api.setPartitionNumber(-1);
 
     assertedFormulas.peek().add(termIndex);
     annotatedTerms.put(termIndex, t);
@@ -76,7 +93,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) {
+  public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
     Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
 
@@ -89,21 +106,42 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
             .collect(Collectors.toSet());
 
     // get interpolant of groups
-    List<IFormula> itp = stack.getInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
+    List<BooleanFormula> itp = getSeqInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
     assert itp.size() == 1; // 2 groups -> 1 interpolant
 
-    return mgr.encapsulateBooleanFormula(itp.get(0));
+    return itp.get(0);
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> pTermNamesOfA) {
+  public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> partitions)
+      throws SolverException {
     Preconditions.checkState(!closed);
 
-    // get interpolant of groups
-    final List<IFormula> itps = stack.getInterpolants(pTermNamesOfA);
+    // convert to needed data-structure
+    final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
+    for (Set<Integer> partition : partitions) {
+      args.$plus$eq(asScalaSet(partition).toSet());
+    }
 
+    // do the hard work
+    final Seq<IFormula> itps;
+    try {
+      itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
+    } catch (StackOverflowError e) {
+      // Princess is recursive and thus produces stack overflows on large formulas.
+      // Princess itself also catches StackOverflowError and returns "OutOfMemory" in checkSat(),
+      // so we can do the same for getInterpolants().
+      throw new SolverException(
+          "Princess ran out of stack memory, try increasing the stack size.", e);
+    }
+
+    assert itps.length() == partitions.size() - 1
+        : "There should be (n-1) interpolants for n partitions";
+
+    // convert data-structure back
+    // TODO check that interpolants do not contain abbreviations we did not introduce ourselves
     final List<BooleanFormula> result = new ArrayList<>();
-    for (final IFormula itp : itps) {
+    for (final IFormula itp : seqAsJavaList(itps)) {
       result.add(mgr.encapsulateBooleanFormula(itp));
     }
     return result;

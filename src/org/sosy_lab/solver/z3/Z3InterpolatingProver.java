@@ -27,24 +27,42 @@ import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 
+import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+
+import javax.annotation.Nullable;
 
 class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     implements InterpolatingProverEnvironment<Long> {
 
+  private final LogManager logger;
+
+  private final @Nullable PathCounterTemplate dumpFailedInterpolationQueries;
   private final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
 
-  Z3InterpolatingProver(Z3FormulaCreator creator, long z3params) {
+  Z3InterpolatingProver(
+      Z3FormulaCreator creator,
+      long z3params,
+      LogManager pLogger,
+      @Nullable PathCounterTemplate pDumpFailedInterpolationQueries) {
     super(creator, z3params);
+    logger = pLogger;
+    dumpFailedInterpolationQueries = pDumpFailedInterpolationQueries;
 
     // add basic level, needed for addConstraints(f) without previous push()
     assertedFormulas.push(new ArrayList<>());
@@ -179,6 +197,19 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
               root, // last element is end of chain (root of tree), pattern := interpolation tree
               Native.mkParams(z3context));
     } catch (Z3Exception e) {
+      if (dumpFailedInterpolationQueries != null && !creator.shutdownNotifier.shouldShutdown()) {
+        try (Writer dumpFile =
+            MoreFiles.openOutputFile(
+                dumpFailedInterpolationQueries.getFreshPath(), StandardCharsets.UTF_8)) {
+          dumpFile.write(Native.solverToString(z3context, z3solver));
+          dumpFile.write("\n(compute-interpolant ");
+          dumpFile.write(Native.astToString(z3context, root));
+          dumpFile.write(")\n");
+        } catch (IOException e2) {
+          logger.logUserException(
+              Level.WARNING, e2, "Could not dump failed interpolation query to file");
+        }
+      }
       if ("theory not supported by interpolation or bad proof".equals(e.getMessage())) {
         throw new SolverException(e.getMessage(), e);
       }

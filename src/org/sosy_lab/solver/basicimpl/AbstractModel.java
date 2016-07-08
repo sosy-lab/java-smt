@@ -20,8 +20,11 @@
 package org.sosy_lab.solver.basicimpl;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
@@ -30,6 +33,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.NumeralFormula.RationalFormula;
 
 import java.math.BigInteger;
+import java.util.Iterator;
 
 import javax.annotation.Nullable;
 
@@ -68,6 +72,9 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Nullable
   @Override
   public final Object evaluate(Formula f) {
+    Preconditions.checkArgument(
+        !(f instanceof ArrayFormula),
+        "cannot compute a simple constant evaluation for an array-formula");
     return evaluateImpl(creator.extractInfo(f));
   }
 
@@ -76,5 +83,25 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Override
   public String toString() {
     return Joiner.on('\n').join(iterator());
+  }
+
+  public static abstract class CachingAbstractModel<TFormulaInfo, TType, TEnv>
+      extends AbstractModel<TFormulaInfo, TType, TEnv> {
+
+    private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
+
+    protected CachingAbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> pCreator) {
+      super(pCreator);
+    }
+
+    @Override
+    public final Iterator<ValueAssignment> iterator() {
+      if (modelAssignments == null) {
+        modelAssignments = modelToList();
+      }
+      return modelAssignments.iterator();
+    }
+
+    protected abstract ImmutableList<ValueAssignment> modelToList();
   }
 }

@@ -49,7 +49,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * @return Either of:
    *    - Number (Rational/Double/BigInteger/Long/Integer)
    *    - Boolean
-   *    - String (for types we do not handle)
+   * @throws IllegalArgumentException if a formula has unexpected type, e.g Array.
    */
   @Nullable
   Object evaluate(Formula f);
@@ -101,9 +101,18 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   void close();
 
   final class ValueAssignment {
+
+    /** the key should be of simple formula-type (Boolean/Integer/Rational/BitVector). */
     private final Formula key;
+
+    /** the key should be boolean or numeral (Rational/Double/BigInteger/Long/Integer). */
     private final Object value;
+
+    /** arguments can have any type.
+     * We would prefer numerals (like value), but we also allow Formulas. */
     private final ImmutableList<Object> argumentsInterpretation;
+
+    /** The name should be a 'useful' identifier for the current assignment, without parameters. */
     private final String name;
 
     public ValueAssignment(

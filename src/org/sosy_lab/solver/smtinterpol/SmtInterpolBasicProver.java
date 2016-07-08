@@ -33,7 +33,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
@@ -43,7 +42,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 
-public abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
+abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
 
   private boolean closed = false;
   private final SmtInterpolEnvironment env;
@@ -84,15 +83,15 @@ public abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnviro
   }
 
   @Override
-  public Model getModel() {
+  public SmtInterpolModel getModel() {
     Preconditions.checkState(!closed);
     return new SmtInterpolModel(env.getModel(), creator, getAssertedTerms());
   }
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (Model model = getModel()) {
-      return ImmutableList.copyOf(model);
+    try (SmtInterpolModel model = getModel()) {
+      return model.modelToList();
     }
   }
 

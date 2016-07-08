@@ -12,8 +12,8 @@ import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
-import org.sosy_lab.solver.reusableStack.ReusableStackInterpolatingProver;
-import org.sosy_lab.solver.reusableStack.ReusableStackTheoremProver;
+import org.sosy_lab.solver.basicimpl.reusableStack.ReusableStackInterpolatingProver;
+import org.sosy_lab.solver.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 import java.util.Set;
 
@@ -31,6 +31,15 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     )
     private int minAtomsForAbbreviation = 100;
 
+    @Option(
+      secure = true,
+      description =
+          "Princess needs to copy all symbols for each new prover. "
+              + "This flag allows to reuse old unused provers and avoid the overhead."
+    )
+    // TODO someone should measure the overhead, perhaps it is negligible.
+    private boolean reuseProvers = true;
+
     PrincessOptions(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
     }
@@ -38,18 +47,17 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     public int getMinAtomsForAbbreviation() {
       return minAtomsForAbbreviation;
     }
+
+    boolean reuseProvers() {
+      return reuseProvers;
+    }
   }
 
-  private final ShutdownNotifier shutdownNotifier;
   private final PrincessFormulaManager manager;
   private final PrincessFormulaCreator creator;
 
-  private PrincessSolverContext(
-      ShutdownNotifier shutdownNotifier,
-      PrincessFormulaManager manager,
-      PrincessFormulaCreator creator) {
+  private PrincessSolverContext(PrincessFormulaManager manager, PrincessFormulaCreator creator) {
     super(manager);
-    this.shutdownNotifier = shutdownNotifier;
     this.manager = manager;
     this.creator = creator;
   }
@@ -74,7 +82,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, arrayTheory, quantifierTheory);
-    return new PrincessSolverContext(pShutdownNotifier, manager, creator);
+    return new PrincessSolverContext(manager, creator);
   }
 
   @SuppressWarnings("resource")
@@ -85,14 +93,14 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       throw new UnsupportedOperationException("Princess does not support unsat core generation");
     }
     return new ReusableStackTheoremProver(
-        new PrincessTheoremProver(manager, shutdownNotifier, creator));
+        (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator));
   }
 
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
     return new ReusableStackInterpolatingProver<>(
-        new PrincessInterpolatingProver(manager, creator));
+        (PrincessInterpolatingProver) creator.getEnv().getNewProver(true, manager, creator));
   }
 
   @Override

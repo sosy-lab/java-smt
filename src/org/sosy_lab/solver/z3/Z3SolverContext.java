@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import javax.annotation.Nullable;
 
 @Options(prefix = "solver.z3")
-public final class Z3SolverContext extends AbstractSolverContext {
+final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings */
   @Option(
@@ -46,6 +46,14 @@ public final class Z3SolverContext extends AbstractSolverContext {
     values = {"lex", "pareto", "box"}
   )
   String objectivePrioritizationMode = "box";
+
+  @Option(
+    secure = true,
+    description = "Dump failed interpolation queries to this file in SMTLIB2 format"
+  )
+  @FileOption(Type.OUTPUT_FILE)
+  private @Nullable PathCounterTemplate dumpFailedInterpolationQueries =
+      PathCounterTemplate.ofFormatString("z3-failed-interpolation-query.%d.smt2");
 
   private final ShutdownRequestListener interruptListener;
   private final long z3params;
@@ -201,7 +209,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new Z3InterpolatingProver(creator, z3params);
+    return new Z3InterpolatingProver(creator, z3params, logger, dumpFailedInterpolationQueries);
   }
 
   @Override

@@ -21,6 +21,7 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -38,6 +39,7 @@ import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaType;
+import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.Model;
@@ -55,6 +57,9 @@ import java.util.stream.Collectors;
  */
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
+
+  private final static List<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -182,6 +187,38 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testQuantifiedUF() throws Exception {
+    requireQuantifiers();
+
+    IntegerFormula var = imgr.makeVariable("var");
+    BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
+    IntegerFormula boundVar = imgr.makeVariable("boundVar");
+    BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(0));
+
+    String func = "func";
+    IntegerFormula funcAtZero = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(0));
+    IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
+
+    BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
+    BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m)
+            .contains(
+                new ValueAssignment(
+                    funcAtZero, func, BigInteger.ONE, ImmutableList.of(BigInteger.ZERO)));
+      }
+    }
+  }
+
+  @Test
   public void testGetBitvectors() throws Exception {
     requireBitvectors();
     assert bvmgr != null;
@@ -195,13 +232,43 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetModelAssignments() throws Exception {
+    testModelIterator(
+        bmgr.and(
+            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)),
+            imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"))));
+  }
+
+  @Test
+  public void testEmptyStackModel() throws Exception {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y")));
+      assertThatEnvironment(prover).isSatisfiable();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
+        assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          // partial model should not return an evaluation
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
+        } else {
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testNonExistantSymbol() throws Exception {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeBoolean(true));
       assertThatEnvironment(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+        if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          // partial model should not return an evaluation
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
+        } else {
+          assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+        }
       }
     }
   }
@@ -211,7 +278,7 @@ public class ModelTest extends SolverBasedTest0 {
     assume()
         .withFailureMessage("As of now, only Z3 and Princess support partial models")
         .that(solver)
-        .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
+        .isIn(SOLVERS_WITH_PARTIAL_MODEL);
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       prover.push(imgr.equal(x, x));
@@ -278,8 +345,177 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
+  @Test
+  public void testGetArrays2() throws Exception {
+    requireArrays();
+
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun |pi@2| () Int)\n"
+                + "(declare-fun *unsigned_int@1 () (Array Int Int))\n"
+                + "(declare-fun |z2@2| () Int)\n"
+                + "(declare-fun |z1@2| () Int)\n"
+                + "(declare-fun |t@2| () Int)\n"
+                + "(declare-fun |__ADDRESS_OF_t| () Int)\n"
+                + "(declare-fun *char@1 () (Array Int Int))\n"
+                + "(assert"
+                + "    (and (= |t@2| 50)"
+                + "        (not (<= |__ADDRESS_OF_t| 0))"
+                + "        (= |z1@2| |__ADDRESS_OF_t|)"
+                + "        (= (select *char@1 |__ADDRESS_OF_t|) |t@2|)"
+                + "        (= |z2@2| |z1@2|)"
+                + "        (= |pi@2| |z2@2|)"
+                + "        (not (= (select *unsigned_int@1 |pi@2|) 50))))");
+
+    testModelIterator(f);
+  }
+
+  @Test
+  public void testGetArrays3() throws Exception {
+    requireArrays();
+    assume()
+        .withFailureMessage("As of now, only Princess does not support multi-dimensional arrays")
+        .that(solver)
+        .isNotSameAs(Solvers.PRINCESS);
+
+    // create formula for "arr[5][3][1]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arr () (Array Int (Array Int (Array Int Int))))\n"
+                + "(assert (and"
+                + "    (= (select (select (select arr 5) 3) 1) x)"
+                + "    (= x 123)"
+                + "))");
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    ArrayFormulaType<
+            IntegerFormula,
+            ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
+        arrType =
+            ArrayFormulaType.getArrayType(
+                IntegerType,
+                ArrayFormulaType.getArrayType(
+                    IntegerType, ArrayFormulaType.getArrayType(IntegerType, IntegerType)));
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.select(
+                amgr.select(amgr.makeArray("arr", arrType), imgr.makeNumber(5)),
+                imgr.makeNumber(3)),
+            imgr.makeNumber(1)),
+        BigInteger.valueOf(123),
+        "arr",
+        true);
+  }
+
+  @Test
+  public void testGetArrays4() throws Exception {
+    requireArrays();
+
+    // create formula for "arr[5]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arr () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select arr 5) x)"
+                + "    (= x 123)"
+                + "))");
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)),
+            imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "arr",
+        true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetArrays4invalid() throws Exception {
+    requireArrays();
+
+    // create formula for "arr[5]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arr () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select arr 5) x)"
+                + "    (= x 123)"
+                + "))");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        @SuppressWarnings("unused")
+        Object evaluation =
+            m.evaluate(
+                amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)));
+      }
+    }
+  }
+
+  @Test
+  public void testGetArrays5() throws Exception {
+    requireArrays();
+
+    // create formula for "arr[5]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arr () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select (store arr 6 x) 5) x)"
+                + "    (= x 123)"
+                + "))");
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)),
+            imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "arr",
+        true);
+  }
+
+  private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+
+      assertThatEnvironment(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+      }
+    }
+  }
+
   private void testModelGetters(
       BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
+      throws Exception {
+    testModelGetters(constraint, variable, expectedValue, varName, false);
+  }
+
+  private void testModelGetters(
+      BooleanFormula constraint,
+      Formula variable,
+      Object expectedValue,
+      String varName,
+      boolean isArray)
       throws Exception {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -295,9 +531,24 @@ public class ModelTest extends SolverBasedTest0 {
                 .stream()
                 .filter(assignment -> assignment.getName().equals(varName))
                 .collect(Collectors.toList());
-        assertThat(relevantAssignments).hasSize(1);
-        ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
-        assertThat(assignment.getValue()).isEqualTo(expectedValue);
+        assertThat(relevantAssignments).isNotEmpty();
+
+        if (isArray) {
+          List<ValueAssignment> arrayAssignments =
+              relevantAssignments
+                  .stream()
+                  .filter(assignment -> expectedValue.equals(assignment.getValue()))
+                  .collect(Collectors.toList());
+          assertThat(arrayAssignments)
+              .isNotEmpty(); // at least one assignment should have the wanted value
+
+        } else {
+          // normal variables or UFs have exactly one evaluation assigned to their name
+          assertThat(relevantAssignments).hasSize(1);
+          ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
+          assertThat(assignment.getValue()).isEqualTo(expectedValue);
+          assertThat(m.evaluate(assignment.getKey())).isEqualTo(expectedValue);
+        }
       }
     }
   }
