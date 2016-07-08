@@ -46,11 +46,11 @@ class IntegerTheoryFuzzer {
     r = pR;
   }
 
-  public IntegerFormula fuzz(int formulaSize, int maxConstant) {
+  public IntegerFormula fuzz(int formulaSize, int pMaxConstant) {
     IntegerFormula[] args  = IntStream.range(0, formulaSize).mapToObj(
         i -> ifmgr.makeVariable(varNameTemplate + i)
     ).toArray(IntegerFormula[]::new);
-    return fuzz(formulaSize, maxConstant, args);
+    return fuzz(formulaSize, pMaxConstant, args);
   }
 
   public IntegerFormula fuzz(int formulaSize, int pMaxConstant, IntegerFormula... pVars) {
@@ -77,7 +77,7 @@ class IntegerTheoryFuzzer {
       pFormulaSize -= 1;
 
       // Pivot \in [1, formulaSize - 1]
-      int pivot = 1 + r.nextInt(pFormulaSize-1);
+      int pivot = 1 + r.nextInt(pFormulaSize - 1);
       switch (r.nextInt(3)) {
         case 0:
           return ifmgr.add(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
