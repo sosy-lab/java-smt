@@ -645,4 +645,16 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       }
     }
   }
+
+  /**
+   * Closing the context.
+   */
+  public void forceClose() {
+    cleanupReferences();
+
+    // Force clean all ASTs, even those which were not GC'd yet.
+    for (long ast : referenceMap.values()) {
+      Native.decRef(getEnv(), ast);
+    }
+  }
 }

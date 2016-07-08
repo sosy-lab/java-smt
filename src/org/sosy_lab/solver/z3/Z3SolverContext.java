@@ -230,6 +230,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     long context = creator.getEnv();
+    creator.forceClose();
     Native.paramsDecRef(context, z3params);
     Native.closeLog();
     Native.delContext(context);
