@@ -35,7 +35,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.basicimpl.Fuzzer;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 
 import java.util.Random;
