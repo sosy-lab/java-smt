@@ -40,7 +40,7 @@ class Fuzzer {
 
   private static final String varNameTemplate = "VAR_";
 
-  public Fuzzer(FormulaManager pFmgr, Random pRandom) {
+  Fuzzer(FormulaManager pFmgr, Random pRandom) {
     bfmgr = pFmgr.getBooleanFormulaManager();
     idGenerator = new UniqueIdGenerator();
     r = pRandom;
