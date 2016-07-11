@@ -147,7 +147,7 @@ public interface BooleanFormulaManager {
 
   /** Visit the formula with the given visitor. */
   @CanIgnoreReturnValue
-  <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula formula);
+  <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor);
 
   /**
    * Visit the formula recursively with a given {@link BooleanFormulaVisitor}.
@@ -158,7 +158,7 @@ public interface BooleanFormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
-  void visitRecursively(BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor, BooleanFormula f);
+  void visitRecursively(BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link BooleanFormulaVisitor}.
@@ -170,8 +170,7 @@ public interface BooleanFormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
-  BooleanFormula transformRecursively(
-      BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f);
+  BooleanFormula transformRecursively(BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor);
 
   /**
    * Return a set of formulas such that a conjunction over them

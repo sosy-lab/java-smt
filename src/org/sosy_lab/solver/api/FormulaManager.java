@@ -169,7 +169,7 @@ public interface FormulaManager {
    * Visit the formula with a given visitor.
    */
   @CanIgnoreReturnValue
-  <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f);
+  <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}.
@@ -180,7 +180,7 @@ public interface FormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
-  void visitRecursively(FormulaVisitor<TraversalProcess> rFormulaVisitor, Formula f);
+  void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}.
@@ -193,7 +193,7 @@ public interface FormulaManager {
    *
    * @param pFormulaVisitor Transformation described by the user.
    */
-  <T extends Formula> T transformRecursively(FormulaTransformationVisitor pFormulaVisitor, T f);
+  <T extends Formula> T transformRecursively(T f, FormulaTransformationVisitor pFormulaVisitor);
 
   /**
    * Extract the names of all free variables and UFs in a formula.

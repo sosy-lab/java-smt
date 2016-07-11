@@ -221,7 +221,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
 
   @CanIgnoreReturnValue
-  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
+  public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
     return visit(visitor, input, extractInfo(input));
   }
 
@@ -248,7 +248,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       Formula tt = recVisitor.pop();
       if (shouldProcess == alwaysTrue || shouldProcess.test(tt)) {
 
-        TraversalProcess process = visit(recVisitor, tt);
+        TraversalProcess process = visit(tt, recVisitor);
         if (process == TraversalProcess.ABORT) {
           return;
         }
@@ -280,7 +280,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       }
 
       if (shouldProcess.test(tt)) {
-        visit(recVisitor, tt);
+        visit(tt, recVisitor);
       } else {
         pCache.put(tt, tt);
       }

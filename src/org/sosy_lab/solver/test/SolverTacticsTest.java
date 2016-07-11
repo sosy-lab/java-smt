@@ -66,7 +66,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula nnf = mgr.applyTactic(not_a_b, Tactic.NNF);
     assertThatFormula(nnf).isEquivalentTo(not_a_b);
     NNFChecker checker = new NNFChecker(mgr);
-    bmgr.visit(checker, nnf);
+    bmgr.visit(nnf, checker);
     assertThat(checker.isInNNF()).isTrue();
   }
 
@@ -164,7 +164,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     Void visit(BooleanFormula f) {
       // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
-      return bfmgr.visit(this, f);
+      return bfmgr.visit(f, this);
     }
 
     public boolean isInCNF() {
@@ -276,7 +276,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     Void visit(BooleanFormula f) {
       // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
-      return bfmgr.visit(this, f);
+      return bfmgr.visit(f, this);
     }
 
     public boolean isInNNF() {

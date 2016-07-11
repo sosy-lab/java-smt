@@ -331,7 +331,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     final AtomicInteger numBound = new AtomicInteger(0);
 
     // Test introspection with visitors.
-    mgr.visit(
+    mgr.visit(forall,
         new DefaultFormulaVisitor<Void>() {
           @Override
           protected Void visitDefault(Formula f) {
@@ -349,8 +349,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
             numBound.set(boundVariables.size());
             return null;
           }
-        },
-        forall);
+        });
   }
 
   @Test
@@ -363,7 +362,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     final List<Formula> boundVars = new ArrayList<>();
 
     // Test introspection with visitors.
-    mgr.visit(
+    mgr.visit(exists,
         new DefaultFormulaVisitor<Void>() {
           @Override
           protected Void visitDefault(Formula f) {
@@ -382,8 +381,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
             boundVars.addAll(boundVariables);
             return null;
           }
-        },
-        exists);
+        });
     assertThat(isQuantifier.get()).isTrue();
     assertThat(isForall.get()).isFalse();
 

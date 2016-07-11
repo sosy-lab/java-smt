@@ -74,7 +74,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     // remove assumption variables from the rawInterpolant if necessary
     if (!solverAssumptionsAsFormula.isEmpty()) {
       interpolant =
-          bmgr.transformRecursively(new RemoveAssumptionsFromFormulaVisitor(), interpolant);
+          bmgr.transformRecursively(interpolant, new RemoveAssumptionsFromFormulaVisitor());
     }
 
     return interpolant;

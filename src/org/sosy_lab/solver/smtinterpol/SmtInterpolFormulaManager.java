@@ -152,8 +152,8 @@ class SmtInterpolFormulaManager
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> rFormulaVisitor, Formula f) {
-    return getFormulaCreator().visit(rFormulaVisitor, f);
+  public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
+    return getFormulaCreator().visit(f, rFormulaVisitor);
   }
 
   /** This method returns a 'shared' environment or

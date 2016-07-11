@@ -85,7 +85,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
           new BooleanFormulaTransformationVisitor(mgr) {
             // we need a subclass, because the original class is 'abstract'
           };
-      assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
+      assertThatFormula(bmgr.visit(bf, identityVisitor)).isEqualTo(bf);
     }
   }
 
@@ -104,7 +104,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
       BooleanFormulaVisitor<BooleanFormula> identityVisitor =
           new BooleanFormulaTransformationVisitor(mgr) {};
       BooleanFormula bf = imgr.equal(n12, f);
-      assertThatFormula(bmgr.visit(identityVisitor, bf)).isEqualTo(bf);
+      assertThatFormula(bmgr.visit(bf, identityVisitor)).isEqualTo(bf);
     }
   }
 
@@ -136,7 +136,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             return TraversalProcess.CONTINUE;
           }
         };
-    mgr.visitRecursively(nameExtractor, f);
+    mgr.visitRecursively(f, nameExtractor);
     assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
   }
 
@@ -153,7 +153,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
-        bmgr.visit(new BooleanFormulaTransformationVisitor(mgr) {}, constraint);
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
     assertThatFormula(newConstraint).isUnsatisfiable();
   }
 
@@ -163,7 +163,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     // Check that "true" is correctly treated as a constant.
     BooleanFormula t = bmgr.makeBoolean(true);
     final List<Boolean> containsTrue = new ArrayList<>();
-    mgr.visitRecursively(
+    mgr.visitRecursively(t,
         new DefaultFormulaVisitor<TraversalProcess>() {
           @Override
           protected TraversalProcess visitDefault(Formula f) {
@@ -177,8 +177,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             }
             return TraversalProcess.CONTINUE;
           }
-        },
-        t);
+        });
     assertThat(containsTrue).isNotEmpty();
   }
 
@@ -189,7 +188,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula ab = bmgr.and(a, b);
 
     final Set<String> found = new HashSet<>();
-    mgr.visitRecursively(
+    mgr.visitRecursively(ab,
         new DefaultFormulaVisitor<TraversalProcess>() {
 
           @Override
@@ -211,8 +210,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             found.add(name);
             return TraversalProcess.CONTINUE;
           }
-        },
-        ab);
+        });
 
     assertThat(found).containsAllOf("a", "b");
     assertThat(found).hasSize(3); // all of the above plus the boolean "and" function
@@ -227,14 +225,13 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 imgr.add(imgr.makeVariable("x"), imgr.makeVariable("y")), imgr.makeNumber(1)),
             imgr.equal(imgr.makeVariable("z"), imgr.makeNumber(10)));
     BooleanFormula transformed =
-        mgr.transformRecursively(
+        mgr.transformRecursively(f,
             new FormulaTransformationVisitor(mgr) {
               @Override
               public Formula visitFreeVariable(Formula f, String name) {
                 return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
               }
-            },
-            f);
+            });
     assertThatFormula(transformed)
         .isEquivalentTo(
             bmgr.or(
@@ -254,7 +251,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                     bmgr.makeVariable("d"),
                     imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5)))));
     final Set<String> foundVars = new HashSet<>();
-    bmgr.visitRecursively(
+    bmgr.visitRecursively(f,
         new DefaultBooleanFormulaVisitor<TraversalProcess>() {
           @Override
           protected TraversalProcess visitDefault() {
@@ -269,8 +266,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             }
             return TraversalProcess.CONTINUE;
           }
-        },
-        f);
+        });
     assertThat(foundVars).containsExactly("x", "y", "z", "d");
   }
 
@@ -293,7 +289,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
     BooleanFormula f = qmgr.forall(quantifiedVars, body);
     BooleanFormula transformed =
-        bmgr.transformRecursively(
+        bmgr.transformRecursively(f,
             new BooleanFormulaTransformationVisitor(mgr) {
               @Override
               public BooleanFormula visitAtom(
@@ -305,8 +301,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                   return pAtom;
                 }
               }
-            },
-            f);
+            });
     assertThat(
             mgr.extractVariables(transformed)
                 .keySet()

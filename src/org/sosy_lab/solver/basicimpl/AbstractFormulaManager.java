@@ -241,7 +241,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @throws InterruptedException Can be thrown by the native code.
    */
   protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
-    return getBooleanFormulaManager().transformRecursively(new NNFVisitor(this), input);
+    return getBooleanFormulaManager().transformRecursively(input, new NNFVisitor(this));
   }
 
   @Override
@@ -257,18 +257,18 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula input) {
-    return formulaCreator.visit(visitor, input);
+  public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
+    return formulaCreator.visit(input, visitor);
   }
 
   @Override
-  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
+  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor) {
     formulaCreator.visitRecursively(pFormulaVisitor, pF);
   }
 
   @Override
   public <T extends Formula> T transformRecursively(
-      FormulaTransformationVisitor pFormulaVisitor, T f) {
+      T f, FormulaTransformationVisitor pFormulaVisitor) {
     return formulaCreator.transformRecursively(pFormulaVisitor, f);
   }
 
@@ -355,7 +355,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public <T extends Formula> T substitute(
       final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    return transformRecursively(
+    return transformRecursively(pF,
         new FormulaTransformationVisitor(this) {
           @Override
           public Formula visitFreeVariable(Formula f, String name) {
@@ -381,7 +381,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
               return out;
             }
           }
-        },
-        pF);
+        });
   }
 }

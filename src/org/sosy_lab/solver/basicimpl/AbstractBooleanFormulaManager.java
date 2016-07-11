@@ -254,13 +254,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected abstract TFormulaInfo ifThenElse(TFormulaInfo cond, TFormulaInfo f1, TFormulaInfo f2);
 
   @Override
-  public <R> R visit(BooleanFormulaVisitor<R> visitor, BooleanFormula pFormula) {
-    return formulaCreator.visit(new DelegatingFormulaVisitor<>(visitor), pFormula);
+  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
+    return formulaCreator.visit(pFormula, new DelegatingFormulaVisitor<>(visitor));
   }
 
   @Override
-  public void visitRecursively(
-      BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor, BooleanFormula pF) {
+  public void visitRecursively(BooleanFormula pF,
+      BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor) {
     formulaCreator.visitRecursively(
         new DelegatingFormulaVisitor<>(pFormulaVisitor),
         pF,
@@ -269,7 +269,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula transformRecursively(
-      BooleanFormulaTransformationVisitor pVisitor, BooleanFormula f) {
+      BooleanFormula f,
+      BooleanFormulaTransformationVisitor pVisitor) {
     return formulaCreator.transformRecursively(
         new DelegatingFormulaVisitor<>(pVisitor), f, p -> p instanceof BooleanFormula);
   }
@@ -400,7 +401,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (flatten) {
       return asFuncRecursive(f, conjunctionFinder);
     }
-    return formulaCreator.visit(conjunctionFinder, f);
+    return formulaCreator.visit(f, conjunctionFinder);
   }
 
   @Override
@@ -408,7 +409,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (flatten) {
       return asFuncRecursive(f, disjunctionFinder);
     }
-    return formulaCreator.visit(disjunctionFinder, f);
+    return formulaCreator.visit(f, disjunctionFinder);
   }
 
   /**
@@ -426,7 +427,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       Set<BooleanFormula> out = cache.get(s);
       if (out == null) {
 
-        out = formulaCreator.visit(visitor, s);
+        out = formulaCreator.visit(s, visitor);
         cache.put(s, out);
       }
       if (out.size() == 1 && s.equals(out.iterator().next())) {
