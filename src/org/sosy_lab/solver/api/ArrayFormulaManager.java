@@ -34,7 +34,7 @@ public interface ArrayFormulaManager {
    * @param pIndex    The position from which to read
    * @return          A formula that represents the result of the "read"
    */
-  <TI extends Formula, TE extends Formula> TE select(ArrayFormula<TI, TE> pArray, Formula pIndex);
+  <TI extends Formula, TE extends Formula> TE select(ArrayFormula<TI, TE> pArray, TI pIndex);
 
   /**
    * Store a value into a cell of the specified array.
@@ -45,7 +45,7 @@ public interface ArrayFormulaManager {
    * @return          A formula that represents the "write"
    */
   <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
-      ArrayFormula<TI, TE> pArray, Formula pIndex, Formula pValue);
+      ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue);
 
   /**
    * Declare a new array.

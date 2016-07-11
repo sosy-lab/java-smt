@@ -38,7 +38,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
   @SuppressWarnings("unchecked")
   @Override
   public <TI extends Formula, TE extends Formula> TE select(
-      ArrayFormula<TI, TE> pArray, Formula pIndex) {
+      ArrayFormula<TI, TE> pArray, TI pIndex) {
 
     final FormulaType<? extends Formula> elementType =
         getFormulaCreator().getArrayFormulaElementType(pArray);
@@ -55,7 +55,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
-      ArrayFormula<TI, TE> pArray, Formula pIndex, Formula pValue) {
+      ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue) {
 
     final FormulaType<TI> indexType = getFormulaCreator().getArrayFormulaIndexType(pArray);
     final FormulaType<TE> elementType = getFormulaCreator().getArrayFormulaElementType(pArray);
