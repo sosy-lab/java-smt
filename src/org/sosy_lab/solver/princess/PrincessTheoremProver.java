@@ -48,9 +48,9 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
 
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
       PrincessFormulaCreator creator,
-      SimpleAPI pApi) {
+      SimpleAPI pApi,
+      ShutdownNotifier pShutdownNotifier) {
     super(pMgr, creator, pApi, pShutdownNotifier);
   }
 

@@ -35,7 +35,6 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import scala.Enumeration.Value;
 
@@ -53,16 +52,12 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   protected final ShutdownNotifier shutdownNotifier;
 
-  protected final FormulaCreator<
-          IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-      creator;
+  protected final PrincessFormulaCreator creator;
   protected boolean closed = false;
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
-      FormulaCreator<
-              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-          creator,
+      PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier) {
     this.mgr = pMgr;
