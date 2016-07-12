@@ -21,7 +21,6 @@ package org.sosy_lab.solver.visitors;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
@@ -29,9 +28,9 @@ import org.sosy_lab.solver.api.FormulaManager;
 /**
  * Return class that lets the visitor guide the recursive formula traversal process
  * started with
- * {@link FormulaManager#visitRecursively(FormulaVisitor, org.sosy_lab.solver.api.Formula)}.
+ * {@link FormulaManager#visitRecursively}.
  * or
- * {@link BooleanFormulaManager#visitRecursively(BooleanFormulaVisitor, BooleanFormula)}.
+ * {@link BooleanFormulaManager#visitRecursively}.
  */
 public class TraversalProcess {
   /**

@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Visitor iterating through the boolean part of the formula.
- * Use {@link BooleanFormulaManager#visit(BooleanFormulaVisitor, BooleanFormula)}
+ * Use {@link BooleanFormulaManager#visit}
  * for visiting formulas.
  *
  * @param <R> Desired return type.

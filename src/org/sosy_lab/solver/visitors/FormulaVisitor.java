@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * Visitor iterating through entire formula.
- * Use {@link FormulaManager#visit(FormulaVisitor, Formula)} for visiting formulas.
+ * Use {@link FormulaManager#visit} for visiting formulas.
  *
  * @param <R> Desired return type.
  */
