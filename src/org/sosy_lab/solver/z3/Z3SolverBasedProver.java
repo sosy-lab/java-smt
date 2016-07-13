@@ -27,6 +27,8 @@ import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.solver.api.BooleanFormula;
 
+import java.util.Collection;
+
 abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
 
   protected final long z3solver;
@@ -47,6 +49,25 @@ abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
     int result;
     try {
       result = Native.solverCheck(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
+    undefinedStatusToException(result);
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
+  }
+
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws Z3SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+
+    int result;
+    try {
+      result =
+          Native.solverCheckAssumptions(
+              z3context,
+              z3solver,
+              assumptions.size(),
+              assumptions.stream().mapToLong(creator::extractInfo).toArray());
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }
