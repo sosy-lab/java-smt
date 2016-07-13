@@ -26,7 +26,6 @@ import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager;
 
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -40,34 +39,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateBoolean(formulaInfo);
-  }
-
-  @Override
-  public BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(exists(Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-  }
-
-  @Override
-  public BooleanFormula exists(BooleanFormula pBody, Formula... quantifiedArgs) {
-    return exists(Arrays.asList(quantifiedArgs), pBody);
-  }
-
-  private TFormulaInfo exists(List<TFormulaInfo> pVariables, TFormulaInfo pBody) {
-    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
-  }
-
-  @Override
-  public final BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
-    return wrap(forall(Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-  }
-
-  @Override
-  public BooleanFormula forall(BooleanFormula pBody, Formula... quantifiedArgs) {
-    return forall(Arrays.asList(quantifiedArgs), pBody);
-  }
-
-  private TFormulaInfo forall(List<TFormulaInfo> pVariables, TFormulaInfo pBody) {
-    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
   }
 
   @Override

@@ -314,9 +314,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
         qmgr.exists(
+            y,
             bmgr.and(
-                imgr.equal(y, imgr.makeNumber(4)), imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))),
-            y);
+                imgr.equal(y, imgr.makeNumber(4)), imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))));
     BooleanFormula out = mgr.applyTactic(f1, Tactic.QE_LIGHT);
     assertThat(out).isEqualTo(imgr.equal(x, imgr.makeNumber(7)));
   }
