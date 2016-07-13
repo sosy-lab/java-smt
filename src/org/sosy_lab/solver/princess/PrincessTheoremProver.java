@@ -110,10 +110,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    push(mgr.getBooleanFormulaManager().and(assumptions));
-    boolean out = isUnsat();
-    pop();
-    return out;
+    throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
 
   @Override
