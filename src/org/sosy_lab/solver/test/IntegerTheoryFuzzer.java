@@ -38,18 +38,16 @@ class IntegerTheoryFuzzer {
   private static final String varNameTemplate = "VAR_";
   private int maxConstant;
 
-
-  IntegerTheoryFuzzer(
-      FormulaManager fmgr,
-      Random pR) {
+  IntegerTheoryFuzzer(FormulaManager fmgr, Random pR) {
     ifmgr = fmgr.getIntegerFormulaManager();
     r = pR;
   }
 
   public IntegerFormula fuzz(int formulaSize, int pMaxConstant) {
-    IntegerFormula[] args  = IntStream.range(0, formulaSize).mapToObj(
-        i -> ifmgr.makeVariable(varNameTemplate + i)
-    ).toArray(IntegerFormula[]::new);
+    IntegerFormula[] args =
+        IntStream.range(0, formulaSize)
+            .mapToObj(i -> ifmgr.makeVariable(varNameTemplate + i))
+            .toArray(IntegerFormula[]::new);
     return fuzz(formulaSize, pMaxConstant, args);
   }
 

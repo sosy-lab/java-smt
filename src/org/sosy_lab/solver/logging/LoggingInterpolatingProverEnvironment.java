@@ -36,8 +36,7 @@ class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnviron
 
   private final InterpolatingProverEnvironment<T> wrapped;
 
-  LoggingInterpolatingProverEnvironment(
-      LogManager logger, InterpolatingProverEnvironment<T> ipe) {
+  LoggingInterpolatingProverEnvironment(LogManager logger, InterpolatingProverEnvironment<T> ipe) {
     super(ipe, logger);
     this.wrapped = checkNotNull(ipe);
   }
