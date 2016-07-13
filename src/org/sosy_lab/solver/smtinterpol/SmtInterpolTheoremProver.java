@@ -55,13 +55,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
 
-  /**
-   * This flag is used to know whether the next modification to assertion stack
-   * should pop before doing anything. The flag is needed for getting an
-   * unsat-core or model after checking the stack with assumptions.
-   */
-  private transient boolean shouldPop = false;
-
   SmtInterpolTheoremProver(
       SmtInterpolFormulaManager pMgr,
       FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> pCreator,
@@ -76,25 +69,14 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   }
 
   @Override
-  public Void push(BooleanFormula f) {
-    popIfNecessary();
-    return super.push(f);
-  }
-
-  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
-    push(mgr.getBooleanFormulaManager().and(assumptions));
-    boolean out = isUnsat();
-    shouldPop = true;
-    return out;
+    throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-
     push();
     Preconditions.checkState(
         annotatedTerms.isEmpty(),
@@ -115,16 +97,9 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   }
 
   @Override
-  public void pop() {
-    popIfNecessary();
-    super.pop();
-  }
-
-  @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!isClosed());
-    popIfNecessary();
     Term t = mgr.extractInfo(constraint);
     if (generateUnsatCores) {
       String termName = generateTermName();
@@ -136,12 +111,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     }
     assertedFormulas.peek().add(t);
     return null;
-  }
-
-  @Override
-  public void close() {
-    popIfNecessary();
-    super.close();
   }
 
   @Override
@@ -166,13 +135,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
       callback.apply(Lists.transform(Arrays.asList(model), creator::encapsulateBoolean));
     }
     return callback.getResult();
-  }
-
-  private void popIfNecessary() {
-    if (shouldPop) {
-      shouldPop = false;
-      pop();
-    }
   }
 
   @Override
