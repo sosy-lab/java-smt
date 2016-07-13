@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
+import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,12 +32,12 @@ import java.util.Set;
 import java.util.logging.Level;
 
 class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnvironment<T>
-    implements InterpolatingProverEnvironmentWithAssumptions<T> {
+    implements InterpolatingProverEnvironment<T> {
 
-  private final InterpolatingProverEnvironmentWithAssumptions<T> wrapped;
+  private final InterpolatingProverEnvironment<T> wrapped;
 
   LoggingInterpolatingProverEnvironment(
-      LogManager logger, InterpolatingProverEnvironmentWithAssumptions<T> ipe) {
+      LogManager logger, InterpolatingProverEnvironment<T> ipe) {
     super(ipe, logger);
     this.wrapped = checkNotNull(ipe);
   }

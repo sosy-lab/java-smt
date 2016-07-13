@@ -140,4 +140,9 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {}
+
+  @Override
+  protected boolean supportsAssumptionSolving() {
+    return false;
+  }
 }

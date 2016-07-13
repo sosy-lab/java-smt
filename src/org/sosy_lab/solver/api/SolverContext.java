@@ -81,10 +81,10 @@ public interface SolverContext extends AutoCloseable {
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
    * and allows to generate and retrieve interpolants for unsatisfiable formulas.
    * If the SMT solver is able to handle satisfiability tests with assumptions please consider
-   * implementing the {@link InterpolatingProverEnvironmentWithAssumptions} interface, and return
+   * implementing the {@link InterpolatingProverEnvironment} interface, and return
    * an Object of this type here.
    */
-  InterpolatingProverEnvironmentWithAssumptions<?> newProverEnvironmentWithInterpolation();
+  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation();
 
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack

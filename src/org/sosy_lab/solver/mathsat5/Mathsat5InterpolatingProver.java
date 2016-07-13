@@ -34,7 +34,7 @@ import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
+import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
-    implements InterpolatingProverEnvironmentWithAssumptions<Integer> {
+    implements InterpolatingProverEnvironment<Integer> {
 
   Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
     super(pMgr, createConfig(), creator);

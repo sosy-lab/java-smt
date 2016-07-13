@@ -34,7 +34,6 @@ import org.sosy_lab.solver.SolverContextFactory.Solvers;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
@@ -60,15 +59,15 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
    * Can be overridden to parametrize the test.
    * @throws InvalidConfigurationException overriding methods are allowed to throw this */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected <T> InterpolatingProverEnvironmentWithAssumptions<T> newEnvironmentForTest()
+  protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
       throws InvalidConfigurationException {
     InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation();
     assume()
         .withFailureMessage(
             "Solver " + solverToUse() + " does not support solving under assumptions")
         .that(env)
-        .isInstanceOf(InterpolatingProverEnvironmentWithAssumptions.class);
-    return (InterpolatingProverEnvironmentWithAssumptions<T>) env;
+        .isInstanceOf(InterpolatingProverEnvironment.class);
+    return (InterpolatingProverEnvironment<T>) env;
   }
 
   @Test
@@ -92,7 +91,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
     BooleanFormula term3 =
         bmgr.or(bmgr.not(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE))), suffix3);
 
-    try (InterpolatingProverEnvironmentWithAssumptions<T> env = newEnvironmentForTest()) {
+    try (InterpolatingProverEnvironment<T> env = newEnvironmentForTest()) {
 
       T firstPartForInterpolant = env.push(term1);
       env.push(term2);

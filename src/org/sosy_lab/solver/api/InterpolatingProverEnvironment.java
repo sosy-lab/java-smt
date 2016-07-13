@@ -22,7 +22,9 @@ package org.sosy_lab.solver.api;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.solver.SolverException;
+import org.sosy_lab.solver.basicimpl.AbstractSolverContext;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -115,5 +117,14 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    *     for example because interpolation procedure is incomplete
    */
   List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree)
+      throws SolverException, InterruptedException;
+
+  /**
+   * Check whether the conjunction of all formulas on the stack is unsatisfiable
+   * with regards to provided assumptions.
+   * The implementation of this method must be consistent with
+   * {@link AbstractSolverContext#supportsAssumptionSolving}.
+   */
+  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 }

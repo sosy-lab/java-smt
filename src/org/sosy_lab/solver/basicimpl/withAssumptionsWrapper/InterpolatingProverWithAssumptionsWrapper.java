@@ -32,7 +32,6 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
@@ -42,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 public class InterpolatingProverWithAssumptionsWrapper<T>
-    implements InterpolatingProverEnvironmentWithAssumptions<T> {
+    implements InterpolatingProverEnvironment<T> {
 
   private final List<T> solverAssumptionsFromPush;
   private final List<BooleanFormula> solverAssumptionsAsFormula;

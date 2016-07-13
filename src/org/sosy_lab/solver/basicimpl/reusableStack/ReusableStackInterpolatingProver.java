@@ -23,6 +23,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -56,5 +57,11 @@ public class ReusableStackInterpolatingProver<T>
       List<Set<T>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    return delegate.isUnsatWithAssumptions(pAssumptions);
   }
 }

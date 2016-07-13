@@ -22,7 +22,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
@@ -65,22 +64,26 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  public final InterpolatingProverEnvironmentWithAssumptions<?>
+  public final InterpolatingProverEnvironment<?>
       newProverEnvironmentWithInterpolation() {
     InterpolatingProverEnvironment<?> ipe = newProverEnvironmentWithInterpolation0();
 
     // In the case we do not already have a prover environment with assumptions
     // we add a wrapper to it
-    InterpolatingProverEnvironmentWithAssumptions<?> out;
-    if (!(ipe instanceof InterpolatingProverEnvironmentWithAssumptions)) {
-      out = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
+    InterpolatingProverEnvironment<?> out;
+    if (supportsAssumptionSolving()) {
+      out = ipe;
     } else {
-      out = (InterpolatingProverEnvironmentWithAssumptions<?>) ipe;
+      out = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
     }
     return out;
   }
 
   protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
+
+  /** whether the solvers supports assumption-solving and all corresponding properties
+   * like model-generation and interpolation */
+  protected abstract boolean supportsAssumptionSolving();
 
   @Override
   public final OptimizationProverEnvironment newCachedOptimizationProverEnvironment() {

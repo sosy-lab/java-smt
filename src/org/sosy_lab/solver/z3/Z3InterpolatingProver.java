@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
+import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
@@ -39,6 +40,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -260,5 +262,25 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     private long getInterpolationPoint() {
       return interpolationPoint;
     }
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws Z3SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+
+    int result;
+    try {
+      result =
+          Native.solverCheckAssumptions(
+              z3context,
+              z3solver,
+              assumptions.size(),
+              assumptions.stream().mapToLong(creator::extractInfo).toArray());
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
+    undefinedStatusToException(result);
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 }
