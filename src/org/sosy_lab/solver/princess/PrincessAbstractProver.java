@@ -55,6 +55,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   protected final PrincessFormulaCreator creator;
   protected boolean closed = false;
+  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -73,8 +74,10 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     final Value result = api.checkSat(true);
     if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
+      wasLastSatCheckSat = true;
       return false;
     } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
       return true;
@@ -88,6 +91,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   protected void addConstraint0(IFormula t) {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     api.addAssertion(
         api.abbrevSharedExpressions(
             t, creator.getEnv().princessOptions.getMinAtomsForAbbreviation()));
@@ -96,6 +100,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public final void push() {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     assertedFormulas.push(new ArrayList<>());
     api.push();
     trackingStack.push(new Level());
@@ -104,6 +109,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     assertedFormulas.pop();
     api.pop();
 
@@ -120,7 +126,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
+    Preconditions.checkState(wasLastSatCheckSat, "model is only available for SAT environments");
     return new PrincessModel(api.partialModel(), creator);
   }
 

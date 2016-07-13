@@ -104,6 +104,8 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     shutdownNotifier.shutdownIfNecessary();
     api.pop();
 
+    wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
+
     return callback.getResult();
   }
 
