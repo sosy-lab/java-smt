@@ -73,7 +73,7 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
       throws SolverException, InterruptedException;
 
   /**
-   * Returns an UNSAT core (if it exists, otherwise {@code Optional.absent()}),
+   * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}),
    * over the chosen assumptions.
    * Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    *
