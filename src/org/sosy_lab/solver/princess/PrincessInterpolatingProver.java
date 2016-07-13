@@ -156,10 +156,4 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   protected Collection<? extends IExpression> getAssertedFormulas() {
     return annotatedTerms.values();
   }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Assumption-solving is not supported.");
-  }
 }

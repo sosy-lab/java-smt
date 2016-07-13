@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableList;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 
 import scala.Enumeration.Value;
@@ -130,6 +131,12 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     try (PrincessModel model = getModel()) {
       return model.modelToList();
     }
+  }
+
+  @SuppressWarnings("unused")
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
 
   /**
