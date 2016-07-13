@@ -21,7 +21,7 @@ package org.sosy_lab.solver.api;
 
 import org.sosy_lab.solver.SolverException;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Interpolating prover with assumptions support.
@@ -33,6 +33,6 @@ public interface InterpolatingProverEnvironmentWithAssumptions<T>
    * Check whether the conjunction of all formulas on the stack is unsatisfiable
    * with regards to provided assumptions.
    */
-  boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 }

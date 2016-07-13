@@ -28,14 +28,15 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,12 +73,12 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     try {
       long[] assumptions =
-          Longs.toArray(Lists.transform(pAssumptions, Mathsat5FormulaManager::getMsatTerm));
+          Longs.toArray(Collections2.transform(pAssumptions, Mathsat5FormulaManager::getMsatTerm));
       return !msat_check_sat_with_assumptions(curEnv, assumptions);
     } catch (IllegalStateException e) {
       handleSolverExceptionInUnsatCheck(e);

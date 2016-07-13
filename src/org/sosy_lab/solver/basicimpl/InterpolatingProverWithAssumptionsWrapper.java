@@ -37,6 +37,7 @@ import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -140,7 +141,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     clearAssumptions();
 

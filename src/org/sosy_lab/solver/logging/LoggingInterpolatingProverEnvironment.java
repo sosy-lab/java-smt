@@ -26,6 +26,7 @@ import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -42,7 +43,7 @@ class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnviron
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(List<BooleanFormula> pAssumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     logger.log(Level.FINE, "assumptions:", pAssumptions);
     boolean result = wrapped.isUnsatWithAssumptions(pAssumptions);
