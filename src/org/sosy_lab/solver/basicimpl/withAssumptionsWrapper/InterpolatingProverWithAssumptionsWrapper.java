@@ -17,12 +17,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.sosy_lab.solver.basicimpl.withAssumptionsWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.solver.SolverException;
@@ -32,7 +30,6 @@ import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
 import org.sosy_lab.solver.api.FunctionDeclarationKind;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.Model;
 import org.sosy_lab.solver.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
@@ -41,27 +38,19 @@ import java.util.List;
 import java.util.Set;
 
 public class InterpolatingProverWithAssumptionsWrapper<T>
+    extends BasicProverWithAssumptionsWrapper<T, InterpolatingProverEnvironment<T>>
     implements InterpolatingProverEnvironment<T> {
 
   private final List<T> solverAssumptionsFromPush;
-  private final List<BooleanFormula> solverAssumptionsAsFormula;
-  private final InterpolatingProverEnvironment<T> delegate;
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bmgr;
 
   public InterpolatingProverWithAssumptionsWrapper(
       InterpolatingProverEnvironment<T> pDelegate, FormulaManager pFmgr) {
-    delegate = checkNotNull(pDelegate);
+    super(pDelegate);
     solverAssumptionsFromPush = new ArrayList<>();
-    solverAssumptionsAsFormula = new ArrayList<>();
     fmgr = checkNotNull(pFmgr);
     bmgr = fmgr.getBooleanFormulaManager();
-  }
-
-  @Override
-  public T push(BooleanFormula pF) {
-    clearAssumptions();
-    return delegate.push(pF);
   }
 
   @Override
@@ -102,44 +91,6 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public void pop() {
-    clearAssumptions();
-    delegate.pop();
-  }
-
-  @Override
-  public T addConstraint(BooleanFormula constraint) {
-    return delegate.addConstraint(constraint);
-  }
-
-  @Override
-  public void push() {
-    clearAssumptions();
-    delegate.push();
-  }
-
-  @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    clearAssumptions();
-    return delegate.isUnsat();
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    return delegate.getModel();
-  }
-
-  @Override
-  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
-    return delegate.getModelAssignments();
-  }
-
-  @Override
-  public void close() {
-    delegate.close();
-  }
-
-  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     clearAssumptions();
@@ -151,11 +102,9 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     return delegate.isUnsat();
   }
 
-  private void clearAssumptions() {
-    for (int i = 0; i < solverAssumptionsAsFormula.size(); i++) {
-      delegate.pop();
-    }
-    solverAssumptionsAsFormula.clear();
+  @Override
+  protected void clearAssumptions() {
+    super.clearAssumptions();
     solverAssumptionsFromPush.clear();
   }
 
@@ -169,6 +118,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     public BooleanFormula visitAtom(BooleanFormula atom, FunctionDeclaration<BooleanFormula> decl) {
       if (decl.getKind() == FunctionDeclarationKind.VAR) {
         String varName = decl.getName();
+        // TODO is it sound to replace a variable with TRUE?
         if (solverAssumptionsContainsVar(varName)) {
           return bmgr.makeBoolean(true);
         } else {
