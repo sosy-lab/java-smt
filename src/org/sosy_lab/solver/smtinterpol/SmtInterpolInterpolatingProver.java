@@ -208,10 +208,4 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
   protected Collection<Term> getAssertedTerms() {
     return annotatedTerms.values();
   }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Assumption-solving is not supported.");
-  }
 }
