@@ -66,15 +66,12 @@ public abstract class AbstractSolverContext implements SolverContext {
   @Override
   public final InterpolatingProverEnvironment<?>
       newProverEnvironmentWithInterpolation() {
-    InterpolatingProverEnvironment<?> ipe = newProverEnvironmentWithInterpolation0();
 
-    // In the case we do not already have a prover environment with assumptions
-    // we add a wrapper to it
-    InterpolatingProverEnvironment<?> out;
-    if (supportsAssumptionSolving()) {
-      out = ipe;
-    } else {
-      out = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
+    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0();
+    if (!supportsAssumptionSolving()) {
+      // In the case we do not already have a prover environment with assumptions,
+      // we add a wrapper to it
+      out = new InterpolatingProverWithAssumptionsWrapper<>(out, fmgr);
     }
     return out;
   }
