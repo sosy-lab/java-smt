@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.solver.basicimpl;
+package org.sosy_lab.solver.basicimpl.withAssumptionsWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

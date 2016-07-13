@@ -29,6 +29,7 @@ import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.cache.CachingOptimizationProverEnvironment;
 import org.sosy_lab.solver.basicimpl.cache.OptimizationQuery;
 import org.sosy_lab.solver.basicimpl.cache.OptimizationResult;
+import org.sosy_lab.solver.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
 
 import java.util.Collections;
 import java.util.EnumSet;
