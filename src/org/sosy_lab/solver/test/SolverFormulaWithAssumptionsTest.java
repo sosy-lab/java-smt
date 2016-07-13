@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +38,9 @@ import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
 import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
@@ -57,17 +60,23 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
 
   /** Generate a prover environment depending on the parameter above.
    * Can be overridden to parameterize the test.
-   * @throws InvalidConfigurationException overriding methods are allowed to throw this */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+   * @throws InvalidConfigurationException overriding methods are allowed to throw this
+   */
+  @SuppressWarnings({"unchecked", "rawtypes", "CheckReturnValue"})
   protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
-      throws InvalidConfigurationException {
-    InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation();
-    assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support solving under assumptions")
-        .that(env)
-        .isInstanceOf(InterpolatingProverEnvironment.class);
-    return (InterpolatingProverEnvironment<T>) env;
+      throws InvalidConfigurationException, SolverException, InterruptedException {
+
+    // check if we support assumption-solving
+    try (InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation()) {
+      env.isUnsatWithAssumptions(ImmutableList.of());
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withFailureMessage("Solver " + solverToUse() + " does not support assumption-solving")
+          .that(e)
+          .isNull();
+    }
+
+    return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
   }
 
   @Test
@@ -109,6 +118,68 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
           .isTrue();
       assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
           .doesNotContain("suffix");
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void assumptionsTest()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    requireInterpolation();
+
+    int n = 5;
+
+    IntegerFormula x = imgr.makeVariable("x");
+    List<BooleanFormula> assignments = new ArrayList<>();
+    List<BooleanFormula> suffices = new ArrayList<>();
+    List<BooleanFormula> terms = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+      BooleanFormula a = imgr.equal(x, imgr.makeNumber(i));
+      BooleanFormula suffix = bmgr.makeVariable("suffix" + i);
+      assignments.add(a);
+      suffices.add(suffix);
+      terms.add(bmgr.or(a, suffix));
+    }
+
+    List<BooleanFormula> toCheckSat = new ArrayList<>();
+    List<BooleanFormula> toCheckUnsat = new ArrayList<>();
+
+    for (int i = 2; i < n; i++) {
+      try (InterpolatingProverEnvironment<T> env = newEnvironmentForTest()) {
+
+        List<T> ids = new ArrayList<>();
+        for (int j = 0; j < i; j++) {
+          ids.add(env.push(terms.get(j)));
+        }
+
+        // x==1 && x==2 ...
+        assertThat(
+                env.isUnsatWithAssumptions(Lists.transform(suffices.subList(0, i + 1), bmgr::not)))
+            .isTrue();
+
+        for (int j = 0; j < i; j++) {
+          BooleanFormula itp = env.getInterpolant(Collections.singletonList(ids.get(j)));
+          for (String var : mgr.extractVariables(itp).keySet()) {
+            assertThat(var).doesNotContain("suffix");
+          }
+          BooleanFormula contra = itp;
+          for (int k = 0; k < i; k++) {
+            if (k != j) {
+              contra = bmgr.and(contra, assignments.get(k));
+            }
+          }
+          toCheckSat.add(bmgr.implication(assignments.get(j), itp));
+          toCheckUnsat.add(contra);
+        }
+      }
+
+      for (BooleanFormula f : toCheckSat) {
+        assertThatFormula(f).isSatisfiable();
+      }
+
+      for (BooleanFormula f : toCheckUnsat) {
+        assertThatFormula(f).isUnsatisfiable();
+      }
     }
   }
 }
