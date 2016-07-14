@@ -582,7 +582,7 @@ public class ModelTest extends SolverBasedTest0 {
     BooleanFormula body =
         bmgr.and(
             a11, bmgr.implication(a21, bvmgr.equal(fmgr.callUF(si2, ctr), fmgr.callUF(si1, ctr))));
-    BooleanFormula a1 = qmgr.forall(body, ctr);
+    BooleanFormula a1 = qmgr.forall(ctr, body);
     BooleanFormula a2 =
         bvmgr.equal(fmgr.callUF(si1, bvmgr.add(adr, bvmgr.multiply(num4, num0))), num0);
 
@@ -610,7 +610,7 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       // exists x : x==0
-      prover.push(qmgr.exists(body, ctr));
+      prover.push(qmgr.exists(ctr, body));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
         for (ValueAssignment v : m) {

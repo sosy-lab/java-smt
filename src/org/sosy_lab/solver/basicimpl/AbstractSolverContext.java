@@ -22,13 +22,14 @@ package org.sosy_lab.solver.basicimpl;
 
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.api.InterpolatingProverEnvironmentWithAssumptions;
 import org.sosy_lab.solver.api.OptimizationProverEnvironment;
 import org.sosy_lab.solver.api.ProverEnvironment;
 import org.sosy_lab.solver.api.SolverContext;
 import org.sosy_lab.solver.basicimpl.cache.CachingOptimizationProverEnvironment;
 import org.sosy_lab.solver.basicimpl.cache.OptimizationQuery;
 import org.sosy_lab.solver.basicimpl.cache.OptimizationResult;
+import org.sosy_lab.solver.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
+import org.sosy_lab.solver.basicimpl.withAssumptionsWrapper.ProverWithAssumptionsWrapper;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -57,29 +58,35 @@ public abstract class AbstractSolverContext implements SolverContext {
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
     Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
     Collections.addAll(opts, options);
-    return newProverEnvironment0(opts);
+    ProverEnvironment out = newProverEnvironment0(opts);
+    if (!supportsAssumptionSolving()) {
+      // In the case we do not already have a prover environment with assumptions,
+      // we add a wrapper to it
+      out = new ProverWithAssumptionsWrapper(out);
+    }
+    return out;
   }
 
   protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
 
   @SuppressWarnings("resource")
   @Override
-  public final InterpolatingProverEnvironmentWithAssumptions<?>
-      newProverEnvironmentWithInterpolation() {
-    InterpolatingProverEnvironment<?> ipe = newProverEnvironmentWithInterpolation0();
+  public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
 
-    // In the case we do not already have a prover environment with assumptions
-    // we add a wrapper to it
-    InterpolatingProverEnvironmentWithAssumptions<?> out;
-    if (!(ipe instanceof InterpolatingProverEnvironmentWithAssumptions)) {
-      out = new InterpolatingProverWithAssumptionsWrapper<>(ipe, fmgr);
-    } else {
-      out = (InterpolatingProverEnvironmentWithAssumptions<?>) ipe;
+    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0();
+    if (!supportsAssumptionSolving()) {
+      // In the case we do not already have a prover environment with assumptions,
+      // we add a wrapper to it
+      out = new InterpolatingProverWithAssumptionsWrapper<>(out, fmgr);
     }
     return out;
   }
 
   protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
+
+  /** whether the solvers supports assumption-solving and all corresponding properties
+   * like model-generation and interpolation */
+  protected abstract boolean supportsAssumptionSolving();
 
   @Override
   public final OptimizationProverEnvironment newCachedOptimizationProverEnvironment() {

@@ -259,8 +259,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public void visitRecursively(BooleanFormula pF,
-      BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor) {
+  public void visitRecursively(
+      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor) {
     formulaCreator.visitRecursively(
         new DelegatingFormulaVisitor<>(pFormulaVisitor),
         pF,
@@ -269,8 +269,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula transformRecursively(
-      BooleanFormula f,
-      BooleanFormulaTransformationVisitor pVisitor) {
+      BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
     return formulaCreator.transformRecursively(
         new DelegatingFormulaVisitor<>(pVisitor), f, p -> p instanceof BooleanFormula);
   }

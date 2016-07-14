@@ -30,6 +30,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
 import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
@@ -104,5 +105,11 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
     assertedFormulas.clear();
     env.pop(env.getStackDepth());
     closed = true;
+  }
+
+  @SuppressWarnings("unused")
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
 }

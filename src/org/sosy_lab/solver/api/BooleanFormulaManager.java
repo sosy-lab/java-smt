@@ -170,7 +170,8 @@ public interface BooleanFormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula
    * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
-  BooleanFormula transformRecursively(BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor);
+  BooleanFormula transformRecursively(
+      BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor);
 
   /**
    * Return a set of formulas such that a conjunction over them

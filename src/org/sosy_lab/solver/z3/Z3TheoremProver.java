@@ -24,9 +24,7 @@ import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 import com.google.common.base.Preconditions;
 import com.google.common.base.VerifyException;
 import com.microsoft.z3.Native;
-import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
-import com.microsoft.z3.enumerations.Z3_lbool;
 
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
@@ -84,26 +82,6 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
       super.addConstraint0(f);
     }
     return null;
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws Z3SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-
-    int result;
-    try {
-      result =
-          Native.solverCheckAssumptions(
-              z3context,
-              z3solver,
-              assumptions.size(),
-              assumptions.stream().mapToLong(creator::extractInfo).toArray());
-    } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
-    }
-    undefinedStatusToException(result);
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override

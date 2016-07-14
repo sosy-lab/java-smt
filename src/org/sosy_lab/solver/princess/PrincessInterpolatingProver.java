@@ -34,7 +34,6 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import scala.collection.Seq;
 import scala.collection.mutable.ArrayBuffer;
@@ -56,9 +55,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   PrincessInterpolatingProver(
       PrincessFormulaManager pMgr,
-      FormulaCreator<
-              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-          creator,
+      PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier) {
     super(pMgr, creator, pApi, pShutdownNotifier);

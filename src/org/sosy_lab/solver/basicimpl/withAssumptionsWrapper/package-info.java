@@ -17,22 +17,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.solver.api;
-
-import org.sosy_lab.solver.SolverException;
-
-import java.util.List;
 
 /**
- * Interpolating prover with assumptions support.
+ * Wrapper-classes to guarantee identical behavior for all solvers.
  */
-public interface InterpolatingProverEnvironmentWithAssumptions<T>
-    extends InterpolatingProverEnvironment<T> {
-
-  /**
-   * Check whether the conjunction of all formulas on the stack is unsatisfiable
-   * with regards to provided assumptions.
-   */
-  boolean isUnsatWithAssumptions(List<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
-}
+package org.sosy_lab.solver.basicimpl.withAssumptionsWrapper;

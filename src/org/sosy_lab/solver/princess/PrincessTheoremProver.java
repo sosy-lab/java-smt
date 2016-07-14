@@ -48,9 +48,9 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
 
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
       PrincessFormulaCreator creator,
-      SimpleAPI pApi) {
+      SimpleAPI pApi,
+      ShutdownNotifier pShutdownNotifier) {
     super(pMgr, creator, pApi, pShutdownNotifier);
   }
 
@@ -104,16 +104,9 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     shutdownNotifier.shutdownIfNecessary();
     api.pop();
 
-    return callback.getResult();
-  }
+    wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
 
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    push(mgr.getBooleanFormulaManager().and(assumptions));
-    boolean out = isUnsat();
-    pop();
-    return out;
+    return callback.getResult();
   }
 
   @Override

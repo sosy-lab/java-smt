@@ -61,7 +61,7 @@ class Fuzzer {
 
       // The only combination of size 1.
       return getVar();
-    }  else if (formulaSize == 2) {
+    } else if (formulaSize == 2) {
 
       // The only combination of size 2.
       return bfmgr.not(getVar());

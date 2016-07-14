@@ -21,6 +21,7 @@ package org.sosy_lab.solver.api;
 
 import org.sosy_lab.solver.SolverException;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,7 +44,9 @@ public interface QuantifiedFormulaManager {
    *
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
-  BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody);
+  default BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
+    return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
+  }
 
   /**
    * @return A universally quantified formula.
@@ -53,17 +56,23 @@ public interface QuantifiedFormulaManager {
    *
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
-  BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody);
+  default BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
+    return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
+  }
 
   /**
    * Syntax sugar, see {@link #forall(List, BooleanFormula)}.
    */
-  BooleanFormula forall(BooleanFormula pBody, Formula... quantifiedArgs);
+  default BooleanFormula forall(Formula quantifiedArg, BooleanFormula pBody) {
+    return forall(Collections.singletonList(quantifiedArg), pBody);
+  }
 
   /**
    * Syntax sugar, see {@link #exists(List, BooleanFormula)}.
    */
-  BooleanFormula exists(BooleanFormula pBody, Formula... quantifiedArgs);
+  default BooleanFormula exists(Formula quantifiedArg, BooleanFormula pBody) {
+    return exists(Collections.singletonList(quantifiedArg), pBody);
+  }
 
   /**
    * @return A quantified formula

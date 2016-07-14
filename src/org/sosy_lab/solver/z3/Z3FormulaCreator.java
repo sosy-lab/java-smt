@@ -329,9 +329,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
       case Z3_NUMERAL_AST:
-        return visitor.visitConstant(formula,
-            convertValue(f)
-        );
+        return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
         int arity = Native.getAppNumArgs(environment, f);
 
@@ -346,18 +344,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
               || Native.getSortKind(environment, Native.getSort(environment, f))
                   == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
-            return visitor.visitConstant(formula,
-                convertValue(f)
-            );
+            return visitor.visitConstant(formula, convertValue(f));
 
           } else {
 
             // Has to be a variable otherwise.
             // TODO: assert that.
-            return visitor.visitFreeVariable(
-                formula,
-                getAppName(f)
-            );
+            return visitor.visitFreeVariable(formula, getAppName(f));
           }
         }
 

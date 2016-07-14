@@ -366,7 +366,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public <T extends Formula> T substitute(
       final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    return transformRecursively(pF,
+    return transformRecursively(
+        pF,
         new FormulaTransformationVisitor(this) {
           @Override
           public Formula visitFreeVariable(Formula f, String name) {

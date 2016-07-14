@@ -314,9 +314,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
         qmgr.exists(
+            y,
             bmgr.and(
-                imgr.equal(y, imgr.makeNumber(4)), imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))),
-            y);
+                imgr.equal(y, imgr.makeNumber(4)), imgr.equal(x, imgr.add(y, imgr.makeNumber(3)))));
     BooleanFormula out = mgr.applyTactic(f1, Tactic.QE_LIGHT);
     assertThat(out).isEqualTo(imgr.equal(x, imgr.makeNumber(7)));
   }
@@ -331,7 +331,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     final AtomicInteger numBound = new AtomicInteger(0);
 
     // Test introspection with visitors.
-    mgr.visit(forall,
+    mgr.visit(
+        forall,
         new DefaultFormulaVisitor<Void>() {
           @Override
           protected Void visitDefault(Formula f) {
@@ -362,7 +363,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     final List<Formula> boundVars = new ArrayList<>();
 
     // Test introspection with visitors.
-    mgr.visit(exists,
+    mgr.visit(
+        exists,
         new DefaultFormulaVisitor<Void>() {
           @Override
           protected Void visitDefault(Formula f) {

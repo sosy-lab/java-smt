@@ -147,7 +147,7 @@ class PrincessEnvironment {
     if (useForInterpolation) {
       prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier);
     } else {
-      prover = new PrincessTheoremProver(mgr, shutdownNotifier, creator, newApi);
+      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier);
     }
     registeredProvers.add(prover);
     return prover;

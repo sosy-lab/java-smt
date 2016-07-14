@@ -34,8 +34,8 @@ import com.google.common.collect.ImmutableList;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BasicProverEnvironment;
+import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Model.ValueAssignment;
-import org.sosy_lab.solver.basicimpl.FormulaCreator;
 
 import scala.Enumeration.Value;
 
@@ -53,16 +53,13 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   protected final ShutdownNotifier shutdownNotifier;
 
-  protected final FormulaCreator<
-          IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-      creator;
+  protected final PrincessFormulaCreator creator;
   protected boolean closed = false;
+  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
-      FormulaCreator<
-              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
-          creator,
+      PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier) {
     this.mgr = pMgr;
@@ -77,8 +74,10 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     final Value result = api.checkSat(true);
     if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
+      wasLastSatCheckSat = true;
       return false;
     } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
       return true;
@@ -92,6 +91,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   protected void addConstraint0(IFormula t) {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     api.addAssertion(
         api.abbrevSharedExpressions(
             t, creator.getEnv().princessOptions.getMinAtomsForAbbreviation()));
@@ -100,6 +100,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public final void push() {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     assertedFormulas.push(new ArrayList<>());
     api.push();
     trackingStack.push(new Level());
@@ -108,6 +109,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     assertedFormulas.pop();
     api.pop();
 
@@ -124,7 +126,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(!isUnsat(), "model is only available for SAT environments");
+    Preconditions.checkState(wasLastSatCheckSat, "model is only available for SAT environments");
     return new PrincessModel(api.partialModel(), creator);
   }
 
@@ -135,6 +137,12 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     try (PrincessModel model = getModel()) {
       return model.modelToList();
     }
+  }
+
+  @SuppressWarnings("unused")
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
 
   /**

@@ -163,7 +163,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     // Check that "true" is correctly treated as a constant.
     BooleanFormula t = bmgr.makeBoolean(true);
     final List<Boolean> containsTrue = new ArrayList<>();
-    mgr.visitRecursively(t,
+    mgr.visitRecursively(
+        t,
         new DefaultFormulaVisitor<TraversalProcess>() {
           @Override
           protected TraversalProcess visitDefault(Formula f) {
@@ -188,7 +189,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula ab = bmgr.and(a, b);
 
     final Set<String> found = new HashSet<>();
-    mgr.visitRecursively(ab,
+    mgr.visitRecursively(
+        ab,
         new DefaultFormulaVisitor<TraversalProcess>() {
 
           @Override
@@ -225,7 +227,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 imgr.add(imgr.makeVariable("x"), imgr.makeVariable("y")), imgr.makeNumber(1)),
             imgr.equal(imgr.makeVariable("z"), imgr.makeNumber(10)));
     BooleanFormula transformed =
-        mgr.transformRecursively(f,
+        mgr.transformRecursively(
+            f,
             new FormulaTransformationVisitor(mgr) {
               @Override
               public Formula visitFreeVariable(Formula f, String name) {
@@ -251,7 +254,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                     bmgr.makeVariable("d"),
                     imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5)))));
     final Set<String> foundVars = new HashSet<>();
-    bmgr.visitRecursively(f,
+    bmgr.visitRecursively(
+        f,
         new DefaultBooleanFormulaVisitor<TraversalProcess>() {
           @Override
           protected TraversalProcess visitDefault() {
@@ -289,7 +293,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
     BooleanFormula f = qmgr.forall(quantifiedVars, body);
     BooleanFormula transformed =
-        bmgr.transformRecursively(f,
+        bmgr.transformRecursively(
+            f,
             new BooleanFormulaTransformationVisitor(mgr) {
               @Override
               public BooleanFormula visitAtom(
