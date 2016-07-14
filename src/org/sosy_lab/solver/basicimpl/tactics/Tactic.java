@@ -31,6 +31,12 @@ package org.sosy_lab.solver.basicimpl.tactics;
 public enum Tactic {
 
   /**
+   * Replaces all applications of UFs with fresh variables and adds constraints to enforce the
+   * functional consistency.
+   */
+  UFE,
+
+  /**
    * Convert the formula to NNF (negated normal form).
    */
   NNF,

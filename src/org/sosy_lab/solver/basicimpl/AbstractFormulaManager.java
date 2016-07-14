@@ -38,6 +38,7 @@ import org.sosy_lab.solver.api.IntegerFormulaManager;
 import org.sosy_lab.solver.api.RationalFormulaManager;
 import org.sosy_lab.solver.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
+import org.sosy_lab.solver.basicimpl.tactics.UfElimination;
 import org.sosy_lab.solver.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.solver.visitors.FormulaVisitor;
 import org.sosy_lab.solver.visitors.TraversalProcess;
@@ -205,6 +206,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
     switch (tactic) {
+      case UFE:
+        return applyUFEImpl(f);
       case NNF:
         return applyNNFImpl(f);
       case TSEITIN_CNF:
@@ -214,6 +217,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       default:
         throw new UnsupportedOperationException("Unexpected enum value");
     }
+  }
+
+  /**
+   * @param pF Input to apply the UFE transformation to.
+   * @throws InterruptedException Can be thrown by the native code.
+   */
+  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
+    return new UfElimination(this).eliminateUfs(pF).getFormula();
   }
 
   /**

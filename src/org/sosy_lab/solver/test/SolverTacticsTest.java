@@ -20,7 +20,11 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.sosy_lab.solver.api.FormulaType.BooleanType;
+import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
+import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.common.truth.TruthJUnit;
 
 import org.junit.Test;
@@ -35,12 +39,14 @@ import org.sosy_lab.solver.api.BooleanFormulaManager;
 import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.FormulaManager;
 import org.sosy_lab.solver.api.FunctionDeclaration;
+import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.solver.basicimpl.tactics.Tactic;
 import org.sosy_lab.solver.visitors.BooleanFormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class SolverTacticsTest extends SolverBasedTest0 {
@@ -148,6 +154,62 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     CNFChecker checker = new CNFChecker(mgr);
     checker.visit(cnf);
     assertThat(checker.isInCNF()).isTrue();
+  }
+
+  @Test
+  public void ufEliminationSimpleTest() throws SolverException, InterruptedException {
+    // uf(v1, v3) /\ NOT (uf(v2, v4))
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+    BooleanFormula v1EqulsV2 = imgr.equal(variable1, variable2);
+    BooleanFormula v3EqulsV4 = imgr.equal(variable3, variable4);
+
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+    BooleanFormula f = bmgr.and(bmgr.and(f1, bmgr.not(f2)), v1EqulsV2, v3EqulsV4);
+
+    BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.UFE);
+    assertThatFormula(withOutUfs).isUnsatisfiable();
+
+    Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
+    Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf");
+    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+  }
+
+  @Test
+  public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException {
+    // uf2(uf1(v1, v2), v3) /\ NOT (uf2(uf1(v2, v1), v4))
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+    BooleanFormula v1EqulsV2 = imgr.equal(variable1, variable2);
+    BooleanFormula v3EqulsV4 = imgr.equal(variable3, variable4);
+
+    FunctionDeclaration<IntegerFormula> uf1Decl =
+        fmgr.declareUF("uf1", IntegerType, Lists.newArrayList(IntegerType, IntegerType));
+    Formula uf1a = fmgr.callUF(uf1Decl, variable1, variable2);
+    Formula uf1b = fmgr.callUF(uf1Decl, variable2, variable1);
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf2", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1a, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1b, variable4));
+    BooleanFormula f = bmgr.and(bmgr.and(f1, bmgr.not(f2)), v1EqulsV2, v3EqulsV4);
+
+    BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.UFE);
+    assertThatFormula(f).isUnsatisfiable();
+    assertThatFormula(withOutUfs).isUnsatisfiable();
+
+    Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
+    Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf2");
+    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
   }
 
   private static class CNFChecker implements BooleanFormulaVisitor<Void> {
