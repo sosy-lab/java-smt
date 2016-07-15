@@ -206,7 +206,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
     switch (tactic) {
-      case UFE:
+      case ACKERMANNIZATION:
         return applyUFEImpl(f);
       case NNF:
         return applyNNFImpl(f);

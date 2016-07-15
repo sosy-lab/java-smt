@@ -34,7 +34,7 @@ public enum Tactic {
    * Replaces all applications of UFs with fresh variables and adds constraints to enforce the
    * functional consistency.
    */
-  UFE,
+  ACKERMANNIZATION,
 
   /**
    * Convert the formula to NNF (negated normal form).

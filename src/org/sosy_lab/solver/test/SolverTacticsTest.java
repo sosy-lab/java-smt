@@ -172,7 +172,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
     BooleanFormula f = bmgr.and(bmgr.and(f1, bmgr.not(f2)), v1EqulsV2, v3EqulsV4);
 
-    BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.UFE);
+    BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
     assertThatFormula(withOutUfs).isUnsatisfiable();
 
     Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
@@ -201,7 +201,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1b, variable4));
     BooleanFormula f = bmgr.and(bmgr.and(f1, bmgr.not(f2)), v1EqulsV2, v3EqulsV4);
 
-    BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.UFE);
+    BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
     assertThatFormula(f).isUnsatisfiable();
     assertThatFormula(withOutUfs).isUnsatisfiable();
 
