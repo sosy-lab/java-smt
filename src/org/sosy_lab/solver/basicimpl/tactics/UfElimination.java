@@ -198,8 +198,7 @@ public class UfElimination {
         return
             pArgs
               .stream()
-              .map(f -> fmgr.visit(f, this))
-              .map(x -> x + 1)
+              .map(f -> fmgr.visit(f, this) + 1)
               .collect(maxBy(Integer::compareTo))
               .orElse(0);
       }
