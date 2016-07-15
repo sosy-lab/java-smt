@@ -158,23 +158,26 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationSimpleTest() throws SolverException, InterruptedException {
-    // uf(v1, v3) /\ NOT (uf(v2, v4))
+    // f := uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
     IntegerFormula variable4 = imgr.makeVariable("variable4");
-    BooleanFormula v1EqulsV2 = imgr.equal(variable1, variable2);
-    BooleanFormula v3EqulsV4 = imgr.equal(variable3, variable4);
+    BooleanFormula v1EqualsV2 = imgr.equal(variable1, variable2);
+    BooleanFormula v3EqualsV4 = imgr.equal(variable3, variable4);
 
     FunctionDeclaration<BooleanFormula> uf2Decl =
         fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
     BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
     BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
-    BooleanFormula f = bmgr.and(bmgr.and(f1, bmgr.not(f2)), v1EqulsV2, v3EqulsV4);
+    BooleanFormula f = bmgr.equivalence(f1, f2);
+    BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
     BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
-    assertThatFormula(withOutUfs).isUnsatisfiable();
+    assertThatFormula(argsEqual).implies(f); // sanity check
+    assertThatFormula(argsEqual).implies(withOutUfs);
 
+    // check that UFs were really eliminated
     Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
     Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
     Truth.assertThat(variablesAndUFs).doesNotContainKey("uf");
@@ -183,13 +186,13 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException {
-    // uf2(uf1(v1, v2), v3) /\ NOT (uf2(uf1(v2, v1), v4))
+    // f :=uf2(uf1(v1, v2), v3) == uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
     IntegerFormula variable4 = imgr.makeVariable("variable4");
-    BooleanFormula v1EqulsV2 = imgr.equal(variable1, variable2);
-    BooleanFormula v3EqulsV4 = imgr.equal(variable3, variable4);
+    BooleanFormula v1EqualsV2 = imgr.equal(variable1, variable2);
+    BooleanFormula v3EqualsV4 = imgr.equal(variable3, variable4);
 
     FunctionDeclaration<IntegerFormula> uf1Decl =
         fmgr.declareUF("uf1", IntegerType, Lists.newArrayList(IntegerType, IntegerType));
@@ -199,12 +202,14 @@ public class SolverTacticsTest extends SolverBasedTest0 {
         fmgr.declareUF("uf2", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
     BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1a, variable3));
     BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1b, variable4));
-    BooleanFormula f = bmgr.and(bmgr.and(f1, bmgr.not(f2)), v1EqulsV2, v3EqulsV4);
+    BooleanFormula f = bmgr.equivalence(f1, f2);
+    BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
     BooleanFormula withOutUfs = mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
-    assertThatFormula(f).isUnsatisfiable();
-    assertThatFormula(withOutUfs).isUnsatisfiable();
+    assertThatFormula(argsEqual).implies(f); // sanity check
+    assertThatFormula(argsEqual).implies(withOutUfs);
 
+    // check that UFs were really eliminated
     Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
     Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
     Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");

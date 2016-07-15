@@ -131,7 +131,7 @@ public class UfElimination {
           Collection<BooleanFormula> argumentEquility = new ArrayList<>(args.size());
           for (int i = 0; i < args.size(); i++) {
             Formula arg1 = args.get(i);
-            Formula arg2 = args.get(i);
+            Formula arg2 = otherArgs.get(i);
             argumentEquility.add(makeEqual(arg1, arg2));
           }
 
@@ -154,7 +154,8 @@ public class UfElimination {
               .map(c -> fmgr.substitute(c, substitutions))
               .collect(Collectors.toList());
     }
-    BooleanFormula newFormula = bfmgr.and(formulaNoUFs, bfmgr.and(extraConstraints));
+
+    BooleanFormula newFormula = bfmgr.implication(bfmgr.and(extraConstraints), formulaNoUFs);
     return new Result(newFormula, substitutions);
   }
 
@@ -256,7 +257,9 @@ public class UfElimination {
     }
 
     abstract Formula getFormula();
+
     abstract List<Formula> getArguments();
+
     abstract Formula getSubstitution();
   }
 }
