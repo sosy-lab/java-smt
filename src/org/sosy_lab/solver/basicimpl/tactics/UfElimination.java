@@ -20,7 +20,6 @@
 package org.sosy_lab.solver.basicimpl.tactics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.maxBy;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
@@ -104,7 +103,7 @@ public class UfElimination {
    */
   public Result eliminateUfs(BooleanFormula f) {
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = findUFs(f);
-    int depth = getFunctionNestingDepth(f);
+    int depth = getNestingDepthOfUfs(f);
 
     ImmutableMap.Builder<Formula, Formula> substitutionsBuilder = ImmutableMap.builder();
     List<BooleanFormula> extraConstraints = new ArrayList<>();
@@ -186,7 +185,7 @@ public class UfElimination {
     return t;
   }
 
-  private int getFunctionNestingDepth(Formula f) {
+  private int getNestingDepthOfUfs(Formula f) {
     return fmgr.visit(
         f,
         new DefaultFormulaVisitor<Integer>() {
@@ -199,11 +198,18 @@ public class UfElimination {
           @Override
           public Integer visitFunction(
               Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
-            return pArgs
+            int depthOfArgs = pArgs
                 .stream()
-                .map(f -> fmgr.visit(f, this) + 1)
-                .collect(maxBy(Integer::compareTo))
+                .mapToInt(f -> fmgr.visit(f, this))
+                .max()
                 .orElse(0);
+
+            // count only UFs
+            if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
+              return depthOfArgs + 1;
+            } else {
+              return depthOfArgs;
+            }
           }
 
           @Override
