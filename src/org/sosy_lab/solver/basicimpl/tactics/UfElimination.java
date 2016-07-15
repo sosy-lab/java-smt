@@ -136,9 +136,9 @@ public class UfElimination {
 
           BooleanFormula functionEquility = makeEqual(substitution, application2.getSubstitution());
           extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquility), functionEquility));
-          }
         }
       }
+    }
 
     // Get rid of UFs.
     ImmutableMap<Formula, Formula> substitutions = substitutionsBuilder.build();
@@ -149,9 +149,9 @@ public class UfElimination {
     for (int i = 0; i < depth; i++) {
       extraConstraints =
           extraConstraints
-            .stream()
-            .map(c -> fmgr.substitute(c, substitutions))
-            .collect(Collectors.toList());
+              .stream()
+              .map(c -> fmgr.substitute(c, substitutions))
+              .collect(Collectors.toList());
     }
     BooleanFormula newFormula = bfmgr.and(formulaNoUFs, bfmgr.and(extraConstraints));
     return new Result(newFormula, substitutions);
@@ -185,54 +185,58 @@ public class UfElimination {
   }
 
   private int getFunctionNestingDepth(Formula f) {
-    return fmgr.visit(f, new DefaultFormulaVisitor<Integer>() {
+    return fmgr.visit(
+        f,
+        new DefaultFormulaVisitor<Integer>() {
 
-      @Override
-      protected Integer visitDefault(Formula pF) {
-        return 0;
-      }
+          @Override
+          protected Integer visitDefault(Formula pF) {
+            return 0;
+          }
 
-      @Override
-      public Integer visitFunction(Formula pF, List<Formula> pArgs,
-          FunctionDeclaration<?> pFunctionDeclaration) {
-        return
-            pArgs
-              .stream()
-              .map(f -> fmgr.visit(f, this) + 1)
-              .collect(maxBy(Integer::compareTo))
-              .orElse(0);
-      }
+          @Override
+          public Integer visitFunction(
+              Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+            return pArgs
+                .stream()
+                .map(f -> fmgr.visit(f, this) + 1)
+                .collect(maxBy(Integer::compareTo))
+                .orElse(0);
+          }
 
-      @Override
-      public Integer visitQuantifier(BooleanFormula pF, Quantifier pQ,
-          List<Formula> pBoundVariables, BooleanFormula pBody) {
-        return fmgr.visit(pBody, this);
-      }
-
-    });
+          @Override
+          public Integer visitQuantifier(
+              BooleanFormula pF,
+              Quantifier pQ,
+              List<Formula> pBoundVariables,
+              BooleanFormula pBody) {
+            return fmgr.visit(pBody, this);
+          }
+        });
   }
 
   private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> findUFs(Formula f) {
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = HashMultimap.create();
 
-    fmgr.visitRecursively(f, new DefaultFormulaVisitor<TraversalProcess>() {
-      @Override
-      protected TraversalProcess visitDefault(Formula f) {
-        return TraversalProcess.CONTINUE;
-      }
+    fmgr.visitRecursively(
+        f,
+        new DefaultFormulaVisitor<TraversalProcess>() {
 
-      @Override
-      public TraversalProcess visitFunction(Formula f,
-          List<Formula> args,
-          FunctionDeclaration<?> decl) {
-        if (decl.getKind() == FunctionDeclarationKind.UF) {
-          Formula substitution = freshUfReplaceVariable(decl.getType());
-          ufs.put(decl, new UninterpretedFunctionApplication(f, args, substitution));
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            return TraversalProcess.CONTINUE;
+          }
 
-        }
-        return TraversalProcess.CONTINUE;
-      }
-    });
+          @Override
+          public TraversalProcess visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> decl) {
+            if (decl.getKind() == FunctionDeclarationKind.UF) {
+              Formula substitution = freshUfReplaceVariable(decl.getType());
+              ufs.put(decl, new UninterpretedFunctionApplication(f, args, substitution));
+            }
+            return TraversalProcess.CONTINUE;
+          }
+        });
 
     return ufs;
   }
