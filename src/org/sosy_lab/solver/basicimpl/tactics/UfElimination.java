@@ -22,6 +22,7 @@ package org.sosy_lab.solver.basicimpl.tactics;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.maxBy;
 
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -232,7 +233,7 @@ public class UfElimination {
               Formula f, List<Formula> args, FunctionDeclaration<?> decl) {
             if (decl.getKind() == FunctionDeclarationKind.UF) {
               Formula substitution = freshUfReplaceVariable(decl.getType());
-              ufs.put(decl, new UninterpretedFunctionApplication(f, args, substitution));
+              ufs.put(decl, UninterpretedFunctionApplication.create(f, args, substitution));
             }
             return TraversalProcess.CONTINUE;
           }
@@ -245,28 +246,17 @@ public class UfElimination {
     return fmgr.makeVariable(pType, prefix + UNIQUE_ID_GENERATOR.getFreshId());
   }
 
-  private static class UninterpretedFunctionApplication {
+  @AutoValue
+  abstract static class UninterpretedFunctionApplication {
 
-    private final Formula formula;
-    private final List<Formula> arguments;
-    private final Formula substitution;
-
-    UninterpretedFunctionApplication(Formula pF, List<Formula> pArguments, Formula pSubstitution) {
-      formula = checkNotNull(pF);
-      arguments = checkNotNull(pArguments);
-      substitution = checkNotNull(pSubstitution);
+    static UninterpretedFunctionApplication create(
+        Formula pF, List<Formula> pArguments, Formula pSubstitution) {
+      return new AutoValue_UfElimination_UninterpretedFunctionApplication(
+          pF, pArguments, pSubstitution);
     }
 
-    public Formula getFormula() {
-      return formula;
-    }
-
-    public List<Formula> getArguments() {
-      return arguments;
-    }
-
-    public Formula getSubstitution() {
-      return substitution;
-    }
+    abstract Formula getFormula();
+    abstract List<Formula> getArguments();
+    abstract Formula getSubstitution();
   }
 }
