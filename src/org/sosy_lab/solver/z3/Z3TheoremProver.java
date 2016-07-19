@@ -24,6 +24,7 @@ import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
 import com.google.common.base.Preconditions;
 import com.google.common.base.VerifyException;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -136,7 +137,11 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
       importantFormulas[i++] = Z3FormulaManager.getZ3Expr(impF);
     }
 
-    Native.solverPush(z3context, z3solver);
+    try {
+      Native.solverPush(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
 
     while (!isUnsat()) {
       long[] valuesOfModel = new long[importantFormulas.length];
