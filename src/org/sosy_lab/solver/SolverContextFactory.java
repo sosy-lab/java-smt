@@ -99,7 +99,7 @@ public class SolverContextFactory {
       Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
     pConfig.inject(this);
-    logger = checkNotNull(pLogger);
+    logger = pLogger.withComponentName("JavaSMT");
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     config = pConfig;
 
