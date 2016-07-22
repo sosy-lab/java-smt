@@ -106,10 +106,7 @@
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-255-gcdd5908" conf="runtime-smtinterpol->runtime; contrib->sources">
-          <artifact name="smtinterpol" e:classifier="comp" conf="runtime-smtinterpol"/>
-          <artifact name="smtinterpol" e:classifier="sources" conf="contrib" ext="zip"/>
-        </dependency>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-282-g2d451cf" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
         <dependency org="org.ruemmer.philipp" name="princess" rev="2016-06-27-r2652" conf="runtime-princess->runtime; contrib->sources">

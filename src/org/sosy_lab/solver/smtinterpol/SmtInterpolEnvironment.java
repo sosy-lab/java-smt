@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
@@ -42,6 +41,8 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import de.uni_freiburg.informatik.ultimate.logic.simplification.SimplifyDDA;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 
@@ -94,6 +95,7 @@ class SmtInterpolEnvironment {
   private List<String> furtherOptions = ImmutableList.of();
 
   private final LogManager logger;
+  private final LogProxy smtInterpolLogProxy;
   private final ShutdownNotifier shutdownNotifier;
 
   /** the wrapped Script */
@@ -116,11 +118,10 @@ class SmtInterpolEnvironment {
     logger = pLogger;
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     smtLogfile = pSmtLogfile;
+    smtInterpolLogProxy = new LogProxyForwarder(logger.withComponentName("SMTInterpol"));
 
     final SMTInterpol smtInterpol =
-        new SMTInterpol(
-            createLog4jLogger(logger.withComponentName("SMTInterpol")),
-            pShutdownNotifier::shouldShutdown);
+        new SMTInterpol(smtInterpolLogProxy, pShutdownNotifier::shouldShutdown);
 
     if (smtLogfile != null) {
       script = createLoggingWrapper(smtInterpol);
@@ -163,51 +164,6 @@ class SmtInterpolEnvironment {
       // go on without logging
       return smtInterpol;
     }
-  }
-
-  private static org.apache.log4j.Logger createLog4jLogger(final LogManager ourLogger) {
-    org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger("SMTInterpol");
-    // levels: ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
-    // WARN is too noisy.
-    logger.setLevel(org.apache.log4j.Level.ERROR);
-    logger.addAppender(
-        new org.apache.log4j.AppenderSkeleton() {
-
-          @Override
-          public boolean requiresLayout() {
-            return false;
-          }
-
-          @Override
-          public void close() {}
-
-          @Override
-          protected void append(org.apache.log4j.spi.LoggingEvent pArg0) {
-            // SMTInterpol has serveral "catch (Throwable t) { log(t); }",
-            // which is very ugly because it also catches errors like OutOfMemoryError
-            // and ThreadDeath.
-            // We do a similarly ugly thing and rethrow such exceptions here
-            // (at least for errors and runtime exceptions).
-            org.apache.log4j.spi.ThrowableInformation throwable = pArg0.getThrowableInformation();
-            if (throwable != null) {
-              Throwables.propagateIfPossible(throwable.getThrowable());
-            }
-
-            // Always log at SEVERE because it is a ERROR message (see above).
-            ourLogger.log(
-                Level.SEVERE,
-                pArg0.getLoggerName(),
-                pArg0.getLevel(),
-                "output:",
-                pArg0.getRenderedMessage());
-
-            if (throwable != null) {
-              ourLogger.logException(
-                  Level.SEVERE, throwable.getThrowable(), pArg0.getLoggerName() + " exception");
-            }
-          }
-        });
-    return logger;
   }
 
   /**
@@ -257,7 +213,7 @@ class SmtInterpolEnvironment {
   public List<Term> parseStringToTerms(String s) {
     FormulaCollectionScript parseScript = new FormulaCollectionScript(script, theory);
     ParseEnvironment parseEnv =
-        new ParseEnvironment(parseScript) {
+        new ParseEnvironment(parseScript, new OptionMap(smtInterpolLogProxy, true)) {
           @Override
           public void printError(String pMessage) {
             throw new SMTLIBException(pMessage);

@@ -109,7 +109,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/smtinterpol-comp.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime/smtinterpol.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
