@@ -63,6 +63,7 @@
     </target>
 
     <target name="unit-tests-coverage" depends="build, load-junit, load-jacoco, init-unit-tests" description="Run all JUnit tests with coverage report">
+        <delete dir="{junit.dir}"/>
         <jacoco:coverage destfile="${junit.dir}/jacoco.exec" excludes="**/*Test*:**/Dummy*">
             <junit fork="true" printSummary="true" showOutput="false" failureproperty="junit.failed" timeout="100000">
                 <assertions><enable/></assertions>
