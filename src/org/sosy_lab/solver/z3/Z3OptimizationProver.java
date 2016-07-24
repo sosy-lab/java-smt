@@ -122,7 +122,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public java.util.Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) {
     Preconditions.checkState(!closed);
     long ast = Native.optimizeGetUpper(z3context, z3optContext, handle);
     if (isInfinity(ast)) {

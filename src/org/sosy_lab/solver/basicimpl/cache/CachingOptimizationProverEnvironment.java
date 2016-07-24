@@ -149,7 +149,7 @@ public class CachingOptimizationProverEnvironment implements OptimizationProverE
   }
 
   @Override
-  public java.util.Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) {
     OptimizationResult cachedResult = optimizationCache.get(currentQuery);
 
     // Previous call to {@code check} must create the cached result.

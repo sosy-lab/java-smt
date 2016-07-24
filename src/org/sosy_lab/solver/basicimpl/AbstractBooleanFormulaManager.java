@@ -20,8 +20,8 @@
 package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -307,7 +307,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     @Override
     public R visitConstant(Formula f, Object value) {
-      Preconditions.checkState(value instanceof Boolean);
+      checkState(value instanceof Boolean);
       return delegate.visitConstant((boolean) value);
     }
 
@@ -322,24 +322,24 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
-          Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
+          checkState(args.iterator().next() instanceof BooleanFormula);
           R out = delegate.visitAnd(getBoolArgs(args));
           return out;
         case NOT:
-          Preconditions.checkState(args.size() == 1);
+          checkState(args.size() == 1);
           Formula arg = args.get(0);
 
-          Preconditions.checkArgument(arg instanceof BooleanFormula);
+          checkArgument(arg instanceof BooleanFormula);
           return delegate.visitNot((BooleanFormula) arg);
         case OR:
-          Preconditions.checkState(args.iterator().next() instanceof BooleanFormula);
+          checkState(args.iterator().next() instanceof BooleanFormula);
           R out2 = delegate.visitOr(getBoolArgs(args));
           return out2;
         case IFF:
-          Preconditions.checkState(args.size() == 2);
+          checkState(args.size() == 2);
           Formula a = args.get(0);
           Formula b = args.get(1);
-          Preconditions.checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
+          checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
           R out3 = delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
           return out3;
         case EQ:
@@ -353,27 +353,27 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
                 (BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
           }
         case ITE:
-          Preconditions.checkArgument(args.size() == 3);
+          checkArgument(args.size() == 3);
           Formula ifC = args.get(0);
           Formula then = args.get(1);
           Formula elseC = args.get(2);
-          Preconditions.checkState(
+          checkState(
               ifC instanceof BooleanFormula
                   && then instanceof BooleanFormula
                   && elseC instanceof BooleanFormula);
           return delegate.visitIfThenElse(
               (BooleanFormula) ifC, (BooleanFormula) then, (BooleanFormula) elseC);
         case XOR:
-          Preconditions.checkArgument(args.size() == 2);
+          checkArgument(args.size() == 2);
           Formula a1 = args.get(0);
           Formula a2 = args.get(1);
-          Preconditions.checkState(a1 instanceof BooleanFormula && a2 instanceof BooleanFormula);
+          checkState(a1 instanceof BooleanFormula && a2 instanceof BooleanFormula);
           return delegate.visitXor((BooleanFormula) a1, (BooleanFormula) a2);
         case IMPLIES:
-          Preconditions.checkArgument(args.size() == 2);
+          checkArgument(args.size() == 2);
           Formula b1 = args.get(0);
           Formula b2 = args.get(1);
-          Preconditions.checkArgument(b1 instanceof BooleanFormula && b2 instanceof BooleanFormula);
+          checkArgument(b1 instanceof BooleanFormula && b2 instanceof BooleanFormula);
           return delegate.visitImplication((BooleanFormula) b1, (BooleanFormula) b2);
         default:
           return delegate.visitAtom((BooleanFormula) f, toBooleanDeclaration(functionDeclaration));

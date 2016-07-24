@@ -119,7 +119,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
     assume()
         .withFailureMessage("Princess and Mathsat5 do not support unsat core generation")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.MATHSAT5);
+        .isNoneOf(PRINCESS, MATHSAT5);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

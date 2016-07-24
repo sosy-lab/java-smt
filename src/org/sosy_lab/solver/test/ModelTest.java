@@ -38,7 +38,6 @@ import org.sosy_lab.solver.api.ArrayFormula;
 import org.sosy_lab.solver.api.BitvectorFormula;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.Formula;
-import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.solver.api.FormulaType.BitvectorType;
 import org.sosy_lab.solver.api.FunctionDeclaration;
@@ -143,8 +142,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetUFs() throws Exception {
     IntegerFormula x =
-        fmgr.declareAndCallUF(
-            "UF", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
+        fmgr.declareAndCallUF("UF", IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
     testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
   }
 
@@ -153,7 +151,7 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
     FunctionDeclaration<IntegerFormula> declaration =
-        fmgr.declareUF("UF", FormulaType.IntegerType, FormulaType.IntegerType);
+        fmgr.declareUF("UF", IntegerType, IntegerType);
     IntegerFormula app1 = fmgr.callUF(declaration, arg1);
     IntegerFormula app2 = fmgr.callUF(declaration, arg2);
 
@@ -298,7 +296,7 @@ public class ModelTest extends SolverBasedTest0 {
         .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
-      IntegerFormula f = fmgr.declareAndCallUF("f", FormulaType.IntegerType, x);
+      IntegerFormula f = fmgr.declareAndCallUF("f", IntegerType, x);
 
       prover.push(imgr.equal(x, imgr.makeNumber(1)));
       assertThatEnvironment(prover).isSatisfiable();
@@ -327,7 +325,7 @@ public class ModelTest extends SolverBasedTest0 {
     assert amgr != null;
 
     ArrayFormula<IntegerFormula, IntegerFormula> array =
-        amgr.makeArray("array", FormulaType.IntegerType, FormulaType.IntegerType);
+        amgr.makeArray("array", IntegerType, IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
         amgr.store(array, imgr.makeNumber(1), imgr.makeNumber(1));
 

@@ -24,7 +24,6 @@ import static org.sosy_lab.solver.api.FormulaType.BooleanType;
 import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
 import com.google.common.collect.Lists;
-import com.google.common.truth.Truth;
 import com.google.common.truth.TruthJUnit;
 
 import org.junit.Test;
@@ -180,8 +179,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     // check that UFs were really eliminated
     Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
     Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
-    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf");
-    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+    assertThat(variablesAndUFs).doesNotContainKey("uf");
+    assertThat(variablesAndUFs).isEqualTo(variables);
   }
 
   @Test
@@ -212,9 +211,9 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     // check that UFs were really eliminated
     Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
     Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
-    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");
-    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf2");
-    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+    assertThat(variablesAndUFs).doesNotContainKey("uf1");
+    assertThat(variablesAndUFs).doesNotContainKey("uf2");
+    assertThat(variablesAndUFs).isEqualTo(variables);
   }
 
   private static class CNFChecker implements BooleanFormulaVisitor<Void> {
