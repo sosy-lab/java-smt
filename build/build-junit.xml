@@ -84,6 +84,7 @@
                 <sourcefiles encoding="UTF-8"><fileset dir="${source.dir}" excludes="**/*Test*,**/Dummy*/"/></sourcefiles>
             </structure>
             <html destdir="JUnit-coverage"/>
+            <xml destfile="${junit.dir}/coverage.xml"/>
         </jacoco:report>
         <junitreport todir="${junit.dir}">
             <fileset dir="${junit.dir}" includes="TEST-*.xml"/>
