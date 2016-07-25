@@ -113,7 +113,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     int numModels = msat_all_sat(curEnv, imp, uCallback);
 
     if (numModels == -1) {
-      throw new RuntimeException(
+      throw new SolverException(
           "Error occurred during Mathsat allsat: " + msat_last_error_message(curEnv));
 
     } else if (numModels == -2) {

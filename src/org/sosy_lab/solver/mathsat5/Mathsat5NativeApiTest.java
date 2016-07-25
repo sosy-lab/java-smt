@@ -76,14 +76,14 @@ public class Mathsat5NativeApiTest {
     long number = msat_make_bv_number(env, "42", 32, 10);
     long type = msat_term_get_type(number);
 
-    assertEquals(true, msat_is_bv_type(env, type));
+    assertTrue(msat_is_bv_type(env, type));
     assertEquals(32, msat_get_bv_type_size(env, type));
 
     long funcDecl = msat_declare_function(env, "testVar", type);
     long var = msat_make_constant(env, funcDecl);
     type = msat_term_get_type(var);
 
-    assertEquals(true, msat_is_bv_type(env, type));
+    assertTrue(msat_is_bv_type(env, type));
     assertEquals(32, msat_get_bv_type_size(env, type));
   }
 

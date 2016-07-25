@@ -47,8 +47,6 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   @SuppressWarnings("hiding")
   private final Z3FormulaCreator creator;
 
-  private @Nullable ImmutableList<ValueAssignment> assignments = null;
-
   private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
     Native.modelIncRef(z3context, z3model);
