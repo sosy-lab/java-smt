@@ -198,11 +198,7 @@ public class UfElimination {
           @Override
           public Integer visitFunction(
               Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
-            int depthOfArgs = pArgs
-                .stream()
-                .mapToInt(f -> fmgr.visit(f, this))
-                .max()
-                .orElse(0);
+            int depthOfArgs = pArgs.stream().mapToInt(f -> fmgr.visit(f, this)).max().orElse(0);
 
             // count only UFs
             if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
