@@ -29,8 +29,8 @@ import static org.sosy_lab.solver.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 
 import org.sosy_lab.solver.SolverException;
@@ -46,7 +46,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
 
   private static final Collection<String> ALLOWED_FAILURE_MESSAGES =
-      Lists.newArrayList(
+      ImmutableList.of(
           "impossible to build a suitable congruence graph",
           "can't build ie-local interpolant",
           "splitting of AB-mixed terms not supported",
