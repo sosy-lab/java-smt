@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
 
-  private final static List<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
+  private static final List<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
       ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
   @Parameters(name = "{0}")

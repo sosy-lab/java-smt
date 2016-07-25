@@ -114,10 +114,9 @@ public class SolverVisitorTest extends SolverBasedTest0 {
    */
   @Test
   public void testFormulaVisitor() {
-    IntegerFormula x, y, z;
-    x = imgr.makeVariable("x");
-    y = imgr.makeVariable("y");
-    z = imgr.makeVariable("z");
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
 
     BooleanFormula f = bmgr.or(imgr.equal(z, imgr.add(x, y)), imgr.equal(x, imgr.add(z, y)));
 

@@ -85,7 +85,7 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     return Joiner.on('\n').join(iterator());
   }
 
-  public static abstract class CachingAbstractModel<TFormulaInfo, TType, TEnv>
+  public abstract static class CachingAbstractModel<TFormulaInfo, TType, TEnv>
       extends AbstractModel<TFormulaInfo, TType, TEnv> {
 
     private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;

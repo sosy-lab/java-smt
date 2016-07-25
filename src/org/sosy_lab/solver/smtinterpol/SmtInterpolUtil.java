@@ -41,7 +41,7 @@ class SmtInterpolUtil {
       ApplicationTerm at = (ApplicationTerm) t;
       String function = at.getFunction().getName();
       if ("and".equals(function) || "or".equals(function)) {
-        str.append("(").append(function).append('\n');
+        str.append('(').append(function).append('\n');
         for (Term child : at.getParameters()) {
           prettyPrint(child, str, n + 1);
         }

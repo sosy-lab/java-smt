@@ -44,7 +44,7 @@ import java.util.List;
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesTest extends SolverBasedTest0 {
 
-  private final static String[] NAMES =
+  private static final String[] NAMES =
       new String[] {
         "as",
         "exists",
@@ -66,7 +66,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
         " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984",
       };
 
-  private final static String[] SPECIAL_NAMES =
+  private static final String[] SPECIAL_NAMES =
       new String[] {
         "true",
         "false",

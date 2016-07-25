@@ -74,9 +74,8 @@ public class OptimizationTest extends SolverBasedTest0 {
     requireRationals();
     assert rmgr != null;
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
-      RationalFormula x, obj;
-      x = rmgr.makeVariable("x");
-      obj = rmgr.makeVariable("obj");
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula obj = rmgr.makeVariable("obj");
       List<BooleanFormula> constraints =
           ImmutableList.of(rmgr.greaterOrEquals(x, rmgr.makeNumber("10")), rmgr.equal(x, obj));
       prover.addConstraint(bmgr.and(constraints));
@@ -92,9 +91,8 @@ public class OptimizationTest extends SolverBasedTest0 {
   public void testUnfeasible() throws Exception {
     requireRationals();
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
-      RationalFormula x, y;
-      x = rmgr.makeVariable("x");
-      y = rmgr.makeVariable("y");
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
       List<BooleanFormula> constraints =
           ImmutableList.of(rmgr.lessThan(x, y), rmgr.greaterThan(x, y));
       prover.addConstraint(bmgr.and(constraints));
@@ -108,10 +106,9 @@ public class OptimizationTest extends SolverBasedTest0 {
   public void testOptimal() throws Exception {
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
-      IntegerFormula x, y, obj;
-      x = imgr.makeVariable("x");
-      y = imgr.makeVariable("y");
-      obj = imgr.makeVariable("obj");
+      IntegerFormula x = imgr.makeVariable("x");
+      IntegerFormula y = imgr.makeVariable("y");
+      IntegerFormula obj = imgr.makeVariable("obj");
 
       /*
        int x, y, obj
@@ -154,10 +151,9 @@ public class OptimizationTest extends SolverBasedTest0 {
     requireRationals();
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
-      RationalFormula x, y, obj;
-      x = rmgr.makeVariable("x");
-      y = rmgr.makeVariable("y");
-      obj = rmgr.makeVariable("obj");
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      RationalFormula obj = rmgr.makeVariable("obj");
 
       prover.push();
 
@@ -206,10 +202,9 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   public void testCaching() throws Exception {
-    IntegerFormula x, y, obj;
-    x = imgr.makeVariable("x");
-    y = imgr.makeVariable("y");
-    obj = imgr.makeVariable("obj");
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula obj = imgr.makeVariable("obj");
     List<BooleanFormula> constraints =
         ImmutableList.of(
             imgr.lessOrEquals(x, imgr.makeNumber(10)),

@@ -220,7 +220,7 @@ public class SolverContextFactory {
    * <p>This interface is only meant to be implemented by SMT solvers
    * and used by this class, not by other classes.
    */
-  public static abstract class InnerUtilFactory {
+  public abstract static class InnerUtilFactory {
 
     public SolverContext create(
         Configuration config,

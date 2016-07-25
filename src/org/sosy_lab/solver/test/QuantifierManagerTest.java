@@ -291,7 +291,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testBlah() throws Exception {
-    IntegerFormula z = imgr.makeVariable("x"), y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
     assert qmgr != null;
     BooleanFormula f =
         qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), imgr.equal(z, y)));
