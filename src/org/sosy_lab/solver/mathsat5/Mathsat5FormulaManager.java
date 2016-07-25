@@ -98,7 +98,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
                 needsLinebreak = false;
               }
               if (needsLinebreak) {
-                smtString.append("\n");
+                smtString.append('\n');
               }
             }
             return smtString.toString();

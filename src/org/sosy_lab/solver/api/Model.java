@@ -171,9 +171,9 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     public String toString() {
       StringBuilder sb = new StringBuilder().append(name);
       if (!argumentsInterpretation.isEmpty()) {
-        sb.append("(");
+        sb.append('(');
         Joiner.on(", ").appendTo(sb, argumentsInterpretation);
-        sb.append(")");
+        sb.append(')');
       }
       return sb.append(": ").append(value).toString();
     }

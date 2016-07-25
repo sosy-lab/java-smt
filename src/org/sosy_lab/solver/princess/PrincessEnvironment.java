@@ -328,7 +328,7 @@ class PrincessEnvironment {
         }
 
         // now add the final assert
-        out.append("(assert ").append(SMTLineariser.asString(lettedFormula)).append(")");
+        out.append("(assert ").append(SMTLineariser.asString(lettedFormula)).append(')');
       }
     };
   }
@@ -340,7 +340,7 @@ class PrincessEnvironment {
       return var.toString();
     } else if (var instanceof IFunApp) {
       String fullStr = ((IFunApp) var).fun().toString();
-      return fullStr.substring(0, fullStr.indexOf("/"));
+      return fullStr.substring(0, fullStr.indexOf('/'));
     }
 
     throw new IllegalArgumentException("The given parameter is no variable or function");
