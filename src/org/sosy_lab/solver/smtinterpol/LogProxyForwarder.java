@@ -21,8 +21,6 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Throwables;
-
 import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 
 import org.sosy_lab.common.log.LogManager;
@@ -129,25 +127,11 @@ final class LogProxyForwarder implements LogProxy {
 
   @Override
   public void fatal(Object pArg0) {
-    if (pArg0 instanceof Throwable) {
-      // SMTInterpol has several "catch (Throwable t) { loger.fatal(t); }",
-      // which is very ugly because it also catches stuff like ThreadDeath and runtime exceptions.
-      // We do a similarly ugly thing and rethrow such exceptions here
-      // (at least for errors and runtime exceptions).
-      Throwables.propagateIfPossible((Throwable) pArg0);
-    }
     delegate.log(LEVEL_FATAL, pArg0);
   }
 
   @Override
   public void fatal(String pArg0, Object... pArg1) {
-    if (pArg1.length > 0 && pArg1[0] instanceof Throwable) {
-      // SMTInterpol has several "catch (Throwable t) { loger.fatal(t); }",
-      // which is very ugly because it also catches stuff like ThreadDeath and runtime exceptions.
-      // We do a similarly ugly thing and rethrow such exceptions here
-      // (at least for errors and runtime exceptions).
-      Throwables.propagateIfPossible((Throwable) pArg1[0]);
-    }
     delegate.logf(LEVEL_FATAL, pArg0, pArg1);
   }
 
