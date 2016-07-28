@@ -106,7 +106,7 @@
         <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.0" conf="build->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-282-g2d451cf" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-290-g24167dc" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
         <dependency org="org.ruemmer.philipp" name="princess" rev="2016-06-27-r2652" conf="runtime-princess->runtime; contrib->sources">
