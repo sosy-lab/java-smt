@@ -39,7 +39,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-class SmtInterpolSolverContext extends AbstractSolverContext {
+public class SmtInterpolSolverContext extends AbstractSolverContext {
 
   private final SmtInterpolEnvironment environment;
   private final SmtInterpolFormulaManager manager;
