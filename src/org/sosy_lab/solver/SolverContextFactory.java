@@ -243,14 +243,12 @@ public class SolverContextFactory {
 
   // ---- Custom class loaders ----
 
-  private static final String solverPathPrefix = "org.sosy_lab.solver";
-
   // For Z3 we need a custom class loader as it's JAR file calls "System.loadLibrary",
   // and we have to force it to look in the correct directory.
-  private static final String Z3_FACTORY_CLASS = solverPathPrefix + ".z3.Z3LoadingFactory";
+  private static final String Z3_PACKAGE = "org.sosy_lab.solver.z3";
+  private static final String Z3_FACTORY_CLASS = Z3_PACKAGE + ".Z3LoadingFactory";
   private static final Pattern Z3_CLASSES =
-      Pattern.compile(
-          "^(" + "com\\.microsoft\\.z3|" + Pattern.quote(solverPathPrefix) + "\\.z3" + ")\\..*");
+      Pattern.compile("^(" + "com\\.microsoft\\.z3|" + Pattern.quote(Z3_PACKAGE) + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
   private static final Set<String> expectedLibrariesToLoad =
