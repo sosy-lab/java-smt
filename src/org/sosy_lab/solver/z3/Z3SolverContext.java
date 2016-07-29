@@ -242,7 +242,12 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return Native.getFullVersion();
+    Native.IntPtr major = new Native.IntPtr();
+    Native.IntPtr minor = new Native.IntPtr();
+    Native.IntPtr build = new Native.IntPtr();
+    Native.IntPtr revision = new Native.IntPtr();
+    Native.getVersion(major, minor, build, revision);
+    return "Z3 " + major.value + "." + minor.value + "." + build.value + "." + revision.value;
   }
 
   @Override

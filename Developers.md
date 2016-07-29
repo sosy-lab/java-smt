@@ -70,7 +70,7 @@ JavaSMT.
 ### Publishing Z3 ###
 To publish Z3, [download it](https://github.com/Z3Prover/z3) and build it with the following command in its directory on a 64bit system:
 ```
-./configure --staticlib --java --git-describe && cd build && make -j 2
+./configure --staticlib --java && cd build && make -j 2
 ```
 
 Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
