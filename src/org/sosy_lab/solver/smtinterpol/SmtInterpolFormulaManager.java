@@ -21,8 +21,6 @@ package org.sosy_lab.solver.smtinterpol;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-import com.google.common.collect.ImmutableList;
-
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FormulaLet;
@@ -45,7 +43,6 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class SmtInterpolFormulaManager
@@ -165,25 +162,5 @@ class SmtInterpolFormulaManager
   @Override
   public Term simplify(Term pF) {
     return getFormulaCreator().getEnv().simplify(pF);
-  }
-
-  @Override
-  protected List<Term> splitNumeralEqualityIfPossible(Term pF) {
-    // we need a function "=" with exactly two parameters
-    if ((pF instanceof ApplicationTerm)
-        && "=".equals(((ApplicationTerm) pF).getFunction().getName())
-        && ((ApplicationTerm) pF).getParameters().length == 2) {
-
-      Term arg0 = ((ApplicationTerm) pF).getParameters()[0];
-      Term arg1 = ((ApplicationTerm) pF).getParameters()[1];
-      assert arg0 != null && arg1 != null;
-      assert arg0.getSort().equals(arg1.getSort());
-      if (arg0.getTheory().getBooleanSort() != arg0.getSort()) {
-        return ImmutableList.of(
-            getFormulaCreator().getEnv().term("<=", arg0, arg1),
-            getFormulaCreator().getEnv().term("<=", arg1, arg0));
-      }
-    }
-    return ImmutableList.of(pF);
   }
 }

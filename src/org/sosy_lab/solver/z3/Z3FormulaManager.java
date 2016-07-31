@@ -19,13 +19,8 @@
  */
 package org.sosy_lab.solver.z3;
 
-import static org.sosy_lab.solver.z3.Z3FormulaCreator.isOP;
-
-import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
-import com.microsoft.z3.enumerations.Z3_decl_kind;
-import com.microsoft.z3.enumerations.Z3_sort_kind;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -36,7 +31,6 @@ import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -151,44 +145,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     } catch (Z3Exception exp) {
       throw formulaCreator.handleZ3Exception(exp);
     }
-  }
-
-  @Override
-  protected List<? extends Long> splitNumeralEqualityIfPossible(Long pF) {
-    long z3context = getFormulaCreator().getEnv();
-    if (isOP(z3context, pF, Z3_decl_kind.Z3_OP_EQ.toInt())
-        && Native.getAppNumArgs(z3context, pF) == 2) {
-      long arg0 = Native.getAppArg(z3context, pF, 0);
-      Native.incRef(z3context, arg0);
-      long arg1 = Native.getAppArg(z3context, pF, 1);
-      Native.incRef(z3context, arg1);
-
-      try {
-        long sortKind = Native.getSortKind(z3context, Native.getSort(z3context, arg0));
-        assert sortKind == Native.getSortKind(z3context, Native.getSort(z3context, arg1));
-        if (sortKind == Z3_sort_kind.Z3_BV_SORT.toInt()) {
-
-          long out1 = Native.mkBvule(z3context, arg0, arg1);
-          Native.incRef(z3context, out1);
-          long out2 = Native.mkBvuge(z3context, arg0, arg1);
-          Native.incRef(z3context, out2);
-
-          return ImmutableList.of(out1, out2);
-        } else if (sortKind == Z3_sort_kind.Z3_INT_SORT.toInt()
-            || sortKind == Z3_sort_kind.Z3_REAL_SORT.toInt()) {
-
-          long out1 = Native.mkLe(z3context, arg0, arg1);
-          Native.incRef(z3context, out1);
-          long out2 = Native.mkGe(z3context, arg0, arg1);
-          Native.incRef(z3context, out2);
-          return ImmutableList.of(out1, out2);
-        }
-      } finally {
-        Native.decRef(z3context, arg0);
-        Native.decRef(z3context, arg1);
-      }
-    }
-    return ImmutableList.of(pF);
   }
 
   @Override

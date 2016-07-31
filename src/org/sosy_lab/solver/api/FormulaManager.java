@@ -238,15 +238,4 @@ public interface FormulaManager {
    * @return Formula belonging to {@code this} context.
    */
   BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
-
-  /**
-   * For a numeral (i.e., non-boolean) equality "x = y",
-   * return a list {@code x<=y, x>=y}.
-   *
-   * <p>Otherwise, return the list consisting of the input formula.
-   * Note:
-   *  1) Returned list always has one or two elements.
-   *  2) Conjunction over the returned list is equivalent to the input formula.
-   */
-  <T extends Formula> List<T> splitNumeralEqualityIfPossible(T f);
 }

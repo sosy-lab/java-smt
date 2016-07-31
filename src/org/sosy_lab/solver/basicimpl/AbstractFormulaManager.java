@@ -21,8 +21,6 @@ package org.sosy_lab.solver.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
-
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.ArrayFormulaManager;
 import org.sosy_lab.solver.api.BooleanFormula;
@@ -306,14 +304,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   private <T extends Formula> T encapsulateWithTypeOf(T f, TFormulaInfo e) {
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), e);
   }
-
-  @Override
-  public <T extends Formula> List<T> splitNumeralEqualityIfPossible(final T pF) {
-    return Lists.transform(
-        splitNumeralEqualityIfPossible(extractInfo(pF)), input -> encapsulateWithTypeOf(pF, input));
-  }
-
-  protected abstract List<? extends TFormulaInfo> splitNumeralEqualityIfPossible(TFormulaInfo pF);
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherContext) {

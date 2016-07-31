@@ -91,16 +91,4 @@ final class PrincessFormulaManager
     }
     return PartialEvaluator.apply(f);
   }
-
-  @Override
-  protected List<? extends IExpression> splitNumeralEqualityIfPossible(IExpression pF) {
-    // Princess does not support Equal.
-    // Formulas are converted from "a==b" to "a+(-b)==0".
-    if (pF instanceof IIntFormula && ((IIntFormula) pF).rel() == IIntRelation.EqZero()) {
-      return ImmutableList.of(
-          ((IIntFormula) pF).t().$less$eq(new IIntLit(IdealInt.ZERO())),
-          ((IIntFormula) pF).t().$greater$eq(new IIntLit(IdealInt.ZERO())));
-    }
-    return ImmutableList.of(pF);
-  }
 }
