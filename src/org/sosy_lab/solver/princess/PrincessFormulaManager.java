@@ -21,23 +21,15 @@ package org.sosy_lab.solver.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-import ap.basetypes.IdealInt;
 import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-import ap.parser.IIntFormula;
-import ap.parser.IIntLit;
-import ap.parser.IIntRelation;
 import ap.parser.PartialEvaluator;
-
-import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.solver.api.BooleanFormula;
 import org.sosy_lab.solver.api.FormulaType;
 import org.sosy_lab.solver.basicimpl.AbstractFormulaManager;
-
-import java.util.List;
 
 final class PrincessFormulaManager
     extends AbstractFormulaManager<
