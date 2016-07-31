@@ -301,10 +301,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator.extractVariablesAndUFs(f, true);
   }
 
-  private <T extends Formula> T encapsulateWithTypeOf(T f, TFormulaInfo e) {
-    return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), e);
-  }
-
   @Override
   public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherContext) {
     return parse(otherContext.dumpFormula(other).toString());
