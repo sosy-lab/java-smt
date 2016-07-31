@@ -125,6 +125,16 @@ public enum FunctionDeclarationKind {
   EQ,
 
   /**
+   * Unary comparison to zero.
+   */
+  EQ_ZERO,
+
+  /**
+   * Unary comparison with zero.
+   */
+  GTE_ZERO,
+
+  /**
    * Solvers support a lot of different built-in theories.
    * We enforce standardization only across a small subset.
    */

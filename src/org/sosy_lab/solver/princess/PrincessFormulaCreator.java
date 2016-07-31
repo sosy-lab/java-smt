@@ -240,9 +240,9 @@ class PrincessFormulaCreator
     } else if (input instanceof IIntFormula) {
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {
-        return FunctionDeclarationKind.EQ;
+        return FunctionDeclarationKind.EQ_ZERO;
       } else if (f.rel().equals(IIntRelation.GeqZero())) {
-        return FunctionDeclarationKind.GTE;
+        return FunctionDeclarationKind.GTE_ZERO;
       } else {
         throw new AssertionError("Unhandled value for integer relation");
       }
