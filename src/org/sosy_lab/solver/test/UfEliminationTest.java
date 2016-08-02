@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.test;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.sosy_lab.solver.api.FormulaType.BooleanType;
 import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
@@ -28,7 +29,9 @@ import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -59,6 +62,8 @@ public class UfEliminationTest extends SolverBasedTest0 {
   protected Solvers solverToUse() {
     return solver;
   }
+
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   private UfElimination ackermannization;
 
@@ -166,6 +171,27 @@ public class UfEliminationTest extends SolverBasedTest0 {
     Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");
     Truth.assertThat(variablesAndUFs).doesNotContainKey("uf2");
     Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+  }
+
+  @Test
+  public void quantifierTest() {
+    requireQuantifiers();
+    // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+    BooleanFormula f =
+        qmgr.exists(
+            newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
+
+    thrown.expect(IllegalArgumentException.class);
+    ackermannization.eliminateUfs(f).getFormula();
   }
 
   @Test

@@ -33,6 +33,7 @@ public enum Tactic {
   /**
    * Replaces all applications of UFs with fresh variables and adds constraints to enforce the
    * functional consistency.
+   * Quantified formulas are not supported.
    */
   ACKERMANNIZATION,
 

@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.test;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.solver.api.FormulaType.BooleanType;
 import static org.sosy_lab.solver.api.FormulaType.IntegerType;
@@ -26,7 +27,9 @@ import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 import com.google.common.collect.Lists;
 import com.google.common.truth.TruthJUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -56,6 +59,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
   }
 
   @Parameter public Solvers solver;
+
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Override
   protected Solvers solverToUse() {
@@ -214,6 +219,27 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     assertThat(variablesAndUFs).doesNotContainKey("uf1");
     assertThat(variablesAndUFs).doesNotContainKey("uf2");
     assertThat(variablesAndUFs).isEqualTo(variables);
+  }
+
+  @Test
+  public void ufEliminationNesteQuantifierTest() throws InterruptedException {
+    requireQuantifiers();
+    // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+    BooleanFormula f =
+        qmgr.exists(
+            newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
+
+    thrown.expect(IllegalArgumentException.class);
+    mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
   }
 
   private static class CNFChecker implements BooleanFormulaVisitor<Void> {

@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.solver.basicimpl.tactics;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.annotation.CheckReturnValue;
@@ -98,10 +100,13 @@ public class UfElimination {
 
   /**
    * Applies the Ackermann transformation to the given {@link Formula}.
+   * Quantified formulas are not supported.
    * @param f the {@link Formula} to remove all Ufs from
    * @return the new {@link Formula} and the substitution done during transformation
    */
   public Result eliminateUfs(BooleanFormula f) {
+    checkArgument(!isQuantifed(f));
+
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = findUFs(f);
     int depth = getNestingDepthOfUfs(f);
 
@@ -183,6 +188,31 @@ public class UfElimination {
     }
 
     return t;
+  }
+
+  private boolean isQuantifed(Formula f) {
+    AtomicBoolean result = new AtomicBoolean();
+    fmgr.visitRecursively(
+        f,
+        new DefaultFormulaVisitor<TraversalProcess>() {
+
+          @Override
+          protected TraversalProcess visitDefault(Formula pF) {
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitQuantifier(
+              BooleanFormula pF,
+              Quantifier pQ,
+              List<Formula> pBoundVariables,
+              BooleanFormula pBody) {
+            result.set(true);
+            return TraversalProcess.ABORT;
+          }
+        });
+
+    return result.get();
   }
 
   private int getNestingDepthOfUfs(Formula f) {
