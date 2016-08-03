@@ -30,9 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -63,8 +61,6 @@ public class UfEliminationTest extends SolverBasedTest0 {
   protected Solvers solverToUse() {
     return solver;
   }
-
-  @Rule public ExpectedException thrown = ExpectedException.none();
 
   private UfElimination ackermannization;
 
