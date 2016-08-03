@@ -28,9 +28,7 @@ import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 import com.google.common.collect.Lists;
 import com.google.common.truth.TruthJUnit;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -60,8 +58,6 @@ public class SolverTacticsTest extends SolverBasedTest0 {
   }
 
   @Parameter public Solvers solver;
-
-  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Override
   protected Solvers solverToUse() {
