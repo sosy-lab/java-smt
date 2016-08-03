@@ -76,12 +76,12 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final Value result = api.checkSat(true);
-    if (result == SimpleAPI.ProverStatus$.MODULE$.Sat()) {
+    if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       wasLastSatCheckSat = true;
       return false;
-    } else if (result == SimpleAPI.ProverStatus$.MODULE$.Unsat()) {
+    } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
-    } else if (result == SimpleAPI.ProverStatus$.MODULE$.OutOfMemory()) {
+    } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.OutOfMemory())) {
       throw new SolverException(
           "Princess ran out of stack or heap memory, try increasing their sizes.");
     } else {

@@ -255,7 +255,7 @@ class PrincessFormulaCreator
   }
 
   private static boolean isBinaryFunction(IExpression t, Enumeration.Value val) {
-    return (t instanceof IBinFormula) && val == ((IBinFormula) t).j(); // j is the operator
+    return (t instanceof IBinFormula) && val.equals(((IBinFormula) t).j()); // j is the operator
   }
 
   public IExpression makeFunction(PrincessFunctionDeclaration pFuncDecl, List<IExpression> args) {
