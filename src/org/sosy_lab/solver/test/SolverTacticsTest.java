@@ -21,6 +21,7 @@ package org.sosy_lab.solver.test;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.solver.api.FormulaType.BooleanType;
 import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
@@ -238,8 +239,11 @@ public class SolverTacticsTest extends SolverBasedTest0 {
         qmgr.exists(
             newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
 
-    thrown.expect(IllegalArgumentException.class);
-    mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
+    try {
+      mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
+      fail();
+    } catch (IllegalArgumentException expected) {
+    }
   }
 
   private static class CNFChecker implements BooleanFormulaVisitor<Void> {
