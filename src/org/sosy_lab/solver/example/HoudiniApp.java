@@ -38,7 +38,7 @@ import java.util.logging.Level;
  *
  * <p>A lemma F is called inductive with respect to T
  * if it implies itself over the primed variables after the transition:
- *     FORALL X, X' . AND( F(X), T(X, X') ) => F(X')
+ *     FORALL X, X' . IMPLIES( AND( F(X), T(X, X') ), F(X'))
  * i.e. in other words, the formula
  *     AND( F(X), T(X, X'), NOT(F(X')) )
  * is unsatisfiable.
