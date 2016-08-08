@@ -1101,15 +1101,15 @@ DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
   jclass cls = (*jenv)->FindClass(jenv,
     "org/sosy_lab/solver/mathsat5/Mathsat5NativeApi$TerminationTest");
   if (cls == NULL) {
-    return;
+    return 0;
   }
   jmethodID mid = (*jenv)->GetMethodID(jenv, cls, "shouldTerminate", "()Z");
   if (mid == NULL) {
-    return;
+    return 0;
   }
   if (arg2 == NULL) {
     throwException(jenv, "java/lang/NullPointerException", "TerminationTest may not be null");
-    return;
+    return 0;
   }
 
   // We can't use a struct on the stack here
@@ -1124,7 +1124,7 @@ DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
   if (retval != 0) {
     const char *msg = msat_last_error_message(m_arg1);
     throwException(jenv, "java/lang/IllegalArgumentException", msg);
-    return;
+    return 0;
   }
   // Ugly: return the struct's address so that it can be free'd later on.
   return (long)helper;

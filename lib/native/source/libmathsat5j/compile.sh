@@ -85,7 +85,8 @@ fi
 echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library"
 
 # This will compile the JNI wrapper part, given the JNI and the Mathsat header files
-gcc -g $JNI_HEADERS -I$MSAT_SRC_DIR -I$GMP_HEADER_DIR $SRC_FILES -fPIC -c
+gcc -g -std=gnu99 -Wall -Wextra -Wpedantic -Wno-return-type -Wno-unused-parameter $JNI_HEADERS -I$MSAT_SRC_DIR -I$GMP_HEADER_DIR $SRC_FILES -fPIC -c
+echo "Compilation Done"
 
 # This will link together the file produced above, the Mathsat library, the GMP library and the standard libraries.
 # Everything except the standard libraries is included statically.

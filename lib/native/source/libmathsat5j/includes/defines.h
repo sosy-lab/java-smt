@@ -49,7 +49,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 #define STRUCT_ARG(mtype, num) \
   if (arg##num == 0) { \
     throwException(jenv, "java/lang/IllegalArgumentException", "Null passed to MathSAT"); \
-    return; \
+    return 0; \
   } \
   mtype m_arg##num; \
   m_arg##num.repr = (void *)((size_t)arg##num);
@@ -286,7 +286,7 @@ typedef jlongArray jjtypeArray;
 #define TYPE_POINTER_ARG(num) STRUCT_POINTER_ARG(msat_type, num)
 
 typedef jint jjboolean;
-#define BOOLEAN_RETURN INT_RETURN;
+#define BOOLEAN_RETURN INT_RETURN
 
 typedef jlong jjobjective_iterator;
 #define OBJECTIVE_ITERATOR_ARG(num) STRUCT_ARG(msat_objective_iterator, num)
