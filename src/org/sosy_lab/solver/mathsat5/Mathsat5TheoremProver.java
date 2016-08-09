@@ -119,7 +119,10 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
           "Error occurred during Mathsat allsat: " + msat_last_error_message(curEnv));
 
     } else if (numModels == -2) {
-      throw new SolverException("Number of models should be finite with boolean predicates");
+      // Formula is trivially tautological.
+      // With the current API, we have no way of signaling this except by iterating over all 2^n
+      // models, which is probably not what we want.
+      throw new UnsupportedOperationException("allSat for trivially tautological formula");
     }
     return callback.getResult();
   }
