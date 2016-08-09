@@ -1,0 +1,4 @@
+MATHSAT5J {
+  global: Java_*;
+  local: *;
+};

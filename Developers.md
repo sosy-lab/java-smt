@@ -80,7 +80,11 @@ ant publish-z3 -Dz3.path=$Z3_DIR
 Finally follow the instructions shown in the message at the end.
 
 ### Publish MathSAT5 ###
-For publishing MathSAT5, [download the binary release](http://mathsat.fbk.eu/download.html), unpack it, and execute the following command in the JavaSMT directory, where `$MATHSAT_PATH` is the path to the MathSAT directory, and `$MATHSAT_VERSION` is the version number of MathSAT:
+For publishing MathSAT5, you need to use a machine with at least GCC 4.9.
+First, [download the binary release](http://mathsat.fbk.eu/download.html), unpack it,
+and then execute the following command in the JavaSMT directory,
+where `$MATHSAT_PATH` is the path to the MathSAT directory,
+and `$MATHSAT_VERSION` is the version number of MathSAT:
 ```
 ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dmathsat.version=$MATHSAT_VERSION
 ```

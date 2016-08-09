@@ -92,7 +92,7 @@ echo "Compilation Done"
 # Everything except the standard libraries is included statically.
 # The result is a shared library.
 if [ `uname -m` = "x86_64" ]; then
-	gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libmathsat5j.so -L. -L$MSAT_LIB_DIR -L$GMP_LIB_DIR -I$GMP_HEADER_DIR versions.o $OBJ_FILES -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++ -Wl,--wrap=memcpy
+	gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libmathsat5j.so -L. -L$MSAT_LIB_DIR -L$GMP_LIB_DIR -I$GMP_HEADER_DIR versions.o $OBJ_FILES -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm -Wl,--wrap=memcpy -Wl,--version-script=libmathsat5j.version
 else
 	gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libmathsat5j.so -L$MSAT_LIB_DIR -L$GMP_LIB_DIR -I$GMP_HEADER_DIR $OBJ_FILES -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
 fi
