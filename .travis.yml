@@ -8,7 +8,7 @@ env:
   global:
   - GH_REF: github.com/dbeyer/java-smt.git
 install:
-  - ant resolve-dependencies
+  - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
 script:
   - ant build-project-ecj
   - ant clean unit-tests-coverage
