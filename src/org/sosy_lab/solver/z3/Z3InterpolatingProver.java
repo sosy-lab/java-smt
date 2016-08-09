@@ -32,7 +32,11 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.solver.SolverException;
 import org.sosy_lab.solver.api.BooleanFormula;
+import org.sosy_lab.solver.api.Formula;
 import org.sosy_lab.solver.api.InterpolatingProverEnvironment;
+import org.sosy_lab.solver.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.solver.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.solver.visitors.TraversalProcess;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -234,7 +238,49 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       Native.decRef(z3context, partition);
     }
 
+    checkInterpolantsForUnboundVariables(result); // Do this last after cleanup.
+
     return result;
+  }
+
+  /**
+   * Check whether any formula in a given list contains unbound variables.
+   * Z3 has the problem that it sometimes returns such invalid formulas as interpolants
+   * (https://github.com/Z3Prover/z3/issues/665).
+   */
+  private void checkInterpolantsForUnboundVariables(List<BooleanFormula> itps)
+      throws SolverException {
+    List<Formula> unboundVariables = new ArrayList<>(1);
+    final DefaultFormulaVisitor<TraversalProcess> unboundVariablesCollector =
+        new DefaultFormulaVisitor<TraversalProcess>() {
+          @Override
+          public TraversalProcess visitBoundVariable(Formula f, int deBruijnIdx) {
+            unboundVariables.add(f);
+            return TraversalProcess.ABORT;
+          }
+
+          @Override
+          public TraversalProcess visitQuantifier(
+              BooleanFormula pF,
+              Quantifier pQ,
+              List<Formula> pBoundVariables,
+              BooleanFormula pBody) {
+            return TraversalProcess.SKIP; // bound variables in quantifiers are probably ok
+          }
+
+          @Override
+          protected TraversalProcess visitDefault(org.sosy_lab.solver.api.Formula pF) {
+            return TraversalProcess.CONTINUE;
+          }
+        };
+
+    for (BooleanFormula itp : itps) {
+      creator.visitRecursively(unboundVariablesCollector, itp);
+      if (!unboundVariables.isEmpty()) {
+        throw new SolverException(
+            "Unbound variable " + unboundVariables.get(0) + " in interpolant " + itp);
+      }
+    }
   }
 
   @Override
