@@ -110,7 +110,9 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       imp[i++] = getMsatTerm(impF);
     }
     MathsatAllSatCallback<T> uCallback = new MathsatAllSatCallback<>(callback);
+    push();
     int numModels = msat_all_sat(curEnv, imp, uCallback);
+    pop();
 
     if (numModels == -1) {
       throw new SolverException(
