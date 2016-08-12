@@ -159,7 +159,7 @@ public class UfElimination {
               .collect(Collectors.toList());
     }
 
-    BooleanFormula newFormula = bfmgr.implication(bfmgr.and(extraConstraints), formulaNoUFs);
+    BooleanFormula newFormula = bfmgr.and(bfmgr.and(extraConstraints), formulaNoUFs);
     return new Result(newFormula, substitutions);
   }
 
