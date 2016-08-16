@@ -254,6 +254,11 @@ with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
  - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
  - [Documentation For Developers](https://github.com/sosy-lab/java-smt/blob/master/Developers.md)
 
+### Additional Acknowledgements
+
+ - Profiled with [jProfiler][] Java Profiler.
+ 
+[jProfiler]: http://www.ej-technologies.com/products/jprofiler/overview.html
 [common]: https://github.com/sosy-lab/java-common-lib
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
