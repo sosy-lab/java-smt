@@ -1,7 +1,4 @@
 language: java
-# Only for newer ant, containers on Travis only have ant 1.8.2 which fails
-sudo: required
-dist: trusty
 jdk:
   - oraclejdk8
 env:
