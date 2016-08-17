@@ -1,5 +1,7 @@
 #include "includes/defines.h"
 
+void throwException(JNIEnv *env, const char *name, const char *msg);
+
 DEFINE_FUNC(jobjective, 1push_1minimize) WITH_FOUR_ARGS(jenv, jterm, string, string)
 ENV_ARG(1)
 TERM_ARG(2)
@@ -59,7 +61,7 @@ PUT_OBJECTIVE_POINTER_ARG(2)
 INT_RETURN
 
 DEFINE_FUNC(void, 1destroy_1objective_1iterator) WITH_ONE_ARG(jobjective_iterator)
-OBJECTIVE_ITERATOR_ARG(1)
+OBJECTIVE_ITERATOR_ARG_VOID(1)
 VOID_CALL1(destroy_objective_iterator)
 
 DEFINE_FUNC(int, 1objective_1result) WITH_TWO_ARGS(jenv, jobjective)

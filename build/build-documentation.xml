@@ -40,10 +40,10 @@
 
             <fileset dir="${source.dir}" defaultexcludes="yes">
                 <exclude name="**/*Test.java"/>
-                <exclude name="org/sosy_lab/solver/mathsat5/*"/>
-                <exclude name="org/sosy_lab/solver/princess/*"/>
-                <exclude name="org/sosy_lab/solver/smtinterpol/*"/>
-                <exclude name="org/sosy_lab/solver/z3/*"/>
+                <exclude name="org/sosy_lab/java_smt/solvers/mathsat5/*"/>
+                <exclude name="org/sosy_lab/java_smt/solvers/princess/*"/>
+                <exclude name="org/sosy_lab/java_smt/solvers/smtinterpol/*"/>
+                <exclude name="org/sosy_lab/java_smt/solvers/z3/*"/>
             </fileset>
             <link href="http://docs.oracle.com/javase/8/docs/api/"/>
             <link href="https://google.github.io/guava/releases/19.0/api/docs/"/>
