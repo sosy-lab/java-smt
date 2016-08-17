@@ -6,6 +6,10 @@ env:
   - GH_REF: github.com/dbeyer/java-smt.git
 install:
   - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
 matrix:
   include:
     - script:
