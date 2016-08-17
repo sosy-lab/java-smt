@@ -22,10 +22,10 @@ package org.sosy_lab.java_smt.logging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 import java.util.Collection;
 import java.util.List;

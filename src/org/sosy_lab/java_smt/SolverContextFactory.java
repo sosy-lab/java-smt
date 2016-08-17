@@ -256,7 +256,8 @@ public class SolverContextFactory {
   private static final Pattern SMTINTERPOL_CLASSES =
       Pattern.compile(
           "^("
-              + Pattern.quote(solverPathPrefix) + "\\.smtinterpol|"
+              + Pattern.quote(solverPathPrefix)
+              + "\\.smtinterpol|"
               + "de\\.uni_freiburg\\.informatik\\.ultimate|"
               + "java_cup\\.runtime|"
               + "org\\.apache\\.log4j"

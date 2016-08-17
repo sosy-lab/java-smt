@@ -20,9 +20,9 @@
 
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 import java.util.Collection;
 import java.util.List;

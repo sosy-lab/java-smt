@@ -21,10 +21,10 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.collect.Lists;
 
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 
 import java.util.List;
 

@@ -30,9 +30,9 @@ import ap.parser.INot;
 import com.google.common.base.Preconditions;
 
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 import scala.Option;
 

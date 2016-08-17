@@ -30,11 +30,11 @@ import com.microsoft.z3.Z3Exception;
 import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.visitors.TraversalProcess;
 
