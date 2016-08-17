@@ -24,6 +24,10 @@ matrix:
         - ant format-source && git diff -s --exit-code
       jdk: oraclejdk8
       env: NAME=format-source
+    - script:
+        - ant build-project-ecj
+      jdk: oraclejdk8
+      env: NAME=ECJ
 script:
   - ant build-project
   - ant clean unit-tests-coverage
