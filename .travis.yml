@@ -36,7 +36,7 @@ matrix:
         - ant unit-tests-coverage
         - ant javadoc
       jdk: oraclejdk8
-      env: NAME=Build DEPLOY=true
+      env: NAME='Testing and Javadoc' DEPLOY=true
 deploy:
   - skip_cleanup: true
     provider: script
