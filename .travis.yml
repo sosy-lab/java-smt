@@ -4,6 +4,7 @@ jdk:
 env:
   global:
   - GH_REF: github.com/dbeyer/java-smt.git
+  - NAME: Build and Deploy
 install:
   - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
 addons:
