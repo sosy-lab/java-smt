@@ -4,33 +4,46 @@ jdk:
 env:
   global:
   - GH_REF: github.com/dbeyer/java-smt.git
-  - CMD=""
-  - CMD2=""
-  matrix:
-  - NAME=FindBugs      DEPLOY=false CMD='ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml'
-  - NAME=Checkstyle    DEPLOY=false CMD='ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]'
-  - NAME=format-source DEPLOY=false CMD='ant format-source && git diff -s --exit-code'
-  - NAME=ECJ           DEPLOY=false CMD='ant build-project-ecj'
-  - NAME=Build         DEPLOY=false CMD='ant build-project'
-  - NAME=Coverage      DEPLOY=true  CMD='ant unit-tests-coverage' CMD2='ant javadoc'
-
 install:
   - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
 addons:
   apt:
     packages:
       - oracle-java8-installer
-
-script:
-  - $CMD
-  - $CMD2
+matrix:
+  include:
+    - script:
+        - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
+      jdk: oraclejdk8
+      env: NAME=FindBugs DEPLOY=false
+    - script:
+        - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
+      jdk: oraclejdk8
+      env: NAME=Checkstyle DEPLOY=false
+    - script:
+        - ant format-source && git diff -s --exit-code
+      jdk: oraclejdk8
+      env: NAME=format-source DEPLOY=false
+    - script:
+        - ant build-project-ecj
+      jdk: oraclejdk8
+      env: NAME='Build ECJ' DEPLOY=false
+    - script:
+        - ant build-project
+      jdk: oraclejdk8
+      env: NAME=Build DEPLOY=false
+    - script:
+        - ant unit-tests-coverage
+        - ant javadoc
+      jdk: oraclejdk8
+      env: NAME=Build DEPLOY=true
 deploy:
   - skip_cleanup: true
     provider: script
-    script: DEPLOY && build/deploy-gh-pages.sh
+    script: $DEPLOY && build/deploy-gh-pages.sh
   - skip_cleanup: true
     provider: script
-    script: DEPLOY && build/deploy-coverage.sh
+    script: $DEPLOY && build/deploy-coverage.sh
 notifications:
   email:
   - java-smt-dev@googlegroups.com
