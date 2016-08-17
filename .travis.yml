@@ -1,7 +1,4 @@
 language: java
-# Only for newer ant, containers on Travis only have ant 1.8.2 which fails
-sudo: required
-dist: trusty
 jdk:
   - oraclejdk8
 env:
@@ -9,13 +6,32 @@ env:
   - GH_REF: github.com/dbeyer/java-smt.git
 install:
   - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+matrix:
+  include:
+    - script:
+        - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
+      jdk: oraclejdk8
+      env: NAME=FindBugs
+    - script:
+        - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
+      jdk: oraclejdk8
+      env: NAME=Checkstyle
+    - script:
+        - ant format-source && git diff -s --exit-code
+      jdk: oraclejdk8
+      env: NAME=format-source
+    - script:
+        - ant build-project-ecj
+      jdk: oraclejdk8
+      env: NAME=ECJ
 script:
-  - ant build-project-ecj
+  - ant build-project
   - ant clean unit-tests-coverage
-  - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
-  - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
   - ant javadoc
-  - ant format-source && git diff -s --exit-code
 deploy:
   - skip_cleanup: true
     provider: script
@@ -26,6 +42,8 @@ deploy:
 notifications:
   email:
   - java-smt-dev@googlegroups.com
+git:
+  depth: 1
 cache:
   directories:
   - $HOME/.ivy2
