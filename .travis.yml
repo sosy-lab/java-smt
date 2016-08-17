@@ -39,17 +39,12 @@ matrix:
       env: NAME='Testing and Javadoc' DEPLOY=true
 script:
   - true # overrides default script from Travis
-deploy:
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-gh-pages.sh
-    on:
-      condition: "$DEPLOY" = true
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-coverage.sh
-    on:
-      condition: "$DEPLOY" = true
+after_success:
+  # deploy documentation if deployment enabled and we are on master
+  - export PR=https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
+  - if [[ "$DEPLOY" = true -a "$BRANCH" = master ]]; then build/deploy-coverage.sh; fi
+  - if [[ "$DEPLOY" = true ]]; then build/deploy-coverage.sh; fi
 notifications:
   email:
   - java-smt-dev@googlegroups.com
