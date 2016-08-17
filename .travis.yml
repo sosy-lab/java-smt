@@ -44,13 +44,11 @@ deploy:
     provider: script
     script: build/deploy-gh-pages.sh
     on:
-      branch: master
       condition: "$DEPLOY" = true
   - skip_cleanup: true
     provider: script
     script: build/deploy-coverage.sh
     on:
-      branch: master
       condition: "$DEPLOY" = true
 notifications:
   email:
