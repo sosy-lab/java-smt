@@ -42,10 +42,16 @@ script:
 deploy:
   - skip_cleanup: true
     provider: script
-    script: if [[ "$DEPLOY" = true ]]; then build/deploy-gh-pages.sh; fi
+    script: build/deploy-gh-pages.sh
+    on:
+      branch: master
+      condition: "$DEPLOY" = true
   - skip_cleanup: true
     provider: script
-    script: if [[ "$DEPLOY" = true ]]; then build/deploy-coverage.sh; fi
+    script: build/deploy-coverage.sh
+    on:
+      branch: master
+      condition: "$DEPLOY" = true
 notifications:
   email:
   - java-smt-dev@googlegroups.com
