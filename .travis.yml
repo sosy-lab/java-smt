@@ -21,17 +21,13 @@ matrix:
       jdk: oraclejdk8
       env: NAME=Checkstyle
     - script:
-        - ant javadoc
-      jdk: oraclejdk8
-      env: NAME=Javadoc
-    - script:
         - ant format-source && git diff -s --exit-code
       jdk: oraclejdk8
       env: NAME=format-source
-
 script:
-  - ant build-project-ecj
+  - ant build-project
   - ant clean unit-tests-coverage
+  - ant javadoc
 deploy:
   - skip_cleanup: true
     provider: script
