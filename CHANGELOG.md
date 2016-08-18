@@ -7,6 +7,7 @@
     - Solver bindings are in the package `java_smt/solvers`
     - User-facing API is in the package `java_smt/api`, apart from the entry
         point `SolverContextFactory`
+ - Caching and statistics are moved to the `statistics` branch.
 
 ## JavaSMT 0.60-174-g7ab7771
 
