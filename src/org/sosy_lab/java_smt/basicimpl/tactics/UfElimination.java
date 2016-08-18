@@ -67,7 +67,7 @@ public class UfElimination {
   public static class Result {
 
     private final BooleanFormula formula;
-    private final BooleanFormula constaints;
+    private final BooleanFormula constraints;
     private final ImmutableMap<Formula, Formula> substitutions;
     private final ImmutableMultimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs;
 
@@ -78,11 +78,11 @@ public class UfElimination {
 
     Result(
         BooleanFormula pFormula,
-        BooleanFormula pConstaints,
+        BooleanFormula pConstraints,
         ImmutableMap<Formula, Formula> pSubstitutions,
         ImmutableMultimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs) {
       formula = checkNotNull(pFormula);
-      constaints = checkNotNull(pConstaints);
+      constraints = checkNotNull(pConstraints);
       substitutions = checkNotNull(pSubstitutions);
       ufs = checkNotNull(pUfs);
     }
@@ -97,8 +97,8 @@ public class UfElimination {
     /**
      * @return the constraints enforcing the functional consistency.
      */
-    public BooleanFormula geConstraints() {
-      return constaints;
+    public BooleanFormula getConstraints() {
+      return constraints;
     }
 
     /**
@@ -136,7 +136,7 @@ public class UfElimination {
    */
   public BooleanFormula eliminateUfs(BooleanFormula f) {
     Result result = eliminateUfs(f, Result.empty(fmgr));
-    return fmgr.getBooleanFormulaManager().and(result.getFormula(), result.geConstraints());
+    return fmgr.getBooleanFormulaManager().and(result.getFormula(), result.getConstraints());
   }
 
   /**
@@ -145,10 +145,10 @@ public class UfElimination {
    * Quantified formulas are not supported.
    * @param pF the {@link Formula} to remove all Ufs from
    * @param pOtherResult result of eliminating Ufs in another {@link BooleanFormula}
-   * @return the {@link Result} of the Ackermanization
+   * @return the {@link Result} of the Ackermannization
    */
   public Result eliminateUfs(BooleanFormula pF, Result pOtherResult) {
-    checkArgument(!isQuantifed(pF));
+    checkArgument(!isQuantified(pF));
     BooleanFormula f;
     if (!pOtherResult.getSubstitution().isEmpty()) {
       f = fmgr.substitute(pF, pOtherResult.getSubstitution());
@@ -178,19 +178,19 @@ public class UfElimination {
           UninterpretedFunctionApplication application2 = applications.get(idx2);
           List<Formula> otherArgs = application2.getArguments();
 
-          /**
+          /*
            * Add constraints to enforce functional consistency.
            */
           Verify.verify(args.size() == otherArgs.size());
-          Collection<BooleanFormula> argumentEquility = new ArrayList<>(args.size());
+          Collection<BooleanFormula> argumentEquality = new ArrayList<>(args.size());
           for (int i = 0; i < args.size(); i++) {
             Formula arg1 = args.get(i);
             Formula arg2 = otherArgs.get(i);
-            argumentEquility.add(makeEqual(arg1, arg2));
+            argumentEquality.add(makeEqual(arg1, arg2));
           }
 
-          BooleanFormula functionEquility = makeEqual(substitution, application2.getSubstitution());
-          extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquility), functionEquility));
+          BooleanFormula functionEquality = makeEqual(substitution, application2.getSubstitution());
+          extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquality), functionEquality));
         }
       }
     }
@@ -252,7 +252,7 @@ public class UfElimination {
     return t;
   }
 
-  private boolean isQuantifed(Formula f) {
+  private boolean isQuantified(Formula f) {
     AtomicBoolean result = new AtomicBoolean();
     fmgr.visitRecursively(
         f,

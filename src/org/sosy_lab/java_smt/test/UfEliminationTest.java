@@ -202,7 +202,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula withOutUfs1 = result1.getFormula();
     Result result2 = ackermannization.eliminateUfs(f2, result1);
     BooleanFormula withOutUfs2 = result2.getFormula();
-    BooleanFormula geConstraints = result2.geConstraints();
+    BooleanFormula geConstraints = result2.getConstraints();
     BooleanFormula withOutUfs = bmgr.and(bmgr.xor(withOutUfs1, withOutUfs2), geConstraints);
     assertThatFormula(f).isSatisfiable(); // sanity check
     assertThatFormula(withOutUfs).isSatisfiable();
