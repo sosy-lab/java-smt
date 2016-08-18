@@ -20,9 +20,12 @@
 package org.sosy_lab.solver.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.sosy_lab.solver.api.FormulaType.BooleanType;
+import static org.sosy_lab.solver.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.testing.EqualsTester;
 
 import org.junit.Test;
@@ -39,6 +42,7 @@ import org.sosy_lab.solver.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class FormulaManagerTest extends SolverBasedTest0 {
@@ -54,6 +58,52 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  @Test
+  public void testEmptySubstitution() throws SolverException, InterruptedException {
+    if (solverToUse().equals(Solvers.PRINCESS)) {
+      requireFalse(Solvers.PRINCESS + " fails.");
+    }
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+    BooleanFormula input = bmgr.xor(f1, f2);
+
+    BooleanFormula out = mgr.substitute(input, ImmutableMap.of());
+    assertThatFormula(out).isEquivalentTo(input);
+  }
+
+  @Test
+  public void testNoSubstitution() throws SolverException, InterruptedException {
+    if (solverToUse().equals(Solvers.PRINCESS)) {
+      requireFalse(Solvers.PRINCESS + " fails.");
+    }
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+    BooleanFormula input = bmgr.xor(f1, f2);
+
+    Map<BooleanFormula, BooleanFormula> substitution =
+        ImmutableMap.of(
+            bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+            bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
+            bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e"));
+
+    BooleanFormula out = mgr.substitute(input, substitution);
+    assertThatFormula(out).isEquivalentTo(input);
   }
 
   @Test
@@ -74,6 +124,28 @@ public class FormulaManagerTest extends SolverBasedTest0 {
             bmgr.or(
                 bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
                 bmgr.makeVariable("e")));
+  }
+
+  @Test
+  public void testSubstitutionTwice() throws SolverException, InterruptedException {
+    BooleanFormula input =
+        bmgr.or(
+            bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
+            bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")));
+    ImmutableMap<BooleanFormula, BooleanFormula> substitution =
+        ImmutableMap.of(
+            bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+            bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
+            bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e"));
+    BooleanFormula out = mgr.substitute(input, substitution);
+    assertThatFormula(out)
+        .isEquivalentTo(
+            bmgr.or(
+                bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
+                bmgr.makeVariable("e")));
+
+    BooleanFormula out2 = mgr.substitute(out, substitution);
+    assertThatFormula(out2).isEquivalentTo(out);
   }
 
   @Test
