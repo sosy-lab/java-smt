@@ -100,7 +100,8 @@ public class TimeoutTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   private void testBasicProverTimeout(Supplier<BasicProverEnvironment<?>> proverConstructor)
       throws Exception {
-    Fuzzer f = new Fuzzer(mgr, new Random(0));
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    BooleanFormula instance = gen.generate(20);
     expectedEx.expect(InterruptedException.class);
     Thread t =
         new Thread() {
@@ -115,7 +116,7 @@ public class TimeoutTest extends SolverBasedTest0 {
           }
         };
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
-      pe.push(f.fuzz(10000, 100));
+      pe.push(instance);
       t.start();
       pe.isUnsat();
     }
