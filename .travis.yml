@@ -1,7 +1,4 @@
 language: java
-# Only for newer ant, containers on Travis only have ant 1.8.2 which fails
-sudo: required
-dist: trusty
 jdk:
   - oraclejdk8
 env:
@@ -9,23 +6,50 @@ env:
   - GH_REF: github.com/dbeyer/java-smt.git
 install:
   - ant resolve-dependencies -Divy.repo.url=http://www.sosy-lab.org/ivy
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+matrix:
+  include:
+    - script:
+        - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
+      jdk: oraclejdk8
+      env: NAME=FindBugs
+    - script:
+        - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
+      jdk: oraclejdk8
+      env: NAME=Checkstyle
+    - script:
+        - ant format-source && git diff -s --exit-code
+      jdk: oraclejdk8
+      env: NAME=format-source
+    - script:
+        - ant build-project-ecj
+      jdk: oraclejdk8
+      env: NAME='Build ECJ'
+    - script:
+        - ant build-project
+      jdk: oraclejdk8
+      env: NAME=Build
+    - script:
+        - ant unit-tests-coverage
+        - ant javadoc
+      jdk: oraclejdk8
+      env: NAME='Testing and Javadoc' DEPLOY=true
 script:
-  - ant build-project-ecj
-  - ant clean unit-tests-coverage
-  - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
-  - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
-  - ant javadoc
-  - ant format-source && git diff -s --exit-code
-deploy:
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-gh-pages.sh
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-coverage.sh
+  - true # overrides default script from Travis
+after_success:
+  # deploy documentation if deployment enabled and we are on master
+  - export PR=https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
+  - if [[ "$DEPLOY" = true && "$BRANCH" = master ]]; then build/deploy-coverage.sh; fi
+  - if [[ "$DEPLOY" = true ]]; then build/deploy-coverage.sh; fi
 notifications:
   email:
   - java-smt-dev@googlegroups.com
+git:
+  depth: 1
 cache:
   directories:
   - $HOME/.ivy2

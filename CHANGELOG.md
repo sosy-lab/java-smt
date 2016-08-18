@@ -1,5 +1,24 @@
 # JavaSMT ChangeLog
 
+## HEAD
+
+ - New package structure
+    - Root package is `java_smt`
+    - Solver bindings are in the package `java_smt/solvers`
+    - User-facing API is in the package `java_smt/api`, apart from the entry
+        point `SolverContextFactory`
+
+## JavaSMT 0.60-174-g7ab7771
+
+ - New solver versions:
+    - Z3: 4.4.1-1558-gf96cfea
+    - MathSAT: 5.3.12
+    - OptiMathSAT: 1.3.10
+    - Princess: 2016-06-27-r2652
+ - Better cancellation handling for Z3
+ - Add `makeTrue()` and `makeFalse()` methods to `BooleanFormulaManager`
+ - Added Ackermannization tactic.
+
 ## JavaSMT 0.60
 
  - Switched to Java8.

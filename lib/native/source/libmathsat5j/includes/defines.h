@@ -20,7 +20,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 
 
 #define DEFINE_FUNC(jreturn, func_escaped) \
-  JNIEXPORT j##jreturn JNICALL Java_org_sosy_1lab_solver_mathsat5_Mathsat5NativeApi_msat_##func_escaped
+  JNIEXPORT j##jreturn JNICALL Java_org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi_msat_##func_escaped
 
 #define WITHOUT_ARGS \
   (JNIEnv *jenv, jclass jcls) {
@@ -50,6 +50,14 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if (arg##num == 0) { \
     throwException(jenv, "java/lang/IllegalArgumentException", "Null passed to MathSAT"); \
     return 0; \
+  } \
+  mtype m_arg##num; \
+  m_arg##num.repr = (void *)((size_t)arg##num);
+
+#define STRUCT_ARG_VOID(mtype, num) \
+  if (arg##num == 0) { \
+    throwException(jenv, "java/lang/IllegalArgumentException", "Null passed to MathSAT"); \
+    return; \
   } \
   mtype m_arg##num; \
   m_arg##num.repr = (void *)((size_t)arg##num);
@@ -247,18 +255,22 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 // Define aliases for Mathsats types
 typedef jlong jjenv;
 #define ENV_ARG(num) STRUCT_ARG(msat_env, num)
+#define ENV_ARG_VOID(num) STRUCT_ARG_VOID(msat_env, num)
 #define ENV_RETURN STRUCT_RETURN
 
 typedef jlong jjconf;
 #define CONF_ARG(num) STRUCT_ARG(msat_config, num)
+#define CONF_ARG_VOID(num) STRUCT_ARG_VOID(msat_config, num)
 #define CONF_RETURN STRUCT_RETURN
 
 typedef jlong jjterm;
 #define TERM_ARG(num) STRUCT_ARG(msat_term, num)
+#define TERM_ARG_VOID(num) STRUCT_ARG_VOID(msat_term, num)
 #define TERM_RETURN STRUCT_RETURN_WITH_ENV
 
 typedef jlong jjmodel;
 #define MODEL_ARG(num) STRUCT_ARG(msat_model, num)
+#define MODEL_ARG_VOID(num) STRUCT_ARG_VOID(msat_model, num)
 #define MODEL_RETURN STRUCT_RETURN_WITH_ENV
 
 typedef jlongArray jjtermArray;
@@ -275,6 +287,7 @@ typedef jlong jjdecl;
 
 typedef jlong jjmodel_iterator;
 #define MODEL_ITERATOR_ARG(num) STRUCT_ARG(msat_model_iterator, num)
+#define MODEL_ITERATOR_ARG_VOID(num) STRUCT_ARG_VOID(msat_model_iterator, num)
 #define MODEL_ITERATOR_RETURN STRUCT_RETURN_WITH_ENV
 
 typedef jlong jjtype;
@@ -290,6 +303,7 @@ typedef jint jjboolean;
 
 typedef jlong jjobjective_iterator;
 #define OBJECTIVE_ITERATOR_ARG(num) STRUCT_ARG(msat_objective_iterator, num)
+#define OBJECTIVE_ITERATOR_ARG_VOID(num) STRUCT_ARG_VOID(msat_objective_iterator, num)
 #define OBJECTIVE_ITERATOR_RETURN STRUCT_RETURN_WITH_ENV
 
 typedef jlong jjobjective;
