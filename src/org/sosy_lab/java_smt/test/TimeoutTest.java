@@ -32,7 +32,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.basicimpl.tactics.Tactic;
+import org.sosy_lab.java_smt.api.Tactic;
 
 import java.util.Random;
 import java.util.function.Supplier;

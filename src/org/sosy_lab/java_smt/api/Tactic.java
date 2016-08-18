@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.basicimpl.tactics;
+package org.sosy_lab.java_smt.api;
 
 /**
  * Tactic is a generic formula to formula transformation.
@@ -48,7 +48,7 @@ public enum Tactic {
    * The resulting formula is not <i>equivalent</i> but only <i>equisatisfiable</i> to the
    * original one.
    *
-   * <p>NB: currently this tactic does not have default implementation.
+   * <p>NB: currently this tactic does not have a default implementation.
    */
   TSEITIN_CNF,
 
