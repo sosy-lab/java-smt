@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -64,11 +66,24 @@ public class UfElimination {
   public static class Result {
 
     private final BooleanFormula formula;
-    private final Map<Formula, Formula> substitutions;
+    private final BooleanFormula constaints;
+    private final ImmutableMap<Formula, Formula> substitutions;
+    private final ImmutableMultimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs;
 
-    Result(BooleanFormula pFormula, ImmutableMap<Formula, Formula> pSubstitutions) {
+    public static Result empty(FormulaManager pFormulaManager) {
+      BooleanFormula trueFormula = pFormulaManager.getBooleanFormulaManager().makeTrue();
+      return new Result(trueFormula, trueFormula, ImmutableMap.of(), ImmutableMultimap.of());
+    }
+
+    Result(
+        BooleanFormula pFormula,
+        BooleanFormula pConstaints,
+        ImmutableMap<Formula, Formula> pSubstitutions,
+        ImmutableMultimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs) {
       formula = checkNotNull(pFormula);
+      constaints = checkNotNull(pConstaints);
       substitutions = checkNotNull(pSubstitutions);
+      ufs = checkNotNull(pUfs);
     }
 
     /**
@@ -79,10 +94,24 @@ public class UfElimination {
     }
 
     /**
+     * @return the constraints enforcing the functional consistency.
+     */
+    public BooleanFormula geConstraints() {
+      return constaints;
+    }
+
+    /**
      * @return the substitution used to replace UFs
      */
     public Map<Formula, Formula> getSubstitution() {
       return substitutions;
+    }
+
+    /**
+     * @return all eliminated application of Ufs
+     */
+    Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> getUfs() {
+      return ufs;
     }
   }
 
@@ -104,11 +133,31 @@ public class UfElimination {
    * @param f the {@link Formula} to remove all Ufs from
    * @return the new {@link Formula} and the substitution done during transformation
    */
-  public Result eliminateUfs(BooleanFormula f) {
-    checkArgument(!isQuantifed(f));
+  public BooleanFormula eliminateUfs(BooleanFormula f) {
+    Result result = eliminateUfs(f, Result.empty(fmgr));
+    return fmgr.getBooleanFormulaManager().and(result.getFormula(), result.geConstraints());
+  }
 
-    Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = findUFs(f);
+  /**
+   * Applies the Ackermann transformation to the given {@link Formula} with respect to the
+   * {@link Result} of another formula.
+   * Quantified formulas are not supported.
+   * @param pF the {@link Formula} to remove all Ufs from
+   * @param pOtherResult result of eliminating Ufs in another {@link BooleanFormula}
+   * @return the {@link Result} of the Ackermanization
+   */
+  public Result eliminateUfs(BooleanFormula pF, Result pOtherResult) {
+    checkArgument(!isQuantifed(pF));
+    BooleanFormula f;
+    if (!pOtherResult.getSubstitution().isEmpty()) {
+      f = fmgr.substitute(pF, pOtherResult.getSubstitution());
+    } else {
+      f = pF;
+    }
+
     int depth = getNestingDepthOfUfs(f);
+    Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = findUFs(f);
+    ufs = merge(ufs, pOtherResult);
 
     ImmutableMap.Builder<Formula, Formula> substitutionsBuilder = ImmutableMap.builder();
     List<BooleanFormula> extraConstraints = new ArrayList<>();
@@ -147,7 +196,7 @@ public class UfElimination {
 
     // Get rid of UFs.
     ImmutableMap<Formula, Formula> substitutions = substitutionsBuilder.build();
-    BooleanFormula formulaNoUFs = fmgr.substitute(f, substitutions);
+    BooleanFormula formulaWithoutUFs = fmgr.substitute(f, substitutions);
 
     // substitute all UFs in the additional constraints,
     // required if UFs are arguments of UFs, e.g. uf(uf(1, 2), 2)
@@ -159,8 +208,20 @@ public class UfElimination {
               .collect(Collectors.toList());
     }
 
-    BooleanFormula newFormula = bfmgr.and(bfmgr.and(extraConstraints), formulaNoUFs);
-    return new Result(newFormula, substitutions);
+    BooleanFormula constraints = bfmgr.and(extraConstraints);
+    return new Result(formulaWithoutUFs, constraints, substitutions, ImmutableMultimap.copyOf(ufs));
+  }
+
+  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> merge(
+      Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs,
+      Result pPreviousResult) {
+    for (Entry<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufInOtherFormula :
+        pPreviousResult.getUfs().entries()) {
+      if (pUfs.containsKey(ufInOtherFormula.getKey())) {
+        pUfs.put(ufInOtherFormula.getKey(), ufInOtherFormula.getValue());
+      }
+    }
+    return pUfs;
   }
 
   @SuppressWarnings("unchecked")

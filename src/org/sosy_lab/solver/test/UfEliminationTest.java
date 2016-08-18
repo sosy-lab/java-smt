@@ -86,7 +86,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f = bmgr.xor(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
-    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f).getFormula();
+    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f);
     assertThatFormula(f).isSatisfiable(); // sanity check
     assertThatFormula(withOutUfs).isSatisfiable();
     assertThatFormula(bmgr.and(argsEqual, f)).isUnsatisfiable(); // sanity check
@@ -120,7 +120,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f = bmgr.xor(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
-    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f).getFormula();
+    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f);
     assertThatFormula(f).isSatisfiable(); // sanity check
     assertThatFormula(withOutUfs).isSatisfiable();
     assertThatFormula(bmgr.and(argsEqual, f)).isUnsatisfiable(); // sanity check
@@ -162,7 +162,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f = imgr.lessThan(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4, v5EqualsV6);
 
-    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f).getFormula();
+    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f);
     assertThatFormula(f).isSatisfiable(); // sanity check
     assertThatFormula(withOutUfs).isSatisfiable();
     assertThatFormula(bmgr.and(argsEqual, f)).isUnsatisfiable(); // sanity check
@@ -173,6 +173,46 @@ public class UfEliminationTest extends SolverBasedTest0 {
     Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
     Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");
     Truth.assertThat(variablesAndUFs).doesNotContainKey("uf2");
+    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+  }
+
+  @Test
+  public void twoFormulasTest() throws SolverException, InterruptedException {
+    // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
+    if (solverToUse().equals(Solvers.PRINCESS)) {
+      requireFalse(Solvers.PRINCESS + " fails.");
+    }
+
+    // f := uf(v1, v3) XOR uf(v2, v4)
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+    IntegerFormula variable3 = imgr.makeVariable("variable3");
+    IntegerFormula variable4 = imgr.makeVariable("variable4");
+    BooleanFormula v1EqualsV2 = imgr.equal(variable1, variable2);
+    BooleanFormula v3EqualsV4 = imgr.equal(variable3, variable4);
+
+    FunctionDeclaration<BooleanFormula> uf2Decl =
+        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+    BooleanFormula f = bmgr.xor(f1, f2);
+    BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
+
+    Result result1 = ackermannization.eliminateUfs(f1, Result.empty(mgr));
+    BooleanFormula withOutUfs1 = result1.getFormula();
+    Result result2 = ackermannization.eliminateUfs(f2, result1);
+    BooleanFormula withOutUfs2 = result2.getFormula();
+    BooleanFormula geConstraints = result2.geConstraints();
+    BooleanFormula withOutUfs = bmgr.and(bmgr.xor(withOutUfs1, withOutUfs2), geConstraints);
+    assertThatFormula(f).isSatisfiable(); // sanity check
+    assertThatFormula(withOutUfs).isSatisfiable();
+    assertThatFormula(bmgr.and(argsEqual, f)).isUnsatisfiable(); // sanity check
+    assertThatFormula(bmgr.and(argsEqual, withOutUfs)).isUnsatisfiable();
+
+    // check that UFs were really eliminated
+    Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
+    Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf");
     Truth.assertThat(variablesAndUFs).isEqualTo(variables);
   }
 
@@ -214,7 +254,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(ufDecl, Lists.newArrayList(variable2, variable4));
     BooleanFormula f = bmgr.or(f1, bmgr.not(f2));
 
-    Result withOutUfs = ackermannization.eliminateUfs(f);
+    Result withOutUfs = ackermannization.eliminateUfs(f, Result.empty(mgr));
 
     Map<Formula, Formula> substitution = withOutUfs.getSubstitution();
     Truth.assertThat(substitution).hasSize(2);

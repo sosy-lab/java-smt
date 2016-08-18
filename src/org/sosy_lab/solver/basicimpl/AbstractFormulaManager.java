@@ -222,7 +222,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @throws InterruptedException Can be thrown by the native code.
    */
   protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
-    return new UfElimination(this).eliminateUfs(pF).getFormula();
+    return new UfElimination(this).eliminateUfs(pF);
   }
 
   /**
