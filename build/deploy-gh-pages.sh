@@ -11,7 +11,7 @@ git init
 
 # inside this git repo we'll pretend to be a new user
 git config user.name "${GIT_NAME}"
-git config user.email "${GIT_EMAIL}"
+git config user.email "${GIT_EMAIL2}"
 
 # The first and only commit to this new Git repo contains all the
 # files present with the commit message "Deploy to GitHub Pages".

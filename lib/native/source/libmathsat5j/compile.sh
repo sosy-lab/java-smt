@@ -48,11 +48,11 @@ SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
   SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ ${SOURCE} != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-cd $DIR
+cd ${DIR}
 
 JNI_HEADERS="$(../get_jni_headers.sh)"
 
@@ -70,8 +70,8 @@ if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
 	exit 1
 fi
 
-SRC_FILES="org_sosy_1lab_solver_mathsat5_Mathsat5NativeApi.c versions.c"
-OBJ_FILES="org_sosy_1lab_solver_mathsat5_Mathsat5NativeApi.o"
+SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c versions.c"
+OBJ_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.o"
 
 if [ "$2" = "-optimathsat" ]; then
     echo "Compiling bindings to OptiMathSAT"
@@ -85,32 +85,34 @@ fi
 echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library"
 
 # This will compile the JNI wrapper part, given the JNI and the Mathsat header files
-gcc -g $JNI_HEADERS -I$MSAT_SRC_DIR -I$GMP_HEADER_DIR $SRC_FILES -fPIC -c
+gcc -g -std=gnu99 -Wall -Wextra -Wpedantic -Wno-return-type -Wno-unused-parameter $JNI_HEADERS -I$MSAT_SRC_DIR -I$GMP_HEADER_DIR $SRC_FILES -fPIC -c
+echo "Compilation Done"
 
 # This will link together the file produced above, the Mathsat library, the GMP library and the standard libraries.
 # Everything except the standard libraries is included statically.
 # The result is a shared library.
 if [ `uname -m` = "x86_64" ]; then
-	gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libmathsat5j.so -L. -L$MSAT_LIB_DIR -L$GMP_LIB_DIR -I$GMP_HEADER_DIR versions.o $OBJ_FILES -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++ -Wl,--wrap=memcpy
+	gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libmathsat5j.so -L. -L$MSAT_LIB_DIR -L$GMP_LIB_DIR -I$GMP_HEADER_DIR versions.o $OBJ_FILES -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm -Wl,--wrap=memcpy -Wl,--version-script=libmathsat5j.version
 else
-	gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libmathsat5j.so -L$MSAT_LIB_DIR -L$GMP_LIB_DIR -I$GMP_HEADER_DIR $OBJ_FILES -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
+	gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libmathsat5j.so -L${MSAT_LIB_DIR} -L${GMP_LIB_DIR} -I${GMP_HEADER_DIR} ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
 fi
 
 
 if [ $? -eq 0 ]; then
-	strip $OUT_FILE
+	strip ${OUT_FILE}
 else
-	echo "There was a problem during compilation of \"org_sosy_1lab_solver_mathsat5_Mathsat5NativeApi.c\""
+	echo "There was a problem during compilation of
+	\"org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c\""
 	exit 1
 fi
 
-MISSING_SYMBOLS="$(readelf -Ws $OUT_FILE | grep NOTYPE | grep GLOBAL | grep UND)"
+MISSING_SYMBOLS="$(readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND)"
 if [ ! -z "$MISSING_SYMBOLS" ]; then
 	echo "Warning: There are the following unresolved dependencies in libmathsat5j.so:"
-	readelf -Ws $OUT_FILE | grep NOTYPE | grep GLOBAL | grep UND
+	readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND
 	exit 1
 fi
 
 echo "All Done"
 echo "Please check in the following output that the library does not depend on any GLIBC version >= 2.11, otherwise it will not work on Ubuntu 10.04:"
-LANG=C objdump -p $OUT_FILE |grep -A50 "required from"
+LANG=C objdump -p ${OUT_FILE} |grep -A50 "required from"

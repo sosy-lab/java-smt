@@ -8,7 +8,7 @@
     <property environment="env"/>
 
     <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, findbugs"/>
-    <property name="package" value="solver"/>
+    <property name="package" value="java_smt"/>
     <property name="jar.excludes" value=""/>
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
 
