@@ -119,7 +119,7 @@
 
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-1558-gf96cfea" conf="runtime-z3->solver-z3" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.12.7" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.12.8" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.7" conf="runtime-optimathsat->solver-optimathsat" />
 
         <!-- Google Auto-Value
