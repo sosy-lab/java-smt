@@ -20,12 +20,10 @@
 
 package org.sosy_lab.java_smt.api;
 
-import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
-
 /**
  * Types of function declarations.
  *
- * @see FunctionDeclarationImpl
+ * @see FunctionDeclaration
  */
 public enum FunctionDeclarationKind {
   AND,

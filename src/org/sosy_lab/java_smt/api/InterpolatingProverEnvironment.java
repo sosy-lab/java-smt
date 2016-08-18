@@ -21,8 +21,6 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
-import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -119,10 +117,10 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
       throws SolverException, InterruptedException;
 
   /**
-   * Check whether the conjunction of all formulas on the stack is unsatisfiable
-   * with regards to provided assumptions.
-   * The implementation of this method must be consistent with
-   * {@link AbstractSolverContext#supportsAssumptionSolving}.
+   * Check whether the conjunction of all formulas on the stack together with the
+   * list of assumptions is satisfiable.
+   *
+   * @param assumptions A list of literals.
    */
   boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;

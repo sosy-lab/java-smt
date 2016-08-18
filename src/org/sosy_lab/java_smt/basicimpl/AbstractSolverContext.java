@@ -84,8 +84,21 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
 
-  /** whether the solvers supports assumption-solving and all corresponding properties
-   * like model-generation and interpolation */
+  /**
+   * Whether the solver supports solving under some given assumptions
+   * (with all corresponding features) by itself,
+   * i.e., whether {@link ProverEnvironment#isUnsatWithAssumptions(java.util.Collection)} and
+   * {@link InterpolatingProverEnvironment#isUnsatWithAssumptions(java.util.Collection)}
+   * are fully implemented.
+   *
+   * <p>Otherwise, i.e., if this method returns {@code false}, the solver does not need to support
+   * this feature and may simply {@code throw UnsupportedOperationException} in the respective
+   * methods. This class will wrap the prover environments and provide an implementation of the
+   * feature.
+   *
+   * <p>This method is expected to always return the same value.
+   * Otherwise the behavior of this class is undefined.
+   */
   protected abstract boolean supportsAssumptionSolving();
 
   @Override
