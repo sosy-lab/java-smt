@@ -50,6 +50,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -83,6 +84,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           .put(Z3_decl_kind.Z3_OP_FPA_PLUS_INF.toInt(), Double.POSITIVE_INFINITY)
           .put(Z3_decl_kind.Z3_OP_FPA_MINUS_INF.toInt(), Double.NEGATIVE_INFINITY)
           .put(Z3_decl_kind.Z3_OP_FPA_NAN.toInt(), Double.NaN)
+          .put(Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN.toInt(), FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)
+          .put(Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY.toInt(), FloatingPointRoundingMode.NEAREST_TIES_AWAY)
+          .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_POSITIVE.toInt(), FloatingPointRoundingMode.TOWARD_POSITIVE)
+          .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE.toInt(), FloatingPointRoundingMode.TOWARD_NEGATIVE)
+          .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO.toInt(), FloatingPointRoundingMode.TOWARD_ZERO)
           .build();
 
   // Set of error messages that might occur if Z3 is interrupted.
@@ -505,8 +511,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /**
-   * @param value Z3_ast representing a *value*.
-   * @return BigInteger|Double|Rational.
+   * @param value Z3_ast representing a constant value.
+   * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or
+   * {@link FloatingPointRoundingMode}.
    */
   public Object convertValue(long value) {
     assert isConstant(value) : "value is not constant";
@@ -529,13 +536,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
-        // Converting to Rational and reading that is easier.
-        return convertValue(Native.simplify(environment, Native.mkFpaToReal(environment, value)));
 
+        // Converting to Rational first.
+        return convertValue(Native.simplify(environment, Native.mkFpaToReal(environment, value)));
       } else {
 
-        // Unknown type --- return string serialization.
-        return Native.astToString(environment, value);
+        // Explicitly crash on unknown type.
+        throw new IllegalArgumentException("Unexpected type encountered: " + type);
       }
 
     } finally {

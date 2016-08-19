@@ -70,6 +70,10 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     if (creator.isConstant(outValue)) {
       return creator.convertValue(outValue);
     }
+
+    // Z3 does not give us a direct API to query for "irrelevant" ASTs during evaluation.
+    // The only hint we get is that the input AST is not simplified down to a constant:
+    // thus, it is assumed to be irrelevant.
     return null;
   }
 
@@ -99,15 +103,19 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     return out.build();
   }
 
-  /** The symbol "!" is part of temporary symbols used for quantified formulas or aliases.
-   * This method is only a heuristic, because the user can also create a symbol containing "!". */
+  /**
+   * The symbol "!" is part of temporary symbols used for quantified formulas or aliases.
+   * This method is only a heuristic, because the user can also create a symbol containing "!".
+   **/
   private boolean isInternalSymbol(long funcDecl) {
     return Z3_IRRELEVANT_MODEL_TERM_PATTERN
         .matcher(creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
         .matches();
   }
 
-  /** get ValueAssignments for a constant declaration in the model */
+  /**
+   * @return ValueAssignments for a constant declaration in the model
+   * */
   private Collection<ValueAssignment> getConstAssignments(long keyDecl) {
     Preconditions.checkArgument(
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
@@ -145,16 +153,10 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     }
   }
 
-  /** Z3 models an array as uninterpreted function.
-   * We try to produce a proper array representation.
-   * There are several possibilities to model an array in Java-SMT:
-   * <ul>
-   * <li> as direct array like "[0,0,?,?,0]" (not useful, if many cells are empty or unused)
-   * <li> as map like "{1:0, 2:0, 5:0}" (human-readable)
-   * <li> as array formula like "(store (store (store arrSymbol 1 0) 2 0) 5 0)"
-   * </ul>
-   * However, we create a list of assignments "a[1]=0; a[2]=0; a[5]=0",
-   * because we want to have a nice right-hand-side.
+  /**
+   * Z3 models an array as an uninterpreted function.
+   *
+   * @return a list of assignments {@code a[1]=0; a[2]=0; a[5]=0}.
    */
   private Collection<ValueAssignment> getArrayAssignments(
       long arraySymbol, long arrayFormula, long value, List<Object> upperIndices) {
@@ -264,8 +266,10 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     return lst;
   }
 
-  /** get a ValueAssignment for an entry (= one evaluation)
-   * of an uninterpreted function in the model */
+  /**
+   * @return ValueAssignment for an entry (one evaluation)
+   * of an uninterpreted function in the model.
+   **/
   private ValueAssignment getFunctionAssignment(
       String functionName, long funcDecl, long entry, long entryValue) {
     Object value = creator.convertValue(entryValue);
