@@ -352,7 +352,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return parseFloatingPoint(repr);
     } else {
 
-      throw new AssertionError("unexpected value: " + repr);
+      throw new IllegalArgumentException("Unexpected type: " + type);
     }
   }
 

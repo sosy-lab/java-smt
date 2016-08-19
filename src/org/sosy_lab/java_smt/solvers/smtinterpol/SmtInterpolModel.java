@@ -169,7 +169,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
       }
     } else {
 
-      throw new AssertionError("unexpected value: " + value);
+      throw new IllegalArgumentException("Unexpected value: " + value);
     }
   }
 
