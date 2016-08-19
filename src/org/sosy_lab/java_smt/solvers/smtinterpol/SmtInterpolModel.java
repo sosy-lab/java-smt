@@ -152,7 +152,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     } else if (value instanceof ConstantTerm
         && ((ConstantTerm) value).getValue() instanceof Rational) {
 
-      /**
+      /*
        * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
        * the output is SmtInterpol's Rational unless it is a bitvector,
        * and currently we do not support bitvectors for SmtInterpol.

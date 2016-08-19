@@ -183,7 +183,7 @@ class SmtInterpolEnvironment {
 
           @Override
           protected void append(org.apache.log4j.spi.LoggingEvent pArg0) {
-            // SMTInterpol has serveral "catch (Throwable t) { log(t); }",
+            // SMTInterpol has several "catch (Throwable t) { log(t); }",
             // which is very ugly because it also catches errors like OutOfMemoryError
             // and ThreadDeath.
             // We do a similarly ugly thing and rethrow such exceptions here

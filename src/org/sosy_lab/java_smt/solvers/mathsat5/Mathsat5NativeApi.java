@@ -728,9 +728,9 @@ class Mathsat5NativeApi {
 
   public static native String msat_last_error_message(long e);
 
-  /** Optimization **/
+  /* Optimization **/
 
-  /**
+  /*
    * OptiMathSAT - objectives creation
    */
 
@@ -800,7 +800,7 @@ class Mathsat5NativeApi {
    */
   public static native void msat_assert_soft_formula(long e, long term, long weight, String id);
 
-  /**
+  /*
    * OptiMathSAT - objective stack iterator
    */
 
@@ -835,7 +835,7 @@ class Mathsat5NativeApi {
    */
   public static native void msat_destroy_objective_iterator(long i);
 
-  /**
+  /*
    * OptiMathSAT - functions for objective state inspection
    */
 
