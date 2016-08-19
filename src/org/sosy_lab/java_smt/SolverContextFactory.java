@@ -35,6 +35,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
@@ -86,8 +87,12 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Which SMT solver to use.")
   private Solvers solver = Solvers.SMTINTERPOL;
 
-  @Option(secure = true, name = "useLogger", description = "Log solver actions, this may be slow!")
+  @Option(secure = true, description = "Log solver actions, this may be slow!")
   private boolean useLogger = false;
+
+  @Option(secure = true, description = "Default rounding mode for floating point operations.")
+  private FloatingPointRoundingMode floatingPointRoundingMode =
+      FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -147,17 +152,20 @@ public class SolverContextFactory {
         // Loading SmtInterpol is difficult as it requires its own class
         // loader for fiddling with Java_CUP versions.
         return getFactoryForSolver(createSmtInterpolClassLoader(logger), SMTINTERPOL_FACTORY_CLASS)
-            .create(config, logger, shutdownNotifier, logfile, randomSeed);
+            .create(
+                config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case MATHSAT5:
-        return Mathsat5SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
+        return Mathsat5SolverContext.create(
+            logger, config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case Z3:
 
         // Z3 requires its own custom class loader to perform trickery with the
         // java.library.path without affecting the main class loader.
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
-            .create(config, logger, shutdownNotifier, logfile, randomSeed);
+            .create(
+                config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case PRINCESS:
         // TODO: pass randomSeed to Princess
@@ -225,13 +233,20 @@ public class SolverContextFactory {
         LogManager logger,
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed)
+        long randomSeed,
+        FloatingPointRoundingMode pFloatingPointRoundingMode)
         throws InvalidConfigurationException {
       final Thread currentThread = Thread.currentThread();
       final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
       try {
         currentThread.setContextClassLoader(this.getClass().getClassLoader());
-        return generateSolverContext(config, logger, pShutdownNotifier, solverLogfile, randomSeed);
+        return generateSolverContext(
+            config,
+            logger,
+            pShutdownNotifier,
+            solverLogfile,
+            randomSeed,
+            pFloatingPointRoundingMode);
       } finally {
         currentThread.setContextClassLoader(contextClassLoader);
       }
@@ -242,7 +257,8 @@ public class SolverContextFactory {
         LogManager logger,
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed)
+        long randomSeed,
+        FloatingPointRoundingMode pFloatingPointRoundingMode)
         throws InvalidConfigurationException;
   }
 

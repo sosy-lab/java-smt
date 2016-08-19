@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
@@ -35,15 +36,47 @@ class Z3FloatingPointFormulaManager
 
   private final Z3UFManager ufmgr;
   private final long z3context;
-
   private final long roundingMode;
 
-  Z3FloatingPointFormulaManager(Z3FormulaCreator creator, Z3UFManager pUFMgr) {
-    super(creator);
+  Z3FloatingPointFormulaManager(
+      Z3FormulaCreator creator,
+      Z3UFManager pUFMgr,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    super(creator, pFloatingPointRoundingMode);
     z3context = creator.getEnv();
     ufmgr = pUFMgr;
-    roundingMode = Native.mkFpaRoundNearestTiesToEven(z3context);
-    Native.incRef(z3context, roundingMode);
+    roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
+  }
+
+  @Override
+  protected Long getDefaultRoundingMode() {
+    return roundingMode;
+  }
+
+  @Override
+  protected Long getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    long out;
+    switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN:
+        out = Native.mkFpaRoundNearestTiesToEven(z3context);
+        break;
+      case NEAREST_TIES_AWAY:
+        out = Native.mkFpaRoundNearestTiesToAway(z3context);
+        break;
+      case TOWARD_POSITIVE:
+        out = Native.mkFpaRoundTowardPositive(z3context);
+        break;
+      case TOWARD_NEGATIVE:
+        out = Native.mkFpaRoundTowardNegative(z3context);
+        break;
+      case TOWARD_ZERO:
+        out = Native.mkFpaRoundTowardZero(z3context);
+        break;
+      default:
+        throw new AssertionError("Unexpected value");
+    }
+    Native.incRef(z3context, out);
+    return out;
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -51,24 +84,24 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeNumberImpl(double pN, FloatingPointType pType) {
+  public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     if (Double.isNaN(pN) || Double.isInfinite(pN)) {
       return Native.mkFpaNumeralDouble(z3context, pN, mkFpaSort(pType));
     }
     // Z3 has problems with rounding when giving a double value, so we go via Strings
-    return makeNumberImpl(Double.toString(pN), pType);
+    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
-  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType) {
+  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType, Long pRoundingMode) {
     // Using toString() fails in CPAchecker with parse error for seemingly correct strings like
     // "3.4028234663852886E+38" and I have no idea why and cannot reproduce it in unit tests,
     // but toPlainString() seems to work at least.
-    return makeNumberImpl(pN.toPlainString(), pType);
+    return makeNumberImpl(pN.toPlainString(), pType, pRoundingMode);
   }
 
   @Override
-  protected Long makeNumberImpl(String pN, FloatingPointType pType) {
+  protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
@@ -76,7 +109,7 @@ class Z3FloatingPointFormulaManager
 
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
-      long smallPrecNumber = castToImpl(highPrecNumber, pType);
+      long smallPrecNumber = castToImpl(highPrecNumber, pType, pRoundingMode);
       Native.incRef(z3context, smallPrecNumber);
       long result = Native.simplify(z3context, smallPrecNumber);
       Native.decRef(z3context, highPrecNumber);
@@ -107,14 +140,14 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType) {
+  protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType, Long pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
-      return Native.mkFpaToFpFloat(z3context, roundingMode, pNumber, mkFpaSort(targetType));
+      return Native.mkFpaToFpFloat(z3context, pRoundingMode, pNumber, mkFpaSort(targetType));
 
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
-      return Native.mkFpaToSbv(z3context, roundingMode, pNumber, targetType.getSize());
+      return Native.mkFpaToSbv(z3context, pRoundingMode, pNumber, targetType.getSize());
 
     } else if (pTargetType.isRationalType()) {
       return Native.mkFpaToReal(z3context, pNumber);
@@ -125,21 +158,22 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  protected Long castFromImpl(Long pNumber, boolean signed, FloatingPointType pTargetType) {
+  protected Long castFromImpl(
+      Long pNumber, boolean signed, FloatingPointType pTargetType, Long pRoundingMode) {
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
 
     if (formulaType.isFloatingPointType()) {
-      return castToImpl(pNumber, pTargetType);
+      return castToImpl(pNumber, pTargetType, pRoundingMode);
 
     } else if (formulaType.isBitvectorType()) {
       if (signed) {
-        return Native.mkFpaToFpSigned(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
+        return Native.mkFpaToFpSigned(z3context, pRoundingMode, pNumber, mkFpaSort(pTargetType));
       } else {
-        return Native.mkFpaToFpUnsigned(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
+        return Native.mkFpaToFpUnsigned(z3context, pRoundingMode, pNumber, mkFpaSort(pTargetType));
       }
 
     } else if (formulaType.isRationalType()) {
-      return Native.mkFpaToFpReal(z3context, roundingMode, pNumber, mkFpaSort(pTargetType));
+      return Native.mkFpaToFpReal(z3context, pRoundingMode, pNumber, mkFpaSort(pTargetType));
 
     } else {
       return genericCast(pNumber, pTargetType);
@@ -162,23 +196,23 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2) {
-    return Native.mkFpaAdd(z3context, roundingMode, pNumber1, pNumber2);
+  public Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return Native.mkFpaAdd(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2) {
-    return Native.mkFpaSub(z3context, roundingMode, pNumber1, pNumber2);
+  public Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return Native.mkFpaSub(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2) {
-    return Native.mkFpaMul(z3context, roundingMode, pNumber1, pNumber2);
+  public Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return Native.mkFpaMul(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  protected Long divide(Long pNumber1, Long pNumber2) {
-    return Native.mkFpaDiv(z3context, roundingMode, pNumber1, pNumber2);
+  protected Long divide(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return Native.mkFpaDiv(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override

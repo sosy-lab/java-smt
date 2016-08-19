@@ -26,6 +26,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.InnerUtilFactory;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 import javax.annotation.Nullable;
@@ -45,7 +46,8 @@ public class SmtInterpolSolverFactory extends InnerUtilFactory {
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed)
+      long randomSeed,
+      FloatingPointRoundingMode pFloatingPointRoundingMode)
       throws InvalidConfigurationException {
     return SmtInterpolSolverContext.create(
         pConfig, pLogger, pShutdownNotifier, solverLogfile, randomSeed);

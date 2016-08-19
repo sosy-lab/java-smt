@@ -36,6 +36,7 @@ import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -62,7 +63,7 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Option(
     secure = true,
-    description = "Ordering for objectives in the optimization" + " context",
+    description = "Ordering for objectives in the optimization context",
     values = {"lex", "pareto", "box"}
   )
   String objectivePrioritizationMode = "box";
@@ -126,7 +127,8 @@ final class Z3SolverContext extends AbstractSolverContext {
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed)
+      long randomSeed,
+      FloatingPointRoundingMode pFloatingPointRoundingMode)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -198,7 +200,7 @@ final class Z3SolverContext extends AbstractSolverContext {
     Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
     Z3FloatingPointFormulaManager floatingPointTheory =
-        new Z3FloatingPointFormulaManager(creator, functionTheory);
+        new Z3FloatingPointFormulaManager(creator, functionTheory, pFloatingPointRoundingMode);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
 
