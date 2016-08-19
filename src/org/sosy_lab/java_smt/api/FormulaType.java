@@ -165,7 +165,6 @@ public abstract class FormulaType<T extends Formula> {
     return new FloatingPointType(exponentSize, mantissaSize);
   }
 
-
   public static FloatingPointType getSinglePrecisionFloatingPointType() {
     return FloatingPointType.SINGLE_PRECISION_FP_TYPE;
   }

@@ -137,5 +137,4 @@ public enum FunctionDeclarationKind {
    * We enforce standardization only across a small subset.
    */
   OTHER;
-
 }
