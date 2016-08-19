@@ -21,9 +21,9 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
-import org.sosy_lab.java_smt.visitors.BooleanFormulaTransformationVisitor;
-import org.sosy_lab.java_smt.visitors.BooleanFormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 import java.util.Collection;
 import java.util.Set;

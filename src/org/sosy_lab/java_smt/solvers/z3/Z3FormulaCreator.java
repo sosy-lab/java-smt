@@ -53,6 +53,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3ArrayFormula;
@@ -62,7 +63,6 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RationalFormula;
-import org.sosy_lab.java_smt.visitors.FormulaVisitor;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;

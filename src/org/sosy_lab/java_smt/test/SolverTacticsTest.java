@@ -43,7 +43,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
-import org.sosy_lab.java_smt.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 
 import java.util.ArrayList;
 import java.util.List;

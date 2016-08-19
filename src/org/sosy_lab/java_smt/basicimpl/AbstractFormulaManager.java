@@ -35,11 +35,11 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination;
-import org.sosy_lab.java_smt.visitors.FormulaTransformationVisitor;
-import org.sosy_lab.java_smt.visitors.FormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
 
 import java.util.Arrays;
 import java.util.List;

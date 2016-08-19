@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.visitors.FormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.visitors.ExpectedFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.ExpectedFormulaVisitor;
 
 import java.util.List;
 

@@ -22,4 +22,4 @@
  * The visitors of this package allow for efficient traversal, manipulation
  * and transformation of formulas.
  */
-package org.sosy_lab.java_smt.visitors;
+package org.sosy_lab.java_smt.api.visitors;
