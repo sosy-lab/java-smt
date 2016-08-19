@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 /**
  * Floating point operations.
  *
- * Most operations are overloaded: there is an option of either using the default
+ * <p>Most operations are overloaded: there is an option of either using the default
  * rounding mode (set via the option {@code solver.floatingPointRoundingMode}),
  * or providing the rounding mode explicitly.
  */

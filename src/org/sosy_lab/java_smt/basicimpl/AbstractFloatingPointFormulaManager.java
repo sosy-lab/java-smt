@@ -53,8 +53,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   private final Map<FloatingPointRoundingMode, TFormulaInfo> roundingModes;
 
   protected AbstractFloatingPointFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
     roundingModes = new HashMap<>();
   }

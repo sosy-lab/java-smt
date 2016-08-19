@@ -66,7 +66,7 @@ class Mathsat5FloatingPointFormulaManager
       Mathsat5FormulaCreator pCreator,
       Mathsat5UFManager pFfmgr,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator, pFloatingPointRoundingMode);
+    super(pCreator);
 
     ffmgr = pFfmgr;
     mathsatEnv = pCreator.getEnv();

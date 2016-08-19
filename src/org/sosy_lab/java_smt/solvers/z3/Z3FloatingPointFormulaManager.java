@@ -42,7 +42,7 @@ class Z3FloatingPointFormulaManager
       Z3FormulaCreator creator,
       Z3UFManager pUFMgr,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(creator, pFloatingPointRoundingMode);
+    super(creator);
     z3context = creator.getEnv();
     ufmgr = pUFMgr;
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
