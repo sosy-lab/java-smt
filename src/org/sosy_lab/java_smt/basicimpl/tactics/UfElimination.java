@@ -21,6 +21,8 @@ package org.sosy_lab.java_smt.basicimpl.tactics;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMultimap.copyOf;
+import static com.google.common.collect.Maps.difference;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
@@ -209,8 +211,12 @@ public class UfElimination {
               .collect(Collectors.toList());
     }
 
+    Map<Formula, Formula> otherSubstitution =
+        difference(pOtherResult.getSubstitution(), substitutions).entriesOnlyOnLeft();
+    substitutionsBuilder.putAll(otherSubstitution);
+    ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.build();
     BooleanFormula constraints = bfmgr.and(extraConstraints);
-    return new Result(formulaWithoutUFs, constraints, substitutions, ImmutableMultimap.copyOf(ufs));
+    return new Result(formulaWithoutUFs, constraints, allSubstitutions, copyOf(ufs));
   }
 
   private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> merge(
