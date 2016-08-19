@@ -165,18 +165,19 @@ public abstract class FormulaType<T extends Formula> {
     return new FloatingPointType(exponentSize, mantissaSize);
   }
 
-  private static final FloatingPointType SINGLE_PRECISION_FP_TYPE = new FloatingPointType(8, 23);
-  private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE = new FloatingPointType(11, 52);
 
   public static FloatingPointType getSinglePrecisionFloatingPointType() {
-    return SINGLE_PRECISION_FP_TYPE;
+    return FloatingPointType.SINGLE_PRECISION_FP_TYPE;
   }
 
   public static FloatingPointType getDoublePrecisionFloatingPointType() {
-    return DOUBLE_PRECISION_FP_TYPE;
+    return FloatingPointType.DOUBLE_PRECISION_FP_TYPE;
   }
 
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
+
+    private static final FloatingPointType SINGLE_PRECISION_FP_TYPE = new FloatingPointType(8, 23);
+    private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE = new FloatingPointType(11, 52);
 
     private final int exponentSize;
     private final int mantissaSize;
