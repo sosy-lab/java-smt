@@ -102,6 +102,20 @@ ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dmathsat.version=$OPTI
 The scripts for publishing Princess and SMTInterpol are available
 at the root of the [Ivy Repository](https://svn.sosy-lab.org/software/ivy).
 
+## Writing Solver Backends
+
+In order to write a solver backend it is sufficient to provide the
+implementation for the `SolverContext` interface.
+A new solver does not have to implement old methods, and should throw
+`UnsupportedOperationException` 
+Abstract classes located inside the `basicimpl` package 
+If the change is done inside JavaSMT, `SolverContextFactory` and the
+`Solvers` enum would have to be updated to include the new backend.
+
+The new backend can be created outside of JavaSMT as well: in that case,
+the user would probably wish to have their own factory which can create
+different contexts.
+
 [Travis]: https://travis-ci.org/sosy-lab/java-smt
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
 [OSSRH]: http://central.sonatype.org/pages/ossrh-guide.html
