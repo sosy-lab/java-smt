@@ -237,4 +237,16 @@ public interface FormulaManager {
    * @return Formula belonging to {@code this} context.
    */
   BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
+
+  /**
+   * Eliminates all applications of uninterpreted function from the given {@link BooleanFormula}
+   * and replaces them by fresh variables.
+   * Quantified formulas are not supported.
+   *
+   * @param formula BooleanFormula to remove all applications of uninterpreted function from
+   * @param otherResult UfEliminationResult to be use for generation of additional constraints
+   * @return UfEliminationResult
+   * @see Tactic#ACKERMANNIZATION
+   */
+  UfEliminationResult eliminateUFs(BooleanFormula formula, UfEliminationResult otherResult);
 }

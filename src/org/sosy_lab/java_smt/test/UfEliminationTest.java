@@ -41,8 +41,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UfEliminationResult;
 import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination;
-import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination.Result;
 
 import java.util.Map;
 
@@ -198,9 +198,9 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f = bmgr.xor(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
-    Result result1 = ackermannization.eliminateUfs(f1, Result.empty(mgr));
+    UfEliminationResult result1 = ackermannization.eliminateUfs(f1, UfEliminationResult.empty(mgr));
     BooleanFormula withOutUfs1 = result1.getFormula();
-    Result result2 = ackermannization.eliminateUfs(f2, result1);
+    UfEliminationResult result2 = ackermannization.eliminateUfs(f2, result1);
     BooleanFormula withOutUfs2 = result2.getFormula();
     BooleanFormula geConstraints = result2.getConstraints();
     BooleanFormula withOutUfs = bmgr.and(bmgr.xor(withOutUfs1, withOutUfs2), geConstraints);
@@ -254,7 +254,8 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(ufDecl, Lists.newArrayList(variable2, variable4));
     BooleanFormula f = bmgr.or(f1, bmgr.not(f2));
 
-    Result withOutUfs = ackermannization.eliminateUfs(f, Result.empty(mgr));
+    UfEliminationResult withOutUfs =
+        ackermannization.eliminateUfs(f, UfEliminationResult.empty(mgr));
 
     Map<Formula, Formula> substitution = withOutUfs.getSubstitution();
     Truth.assertThat(substitution).hasSize(2);
