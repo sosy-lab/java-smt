@@ -35,7 +35,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
-import org.sosy_lab.java_smt.api.UfEliminationResult;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -381,11 +380,5 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             }
           }
         });
-  }
-
-  @Override
-  public UfEliminationResult eliminateUFs(
-      BooleanFormula pFormula, UfEliminationResult pOtherResult) {
-    return new UfElimination(this).eliminateUfs(pFormula, pOtherResult);
   }
 }
