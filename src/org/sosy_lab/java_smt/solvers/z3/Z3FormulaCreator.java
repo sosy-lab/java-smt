@@ -681,6 +681,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     cleanupReferences();
 
     // Force clean all ASTs, even those which were not GC'd yet.
+    // Is a no-op if phantom reference handling is not enabled.
     for (long ast : referenceMap.values()) {
       Native.decRef(getEnv(), ast);
     }
