@@ -22,6 +22,73 @@ overhead compared to using the solver API directly), customizability
 wrapping layer) and type-safety (it shouldn't be possible to add boolean terms
 to integer ones at _compile_ time) sometimes at the cost of verbosity.
 
+## Supported Solvers
+
+Currently, we support the following SMT solvers:
+
+ - [Z3](https://github.com/Z3Prover/z3)
+ - [MathSAT](http://mathsat.fbk.eu/)
+ - [OptiMathSAT](http://optimathsat.disi.unitn.it/)
+ - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
+ - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
+ 
+Support for CVC4 is planned in the near future. 
+
+## Supported Features
+
+JavaSMT can express formulas in the following theories:
+
+ - Integer
+ - Rational
+ - Bitvector
+ - Floating point
+ - Array
+ - Uninterpreted Function
+ - Bitvectors
+
+The following features are supported:
+
+ - Satisfiability checking
+ - Quantifiers and quantifier elimination
+ - Incremental solving with assumptions
+ - Incremental solving with push/pop
+ - Multiple independent contexts
+ - Model generation
+ - Interpolation, including tree and sequential
+ - Formula transformation using built-in tactics
+ - Formula introspection using visitors
+    
+### Multithreading Support
+
+All solvers except for MathSAT5 fully support multithreading, provided
+that different threads use different contexts, and _all_ operations on a
+single context are performed from a single thread.
+Interruption using [ShutdownNotifier][] may be used to interrupt a
+a solver from any thread.
+
+### Garbage Collection in Native Solvers
+
+JavaSMT exposes an API for performing garbage collection on solvers
+implemented in a native language.
+As a native solver has no way of knowing whether the created formula
+object is still referenced by the client application, this API is
+necessary to avoid leaking memory.
+Note that due to the _hash consing_ usage inside the solvers, there is
+never more than one copy of an identical formula object in memory.
+Consequently, if all created formulas are later re-used (or re-created)
+in the application, it is not necessary to perform any garbage
+collection at all.
+
+#### Z3
+
+The parameter `solver.z3.usePhantomReferences` may be used to control
+whether JavaSMT will attempt to decrease references on Z3 formula
+objects once they are no longer referenced.
+
+#### MathSAT5
+
+Currently we do not support performing garbage collection for MathSAT5.
+
 # Installation
 
 ### Automatic Installation from Maven Central
@@ -39,16 +106,9 @@ For Maven:
 </dependency>
 ```
 
-Or for Gradle:
-
-```
-dependencies {
-  compile 'org.sosy-lab:common:0.60'
-}
-```
-
 Currently, only SMTInterpol is automatically fetched from Maven Central,
-and other solvers would have to be installed manually.
+and shared object for other solvers would have to be installed manually:
+see the section "Manual Installation" below.
 
 ### Automatic Installation using Ivy
 
@@ -65,20 +125,34 @@ dependency:
 <dependency org="org.sosy_lab" name="javasmt" rev="0.60" />
 ```
 
-### Manual Installation using JAR files
+### Manual Installation
 
-Alternatively, JARs for JavaSMT and its dependencies can be downloaded from our
-[Ivy Repository](IvyRepository) manually:
+JARs for JavaSMT and its dependencies can be downloaded from our
+[Ivy Repository](IvyRepository) manually.
+In order to perform the manual installation, the following steps should
+be followed:
 
-<!-- TODO: guide for fetching solver binaries/etc-->
-
+ - The desired version has to be chosen.
+   Latest version can be found by looking at the [Ivy index](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/).
+ - Suppose the version `0.60` was chosen.
+   Ivy description file [`ivy-0.60.xml`](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/ivy-0.60.xml) can
+   be consulted in order to determine all the files which should be fetched.
+ - The artifacts tag specifies what files the release depends on.
+   In the example case, those are `javasmt-0.60.jar` and (optionally)
+   `javasmt-0.60-sources.jar`, located in the same directory.
+ - Finally, the dependencies can be manually followed and resolved.
+   E.g. in the example, Z3 version `z3-4.4.1-1394-gd12efb6` is specified,
+   which is described by the corresponding [XML](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1394-gd12efb6.xml)
+   file, specifying what binaries should be fetched from the corresponding
+   [directory](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
+ 
 ## Binaries for Native Solvers (MathSAT and Z3)
 
 Solver binaries for native solvers are downloaded automatically by Ivy.
 We supply binaries only for 64-bit linux platforms
 (tested on Ubuntu latest LTS).
-If you have this architecture, then (hopefully) everything should work as is after
-installation.
+If you have this architecture,
+then (hopefully) everything should work as is after installation.
 
 If you require native solvers on a different platform, then you can copy the
 `.so` binaries manually to the folder in `lib/native` corresponding to your
@@ -88,7 +162,7 @@ See [NativeLibraries](NativeLibraries) documentation for more details.
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
 
-# Usage
+# Quickstart Guide
 
 ## Initialization
 
@@ -140,7 +214,7 @@ These dependencies are:
     Shutdown notifier provides a solution to handle interrupts gracefully,
     without having to resort to `kill -9` command.
 
-## Quickstart guide
+## Solving Constraints
 
 Once the formula manager is initialized, we can start posing queries to the
 solver.
@@ -151,7 +225,7 @@ over integers `a`, `b` and `c`:
 a + b = c \/ a + c = 2 * b
 ```
 
-Creating the required constraint is straghtforward:
+Creating the required constraint is straightforward:
 
 ```java
     // Assume we have a SolverContext instance.
@@ -198,38 +272,6 @@ through all of the returned data, or by querying for the variables we need:
 ```java
     BigInteger value = model.evaluate(a);
 ```
-
-## Multithreading Support
-
-All solvers except for MathSAT5 fully support multithreading, provided
-that different threads use different contexts, and _all_ operations on a
-single context are performed from a single thread.
-
-Interruption using [ShutdownNotifier][] may be used to interrupt a
-a solver from any thread.
-
-## Garbage Collection in Native Solvers
-
-JavaSMT exposes an API for performing garbage collection on solvers
-implemented in a native language.
-As a native solver has no way of knowing whether the created formula
-object is still referenced by the client application, this API is
-necessary to avoid leaking memory.
-Note that due to the _hash consing_ usage inside the solvers, there is
-never more than one copy of an identical formula object in memory.
-Consequently, if all created formulas are later re-used (or re-created)
-in the application, it is not necessary to perform any garbage
-collection at all.
-
-### Z3
-
-The parameter `solver.z3.usePhantomReferences` may be used to control
-whether JavaSMT will attempt to decrease references on Z3 formula
-objects once they are no longer referenced.
-
-### MathSAT5
-
-Currently we do not support performing garbage collection for MathSAT5.
 
 ## Known Solver Issues
 
