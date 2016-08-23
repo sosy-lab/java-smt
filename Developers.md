@@ -106,15 +106,17 @@ at the root of the [Ivy Repository](https://svn.sosy-lab.org/software/ivy).
 
 In order to write a solver backend it is sufficient to provide the
 implementation for the `SolverContext` interface.
-A new solver does not have to implement old methods, and should throw
-`UnsupportedOperationException` 
-Abstract classes located inside the `basicimpl` package 
-If the change is done inside JavaSMT, `SolverContextFactory` and the
-`Solvers` enum would have to be updated to include the new backend.
+A new backend does not have to implement all the present methods,
+and should throw `UnsupportedOperationException` for methods it chooses to ignore.
+Abstract classes located inside the `basicimpl` package could be very helpful
+for writing new backends.
 
-The new backend can be created outside of JavaSMT as well: in that case,
-the user would probably wish to have their own factory which can create
-different contexts.
+If the new backend is written inside JavaSMT,
+`SolverContextFactory` and the `Solvers` enum should be updated
+to include the new solver.
+The new solver can be added from outside of JavaSMT as well: in that case,
+the user might wish to have their own factory which can create
+a suitable `SolverContext`.
 
 [Travis]: https://travis-ci.org/sosy-lab/java-smt
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
