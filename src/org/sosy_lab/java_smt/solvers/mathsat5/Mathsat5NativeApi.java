@@ -24,6 +24,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.java_smt.api.SolverException;
@@ -171,6 +172,13 @@ class Mathsat5NativeApi {
     return processSolveResult(e, msat_solve_with_assumptions(e, assumptions, assumptions.length));
   }
 
+  private static final ImmutableSet<String> ALLOWED_SOLVE_FAILURE_MESSAGES =
+      ImmutableSet.of(
+          "unsupported",
+          "non-integer model value",
+          "build_model: too many iterations",
+          "FP<->BV combination unsupported by the current configuration");
+
   private static boolean processSolveResult(long e, int resultCode)
       throws IllegalStateException, SolverException {
     switch (resultCode) {
@@ -181,7 +189,7 @@ class Mathsat5NativeApi {
       default:
         String msg = Strings.emptyToNull(msat_last_error_message(e));
 
-        if (msg != null && msg.contains("non-integer model value")) {
+        if (ALLOWED_SOLVE_FAILURE_MESSAGES.contains(msg)) {
           //·This·is·not·a·bug·in·our·code,·but·a·problem·of·MathSAT
           throw new SolverException(msg);
         }

@@ -28,7 +28,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -72,24 +71,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    try {
-      return !msat_check_sat(curEnv);
-    } catch (IllegalStateException e) {
-      handleSolverExceptionInUnsatCheck(e);
-      throw e;
-    }
-  }
-
-  protected void handleSolverExceptionInUnsatCheck(IllegalStateException e) throws SolverException {
-    String msg = Strings.nullToEmpty(e.getMessage());
-    if (msg.contains("too many iterations")
-        || msg.contains("impossible to build a suitable congruence graph!")
-        || msg.contains("can't produce proofs")
-        || msg.contains("FP<->BV combination unsupported by the current configuration")
-        || msg.equals("msat_solve returned \"unknown\": unsupported")) {
-      // This is not a bug in our code, but a problem of MathSAT which happens during interpolation
-      throw new SolverException(e.getMessage(), e);
-    }
+    return !msat_check_sat(curEnv);
   }
 
   @Override

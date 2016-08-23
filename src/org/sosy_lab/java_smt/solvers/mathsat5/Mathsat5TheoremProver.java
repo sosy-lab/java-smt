@@ -151,13 +151,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    try {
-      return !msat_check_sat_with_assumptions(
-          curEnv, Longs.toArray(Collections2.transform(assumptions, creator::extractInfo)));
-    } catch (IllegalStateException e) {
-      handleSolverExceptionInUnsatCheck(e);
-      throw e;
-    }
+    return !msat_check_sat_with_assumptions(
+        curEnv, Longs.toArray(Collections2.transform(assumptions, creator::extractInfo)));
   }
 
   @Override

@@ -65,7 +65,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
       msatModel = msat_get_model(msatEnv);
     } catch (IllegalArgumentException e) {
       String msg = Strings.nullToEmpty(e.getMessage());
-      if (msg.contains("non-integer model value")) {
+      if (msg.equals("non-integer model value")) {
         // This is not a bug in our code, but a problem of MathSAT
         throw new SolverException(e.getMessage(), e);
       }
