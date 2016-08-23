@@ -13,7 +13,7 @@ Unified Java API for SMT solvers.
 JavaSMT is a common API layer for accessing various SMT solvers.
 
 It was created out of our experience integrating and using different SMT solvers
-in [CPAchecker](http://cpachecker.sosy-lab.org/) project.
+in the [CPAchecker][] project.
 The library is developed for medium to large software projects which
 require access to SMT solvers.
 The API is optimized for performance (using JavaSMT has very little runtime
@@ -32,7 +32,7 @@ Currently, we support the following SMT solvers:
  - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
  - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
  
-Support for CVC4 is planned in the near future. 
+Support for CVC4 is planned in the near future (cf. [#2](https://github.com/sosy-lab/java-smt/issues/2)).
 
 ## Supported Features
 
@@ -114,8 +114,7 @@ see the section "Manual Installation" below.
 
 If your build tool supports fetching packages from
 [Apache Ivy](http://ant.apache.org/ivy/),
-you can point it to [Sosy-Lab](http://www.sosy-lab.org/) Ivy
-[repository](IvyRepository), which would automatically fetch
+you can point it to [Sosy-Lab](http://www.sosy-lab.org/) [Ivy repository][], which would automatically fetch
 `JavaSMT` and all of its dependencies.
 
 After the repository URL is configured, you only need to add the following
@@ -128,25 +127,25 @@ dependency:
 ### Manual Installation
 
 JARs for JavaSMT and its dependencies can be downloaded from our
-[Ivy Repository](IvyRepository) manually.
+[Ivy repository][] manually.
 In order to perform the manual installation, the following steps should
 be followed:
 
  - The desired version has to be chosen.
-   Latest version can be found by looking at the [Ivy index](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/).
+   Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/).
  - Suppose the version `0.60` was chosen.
-   Ivy description file [`ivy-0.60.xml`](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/ivy-0.60.xml) can
+   Ivy description file [`ivy-0.60.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/ivy-0.60.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
    In the example case, those are `javasmt-0.60.jar` and (optionally)
    `javasmt-0.60-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
    E.g. in the example, Z3 version `z3-4.4.1-1394-gd12efb6` is specified,
-   which is described by the corresponding [XML](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1394-gd12efb6.xml)
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1394-gd12efb6.xml)
    file, specifying what binaries should be fetched from the corresponding
-   [directory](http://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
+   [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
  
-## Binaries for Native Solvers (MathSAT and Z3)
+### Binaries for Native Solvers (MathSAT and Z3)
 
 Solver binaries for native solvers are downloaded automatically by Ivy.
 We supply binaries only for 64-bit linux platforms
@@ -157,7 +156,7 @@ then (hopefully) everything should work as is after installation.
 If you require native solvers on a different platform, then you can copy the
 `.so` binaries manually to the folder in `lib/native` corresponding to your
 architecture.
-See [NativeLibraries](NativeLibraries) documentation for more details.
+See [NativeLibraries][] documentation for more details.
 
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
@@ -166,13 +165,12 @@ do not require any configuration and work out of the box.
 
 ## Initialization
 
-Below is a small example showing how to initialize the library:
+Below is a small example showing how to initialize the library using the entry point [SolverContextFactory][]:
 
 ```java
 package org.sosy_lab.solver.test;
 
 import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
@@ -185,18 +183,18 @@ public class TestApp {
   public static void main(String[] args) throws InvalidConfigurationException {
     Configuration config = Configuration.fromCmdLineArguments(args);
     LogManager logger = new BasicLogManager(config);
-    ShutdownNotifier notifier = ShutdownManager.create().getNotifier();
+    ShutdownManager shutdown = ShutdownManager.create();
 
     // SolverContext is a class wrapping a solver context.
     // Solver can be selected either using an argument or a configuration option
     // inside `config`.
-    SolverContext context = SolverContextFactory.
-        createSolverContext(config, logger, notifier, Solvers.SMTINTERPOL);
+    SolverContext context = SolverContextFactory.createSolverContext(
+        config, logger, shutdown.getNotifier(), Solvers.SMTINTERPOL);
   }
 }
 ```
 
-JavaSMT relies on three dependencies from the SoSy-Lab [common](common) library.
+JavaSMT relies on three dependencies from the SoSy-Lab [Common][common] library.
 These dependencies are:
 
  - [Configuration][]: SMT solvers expose many different
@@ -207,16 +205,17 @@ These dependencies are:
     logging for the operations related to all SMT queries.
     If you already use your own logging framework, you just have to create a
     wrapper implementing `LogManager` interface.
- - [ShutdownNotifier][]: Many SMT queries can take a very
+    [BasicLogManager][] is an implementation that delegates to the standard JDK logging API.
+ - [ShutdownNotifier][] from a [ShutdownManager][]: Many SMT queries can take a very
     long time, potentially more than the user is willing to wait.
     What's more, for a solver implemented in the native code usual ways of
     interrupting a Java process (e.g. interrupt signal) would not work.
-    Shutdown notifier provides a solution to handle interrupts gracefully,
-    without having to resort to `kill -9` command.
+    Shutdown manager provides a solution to gracefully request termination,
+    and JavaSMT and the solvers will try to respond to such requests as soon as possible.
 
 ## Solving Constraints
 
-Once the formula manager is initialized, we can start posing queries to the
+Once the [SolverContext][] is initialized, we can start posing queries to the
 solver.
 In this example, we want to find a satisfying example for a constraint
 over integers `a`, `b` and `c`:
@@ -273,17 +272,35 @@ through all of the returned data, or by querying for the variables we need:
     BigInteger value = model.evaluate(a);
 ```
 
+For further information, look at our full example [HoudiniApp][], or at the [JavaDoc][].
+
 ## Known Solver Issues
+
+### Princess
+
+ - Princess is recursive and might require a large amount of stack memory.
+If you experience stack overflows or Princess returns `OutOfMemory`,
+try increasing the stack size with the JVM parameter `-Xss`.
+ - Requesting termination via the [ShutdownNotifier][] works only in limited circumstances.
 
 ### SMTInterpol
 
  - SMTInterpol does not support multiple concurrent stacks under the same context.
+ - Variables and UFs that are used for the first time after a solver stack has been created
+will be deleted on the next call to `pop()` and will be invalid afterwards.
+This will change with one of the next SMTInterpol versions (cf. [#69](https://github.com/sosy-lab/java-smt/issues/69)).
 
 ### Z3
 
  - Z3 interpolation procedure might require a large amount of stack memory.
 If you get segmentation fault on interpolation, try increasing the stack size 
-with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
+with the JVM parameter `-Xss`.
+
+## Further Documentation
+
+ - [JavaDoc][]
+ - [Changelog](https://github.com/sosy-lab/java-smt/blob/master/CHANGELOG.md)
+ - [Documentation For Developers](https://github.com/sosy-lab/java-smt/blob/master/Developers.md)
 
 ## Authors
 
@@ -291,23 +308,24 @@ with the parameter `-Xss` for your Java program or `-stack` for CPAchecker.
  - Initial codebase, many design decisions: [Philipp Wendler][]
  - Contributions: [Thomas Stieglmaier][], [Karlheinz Friedberger][], and others.
 
-## Further Documentation
-
- - [JavaDoc documentation](http://sosy-lab.github.io/java-smt/)
- - [Documentation For Developers](https://github.com/sosy-lab/java-smt/blob/master/Developers.md)
-
 ### Additional Acknowledgements
 
  - Profiled with [jProfiler][] Java Profiler.
  
+[CPAchecker]: http://cpachecker.sosy-lab.org/
 [jProfiler]: http://www.ej-technologies.com/products/jprofiler/overview.html
 [common]: https://github.com/sosy-lab/java-common-lib
+[ShutdownManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownManager.html
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
 [Configuration]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html
-[LogManager]: https://sosy-lab.github.io/java-common-lib/api/index.html?org/sosy_lab/common/configuration/package-summary.html
-[FormulaManagerFactory]: http://sosy-lab.github.io/java-smt/api/org/sosy_lab/solver/FormulaManagerFactory.html
-[IvyRepository]: http://www.sosy-lab.org/ivy
+[BasicLogManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/log/BasicLogManager.html
+[LogManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/log/LogManager.html
+[SolverContext]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/api/SolverContext.html
+[SolverContextFactory]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/SolverContextFactory.html
+[HoudiniApp]: https://github.com/sosy-lab/java-smt/blob/master/src/org/sosy_lab/java_smt/example/HoudiniApp.java
+[JavaDoc]: http://sosy-lab.github.io/java-smt/
+[Ivy repository]: https://www.sosy-lab.org/ivy
 [George Karpenkov]: http://metaworld.me
 [Philipp Wendler]: http://www.philippwendler.de/
 [Thomas Stieglmaier]: https://stieglmaier.me/
