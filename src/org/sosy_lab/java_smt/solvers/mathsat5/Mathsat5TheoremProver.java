@@ -28,9 +28,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Longs;
 
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -152,7 +150,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     return !msat_check_sat_with_assumptions(
-        curEnv, Longs.toArray(Collections2.transform(assumptions, creator::extractInfo)));
+        curEnv, Mathsat5FormulaManager.getMsatTerm(assumptions));
   }
 
   @Override

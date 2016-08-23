@@ -23,6 +23,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_appl
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Longs;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -30,6 +33,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -59,6 +63,10 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   static long getMsatTerm(Formula pT) {
     return ((Mathsat5Formula) pT).getTerm();
+  }
+
+  static long[] getMsatTerm(Collection<? extends Formula> pFormulas) {
+    return Longs.toArray(Collections2.transform(pFormulas, Mathsat5FormulaManager::getMsatTerm));
   }
 
   @Override
