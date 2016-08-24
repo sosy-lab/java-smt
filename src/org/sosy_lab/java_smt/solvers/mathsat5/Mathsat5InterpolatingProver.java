@@ -23,10 +23,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_asse
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -89,6 +91,25 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     Preconditions.checkState(!closed);
     return !msat_check_sat_with_assumptions(
         curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
+  }
+
+  @Override
+  protected long getMsatModel() throws SolverException {
+    // Interpolation in MathSAT is buggy at least for UFs+Ints and sometimes returns a wrong "SAT".
+    // In this case, model generation fails and users should try again without interpolation.
+    // Example failures: "Invalid model", "non-integer model value"
+    // As this is a bug in MathSAT and not in our code, we throw a SolverException.
+    // We do it only in InterpolatingProver because without interpolation this is not expected.
+    try {
+      return msat_get_model(curEnv);
+    } catch (IllegalArgumentException e) {
+      String msg = Strings.emptyToNull(e.getMessage());
+      throw new SolverException(
+          "msat_get_model failed"
+              + (msg != null ? " with \"" + msg + "\"" : "")
+              + ", probably the actual problem is interpolation",
+          e);
+    }
   }
 
   @Override

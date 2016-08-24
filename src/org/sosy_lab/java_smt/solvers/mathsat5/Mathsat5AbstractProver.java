@@ -77,14 +77,21 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return Mathsat5Model.create(creator, curEnv);
+    return new Mathsat5Model(getMsatModel(), creator);
   }
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (Mathsat5Model model = Mathsat5Model.create(creator, curEnv)) {
+    try (Mathsat5Model model = new Mathsat5Model(getMsatModel(), creator)) {
       return model.modelToList();
     }
+  }
+
+  /**
+   * @throws SolverException if an expected MathSAT failure occurs
+   */
+  protected long getMsatModel() throws SolverException {
+    return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
   @Override
