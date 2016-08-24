@@ -26,8 +26,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
  */
 public class SolverUtils {
 
-  private SolverUtils() {
-  }
+  private SolverUtils() {}
 
   /**
    * Creates a new {@link UfElimination} instance.
@@ -37,5 +36,4 @@ public class SolverUtils {
   public static UfElimination ufElimination(FormulaManager pFormulaManager) {
     return new UfElimination(pFormulaManager);
   }
-
 }
