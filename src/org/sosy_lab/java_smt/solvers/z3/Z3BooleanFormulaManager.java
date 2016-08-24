@@ -19,11 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
-
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-import com.microsoft.z3.enumerations.Z3_decl_kind;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
@@ -32,10 +29,16 @@ import java.util.Collection;
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
+  private final long z3true;
+  private final long z3false;
 
   Z3BooleanFormulaManager(Z3FormulaCreator creator) {
     super(creator);
     z3context = creator.getEnv();
+    z3true = Native.mkTrue(z3context);
+    Native.incRef(z3context, z3true);
+    z3false = Native.mkFalse(z3context);
+    Native.incRef(z3context, z3false);
   }
 
   @Override
@@ -60,11 +63,29 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
+    if (Native.isEqAst(z3context, pParam1, z3true)) {
+      return pParam2;
+    } else if (Native.isEqAst(z3context, pParam2, z3true)) {
+      return pParam1;
+    } else if (Native.isEqAst(z3context, pParam1, z3false)) {
+      return z3false;
+    } else if (Native.isEqAst(z3context, pParam2, z3false)) {
+      return z3false;
+    }
     return Native.mkAnd(z3context, 2, new long[] {pParam1, pParam2});
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
+    if (Native.isEqAst(z3context, pParam1, z3true)) {
+      return z3true;
+    } else if (Native.isEqAst(z3context, pParam2, z3true)) {
+      return z3true;
+    } else if (Native.isEqAst(z3context, pParam1, z3false)) {
+      return pParam2;
+    } else if (Native.isEqAst(z3context, pParam2, z3false)) {
+      return pParam1;
+    }
     return Native.mkOr(z3context, 2, new long[] {pParam1, pParam2});
   }
 
@@ -95,12 +116,12 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected boolean isTrue(Long pParam) {
-    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_TRUE.toInt());
+    return Native.isEqAst(z3context, pParam, z3true);
   }
 
   @Override
   protected boolean isFalse(Long pParam) {
-    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_FALSE.toInt());
+    return Native.isEqAst(z3context, pParam, z3false);
   }
 
   @Override
