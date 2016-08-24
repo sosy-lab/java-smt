@@ -1,3 +1,5 @@
+#include<stdint.h>
+
 #include "includes/defines.h"
 
 /*
@@ -265,7 +267,7 @@ CALL4(int, is_array_type)
     throwException(jenv, "java/lang/IllegalArgumentException", "Cannot get index type of non-array type"); \
     return -1;
   } \
-  return (jlong)r_arg3.repr; \
+  return (jlong)(intptr_t)r_arg3.repr; \
 }
 
 DEFINE_FUNC(jtype, 1get_1array_1element_1type) WITH_TWO_ARGS(jenv, jtype)
@@ -279,7 +281,7 @@ CALL4(int, is_array_type)
     throwException(jenv, "java/lang/IllegalArgumentException", "Cannot get element type of non-array type"); \
     return -1;
   } \
-  return (jlong)r_arg4.repr; \
+  return (jlong)(intptr_t)r_arg4.repr; \
 }
 
 DEFINE_FUNC(jboolean, 1is_1fp_1type) WITH_TWO_ARGS(jenv, jtype)
