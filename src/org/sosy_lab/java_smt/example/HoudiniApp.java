@@ -2,9 +2,9 @@ package org.sosy_lab.java_smt.example;
 
 import com.google.common.collect.ImmutableList;
 
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 import java.util.ArrayList;
@@ -49,51 +50,66 @@ import java.util.logging.Level;
  * to exclude the lemmas that give rise to counterexamples-to-induction.
  */
 public class HoudiniApp {
+
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bfmgr;
   private final SolverContext context;
 
-  public static void main(String... args) throws Exception {
+  public static void main(String... args)
+      throws InvalidConfigurationException, SolverException, InterruptedException {
     LogManager mainLogger = BasicLogManager.create(Configuration.defaultConfiguration());
+    ShutdownNotifier notifier = ShutdownNotifier.createDummy();
+
+    // this example executes the Houdini algorithm for all available solvers
     for (Solvers solver : Solvers.values()) {
       mainLogger.log(Level.INFO, "using solver", solver);
 
-      // initialize Houdini
-      HoudiniApp houdini = new HoudiniApp("--solver.solver=" + solver);
+      // set basic options, e.g. the solver that should be used
+      Configuration config =
+          Configuration.fromCmdLineArguments(new String[] {"--solver.solver=" + solver});
+      LogManager logger = BasicLogManager.create(config);
 
-      IntegerFormulaManager ifmgr = houdini.fmgr.getIntegerFormulaManager();
+      // create the solver context, which includes all necessary parts for building, manipulating,
+      // and solving formulas.
+      try (SolverContext solverContext =
+          SolverContextFactory.createSolverContext(config, logger, notifier)) {
 
-      // create some symbols
-      IntegerFormula x = ifmgr.makeVariable("X");
-      IntegerFormula xPrimed = ifmgr.makeVariable("X'");
-      IntegerFormula one = ifmgr.makeNumber(1);
+        // initialize Houdini
+        HoudiniApp houdini = new HoudiniApp(solverContext);
 
-      // for the transition X'=X+1 the lemma X>1 is valid and X<1 is invalid.
-      List<BooleanFormula> lemmas =
-          ImmutableList.of(ifmgr.greaterThan(x, one), ifmgr.lessThan(x, one));
-      BooleanFormula transition = ifmgr.equal(xPrimed, ifmgr.add(x, one));
+        IntegerFormulaManager ifmgr = solverContext.getFormulaManager().getIntegerFormulaManager();
 
-      // compute the maximal inductive subset
-      List<BooleanFormula> result = houdini.houdini(lemmas, transition);
+        // create some symbols for the example
+        IntegerFormula x = ifmgr.makeVariable("X");
+        IntegerFormula xPrimed = ifmgr.makeVariable("X'");
+        IntegerFormula one = ifmgr.makeNumber(1);
 
-      mainLogger.log(Level.INFO, "Houdini returned", result);
+        // create boolean formulas for the example,
+        // for the transition X'=X+1 the lemma X>1 is valid and X<1 is invalid.
+        List<BooleanFormula> lemmas =
+            ImmutableList.of(ifmgr.greaterThan(x, one), ifmgr.lessThan(x, one));
+        BooleanFormula transition = ifmgr.equal(xPrimed, ifmgr.add(x, one));
+
+        // use Houdini and compute the maximal inductive subset
+        List<BooleanFormula> result = houdini.houdini(lemmas, transition);
+
+        mainLogger.log(Level.INFO, "Houdini returned", result);
+      }
     }
   }
 
-  public HoudiniApp(String... args) throws Exception {
-    Configuration config = Configuration.fromCmdLineArguments(args);
-    LogManager logger = BasicLogManager.create(config);
-    ShutdownNotifier notifier = ShutdownManager.create().getNotifier();
-
-    context = SolverContextFactory.createSolverContext(config, logger, notifier);
+  public HoudiniApp(SolverContext solverContext) {
+    context = solverContext;
     fmgr = context.getFormulaManager();
     bfmgr = context.getFormulaManager().getBooleanFormulaManager();
   }
 
+  /** create a temporary symbol using the given index. */
   private BooleanFormula getSelectorVar(int idx) {
     return bfmgr.makeVariable("SEL_" + idx);
   }
 
+  /** traverse the formula and replace all symbols in the formula with their primed version. */
   private BooleanFormula prime(BooleanFormula input) {
     return fmgr.transformRecursively(
         input,
@@ -106,8 +122,10 @@ public class HoudiniApp {
         });
   }
 
+  /** execute the Houdini algorithm to get the maximal inductive subset L_I
+   * for the given lemmas and the transition. */
   public List<BooleanFormula> houdini(List<BooleanFormula> lemmas, BooleanFormula transition)
-      throws Exception {
+      throws SolverException, InterruptedException {
     List<BooleanFormula> annotated = new ArrayList<>();
     List<BooleanFormula> annotatedPrimes = new ArrayList<>();
     Map<Integer, BooleanFormula> indexed = new HashMap<>();
@@ -121,6 +139,7 @@ public class HoudiniApp {
       indexed.put(i, lemma);
     }
 
+    // create a prover environment for solving the formulas and receiving a model
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(transition);
       prover.addConstraint(bfmgr.and(annotated));
