@@ -87,14 +87,14 @@ and then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH` is the path to the MathSAT directory,
 and `$MATHSAT_VERSION` is the version number of MathSAT:
 ```
-ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dmathsat.version=$MATHSAT_VERSION
+ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$MATHSAT_VERSION
 ```
 Finally follow the instructions shown in the message at the end.
 The same procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
 except the publishing command is:
 
 ```
-ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dmathsat.version=$OPTIMATHSAT_VERSION
+ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$OPTIMATHSAT_VERSION
 ```
 
 ### Publishing Princess and SMTInterpol
