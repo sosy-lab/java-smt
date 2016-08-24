@@ -154,9 +154,14 @@ If you have this architecture,
 then (hopefully) everything should work as is after installation.
 
 If you require native solvers on a different platform, then you can copy the
-`.so` binaries manually to the folder in `lib/native` corresponding to your
-architecture.
-See [NativeLibraries][] documentation for more details.
+binaries manually to the corresponding folder
+in `lib/native` corresponding to your architecture.
+See [NativeLibraries][] documentation for more details on which path is searched.
+For Z3, it is sufficient to grab the binary and the JAR file after the compilation
+(cf. [Developers Documentation](Developers.md) for compilation instructions).
+In order to compile MathSAT binaries,
+see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](lib/native/source/libmathsat5j/compile.sh)
+script.
 
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
