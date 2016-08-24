@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.basicimpl.tactics;
+package org.sosy_lab.java_smt.utils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -125,7 +125,7 @@ public class UfElimination {
   private final BooleanFormulaManager bfmgr;
   private final FormulaManager fmgr;
 
-  public UfElimination(FormulaManager pFmgr) {
+  UfElimination(FormulaManager pFmgr) {
     bfmgr = pFmgr.getBooleanFormulaManager();
     fmgr = pFmgr;
   }

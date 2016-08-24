@@ -41,8 +41,9 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination;
-import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination.Result;
+import org.sosy_lab.java_smt.utils.SolverUtils;
+import org.sosy_lab.java_smt.utils.UfElimination;
+import org.sosy_lab.java_smt.utils.UfElimination.Result;
 
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
   @Before
   public void setUp() throws Exception {
-    ackermannization = new UfElimination(mgr);
+    ackermannization = SolverUtils.ufElimination(mgr);
   }
 
   @Test

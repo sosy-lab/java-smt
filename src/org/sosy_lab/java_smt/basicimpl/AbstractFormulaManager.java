@@ -39,7 +39,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
-import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination;
+import org.sosy_lab.java_smt.utils.SolverUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -222,7 +222,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @throws InterruptedException Can be thrown by the native code.
    */
   protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
-    return new UfElimination(this).eliminateUfs(pF);
+    return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
   /**
