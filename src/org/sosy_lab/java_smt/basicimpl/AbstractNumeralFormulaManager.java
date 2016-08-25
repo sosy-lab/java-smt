@@ -243,7 +243,7 @@ public abstract class AbstractNumeralFormulaManager<
    * @param a first operand
    * @param b second operand
    * @param m the modulus
-   * @returns the formula representing "(a % m) == (b % m)"
+   * @return the formula representing "(a % m) == (b % m)"
    */
   protected TFormulaInfo modularCongruence(TFormulaInfo a, TFormulaInfo b, long m) {
     throw new UnsupportedOperationException();
