@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.basetypes.IdealInt;
-import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
@@ -76,12 +75,9 @@ class PrincessIntegerFormulaManager
   protected IExpression modularCongruence(
       IExpression pNumber1, IExpression pNumber2, long pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    if (pModulo > 0) {
-      ITerm n = makeNumberImpl(pModulo);
-      ITerm x = subtract(pNumber1, pNumber2);
-      return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
-    }
-    return new IBoolLit(true);
+    ITerm n = makeNumberImpl(pModulo);
+    ITerm x = subtract(pNumber1, pNumber2);
+    return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
   }
 
   @Override

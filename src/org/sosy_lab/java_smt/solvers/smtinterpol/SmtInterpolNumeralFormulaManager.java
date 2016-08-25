@@ -76,7 +76,7 @@ abstract class SmtInterpolNumeralFormulaManager<
     // if x >= 0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     // if x <  0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     Sort intSort = pNumber1.getTheory().getNumericSort();
-    if (pModulo > 0 && intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort())) {
+    if (intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort())) {
       Term n = env.numeral(BigInteger.valueOf(pModulo));
       Term x = subtract(pNumber1, pNumber2);
       return env.term("=", x, env.term("*", n, env.term("div", x, n)));

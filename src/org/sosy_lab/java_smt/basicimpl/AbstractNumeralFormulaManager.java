@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.rationals.Rational;
@@ -228,6 +229,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public BooleanFormula modularCongruence(
       ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
+    Preconditions.checkArgument(pModulo > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 

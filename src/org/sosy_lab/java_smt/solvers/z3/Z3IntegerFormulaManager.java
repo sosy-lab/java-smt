@@ -56,12 +56,9 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    if (pModulo > 0) {
-      long n = makeNumberImpl(pModulo);
-      long x = subtract(pNumber1, pNumber2);
-      return Native.mkEq(
-          z3context, x, Native.mkMul(z3context, 2, new long[] {n, Native.mkDiv(z3context, x, n)}));
-    }
-    return Native.mkTrue(z3context);
+    long n = makeNumberImpl(pModulo);
+    long x = subtract(pNumber1, pNumber2);
+    return Native.mkEq(
+        z3context, x, Native.mkMul(z3context, 2, new long[] {n, Native.mkDiv(z3context, x, n)}));
   }
 }
