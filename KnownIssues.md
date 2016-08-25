@@ -19,3 +19,5 @@ This will change with one of the next SMTInterpol versions (cf. [#69](https://gi
  - Z3 interpolation procedure might require a large amount of stack memory.
 If you get segmentation fault on interpolation, try increasing the stack size 
 with the JVM parameter `-Xss`.
+
+[ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
