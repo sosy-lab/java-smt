@@ -147,10 +147,8 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");
-    BooleanFormula y = bmgr.makeVariable("y");
 
     // AND
-
     Truth.assertThat(bmgr.and(tru)).isEqualTo(tru);
     Truth.assertThat(bmgr.and(fals)).isEqualTo(fals);
     Truth.assertThat(bmgr.and(x)).isEqualTo(x);
@@ -165,7 +163,6 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     // Truth.assertThat(bmgr.and(x, x, x, y, y)).isEqualTo(bmgr.and(x, y));
 
     // OR
-
     Truth.assertThat(bmgr.or(tru)).isEqualTo(tru);
     Truth.assertThat(bmgr.or(fals)).isEqualTo(fals);
     Truth.assertThat(bmgr.or(x)).isEqualTo(x);
