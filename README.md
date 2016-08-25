@@ -3,7 +3,7 @@
 [![Build Status](https://api.travis-ci.org/sosy-lab/java-smt.svg?branch=master "Build Status")](https://travis-ci.org/sosy-lab/java-smt)
 [![Code Quality](https://api.codacy.com/project/badge/Grade/94b27e1928034a4f9d91faad82a0b870)](https://www.codacy.com/app/PhilippWendler/java-smt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-smt&amp;utm_campaign=Badge_Grade)
 [![Test Coverage](https://api.codacy.com/project/badge/Coverage/94b27e1928034a4f9d91faad82a0b870)](https://www.codacy.com/app/PhilippWendler/java-smt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-smt&amp;utm_campaign=Badge_Coverage)
-[![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt)
 
 Unified Java API for SMT solvers.
@@ -113,8 +113,8 @@ see the section "Manual Installation" below.
 ### Automatic Installation using Ivy
 
 If your build tool supports fetching packages from
-[Apache Ivy](http://ant.apache.org/ivy/),
-you can point it to [Sosy-Lab](http://www.sosy-lab.org/) [Ivy repository][], which would automatically fetch
+[Apache Ivy](https://ant.apache.org/ivy/),
+you can point it to [Sosy-Lab](https://www.sosy-lab.org/) [Ivy repository][], which would automatically fetch
 `JavaSMT` and all of its dependencies.
 
 After the repository URL is configured, you only need to add the following
@@ -296,8 +296,8 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 
  - Profiled with [jProfiler][] Java Profiler.
  
-[CPAchecker]: http://cpachecker.sosy-lab.org/
-[jProfiler]: http://www.ej-technologies.com/products/jprofiler/overview.html
+[CPAchecker]: https://cpachecker.sosy-lab.org/
+[jProfiler]: https://www.ej-technologies.com/products/jprofiler/overview.html
 [common]: https://github.com/sosy-lab/java-common-lib
 [ShutdownManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownManager.html
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
@@ -308,9 +308,9 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 [SolverContext]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/api/SolverContext.html
 [SolverContextFactory]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/SolverContextFactory.html
 [HoudiniApp]: https://github.com/sosy-lab/java-smt/blob/master/src/org/sosy_lab/java_smt/example/HoudiniApp.java
-[JavaDoc]: http://sosy-lab.github.io/java-smt/
+[JavaDoc]: https://sosy-lab.github.io/java-smt/
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [George Karpenkov]: http://metaworld.me
-[Philipp Wendler]: http://www.philippwendler.de/
+[Philipp Wendler]: https://www.philippwendler.de/
 [Thomas Stieglmaier]: https://stieglmaier.me/
-[Karlheinz Friedberger]: http://www.sosy-lab.org/people-friedberger.php
+[Karlheinz Friedberger]: https://www.sosy-lab.org/people-friedberger.php
