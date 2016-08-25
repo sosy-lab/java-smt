@@ -19,15 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.collect.Iterables;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
@@ -98,59 +95,16 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long orImpl(Collection<Long> params) {
-    Set<Long> filtered = new LinkedHashSet<>(params.size());
-    for (Long param : params) {
-      if (isFalse(param)) {
-        // ignore
-      } else if (isTrue(param)) {
-        return z3true;
-      } else {
-        // heuristic: identical terms might have identical pointers, filter duplicates.
-        filtered.add(param);
-      }
-    }
-
-    switch (filtered.size()) {
-      case 0:
-        return z3false;
-      case 1:
-        return Iterables.getOnlyElement(filtered);
-      default:
-        return Native.mkOr(z3context, filtered.size(), Longs.toArray(filtered));
-    }
+    return Native.mkOr(z3context, params.size(), Longs.toArray(params));
   }
 
   @Override
   protected Long andImpl(Collection<Long> params) {
-    Set<Long> filtered = new LinkedHashSet<>(params.size());
-    for (Long param : params) {
-      if (isFalse(param)) {
-        return z3false;
-      } else if (isTrue(param)) {
-        // ignore
-      } else {
-        // heuristic: identical terms might have identical pointers, filter duplicates.
-        filtered.add(param);
-      }
-    }
-
-    switch (filtered.size()) {
-      case 0:
-        return z3true;
-      case 1:
-        return Iterables.getOnlyElement(filtered);
-      default:
-        return Native.mkAnd(z3context, filtered.size(), Longs.toArray(filtered));
-    }
+    return Native.mkAnd(z3context, params.size(), Longs.toArray(params));
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
-    if (isFalse(pParam1)) {
-      return pParam2;
-    } else if (isFalse(pParam2)) {
-      return pParam1;
-    }
     return Native.mkXor(z3context, pParam1, pParam2);
   }
 
