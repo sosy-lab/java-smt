@@ -73,8 +73,7 @@ abstract class SmtInterpolNumeralFormulaManager<
 
   @Override
   protected Term modularCongruence(Term pNumber1, Term pNumber2, long pModulo) {
-    // if x >= 0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    // if x <  0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
+    // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     Sort intSort = pNumber1.getTheory().getNumericSort();
     if (intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort())) {
       Term n = env.numeral(BigInteger.valueOf(pModulo));

@@ -32,8 +32,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 class PrincessIntegerFormulaManager
-    extends org.sosy_lab.java_smt.solvers.princess.PrincessNumeralFormulaManager<
-        IntegerFormula, IntegerFormula>
+    extends PrincessNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
   PrincessIntegerFormulaManager(PrincessFormulaCreator pCreator) {
