@@ -37,6 +37,9 @@ class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<
         IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
+  private final IBoolLit pTrue = new IBoolLit(true);
+  private final IBoolLit pFalse = new IBoolLit(false);
+
   PrincessBooleanFormulaManager(PrincessFormulaCreator creator) {
     super(creator);
   }
@@ -48,7 +51,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula makeBooleanImpl(boolean pValue) {
-    return new IBoolLit(pValue);
+    return pValue ? pTrue : pFalse;
   }
 
   @Override
@@ -95,11 +98,23 @@ class PrincessBooleanFormulaManager
     if (isTrue(t2)) {
       return (IFormula) t1;
     }
+    if (isFalse(t1)) {
+      return pFalse;
+    }
+    if (isFalse(t2)) {
+      return pFalse;
+    }
     return simplify(new IBinFormula(IBinJunctor.And(), (IFormula) t1, (IFormula) t2));
   }
 
   @Override
   public IFormula or(IExpression t1, IExpression t2) {
+    if (isTrue(t1)) {
+      return pTrue;
+    }
+    if (isTrue(t2)) {
+      return pTrue;
+    }
     if (isFalse(t1)) {
       return (IFormula) t2;
     }
