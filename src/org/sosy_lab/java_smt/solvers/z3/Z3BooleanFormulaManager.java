@@ -71,6 +71,8 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
       return z3false;
     } else if (Native.isEqAst(z3context, pParam2, z3false)) {
       return z3false;
+    } else if (Native.isEqAst(z3context, pParam1, pParam2)) {
+      return pParam1;
     }
     return Native.mkAnd(z3context, 2, new long[] {pParam1, pParam2});
   }
@@ -84,6 +86,8 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
     } else if (Native.isEqAst(z3context, pParam1, z3false)) {
       return pParam2;
     } else if (Native.isEqAst(z3context, pParam2, z3false)) {
+      return pParam1;
+    } else if (Native.isEqAst(z3context, pParam1, pParam2)) {
       return pParam1;
     }
     return Native.mkOr(z3context, 2, new long[] {pParam1, pParam2});
