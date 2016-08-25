@@ -111,18 +111,6 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
       TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BooleanFormula modularCongruence(
-      BitvectorFormula pNumber1, BitvectorFormula pNumber2, long pModulo) {
-    TFormulaInfo param1 = extractInfo(pNumber1);
-    TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(modularCongruence(param1, param2, pModulo));
-  }
-
-  protected abstract TFormulaInfo modularCongruence(
-      TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
-
-  @Override
   public BitvectorFormula multiply(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkSameSize(pNumber1, pNumber2, "modulo");
     TFormulaInfo param1 = extractInfo(pNumber1);

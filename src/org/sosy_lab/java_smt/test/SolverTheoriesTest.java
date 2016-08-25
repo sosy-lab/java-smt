@@ -446,60 +446,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTestBV_ModularCongruence() throws Exception {
-    requireBitvectors();
-
-    BitvectorFormula a = bvmgr.makeVariable(32, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(32, "int_b");
-    BitvectorFormula c = bvmgr.makeVariable(32, "int_c");
-    BitvectorFormula d = bvmgr.makeVariable(32, "int_d");
-    BitvectorFormula num10 = bvmgr.makeBitvector(32, 10);
-    BitvectorFormula num5 = bvmgr.makeBitvector(32, 5);
-    BitvectorFormula num0 = bvmgr.makeBitvector(32, 0);
-    BitvectorFormula numNeg5 = bvmgr.makeBitvector(32, -5);
-
-    BooleanFormula fa = bvmgr.equal(a, num10);
-    BooleanFormula fb = bvmgr.equal(b, num5);
-    BooleanFormula fc = bvmgr.equal(c, num0);
-    BooleanFormula fd = bvmgr.equal(d, numNeg5);
-    BooleanFormula fConb = bvmgr.modularCongruence(a, b, 5);
-    BooleanFormula fConc = bvmgr.modularCongruence(a, c, 5);
-    BooleanFormula fCond = bvmgr.modularCongruence(a, d, 5);
-
-    // check modular congruence, a=10 && b=5 && (a mod 5 = b mod 5)
-    assertThatFormula(bmgr.and(fa, fb, fConb)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(fConb))).isUnsatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, fConc)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc))).isUnsatisfiable();
-    assertThatFormula(bmgr.and(fa, fd, fCond)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fd, bmgr.not(fCond))).isUnsatisfiable();
-  }
-
-  @Test
-  public void intTestBV_ModularCongruence_NegativeNumbers() throws Exception {
-    requireBitvectors();
-
-    BitvectorFormula a = bvmgr.makeVariable(32, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(32, "int_b");
-    BitvectorFormula c = bvmgr.makeVariable(32, "int_c");
-    BitvectorFormula num8 = bvmgr.makeBitvector(32, 8);
-    BitvectorFormula num3 = bvmgr.makeBitvector(32, 3);
-    BitvectorFormula numNeg2 = bvmgr.makeBitvector(32, -2);
-
-    BooleanFormula fa = bvmgr.equal(a, num8);
-    BooleanFormula fb = bvmgr.equal(b, num3);
-    BooleanFormula fc = bvmgr.equal(c, numNeg2);
-    BooleanFormula fConb = bvmgr.modularCongruence(a, b, 5);
-    BooleanFormula fConc = bvmgr.modularCongruence(a, c, 5);
-
-    // check modular congruence, a=10 && b=5 && (a mod 5 = b mod 5)
-    assertThatFormula(bmgr.and(fa, fb, fConb)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(fConb))).isUnsatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, fConc)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc))).isUnsatisfiable();
-  }
-
-  @Test
   public void realTest() throws Exception {
     requireRationals();
 

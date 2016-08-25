@@ -142,11 +142,6 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   }
 
   @Override
-  protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    return Native.mkTrue(z3context);
-  }
-
-  @Override
   public Long multiply(Long pNumber1, Long pNumber2) {
     return Native.mkBvmul(z3context, pNumber1, pNumber2);
   }
