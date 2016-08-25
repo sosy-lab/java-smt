@@ -141,4 +141,50 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
   }
+
+  @Test
+  public void simplificationTest() {
+    BooleanFormula tru = bmgr.makeBoolean(true);
+    BooleanFormula fals = bmgr.makeBoolean(false);
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+
+    // AND
+
+    Truth.assertThat(bmgr.and(tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(fals)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(x)).isEqualTo(x);
+    Truth.assertThat(bmgr.and()).isEqualTo(tru);
+
+    Truth.assertThat(bmgr.and(tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(tru, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.and(fals, x)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(x, x)).isEqualTo(x);
+
+    Truth.assertThat(bmgr.and(tru, tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(tru, tru, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.and(fals, tru, x)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(x, x, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.and(x, x, x, y)).isEqualTo(bmgr.and(x, y));
+    // Truth.assertThat(bmgr.and(x, x, x, y, y)).isEqualTo(bmgr.and(x, y)); // recursive simplification needed
+
+    // OR
+
+    Truth.assertThat(bmgr.or(tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(fals)).isEqualTo(fals);
+    Truth.assertThat(bmgr.or(x)).isEqualTo(x);
+    Truth.assertThat(bmgr.or()).isEqualTo(fals);
+
+    Truth.assertThat(bmgr.or(tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(tru, x)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(fals, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.or(x, x)).isEqualTo(x);
+
+    Truth.assertThat(bmgr.or(tru, tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(tru, tru, x)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(fals, tru, x)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(x, x, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.or(x, x, x, y)).isEqualTo(bmgr.or(x, y));
+    // Truth.assertThat(bmgr.or(x, x, x, y, y)).isEqualTo(bmgr.or(x, y)); // recursive simplification needed
+  }
 }
