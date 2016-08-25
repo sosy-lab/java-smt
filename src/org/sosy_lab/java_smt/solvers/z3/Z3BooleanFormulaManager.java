@@ -25,6 +25,7 @@ import com.microsoft.z3.Native;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
@@ -95,11 +96,19 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long orImpl(Collection<Long> params) {
+    if (params.size() == 2) {
+      Iterator<Long> it = params.iterator();
+      return or(it.next(), it.next());
+    }
     return Native.mkOr(z3context, params.size(), Longs.toArray(params));
   }
 
   @Override
   protected Long andImpl(Collection<Long> params) {
+    if (params.size() == 2) {
+      Iterator<Long> it = params.iterator();
+      return and(it.next(), it.next());
+    }
     return Native.mkAnd(z3context, params.size(), Longs.toArray(params));
   }
 
