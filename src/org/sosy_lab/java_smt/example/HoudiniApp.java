@@ -57,17 +57,16 @@ public class HoudiniApp {
 
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
-    LogManager mainLogger = BasicLogManager.create(Configuration.defaultConfiguration());
+    LogManager logger = BasicLogManager.create(Configuration.defaultConfiguration());
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
     // this example executes the Houdini algorithm for all available solvers
     for (Solvers solver : Solvers.values()) {
-      mainLogger.log(Level.INFO, "using solver", solver);
+      logger.log(Level.INFO, "using solver", solver);
 
       // set basic options, e.g. the solver that should be used
       Configuration config =
           Configuration.fromCmdLineArguments(new String[] {"--solver.solver=" + solver});
-      LogManager logger = BasicLogManager.create(config);
 
       // create the solver context, which includes all necessary parts for building, manipulating,
       // and solving formulas.
@@ -93,7 +92,7 @@ public class HoudiniApp {
         // use Houdini and compute the maximal inductive subset
         List<BooleanFormula> result = houdini.houdini(lemmas, transition);
 
-        mainLogger.log(Level.INFO, "Houdini returned", result);
+        logger.log(Level.INFO, "Houdini returned", result);
       }
     }
   }
