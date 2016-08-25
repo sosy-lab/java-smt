@@ -30,6 +30,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 public interface IntegerFormulaManager
     extends NumeralFormulaManager<IntegerFormula, IntegerFormula> {
 
+  /**
+   * Create a term representing the constraint {@code number1 == number2 (mod n)}.
+   */
+  BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n);
+
   @Override
   default FormulaType<IntegerFormula> getFormulaType() {
     return FormulaType.IntegerType;

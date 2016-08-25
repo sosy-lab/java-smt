@@ -226,7 +226,6 @@ public abstract class AbstractNumeralFormulaManager<
     throw new UnsupportedOperationException();
   }
 
-  @Override
   public BooleanFormula modularCongruence(
       ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
     Preconditions.checkArgument(pModulo > 0, "modular congruence needs a positive modulo.");

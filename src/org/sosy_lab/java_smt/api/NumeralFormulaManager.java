@@ -74,13 +74,6 @@ public interface NumeralFormulaManager<
 
   ResultFormulaType modulo(ParamFormulaType number1, ParamFormulaType number2);
 
-  /**
-   * Create a term stating that (n1 == n2) when using modulo arithmetic regarding mod).
-   * This is an optional operation,
-   * and instead may return `true`.
-   */
-  BooleanFormula modularCongruence(ParamFormulaType number1, ParamFormulaType number2, long mod);
-
   ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
