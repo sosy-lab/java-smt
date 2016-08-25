@@ -63,13 +63,13 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    if (Native.isEqAst(z3context, pParam1, z3true)) {
+    if (isTrue(pParam1)) {
       return pParam2;
-    } else if (Native.isEqAst(z3context, pParam2, z3true)) {
+    } else if (isTrue(pParam2)) {
       return pParam1;
-    } else if (Native.isEqAst(z3context, pParam1, z3false)) {
+    } else if (isFalse(pParam1)) {
       return z3false;
-    } else if (Native.isEqAst(z3context, pParam2, z3false)) {
+    } else if (isFalse(pParam2)) {
       return z3false;
     } else if (Native.isEqAst(z3context, pParam1, pParam2)) {
       return pParam1;
@@ -79,13 +79,13 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    if (Native.isEqAst(z3context, pParam1, z3true)) {
+    if (isTrue(pParam1)) {
       return z3true;
-    } else if (Native.isEqAst(z3context, pParam2, z3true)) {
+    } else if (isTrue(pParam2)) {
       return z3true;
-    } else if (Native.isEqAst(z3context, pParam1, z3false)) {
+    } else if (isFalse(pParam1)) {
       return pParam2;
-    } else if (Native.isEqAst(z3context, pParam2, z3false)) {
+    } else if (isFalse(pParam2)) {
       return pParam1;
     } else if (Native.isEqAst(z3context, pParam1, pParam2)) {
       return pParam1;
