@@ -161,12 +161,6 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     Truth.assertThat(bmgr.and(fals, x)).isEqualTo(fals);
     Truth.assertThat(bmgr.and(x, x)).isEqualTo(x);
 
-    Truth.assertThat(bmgr.and(tru, tru, tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.and(tru, tru, x)).isEqualTo(x);
-    Truth.assertThat(bmgr.and(fals, tru, x)).isEqualTo(fals);
-    Truth.assertThat(bmgr.and(x, x, x)).isEqualTo(x);
-    Truth.assertThat(bmgr.and(x, x, x, y)).isEqualTo(bmgr.and(x, y));
-
     // recursive simplification needed
     // Truth.assertThat(bmgr.and(x, x, x, y, y)).isEqualTo(bmgr.and(x, y));
 
@@ -181,14 +175,5 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     Truth.assertThat(bmgr.or(tru, x)).isEqualTo(tru);
     Truth.assertThat(bmgr.or(fals, x)).isEqualTo(x);
     Truth.assertThat(bmgr.or(x, x)).isEqualTo(x);
-
-    Truth.assertThat(bmgr.or(tru, tru, tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(tru, tru, x)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(fals, tru, x)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(x, x, x)).isEqualTo(x);
-    Truth.assertThat(bmgr.or(x, x, x, y)).isEqualTo(bmgr.or(x, y));
-
-    // recursive simplification needed
-    // Truth.assertThat(bmgr.or(x, x, x, y, y)).isEqualTo(bmgr.or(x, y));
   }
 }
