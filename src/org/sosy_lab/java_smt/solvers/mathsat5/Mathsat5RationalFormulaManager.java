@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -76,10 +75,5 @@ class Mathsat5RationalFormulaManager
     }
     t2 = msat_make_number(mathsatEnv, n);
     return msat_make_times(mathsatEnv, t2, t1);
-  }
-
-  @Override
-  protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    return msat_make_true(getFormulaCreator().getEnv());
   }
 }

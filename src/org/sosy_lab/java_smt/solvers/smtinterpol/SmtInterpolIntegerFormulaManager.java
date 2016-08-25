@@ -88,4 +88,15 @@ class SmtInterpolIntegerFormulaManager
       return super.modulo(pNumber1, pNumber2);
     }
   }
+
+  @Override
+  protected Term modularCongruence(Term pNumber1, Term pNumber2, long pModulo) {
+    Sort intSort = pNumber1.getTheory().getNumericSort();
+    assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
+
+    // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
+    Term n = env.numeral(BigInteger.valueOf(pModulo));
+    Term x = subtract(pNumber1, pNumber2);
+    return env.term("=", x, env.term("*", n, env.term("div", x, n)));
+  }
 }

@@ -236,8 +236,18 @@ public abstract class AbstractNumeralFormulaManager<
     return wrapBool(modularCongruence(param1, param2, pModulo));
   }
 
-  protected abstract TFormulaInfo modularCongruence(
-      TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
+  /**
+   * If a solver does not support this operation, e.g. because of missing
+   * support for linear arithmetic division, we throw UnsupportedOperationException.
+   *
+   * @param a first operand
+   * @param b second operand
+   * @param m the modulus
+   * @returns the formula representing "(a % m) == (b % m)"
+   */
+  protected TFormulaInfo modularCongruence(TFormulaInfo a, TFormulaInfo b, long m) {
+    throw new UnsupportedOperationException();
+  }
 
   @Override
   public ResultFormulaType multiply(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
