@@ -57,21 +57,18 @@ public class HoudiniApp {
 
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
-    LogManager logger = BasicLogManager.create(Configuration.defaultConfiguration());
+    Configuration config = Configuration.defaultConfiguration();
+    LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
     // this example executes the Houdini algorithm for all available solvers
     for (Solvers solver : Solvers.values()) {
       logger.log(Level.INFO, "using solver", solver);
 
-      // set basic options, e.g. the solver that should be used
-      Configuration config =
-          Configuration.fromCmdLineArguments(new String[] {"--solver.solver=" + solver});
-
       // create the solver context, which includes all necessary parts for building, manipulating,
       // and solving formulas.
       try (SolverContext solverContext =
-          SolverContextFactory.createSolverContext(config, logger, notifier)) {
+          SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
 
         // initialize Houdini
         HoudiniApp houdini = new HoudiniApp(solverContext);
