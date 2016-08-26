@@ -315,7 +315,8 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_number(long e, String num_rep);
 
-  public static native long msat_make_int_modular_congruence(long e, String modulo, long t1, long t2);
+  public static native long msat_make_int_modular_congruence(
+      long e, String modulo, long t1, long t2);
 
   public static native long msat_make_term_ite(long e, long c, long tt, long te);
 

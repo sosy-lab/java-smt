@@ -82,8 +82,7 @@ class PrincessIntegerFormulaManager
     return modularCongruence0(pNumber1, pNumber2, makeNumberImpl(pModulo));
   }
 
-  protected IExpression modularCongruence0(
-      IExpression pNumber1, IExpression pNumber2, ITerm n) {
+  protected IExpression modularCongruence0(IExpression pNumber1, IExpression pNumber2, ITerm n) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     ITerm x = subtract(pNumber1, pNumber2);
     return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));

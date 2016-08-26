@@ -452,7 +452,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc))).isUnsatisfiable();
   }
 
-  @Test public void testHardCongruence() throws Exception {
+  @Test
+  public void testHardCongruence() throws Exception {
     IntegerFormula a, b, c;
     a = imgr.makeVariable("a");
     b = imgr.makeVariable("b");
@@ -464,11 +465,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BigInteger prime2 = BigInteger.probablePrime(bitSize + 1, r);
     BigInteger prime3 = BigInteger.probablePrime(bitSize + 2, r);
 
-    constraints.add(
-      imgr.modularCongruence(
-          imgr.add(a, imgr.makeNumber(1)),
-          b,
-          prime1));
+    constraints.add(imgr.modularCongruence(imgr.add(a, imgr.makeNumber(1)), b, prime1));
     constraints.add(imgr.modularCongruence(b, c, prime2));
     constraints.add(imgr.modularCongruence(a, c, prime3));
 
@@ -484,7 +481,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         BigInteger aValue = m.evaluate(a);
         BigInteger bValue = m.evaluate(b);
         BigInteger cValue = m.evaluate(c);
-        assertThat(aValue.add(BigInteger.ONE).subtract(bValue).mod(prime1)).isEqualTo(BigInteger.ZERO);
+        assertThat(aValue.add(BigInteger.ONE).subtract(bValue).mod(prime1))
+            .isEqualTo(BigInteger.ZERO);
         assertThat(bValue.subtract(cValue).mod(prime2)).isEqualTo(BigInteger.ZERO);
         assertThat(aValue.subtract(cValue).mod(prime3)).isEqualTo(BigInteger.ZERO);
       }

@@ -92,5 +92,4 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
       Native.decRef(z3context, mul);
     }
   }
-
 }
