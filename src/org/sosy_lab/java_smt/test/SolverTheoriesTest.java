@@ -37,10 +37,17 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.NumeralType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @RunWith(Parameterized.class)
 public class SolverTheoriesTest extends SolverBasedTest0 {
@@ -443,6 +450,45 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(fa, fb, bmgr.not(fConb))).isUnsatisfiable();
     assertThatFormula(bmgr.and(fa, fc, fConc)).isSatisfiable();
     assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc))).isUnsatisfiable();
+  }
+
+  @Test public void testHardCongruence() throws Exception {
+    IntegerFormula a, b, c;
+    a = imgr.makeVariable("a");
+    b = imgr.makeVariable("b");
+    c = imgr.makeVariable("c");
+    List<BooleanFormula> constraints = new ArrayList<>();
+    Random r = new Random(42);
+    int bitSize = 8;
+    BigInteger prime1 = BigInteger.probablePrime(bitSize, r);
+    BigInteger prime2 = BigInteger.probablePrime(bitSize + 1, r);
+    BigInteger prime3 = BigInteger.probablePrime(bitSize + 2, r);
+
+    constraints.add(
+      imgr.modularCongruence(
+          imgr.add(a, imgr.makeNumber(1)),
+          b,
+          prime1));
+    constraints.add(imgr.modularCongruence(b, c, prime2));
+    constraints.add(imgr.modularCongruence(a, c, prime3));
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.addConstraint(imgr.greaterThan(a, imgr.makeNumber(1)));
+      pe.addConstraint(imgr.greaterThan(b, imgr.makeNumber(1)));
+      pe.addConstraint(imgr.greaterThan(c, imgr.makeNumber(1)));
+      pe.addConstraint(bmgr.and(constraints));
+
+      assertThat(pe.isUnsat()).isFalse();
+
+      try (Model m = pe.getModel()) {
+        BigInteger aValue = m.evaluate(a);
+        BigInteger bValue = m.evaluate(b);
+        BigInteger cValue = m.evaluate(c);
+        assertThat(aValue.add(BigInteger.ONE).subtract(bValue).mod(prime1)).isEqualTo(BigInteger.ZERO);
+        assertThat(bValue.subtract(cValue).mod(prime2)).isEqualTo(BigInteger.ZERO);
+        assertThat(aValue.subtract(cValue).mod(prime3)).isEqualTo(BigInteger.ZERO);
+      }
+    }
   }
 
   @Test
