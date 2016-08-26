@@ -80,6 +80,10 @@ class Mathsat5IntegerFormulaManager
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, Long.toString(pModulo));
+  }
+
+  protected Long modularCongruence0(Long pNumber1, Long pNumber2, String pModulo) {
     return msat_make_int_modular_congruence(
         getFormulaCreator().getEnv(), pModulo, pNumber1, pNumber2);
   }

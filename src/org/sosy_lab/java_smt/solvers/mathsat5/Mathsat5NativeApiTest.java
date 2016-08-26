@@ -116,7 +116,7 @@ public class Mathsat5NativeApiTest {
     long v2 = msat_declare_function(env, "v2", type);
     long t2 = msat_make_constant(env, v2);
 
-    long t = msat_make_int_modular_congruence(env, 42, t1, t2);
+    long t = msat_make_int_modular_congruence(env, "42", t1, t2);
 
     assertEquals("(`int_mod_congr_42` (`+_int` v1 (`*_int` -1 v2)) 0)", msat_term_repr(t));
 

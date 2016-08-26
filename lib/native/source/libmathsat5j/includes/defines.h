@@ -82,8 +82,9 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 
 #define MPZ_ARG(num) \
   mpz_t m_arg##num; \
-  mpz_init(m_arg##num); \
-  mpz_set_si(m_arg##num, arg##num);
+  char *tmp_str = (char *)(*jenv)->GetStringUTFChars(jenv, arg##num, NULL);\
+  mpz_init_set_str(m_arg##num, tmp_str, 10); \
+  (*jenv)->ReleaseStringUTFChars(jenv, arg##num, tmp_str);
 
 #define STRUCT_ARRAY_ARG(mtype, num) \
   mtype * m_arg##num; \

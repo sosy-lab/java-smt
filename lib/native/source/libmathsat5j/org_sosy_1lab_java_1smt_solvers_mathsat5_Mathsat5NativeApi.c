@@ -372,7 +372,7 @@ make_term_binary(leq)
 make_term_binary(plus)
 make_term_binary(times)
 
-DEFINE_FUNC(jterm, 1make_1int_1modular_1congruence) WITH_FOUR_ARGS(jenv, long, jterm, jterm)
+DEFINE_FUNC(jterm, 1make_1int_1modular_1congruence) WITH_FOUR_ARGS(jenv, string, jterm, jterm)
 ENV_ARG(1)
 MPZ_ARG(2)
 TERM_ARG(3)
