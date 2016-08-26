@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
@@ -63,6 +64,18 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
       Native.decRef(z3context, n);
     }
   }
+
+  @Override
+  protected Long modularCongruence(Long pNumber1, Long pNumber2, BigInteger pModulo) {
+    long n = makeNumberImpl(pModulo);
+    Native.incRef(z3context, n);
+    try {
+      return modularCongruence0(pNumber1, pNumber2, makeNumberImpl(pModulo));
+    } finally {
+      Native.decRef(z3context, n);
+    }
+  }
+
   protected Long modularCongruence0(Long pNumber1, Long pNumber2, Long n) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     long x = subtract(pNumber1, pNumber2);

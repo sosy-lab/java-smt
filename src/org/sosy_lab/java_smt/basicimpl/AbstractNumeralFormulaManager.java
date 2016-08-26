@@ -235,6 +235,19 @@ public abstract class AbstractNumeralFormulaManager<
     return wrapBool(modularCongruence(param1, param2, pModulo));
   }
 
+  public BooleanFormula modularCongruence(
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, BigInteger pModulo) {
+    Preconditions.checkArgument(pModulo.signum() > 0, "modular congruence needs a positive modulo.");
+    TFormulaInfo param1 = extractInfo(pNumber1);
+    TFormulaInfo param2 = extractInfo(pNumber2);
+
+    return wrapBool(modularCongruence(param1, param2, pModulo));
+  }
+
+  protected TFormulaInfo modularCongruence(TFormulaInfo a, TFormulaInfo b, BigInteger m) {
+    throw new UnsupportedOperationException();
+  }
+
   /**
    * If a solver does not support this operation, e.g. because of missing
    * support for linear arithmetic division, we throw UnsupportedOperationException.

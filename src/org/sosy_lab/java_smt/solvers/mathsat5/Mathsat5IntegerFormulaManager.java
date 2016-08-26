@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 class Mathsat5IntegerFormulaManager
     extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula>
@@ -76,6 +77,11 @@ class Mathsat5IntegerFormulaManager
     }
     t2 = msat_make_number(mathsatEnv, n);
     return msat_make_times(mathsatEnv, t2, t1);
+  }
+
+  @Override
+  protected Long modularCongruence(Long pNumber1, Long pNumber2, BigInteger pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, pModulo.toString());
   }
 
   @Override
