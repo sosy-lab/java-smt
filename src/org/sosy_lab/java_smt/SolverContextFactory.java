@@ -23,9 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
-import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -47,8 +46,6 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -291,7 +288,7 @@ public class SolverContextFactory {
           "^(" + "com\\.microsoft\\.z3|" + Pattern.quote(solverPathPrefix) + "\\.z3" + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
-  private static final Set<String> expectedLibrariesToLoad =
+  private static final Set<String> Z3_LIBRARY_NAMES =
       ImmutableSet.of("z3", "libz3", "libz3java", "z3java");
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
@@ -314,20 +311,25 @@ public class SolverContextFactory {
   private static ClassLoader createZ3ClassLoader() {
     ClassLoader parentClassLoader = SolverContextFactory.class.getClassLoader();
 
-    URL[] urls;
+    ClassLoaderBuilder builder =
+        Classes.makeExtendedURLClassLoader()
+            .setParent(parentClassLoader)
+            .setDirectLoadClasses(Z3_CLASSES)
+            .setCustomLookupNativeLibraries(Z3_LIBRARY_NAMES::contains);
+
     if (parentClassLoader instanceof URLClassLoader) {
       @SuppressWarnings("resource")
       URLClassLoader uParentClassLoader = (URLClassLoader) parentClassLoader;
-      urls = uParentClassLoader.getURLs();
+      builder.setUrls(uParentClassLoader.getURLs());
     } else {
-      urls =
-          new URL[] {
-            SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
-          };
+      builder.setUrls(
+          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation());
     }
-    return new CustomLibraryPathClassLoader(Z3_CLASSES, urls, parentClassLoader);
+
+    return builder.build();
   }
 
+  @SuppressWarnings("deprecation") // will be removed soon anyway
   private static ClassLoader createSmtInterpolClassLoader(LogManager logger) {
     // Cache SMTInterpol class loader using weak reference.
     ClassLoader classLoader = smtInterpolClassLoader.get();
@@ -357,7 +359,9 @@ public class SolverContextFactory {
 
         // By using ChildFirstPatternClassLoader we ensure that classes
         // do not get loaded by the parent class loader.
-        classLoader = new ChildFirstPatternClassLoader(SMTINTERPOL_CLASSES, urls, classLoader);
+        classLoader =
+            new org.sosy_lab.common.ChildFirstPatternClassLoader(
+                SMTINTERPOL_CLASSES, urls, classLoader);
 
       } catch (MalformedURLException e) {
         logger.logUserException(
@@ -376,30 +380,5 @@ public class SolverContextFactory {
     }
     smtInterpolClassLoader = new WeakReference<>(classLoader);
     return classLoader;
-  }
-
-  private static class CustomLibraryPathClassLoader extends ChildFirstPatternClassLoader {
-
-    /**
-     * Create a new class loader.
-     *
-     * @param pClassPattern The pattern telling which classes should never be loaded by the parent.
-     * @param pUrls         The sources where this class loader should load classes from.
-     * @param pParent       The parent class loader.
-     */
-    CustomLibraryPathClassLoader(Pattern pClassPattern, URL[] pUrls, ClassLoader pParent) {
-      super(pClassPattern, pUrls, pParent);
-    }
-
-    @Override
-    protected String findLibrary(String libname) {
-      if (expectedLibrariesToLoad.contains(libname)) {
-        Optional<Path> path = NativeLibraries.findPathForLibrary(libname);
-        if (path.isPresent()) {
-          return path.get().toAbsolutePath().toString();
-        }
-      }
-      return super.findLibrary(libname);
-    }
   }
 }
