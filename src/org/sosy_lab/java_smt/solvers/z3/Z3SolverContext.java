@@ -23,7 +23,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -140,14 +139,22 @@ final class Z3SolverContext extends AbstractSolverContext {
               + "Please use the option solver.z3.log for a Z3-specific log instead.");
     }
 
-    if (NativeLibraries.OS.guessOperatingSystem() == NativeLibraries.OS.WINDOWS) {
-      // Z3 itself
-      System.loadLibrary("libz3");
-      System.loadLibrary("libz3java");
+    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
+    // but it will fail to find the former if not loaded previously.
+    // We load both libraries here to have all the loading in one place.
+    try {
+      System.loadLibrary("z3");
+      System.loadLibrary("z3java");
+    } catch (UnsatisfiedLinkError e1) {
+      // On Windows, the library name is different, so we try again.
+      try {
+        System.loadLibrary("libz3");
+        System.loadLibrary("libz3java");
+      } catch (UnsatisfiedLinkError e2) {
+        e1.addSuppressed(e2);
+        throw e1;
+      }
     }
-
-    System.loadLibrary("z3");
-    System.loadLibrary("z3java");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
