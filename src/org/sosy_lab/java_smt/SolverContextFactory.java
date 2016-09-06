@@ -274,5 +274,4 @@ public class SolverContextFactory {
 
     return builder.build();
   }
-
 }

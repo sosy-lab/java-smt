@@ -192,27 +192,29 @@ public class VariableNamesTest extends SolverBasedTest0 {
           .that(varFromString.toString())
           .isNotEqualTo(varname);
       assert_()
-        .withFailureMessage("name is escaped once, then the second call should escape it twice")
-        .that(mgr.dumpFormula(varFromString).toString())
-        .isNotEqualTo(mgr.dumpFormula(var).toString());
+          .withFailureMessage("name is escaped once, then the second call should escape it twice")
+          .that(mgr.dumpFormula(varFromString).toString())
+          .isNotEqualTo(mgr.dumpFormula(var).toString());
     }
   }
 
   public void testBoolVariableNameInVisitor() {
     BooleanFormula var = createVariableWith(bmgr::makeVariable);
 
-    bmgr.visit(var, new DefaultBooleanFormulaVisitor<Void>() {
-      @Override
-      protected Void visitDefault() {
-        throw new AssertionError("unexpected case");
-      }
+    bmgr.visit(
+        var,
+        new DefaultBooleanFormulaVisitor<Void>() {
+          @Override
+          protected Void visitDefault() {
+            throw new AssertionError("unexpected case");
+          }
 
-      @Override
-      public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> pDecl) {
-        assertThat(pDecl.getName()).isEqualTo(varname);
-        return null;
-      }
-    });
+          @Override
+          public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> pDecl) {
+            assertThat(pDecl.getName()).isEqualTo(varname);
+            return null;
+          }
+        });
   }
 
   @Test
