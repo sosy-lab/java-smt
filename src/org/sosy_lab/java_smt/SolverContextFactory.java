@@ -39,16 +39,11 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
+import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -145,12 +140,8 @@ public class SolverContextFactory {
       throws InvalidConfigurationException {
     switch (solverToCreate) {
       case SMTINTERPOL:
-
-        // Loading SmtInterpol is difficult as it requires its own class
-        // loader for fiddling with Java_CUP versions.
-        return getFactoryForSolver(createSmtInterpolClassLoader(logger), SMTINTERPOL_FACTORY_CLASS)
-            .create(
-                config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
+        return SmtInterpolSolverContext.create(
+            config, logger, shutdownNotifier, logfile, randomSeed);
 
       case MATHSAT5:
         return Mathsat5SolverContext.create(
@@ -161,7 +152,7 @@ public class SolverContextFactory {
         // Z3 requires its own custom class loader to perform trickery with the
         // java.library.path without affecting the main class loader.
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
-            .create(
+            .generateSolverContext(
                 config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case PRINCESS:
@@ -225,30 +216,6 @@ public class SolverContextFactory {
    */
   public abstract static class InnerUtilFactory {
 
-    public SolverContext create(
-        Configuration config,
-        LogManager logger,
-        ShutdownNotifier pShutdownNotifier,
-        @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed,
-        FloatingPointRoundingMode pFloatingPointRoundingMode)
-        throws InvalidConfigurationException {
-      final Thread currentThread = Thread.currentThread();
-      final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-      try {
-        currentThread.setContextClassLoader(this.getClass().getClassLoader());
-        return generateSolverContext(
-            config,
-            logger,
-            pShutdownNotifier,
-            solverLogfile,
-            randomSeed,
-            pFloatingPointRoundingMode);
-      } finally {
-        currentThread.setContextClassLoader(contextClassLoader);
-      }
-    }
-
     protected abstract SolverContext generateSolverContext(
         Configuration config,
         LogManager logger,
@@ -261,31 +228,12 @@ public class SolverContextFactory {
 
   // ---- Custom class loaders ----
 
-  // For SmtInterpol we need a separate class loader
-  // because it needs it's own (modified) version of the Java CUP runtime
-  // and we might already have the normal (unmodified) version of Java CUP
-  // on the class path of the normal class loader.
-  private static final String solverPathPrefix = "org.sosy_lab.java_smt.solvers";
-  private static final Pattern SMTINTERPOL_CLASSES =
-      Pattern.compile(
-          "^("
-              + Pattern.quote(solverPathPrefix)
-              + "\\.smtinterpol|"
-              + "de\\.uni_freiburg\\.informatik\\.ultimate|"
-              + "java_cup\\.runtime|"
-              + "org\\.apache\\.log4j"
-              + ")\\..*");
-  private static final String SMTINTERPOL_CLASS =
-      "de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol";
-  private static final String SMTINTERPOL_FACTORY_CLASS =
-      solverPathPrefix + ".smtinterpol.SmtInterpolSolverFactory";
-
   // For Z3 we need a custom class loader as it's JAR file calls "System.loadLibrary",
   // and we have to force it to look in the correct directory.
-  private static final String Z3_FACTORY_CLASS = solverPathPrefix + ".z3.Z3LoadingFactory";
+  private static final String Z3_PACKAGE = "org.sosy_lab.java_smt.solvers.z3";
+  private static final String Z3_FACTORY_CLASS = Z3_PACKAGE + ".Z3LoadingFactory";
   private static final Pattern Z3_CLASSES =
-      Pattern.compile(
-          "^(" + "com\\.microsoft\\.z3|" + Pattern.quote(solverPathPrefix) + "\\.z3" + ")\\..*");
+      Pattern.compile("^(" + "com\\.microsoft\\.z3|" + Pattern.quote(Z3_PACKAGE) + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
   private static final Set<String> Z3_LIBRARY_NAMES =
@@ -293,8 +241,6 @@ public class SolverContextFactory {
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
   private static final ClassLoader z3ClassLoader = createZ3ClassLoader();
-  private static WeakReference<ClassLoader> smtInterpolClassLoader = new WeakReference<>(null);
-  private static final AtomicInteger smtInterpolLoadingCount = new AtomicInteger(0);
 
   private InnerUtilFactory getFactoryForSolver(ClassLoader pClassLoader, String factoryClassName) {
     try {
@@ -327,58 +273,5 @@ public class SolverContextFactory {
     }
 
     return builder.build();
-  }
-
-  @SuppressWarnings("deprecation") // will be removed soon anyway
-  private static ClassLoader createSmtInterpolClassLoader(LogManager logger) {
-    // Cache SMTInterpol class loader using weak reference.
-    ClassLoader classLoader = smtInterpolClassLoader.get();
-    if (classLoader != null) {
-      return classLoader;
-    }
-
-    // Garbage collected on first entry.
-    if (smtInterpolLoadingCount.incrementAndGet() > 1) {
-      logger.log(Level.INFO, "Repeated loading of SmtInterpol");
-    }
-
-    classLoader = SolverContextFactory.class.getClassLoader();
-
-    // If possible, create class loader with special class path with only SMTInterpol and JavaSMT.
-    // SMTInterpol needs to have its own version of java-cup,
-    // so the class loader should not load java-cup classes from any other place.
-    String classFile = SMTINTERPOL_CLASS.replace('.', File.separatorChar) + ".class";
-    URL url = classLoader.getResource(classFile);
-    if (url != null && url.getProtocol().equals("jar") && url.getFile().contains("!")) {
-      try {
-        url = new URL(url.getFile().substring(0, url.getFile().lastIndexOf('!')));
-
-        URL[] urls = {
-          url, SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
-        };
-
-        // By using ChildFirstPatternClassLoader we ensure that classes
-        // do not get loaded by the parent class loader.
-        classLoader =
-            new org.sosy_lab.common.ChildFirstPatternClassLoader(
-                SMTINTERPOL_CLASSES, urls, classLoader);
-
-      } catch (MalformedURLException e) {
-        logger.logUserException(
-            Level.WARNING,
-            e,
-            "Could not create proper classpath for SMTInterpol, "
-                + "loading correct java-cup classes may fail.");
-      }
-    } else {
-      logger.log(
-          Level.WARNING,
-          "Could not create proper classpath for SMTInterpol because location of SMTInterpol "
-              + "classes is unexpected, loading correct java-cup classes may fail. "
-              + "Location of SMTInterpol is ",
-          url);
-    }
-    smtInterpolClassLoader = new WeakReference<>(classLoader);
-    return classLoader;
   }
 }
