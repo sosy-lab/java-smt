@@ -23,6 +23,7 @@ package org.sosy_lab.java_smt.test;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,6 +47,30 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  @Test
+  public void testVariableNamedTrue() throws SolverException, InterruptedException {
+    BooleanFormula var;
+    try {
+      var = bmgr.makeVariable("true");
+    } catch (RuntimeException e) {
+      throw new AssumptionViolatedException("unsupported variable name", e);
+    }
+    BooleanFormula f = bmgr.equivalence(var, bmgr.makeFalse());
+    assertThatFormula(f).isSatisfiable();
+  }
+
+  @Test
+  public void testVariableNamedFalse() throws SolverException, InterruptedException {
+    BooleanFormula var;
+    try {
+      var = bmgr.makeVariable("false");
+    } catch (RuntimeException e) {
+      throw new AssumptionViolatedException("unsupported variable name", e);
+    }
+    BooleanFormula f = bmgr.equivalence(var, bmgr.makeTrue());
+    assertThatFormula(f).isSatisfiable();
   }
 
   @Test

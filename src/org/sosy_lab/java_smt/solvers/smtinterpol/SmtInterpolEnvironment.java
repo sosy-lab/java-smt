@@ -247,6 +247,9 @@ class SmtInterpolEnvironment {
         throw new SMTLIBException(
             "Function " + fun + " is already declared with different definition");
       }
+      if (fun.equals("true") || fun.equals("false")) {
+        throw new SMTLIBException("Cannot declare a variable named " + fun);
+      }
       return fsym;
     }
   }
