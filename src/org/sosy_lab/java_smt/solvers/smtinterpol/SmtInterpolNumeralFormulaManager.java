@@ -26,14 +26,12 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
-import java.math.BigInteger;
-
 abstract class SmtInterpolNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
         Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType, FunctionSymbol> {
 
-  private final SmtInterpolEnvironment env;
+  protected final SmtInterpolEnvironment env;
   private final SmtInterpolFormulaCreator creator;
 
   SmtInterpolNumeralFormulaManager(SmtInterpolFormulaCreator pCreator) {
@@ -69,19 +67,6 @@ abstract class SmtInterpolNumeralFormulaManager<
     } else {
       return super.multiply(pNumber1, pNumber2);
     }
-  }
-
-  @Override
-  protected Term modularCongruence(Term pNumber1, Term pNumber2, long pModulo) {
-    // if x >= 0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    // if x <  0: ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    Sort intSort = pNumber1.getTheory().getNumericSort();
-    if (pModulo > 0 && intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort())) {
-      Term n = env.numeral(BigInteger.valueOf(pModulo));
-      Term x = subtract(pNumber1, pNumber2);
-      return env.term("=", x, env.term("*", n, env.term("div", x, n)));
-    }
-    return env.getTheory().mTrue;
   }
 
   @Override

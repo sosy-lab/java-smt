@@ -23,9 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.sosy_lab.common.ChildFirstPatternClassLoader;
 import org.sosy_lab.common.Classes;
-import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -35,6 +34,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
@@ -42,10 +42,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 
 import java.lang.reflect.Constructor;
-import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -82,8 +79,12 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Which SMT solver to use.")
   private Solvers solver = Solvers.SMTINTERPOL;
 
-  @Option(secure = true, name = "useLogger", description = "Log solver actions, this may be slow!")
+  @Option(secure = true, description = "Log solver actions, this may be slow!")
   private boolean useLogger = false;
+
+  @Option(secure = true, description = "Default rounding mode for floating point operations.")
+  private FloatingPointRoundingMode floatingPointRoundingMode =
+      FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -143,14 +144,16 @@ public class SolverContextFactory {
             config, logger, shutdownNotifier, logfile, randomSeed);
 
       case MATHSAT5:
-        return Mathsat5SolverContext.create(logger, config, shutdownNotifier, logfile, randomSeed);
+        return Mathsat5SolverContext.create(
+            logger, config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case Z3:
 
         // Z3 requires its own custom class loader to perform trickery with the
         // java.library.path without affecting the main class loader.
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
-            .create(config, logger, shutdownNotifier, logfile, randomSeed);
+            .create(
+                config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case PRINCESS:
         // TODO: pass randomSeed to Princess
@@ -218,13 +221,20 @@ public class SolverContextFactory {
         LogManager logger,
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed)
+        long randomSeed,
+        FloatingPointRoundingMode pFloatingPointRoundingMode)
         throws InvalidConfigurationException {
       final Thread currentThread = Thread.currentThread();
       final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
       try {
         currentThread.setContextClassLoader(this.getClass().getClassLoader());
-        return generateSolverContext(config, logger, pShutdownNotifier, solverLogfile, randomSeed);
+        return generateSolverContext(
+            config,
+            logger,
+            pShutdownNotifier,
+            solverLogfile,
+            randomSeed,
+            pFloatingPointRoundingMode);
       } finally {
         currentThread.setContextClassLoader(contextClassLoader);
       }
@@ -235,7 +245,8 @@ public class SolverContextFactory {
         LogManager logger,
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed)
+        long randomSeed,
+        FloatingPointRoundingMode pFloatingPointRoundingMode)
         throws InvalidConfigurationException;
   }
 
@@ -249,7 +260,7 @@ public class SolverContextFactory {
       Pattern.compile("^(" + "com\\.microsoft\\.z3|" + Pattern.quote(Z3_PACKAGE) + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
-  private static final Set<String> expectedLibrariesToLoad =
+  private static final Set<String> Z3_LIBRARY_NAMES =
       ImmutableSet.of("z3", "libz3", "libz3java", "z3java");
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
@@ -270,42 +281,22 @@ public class SolverContextFactory {
   private static ClassLoader createZ3ClassLoader() {
     ClassLoader parentClassLoader = SolverContextFactory.class.getClassLoader();
 
-    URL[] urls;
+    ClassLoaderBuilder builder =
+        Classes.makeExtendedURLClassLoader()
+            .setParent(parentClassLoader)
+            .setDirectLoadClasses(Z3_CLASSES)
+            .setCustomLookupNativeLibraries(Z3_LIBRARY_NAMES::contains);
+
     if (parentClassLoader instanceof URLClassLoader) {
       @SuppressWarnings("resource")
       URLClassLoader uParentClassLoader = (URLClassLoader) parentClassLoader;
-      urls = uParentClassLoader.getURLs();
+      builder.setUrls(uParentClassLoader.getURLs());
     } else {
-      urls =
-          new URL[] {
-            SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation(),
-          };
+      builder.setUrls(
+          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation());
     }
-    return new CustomLibraryPathClassLoader(Z3_CLASSES, urls, parentClassLoader);
+
+    return builder.build();
   }
 
-  private static class CustomLibraryPathClassLoader extends ChildFirstPatternClassLoader {
-
-    /**
-     * Create a new class loader.
-     *
-     * @param pClassPattern The pattern telling which classes should never be loaded by the parent.
-     * @param pUrls         The sources where this class loader should load classes from.
-     * @param pParent       The parent class loader.
-     */
-    CustomLibraryPathClassLoader(Pattern pClassPattern, URL[] pUrls, ClassLoader pParent) {
-      super(pClassPattern, pUrls, pParent);
-    }
-
-    @Override
-    protected String findLibrary(String libname) {
-      if (expectedLibrariesToLoad.contains(libname)) {
-        Optional<Path> path = NativeLibraries.findPathForLibrary(libname);
-        if (path.isPresent()) {
-          return path.get().toAbsolutePath().toString();
-        }
-      }
-      return super.findLibrary(libname);
-    }
-  }
 }

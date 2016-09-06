@@ -24,6 +24,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.java_smt.api.SolverException;
@@ -171,6 +172,13 @@ class Mathsat5NativeApi {
     return processSolveResult(e, msat_solve_with_assumptions(e, assumptions, assumptions.length));
   }
 
+  private static final ImmutableSet<String> ALLOWED_SOLVE_FAILURE_MESSAGES =
+      ImmutableSet.of(
+          "unsupported",
+          "non-integer model value",
+          "build_model: too many iterations",
+          "FP<->BV combination unsupported by the current configuration");
+
   private static boolean processSolveResult(long e, int resultCode)
       throws IllegalStateException, SolverException {
     switch (resultCode) {
@@ -181,7 +189,7 @@ class Mathsat5NativeApi {
       default:
         String msg = Strings.emptyToNull(msat_last_error_message(e));
 
-        if (msg != null && msg.contains("non-integer model value")) {
+        if (ALLOWED_SOLVE_FAILURE_MESSAGES.contains(msg)) {
           //·This·is·not·a·bug·in·our·code,·but·a·problem·of·MathSAT
           throw new SolverException(msg);
         }
@@ -307,7 +315,8 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_number(long e, String num_rep);
 
-  public static native long msat_make_int_modular_congruence(long e, long modulo, long t1, long t2);
+  public static native long msat_make_int_modular_congruence(
+      long e, String modulo, long t1, long t2);
 
   public static native long msat_make_term_ite(long e, long c, long tt, long te);
 
@@ -728,9 +737,9 @@ class Mathsat5NativeApi {
 
   public static native String msat_last_error_message(long e);
 
-  /** Optimization **/
+  /* Optimization **/
 
-  /**
+  /*
    * OptiMathSAT - objectives creation
    */
 
@@ -800,7 +809,7 @@ class Mathsat5NativeApi {
    */
   public static native void msat_assert_soft_formula(long e, long term, long weight, String id);
 
-  /**
+  /*
    * OptiMathSAT - objective stack iterator
    */
 
@@ -835,7 +844,7 @@ class Mathsat5NativeApi {
    */
   public static native void msat_destroy_objective_iterator(long i);
 
-  /**
+  /*
    * OptiMathSAT - functions for objective state inspection
    */
 

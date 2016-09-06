@@ -64,13 +64,13 @@ Additional instructions are available at the official [OSSRH][] page.
 
 ## Releasing Solvers
 
-Publishing of MathSAT5 and Z3 to the [Ivy Repository][] is handled through
-JavaSMT.
+### Publishing Z3
 
-### Publishing Z3 ###
-To publish Z3, [download it](https://github.com/Z3Prover/z3) and build it with the following command in its directory on a 64bit system:
+To publish Z3, [download it](https://github.com/Z3Prover/z3) and build
+it with the following command in its directory on a 64bit system:
+
 ```
-./configure --staticlib --java && cd build && make -j 2
+./configure --staticlib --java --git-describe && cd build && make -j 2
 ```
 
 Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
@@ -79,16 +79,44 @@ ant publish-z3 -Dz3.path=$Z3_DIR
 ```
 Finally follow the instructions shown in the message at the end.
 
-### Publish MathSAT5 ###
+### Publishing (Opti)-MathSAT5
+
 For publishing MathSAT5, you need to use a machine with at least GCC 4.9.
 First, [download the binary release](http://mathsat.fbk.eu/download.html), unpack it,
 and then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH` is the path to the MathSAT directory,
 and `$MATHSAT_VERSION` is the version number of MathSAT:
 ```
-ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dmathsat.version=$MATHSAT_VERSION
+ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$MATHSAT_VERSION
 ```
 Finally follow the instructions shown in the message at the end.
+The same procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
+except the publishing command is:
+
+```
+ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$OPTIMATHSAT_VERSION
+```
+
+### Publishing Princess and SMTInterpol
+
+The scripts for publishing Princess and SMTInterpol are available
+at the root of the [Ivy Repository](https://svn.sosy-lab.org/software/ivy).
+
+## Writing Solver Backends
+
+In order to write a solver backend it is sufficient to provide the
+implementation for the `SolverContext` interface.
+A new backend does not have to implement all the present methods,
+and should throw `UnsupportedOperationException` for methods it chooses to ignore.
+Abstract classes located inside the `basicimpl` package could be very helpful
+for writing new backends.
+
+If the new backend is written inside JavaSMT,
+`SolverContextFactory` and the `Solvers` enum should be updated
+to include the new solver.
+The new solver can be added from outside of JavaSMT as well: in that case,
+the user might wish to have their own factory which can create
+a suitable `SolverContext`.
 
 [Travis]: https://travis-ci.org/sosy-lab/java-smt
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/

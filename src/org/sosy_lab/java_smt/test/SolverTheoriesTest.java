@@ -37,10 +37,17 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.NumeralType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @RunWith(Parameterized.class)
 public class SolverTheoriesTest extends SolverBasedTest0 {
@@ -446,57 +453,40 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTestBV_ModularCongruence() throws Exception {
-    requireBitvectors();
+  public void testHardCongruence() throws Exception {
+    IntegerFormula a, b, c;
+    a = imgr.makeVariable("a");
+    b = imgr.makeVariable("b");
+    c = imgr.makeVariable("c");
+    List<BooleanFormula> constraints = new ArrayList<>();
+    Random r = new Random(42);
+    int bitSize = 8;
+    BigInteger prime1 = BigInteger.probablePrime(bitSize, r);
+    BigInteger prime2 = BigInteger.probablePrime(bitSize + 1, r);
+    BigInteger prime3 = BigInteger.probablePrime(bitSize + 2, r);
 
-    BitvectorFormula a = bvmgr.makeVariable(32, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(32, "int_b");
-    BitvectorFormula c = bvmgr.makeVariable(32, "int_c");
-    BitvectorFormula d = bvmgr.makeVariable(32, "int_d");
-    BitvectorFormula num10 = bvmgr.makeBitvector(32, 10);
-    BitvectorFormula num5 = bvmgr.makeBitvector(32, 5);
-    BitvectorFormula num0 = bvmgr.makeBitvector(32, 0);
-    BitvectorFormula numNeg5 = bvmgr.makeBitvector(32, -5);
+    constraints.add(imgr.modularCongruence(imgr.add(a, imgr.makeNumber(1)), b, prime1));
+    constraints.add(imgr.modularCongruence(b, c, prime2));
+    constraints.add(imgr.modularCongruence(a, c, prime3));
 
-    BooleanFormula fa = bvmgr.equal(a, num10);
-    BooleanFormula fb = bvmgr.equal(b, num5);
-    BooleanFormula fc = bvmgr.equal(c, num0);
-    BooleanFormula fd = bvmgr.equal(d, numNeg5);
-    BooleanFormula fConb = bvmgr.modularCongruence(a, b, 5);
-    BooleanFormula fConc = bvmgr.modularCongruence(a, c, 5);
-    BooleanFormula fCond = bvmgr.modularCongruence(a, d, 5);
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.addConstraint(imgr.greaterThan(a, imgr.makeNumber(1)));
+      pe.addConstraint(imgr.greaterThan(b, imgr.makeNumber(1)));
+      pe.addConstraint(imgr.greaterThan(c, imgr.makeNumber(1)));
+      pe.addConstraint(bmgr.and(constraints));
 
-    // check modular congruence, a=10 && b=5 && (a mod 5 = b mod 5)
-    assertThatFormula(bmgr.and(fa, fb, fConb)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(fConb))).isUnsatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, fConc)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc))).isUnsatisfiable();
-    assertThatFormula(bmgr.and(fa, fd, fCond)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fd, bmgr.not(fCond))).isUnsatisfiable();
-  }
+      assertThat(pe.isUnsat()).isFalse();
 
-  @Test
-  public void intTestBV_ModularCongruence_NegativeNumbers() throws Exception {
-    requireBitvectors();
-
-    BitvectorFormula a = bvmgr.makeVariable(32, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(32, "int_b");
-    BitvectorFormula c = bvmgr.makeVariable(32, "int_c");
-    BitvectorFormula num8 = bvmgr.makeBitvector(32, 8);
-    BitvectorFormula num3 = bvmgr.makeBitvector(32, 3);
-    BitvectorFormula numNeg2 = bvmgr.makeBitvector(32, -2);
-
-    BooleanFormula fa = bvmgr.equal(a, num8);
-    BooleanFormula fb = bvmgr.equal(b, num3);
-    BooleanFormula fc = bvmgr.equal(c, numNeg2);
-    BooleanFormula fConb = bvmgr.modularCongruence(a, b, 5);
-    BooleanFormula fConc = bvmgr.modularCongruence(a, c, 5);
-
-    // check modular congruence, a=10 && b=5 && (a mod 5 = b mod 5)
-    assertThatFormula(bmgr.and(fa, fb, fConb)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(fConb))).isUnsatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, fConc)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc))).isUnsatisfiable();
+      try (Model m = pe.getModel()) {
+        BigInteger aValue = m.evaluate(a);
+        BigInteger bValue = m.evaluate(b);
+        BigInteger cValue = m.evaluate(c);
+        assertThat(aValue.add(BigInteger.ONE).subtract(bValue).mod(prime1))
+            .isEqualTo(BigInteger.ZERO);
+        assertThat(bValue.subtract(cValue).mod(prime2)).isEqualTo(BigInteger.ZERO);
+        assertThat(aValue.subtract(cValue).mod(prime3)).isEqualTo(BigInteger.ZERO);
+      }
+    }
   }
 
   @Test

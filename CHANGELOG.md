@@ -1,12 +1,23 @@
 # JavaSMT ChangeLog
 
-## HEAD
+## JavaSMT 1.0.0
 
+ - Floating point rounding mode can be now specified for all operations in
+   `FloatingPointFormulaManager`.
+   Additionally, default rounding mode can be set using an option
+   `solver.floatingPointRoundingMode`.
+ - Automatic boolean formula simplification for Z3.
+ - New `utils` package, with optional utilities. Includes:
+    - `UfElimination` class for performing Ackermannization and returning the
+      metadata describing the fresh variables.
+ - `modularCongruence` method was moved to `IntegerFormulaManager` and now
+    throws an exception on non-positive input.
  - New package structure
     - Root package is `java_smt`
     - Solver bindings are in the package `java_smt/solvers`
     - User-facing API is in the package `java_smt/api`, apart from the entry
         point `SolverContextFactory`
+ - Caching and statistics are moved to the `statistics` branch.
 
 ## JavaSMT 0.60-174-g7ab7771
 

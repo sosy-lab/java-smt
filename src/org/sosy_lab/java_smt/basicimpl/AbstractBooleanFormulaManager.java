@@ -35,11 +35,11 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.visitors.BooleanFormulaTransformationVisitor;
-import org.sosy_lab.java_smt.visitors.BooleanFormulaVisitor;
-import org.sosy_lab.java_smt.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.visitors.FormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;

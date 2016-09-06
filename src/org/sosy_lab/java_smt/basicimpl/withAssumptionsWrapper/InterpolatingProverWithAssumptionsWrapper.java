@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.visitors.BooleanFormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
 import java.util.Collection;

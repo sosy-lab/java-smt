@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.common.rationals.Rational;
@@ -225,17 +226,44 @@ public abstract class AbstractNumeralFormulaManager<
     throw new UnsupportedOperationException();
   }
 
-  @Override
   public BooleanFormula modularCongruence(
       ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
+    Preconditions.checkArgument(pModulo > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
     return wrapBool(modularCongruence(param1, param2, pModulo));
   }
 
-  protected abstract TFormulaInfo modularCongruence(
-      TFormulaInfo pNumber1, TFormulaInfo pNumber2, long pModulo);
+  public BooleanFormula modularCongruence(
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, BigInteger pModulo) {
+    Preconditions.checkArgument(
+        pModulo.signum() > 0, "modular congruence needs a positive modulo.");
+    TFormulaInfo param1 = extractInfo(pNumber1);
+    TFormulaInfo param2 = extractInfo(pNumber2);
+
+    return wrapBool(modularCongruence(param1, param2, pModulo));
+  }
+
+  /**
+   * @param a first operand
+   * @param b second operand
+   * @param m the modulus
+   * @return the formula representing {@code a = b (mod m)}
+   */
+  protected TFormulaInfo modularCongruence(TFormulaInfo a, TFormulaInfo b, BigInteger m) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @param a first operand
+   * @param b second operand
+   * @param m the modulus
+   * @return the formula representing {@code a = b (mod m)}
+   */
+  protected TFormulaInfo modularCongruence(TFormulaInfo a, TFormulaInfo b, long m) {
+    throw new UnsupportedOperationException();
+  }
 
   @Override
   public ResultFormulaType multiply(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {

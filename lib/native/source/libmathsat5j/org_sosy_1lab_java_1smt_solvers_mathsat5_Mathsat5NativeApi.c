@@ -1,3 +1,5 @@
+#include<stdint.h>
+
 #include "includes/defines.h"
 
 /*
@@ -265,7 +267,7 @@ CALL4(int, is_array_type)
     throwException(jenv, "java/lang/IllegalArgumentException", "Cannot get index type of non-array type"); \
     return -1;
   } \
-  return (jlong)r_arg3.repr; \
+  return (jlong)(intptr_t)r_arg3.repr; \
 }
 
 DEFINE_FUNC(jtype, 1get_1array_1element_1type) WITH_TWO_ARGS(jenv, jtype)
@@ -279,7 +281,7 @@ CALL4(int, is_array_type)
     throwException(jenv, "java/lang/IllegalArgumentException", "Cannot get element type of non-array type"); \
     return -1;
   } \
-  return (jlong)r_arg4.repr; \
+  return (jlong)(intptr_t)r_arg4.repr; \
 }
 
 DEFINE_FUNC(jboolean, 1is_1fp_1type) WITH_TWO_ARGS(jenv, jtype)
@@ -370,7 +372,7 @@ make_term_binary(leq)
 make_term_binary(plus)
 make_term_binary(times)
 
-DEFINE_FUNC(jterm, 1make_1int_1modular_1congruence) WITH_FOUR_ARGS(jenv, long, jterm, jterm)
+DEFINE_FUNC(jterm, 1make_1int_1modular_1congruence) WITH_FOUR_ARGS(jenv, string, jterm, jterm)
 ENV_ARG(1)
 MPZ_ARG(2)
 TERM_ARG(3)

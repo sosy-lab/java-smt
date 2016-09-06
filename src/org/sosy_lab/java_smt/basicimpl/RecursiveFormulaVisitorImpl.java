@@ -27,9 +27,9 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.visitors.FormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.visitors.TraversalProcess.TraversalType;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess.TraversalType;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

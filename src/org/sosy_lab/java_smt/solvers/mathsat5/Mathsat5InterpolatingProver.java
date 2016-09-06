@@ -23,15 +23,14 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_asse
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Longs;
+import com.google.common.collect.ImmutableSet;
 
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -45,16 +44,18 @@ import java.util.Set;
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
 
-  private static final Collection<String> ALLOWED_FAILURE_MESSAGES =
-      ImmutableList.of(
-          "impossible to build a suitable congruence graph",
+  private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGES =
+      ImmutableSet.of(
+          "impossible to build a suitable congruence graph!",
           "can't build ie-local interpolant",
           "splitting of AB-mixed terms not supported",
           "Hypothesis belongs neither to A nor to B",
           "FP<->BV combination unsupported by the current configuration",
           "cur_eq unknown to the classifier",
           "unknown constraint in the ItpMapper",
-          "AB-mixed term not found in eq_itp map");
+          "AB-mixed term not found in eq_itp map",
+          "uncolored atom found in Array proof",
+          "arr: proof splitting not supported");
 
   Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
     super(pMgr, createConfig(), creator);
@@ -88,13 +89,26 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    return !msat_check_sat_with_assumptions(
+        curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
+  }
+
+  @Override
+  protected long getMsatModel() throws SolverException {
+    // Interpolation in MathSAT is buggy at least for UFs+Ints and sometimes returns a wrong "SAT".
+    // In this case, model generation fails and users should try again without interpolation.
+    // Example failures: "Invalid model", "non-integer model value"
+    // As this is a bug in MathSAT and not in our code, we throw a SolverException.
+    // We do it only in InterpolatingProver because without interpolation this is not expected.
     try {
-      long[] assumptions =
-          Longs.toArray(Collections2.transform(pAssumptions, Mathsat5FormulaManager::getMsatTerm));
-      return !msat_check_sat_with_assumptions(curEnv, assumptions);
-    } catch (IllegalStateException e) {
-      handleSolverExceptionInUnsatCheck(e);
-      throw e;
+      return msat_get_model(curEnv);
+    } catch (IllegalArgumentException e) {
+      String msg = Strings.emptyToNull(e.getMessage());
+      throw new SolverException(
+          "msat_get_model failed"
+              + (msg != null ? " with \"" + msg + "\"" : "")
+              + ", probably the actual problem is interpolation",
+          e);
     }
   }
 
@@ -112,8 +126,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
     } catch (IllegalArgumentException e) {
-      String msg = Strings.nullToEmpty(e.getMessage());
-      if (ALLOWED_FAILURE_MESSAGES.stream().anyMatch(msg::contains)) {
+      if (ALLOWED_FAILURE_MESSAGES.contains(e.getMessage())) {
         // This is not a bug in our code,
         // but a problem of MathSAT which happens during interpolation
         throw new SolverException(e.getMessage(), e);

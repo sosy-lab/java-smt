@@ -74,7 +74,7 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
     return t;
   }
 
-  protected static final void checkVariableName(String pVar) {
+  protected static void checkVariableName(String pVar) {
     Preconditions.checkArgument(!pVar.isEmpty(), "Identifier for variable should not be empty.");
   }
 }

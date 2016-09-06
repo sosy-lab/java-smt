@@ -17,29 +17,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package org.sosy_lab.java_smt.api.visitors;
 
-package org.sosy_lab.java_smt.basicimpl.cache;
+import org.sosy_lab.java_smt.api.Formula;
 
 /**
- * Statistics for optimization cache.
+ * Like {@link DefaultFormulaVisitor}, but throws
+ * {@link UnsupportedOperationException} on unexpected formula types.
  */
-public class OptimizationCacheStatistics {
-  int checks = 0;
-  int cacheHits = 0;
+public abstract class ExpectedFormulaVisitor<R> extends DefaultFormulaVisitor<R> {
 
-  void incChecks() {
-    checks++;
-  }
-
-  void incCacheHits() {
-    cacheHits++;
-  }
-
-  public int getChecks() {
-    return checks;
-  }
-
-  public int getCacheHits() {
-    return cacheHits;
+  @Override
+  protected final R visitDefault(Formula f) {
+    throw new UnsupportedOperationException();
   }
 }

@@ -20,30 +20,61 @@
 package org.sosy_lab.java_smt.api;
 
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 import java.math.BigDecimal;
 
+/**
+ * Floating point operations.
+ *
+ * <p>Most operations are overloaded: there is an option of either using the default
+ * rounding mode (set via the option {@code solver.floatingPointRoundingMode}),
+ * or providing the rounding mode explicitly.
+ */
 public interface FloatingPointFormulaManager {
-  FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type);
 
-  FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(double n, FloatingPointType type);
 
-  FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(
+      double n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
-  FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(BigDecimal n, FloatingPointType type);
 
-  FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(
+      BigDecimal n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
-  FloatingPointFormula makePlusInfinity(FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(String n, FloatingPointType type);
 
-  FloatingPointFormula makeMinusInfinity(FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(
+      String n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
-  FloatingPointFormula makeNaN(FormulaType.FloatingPointType type);
+  FloatingPointFormula makeNumber(Rational n, FloatingPointType type);
+
+  FloatingPointFormula makeNumber(
+      Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  FloatingPointFormula makeVariable(String pVar, FloatingPointType type);
+
+  FloatingPointFormula makePlusInfinity(FloatingPointType type);
+
+  FloatingPointFormula makeMinusInfinity(FloatingPointType type);
+
+  FloatingPointFormula makeNaN(FloatingPointType type);
 
   <T extends Formula> T castTo(FloatingPointFormula number, FormulaType<T> targetType);
 
+  <T extends Formula> T castTo(
+      FloatingPointFormula number,
+      FormulaType<T> targetType,
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  FloatingPointFormula castFrom(Formula number, boolean signed, FloatingPointType targetType);
+
   FloatingPointFormula castFrom(
-      Formula number, boolean signed, FormulaType.FloatingPointType targetType);
+      Formula number,
+      boolean signed,
+      FloatingPointType targetType,
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   // ----------------- Arithmetic relations, return type NumeralFormula -----------------
 
@@ -51,11 +82,31 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula add(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  FloatingPointFormula add(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
+
   FloatingPointFormula subtract(FloatingPointFormula number1, FloatingPointFormula number2);
+
+  FloatingPointFormula subtract(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   FloatingPointFormula divide(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  FloatingPointFormula divide(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
+
   FloatingPointFormula multiply(FloatingPointFormula number1, FloatingPointFormula number2);
+
+  FloatingPointFormula multiply(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 

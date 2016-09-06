@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.visitors.BooleanFormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -17,18 +17,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.visitors;
 
-import org.sosy_lab.java_smt.api.Formula;
+package org.sosy_lab.java_smt.api;
 
 /**
- * Like {@link DefaultFormulaVisitor}, but throws
- * {@link UnsupportedOperationException} on unexpected formula types.
+ * Possible floating point rounding modes.
  */
-public abstract class ExpectedFormulaVisitor<R> extends DefaultFormulaVisitor<R> {
-
-  @Override
-  protected final R visitDefault(Formula f) {
-    throw new UnsupportedOperationException();
-  }
+public enum FloatingPointRoundingMode {
+  NEAREST_TIES_TO_EVEN,
+  NEAREST_TIES_AWAY,
+  TOWARD_POSITIVE,
+  TOWARD_NEGATIVE,
+  TOWARD_ZERO
 }

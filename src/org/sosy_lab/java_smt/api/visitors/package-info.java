@@ -19,10 +19,7 @@
  */
 
 /**
- * Caching layer for solver queries.
- * Usage is optional.
- *
- * <p>Cache is associated to a single
- * {@link org.sosy_lab.java_smt.api.SolverContext} instance.
+ * The visitors of this package allow for efficient traversal, manipulation
+ * and transformation of formulas.
  */
-package org.sosy_lab.java_smt.basicimpl.cache;
+package org.sosy_lab.java_smt.api.visitors;

@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.visitors;
+package org.sosy_lab.java_smt.api.visitors;
 
 import com.google.common.collect.ImmutableSet;
 

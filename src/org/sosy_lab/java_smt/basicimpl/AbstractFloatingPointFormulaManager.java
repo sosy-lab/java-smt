@@ -23,10 +23,14 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package,
@@ -46,9 +50,26 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FloatingPointFormulaManager {
 
+  private final Map<FloatingPointRoundingMode, TFormulaInfo> roundingModes;
+
   protected AbstractFloatingPointFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
+    roundingModes = new HashMap<>();
+  }
+
+  protected abstract TFormulaInfo getDefaultRoundingMode();
+
+  protected abstract TFormulaInfo getRoundingModeImpl(
+      FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    TFormulaInfo out = roundingModes.get(pFloatingPointRoundingMode);
+    if (out == null) {
+      out = getRoundingModeImpl(pFloatingPointRoundingMode);
+      roundingModes.put(pFloatingPointRoundingMode, out);
+    }
+    return out;
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
@@ -57,29 +78,56 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type) {
-    return wrap(makeNumberImpl(n.toString(), type));
+    return wrap(makeNumberImpl(n.toString(), type, getDefaultRoundingMode()));
+  }
+
+  @Override
+  public FloatingPointFormula makeNumber(
+      Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(makeNumberImpl(n.toString(), type, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
   @Override
   public FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type) {
-    return wrap(makeNumberImpl(n, type));
+    return wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(double n, FormulaType.FloatingPointType type);
+  @Override
+  public FloatingPointFormula makeNumber(
+      double n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo makeNumberImpl(
+      double n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type) {
-    return wrap(makeNumberImpl(n, type));
+    return wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(BigDecimal n, FormulaType.FloatingPointType type);
+  @Override
+  public FloatingPointFormula makeNumber(
+      BigDecimal n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo makeNumberImpl(
+      BigDecimal n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type) {
-    return wrap(makeNumberImpl(n, type));
+    return wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(String n, FormulaType.FloatingPointType type);
+  @Override
+  public FloatingPointFormula makeNumber(
+      String n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo makeNumberImpl(
+      String n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {
@@ -114,19 +162,47 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public <T extends Formula> T castTo(FloatingPointFormula pNumber, FormulaType<T> pTargetType) {
     return getFormulaCreator()
-        .encapsulate(pTargetType, castToImpl(extractInfo(pNumber), pTargetType));
+        .encapsulate(
+            pTargetType, castToImpl(extractInfo(pNumber), pTargetType, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo castToImpl(TFormulaInfo pNumber, FormulaType<?> pTargetType);
+  @Override
+  public <T extends Formula> T castTo(
+      FloatingPointFormula number,
+      FormulaType<T> targetType,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return getFormulaCreator()
+        .encapsulate(
+            targetType,
+            castToImpl(
+                extractInfo(number), targetType, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo castToImpl(
+      TFormulaInfo pNumber, FormulaType<?> pTargetType, TFormulaInfo pRoundingMode);
 
   @Override
   public FloatingPointFormula castFrom(
       Formula pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType) {
-    return wrap(castFromImpl(extractInfo(pNumber), pSigned, pTargetType));
+    return wrap(castFromImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
+  }
+
+  @Override
+  public FloatingPointFormula castFrom(
+      Formula number,
+      boolean signed,
+      FloatingPointType targetType,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(
+        castFromImpl(
+            extractInfo(number), signed, targetType, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
   protected abstract TFormulaInfo castFromImpl(
-      TFormulaInfo pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType);
+      TFormulaInfo pNumber,
+      boolean pSigned,
+      FormulaType.FloatingPointType pTargetType,
+      TFormulaInfo pRoundingMode);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {
@@ -141,10 +217,23 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrap(add(param1, param2));
+    return wrap(add(param1, param2, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  @Override
+  public FloatingPointFormula add(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(
+        add(
+            extractInfo(number1),
+            extractInfo(number2),
+            getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo add(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pRoundingMode);
 
   @Override
   public FloatingPointFormula subtract(
@@ -152,20 +241,44 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrap(subtract(param1, param2));
+    return wrap(subtract(param1, param2, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  @Override
+  public FloatingPointFormula subtract(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    TFormulaInfo param1 = extractInfo(number1);
+    TFormulaInfo param2 = extractInfo(number2);
+
+    return wrap(subtract(param1, param2, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo subtract(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula divide(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrap(divide(param1, param2));
+    return wrap(divide(param1, param2, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo divide(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  @Override
+  public FloatingPointFormula divide(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    TFormulaInfo param1 = extractInfo(number1);
+    TFormulaInfo param2 = extractInfo(number2);
+
+    return wrap(divide(param1, param2, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo divide(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula multiply(
@@ -173,10 +286,21 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrap(multiply(param1, param2));
+    return wrap(multiply(param1, param2, getDefaultRoundingMode()));
   }
 
-  protected abstract TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  @Override
+  public FloatingPointFormula multiply(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    TFormulaInfo param1 = extractInfo(number1);
+    TFormulaInfo param2 = extractInfo(number2);
+    return wrap(multiply(param1, param2, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo multiply(
+      TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public BooleanFormula assignment(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {

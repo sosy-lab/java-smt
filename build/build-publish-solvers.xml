@@ -157,6 +157,7 @@
 
            <exec executable="lib/native/source/libmathsat5j/compile.sh">
                <arg value="${mathsat.path}" />
+               <arg value="${gmp.path}" />
                <arg value="-@{flag}" />
            </exec>
 

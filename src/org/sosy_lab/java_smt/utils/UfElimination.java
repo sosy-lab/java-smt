@@ -17,10 +17,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.basicimpl.tactics;
+package org.sosy_lab.java_smt.utils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMultimap.copyOf;
+import static com.google.common.collect.Maps.difference;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
@@ -45,8 +47,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +69,7 @@ public class UfElimination {
   public static class Result {
 
     private final BooleanFormula formula;
-    private final BooleanFormula constaints;
+    private final BooleanFormula constraints;
     private final ImmutableMap<Formula, Formula> substitutions;
     private final ImmutableMultimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs;
 
@@ -78,11 +80,11 @@ public class UfElimination {
 
     Result(
         BooleanFormula pFormula,
-        BooleanFormula pConstaints,
+        BooleanFormula pConstraints,
         ImmutableMap<Formula, Formula> pSubstitutions,
         ImmutableMultimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs) {
       formula = checkNotNull(pFormula);
-      constaints = checkNotNull(pConstaints);
+      constraints = checkNotNull(pConstraints);
       substitutions = checkNotNull(pSubstitutions);
       ufs = checkNotNull(pUfs);
     }
@@ -97,8 +99,8 @@ public class UfElimination {
     /**
      * @return the constraints enforcing the functional consistency.
      */
-    public BooleanFormula geConstraints() {
-      return constaints;
+    public BooleanFormula getConstraints() {
+      return constraints;
     }
 
     /**
@@ -123,7 +125,7 @@ public class UfElimination {
   private final BooleanFormulaManager bfmgr;
   private final FormulaManager fmgr;
 
-  public UfElimination(FormulaManager pFmgr) {
+  UfElimination(FormulaManager pFmgr) {
     bfmgr = pFmgr.getBooleanFormulaManager();
     fmgr = pFmgr;
   }
@@ -136,7 +138,7 @@ public class UfElimination {
    */
   public BooleanFormula eliminateUfs(BooleanFormula f) {
     Result result = eliminateUfs(f, Result.empty(fmgr));
-    return fmgr.getBooleanFormulaManager().and(result.getFormula(), result.geConstraints());
+    return fmgr.getBooleanFormulaManager().and(result.getFormula(), result.getConstraints());
   }
 
   /**
@@ -145,10 +147,10 @@ public class UfElimination {
    * Quantified formulas are not supported.
    * @param pF the {@link Formula} to remove all Ufs from
    * @param pOtherResult result of eliminating Ufs in another {@link BooleanFormula}
-   * @return the {@link Result} of the Ackermanization
+   * @return the {@link Result} of the Ackermannization
    */
   public Result eliminateUfs(BooleanFormula pF, Result pOtherResult) {
-    checkArgument(!isQuantifed(pF));
+    checkArgument(!isQuantified(pF));
     BooleanFormula f;
     if (!pOtherResult.getSubstitution().isEmpty()) {
       f = fmgr.substitute(pF, pOtherResult.getSubstitution());
@@ -178,19 +180,19 @@ public class UfElimination {
           UninterpretedFunctionApplication application2 = applications.get(idx2);
           List<Formula> otherArgs = application2.getArguments();
 
-          /**
+          /*
            * Add constraints to enforce functional consistency.
            */
           Verify.verify(args.size() == otherArgs.size());
-          Collection<BooleanFormula> argumentEquility = new ArrayList<>(args.size());
+          Collection<BooleanFormula> argumentEquality = new ArrayList<>(args.size());
           for (int i = 0; i < args.size(); i++) {
             Formula arg1 = args.get(i);
             Formula arg2 = otherArgs.get(i);
-            argumentEquility.add(makeEqual(arg1, arg2));
+            argumentEquality.add(makeEqual(arg1, arg2));
           }
 
-          BooleanFormula functionEquility = makeEqual(substitution, application2.getSubstitution());
-          extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquility), functionEquility));
+          BooleanFormula functionEquality = makeEqual(substitution, application2.getSubstitution());
+          extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquality), functionEquality));
         }
       }
     }
@@ -209,8 +211,12 @@ public class UfElimination {
               .collect(Collectors.toList());
     }
 
+    Map<Formula, Formula> otherSubstitution =
+        difference(pOtherResult.getSubstitution(), substitutions).entriesOnlyOnLeft();
+    substitutionsBuilder.putAll(otherSubstitution);
+    ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.build();
     BooleanFormula constraints = bfmgr.and(extraConstraints);
-    return new Result(formulaWithoutUFs, constraints, substitutions, ImmutableMultimap.copyOf(ufs));
+    return new Result(formulaWithoutUFs, constraints, allSubstitutions, copyOf(ufs));
   }
 
   private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> merge(
@@ -252,7 +258,7 @@ public class UfElimination {
     return t;
   }
 
-  private boolean isQuantifed(Formula f) {
+  private boolean isQuantified(Formula f) {
     AtomicBoolean result = new AtomicBoolean();
     fmgr.visitRecursively(
         f,

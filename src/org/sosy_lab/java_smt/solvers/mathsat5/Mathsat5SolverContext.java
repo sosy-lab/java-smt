@@ -43,6 +43,7 @@ import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -150,7 +151,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogFile,
-      long randomSeed)
+      long randomSeed,
+      FloatingPointRoundingMode pFloatingPointRoundingMode)
       throws InvalidConfigurationException {
 
     // Init Msat
@@ -187,7 +189,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5BitvectorFormulaManager bitvectorTheory =
         Mathsat5BitvectorFormulaManager.create(creator);
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
-        new Mathsat5FloatingPointFormulaManager(creator, functionTheory);
+        new Mathsat5FloatingPointFormulaManager(
+            creator, functionTheory, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(

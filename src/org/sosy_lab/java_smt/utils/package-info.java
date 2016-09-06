@@ -17,29 +17,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-package org.sosy_lab.java_smt.basicimpl.cache;
-
-import com.google.auto.value.AutoValue;
-
-import org.sosy_lab.java_smt.api.Formula;
-
-@AutoValue
-public abstract class OptimizationObjective {
-  public abstract Formula objective();
-
-  public abstract DIRECTION direction();
-
-  enum DIRECTION {
-    MAX,
-    MIN
-  }
-
-  public static OptimizationObjective maxObjective(Formula objective) {
-    return new AutoValue_OptimizationObjective(objective, DIRECTION.MAX);
-  }
-
-  public static OptimizationObjective minObjective(Formula objective) {
-    return new AutoValue_OptimizationObjective(objective, DIRECTION.MIN);
-  }
-}
+/**
+ * Utility classes implementing algorithms based on the API of JavaSMT.
+ */
+@javax.annotation.CheckReturnValue
+@javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+package org.sosy_lab.java_smt.utils;

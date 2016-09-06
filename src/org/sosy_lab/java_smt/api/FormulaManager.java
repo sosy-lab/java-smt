@@ -22,10 +22,9 @@ package org.sosy_lab.java_smt.api;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.java_smt.basicimpl.tactics.Tactic;
-import org.sosy_lab.java_smt.visitors.FormulaTransformationVisitor;
-import org.sosy_lab.java_smt.visitors.FormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 import java.util.List;
 import java.util.Map;

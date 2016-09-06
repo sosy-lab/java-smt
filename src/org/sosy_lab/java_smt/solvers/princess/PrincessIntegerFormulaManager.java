@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.basetypes.IdealInt;
-import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
@@ -33,8 +32,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 class PrincessIntegerFormulaManager
-    extends org.sosy_lab.java_smt.solvers.princess.PrincessNumeralFormulaManager<
-        IntegerFormula, IntegerFormula>
+    extends PrincessNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
   PrincessIntegerFormulaManager(PrincessFormulaCreator pCreator) {
@@ -75,13 +73,19 @@ class PrincessIntegerFormulaManager
   @Override
   protected IExpression modularCongruence(
       IExpression pNumber1, IExpression pNumber2, long pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, makeNumberImpl(pModulo));
+  }
+
+  @Override
+  protected IExpression modularCongruence(
+      IExpression pNumber1, IExpression pNumber2, BigInteger pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, makeNumberImpl(pModulo));
+  }
+
+  protected IExpression modularCongruence0(IExpression pNumber1, IExpression pNumber2, ITerm n) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    if (pModulo > 0) {
-      ITerm n = makeNumberImpl(pModulo);
-      ITerm x = subtract(pNumber1, pNumber2);
-      return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
-    }
-    return new IBoolLit(true);
+    ITerm x = subtract(pNumber1, pNumber2);
+    return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
   }
 
   @Override

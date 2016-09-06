@@ -27,6 +27,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.InnerUtilFactory;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 import javax.annotation.Nullable;
@@ -45,9 +46,11 @@ public class Z3LoadingFactory extends InnerUtilFactory {
       LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed)
+      long randomSeed,
+      FloatingPointRoundingMode pFloatingPointRoundingMode)
       throws InvalidConfigurationException {
 
-    return Z3SolverContext.create(logger, config, pShutdownNotifier, solverLogfile, randomSeed);
+    return Z3SolverContext.create(
+        logger, config, pShutdownNotifier, solverLogfile, randomSeed, pFloatingPointRoundingMode);
   }
 }

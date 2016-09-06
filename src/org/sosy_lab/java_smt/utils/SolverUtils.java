@@ -17,9 +17,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package org.sosy_lab.java_smt.utils;
+
+import org.sosy_lab.java_smt.api.FormulaManager;
 
 /**
- * The visitors of this package allow for efficient traversal, manipulation
- * and transformation of formulas.
+ * Central entry point for all utility classes.
  */
-package org.sosy_lab.java_smt.visitors;
+public class SolverUtils {
+
+  private SolverUtils() {}
+
+  /**
+   * Creates a new {@link UfElimination} instance.
+   * @param pFormulaManager the {@link FormulaManager} to be used
+   * @return a new {@link UfElimination} instance
+   */
+  public static UfElimination ufElimination(FormulaManager pFormulaManager) {
+    return new UfElimination(pFormulaManager);
+  }
+}

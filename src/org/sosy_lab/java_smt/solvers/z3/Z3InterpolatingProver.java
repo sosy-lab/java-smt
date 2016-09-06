@@ -35,8 +35,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 import java.io.IOException;
 import java.io.Writer;

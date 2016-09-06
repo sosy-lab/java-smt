@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.api;
 
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.basicimpl.SolverContextStatistics;
 
 /**
  * Instances of this interface provide access to an SMT solver.
@@ -93,11 +92,6 @@ public interface SolverContext extends AutoCloseable {
   OptimizationProverEnvironment newOptimizationProverEnvironment();
 
   /**
-   * Create a fresh new {@link OptimizationProverEnvironment} with caching.
-   */
-  OptimizationProverEnvironment newCachedOptimizationProverEnvironment();
-
-  /**
    * Get version information out of the solver.
    */
   String getVersion();
@@ -108,13 +102,9 @@ public interface SolverContext extends AutoCloseable {
   Solvers getSolverName();
 
   /**
-   * Get statistics information on solver usage.
-   */
-  SolverContextStatistics getStatistics();
-
-  /**
    * Close the solver context.
-   * Necessary for solvers implemented in native code, frees the associated
+   *
+   * <p>Necessary for the solvers implemented in native code, frees the associated
    * memory.
    */
   @Override

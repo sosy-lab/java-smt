@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_read;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
@@ -33,13 +32,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_array_write;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 import java.util.ArrayList;
@@ -53,25 +50,10 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
 
-  private Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
+  Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
     super(creator);
     this.model = model;
     formulaCreator = creator;
-  }
-
-  static Mathsat5Model create(Mathsat5FormulaCreator creator, long msatEnv) throws SolverException {
-    long msatModel;
-    try {
-      msatModel = msat_get_model(msatEnv);
-    } catch (IllegalArgumentException e) {
-      String msg = Strings.nullToEmpty(e.getMessage());
-      if (msg.contains("non-integer model value")) {
-        // This is not a bug in our code, but a problem of MathSAT
-        throw new SolverException(e.getMessage(), e);
-      }
-      throw e;
-    }
-    return new Mathsat5Model(msatModel, creator);
   }
 
   @Override

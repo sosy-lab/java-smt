@@ -22,31 +22,21 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.basicimpl.cache.CachingOptimizationProverEnvironment;
-import org.sosy_lab.java_smt.basicimpl.cache.OptimizationQuery;
-import org.sosy_lab.java_smt.basicimpl.cache.OptimizationResult;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.ProverWithAssumptionsWrapper;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSolverContext implements SolverContext {
 
   private final FormulaManager fmgr;
-  private final Map<OptimizationQuery, OptimizationResult> optimizationCache;
-  private final SolverContextStatistics statistics;
 
   protected AbstractSolverContext(FormulaManager fmgr) {
     this.fmgr = fmgr;
-    optimizationCache = new HashMap<>();
-    statistics = new SolverContextStatistics();
   }
 
   @Override
@@ -100,17 +90,4 @@ public abstract class AbstractSolverContext implements SolverContext {
    * Otherwise the behavior of this class is undefined.
    */
   protected abstract boolean supportsAssumptionSolving();
-
-  @Override
-  public final OptimizationProverEnvironment newCachedOptimizationProverEnvironment() {
-    return new CachingOptimizationProverEnvironment(
-        newOptimizationProverEnvironment(),
-        optimizationCache,
-        statistics.getOptimizationCacheStatistics());
-  }
-
-  @Override
-  public SolverContextStatistics getStatistics() {
-    return statistics;
-  }
 }

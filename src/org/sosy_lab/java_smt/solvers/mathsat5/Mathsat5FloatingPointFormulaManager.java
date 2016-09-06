@@ -38,11 +38,15 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_plus;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_plus_inf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_rat_number;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_minus_inf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_nearest_even;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_plus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_zero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_times;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_to_bv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
@@ -58,16 +62,43 @@ class Mathsat5FloatingPointFormulaManager
 
   private final long roundingMode;
 
-  Mathsat5FloatingPointFormulaManager(Mathsat5FormulaCreator pCreator, Mathsat5UFManager pFfmgr) {
+  Mathsat5FloatingPointFormulaManager(
+      Mathsat5FormulaCreator pCreator,
+      Mathsat5UFManager pFfmgr,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
 
     ffmgr = pFfmgr;
     mathsatEnv = pCreator.getEnv();
-    roundingMode = msat_make_fp_roundingmode_nearest_even(mathsatEnv);
+    roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
   @Override
-  public Long makeNumberImpl(double pN, FloatingPointType pType) {
+  protected Long getDefaultRoundingMode() {
+    return roundingMode;
+  }
+
+  @Override
+  protected Long getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN:
+        return msat_make_fp_roundingmode_nearest_even(mathsatEnv);
+      case NEAREST_TIES_AWAY:
+        throw new IllegalArgumentException(
+            "Rounding mode NEAREST_TIES_AWAY is not supported by Mathsat5");
+      case TOWARD_POSITIVE:
+        return msat_make_fp_roundingmode_plus_inf(mathsatEnv);
+      case TOWARD_NEGATIVE:
+        return msat_make_fp_roundingmode_minus_inf(mathsatEnv);
+      case TOWARD_ZERO:
+        return msat_make_fp_roundingmode_zero(mathsatEnv);
+      default:
+        throw new AssertionError("Unexpected branch");
+    }
+  }
+
+  @Override
+  public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     if (Double.isNaN(pN)) {
       return makeNaNImpl(pType);
     } else if (Double.isInfinite(pN)) {
@@ -77,18 +108,18 @@ class Mathsat5FloatingPointFormulaManager
         return makeMinusInfinityImpl(pType);
       }
     }
-    return makeNumberImpl(Double.toString(pN), pType);
+    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
-  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType) {
-    return makeNumberImpl(pN.toPlainString(), pType);
+  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType, Long pRoundingMode) {
+    return makeNumberImpl(pN.toPlainString(), pType, pRoundingMode);
   }
 
   @Override
-  protected Long makeNumberImpl(String pN, FloatingPointType pType) {
+  protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
     return msat_make_fp_rat_number(
-        mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), roundingMode);
+        mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode);
   }
 
   @Override
@@ -112,19 +143,19 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType) {
+  protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType, Long pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
       return msat_make_fp_cast(
           mathsatEnv,
           targetType.getExponentSize(),
           targetType.getMantissaSize(),
-          roundingMode,
+          pRoundingMode,
           pNumber);
 
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
-      return msat_make_fp_to_bv(mathsatEnv, targetType.getSize(), roundingMode, pNumber);
+      return msat_make_fp_to_bv(mathsatEnv, targetType.getSize(), pRoundingMode, pNumber);
 
     } else {
       return genericCast(pNumber, pTargetType);
@@ -132,11 +163,12 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  protected Long castFromImpl(Long pNumber, boolean signed, FloatingPointType pTargetType) {
+  protected Long castFromImpl(
+      Long pNumber, boolean signed, FloatingPointType pTargetType, Long pRoundingMode) {
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
 
     if (formulaType.isFloatingPointType()) {
-      return castToImpl(pNumber, pTargetType);
+      return castToImpl(pNumber, pTargetType, pRoundingMode);
 
     } else if (formulaType.isBitvectorType()) {
       if (signed) {
@@ -144,14 +176,14 @@ class Mathsat5FloatingPointFormulaManager
             mathsatEnv,
             pTargetType.getExponentSize(),
             pTargetType.getMantissaSize(),
-            roundingMode,
+            pRoundingMode,
             pNumber);
       } else {
         return msat_make_fp_from_ubv(
             mathsatEnv,
             pTargetType.getExponentSize(),
             pTargetType.getMantissaSize(),
-            roundingMode,
+            pRoundingMode,
             pNumber);
       }
 
@@ -177,23 +209,23 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2) {
-    return msat_make_fp_plus(mathsatEnv, roundingMode, pNumber1, pNumber2);
+  public Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return msat_make_fp_plus(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2) {
-    return msat_make_fp_minus(mathsatEnv, roundingMode, pNumber1, pNumber2);
+  public Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return msat_make_fp_minus(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2) {
-    return msat_make_fp_times(mathsatEnv, roundingMode, pNumber1, pNumber2);
+  public Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return msat_make_fp_times(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  protected Long divide(Long pNumber1, Long pNumber2) {
-    return msat_make_fp_div(mathsatEnv, roundingMode, pNumber1, pNumber2);
+  protected Long divide(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+    return msat_make_fp_div(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override

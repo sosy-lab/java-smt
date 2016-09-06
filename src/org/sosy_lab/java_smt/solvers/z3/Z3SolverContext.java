@@ -23,7 +23,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -36,6 +35,7 @@ import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -62,7 +62,7 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Option(
     secure = true,
-    description = "Ordering for objectives in the optimization" + " context",
+    description = "Ordering for objectives in the optimization context",
     values = {"lex", "pareto", "box"}
   )
   String objectivePrioritizationMode = "box";
@@ -126,7 +126,8 @@ final class Z3SolverContext extends AbstractSolverContext {
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed)
+      long randomSeed,
+      FloatingPointRoundingMode pFloatingPointRoundingMode)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -138,14 +139,22 @@ final class Z3SolverContext extends AbstractSolverContext {
               + "Please use the option solver.z3.log for a Z3-specific log instead.");
     }
 
-    if (NativeLibraries.OS.guessOperatingSystem() == NativeLibraries.OS.WINDOWS) {
-      // Z3 itself
-      System.loadLibrary("libz3");
-      System.loadLibrary("libz3java");
+    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
+    // but it will fail to find the former if not loaded previously.
+    // We load both libraries here to have all the loading in one place.
+    try {
+      System.loadLibrary("z3");
+      System.loadLibrary("z3java");
+    } catch (UnsatisfiedLinkError e1) {
+      // On Windows, the library name is different, so we try again.
+      try {
+        System.loadLibrary("libz3");
+        System.loadLibrary("libz3java");
+      } catch (UnsatisfiedLinkError e2) {
+        e1.addSuppressed(e2);
+        throw e1;
+      }
     }
-
-    System.loadLibrary("z3");
-    System.loadLibrary("z3java");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
@@ -198,7 +207,7 @@ final class Z3SolverContext extends AbstractSolverContext {
     Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
     Z3FloatingPointFormulaManager floatingPointTheory =
-        new Z3FloatingPointFormulaManager(creator, functionTheory);
+        new Z3FloatingPointFormulaManager(creator, functionTheory, pFloatingPointRoundingMode);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
 

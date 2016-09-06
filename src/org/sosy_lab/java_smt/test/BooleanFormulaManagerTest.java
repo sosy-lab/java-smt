@@ -141,4 +141,36 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
   }
+
+  @Test
+  public void simplificationTest() {
+    BooleanFormula tru = bmgr.makeBoolean(true);
+    BooleanFormula fals = bmgr.makeBoolean(false);
+    BooleanFormula x = bmgr.makeVariable("x");
+
+    // AND
+    Truth.assertThat(bmgr.and(tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(fals)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(x)).isEqualTo(x);
+    Truth.assertThat(bmgr.and()).isEqualTo(tru);
+
+    Truth.assertThat(bmgr.and(tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(tru, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.and(fals, x)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(x, x)).isEqualTo(x);
+
+    // recursive simplification needed
+    // Truth.assertThat(bmgr.and(x, x, x, y, y)).isEqualTo(bmgr.and(x, y));
+
+    // OR
+    Truth.assertThat(bmgr.or(tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(fals)).isEqualTo(fals);
+    Truth.assertThat(bmgr.or(x)).isEqualTo(x);
+    Truth.assertThat(bmgr.or()).isEqualTo(fals);
+
+    Truth.assertThat(bmgr.or(tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(tru, x)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(fals, x)).isEqualTo(x);
+    Truth.assertThat(bmgr.or(x, x)).isEqualTo(x);
+  }
 }

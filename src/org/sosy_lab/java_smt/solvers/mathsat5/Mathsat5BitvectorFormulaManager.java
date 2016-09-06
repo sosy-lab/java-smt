@@ -44,7 +44,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_xor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_zext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_true;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
@@ -181,11 +180,6 @@ class Mathsat5BitvectorFormulaManager
     } else {
       return msat_make_bv_urem(mathsatEnv, pNumber1, pNumber2);
     }
-  }
-
-  @Override
-  public Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    return msat_make_true(mathsatEnv);
   }
 
   @Override

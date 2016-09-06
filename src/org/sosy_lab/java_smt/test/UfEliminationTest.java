@@ -41,8 +41,9 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination;
-import org.sosy_lab.java_smt.basicimpl.tactics.UfElimination.Result;
+import org.sosy_lab.java_smt.utils.SolverUtils;
+import org.sosy_lab.java_smt.utils.UfElimination;
+import org.sosy_lab.java_smt.utils.UfElimination.Result;
 
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
   @Before
   public void setUp() throws Exception {
-    ackermannization = new UfElimination(mgr);
+    ackermannization = SolverUtils.ufElimination(mgr);
   }
 
   @Test
@@ -202,7 +203,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula withOutUfs1 = result1.getFormula();
     Result result2 = ackermannization.eliminateUfs(f2, result1);
     BooleanFormula withOutUfs2 = result2.getFormula();
-    BooleanFormula geConstraints = result2.geConstraints();
+    BooleanFormula geConstraints = result2.getConstraints();
     BooleanFormula withOutUfs = bmgr.and(bmgr.xor(withOutUfs1, withOutUfs2), geConstraints);
     assertThatFormula(f).isSatisfiable(); // sanity check
     assertThatFormula(withOutUfs).isSatisfiable();

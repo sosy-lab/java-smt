@@ -37,6 +37,9 @@ class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<
         IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
+  private final IBoolLit pTrue = new IBoolLit(true);
+  private final IBoolLit pFalse = new IBoolLit(false);
+
   PrincessBooleanFormulaManager(PrincessFormulaCreator creator) {
     super(creator);
   }
@@ -48,7 +51,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula makeBooleanImpl(boolean pValue) {
-    return new IBoolLit(pValue);
+    return pValue ? pTrue : pFalse;
   }
 
   @Override
@@ -86,7 +89,7 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula and(IExpression t1, IExpression t2) {
-    if (t1.equals(t2)) {
+    if (t1 == t2) {
       return (IFormula) t1;
     }
     if (isTrue(t1)) {
@@ -95,11 +98,26 @@ class PrincessBooleanFormulaManager
     if (isTrue(t2)) {
       return (IFormula) t1;
     }
+    if (isFalse(t1)) {
+      return pFalse;
+    }
+    if (isFalse(t2)) {
+      return pFalse;
+    }
     return simplify(new IBinFormula(IBinJunctor.And(), (IFormula) t1, (IFormula) t2));
   }
 
   @Override
   public IFormula or(IExpression t1, IExpression t2) {
+    if (t1 == t2) {
+      return (IFormula) t1;
+    }
+    if (isTrue(t1)) {
+      return pTrue;
+    }
+    if (isTrue(t2)) {
+      return pTrue;
+    }
     if (isFalse(t1)) {
       return (IFormula) t2;
     }
@@ -124,13 +142,14 @@ class PrincessBooleanFormulaManager
         IFormula s21 = ((IBinFormula) bin.f2()).f1();
         IFormula s22 = ((IBinFormula) bin.f2()).f2();
 
-        if (s11.equals(s21)) { // (ab)(ac) -> a(bc)
+        // only check for object equality, for performance
+        if (s11 == s21) { // (ab)(ac) -> a(bc)
           return new IBinFormula(innerOperator, s11, new IBinFormula(operator, s12, s22));
-        } else if (s11.equals(s22)) { // (ab)(ca) -> a(bc)
+        } else if (s11 == s22) { // (ab)(ca) -> a(bc)
           return new IBinFormula(innerOperator, s11, new IBinFormula(operator, s12, s21));
-        } else if (s12.equals(s21)) { // (ba)(ac) -> a(bc)
+        } else if (s12 == s21) { // (ba)(ac) -> a(bc)
           return new IBinFormula(innerOperator, s12, new IBinFormula(operator, s11, s22));
-        } else if (s12.equals(s22)) { // (ba)(ca) -> a(bc)
+        } else if (s12 == s22) { // (ba)(ca) -> a(bc)
           return new IBinFormula(innerOperator, s12, new IBinFormula(operator, s11, s21));
         }
       }

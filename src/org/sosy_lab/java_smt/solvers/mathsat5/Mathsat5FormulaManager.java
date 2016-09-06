@@ -23,6 +23,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_appl
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Longs;
+
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -30,6 +34,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -61,6 +67,10 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
     return ((Mathsat5Formula) pT).getTerm();
   }
 
+  static long[] getMsatTerm(Collection<? extends Formula> pFormulas) {
+    return Longs.toArray(Collections2.transform(pFormulas, Mathsat5FormulaManager::getMsatTerm));
+  }
+
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
     long f = msat_from_smtlib2(getEnvironment(), pS);
@@ -73,25 +83,23 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         : "Only BooleanFormulas may be dumped";
 
     // Lazy invocation of msat_to_smtlib2 wrapped in an Appender.
-    return Appenders.fromToStringMethod(
-        new Object() {
-          @Override
-          public String toString() {
-            String msatString = msat_to_smtlib2(getEnvironment(), f);
-            StringBuilder smtString = new StringBuilder();
-            boolean needsLinebreak = true;
-            for (String part : msatString.split("\n")) {
-              smtString.append(part);
-              if (part.startsWith("(assert")) {
-                needsLinebreak = false;
-              }
-              if (needsLinebreak) {
-                smtString.append('\n');
-              }
-            }
-            return smtString.toString();
+    return new Appenders.AbstractAppender() {
+      @Override
+      public void appendTo(Appendable out) throws IOException {
+        String msatString = msat_to_smtlib2(getEnvironment(), f);
+        // Adjust line breaks: assert needs to be on last line, so we remove all following breaks.
+        boolean needsLinebreak = true;
+        for (String part : Splitter.on('\n').split(msatString)) {
+          out.append(part);
+          if (needsLinebreak && part.startsWith("(assert")) {
+            needsLinebreak = false;
           }
-        });
+          if (needsLinebreak) {
+            out.append('\n');
+          }
+        }
+      }
+    };
   }
 
   @Override

@@ -103,11 +103,6 @@ abstract class Z3NumeralFormulaManager<
   }
 
   @Override
-  protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    return Native.mkTrue(z3context);
-  }
-
-  @Override
   public Long equal(Long pNumber1, Long pNumber2) {
     return Native.mkEq(z3context, pNumber1, pNumber2);
   }
