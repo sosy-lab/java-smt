@@ -147,18 +147,23 @@ be followed:
  
 ### Binaries for Native Solvers (MathSAT and Z3)
 
-Solver binaries for native solvers are downloaded automatically by Ivy.
-We supply binaries only for 64-bit linux platforms
-(tested on Ubuntu latest LTS).
-If you have this architecture,
-then (hopefully) everything should work as is after installation.
+When using Ivy for installation on a 64-bit Linux platform,
+solver binaries for native solvers are downloaded automatically.
+Everything should work as is after installation.
 
-If you require native solvers on a different platform, then you can copy the
-binaries manually to the corresponding folder
-in `lib/native` corresponding to your architecture.
+Without Ivy you need to download and install the binaries manually as described above
+under [Manual Installation](README.md#manual-installation).
+You can either copy them into the directory of the JavaSMT JAR file,
+or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
-For Z3, it is sufficient to grab the binary and the JAR file after the compilation
-(cf. [Developers Documentation](Developers.md) for compilation instructions).
+
+For systems other than 64-bit Linux (e.g., Windows, or 32-bit systems)
+we do not provide binaries so you need to compile them for yourself.
+For Z3, [download it](https://github.com/Z3Prover/z3)
+and build it with the flags `--staticlib --java --git-describe` according to its documentation.
+Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
+You might also experiment with using its [latest binary release](https://github.com/Z3Prover/z3/releases),
+though we recommend the latest git version of Z3 due to its large number of fixes and improvements.
 In order to compile MathSAT binaries,
 see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](lib/native/source/libmathsat5j/compile.sh)
 script.
