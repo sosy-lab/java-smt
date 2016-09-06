@@ -152,7 +152,7 @@ public class SolverContextFactory {
         // Z3 requires its own custom class loader to perform trickery with the
         // java.library.path without affecting the main class loader.
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
-            .create(
+            .generateSolverContext(
                 config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case PRINCESS:
@@ -215,30 +215,6 @@ public class SolverContextFactory {
    * and used by this class, not by other classes.
    */
   public abstract static class InnerUtilFactory {
-
-    public SolverContext create(
-        Configuration config,
-        LogManager logger,
-        ShutdownNotifier pShutdownNotifier,
-        @Nullable PathCounterTemplate solverLogfile,
-        long randomSeed,
-        FloatingPointRoundingMode pFloatingPointRoundingMode)
-        throws InvalidConfigurationException {
-      final Thread currentThread = Thread.currentThread();
-      final ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-      try {
-        currentThread.setContextClassLoader(this.getClass().getClassLoader());
-        return generateSolverContext(
-            config,
-            logger,
-            pShutdownNotifier,
-            solverLogfile,
-            randomSeed,
-            pFloatingPointRoundingMode);
-      } finally {
-        currentThread.setContextClassLoader(contextClassLoader);
-      }
-    }
 
     protected abstract SolverContext generateSolverContext(
         Configuration config,
