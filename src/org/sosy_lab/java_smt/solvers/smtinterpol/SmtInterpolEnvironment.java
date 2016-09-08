@@ -129,6 +129,7 @@ class SmtInterpolEnvironment {
       script = smtInterpol;
     }
 
+    script.setOption(":global-declarations", true);
     script.setOption(":random-seed", randomSeed);
     script.setOption(":produce-interpolants", true);
     script.setOption(":produce-models", true);
@@ -183,6 +184,7 @@ class SmtInterpolEnvironment {
         PrintWriter out =
             new PrintWriter(MoreFiles.openOutputFile(logfile, Charset.defaultCharset()));
 
+        out.println("(set-option :global-declarations true)");
         out.println("(set-option :random-seed " + script.getOption(":random-seed") + ")");
         out.println("(set-option :produce-interpolants true)");
         out.println("(set-option :produce-models true)");

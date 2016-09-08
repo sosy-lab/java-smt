@@ -369,8 +369,6 @@ public class SolverStackTest extends SolverBasedTest0 {
    */
   @Test
   public void dualStackGlobalDeclarations() throws Exception {
-    requireMultipleStackSupport();
-
     // Create non-empty stack
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeVariable("bool_a"));
