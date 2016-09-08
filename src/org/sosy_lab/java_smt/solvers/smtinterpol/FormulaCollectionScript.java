@@ -331,6 +331,21 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
+  public LBool checkSatAssuming(Term... pAssumptions) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Term[] getUnsatAssumptions() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void resetAssertions() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public Term[] findImpliedEquality(Term[] pX, Term[] pY) {
     throw new UnsupportedOperationException();
   }
