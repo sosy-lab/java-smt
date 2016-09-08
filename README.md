@@ -102,7 +102,7 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>0.60</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 
@@ -133,15 +133,15 @@ be followed:
 
  - The desired version has to be chosen.
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/).
- - Suppose the version `0.60` was chosen.
-   Ivy description file [`ivy-0.60.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/ivy-0.60.xml) can
+ - Suppose the version `1.0.1` was chosen.
+   Ivy description file [`ivy-1.0.1.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/ivy-1.0.1.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `javasmt-0.60.jar` and (optionally)
-   `javasmt-0.60-sources.jar`, located in the same directory.
+   In the example case, those are `javasmt-1.0.1.jar` and (optionally)
+   `javasmt-1.0.1-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
    E.g. in the example, Z3 version `z3-4.4.1-1394-gd12efb6` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1394-gd12efb6.xml)
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1558-gf96cfea.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
  
