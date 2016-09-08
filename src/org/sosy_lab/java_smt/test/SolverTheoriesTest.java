@@ -20,10 +20,10 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,12 +117,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivModLinear() throws Exception {
-    assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support the operations MOD and DIV")
-        .that(solver == Solvers.MATHSAT5)
-        .isFalse();
-
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -135,7 +129,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BooleanFormula fa = imgr.equal(a, num10);
     BooleanFormula fb = imgr.equal(b, num2);
-    BooleanFormula fADiv5 = imgr.equal(imgr.divide(a, num5), b);
+    BooleanFormula fADiv5;
+    try {
+      fADiv5 = imgr.equal(imgr.divide(a, num5), b);
+    } catch (UnsupportedOperationException e) {
+      throw new AssumptionViolatedException("Support for operation DIV is optional", e);
+    }
     BooleanFormula fADiv3 = imgr.equal(imgr.divide(a, num3), num3);
     BooleanFormula fAMod5 = imgr.equal(imgr.modulo(a, num5), num0);
     BooleanFormula fAMod3 = imgr.equal(imgr.modulo(a, num3), num1);
@@ -161,11 +160,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void intTest3_DivModNonLinear() throws Exception {
     // not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
-    assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support the operations MOD and DIV")
-        .that(solver != Solvers.MATHSAT5 && solver != Solvers.SMTINTERPOL)
-        .isTrue();
 
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -176,7 +170,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BooleanFormula fa = imgr.equal(a, num10);
     BooleanFormula fb = imgr.equal(b, num2);
-    BooleanFormula fADivB = imgr.equal(imgr.divide(a, b), num5);
+    BooleanFormula fADivB;
+    try {
+      fADivB = imgr.equal(imgr.divide(a, b), num5);
+    } catch (UnsupportedOperationException e) {
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    }
 
     // check division-by-variable, a=10 && b=2 && a/b=5
     assertThatFormula(bmgr.and(fa, fb, fADivB)).isSatisfiable();
@@ -188,12 +187,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivMod_NegativeNumbersLinear() throws Exception {
-    assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support the operations MOD and DIV")
-        .that(solver == Solvers.MATHSAT5)
-        .isFalse();
-
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -209,7 +202,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BooleanFormula fa = imgr.equal(a, numNeg10);
     BooleanFormula fb = imgr.equal(b, numNeg2);
-    BooleanFormula fADiv5 = imgr.equal(imgr.divide(a, num5), b);
+    BooleanFormula fADiv5;
+    try {
+      fADiv5 = imgr.equal(imgr.divide(a, num5), b);
+    } catch (UnsupportedOperationException e) {
+      throw new AssumptionViolatedException("Support for operation DIV is optional", e);
+    }
     BooleanFormula fADiv3 = imgr.equal(imgr.divide(a, num3), numNeg4);
     BooleanFormula fADivNeg3 = imgr.equal(imgr.divide(a, numNeg3), num4);
     BooleanFormula fAMod5 = imgr.equal(imgr.modulo(a, num5), num0);
@@ -248,11 +246,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void intTest3_DivMod_NegativeNumbersNonLinear() throws Exception {
     // TODO not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
-    assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support the operations MOD and DIV")
-        .that(solver != Solvers.MATHSAT5 && solver != Solvers.SMTINTERPOL)
-        .isTrue();
 
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -263,7 +256,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BooleanFormula fa = imgr.equal(a, numNeg10);
     BooleanFormula fb = imgr.equal(b, numNeg2);
-    BooleanFormula fADivB = imgr.equal(imgr.divide(a, b), num5);
+    BooleanFormula fADivB;
+    try {
+      fADivB = imgr.equal(imgr.divide(a, b), num5);
+    } catch (UnsupportedOperationException e) {
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    }
 
     // integer-division for negative numbers is __not__ C99-conform!
     // SMTlib always rounds against +/- infinity.
@@ -746,8 +744,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      requireFalse("Support for non-linear arithmetic is optional");
-      return;
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
     }
 
     BooleanFormula x_equal_2 = imgr.equal(i2, x);
@@ -779,8 +776,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      requireFalse("Support for non-linear arithmetic is optional");
-      return;
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
     }
 
     BooleanFormula x_equal_4 = imgr.equal(i4, x);

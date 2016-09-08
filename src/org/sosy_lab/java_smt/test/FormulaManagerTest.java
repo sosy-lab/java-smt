@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -62,9 +63,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
-    if (solverToUse().equals(Solvers.PRINCESS)) {
-      requireFalse(Solvers.PRINCESS + " fails.");
-    }
+    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -82,9 +82,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
-    if (solverToUse().equals(Solvers.PRINCESS)) {
-      requireFalse(Solvers.PRINCESS + " fails.");
-    }
+    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");

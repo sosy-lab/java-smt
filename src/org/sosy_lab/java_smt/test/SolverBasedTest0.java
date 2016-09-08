@@ -239,6 +239,7 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  @Deprecated
   protected final void requireFalse(String failureMessage) {
     assume().withFailureMessage(failureMessage).fail();
   }

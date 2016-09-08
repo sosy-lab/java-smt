@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -180,9 +181,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void twoFormulasTest() throws SolverException, InterruptedException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
-    if (solverToUse().equals(Solvers.PRINCESS)) {
-      requireFalse(Solvers.PRINCESS + " fails.");
-    }
+    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
