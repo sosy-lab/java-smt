@@ -30,6 +30,7 @@ import java.util.logging.Level;
 /**
  * Implementation of {@link LogProxy} that forwards to {@link LogManager}.
  */
+@SuppressWarnings("FormatStringAnnotation")
 final class LogProxyForwarder implements LogProxy {
 
   private static final Level LEVEL_FATAL = Level.SEVERE;

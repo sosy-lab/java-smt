@@ -93,11 +93,11 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * Will show a model (satisfying assignment) on failure.
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
-    if (context.getFormulaManager().getBooleanFormulaManager().isTrue(getSubject())) {
+    if (context.getFormulaManager().getBooleanFormulaManager().isTrue(actual())) {
       failWithBadResults("is", "unsatisfiable", "is", "trivially satisfiable");
     }
 
-    checkIsUnsat(getSubject(), "is", "unsatisfiable");
+    checkIsUnsat(actual(), "is", "unsatisfiable");
   }
 
   /**
@@ -105,12 +105,12 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * Will show an unsat core on failure.
    */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    if (context.getFormulaManager().getBooleanFormulaManager().isFalse(getSubject())) {
+    if (context.getFormulaManager().getBooleanFormulaManager().isFalse(actual())) {
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
     try (ProverEnvironment prover = context.newProverEnvironment()) {
-      prover.push(getSubject());
+      prover.push(actual());
       if (!prover.isUnsat()) {
         return; // success
       }
@@ -120,7 +120,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       // Try to report unsat core for failure message if the solver supports it.
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
-      if (unsatCore.isEmpty() || (unsatCore.size() == 1 && getSubject().equals(unsatCore.get(0)))) {
+      if (unsatCore.isEmpty() || (unsatCore.size() == 1 && actual().equals(unsatCore.get(0)))) {
         // empty or trivial unsat core
         fail("is", "satisfiable");
       } else {
@@ -142,9 +142,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   public void isTautological() throws SolverException, InterruptedException {
     isSatisfiable();
     checkIsUnsat(
-        context.getFormulaManager().getBooleanFormulaManager().not(getSubject()),
-        "is",
-        "tautological");
+        context.getFormulaManager().getBooleanFormulaManager().not(actual()), "is", "tautological");
   }
 
   /**
@@ -154,12 +152,12 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    */
   public void isEquivalentTo(final BooleanFormula expected)
       throws SolverException, InterruptedException {
-    if (getSubject().equals(expected)) {
+    if (actual().equals(expected)) {
       return;
     }
 
     final BooleanFormula f =
-        context.getFormulaManager().getBooleanFormulaManager().xor(getSubject(), expected);
+        context.getFormulaManager().getBooleanFormulaManager().xor(actual(), expected);
 
     checkIsUnsat(f, "is equivalent to", expected);
   }
@@ -167,7 +165,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   public void isEquisatisfiableTo(BooleanFormula other)
       throws SolverException, InterruptedException {
     BooleanFormulaManager bfmgr = context.getFormulaManager().getBooleanFormulaManager();
-    checkIsUnsat(bfmgr.and(getSubject(), bfmgr.not(other)), " is not equisatisfiable with ", other);
+    checkIsUnsat(bfmgr.and(actual(), bfmgr.not(other)), " is not equisatisfiable with ", other);
   }
 
   /**
@@ -176,12 +174,12 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    * Will show a counterexample on failure.
    */
   public void implies(final BooleanFormula expected) throws SolverException, InterruptedException {
-    if (getSubject().equals(expected)) {
+    if (actual().equals(expected)) {
       return;
     }
 
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
-    final BooleanFormula implication = bmgr.or(bmgr.not(getSubject()), expected);
+    final BooleanFormula implication = bmgr.or(bmgr.not(actual()), expected);
 
     checkIsUnsat(bmgr.not(implication), "implies", expected);
   }

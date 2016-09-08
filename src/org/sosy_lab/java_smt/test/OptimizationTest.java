@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 
 import com.google.common.collect.ImmutableList;
 
@@ -82,7 +83,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(obj);
       OptStatus response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThatOptional(prover.upper(handle, Rational.ZERO)).isAbsent();
+      assertThat(prover.upper(handle, Rational.ZERO)).isEmpty();
     }
   }
 
@@ -132,7 +133,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       assertThat(response).isEqualTo(OptStatus.OPT);
 
       // Check the value.
-      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
+      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
       try (Model model = prover.getModel()) {
         BigInteger xValue = model.evaluate(x);
@@ -178,7 +179,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(obj);
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
+      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("19"));
 
       prover.pop();
       prover.push();
@@ -186,7 +187,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       handle = prover.maximize(x);
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
+      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("10"));
 
       prover.pop();
       prover.push();
@@ -194,7 +195,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       handle = prover.maximize(rmgr.makeVariable("y"));
       response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
-      assertThatOptional(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("9"));
+      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.ofString("9"));
 
       prover.pop();
     }

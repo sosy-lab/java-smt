@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
@@ -128,7 +129,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
       pe.addConstraint(bmgr.or(selector, imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1))));
       Optional<List<BooleanFormula>> res =
           pe.unsatCoreOverAssumptions(ImmutableList.of(bmgr.not(selector)));
-      assertThatOptional(res).isPresent();
+      assertThat(res).isPresent();
       List<BooleanFormula> unsatCore = res.get();
       assertThat(unsatCore).containsExactly(bmgr.not(selector));
     }

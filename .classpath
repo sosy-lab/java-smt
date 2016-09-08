@@ -17,6 +17,7 @@
 	<classpathentry kind="lib" path="lib/java/runtime/smt-parser.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/java-cup-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path=".apt-generated">
 		<attributes>

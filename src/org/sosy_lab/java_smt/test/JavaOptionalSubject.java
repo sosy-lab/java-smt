@@ -32,19 +32,20 @@ import javax.annotation.Nullable;
  * Mirrors {@link com.google.common.truth.GuavaOptionalSubject},
  * yet works for another kind of optional.
  */
+@Deprecated // Uses Truth8's OptionalSubject instead
 public class JavaOptionalSubject extends Subject<JavaOptionalSubject, Optional<?>> {
   JavaOptionalSubject(FailureStrategy failureStrategy, @Nullable Optional<?> subject) {
     super(failureStrategy, subject);
   }
 
   public void isPresent() {
-    if (this.getSubject() == null || !this.getSubject().isPresent()) {
-      this.failWithoutSubject("is present");
+    if (this.actual() == null || !this.actual().isPresent()) {
+      this.failWithoutActual("is present");
     }
   }
 
   public void isAbsent() {
-    if (this.getSubject() == null || this.getSubject().isPresent()) {
+    if (this.actual() == null || this.actual().isPresent()) {
       this.fail("is absent");
     }
   }
@@ -53,8 +54,8 @@ public class JavaOptionalSubject extends Subject<JavaOptionalSubject, Optional<?
     if (expected == null) {
       throw new NullPointerException("Optional cannot have a null value.");
     } else {
-      if (this.getSubject() != null && (this.getSubject()).isPresent()) {
-        Object actual = this.getSubject().get();
+      if (this.actual() != null && (this.actual()).isPresent()) {
+        Object actual = this.actual().get();
         if (!actual.equals(expected)) {
           this.fail("has value", expected);
         }

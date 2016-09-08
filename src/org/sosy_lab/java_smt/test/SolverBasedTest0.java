@@ -260,6 +260,7 @@ public abstract class SolverBasedTest0 {
     return assert_().about(proverEnvironment()).that(prover);
   }
 
+  @Deprecated
   protected final JavaOptionalSubject assertThatOptional(Optional<?> pOptional) {
     return assert_()
         .about(

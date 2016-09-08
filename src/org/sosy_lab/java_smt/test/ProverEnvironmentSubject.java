@@ -71,12 +71,12 @@ public class ProverEnvironmentSubject
    * Will show a model (satisfying assignment) on failure.
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
-    if (getSubject().isUnsat()) {
+    if (actual().isUnsat()) {
       return; // success
     }
 
     // get model for failure message
-    try (final Model model = getSubject().getModel()) {
+    try (final Model model = actual().getModel()) {
       failWithBadResults("is", "unsatisfiable", "has counterexample", model);
     }
   }
@@ -86,14 +86,14 @@ public class ProverEnvironmentSubject
    * Will show an unsat core on failure.
    */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    if (!getSubject().isUnsat()) {
+    if (!actual().isUnsat()) {
       return; // success
     }
 
     // get unsat core for failure message if possible
-    if (getSubject() instanceof ProverEnvironment) {
+    if (actual() instanceof ProverEnvironment) {
       try {
-        final List<BooleanFormula> unsatCore = ((ProverEnvironment) getSubject()).getUnsatCore();
+        final List<BooleanFormula> unsatCore = ((ProverEnvironment) actual()).getUnsatCore();
         if (!unsatCore.isEmpty()) {
           failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
           return;
