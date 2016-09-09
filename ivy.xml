@@ -45,7 +45,9 @@
         <conf name="contrib" />
 
         <!-- Configuration for publishing sources -->
-        <conf name="sources" />
+        <conf name="sources" description="sources of JavaSMT" />
+
+        <conf name="sources-all" extends="sources,contrib" description="sources of JavaSMT and its dependencies" />
     </configurations>
 
     <publications defaultconf="core">
