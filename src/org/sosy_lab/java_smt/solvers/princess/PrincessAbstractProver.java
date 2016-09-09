@@ -92,9 +92,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   protected void addConstraint0(IFormula t) {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    api.addAssertion(
-        api.abbrevSharedExpressions(
-            t, creator.getEnv().princessOptions.getMinAtomsForAbbreviation()));
+    api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
   }
 
   @Override

@@ -47,8 +47,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext.PrincessOptions;
 
 import scala.Tuple2;
 import scala.Tuple3;
@@ -76,7 +79,25 @@ import javax.annotation.Nullable;
  * This Wrapper allows to set a logfile for all Smt-Queries (default "princess.###.smt2").
  * It also manages the "shared variables": each variable is declared for all stacks.
  */
+@Options(prefix = "solver.princess")
 class PrincessEnvironment {
+
+  @Option(
+    secure = true,
+    description =
+        "The number of atoms a term has to have before"
+            + " it gets abbreviated if there are more identical terms."
+  )
+  private int minAtomsForAbbreviation = 100;
+
+  @Option(
+    secure = true,
+    description =
+        "Princess needs to copy all symbols for each new prover. "
+            + "This flag allows to reuse old unused provers and avoid the overhead."
+  )
+  // TODO someone should measure the overhead, perhaps it is negligible.
+  private boolean reuseProvers = true;
 
   /** cache for variables, because they do not implement equals() and hashCode(),
    * so we need to have the same objects. */
@@ -100,18 +121,17 @@ class PrincessEnvironment {
   private final List<SimpleAPI> reusableAPIs = new ArrayList<>();
   private final Map<SimpleAPI, Boolean> allAPIs = new LinkedHashMap<>();
 
-  final PrincessOptions princessOptions;
-
   PrincessEnvironment(
+      Configuration config,
       @Nullable final PathCounterTemplate pBasicLogfile,
-      ShutdownNotifier pShutdownNotifier,
-      PrincessOptions pOptions) {
+      ShutdownNotifier pShutdownNotifier)
+      throws InvalidConfigurationException {
+    config.inject(this);
 
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
     // this api is only used local in this environment, no need for interpolation
     api = getNewApi(false);
-    princessOptions = pOptions;
   }
 
   /** This method returns a new prover, that is registered in this environment.
@@ -121,7 +141,7 @@ class PrincessEnvironment {
 
     SimpleAPI newApi = null;
 
-    if (princessOptions.reuseProvers()) {
+    if (reuseProvers) {
       // shortcut if we have a reusable stack
       for (Iterator<SimpleAPI> it = reusableAPIs.iterator(); it.hasNext(); ) {
         newApi = it.next();
@@ -174,10 +194,14 @@ class PrincessEnvironment {
     return newApi;
   }
 
+  int getMinAtomsForAbbreviation() {
+    return minAtomsForAbbreviation;
+  }
+
   void unregisterStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {
     assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
     registeredProvers.remove(stack);
-    if (princessOptions.reuseProvers()) {
+    if (reuseProvers) {
       reusableAPIs.add(usedAPI);
     } else {
       allAPIs.remove(usedAPI);

@@ -23,8 +23,6 @@ package org.sosy_lab.java_smt.solvers.princess;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
-import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -41,38 +39,6 @@ import javax.annotation.Nullable;
 
 public final class PrincessSolverContext extends AbstractSolverContext {
 
-  @Options(prefix = "solver.princess")
-  static class PrincessOptions {
-    @Option(
-      secure = true,
-      description =
-          "The number of atoms a term has to have before"
-              + " it gets abbreviated if there are more identical terms."
-    )
-    private int minAtomsForAbbreviation = 100;
-
-    @Option(
-      secure = true,
-      description =
-          "Princess needs to copy all symbols for each new prover. "
-              + "This flag allows to reuse old unused provers and avoid the overhead."
-    )
-    // TODO someone should measure the overhead, perhaps it is negligible.
-    private boolean reuseProvers = true;
-
-    PrincessOptions(Configuration config) throws InvalidConfigurationException {
-      config.inject(this);
-    }
-
-    public int getMinAtomsForAbbreviation() {
-      return minAtomsForAbbreviation;
-    }
-
-    boolean reuseProvers() {
-      return reuseProvers;
-    }
-  }
-
   private final PrincessFormulaManager manager;
   private final PrincessFormulaCreator creator;
 
@@ -87,8 +53,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate)
       throws InvalidConfigurationException {
-    PrincessOptions options = new PrincessOptions(config);
-    PrincessEnvironment env = new PrincessEnvironment(pLogfileTemplate, pShutdownNotifier, options);
+    PrincessEnvironment env = new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier);
     PrincessFormulaCreator creator =
         new PrincessFormulaCreator(env, PrincessTermType.Boolean, PrincessTermType.Integer);
 
