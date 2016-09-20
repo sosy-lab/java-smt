@@ -112,13 +112,13 @@
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-327-g92cafef" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
-        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-06-27-r2652" conf="runtime-princess->runtime; contrib->sources">
+        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-09-20-r2686" conf="runtime-princess->runtime; contrib->sources">
           <artifact name="princess" e:classifier="assertionless" conf="runtime-princess"/>
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-1658-gc746d46" conf="runtime-z3->solver-z3" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-1698-ge8f4dd7" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.13" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
 
