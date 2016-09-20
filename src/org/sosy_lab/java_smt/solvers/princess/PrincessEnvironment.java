@@ -38,9 +38,11 @@ import ap.parser.SMTParser2InputAbsy;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
+import ap.util.Debug;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -48,6 +50,8 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.FileOption;
+import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -61,6 +65,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -71,6 +76,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -97,7 +103,15 @@ class PrincessEnvironment {
             + "This flag allows to reuse old unused provers and avoid the overhead."
   )
   // TODO someone should measure the overhead, perhaps it is negligible.
+
   private boolean reuseProvers = true;
+  @Option(secure = true, description = "log all queries as Princess-specific Scala code")
+  private boolean logAllQueriesAsScala = false;
+
+  @Option(secure = true, description = "file for Princess-specific dump of queries as Scala code")
+  @FileOption(Type.OUTPUT_FILE)
+  private PathCounterTemplate logAllQueriesAsScalaFile =
+      PathCounterTemplate.ofFormatString("princess-query-%03d-");
 
   /** cache for variables, because they do not implement equals() and hashCode(),
    * so we need to have the same objects. */
@@ -175,23 +189,56 @@ class PrincessEnvironment {
 
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   private SimpleAPI getNewApi(boolean useForInterpolation) {
-    final SimpleAPI newApi;
+    File directory = null;
+    String smtDumpBasename = null;
+    String scalaDumpBasename = null;
+
     if (basicLogfile != null) {
       Path logPath = basicLogfile.getFreshPath();
-      String fileName = logPath.getFileName().toString();
-      String absPath = logPath.toAbsolutePath().toString();
-      File directory = new File(absPath.substring(0, absPath.length() - fileName.length()));
-      newApi = SimpleAPI.spawnWithLogNoSanitise(fileName, directory);
-    } else {
-      newApi = SimpleAPI.spawnNoSanitise();
+      directory = getAbsoluteParent(logPath);
+      smtDumpBasename = logPath.getFileName().toString();
+      if (Files.getFileExtension(smtDumpBasename).equals("smt2")) {
+        // Princess adds .smt2 anyway
+        smtDumpBasename = Files.getNameWithoutExtension(smtDumpBasename);
+      }
+      smtDumpBasename += "-";
     }
-    // we do not use 'sanitise', because variable-names contain special chars like "@" and ":"
+
+    if (logAllQueriesAsScala && logAllQueriesAsScalaFile != null) {
+      Path logPath = logAllQueriesAsScalaFile.getFreshPath();
+      if (directory == null) {
+        directory = getAbsoluteParent(logPath);
+      }
+      scalaDumpBasename = logPath.getFileName().toString();
+    }
+
+    // We enable assertions because typically we use the "assertionless" JAR where they have no
+    // effect anyway, but if we use the JAR with assertions we want them to be enabled.
+    // The constructor parameter to SimpleAPI affects only part of the assertions.
+    Debug.enableAllAssertions(true);
+
+    final SimpleAPI newApi =
+        SimpleAPI.apply(
+            true, // enableAssert, see above
+            false, // no sanitiseNames, because variable names may contain chars like "@" and ":".
+            smtDumpBasename != null, // dumpSMT
+            smtDumpBasename, // smtDumpBasename
+            scalaDumpBasename != null, // dumpScala
+            scalaDumpBasename, // scalaDumpBasename
+            directory, // dumpDirectory
+            SimpleAPI.apply$default$8(), // tightFunctionScopes
+            SimpleAPI.apply$default$9() // genTotalityAxioms
+            );
 
     if (useForInterpolation) {
       newApi.setConstructProofs(true); // needed for interpolation
     }
 
     return newApi;
+  }
+
+  private File getAbsoluteParent(Path path) {
+    return Optional.ofNullable(path.getParent()).orElse(Paths.get(".")).toAbsolutePath().toFile();
   }
 
   int getMinAtomsForAbbreviation() {
