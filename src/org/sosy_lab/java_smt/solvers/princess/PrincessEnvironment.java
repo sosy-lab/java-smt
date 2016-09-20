@@ -105,6 +105,7 @@ class PrincessEnvironment {
   // TODO someone should measure the overhead, perhaps it is negligible.
 
   private boolean reuseProvers = true;
+
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
 
