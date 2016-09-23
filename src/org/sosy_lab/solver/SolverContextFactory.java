@@ -65,8 +65,8 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
-    PRINCESS
-    //    CVC4
+    PRINCESS,
+    CVC4
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
