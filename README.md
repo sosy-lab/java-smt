@@ -192,7 +192,7 @@ import org.sosy_lab.solver.api.SolverContext;
 public class TestApp {
   public static void main(String[] args) throws InvalidConfigurationException {
     Configuration config = Configuration.fromCmdLineArguments(args);
-    LogManager logger = new BasicLogManager(config);
+    LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
 
     // SolverContext is a class wrapping a solver context.
