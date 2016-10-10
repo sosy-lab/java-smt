@@ -117,8 +117,7 @@ public class SolverContextFactory {
               "The SMT solver %s is not available on this machine because of missing libraries "
                   + "(%s). "
                   + "You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
-              solverToCreate,
-              e.getMessage()),
+              solverToCreate, e.getMessage()),
           e);
     }
 

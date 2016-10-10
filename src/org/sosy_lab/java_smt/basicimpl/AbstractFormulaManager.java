@@ -84,12 +84,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       @Nullable IntegerFormulaManager pIntegerManager,
       @Nullable RationalFormulaManager pRationalManager,
       @Nullable
-      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bitvectorManager,
+          AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bitvectorManager,
       @Nullable
-      AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-          floatingPointManager,
+          AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+              floatingPointManager,
       @Nullable
-      AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> quantifiedManager,
+          AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> quantifiedManager,
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager) {
 
     this.arrayManager = arrayManager;

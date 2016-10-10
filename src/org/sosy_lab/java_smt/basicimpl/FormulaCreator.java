@@ -144,9 +144,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     assert pType.equals(getFormulaType(pTerm))
         : String.format(
             "Trying to encapsulate formula %s of type %s as %s",
-            pTerm,
-            getFormulaType(pTerm),
-            pType);
+            pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BooleanFormulaImpl<>(pTerm);
     } else if (pType.isIntegerType()) {

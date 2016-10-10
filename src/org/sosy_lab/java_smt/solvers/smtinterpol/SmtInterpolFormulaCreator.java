@@ -193,8 +193,7 @@ class SmtInterpolFormulaCreator
       throw new UnsupportedOperationException(
           String.format(
               "Unexpected SMTInterpol formula of type %s: %s",
-              input.getClass().getSimpleName(),
-              input));
+              input.getClass().getSimpleName(), input));
     }
   }
 

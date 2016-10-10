@@ -63,7 +63,7 @@ abstract class Mathsat5NumeralFormulaManager<
     return msat_make_number(mathsatEnv, pI);
   }
 
-  abstract protected long getNumeralType();
+  protected abstract long getNumeralType();
 
   @Override
   public Long makeVariableImpl(String var) {
