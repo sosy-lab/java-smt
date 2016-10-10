@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 /**
  * Type of a formula.
+ *
  * @param <T> Formula class corresponding to the given formula type.
  */
 @SuppressWarnings("checkstyle:constantname")
@@ -298,9 +299,9 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   /**
-   * Parse a string and return the corresponding type.
-   * This method is the counterpart of {@link #toString()}.
-   * */
+   * Parse a string and return the corresponding type. This method is the counterpart of {@link
+   * #toString()}.
+   */
   public static FormulaType<?> fromString(String t) {
     if (BooleanType.toString().equals(t)) {
       return BooleanType;

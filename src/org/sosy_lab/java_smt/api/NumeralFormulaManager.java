@@ -38,16 +38,14 @@ public interface NumeralFormulaManager<
   ResultFormulaType makeNumber(BigInteger number);
 
   /**
-   * Create a numeric literal with a given value.
-   * Note: if the theory represented by this instance cannot handle rational numbers,
-   * the value may get rounded or otherwise represented imprecisely.
+   * Create a numeric literal with a given value. Note: if the theory represented by this instance
+   * cannot handle rational numbers, the value may get rounded or otherwise represented imprecisely.
    */
   ResultFormulaType makeNumber(double number);
 
   /**
-   * Create a numeric literal with a given value.
-   * Note: if the theory represented by this instance cannot handle rational numbers,
-   * the value may get rounded or otherwise represented imprecisely.
+   * Create a numeric literal with a given value. Note: if the theory represented by this instance
+   * cannot handle rational numbers, the value may get rounded or otherwise represented imprecisely.
    */
   ResultFormulaType makeNumber(BigDecimal number);
 

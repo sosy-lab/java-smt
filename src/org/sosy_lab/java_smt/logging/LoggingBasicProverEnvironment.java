@@ -30,9 +30,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * Wraps a basic prover environment with a logging object.
- */
+/** Wraps a basic prover environment with a logging object. */
 class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   private final BasicProverEnvironment<T> wrapped;

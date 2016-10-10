@@ -75,9 +75,10 @@ import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.Seq;
 
-/** This is a Wrapper around Princess.
- * This Wrapper allows to set a logfile for all Smt-Queries (default "princess.###.smt2").
- * It also manages the "shared variables": each variable is declared for all stacks.
+/**
+ * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
+ * (default "princess.###.smt2"). It also manages the "shared variables": each variable is declared
+ * for all stacks.
  */
 @Options(prefix = "solver.princess")
 class PrincessEnvironment {
@@ -108,9 +109,12 @@ class PrincessEnvironment {
   private PathCounterTemplate logAllQueriesAsScalaFile =
       PathCounterTemplate.ofFormatString("princess-query-%03d-");
 
-  /** cache for variables, because they do not implement equals() and hashCode(),
-   * so we need to have the same objects. */
+  /**
+   * cache for variables, because they do not implement equals() and hashCode(), so we need to have
+   * the same objects.
+   */
   private final Map<String, IFormula> boolVariablesCache = new HashMap<>();
+
   private final Map<String, ITerm> intVariablesCache = new HashMap<>();
   private final Map<String, ITerm> arrayVariablesCache = new HashMap<>();
 
@@ -120,11 +124,13 @@ class PrincessEnvironment {
   private final @Nullable PathCounterTemplate basicLogfile;
   private final ShutdownNotifier shutdownNotifier;
 
-  /** The wrapped API is the first created API.
-   * It will never be used outside of this class and never be closed.
-   * If a variable is declared, it is declared in the first api,
-   * then copied into all registered APIs. Each API has its own stack for formulas. */
+  /**
+   * The wrapped API is the first created API. It will never be used outside of this class and never
+   * be closed. If a variable is declared, it is declared in the first api, then copied into all
+   * registered APIs. Each API has its own stack for formulas.
+   */
   private final SimpleAPI api;
+
   private final List<PrincessAbstractProver<?, ?>> registeredProvers =
       new ArrayList<>(); // where an API is used
   private final List<SimpleAPI> reusableAPIs = new ArrayList<>();
@@ -143,8 +149,10 @@ class PrincessEnvironment {
     api = getNewApi(false);
   }
 
-  /** This method returns a new prover, that is registered in this environment.
-   * All variables are shared in all registered APIs. */
+  /**
+   * This method returns a new prover, that is registered in this environment. All variables are
+   * shared in all registered APIs.
+   */
   PrincessAbstractProver<?, ?> getNewProver(
       boolean useForInterpolation, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
 
@@ -466,8 +474,10 @@ class PrincessEnvironment {
     }
   }
 
-  /** This function declares a new functionSymbol, that has a given number of params.
-   * Princess has no support for typed params, only their number is important. */
+  /**
+   * This function declares a new functionSymbol, that has a given number of params. Princess has no
+   * support for typed params, only their number is important.
+   */
   public IFunction declareFun(String name, int nofArgs, PrincessTermType returnType) {
     if (functionsCache.containsKey(name)) {
       assert returnType == functionsReturnTypes.get(functionsCache.get(name));

@@ -55,12 +55,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RationalFormulaImpl;
 
 /**
- * This is a helper class with several methods that are commonly used
- * throughout the basicimpl package and may have solver-specific implementations.
- * Each solver package is expected to provide an instance of this class,
- * with the appropriate methods overwritten.
- * Depending on the solver, some or all non-final methods in this class
- * may need to be overwritten.
+ * This is a helper class with several methods that are commonly used throughout the basicimpl
+ * package and may have solver-specific implementations. Each solver package is expected to provide
+ * an instance of this class, with the appropriate methods overwritten. Depending on the solver,
+ * some or all non-final methods in this class may need to be overwritten.
+ *
  * @param <TFormulaInfo> the solver specific type for formulas.
  * @param <TType> the solver specific type for formula types.
  * @param <TEnv> the solver specific type for the environment/context.
@@ -189,9 +188,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return ((ArrayFormulaImpl<TI, TE, TFormulaInfo>) pArray).getIndexType();
   }
 
-  /**
-   * Returns the type of the given Formula.
-   */
+  /** Returns the type of the given Formula. */
   @SuppressWarnings("unchecked")
   protected <T extends Formula> FormulaType<T> getFormulaType(T formula) {
     checkNotNull(formula);
@@ -288,8 +285,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   /**
-   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean)} which unwraps
-   * both input and output.
+   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean)} which unwraps both input and
+   * output.
    */
   public Map<String, TFormulaInfo> extractVariablesAndUFs(
       final TFormulaInfo pFormula, final boolean extractUFs) {
@@ -297,9 +294,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         extractVariablesAndUFs(encapsulateWithTypeOf(pFormula), extractUFs), this::extractInfo);
   }
 
-  /**
-   * Extract all free variables from the formula, optionally including UFs.
-   */
+  /** Extract all free variables from the formula, optionally including UFs. */
   public Map<String, Formula> extractVariablesAndUFs(
       final Formula pFormula, final boolean extractUF) {
 

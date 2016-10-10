@@ -30,8 +30,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 
 /**
- * Base class for visitors for boolean formulas that recursively transform
- * boolean formulas.
+ * Base class for visitors for boolean formulas that recursively transform boolean formulas.
  *
  * @see BooleanFormulaManager#transformRecursively
  */

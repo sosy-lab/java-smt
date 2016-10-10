@@ -29,6 +29,7 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
 
   /**
    * Method for default case, is called by all methods from this class if they are not overridden.
+   *
    * @param f Formula for the currently visited node.
    * @return An arbitrary value, will be passed through to the caller.
    */

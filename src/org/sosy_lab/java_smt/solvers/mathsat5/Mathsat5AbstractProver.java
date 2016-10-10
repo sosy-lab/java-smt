@@ -36,10 +36,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * Common base class for {@link Mathsat5TheoremProver}
- * and {@link Mathsat5InterpolatingProver}.
- */
+/** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
 abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> {
 
   protected final Mathsat5SolverContext context;
@@ -85,9 +82,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
     }
   }
 
-  /**
-   * @throws SolverException if an expected MathSAT failure occurs
-   */
+  /** @throws SolverException if an expected MathSAT failure occurs */
   protected long getMsatModel() throws SolverException {
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }

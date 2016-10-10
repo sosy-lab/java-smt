@@ -25,9 +25,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 
-/**
- * Implementation of {@link LogProxy} that forwards to {@link LogManager}.
- */
+/** Implementation of {@link LogProxy} that forwards to {@link LogManager}. */
 @SuppressWarnings("FormatStringAnnotation")
 final class LogProxyForwarder implements LogProxy {
 

@@ -25,20 +25,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class provides an interface to an incremental SMT solver
- * with methods for pushing and popping formulas as well as SAT checks.
- * Furthermore, interpolants can be generated for an unsatisfiable list of formulas.
+ * This class provides an interface to an incremental SMT solver with methods for pushing and
+ * popping formulas as well as SAT checks. Furthermore, interpolants can be generated for an
+ * unsatisfiable list of formulas.
  *
- * @see ProverEnvironment The non-interpolating ProverEnvironment for general notes
- *     that also apply to this interface.
- *
+ * @see ProverEnvironment The non-interpolating ProverEnvironment for general notes that also apply
+ *     to this interface.
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */
 public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironment<T> {
 
   /**
-   * Add a formula to the environment stack, asserting it.
-   * The returned value can be used when selecting the formulas for interpolant generation.
+   * Add a formula to the environment stack, asserting it. The returned value can be used when
+   * selecting the formulas for interpolant generation.
    */
   @Override
   @CanIgnoreReturnValue
@@ -49,47 +48,45 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
   }
 
   /**
-   * Get an interpolant for two groups of formulas.
-   * This should be called only immediately after an {@link #isUnsat()} call
-   * that returned <code>true</code>.
+   * Get an interpolant for two groups of formulas. This should be called only immediately after an
+   * {@link #isUnsat()} call that returned <code>true</code>.
    *
-   * <p>There is no direct guarantee
-   * that the interpolants returned are part of an inductive sequence',
-   * however this seems to work for most (all?) solvers as long as the same proof is used,
-   * i.e. all interpolants are computed after the same SAT-check.
+   * <p>There is no direct guarantee that the interpolants returned are part of an inductive
+   * sequence', however this seems to work for most (all?) solvers as long as the same proof is
+   * used, i.e. all interpolants are computed after the same SAT-check.
    *
-   * @param formulasOfA A list of values returned by {@link #push(BooleanFormula)}.
-   *     All the corresponding formulas from group A, the remaining formulas form group B.
+   * @param formulasOfA A list of values returned by {@link #push(BooleanFormula)}. All the
+   *     corresponding formulas from group A, the remaining formulas form group B.
    * @return An interpolant for A and B
-   * @throws SolverException if interpolant cannot be computed,
-   *     for example because interpolation procedure is incomplete
+   * @throws SolverException if interpolant cannot be computed, for example because interpolation
+   *     procedure is incomplete
    */
   BooleanFormula getInterpolant(List<T> formulasOfA) throws SolverException, InterruptedException;
 
   /**
-   * This method returns interpolants of an 'inductive sequence'.
-   * This property must be supported by the interpolation-strategy of the underlying SMT-solver!
-   * Depending on the underlying SMT-solver this method might be faster than N direct calls
-   * to getInterpolant().
+   * This method returns interpolants of an 'inductive sequence'. This property must be supported by
+   * the interpolation-strategy of the underlying SMT-solver! Depending on the underlying SMT-solver
+   * this method might be faster than N direct calls to getInterpolant().
    *
-   * <p>The stack must contain exactly the partitioned formulas, but any order is allowed.
-   * For an input of N partitions we return N-1 interpolants.
+   * <p>The stack must contain exactly the partitioned formulas, but any order is allowed. For an
+   * input of N partitions we return N-1 interpolants.
    *
-   * @return a 'inductive sequence' of interpolants,
-   *         such that the implication {@code AND(I_i, P_i) => I_(i+1)} is satisfied for all i,
-   *         where P_i is the conjunction of all formulas in partition i.
-   * @throws SolverException if interpolant cannot be computed,
-   *     for example because interpolation procedure is incomplete
+   * @return a 'inductive sequence' of interpolants, such that the implication {@code AND(I_i, P_i)
+   *     => I_(i+1)} is satisfied for all i, where P_i is the conjunction of all formulas in
+   *     partition i.
+   * @throws SolverException if interpolant cannot be computed, for example because interpolation
+   *     procedure is incomplete
    */
   List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas)
       throws SolverException, InterruptedException;
 
   /**
-   * Compute a sequence of interpolants. The nesting array describes the
-   * start of the subtree for tree interpolants. For inductive sequences of
-   * interpolants use a nesting array completely filled with 0.
+   * Compute a sequence of interpolants. The nesting array describes the start of the subtree for
+   * tree interpolants. For inductive sequences of interpolants use a nesting array completely
+   * filled with 0.
    *
    * <p>Example:
+   *
    * <pre>
    * A  D
    * |  |
@@ -109,15 +106,15 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @param partitionedFormulas of formulas
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
-   * @throws SolverException if interpolant cannot be computed,
-   *     for example because interpolation procedure is incomplete
+   * @throws SolverException if interpolant cannot be computed, for example because interpolation
+   *     procedure is incomplete
    */
   List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException;
 
   /**
-   * Check whether the conjunction of all formulas on the stack together with the
-   * list of assumptions is satisfiable.
+   * Check whether the conjunction of all formulas on the stack together with the list of
+   * assumptions is satisfiable.
    *
    * @param assumptions A list of literals.
    */

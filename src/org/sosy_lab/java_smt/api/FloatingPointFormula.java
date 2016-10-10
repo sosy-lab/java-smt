@@ -19,7 +19,5 @@
  */
 package org.sosy_lab.java_smt.api;
 
-/**
- * Formula of the floating point sort.
- */
+/** Formula of the floating point sort. */
 public interface FloatingPointFormula extends Formula {}

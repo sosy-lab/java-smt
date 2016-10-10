@@ -35,13 +35,11 @@ import java.util.List;
 import scala.collection.mutable.ArrayBuffer;
 
 /**
- * Unlike other solvers, Princess does not have a class representing the
- * built-in functions (OR, etc...).
- * This interface wraps two cases:  IFunction declaration (represented by IFunction),
- * and declaration for a built-in function (represented by an example instantiation of the
- * built-in function).
- * The latter case does not have a valid {@code equals}, but it is not necessary,
- * as it's not used in {@link org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl}.
+ * Unlike other solvers, Princess does not have a class representing the built-in functions (OR,
+ * etc...). This interface wraps two cases: IFunction declaration (represented by IFunction), and
+ * declaration for a built-in function (represented by an example instantiation of the built-in
+ * function). The latter case does not have a valid {@code equals}, but it is not necessary, as it's
+ * not used in {@link org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl}.
  */
 abstract class PrincessFunctionDeclaration {
   private PrincessFunctionDeclaration() {}

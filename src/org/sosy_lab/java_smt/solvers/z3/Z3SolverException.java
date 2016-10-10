@@ -21,10 +21,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * This exception is thrown by native Z3 code, through our customized JNI
- * bindings.
- */
+/** This exception is thrown by native Z3 code, through our customized JNI bindings. */
 class Z3SolverException extends SolverException {
 
   private static final long serialVersionUID = 9047786707330265032L;

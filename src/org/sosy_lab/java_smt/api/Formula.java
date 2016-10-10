@@ -19,7 +19,5 @@
  */
 package org.sosy_lab.java_smt.api;
 
-/**
- * An arbitrary SMT formula.
- */
+/** An arbitrary SMT formula. */
 public interface Formula {}

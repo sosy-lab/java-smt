@@ -26,9 +26,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 
-/**
- * Boolean fuzzer, useful for testing.
- */
+/** Boolean fuzzer, useful for testing. */
 class Fuzzer {
   private final BooleanFormulaManager bfmgr;
 

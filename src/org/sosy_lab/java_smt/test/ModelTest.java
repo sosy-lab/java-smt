@@ -49,9 +49,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * Test that values from models are appropriately parsed.
- */
+/** Test that values from models are appropriately parsed. */
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
 

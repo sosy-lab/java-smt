@@ -20,9 +20,7 @@
 
 package org.sosy_lab.java_smt.api;
 
-/**
- * Possible floating point rounding modes.
- */
+/** Possible floating point rounding modes. */
 public enum FloatingPointRoundingMode {
   NEAREST_TIES_TO_EVEN,
   NEAREST_TIES_AWAY,

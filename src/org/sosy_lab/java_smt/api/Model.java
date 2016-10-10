@@ -32,67 +32,51 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
-/**
- * A model returned from the satisfiable solver environment.
- */
+/** A model returned from the satisfiable solver environment. */
 public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   /**
-   * Evaluate a given formula substituting the values from the model.
-   * Can be absent if the value is not relevant to the satisfiability
-   * result.
+   * Evaluate a given formula substituting the values from the model. Can be absent if the value is
+   * not relevant to the satisfiability result.
    *
    * @param f Input formula
-   * @return Either of:
-   *    - Number (Rational/Double/BigInteger/Long/Integer)
-   *    - Boolean
+   * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
    * @throws IllegalArgumentException if a formula has unexpected type, e.g Array.
    */
   @Nullable
   Object evaluate(Formula f);
 
-  /**
-   * Type-safe evaluation for integer formulas.
-   */
+  /** Type-safe evaluation for integer formulas. */
   @Nullable
   BigInteger evaluate(IntegerFormula f);
 
-  /**
-   * Type-safe evaluation for rational formulas.
-   */
+  /** Type-safe evaluation for rational formulas. */
   @Nullable
   Rational evaluate(RationalFormula f);
 
-  /**
-   * Type-safe evaluation for boolean formulas.
-   */
+  /** Type-safe evaluation for boolean formulas. */
   @Nullable
   Boolean evaluate(BooleanFormula f);
 
-  /**
-   * Type-safe evaluation for bitvector formulas.
-   */
+  /** Type-safe evaluation for bitvector formulas. */
   @Nullable
   BigInteger evaluate(BitvectorFormula f);
 
   /**
-   * Iterate over all values present in the model.
-   * Note that iterating multiple times may be inefficient for some solvers, it is recommended
-   * to use {@link BasicProverEnvironment#getModelAssignments()} instead in this case.
+   * Iterate over all values present in the model. Note that iterating multiple times may be
+   * inefficient for some solvers, it is recommended to use {@link
+   * BasicProverEnvironment#getModelAssignments()} instead in this case.
    */
   @Override
   Iterator<ValueAssignment> iterator();
 
-  /**
-   * Pretty-printing of the model values.
-   */
+  /** Pretty-printing of the model values. */
   @Override
   String toString();
 
   /**
-   * Free resources associated with this model
-   * (existing {@link ValueAssignment} instances stay valid,
-   * but {@link #evaluate(Formula)} etc. and {@link #iterator()} must not be called again).
+   * Free resources associated with this model (existing {@link ValueAssignment} instances stay
+   * valid, but {@link #evaluate(Formula)} etc. and {@link #iterator()} must not be called again).
    */
   @Override
   void close();
@@ -105,8 +89,10 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /** the key should be boolean or numeral (Rational/Double/BigInteger/Long/Integer). */
     private final Object value;
 
-    /** arguments can have any type.
-     * We would prefer numerals (like value), but we also allow Formulas. */
+    /**
+     * arguments can have any type. We would prefer numerals (like value), but we also allow
+     * Formulas.
+     */
     private final ImmutableList<Object> argumentsInterpretation;
 
     /** The name should be a 'useful' identifier for the current assignment, without parameters. */
@@ -121,32 +107,22 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
       this.argumentsInterpretation = ImmutableList.copyOf(argumentInterpretation);
     }
 
-    /**
-     * The formula AST which is assigned a given value.
-     */
+    /** The formula AST which is assigned a given value. */
     public Formula getKey() {
       return key;
     }
 
-    /**
-     * Variable name for variables, function name for UFs, and array name for
-     * arrays.
-     */
+    /** Variable name for variables, function name for UFs, and array name for arrays. */
     public String getName() {
       return name;
     }
 
-    /**
-     * Value: see the {@link #evaluate} methods for the possible types.
-     */
+    /** Value: see the {@link #evaluate} methods for the possible types. */
     public Object getValue() {
       return value;
     }
 
-    /**
-     * Interpretation assigned for function arguments.
-     * Empty for variables.
-     */
+    /** Interpretation assigned for function arguments. Empty for variables. */
     public ImmutableList<Object> getArgumentsInterpretation() {
       return argumentsInterpretation;
     }

@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.api;
 
-/**
- * Formulas of any numeral sort.
- */
+/** Formulas of any numeral sort. */
 public interface NumeralFormula extends Formula {
 
   interface IntegerFormula extends NumeralFormula {}

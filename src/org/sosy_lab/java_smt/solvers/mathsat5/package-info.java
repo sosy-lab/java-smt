@@ -17,9 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-/**
- * Interface to the SMT solver MathSAT5 (based on the native C API and JNI).
- */
+/** Interface to the SMT solver MathSAT5 (based on the native C API and JNI). */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

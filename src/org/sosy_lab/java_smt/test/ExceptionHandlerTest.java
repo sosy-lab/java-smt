@@ -27,9 +27,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
-/**
- * Test that exception handling is set up properly.
- */
+/** Test that exception handling is set up properly. */
 @RunWith(Parameterized.class)
 public class ExceptionHandlerTest extends SolverBasedTest0 {
 

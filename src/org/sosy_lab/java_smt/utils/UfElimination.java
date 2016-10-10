@@ -58,8 +58,8 @@ import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 /**
- * UfElimination replaces UFs by fresh variables
- * and adds constraints to enforce the functional consistency.
+ * UfElimination replaces UFs by fresh variables and adds constraints to enforce the functional
+ * consistency.
  */
 public class UfElimination {
 
@@ -86,30 +86,22 @@ public class UfElimination {
       ufs = checkNotNull(pUfs);
     }
 
-    /**
-     * @return the new {@link Formula} without UFs
-     */
+    /** @return the new {@link Formula} without UFs */
     public BooleanFormula getFormula() {
       return formula;
     }
 
-    /**
-     * @return the constraints enforcing the functional consistency.
-     */
+    /** @return the constraints enforcing the functional consistency. */
     public BooleanFormula getConstraints() {
       return constraints;
     }
 
-    /**
-     * @return the substitution used to replace UFs
-     */
+    /** @return the substitution used to replace UFs */
     public Map<Formula, Formula> getSubstitution() {
       return substitutions;
     }
 
-    /**
-     * @return all eliminated application of Ufs
-     */
+    /** @return all eliminated application of Ufs */
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> getUfs() {
       return ufs;
     }
@@ -128,8 +120,9 @@ public class UfElimination {
   }
 
   /**
-   * Applies the Ackermann transformation to the given {@link Formula}.
-   * Quantified formulas are not supported.
+   * Applies the Ackermann transformation to the given {@link Formula}. Quantified formulas are not
+   * supported.
+   *
    * @param f the {@link Formula} to remove all Ufs from
    * @return the new {@link Formula} and the substitution done during transformation
    */
@@ -139,9 +132,9 @@ public class UfElimination {
   }
 
   /**
-   * Applies the Ackermann transformation to the given {@link Formula} with respect to the
-   * {@link Result} of another formula.
-   * Quantified formulas are not supported.
+   * Applies the Ackermann transformation to the given {@link Formula} with respect to the {@link
+   * Result} of another formula. Quantified formulas are not supported.
+   *
    * @param pF the {@link Formula} to remove all Ufs from
    * @param pOtherResult result of eliminating Ufs in another {@link BooleanFormula}
    * @return the {@link Result} of the Ackermannization

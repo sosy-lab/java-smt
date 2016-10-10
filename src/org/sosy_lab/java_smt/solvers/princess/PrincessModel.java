@@ -95,13 +95,11 @@ class PrincessModel
   }
 
   /**
-   * Collect array-models, we need them to replace identifiers later.
-   * Princess models arrays as plain numeric "memory-addresses",
-   * and the model for an array-access at one of the addresses is the array-content.
-   * Example:
-   * "arr[5]=123" is modeled as "{arr=0, select(0,5)=123}" or "{arr=0, store(0,5,123)=0}",
-   * where "0" is the memory-address.
-   * The returned mapping contains the mapping of "0" (=address) to "arr" (=identifier).
+   * Collect array-models, we need them to replace identifiers later. Princess models arrays as
+   * plain numeric "memory-addresses", and the model for an array-access at one of the addresses is
+   * the array-content. Example: "arr[5]=123" is modeled as "{arr=0, select(0,5)=123}" or "{arr=0,
+   * store(0,5,123)=0}", where "0" is the memory-address. The returned mapping contains the mapping
+   * of "0" (=address) to "arr" (=identifier).
    */
   private Map<IdealInt, ITerm> getArrayAddresses(
       scala.collection.Map<ModelLocation, ModelValue> interpretation) {

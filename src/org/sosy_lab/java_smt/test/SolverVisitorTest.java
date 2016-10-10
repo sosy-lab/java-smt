@@ -107,8 +107,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   /**
-   * A very basic test for the formula visitor, defines a visitor
-   * which gathers all found free variables.
+   * A very basic test for the formula visitor, defines a visitor which gathers all found free
+   * variables.
    */
   @Test
   public void testFormulaVisitor() {

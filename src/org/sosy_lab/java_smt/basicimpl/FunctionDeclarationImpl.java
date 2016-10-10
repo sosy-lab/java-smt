@@ -30,9 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 
-/**
- * Declaration of a function.
- */
+/** Declaration of a function. */
 public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDeclaration<F> {
   private final String name;
   private final FunctionDeclarationKind kind;
@@ -62,26 +60,20 @@ public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDe
     return new FunctionDeclarationImpl<>(name, kind, pArgumentTypes, pReturnType, pDeclaration);
   }
 
-  /**
-   * Get type of the declaration.
-   */
+  /** Get type of the declaration. */
   @Override
   public FunctionDeclarationKind getKind() {
     return kind;
   }
 
-  /**
-   * @return Solver-specific representation of the function declaration.
-   */
+  /** @return Solver-specific representation of the function declaration. */
   public T getSolverDeclaration() {
     return solverDeclaration;
   }
 
   /**
-   * Name of the function.
-   * For variables and UF's, it's the user-supplied name.
-   * For default theories, it is the operator name (e.g. {@code "ITE"} for the
-   * if-then-else operator.)
+   * Name of the function. For variables and UF's, it's the user-supplied name. For default
+   * theories, it is the operator name (e.g. {@code "ITE"} for the if-then-else operator.)
    */
   @Override
   public String getName() {

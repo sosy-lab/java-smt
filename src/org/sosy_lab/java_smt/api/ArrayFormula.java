@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.api;
 
 /**
  * A formula of the array sort.
+ *
  * @param <TI> Index type.
  * @param <TE> Element type.
  */

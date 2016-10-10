@@ -18,7 +18,5 @@
  *  limitations under the License.
  */
 
-/**
- * Default tactics implementations (formula-to-formula transformations).
- */
+/** Default tactics implementations (formula-to-formula transformations). */
 package org.sosy_lab.java_smt.basicimpl.tactics;

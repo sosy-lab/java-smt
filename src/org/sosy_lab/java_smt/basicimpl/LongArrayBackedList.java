@@ -27,11 +27,10 @@ import java.util.AbstractList;
 import java.util.RandomAccess;
 
 /**
- * Immutable list that is backed by a <code>long[]</code> and can have any
- * element type.
- * Sub-classes need to be defined and implement methods for creating
- * element instances from a long value.
- * These classes should not override any other methods to guarantee immutability.
+ * Immutable list that is backed by a <code>long[]</code> and can have any element type. Sub-classes
+ * need to be defined and implement methods for creating element instances from a long value. These
+ * classes should not override any other methods to guarantee immutability.
+ *
  * @param <E> The element type.
  */
 public abstract class LongArrayBackedList<E> extends AbstractList<E> implements RandomAccess {
@@ -39,8 +38,8 @@ public abstract class LongArrayBackedList<E> extends AbstractList<E> implements 
   private final long[] array;
 
   /**
-   * Create an instance backed by a given array.
-   * For efficiency, the array is not copied and should thus not be changed afterwards.
+   * Create an instance backed by a given array. For efficiency, the array is not copied and should
+   * thus not be changed afterwards.
    */
   protected LongArrayBackedList(long[] pArray) {
     array = checkNotNull(pArray);

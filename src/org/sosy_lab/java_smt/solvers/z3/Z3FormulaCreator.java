@@ -110,10 +110,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
-  /**
-   * Automatic clean-up of Z3 ASTs.
-   */
+  /** Automatic clean-up of Z3 ASTs. */
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
+
   private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
       Maps.newIdentityHashMap();
 
@@ -518,8 +517,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * @param value Z3_ast representing a constant value.
-   * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or
-   * {@link FloatingPointRoundingMode}.
+   * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
+   *     FloatingPointRoundingMode}.
    */
   public Object convertValue(long value) {
     assert isConstant(value) : "value is not constant";
@@ -579,6 +578,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * Apply multiple tactics in sequence.
+   *
    * @throws InterruptedException thrown by JNI code in case of termination request
    * @throws SolverException thrown by JNI code in case of error
    */
@@ -602,7 +602,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @param tactic Z3 Tactic Name
    * @param pF Z3_ast
    * @return Z3_ast
-   *
    * @throws InterruptedException If execution gets interrupted.
    */
   public long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
@@ -672,9 +671,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  /**
-   * Closing the context.
-   */
+  /** Closing the context. */
   public void forceClose() {
     cleanupReferences();
 

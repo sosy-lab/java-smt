@@ -40,9 +40,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 
-/**
- * Testing formula serialization.
- */
+/** Testing formula serialization. */
 @RunWith(Parameterized.class)
 public class TranslateFormulaTest {
 

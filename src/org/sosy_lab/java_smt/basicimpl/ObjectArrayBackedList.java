@@ -26,11 +26,10 @@ import com.google.errorprone.annotations.ForOverride;
 import java.util.AbstractList;
 
 /**
- * Immutable list that is backed by a <code>InnerT[]</code> and can have any
- * element type.
- * Sub-classes need to be defined and implement methods for creating
- * element instances from a long value.
- * These classes should not override any other methods to guarantee immutability.
+ * Immutable list that is backed by a <code>InnerT[]</code> and can have any element type.
+ * Sub-classes need to be defined and implement methods for creating element instances from a long
+ * value. These classes should not override any other methods to guarantee immutability.
+ *
  * @param <InnerT> The element type of the backing array.
  * @param <OuterT> The element type of the list.
  */
@@ -39,8 +38,8 @@ public abstract class ObjectArrayBackedList<InnerT, OuterT> extends AbstractList
   private final InnerT[] array;
 
   /**
-   * Create an instance backed by a given array.
-   * For efficiency, the array is not copied and should thus not be changed afterwards.
+   * Create an instance backed by a given array. For efficiency, the array is not copied and should
+   * thus not be changed afterwards.
    */
   protected ObjectArrayBackedList(InnerT[] pArray) {
     array = checkNotNull(pArray);

@@ -26,9 +26,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 /**
  * Floating point operations.
  *
- * <p>Most operations are overloaded: there is an option of either using the default
- * rounding mode (set via the option {@code solver.floatingPointRoundingMode}),
- * or providing the rounding mode explicitly.
+ * <p>Most operations are overloaded: there is an option of either using the default rounding mode
+ * (set via the option {@code solver.floatingPointRoundingMode}), or providing the rounding mode
+ * explicitly.
  */
 public interface FloatingPointFormulaManager {
 
@@ -110,17 +110,16 @@ public interface FloatingPointFormulaManager {
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 
   /**
-   * Create a term for assigning one floating-point term to another.
-   * This means both terms are considered equal afterwards.
-   * This method is the same as the method <code>equal</code> for other theories.
+   * Create a term for assigning one floating-point term to another. This means both terms are
+   * considered equal afterwards. This method is the same as the method <code>equal</code> for other
+   * theories.
    */
   BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2);
 
   /**
-   * Create a term for comparing the equality of two floating-point terms,
-   * according to standard floating-point semantics (i.e., NaN != NaN).
-   * Be careful to not use this method when you really need
-   * {@link #assignment(FloatingPointFormula, FloatingPointFormula)}.
+   * Create a term for comparing the equality of two floating-point terms, according to standard
+   * floating-point semantics (i.e., NaN != NaN). Be careful to not use this method when you really
+   * need {@link #assignment(FloatingPointFormula, FloatingPointFormula)}.
    */
   BooleanFormula equalWithFPSemantics(FloatingPointFormula number1, FloatingPointFormula number2);
 

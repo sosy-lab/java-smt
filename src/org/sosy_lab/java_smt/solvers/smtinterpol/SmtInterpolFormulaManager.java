@@ -151,8 +151,7 @@ class SmtInterpolFormulaManager
     return getFormulaCreator().visit(f, rFormulaVisitor);
   }
 
-  /** This method returns a 'shared' environment or
-   * a complete new environment. */
+  /** This method returns a 'shared' environment or a complete new environment. */
   SmtInterpolEnvironment createEnvironment() {
     return getEnvironment();
   }

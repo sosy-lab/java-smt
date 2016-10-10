@@ -22,27 +22,27 @@ package org.sosy_lab.java_smt.api;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 
 /**
- * This interface represents the theory of (arbitrarily nested) arrays.
- * (as defined in the SMTLib2 standard)
+ * This interface represents the theory of (arbitrarily nested) arrays. (as defined in the SMTLib2
+ * standard)
  */
 public interface ArrayFormulaManager {
 
   /**
    * Read a value that is stored in the array at the specified position.
    *
-   * @param pArray    The array from which to read
-   * @param pIndex    The position from which to read
-   * @return          A formula that represents the result of the "read"
+   * @param pArray The array from which to read
+   * @param pIndex The position from which to read
+   * @return A formula that represents the result of the "read"
    */
   <TI extends Formula, TE extends Formula> TE select(ArrayFormula<TI, TE> pArray, TI pIndex);
 
   /**
    * Store a value into a cell of the specified array.
    *
-   * @param pArray    The array to which to write
-   * @param pIndex    The position to which to write
-   * @param pValue    The value that should be written
-   * @return          A formula that represents the "write"
+   * @param pArray The array to which to write
+   * @param pIndex The position to which to write
+   * @param pValue The value that should be written
+   * @return A formula that represents the "write"
    */
   <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
       ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue);
@@ -50,10 +50,10 @@ public interface ArrayFormulaManager {
   /**
    * Declare a new array.
    *
-   * @param pName         The name of the array variable
-   * @param pIndexType    The type of the array index
-   * @param pElementType  The type of the array elements
-   * @return              Formula that represents the array
+   * @param pName The name of the array variable
+   * @param pIndexType The type of the array index
+   * @param pElementType The type of the array elements
+   * @return Formula that represents the array
    */
   <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType);
@@ -61,15 +61,12 @@ public interface ArrayFormulaManager {
   /**
    * Declare a new array.
    *
-   * @param pName         The name of the array variable
+   * @param pName The name of the array variable
    */
   <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
       String pName, ArrayFormulaType<TI, TE> type);
 
-  /**
-   * Make a {@link BooleanFormula} that represents the equality of
-   * two {@link ArrayFormula}.
-   */
+  /** Make a {@link BooleanFormula} that represents the equality of two {@link ArrayFormula}. */
   <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2);
 

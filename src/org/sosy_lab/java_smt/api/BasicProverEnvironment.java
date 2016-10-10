@@ -24,17 +24,15 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import javax.annotation.Nullable;
 
 /**
- * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment}
- * that provides only the common operations.
- * In most cases, just use one of the two sub-interfaces
+ * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment} that
+ * provides only the common operations. In most cases, just use one of the two sub-interfaces
  */
 public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
-   * Push a backtracking point and
-   * add a formula to the environment stack, asserting it.
-   * The return value may be used to identify this formula later on
-   * in a query (this depends on the sub-type of the environment).
+   * Push a backtracking point and add a formula to the environment stack, asserting it. The return
+   * value may be used to identify this formula later on in a query (this depends on the sub-type of
+   * the environment).
    */
   @Nullable
   @CanIgnoreReturnValue
@@ -43,52 +41,41 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
     return addConstraint(f);
   }
 
-  /**
-   * Remove one formula from the environment stack.
-   */
+  /** Remove one formula from the environment stack. */
   void pop();
 
-  /**
-   * Add constraint to the context.
-   */
+  /** Add constraint to the context. */
   @Nullable
   @CanIgnoreReturnValue
   T addConstraint(BooleanFormula constraint);
 
-  /**
-   * Create backtracking point.
-   */
+  /** Create backtracking point. */
   void push();
 
-  /**
-   * Check whether the conjunction of all formulas on the stack is unsatisfiable.
-   */
+  /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   boolean isUnsat() throws SolverException, InterruptedException;
 
   /**
-   * Get a satisfying assignment.
-   * This should be called only immediately after an {@link #isUnsat()} call
-   * that returned <code>false</code>.
-   * A model might contain additional symbols with their evaluation,
-   * if a solver uses its own temporary symbols.
-   * There should be at least an value-assignment for each free symbol.
+   * Get a satisfying assignment. This should be called only immediately after an {@link #isUnsat()}
+   * call that returned <code>false</code>. A model might contain additional symbols with their
+   * evaluation, if a solver uses its own temporary symbols. There should be at least an
+   * value-assignment for each free symbol.
    */
   Model getModel() throws SolverException;
 
   /**
-   * Get a list of satisfying assignments.
-   * This is equivalent to <code>ImmutableList.copyOf(getModel())</code>,
-   * but removes the need for calling {@link Model#close()}.
+   * Get a list of satisfying assignments. This is equivalent to <code>
+   * ImmutableList.copyOf(getModel())</code>, but removes the need for calling {@link
+   * Model#close()}.
    *
-   * <p>Note that if you need to iterate multiple times over the model
-   * it may be more efficient to use this method instead of {@link #getModel()}
-   * (depending on the solver).
+   * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
+   * use this method instead of {@link #getModel()} (depending on the solver).
    */
   ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException;
 
   /**
-   * Closes the prover environment.
-   * The object should be discarded, and should not be used after closing.
+   * Closes the prover environment. The object should be discarded, and should not be used after
+   * closing.
    */
   @Override
   void close();

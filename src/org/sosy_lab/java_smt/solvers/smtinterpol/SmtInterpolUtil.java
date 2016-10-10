@@ -26,7 +26,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 class SmtInterpolUtil {
   private SmtInterpolUtil() {}
 
-  /** this function can be used to print a bigger term*/
+  /** this function can be used to print a bigger term */
   public static String prettyPrint(Term t) {
     StringBuilder str = new StringBuilder();
     prettyPrint(t, str, 0);

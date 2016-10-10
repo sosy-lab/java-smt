@@ -19,7 +19,5 @@
  */
 package org.sosy_lab.java_smt.api;
 
-/**
- * A formula of the boolean sort.
- */
+/** A formula of the boolean sort. */
 public interface BooleanFormula extends Formula {}

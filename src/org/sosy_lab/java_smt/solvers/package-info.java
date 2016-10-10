@@ -18,7 +18,5 @@
  *  limitations under the License.
  */
 
-/**
- * Solver-specific backends.
- */
+/** Solver-specific backends. */
 package org.sosy_lab.java_smt.solvers;

@@ -25,28 +25,19 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 
 /**
- * Return class that lets the visitor guide the recursive formula traversal process
- * started with
- * {@link FormulaManager#visitRecursively}.
- * or
- * {@link BooleanFormulaManager#visitRecursively}.
+ * Return class that lets the visitor guide the recursive formula traversal process started with
+ * {@link FormulaManager#visitRecursively}. or {@link BooleanFormulaManager#visitRecursively}.
  */
 public class TraversalProcess {
-  /**
-   * Continue traversal and recurse into current formula subtree.
-   */
+  /** Continue traversal and recurse into current formula subtree. */
   public static final TraversalProcess CONTINUE =
       new TraversalProcess(TraversalType.CONTINUE_TYPE, ImmutableSet.of());
 
-  /**
-   * Continue traversal, but do not recurse into current formula subtree.
-   */
+  /** Continue traversal, but do not recurse into current formula subtree. */
   public static final TraversalProcess SKIP =
       new TraversalProcess(TraversalType.SKIP_TYPE, ImmutableSet.of());
 
-  /**
-   * Immediately abort traversal and return to caller.
-   */
+  /** Immediately abort traversal and return to caller. */
   public static final TraversalProcess ABORT =
       new TraversalProcess(TraversalType.ABORT_TYPE, ImmutableSet.of());
 

@@ -22,15 +22,13 @@ package org.sosy_lab.java_smt.api;
 import java.util.Optional;
 import org.sosy_lab.common.rationals.Rational;
 
-/**
- * Interface for optimization modulo SMT.
- */
+/** Interface for optimization modulo SMT. */
 public interface OptimizationProverEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
 
   /**
    * Add the maximization <code>objective</code>.
    *
-   * <b>Note: {@code push/pop} may be used for switching objectives</b>
+   * <p><b>Note: {@code push/pop} may be used for switching objectives</b>
    *
    * @return Objective handle, to be used for retrieving the value.
    */
@@ -39,15 +37,14 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
   /**
    * Add minimization <code>objective</code>.
    *
-   * <b>Note: {@code push/pop} may be used for switching objectives</b>
+   * <p><b>Note: {@code push/pop} may be used for switching objectives</b>
    *
    * @return Objective handle, to be used for retrieving the value.
    */
   int minimize(Formula objective);
 
   /**
-   * Optimize the objective function subject to the previously
-   * imposed constraints.
+   * Optimize the objective function subject to the previously imposed constraints.
    *
    * @return Status of the optimization problem.
    */
@@ -55,36 +52,28 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
 
   /**
    * @param epsilon Value to substitute for the {@code epsilon}.
-   * @return Upper approximation of the optimized value, or
-   *  absent optional if the objective is unbounded.
+   * @return Upper approximation of the optimized value, or absent optional if the objective is
+   *     unbounded.
    */
   Optional<Rational> upper(int handle, Rational epsilon);
 
   /**
    * @param epsilon Value to substitute for the {@code epsilon}.
-   * @return Lower approximation of the optimized value, or
-   *  absent optional if the objective is unbounded.
+   * @return Lower approximation of the optimized value, or absent optional if the objective is
+   *     unbounded.
    */
   Optional<Rational> lower(int handle, Rational epsilon);
 
-  /**
-   * Status of the optimization problem.
-   */
+  /** Status of the optimization problem. */
   enum OptStatus {
 
-    /**
-     * The solution was found (may be unbounded).
-     */
+    /** The solution was found (may be unbounded). */
     OPT,
 
-    /**
-     * The set of constraints is unsatisfiable.
-     */
+    /** The set of constraints is unsatisfiable. */
     UNSAT,
 
-    /**
-     * The result is unknown.
-     */
+    /** The result is unknown. */
     UNDEF
   }
 }

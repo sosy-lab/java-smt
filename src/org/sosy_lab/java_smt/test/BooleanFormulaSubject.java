@@ -36,12 +36,11 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth
- * (allows to use <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
+ * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth (allows to use
+ * <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
- * <p>Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)},
- * or {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and
- * {@link #forSolver(SolverContext)}.
+ * <p>Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or {@link
+ * TestVerb#about(com.google.common.truth.SubjectFactory)} and {@link #forSolver(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {
@@ -55,9 +54,9 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   }
 
   /**
-   * Use this for checking assertions about BooleanFormulas
-   * (given the corresponding solver) with Truth:
-   * <code>assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula).is...()</code>.
+   * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
+   * Truth: <code>assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula).is...()</code>
+   * .
    */
   public static SubjectFactory<BooleanFormulaSubject, BooleanFormula> forSolver(
       final SolverContext context) {
@@ -86,8 +85,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   }
 
   /**
-   * Check that the subject is unsatisfiable.
-   * Will show a model (satisfying assignment) on failure.
+   * Check that the subject is unsatisfiable. Will show a model (satisfying assignment) on failure.
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
     if (context.getFormulaManager().getBooleanFormulaManager().isTrue(actual())) {
@@ -97,10 +95,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
     checkIsUnsat(actual(), "is", "unsatisfiable");
   }
 
-  /**
-   * Check that the subject is satisfiable.
-   * Will show an unsat core on failure.
-   */
+  /** Check that the subject is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
     if (context.getFormulaManager().getBooleanFormulaManager().isFalse(actual())) {
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
@@ -131,10 +126,10 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   }
 
   /**
-   * Check that the subject is tautological, i.e., always holds.
-   * This is equivalent to calling {@link #isEquivalentTo(BooleanFormula)}
-   * with the formula {@code true}, but it checks satisfiability of the subject
-   * and unsatisfiability of the negated subject in two steps to improve error messages.
+   * Check that the subject is tautological, i.e., always holds. This is equivalent to calling
+   * {@link #isEquivalentTo(BooleanFormula)} with the formula {@code true}, but it checks
+   * satisfiability of the subject and unsatisfiability of the negated subject in two steps to
+   * improve error messages.
    */
   public void isTautological() throws SolverException, InterruptedException {
     isSatisfiable();
@@ -143,9 +138,8 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   }
 
   /**
-   * Check that the subject is equivalent to a given formula,
-   * i.e. {@code subject <=> expected} always holds.
-   * Will show a counterexample on failure.
+   * Check that the subject is equivalent to a given formula, i.e. {@code subject <=> expected}
+   * always holds. Will show a counterexample on failure.
    */
   public void isEquivalentTo(final BooleanFormula expected)
       throws SolverException, InterruptedException {
@@ -166,8 +160,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   }
 
   /**
-   * Check that the subject implies a given formula,
-   * i.e. {@code subject => expected} always holds.
+   * Check that the subject implies a given formula, i.e. {@code subject => expected} always holds.
    * Will show a counterexample on failure.
    */
   public void implies(final BooleanFormula expected) throws SolverException, InterruptedException {

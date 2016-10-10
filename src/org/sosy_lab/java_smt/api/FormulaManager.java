@@ -27,16 +27,12 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-/**
- * FormulaManager class contains all operations which can be performed on
- * formulas.
- */
+/** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
 
   /**
-   * Returns the Integer-Theory.
-   * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
-   * the Integer- and the RationalFormulaManager both return the same Formulas
+   * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
+   * and Rational-Theory, the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL and others.
    *
    * @throws UnsupportedOperationException If the theory is not supported by the solver.
@@ -44,18 +40,15 @@ public interface FormulaManager {
   IntegerFormulaManager getIntegerFormulaManager();
 
   /**
-   * Returns the Rational-Theory.
-   * Because most SAT-solvers support automatic casting between Integer- and Rational-Theory,
-   * the Integer- and the RationalFormulaManager both return the same Formulas
-   * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL, etc.
+   * Returns the Rational-Theory. Because most SAT-solvers support automatic casting between
+   * Integer- and Rational-Theory, the Integer- and the RationalFormulaManager both return the same
+   * Formulas for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL, etc.
    *
    * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   RationalFormulaManager getRationalFormulaManager();
 
-  /**
-   * Returns the Boolean-Theory.
-   */
+  /** Returns the Boolean-Theory. */
   BooleanFormulaManager getBooleanFormulaManager();
 
   /**
@@ -79,9 +72,7 @@ public interface FormulaManager {
    */
   FloatingPointFormulaManager getFloatingPointFormulaManager();
 
-  /**
-   * Returns the function for dealing with uninterpreted functions (UFs).
-   */
+  /** Returns the function for dealing with uninterpreted functions (UFs). */
   UFManager getUFManager();
 
   /**
@@ -119,9 +110,7 @@ public interface FormulaManager {
    */
   <T extends Formula> T makeApplication(FunctionDeclaration<T> declaration, Formula... args);
 
-  /**
-   * Returns the type of the given Formula.
-   */
+  /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
 
   /**
@@ -133,60 +122,55 @@ public interface FormulaManager {
   BooleanFormula parse(String s) throws IllegalArgumentException;
 
   /**
-   * Serialize an input formula to an SMT-LIB format.
-   * Very useful when passing formulas between different solvers.
+   * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between
+   * different solvers.
    *
-   * <p>To get a String, simply call {@link Object#toString()}
-   * on the returned object.
-   * This method is lazy and does not create an output string until the returned
-   * object is actually used.
+   * <p>To get a String, simply call {@link Object#toString()} on the returned object. This method
+   * is lazy and does not create an output string until the returned object is actually used.
    *
    * @return SMT-LIB formula serialization.
    */
   Appender dumpFormula(BooleanFormula pT);
 
   /**
-   * Apply a tactic which performs formula transformation. The available tactics
-   * depend on the used solver.
+   * Apply a tactic which performs formula transformation. The available tactics depend on the used
+   * solver.
    */
   BooleanFormula applyTactic(BooleanFormula input, Tactic tactic) throws InterruptedException;
 
   /**
    * Simplify an input formula, while ensuring equivalence.
    *
-   * <p>For solvers that do not provide a simplification API, an original formula
-   * is returned.
+   * <p>For solvers that do not provide a simplification API, an original formula is returned.
    *
    * @param input The input formula
    * @return Simplified version of the formula
    */
   <T extends Formula> T simplify(T input) throws InterruptedException;
 
-  /**
-   * Visit the formula with a given visitor.
-   */
+  /** Visit the formula with a given visitor. */
   @CanIgnoreReturnValue
   <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}.
    *
-   * <p>This method guarantees that the traversal is done iteratively,
-   * without using Java recursion, and thus is not prone to StackOverflowErrors.
+   * <p>This method guarantees that the traversal is done iteratively, without using Java recursion,
+   * and thus is not prone to StackOverflowErrors.
    *
-   * <p>Furthermore, this method also guarantees that every equal part of the formula
-   * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
+   * only once. Thus it can be used to traverse DAG-like formulas efficiently.
    */
   void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}.
    *
-   * <p>This method guarantees that the traversal is done iteratively,
-   * without using Java recursion, and thus is not prone to StackOverflowErrors.
+   * <p>This method guarantees that the traversal is done iteratively, without using Java recursion,
+   * and thus is not prone to StackOverflowErrors.
    *
-   * <p>Furthermore, this method also guarantees that every equal part of the formula
-   * is visited only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
+   * only once. Thus it can be used to traverse DAG-like formulas efficiently.
    *
    * @param pFormulaVisitor Transformation described by the user.
    */
@@ -195,26 +179,26 @@ public interface FormulaManager {
   /**
    * Extract the names of all free variables and UFs in a formula.
    *
-   * @param f   The input formula
-   * @return    Map from variable names to the corresponding formulas.
+   * @param f The input formula
+   * @return Map from variable names to the corresponding formulas.
    */
   Map<String, Formula> extractVariables(Formula f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
    *
-   * @param f   The input formula
-   * @return    Map from variable names to the corresponding formulas.
+   * @param f The input formula
+   * @return Map from variable names to the corresponding formulas.
    */
   Map<String, Formula> extractVariablesAndUFs(Formula f);
 
   /**
-   * Substitute every occurrence of any item from {@code changeFrom}
-   * in formula {@code f} to the corresponding occurrence from {@code changeTo}.
+   * Substitute every occurrence of any item from {@code changeFrom} in formula {@code f} to the
+   * corresponding occurrence from {@code changeTo}.
    *
-   * <p>E.g. if {@code changeFrom} contains a variable {@code a} and
-   * {@code changeTo} contains a variable {@code b} all occurrences of {@code a}
-   * will be changed to {@code b} in the returned formula.
+   * <p>E.g. if {@code changeFrom} contains a variable {@code a} and {@code changeTo} contains a
+   * variable {@code b} all occurrences of {@code a} will be changed to {@code b} in the returned
+   * formula.
    *
    * @param f Formula to change.
    * @param fromToMapping Mapping of old and new formula parts.
@@ -223,12 +207,10 @@ public interface FormulaManager {
   <T extends Formula> T substitute(T f, Map<? extends Formula, ? extends Formula> fromToMapping);
 
   /**
-   * Translates the formula from another context into the context represented by
-   * {@code this}.
-   * Default implementation relies on string serialization
-   * ({@link #dumpFormula(BooleanFormula)} and {@link #parse(String)}),
-   * but each solver may implement more efficient translation between its own
-   * contexts.
+   * Translates the formula from another context into the context represented by {@code this}.
+   * Default implementation relies on string serialization ({@link #dumpFormula(BooleanFormula)} and
+   * {@link #parse(String)}), but each solver may implement more efficient translation between its
+   * own contexts.
    *
    * @param formula Formula belonging to {@code otherContext}.
    * @param otherContext Formula manager belonging to the other context.

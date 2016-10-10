@@ -30,111 +30,72 @@ public enum FunctionDeclarationKind {
   NOT,
   OR,
 
-  /**
-   * If and only if.
-   */
+  /** If and only if. */
   IFF,
 
-  /**
-   * If-then-else operator.
-   */
+  /** If-then-else operator. */
   ITE,
 
-  /**
-   * Exclusive OR over two variables.
-   */
+  /** Exclusive OR over two variables. */
   XOR,
   IMPLIES,
   DISTINCT,
 
-  /**
-   * Store and select on arrays
-   */
+  /** Store and select on arrays */
   STORE,
   SELECT,
 
   // Simple arithmetic,
   // they work across integers and rationals.
 
-  /**
-   * Unary minus.
-   */
+  /** Unary minus. */
   UMINUS,
 
-  /**
-   * Subtraction over integers and rationals.
-   */
+  /** Subtraction over integers and rationals. */
   SUB,
 
-  /**
-   * Addition over integers and rationals.
-   */
+  /** Addition over integers and rationals. */
   ADD,
 
-  /**
-   * Division over rationals and integer division over integers.
-   */
+  /** Division over rationals and integer division over integers. */
   DIV,
 
-  /**
-   * Multiplication over integers and rationals.
-   */
+  /** Multiplication over integers and rationals. */
   MUL,
 
-  /**
-   * Modulo operator over integers.
-   */
+  /** Modulo operator over integers. */
   MODULO,
 
-  /**
-   * Uninterpreted function.
-   */
+  /** Uninterpreted function. */
   UF,
 
-  /**
-   * User-defined variable.
-   */
+  /** User-defined variable. */
   VAR,
 
-  /**
-   * Less-than over integers and rationals.
-   */
+  /** Less-than over integers and rationals. */
   LT,
 
-  /**
-   * Less-than-or-equal over integers and rationals.
-   */
+  /** Less-than-or-equal over integers and rationals. */
   LTE,
 
-  /**
-   * Greater-than over integers and rationals.
-   */
+  /** Greater-than over integers and rationals. */
   GT,
 
-  /**
-   * Greater-than-or-equal over integers and rationals.
-   */
+  /** Greater-than-or-equal over integers and rationals. */
   GTE,
 
-  /**
-   * Equality over integers and rationals.
-   * Binary equality is modelled with {@code IFF}.
-   */
+  /** Equality over integers and rationals. Binary equality is modelled with {@code IFF}. */
   EQ,
 
-  /**
-   * Unary comparison to zero.
-   */
+  /** Unary comparison to zero. */
   EQ_ZERO,
 
-  /**
-   * Unary comparison with zero.
-   */
+  /** Unary comparison with zero. */
   GTE_ZERO,
 
   /**
-   * Solvers support a lot of different built-in theories.
-   * We enforce standardization only across a small subset.
+   * Solvers support a lot of different built-in theories. We enforce standardization only across a
+   * small subset.
    */
   OTHER;
 }

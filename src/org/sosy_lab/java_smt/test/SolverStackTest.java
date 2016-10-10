@@ -72,9 +72,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Parameter(1)
   public boolean useInterpolatingEnvironment;
 
-  /**
-   * Generate a prover environment depending on the parameter above.
-   */
+  /** Generate a prover environment depending on the parameter above. */
   private BasicProverEnvironment<?> newEnvironmentForTest(ProverOptions... options) {
     if (useInterpolatingEnvironment) {
       requireInterpolation();
@@ -357,13 +355,10 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   /**
-   * This test checks that a SMT solver uses "global declarations":
-   * regardless of the stack at declaration time,
-   * declarations always live for the full life time of the solver
-   * (i.e., they do not get deleted on pop()).
-   * This is contrary to the SMTLib standard,
-   * but required by us, e.g. for BMC with induction
-   * (where we create new formulas while there is something on the stack).
+   * This test checks that a SMT solver uses "global declarations": regardless of the stack at
+   * declaration time, declarations always live for the full life time of the solver (i.e., they do
+   * not get deleted on pop()). This is contrary to the SMTLib standard, but required by us, e.g.
+   * for BMC with induction (where we create new formulas while there is something on the stack).
    */
   @Test
   public void dualStackGlobalDeclarations() throws Exception {

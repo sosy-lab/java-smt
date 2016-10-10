@@ -18,9 +18,7 @@
  *  limitations under the License.
  */
 
-/**
- * Interface to the SMT solver Z3 (based on the native C API and JNI).
- */
+/** Interface to the SMT solver Z3 (based on the native C API and JNI). */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

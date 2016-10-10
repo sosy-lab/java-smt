@@ -38,7 +38,7 @@ abstract class Z3NumeralFormulaManager<
     this.z3context = pCreator.getEnv();
   }
 
-  abstract protected long getNumeralType();
+  protected abstract long getNumeralType();
 
   @Override
   protected boolean isNumeral(Long val) {

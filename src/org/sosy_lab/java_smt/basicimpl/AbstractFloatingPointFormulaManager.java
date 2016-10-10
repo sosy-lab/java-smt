@@ -32,18 +32,16 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
- * Similar to the other Abstract*FormulaManager classes in this package,
- * this class serves as a helper for implementing {@link FloatingPointFormulaManager}.
- * It handles all the unwrapping and wrapping from and to the {@link Formula}
- * instances, such that the concrete class needs to handle only its own internal types.
+ * Similar to the other Abstract*FormulaManager classes in this package, this class serves as a
+ * helper for implementing {@link FloatingPointFormulaManager}. It handles all the unwrapping and
+ * wrapping from and to the {@link Formula} instances, such that the concrete class needs to handle
+ * only its own internal types.
  *
- * <p>For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and
- * {@link #divide(FloatingPointFormula, FloatingPointFormula)}
- * this class even offers an implementation based on UFs.
- * Sub-classes are supposed to override them
- * if they can implement these operations more precisely
- * (for example multiplication with constants should be supported by all solvers
- * and implemented by all sub-classes).
+ * <p>For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and {@link
+ * #divide(FloatingPointFormula, FloatingPointFormula)} this class even offers an implementation
+ * based on UFs. Sub-classes are supposed to override them if they can implement these operations
+ * more precisely (for example multiplication with constants should be supported by all solvers and
+ * implemented by all sub-classes).
  */
 public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>

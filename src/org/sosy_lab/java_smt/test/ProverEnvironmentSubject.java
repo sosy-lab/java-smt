@@ -32,12 +32,11 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth
- * (allows to use <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
+ * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth (allows to
+ * use <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
  *
- * <p>Use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)},
- * or {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and
- * {@link #proverEnvironment()}.
+ * <p>Use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)}, or {@link
+ * TestVerb#about(com.google.common.truth.SubjectFactory)} and {@link #proverEnvironment()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class ProverEnvironmentSubject
@@ -49,8 +48,8 @@ public class ProverEnvironmentSubject
   }
 
   /**
-   * Use this for checking assertions about ProverEnvironments with Truth:
-   * <code>assert_().about(proverEnvironment()).that(stack).is...()</code>.
+   * Use this for checking assertions about ProverEnvironments with Truth: <code>
+   * assert_().about(proverEnvironment()).that(stack).is...()</code>.
    */
   public static SubjectFactory<ProverEnvironmentSubject, BasicProverEnvironment<?>>
       proverEnvironment() {
@@ -64,8 +63,8 @@ public class ProverEnvironmentSubject
   }
 
   /**
-   * Check that the subject stack is unsatisfiable.
-   * Will show a model (satisfying assignment) on failure.
+   * Check that the subject stack is unsatisfiable. Will show a model (satisfying assignment) on
+   * failure.
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
     if (actual().isUnsat()) {
@@ -78,10 +77,7 @@ public class ProverEnvironmentSubject
     }
   }
 
-  /**
-   * Check that the subject stack is satisfiable.
-   * Will show an unsat core on failure.
-   */
+  /** Check that the subject stack is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
     if (!actual().isUnsat()) {
       return; // success

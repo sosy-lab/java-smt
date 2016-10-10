@@ -18,8 +18,7 @@
  *  limitations under the License.
  */
 /**
- * The core interfaces for abstracting from SMT solvers and providing a common API
- * for all solvers.
+ * The core interfaces for abstracting from SMT solvers and providing a common API for all solvers.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault

@@ -42,19 +42,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This {@link Script} implementation allows to use the SMTLIB2 parser
- * of SMTInterpol for parsing single formulas.
- * It is meant to be given to a
- * {@link de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment}
- * and allows to declare and define terms (by forwarding such calls to
- * a real {@link Script} implementation,
- * but does not allow any other actions.
- * All formulas that are asserted (regardless of pop and push commands)
- * are collected and can be retrieved afterwards.
+ * This {@link Script} implementation allows to use the SMTLIB2 parser of SMTInterpol for parsing
+ * single formulas. It is meant to be given to a {@link
+ * de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment} and allows to declare
+ * and define terms (by forwarding such calls to a real {@link Script} implementation, but does not
+ * allow any other actions. All formulas that are asserted (regardless of pop and push commands) are
+ * collected and can be retrieved afterwards.
  *
- * <p>The environment represented by the given {@link Script} that this class
- * delegates to is changed only by declaring and defining terms, sorts etc.,
- * so these terms can be used in that environment afterwards.
+ * <p>The environment represented by the given {@link Script} that this class delegates to is
+ * changed only by declaring and defining terms, sorts etc., so these terms can be used in that
+ * environment afterwards.
  */
 class FormulaCollectionScript implements Script {
 

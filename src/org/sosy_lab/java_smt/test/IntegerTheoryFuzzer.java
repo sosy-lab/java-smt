@@ -26,9 +26,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-/**
- * Fuzzer over the theory of integers.
- */
+/** Fuzzer over the theory of integers. */
 class IntegerTheoryFuzzer {
 
   private final IntegerFormulaManager ifmgr;

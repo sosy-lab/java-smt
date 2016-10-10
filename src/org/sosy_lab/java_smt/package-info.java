@@ -21,9 +21,9 @@
 /**
  * JavaSMT: a generic SMT solver API.
  *
- * <p>{@link org.sosy_lab.java_smt.SolverContextFactory} is a package entry point,
- * which creates a {@link org.sosy_lab.java_smt.api.SolverContext} object.
- * All operations on formulas are performed using managers, available through the context object.
+ * <p>{@link org.sosy_lab.java_smt.SolverContextFactory} is a package entry point, which creates a
+ * {@link org.sosy_lab.java_smt.api.SolverContext} object. All operations on formulas are performed
+ * using managers, available through the context object.
  *
  * <p>All interfaces which form the public API are located in the {@link org.sosy_lab.java_smt.api}
  * package.

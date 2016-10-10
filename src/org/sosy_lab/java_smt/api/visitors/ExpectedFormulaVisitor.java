@@ -22,8 +22,8 @@ package org.sosy_lab.java_smt.api.visitors;
 import org.sosy_lab.java_smt.api.Formula;
 
 /**
- * Like {@link DefaultFormulaVisitor}, but throws
- * {@link UnsupportedOperationException} on unexpected formula types.
+ * Like {@link DefaultFormulaVisitor}, but throws {@link UnsupportedOperationException} on
+ * unexpected formula types.
  */
 public abstract class ExpectedFormulaVisitor<R> extends DefaultFormulaVisitor<R> {
 

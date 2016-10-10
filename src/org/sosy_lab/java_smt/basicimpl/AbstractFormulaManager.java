@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**
  * Simplifies building a solver from the specific theories.
+ *
  * @param <TFormulaInfo> The solver specific type.
  */
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -74,9 +75,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
-  /**
-   * Builds a solver from the given theory implementations
-   */
+  /** Builds a solver from the given theory implementations */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,
@@ -223,9 +222,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
-  /**
-   * @throws InterruptedException Can be thrown by the native code.
-   */
+  /** @throws InterruptedException Can be thrown by the native code. */
   protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
 
     // Returning the untouched formula is valid according to QE_LIGHT contract.
@@ -244,9 +241,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         "Currently there is no generic implementation for CNF conversion");
   }
 
-  /**
-   * @throws InterruptedException Can be thrown by the native code.
-   */
+  /** @throws InterruptedException Can be thrown by the native code. */
   protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
     return getBooleanFormulaManager().transformRecursively(input, new NNFVisitor(this));
   }
@@ -256,9 +251,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), simplify(extractInfo(f)));
   }
 
-  /**
-   * @throws InterruptedException Can be thrown by the native code.
-   */
+  /** @throws InterruptedException Can be thrown by the native code. */
   protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException {
     return f;
   }
@@ -282,7 +275,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   /**
    * Extract names of all free variables in a formula.
    *
-   * @param f   The input formula
+   * @param f The input formula
    */
   @Override
   public Map<String, Formula> extractVariables(Formula f) {
@@ -292,7 +285,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   /**
    * Extract the names of all free variables and UFs in a formula.
    *
-   * @param f   The input formula
+   * @param f The input formula
    */
   @Override
   public Map<String, Formula> extractVariablesAndUFs(Formula f) {

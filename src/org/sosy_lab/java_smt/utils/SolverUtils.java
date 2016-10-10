@@ -21,15 +21,14 @@ package org.sosy_lab.java_smt.utils;
 
 import org.sosy_lab.java_smt.api.FormulaManager;
 
-/**
- * Central entry point for all utility classes.
- */
+/** Central entry point for all utility classes. */
 public class SolverUtils {
 
   private SolverUtils() {}
 
   /**
    * Creates a new {@link UfElimination} instance.
+   *
    * @param pFormulaManager the {@link FormulaManager} to be used
    * @return a new {@link UfElimination} instance
    */

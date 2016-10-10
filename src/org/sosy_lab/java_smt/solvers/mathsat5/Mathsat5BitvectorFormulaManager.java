@@ -48,9 +48,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-/**
- * Mathsat Bitvector Theory, build out of Bitvector*Operations.
- */
+/** Mathsat Bitvector Theory, build out of Bitvector*Operations. */
 class Mathsat5BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
 

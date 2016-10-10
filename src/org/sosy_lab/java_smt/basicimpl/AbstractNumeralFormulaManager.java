@@ -31,11 +31,10 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 /**
- * Similar to the other Abstract*FormulaManager classes in this package,
- * this class serves as a helper for implementing {@link NumeralFormulaManager}.
- * It handles all the unwrapping and wrapping from {@link Formula}
- * instances to solver-specific formula representations,
- * such that the concrete class needs to handle only its own internal types.
+ * Similar to the other Abstract*FormulaManager classes in this package, this class serves as a
+ * helper for implementing {@link NumeralFormulaManager}. It handles all the unwrapping and wrapping
+ * from {@link Formula} instances to solver-specific formula representations, such that the concrete
+ * class needs to handle only its own internal types.
  */
 public abstract class AbstractNumeralFormulaManager<
         TFormulaInfo,
@@ -103,9 +102,9 @@ public abstract class AbstractNumeralFormulaManager<
   protected abstract TFormulaInfo makeNumberImpl(BigDecimal pNumber);
 
   /**
-   * This method tries to represent a BigDecimal using only BigInteger.
-   * It can be used for implementing {@link #makeNumber(BigDecimal)}
-   * when the current theory supports only integers and division by constants.
+   * This method tries to represent a BigDecimal using only BigInteger. It can be used for
+   * implementing {@link #makeNumber(BigDecimal)} when the current theory supports only integers and
+   * division by constants.
    */
   protected final TFormulaInfo decimalAsInteger(BigDecimal val) {
     if (val.scale() <= 0) {
@@ -196,8 +195,8 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   /**
-   * If a solver does not support this operation, e.g. because of missing
-   * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   * If a solver does not support this operation, e.g. because of missing support for non-linear
+   * arithmetics, we throw UnsupportedOperationException.
    *
    * @param pParam1 the dividend
    * @param pParam2 the divisor
@@ -214,8 +213,8 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   /**
-   * If a solver does not support this operation, e.g. because of missing
-   * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   * If a solver does not support this operation, e.g. because of missing support for non-linear
+   * arithmetics, we throw UnsupportedOperationException.
    *
    * @param pParam1 the dividend
    * @param pParam2 the divisor
@@ -271,8 +270,8 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   /**
-   * If a solver does not support this operation, e.g. because of missing
-   * support for non-linear arithmetics, we throw UnsupportedOperationException.
+   * If a solver does not support this operation, e.g. because of missing support for non-linear
+   * arithmetics, we throw UnsupportedOperationException.
    *
    * @param pParam1 first factor
    * @param pParam2 second factor

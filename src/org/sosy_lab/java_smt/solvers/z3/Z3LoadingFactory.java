@@ -34,8 +34,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 /**
  * Entry point for loading Z3.
  *
- * <p>Do not access this class directly, it needs to be loaded via
- * {@link SolverContextFactory}
+ * <p>Do not access this class directly, it needs to be loaded via {@link SolverContextFactory}
  * because Z3 needs to have its own class loader.
  */
 public class Z3LoadingFactory extends InnerUtilFactory {

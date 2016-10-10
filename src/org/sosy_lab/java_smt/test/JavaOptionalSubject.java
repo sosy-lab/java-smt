@@ -26,9 +26,8 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Optional subject for Java8 {@link Optional}.
- * Mirrors {@link com.google.common.truth.GuavaOptionalSubject},
- * yet works for another kind of optional.
+ * Optional subject for Java8 {@link Optional}. Mirrors {@link
+ * com.google.common.truth.GuavaOptionalSubject}, yet works for another kind of optional.
  */
 @Deprecated // Uses Truth8's OptionalSubject instead
 public class JavaOptionalSubject extends Subject<JavaOptionalSubject, Optional<?>> {

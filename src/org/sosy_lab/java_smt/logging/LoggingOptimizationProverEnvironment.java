@@ -29,9 +29,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * Wrapper for an optimizing solver.
- */
+/** Wrapper for an optimizing solver. */
 class LoggingOptimizationProverEnvironment extends LoggingBasicProverEnvironment<Void>
     implements OptimizationProverEnvironment {
 

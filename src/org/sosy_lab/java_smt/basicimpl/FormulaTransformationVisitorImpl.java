@@ -30,9 +30,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
-/**
- * Internal implementation of recursive transformation.
- */
+/** Internal implementation of recursive transformation. */
 final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   private final Deque<Formula> toProcess;

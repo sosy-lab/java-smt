@@ -22,9 +22,7 @@ package org.sosy_lab.java_smt.api;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 
-/**
- * Manager for dealing with formulas of the bitvector sort.
- */
+/** Manager for dealing with formulas of the bitvector sort. */
 public interface BitvectorFormulaManager {
 
   BitvectorFormula makeBitvector(int length, long pI);
@@ -68,6 +66,7 @@ public interface BitvectorFormulaManager {
 
   /**
    * Creates a formula representing a negation of the argument.
+   *
    * @param bits Formula
    * @return {@code !f1}
    */
@@ -75,6 +74,7 @@ public interface BitvectorFormulaManager {
 
   /**
    * Creates a formula representing an AND of the two arguments.
+   *
    * @param bits1 a Formula
    * @param bits2 a Formula
    * @return {@code f1 & f2}
@@ -83,6 +83,7 @@ public interface BitvectorFormulaManager {
 
   /**
    * Creates a formula representing an OR of the two arguments.
+   *
    * @param bits1 a Formula
    * @param bits2 a Formula
    * @return {@code f1 | f2}
@@ -104,6 +105,7 @@ public interface BitvectorFormulaManager {
 
   /**
    * Extend a bitvector to the left (add most significant bits).
+   *
    * @param number The bitvector to extend.
    * @param extensionBits How many bits to add.
    * @param signed Whether the extension should depend on the sign bit.

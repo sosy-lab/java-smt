@@ -143,8 +143,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
     return result;
   }
 
-  /** checks for a valid subtree-structure.
-   * This code is taken from SMTinterpol itself, where it is disabled. */
+  /**
+   * checks for a valid subtree-structure. This code is taken from SMTinterpol itself, where it is
+   * disabled.
+   */
   private static boolean checkSubTrees(
       List<Set<String>> partitionedTermNames, int[] startOfSubTree) {
     for (int i = 0; i < partitionedTermNames.size(); i++) {

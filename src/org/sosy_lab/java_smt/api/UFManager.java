@@ -21,20 +21,14 @@ package org.sosy_lab.java_smt.api;
 
 import java.util.List;
 
-/**
- * Manager for dealing with uninterpreted functions (UFs).
- */
+/** Manager for dealing with uninterpreted functions (UFs). */
 public interface UFManager {
 
-  /**
-   * Declare an uninterpreted function.
-   */
+  /** Declare an uninterpreted function. */
   <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args);
 
-  /**
-   * Declare an uninterpreted function.
-   */
+  /** Declare an uninterpreted function. */
   <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, FormulaType<?>... args);
 
@@ -51,9 +45,7 @@ public interface UFManager {
 
   <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args);
 
-  /**
-   * Declares and calls an uninterpreted function.
-   */
+  /** Declares and calls an uninterpreted function. */
   <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs);
 

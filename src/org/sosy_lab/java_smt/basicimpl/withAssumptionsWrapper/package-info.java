@@ -18,7 +18,5 @@
  *  limitations under the License.
  */
 
-/**
- * Wrapper-classes to guarantee identical behavior for all solvers.
- */
+/** Wrapper-classes to guarantee identical behavior for all solvers. */
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;

@@ -121,10 +121,7 @@ class SmtInterpolFormulaCreator
     };
   }
 
-  /**
-   * ApplicationTerms can be wrapped with "|".
-   * This function removes those chars.
-   **/
+  /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
   private String dequote(String s) {
     int l = s.length();
     if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
@@ -210,8 +207,7 @@ class SmtInterpolFormulaCreator
     }
   }
 
-  /** check for ConstantTerm with Number or
-   * ApplicationTerm with negative Number */
+  /** check for ConstantTerm with Number or ApplicationTerm with negative Number */
   public boolean isNumber(Term t) {
     boolean is = false;
     // ConstantTerm with Number --> "123"

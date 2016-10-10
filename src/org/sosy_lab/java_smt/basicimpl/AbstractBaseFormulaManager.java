@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 
 /**
  * A BaseFormulaManager because all Abstract*FormulaManager-Classes wrap a FormulaCreator-instance.
+ *
  * @param <TFormulaInfo> the solver specific type.
  */
 abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {

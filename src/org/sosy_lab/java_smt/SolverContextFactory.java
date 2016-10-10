@@ -46,9 +46,8 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 
 /**
- * Factory class for loading and generating solver contexts.
- * Generates a {@link SolverContext} corresponding to the chosen
- * solver.
+ * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
+ * corresponding to the chosen solver.
  *
  * <p>Main entry point for JavaSMT.
  */
@@ -100,16 +99,12 @@ public class SolverContextFactory {
     }
   }
 
-  /**
-   * Create new context with solver chosen according to the supplied configuration.
-   */
+  /** Create new context with solver chosen according to the supplied configuration. */
   public SolverContext generateContext() throws InvalidConfigurationException {
     return generateContext(solver);
   }
 
-  /**
-   * Create new context with solver name supplied.
-   */
+  /** Create new context with solver name supplied. */
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
@@ -162,12 +157,11 @@ public class SolverContextFactory {
   }
 
   /**
-   * Shortcut for getting a {@link SolverContext},
-   * the solver is selected using the configuration {@code config}
+   * Shortcut for getting a {@link SolverContext}, the solver is selected using the configuration
+   * {@code config}
    *
-   * <p>See
-   * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
-   * for documentation of accepted parameters.
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
+   * documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
@@ -176,12 +170,10 @@ public class SolverContextFactory {
   }
 
   /**
-   * Shortcut for getting a {@link SolverContext}, the solver is selected using
-   * an argument.
+   * Shortcut for getting a {@link SolverContext}, the solver is selected using an argument.
    *
-   * <p>See
-   * {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)}
-   * for documentation of accepted parameters.
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
+   * documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier, Solvers solver)
@@ -190,8 +182,8 @@ public class SolverContextFactory {
   }
 
   /**
-   * Minimalistic shortcut for creating a solver context.
-   * Empty default configuration, no logging, and no shutdown notifier.
+   * Minimalistic shortcut for creating a solver context. Empty default configuration, no logging,
+   * and no shutdown notifier.
    *
    * @param solver Solver to initialize
    */
@@ -205,11 +197,11 @@ public class SolverContextFactory {
   }
 
   /**
-   * Interface for completely encapsulating all accesses to a solver's package
-   * to decouple the solver's package from the rest of the code.
+   * Interface for completely encapsulating all accesses to a solver's package to decouple the
+   * solver's package from the rest of the code.
    *
-   * <p>This interface is only meant to be implemented by SMT solvers
-   * and used by this class, not by other classes.
+   * <p>This interface is only meant to be implemented by SMT solvers and used by this class, not by
+   * other classes.
    */
   public abstract static class InnerUtilFactory {
 

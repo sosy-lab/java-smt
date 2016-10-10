@@ -27,25 +27,20 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 /**
- * This application executes the inductive-invariant synthesis algorithm
- * called "Houdini" taken from the paper
- * Flanagan and Leino: "Houdini, an Annotation Assistant for ESC/Java".
+ * This application executes the inductive-invariant synthesis algorithm called "Houdini" taken from
+ * the paper Flanagan and Leino: "Houdini, an Annotation Assistant for ESC/Java".
  *
- * <p>It considers a program manipulating a set X of variables, defined by an
- * initial condition I(X) (given as lemmas) and a transition relation T(X, X').
- * Both I and T are quantifier-free first-order formulas.
+ * <p>It considers a program manipulating a set X of variables, defined by an initial condition I(X)
+ * (given as lemmas) and a transition relation T(X, X'). Both I and T are quantifier-free
+ * first-order formulas.
  *
- * <p>A lemma F is called inductive with respect to T
- * if it implies itself over the primed variables after the transition:
- *     FORALL X, X' . IMPLIES( AND( F(X), T(X, X') ), F(X'))
- * i.e. in other words, the formula
- *     AND( F(X), T(X, X'), NOT(F(X')) )
- * is unsatisfiable.
+ * <p>A lemma F is called inductive with respect to T if it implies itself over the primed variables
+ * after the transition: FORALL X, X' . IMPLIES( AND( F(X), T(X, X') ), F(X')) i.e. in other words,
+ * the formula AND( F(X), T(X, X'), NOT(F(X')) ) is unsatisfiable.
  *
- * <p>The Houdini algorithm finds and returns a maximal inductive subset L_I
- * of a given set L of candidate lemmas.
- * It repeatedly checks the conjunction of L for inductiveness and updates L
- * to exclude the lemmas that give rise to counterexamples-to-induction.
+ * <p>The Houdini algorithm finds and returns a maximal inductive subset L_I of a given set L of
+ * candidate lemmas. It repeatedly checks the conjunction of L for inductiveness and updates L to
+ * exclude the lemmas that give rise to counterexamples-to-induction.
  */
 public class HoudiniApp {
 
@@ -116,8 +111,10 @@ public class HoudiniApp {
         });
   }
 
-  /** execute the Houdini algorithm to get the maximal inductive subset L_I
-   * for the given lemmas and the transition. */
+  /**
+   * execute the Houdini algorithm to get the maximal inductive subset L_I for the given lemmas and
+   * the transition.
+   */
   public List<BooleanFormula> houdini(List<BooleanFormula> lemmas, BooleanFormula transition)
       throws SolverException, InterruptedException {
     List<BooleanFormula> annotated = new ArrayList<>();

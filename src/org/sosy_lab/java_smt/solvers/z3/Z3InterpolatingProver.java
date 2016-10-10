@@ -241,8 +241,8 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   }
 
   /**
-   * Check whether any formula in a given list contains unbound variables.
-   * Z3 has the problem that it sometimes returns such invalid formulas as interpolants
+   * Check whether any formula in a given list contains unbound variables. Z3 has the problem that
+   * it sometimes returns such invalid formulas as interpolants
    * (https://github.com/Z3Prover/z3/issues/665).
    */
   private void checkInterpolantsForUnboundVariables(List<BooleanFormula> itps)

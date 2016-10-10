@@ -51,12 +51,12 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.UFManager;
 
 /**
- * Abstract base class with helpful utilities for writing tests
- * that use an SMT solver.
- * It instantiates and closes the SMT solver before and after each test,
- * and provides fields with direct access to the most relevant instances.
+ * Abstract base class with helpful utilities for writing tests that use an SMT solver. It
+ * instantiates and closes the SMT solver before and after each test, and provides fields with
+ * direct access to the most relevant instances.
  *
  * <p>To run the tests using all available solvers, add the following code to your class:
+ *
  * <pre>
  * <code>
  *  {@literal @}Parameters(name="{0}")
@@ -74,11 +74,11 @@ import org.sosy_lab.java_smt.api.UFManager;
  * </code>
  * </pre>
  *
- * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions
- * about formulas using Truth.
+ * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
+ * using Truth.
  *
- * <p>Test that rely on a theory that not all solvers support
- * should call one of the {@code require} methods at the beginning.
+ * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
+ * methods at the beginning.
  */
 @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "test code")
 public abstract class SolverBasedTest0 {
@@ -104,9 +104,8 @@ public abstract class SolverBasedTest0 {
   }
 
   /**
-   * Return the solver to use in this test.
-   * The default is SMTInterpol because it's the only solver guaranteed on all platforms.
-   * Overwrite to specify a different solver.
+   * Return the solver to use in this test. The default is SMTInterpol because it's the only solver
+   * guaranteed on all platforms. Overwrite to specify a different solver.
    */
   protected Solvers solverToUse() {
     return Solvers.SMTINTERPOL;
@@ -159,9 +158,7 @@ public abstract class SolverBasedTest0 {
     context.close();
   }
 
-  /**
-   * Skip test if the solver does not support rationals.
-   */
+  /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
         .withFailureMessage("Solver " + solverToUse() + " does not support the theory of rationals")
@@ -169,9 +166,7 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /**
-   * Skip test if the solver does not support bitvectors.
-   */
+  /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
         .withFailureMessage(
@@ -179,9 +174,7 @@ public abstract class SolverBasedTest0 {
         .that(bvmgr)
         .isNotNull();
   }
-  /**
-   * Skip test if the solver does not support quantifiers.
-   */
+  /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
         .withFailureMessage("Solver " + solverToUse() + " does not support quantifiers")
@@ -189,9 +182,7 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /**
-   * Skip test if the solver does not support arrays.
-   */
+  /** Skip test if the solver does not support arrays. */
   protected final void requireArrays() {
     assume()
         .withFailureMessage("Solver " + solverToUse() + " does not support the theory of arrays")
@@ -206,9 +197,7 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /**
-   * Skip test if the solver does not support optimization.
-   */
+  /** Skip test if the solver does not support optimization. */
   protected final void requireOptimization() {
 
     // TODO: re-enable opti-mathsat, currently it has too many bugs.
@@ -241,16 +230,16 @@ public abstract class SolverBasedTest0 {
   }
 
   /**
-   * Use this for checking assertions about BooleanFormulas with Truth:
-   * <code>assertThatFormula(formula).is...()</code>.
+   * Use this for checking assertions about BooleanFormulas with Truth: <code>
+   * assertThatFormula(formula).is...()</code>.
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
     return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
   }
 
   /**
-   * Use this for checking assertions about ProverEnvironments with Truth:
-   * <code>assertThatEnvironment(stack).is...()</code>.
+   * Use this for checking assertions about ProverEnvironments with Truth: <code>
+   * assertThatEnvironment(stack).is...()</code>.
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
     return assert_().about(proverEnvironment()).that(prover);

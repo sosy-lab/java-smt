@@ -161,8 +161,7 @@ class PrincessBooleanFormulaManager
   /**
    * {@inheritDoc}
    *
-   * <p>Princess does not support XOR
-   * Formulas are converted from {@code a^b} to {@code !(a<=>b)}
+   * <p>Princess does not support XOR Formulas are converted from {@code a^b} to {@code !(a<=>b)}
    */
   @Override
   public IFormula xor(IExpression t1, IExpression t2) {

@@ -18,14 +18,11 @@
  *  limitations under the License.
  */
 /**
- * This wrapper around another theorem prover can be used,
- * if the inner theorem prover does not support addConstraints(f) on an empty stack,
- * i.e. before "push()" was called at least once.
- * The reasons for this behavior of the inner prover might be
- * that the prover should be reused,
- * i.e. the internal stack of formulas must be able to be cleared completely.
- * This is not possible, if the stack is shared,
- * because we cannot use "pop()" to remove constraints from an empty stack.
+ * This wrapper around another theorem prover can be used, if the inner theorem prover does not
+ * support addConstraints(f) on an empty stack, i.e. before "push()" was called at least once. The
+ * reasons for this behavior of the inner prover might be that the prover should be reused, i.e. the
+ * internal stack of formulas must be able to be cleared completely. This is not possible, if the
+ * stack is shared, because we cannot use "pop()" to remove constraints from an empty stack.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault

@@ -65,10 +65,10 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/** This is a Wrapper around SmtInterpol.
- * It guarantees the stack-behavior of function-declarations towards the SmtSolver,
- * so functions remain declared, if levels are popped.
- * This Wrapper allows to set a logfile for all Smt-Queries (default "smtinterpol.smt2").
+/**
+ * This is a Wrapper around SmtInterpol. It guarantees the stack-behavior of function-declarations
+ * towards the SmtSolver, so functions remain declared, if levels are popped. This Wrapper allows to
+ * set a logfile for all Smt-Queries (default "smtinterpol.smt2").
  */
 @Options(prefix = "solver.smtinterpol")
 class SmtInterpolEnvironment {
@@ -96,13 +96,13 @@ class SmtInterpolEnvironment {
 
   /** the wrapped Script */
   private final Script script;
+
   private final Theory theory;
 
   /** The current depth of the stack in the solver. */
   private int stackDepth = 0;
 
-  /** The Constructor creates the wrapped Element, sets some options
-   * and initializes the logger. */
+  /** The Constructor creates the wrapped Element, sets some options and initializes the logger. */
   SmtInterpolEnvironment(
       Configuration config,
       final LogManager pLogger,
@@ -164,9 +164,8 @@ class SmtInterpolEnvironment {
   }
 
   /**
-   * Be careful when accessing the Theory directly,
-   * because operations on it won't be caught by the LoggingScript.
-   * It is ok to create terms using the Theory, not to define them or call checkSat.
+   * Be careful when accessing the Theory directly, because operations on it won't be caught by the
+   * LoggingScript. It is ok to create terms using the Theory, not to define them or call checkSat.
    */
   Theory getTheory() {
     return theory;
@@ -205,9 +204,10 @@ class SmtInterpolEnvironment {
     return stackDepth;
   }
 
-  /** Parse a String to Terms and Declarations.
-   * The String may contain terms and function-declarations in SMTLIB2-format.
-   * Use Prefix-notation! */
+  /**
+   * Parse a String to Terms and Declarations. The String may contain terms and
+   * function-declarations in SMTLIB2-format. Use Prefix-notation!
+   */
   public List<Term> parseStringToTerms(String s) {
     FormulaCollectionScript parseScript = new FormulaCollectionScript(script, theory);
     ParseEnvironment parseEnv =
@@ -230,9 +230,11 @@ class SmtInterpolEnvironment {
     script.setOption(opt, value);
   }
 
-  /** This function declares a new functionSymbol, that has a given (result-) sort.
-   * The params for the functionSymbol also have sorts.
-   * If you want to declare a new variable, i.e. "X", paramSorts is an empty array. */
+  /**
+   * This function declares a new functionSymbol, that has a given (result-) sort. The params for
+   * the functionSymbol also have sorts. If you want to declare a new variable, i.e. "X", paramSorts
+   * is an empty array.
+   */
   @CanIgnoreReturnValue
   public FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
     FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
@@ -258,8 +260,10 @@ class SmtInterpolEnvironment {
     stackDepth += levels;
   }
 
-  /** This function pops levels from the assertion-stack.
-   * It also declares popped functions on the lower level. */
+  /**
+   * This function pops levels from the assertion-stack. It also declares popped functions on the
+   * lower level.
+   */
   public void pop(int levels) {
     checkArgument(levels >= 0);
     checkState(stackDepth >= levels, "not enough levels to remove");
@@ -277,8 +281,9 @@ class SmtInterpolEnvironment {
     script.assertTerm(term);
   }
 
-  /** This function causes the SatSolver to check all the terms on the stack,
-   * if their conjunction is SAT or UNSAT.
+  /**
+   * This function causes the SatSolver to check all the terms on the stack, if their conjunction is
+   * SAT or UNSAT.
    */
   public boolean checkSat() throws InterruptedException {
     // We actually terminate SmtInterpol during the analysis
@@ -324,8 +329,7 @@ class SmtInterpolEnvironment {
     return script.checkAllsat(importantPredicates);
   }
 
-  /** This function returns a map,
-   * that contains assignments term->term for all terms in terms. */
+  /** This function returns a map, that contains assignments term->term for all terms in terms. */
   public Model getModel() {
     return script.getModel();
   }
@@ -404,9 +408,9 @@ class SmtInterpolEnvironment {
     return script.binary(bin);
   }
 
-  /** This function returns a list of interpolants for the partitions.
-   * Each partition must be a named term or a conjunction of named terms.
-   * There should be (n-1) interpolants for n partitions.
+  /**
+   * This function returns a list of interpolants for the partitions. Each partition must be a named
+   * term or a conjunction of named terms. There should be (n-1) interpolants for n partitions.
    */
   public Term[] getInterpolants(Term[] partition) throws SolverException, InterruptedException {
     checkState(stackDepth > 0, "interpolants should be on higher levels");
@@ -428,11 +432,12 @@ class SmtInterpolEnvironment {
   }
 
   /**
-   * Compute a sequence of interpolants. The nesting array describes the
-   * start of the subtree for tree interpolants. For inductive sequences of
-   * interpolants use a nesting array completely filled with 0.
+   * Compute a sequence of interpolants. The nesting array describes the start of the subtree for
+   * tree interpolants. For inductive sequences of interpolants use a nesting array completely
+   * filled with 0.
    *
    * <p>Example:
+   *
    * <pre>
    * A  D
    * |  |
@@ -449,8 +454,8 @@ class SmtInterpolEnvironment {
    * startOfSubTree = [0,0,2,2,0,0,6,0]  // index of left-most leaf of the current element
    * </pre>
    *
-   * @param partition The array of formulas (post-order of tree).
-   *                  This should contain either top-level names or conjunction of top-level names.
+   * @param partition The array of formulas (post-order of tree). This should contain either
+   *     top-level names or conjunction of top-level names.
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.
    * @return Tree interpolants respecting the nesting relation.
    */

@@ -57,21 +57,16 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     implements OptimizationProverEnvironment {
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
-  /**
-   * Number of the objective -> objective pointer.
-   */
+  /** Number of the objective -> objective pointer. */
   private @Nullable List<Long> objectives = null;
 
   /**
-   * ID given to user -> number of the objective.
-   * Size corresponds to the number of currently existing objectives.
+   * ID given to user -> number of the objective. Size corresponds to the number of currently
+   * existing objectives.
    */
   private Map<Integer, Integer> objectiveMap;
 
-  /**
-   * Stack of the objective maps.
-   * Some duplication, but shouldn't be too important.
-   */
+  /** Stack of the objective maps. Some duplication, but shouldn't be too important. */
   private final Deque<ImmutableMap<Integer, Integer>> stack;
 
   Mathsat5OptimizationProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {

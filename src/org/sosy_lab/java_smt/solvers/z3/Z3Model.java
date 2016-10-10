@@ -101,18 +101,16 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   /**
-   * The symbol "!" is part of temporary symbols used for quantified formulas or aliases.
-   * This method is only a heuristic, because the user can also create a symbol containing "!".
-   **/
+   * The symbol "!" is part of temporary symbols used for quantified formulas or aliases. This
+   * method is only a heuristic, because the user can also create a symbol containing "!".
+   */
   private boolean isInternalSymbol(long funcDecl) {
     return Z3_IRRELEVANT_MODEL_TERM_PATTERN
         .matcher(creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
         .matches();
   }
 
-  /**
-   * @return ValueAssignments for a constant declaration in the model
-   * */
+  /** @return ValueAssignments for a constant declaration in the model */
   private Collection<ValueAssignment> getConstAssignments(long keyDecl) {
     Preconditions.checkArgument(
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
@@ -264,9 +262,9 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   /**
-   * @return ValueAssignment for an entry (one evaluation)
-   * of an uninterpreted function in the model.
-   **/
+   * @return ValueAssignment for an entry (one evaluation) of an uninterpreted function in the
+   *     model.
+   */
   private ValueAssignment getFunctionAssignment(
       String functionName, long funcDecl, long entry, long entryValue) {
     Object value = creator.convertValue(entryValue);

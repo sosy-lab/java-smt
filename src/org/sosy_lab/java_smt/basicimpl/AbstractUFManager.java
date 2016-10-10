@@ -31,8 +31,8 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
 
 /**
- * This class simplifies the implementation of the FunctionFormulaManager by converting the types
- * to the solver specific type.
+ * This class simplifies the implementation of the FunctionFormulaManager by converting the types to
+ * the solver specific type.
  *
  * @param <TFormulaInfo> The solver specific type.
  * @param <TFunctionDecl> The solver specific type of declarations of any function application

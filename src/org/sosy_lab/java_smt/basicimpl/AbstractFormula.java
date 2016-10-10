@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 /**
  * A Formula represented as a TFormulaInfo object.
+ *
  * @param <TFormulaInfo> the solver specific type.
  */
 abstract class AbstractFormula<TFormulaInfo> implements Formula {
@@ -69,9 +70,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     return formulaInfo.toString();
   }
 
-  /**
-   * Simple ArrayFormula implementation.
-   */
+  /** Simple ArrayFormula implementation. */
   static final class ArrayFormulaImpl<TI extends Formula, TE extends Formula, TFormulaInfo>
       extends AbstractFormula<TFormulaInfo> implements ArrayFormula<TI, TE> {
 
@@ -93,9 +92,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     }
   }
 
-  /**
-   * Simple BooleanFormula implementation. Just tracing the size and the sign-treatment
-   */
+  /** Simple BooleanFormula implementation. Just tracing the size and the sign-treatment */
   static final class BitvectorFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BitvectorFormula {
     BitvectorFormulaImpl(TFormulaInfo info) {
@@ -103,9 +100,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     }
   }
 
-  /**
-   * Simple FloatingPointFormula implementation.
-   */
+  /** Simple FloatingPointFormula implementation. */
   static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements FloatingPointFormula {
     FloatingPointFormulaImpl(TFormulaInfo info) {
@@ -113,9 +108,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     }
   }
 
-  /**
-   * Simple FloatingPointRoundingModeFormula implementation.
-   */
+  /** Simple FloatingPointRoundingModeFormula implementation. */
   static final class FloatingPointRoundingModeFormulaImpl<TFormulaInfo>
       extends AbstractFormula<TFormulaInfo> implements FloatingPointRoundingModeFormula {
     FloatingPointRoundingModeFormulaImpl(TFormulaInfo info) {
@@ -123,9 +116,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     }
   }
 
-  /**
-   * Simple BooleanFormula implementation.
-   */
+  /** Simple BooleanFormula implementation. */
   static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BooleanFormula {
     BooleanFormulaImpl(TFormulaInfo pT) {
@@ -133,9 +124,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     }
   }
 
-  /**
-   * Simple IntegerFormula implementation.
-   */
+  /** Simple IntegerFormula implementation. */
   static final class IntegerFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements IntegerFormula {
     IntegerFormulaImpl(TFormulaInfo pTerm) {
@@ -143,9 +132,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     }
   }
 
-  /**
-   * Simple RationalFormula implementation.
-   */
+  /** Simple RationalFormula implementation. */
   static final class RationalFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements RationalFormula {
     RationalFormulaImpl(TFormulaInfo pTerm) {

@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
-/**
- * Princess doesn't have a class representing sort.
- */
+/** Princess doesn't have a class representing sort. */
 enum PrincessTermType {
   Boolean,
   UF,

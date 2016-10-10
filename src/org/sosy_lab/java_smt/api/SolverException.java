@@ -21,9 +21,7 @@ package org.sosy_lab.java_smt.api;
 
 import javax.annotation.Nullable;
 
-/**
- * Exception thrown if there is an error during SMT solving.
- */
+/** Exception thrown if there is an error during SMT solving. */
 public class SolverException extends Exception {
 
   private static final long serialVersionUID = -1557936144555925180L;

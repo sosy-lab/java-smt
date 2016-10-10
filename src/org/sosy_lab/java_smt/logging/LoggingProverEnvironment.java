@@ -31,9 +31,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * Wraps a prover environment with a logging object.
- */
+/** Wraps a prover environment with a logging object. */
 class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
     implements ProverEnvironment {
 

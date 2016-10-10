@@ -64,8 +64,9 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
   }
 
-  /** This function causes the SatSolver to check all the terms on the stack,
-   * if their conjunction is SAT or UNSAT.
+  /**
+   * This function causes the SatSolver to check all the terms on the stack, if their conjunction is
+   * SAT or UNSAT.
    */
   @Override
   public boolean isUnsat() throws SolverException {
@@ -140,10 +141,9 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   }
 
   /**
-   * Clean the stack, such that it can be re-used.
-   * The caller has to guarantee, that a stack not used by several provers
-   * after calling {@link #close()}, because there is a dependency
-   * from 'one' prover to 'one' (reusable)
+   * Clean the stack, such that it can be re-used. The caller has to guarantee, that a stack not
+   * used by several provers after calling {@link #close()}, because there is a dependency from
+   * 'one' prover to 'one' (reusable)
    */
   @Override
   public void close() {
@@ -192,7 +192,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     List<ITerm> intSymbols = new ArrayList<>();
     List<IFunction> functionSymbols = new ArrayList<>();
 
-    /**  add higher level to current level, we keep the order of creating symbols. */
+    /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
       this.booleanSymbols.addAll(other.booleanSymbols);
       this.intSymbols.addAll(other.intSymbols);

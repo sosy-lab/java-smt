@@ -28,9 +28,8 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 
 /**
- * Visitor iterating through the boolean part of the formula.
- * Use {@link BooleanFormulaManager#visit}
- * for visiting formulas.
+ * Visitor iterating through the boolean part of the formula. Use {@link
+ * BooleanFormulaManager#visit} for visiting formulas.
  *
  * @param <R> Desired return type.
  */
@@ -43,16 +42,13 @@ public interface BooleanFormulaVisitor<R> {
    */
   R visitConstant(boolean value);
 
-  /**
-   * Visit a boolean variable bound by a quantifier.
-   */
+  /** Visit a boolean variable bound by a quantifier. */
   R visitBoundVar(BooleanFormula var, int deBruijnIdx);
 
   /**
    * Visit a NOT-expression.
    *
    * @param operand Negated term.
-   *
    * @see BooleanFormulaManager#not
    */
   R visitNot(BooleanFormula operand);
@@ -79,8 +75,7 @@ public interface BooleanFormulaVisitor<R> {
   R visitXor(BooleanFormula operand1, BooleanFormula operand2);
 
   /**
-   * Visit an equivalence between two formulas of boolean sort:
-   * {@code operand1 = operand2}
+   * Visit an equivalence between two formulas of boolean sort: {@code operand1 = operand2}
    *
    * @see BooleanFormulaManager#equivalence
    */
@@ -105,11 +100,10 @@ public interface BooleanFormulaVisitor<R> {
    * Visit a quantifier: forall- or exists-.
    *
    * @param quantifier Quantifier type: FORALL- or EXISTS-
-   * @param quantifiedAST AST of the quantified node.
-   *                      Provided because it is difficult to re-create from the parameters.
+   * @param quantifiedAST AST of the quantified node. Provided because it is difficult to re-create
+   *     from the parameters.
    * @param boundVars Variables bound by this quantifier.
    * @param body Body of the quantified expression.
-   *
    * @see QuantifiedFormulaManager#mkQuantifier
    * @see QuantifiedFormulaManager#forall
    * @see QuantifiedFormulaManager#exists
@@ -121,11 +115,9 @@ public interface BooleanFormulaVisitor<R> {
       BooleanFormula body);
 
   /**
-   * Visit an SMT atom.
-   * An atom can be a theory expression, constant, or a variable.
+   * Visit an SMT atom. An atom can be a theory expression, constant, or a variable.
    *
-   * <p>This is anything with a boolean sort which is not covered by the cases
-   * above.
+   * <p>This is anything with a boolean sort which is not covered by the cases above.
    */
   R visitAtom(BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl);
 }

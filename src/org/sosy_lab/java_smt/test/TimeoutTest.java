@@ -35,9 +35,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Tactic;
 
-/**
- * Check that timeout is handled gracefully.
- */
+/** Check that timeout is handled gracefully. */
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
 

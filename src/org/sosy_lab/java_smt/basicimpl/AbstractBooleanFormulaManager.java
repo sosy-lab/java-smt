@@ -187,6 +187,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   /**
    * Creates a formula representing an equivalence of the two arguments.
+   *
    * @param pBits1 a Formula
    * @param pBits2 a Formula
    * @return {@code f1 <-> f2}
@@ -227,6 +228,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   /**
    * Creates a formula representing "IF cond THEN f1 ELSE f2"
+   *
    * @param pBits a Formula
    * @param f1 a Formula
    * @param f2 a Formula
@@ -408,9 +410,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     return formulaCreator.visit(f, disjunctionFinder);
   }
 
-  /**
-   * Optimized non-recursive flattening implementation.
-   */
+  /** Optimized non-recursive flattening implementation. */
   private Set<BooleanFormula> asFuncRecursive(
       BooleanFormula f, FormulaVisitor<Set<BooleanFormula>> visitor) {
     Set<BooleanFormula> output = new HashSet<>();
@@ -463,8 +463,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       };
 
   /**
-   * Optimized, but ugly, implementation of argument extraction.
-   * Avoids extra visitor instantiation.
+   * Optimized, but ugly, implementation of argument extraction. Avoids extra visitor instantiation.
    */
   private final FormulaVisitor<Set<BooleanFormula>> disjunctionFinder =
       new DefaultFormulaVisitor<Set<BooleanFormula>>() {

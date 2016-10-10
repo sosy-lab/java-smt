@@ -162,9 +162,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     return Native.astToString(z3context, ast).contains(Z3_INFINITY_REPRESENTATION);
   }
 
-  /**
-   * Replace the epsilon in the returned formula with a numeric value.
-   */
+  /** Replace the epsilon in the returned formula with a numeric value. */
   private long replaceEpsilon(long ast, Rational newValue) {
     Formula z = creator.encapsulate(FormulaType.RationalType, ast);
     Formula epsFormula = rfmgr.makeVariable("epsilon");
@@ -177,8 +175,8 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   /**
-   * Dumps the optimized objectives and the constraints on the solver in the
-   * SMT-lib format. Super-useful!
+   * Dumps the optimized objectives and the constraints on the solver in the SMT-lib format.
+   * Super-useful!
    */
   @Override
   public String toString() {

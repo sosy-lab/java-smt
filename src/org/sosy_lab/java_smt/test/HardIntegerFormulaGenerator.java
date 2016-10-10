@@ -27,9 +27,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 
-/**
- * Generator of hard formulas using the theory of integers.
- */
+/** Generator of hard formulas using the theory of integers. */
 class HardIntegerFormulaGenerator {
   private final IntegerFormulaManager ifmgr;
   private final BooleanFormulaManager bfmgr;

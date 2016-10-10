@@ -20,7 +20,7 @@
 package org.sosy_lab.java_smt.api;
 
 /**
- * Formula representing a rounding mode for floating-point operations.
- * This is currently unused by the API but necessary for traversal of formulas with such terms.
+ * Formula representing a rounding mode for floating-point operations. This is currently unused by
+ * the API but necessary for traversal of formulas with such terms.
  */
 public interface FloatingPointRoundingModeFormula extends Formula {}
