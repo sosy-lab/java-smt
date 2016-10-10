@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.princess;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.ITerm;
-
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 

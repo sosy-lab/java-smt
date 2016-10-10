@@ -21,12 +21,10 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-
-import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
-
 import java.math.BigInteger;
 import java.util.List;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
 abstract class Z3NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>

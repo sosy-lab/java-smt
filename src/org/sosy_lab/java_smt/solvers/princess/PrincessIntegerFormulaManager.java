@@ -24,12 +24,10 @@ import ap.parser.IExpression;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.BitShiftMultiplication;
-
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 class PrincessIntegerFormulaManager
     extends PrincessNumeralFormulaManager<IntegerFormula, IntegerFormula>

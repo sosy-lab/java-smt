@@ -26,11 +26,9 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import org.sosy_lab.java_smt.api.SolverException;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
 class Mathsat5NativeApi {

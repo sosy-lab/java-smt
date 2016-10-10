@@ -31,10 +31,8 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
-
-import scala.collection.mutable.ArrayBuffer;
-
 import java.util.List;
+import scala.collection.mutable.ArrayBuffer;
 
 /**
  * Unlike other solvers, Princess does not have a class representing the

@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.test;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

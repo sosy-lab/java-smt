@@ -20,12 +20,10 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.Native;
-
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {

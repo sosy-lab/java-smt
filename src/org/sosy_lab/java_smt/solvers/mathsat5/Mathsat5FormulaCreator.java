@@ -69,7 +69,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
-
+import java.math.BigInteger;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -90,11 +93,6 @@ import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5FloatingPo
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5IntegerFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5RationalFormula;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 

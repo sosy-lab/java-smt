@@ -21,14 +21,12 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 class SmtInterpolRationalFormulaManager
     extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula>

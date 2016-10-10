@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.errorprone.annotations.ForOverride;
-
 import java.util.AbstractList;
 
 /**

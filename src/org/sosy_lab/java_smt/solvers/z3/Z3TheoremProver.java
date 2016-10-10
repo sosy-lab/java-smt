@@ -26,15 +26,6 @@ import com.google.common.base.VerifyException;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
-
-import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,8 +33,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
 
 class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnvironment {
 

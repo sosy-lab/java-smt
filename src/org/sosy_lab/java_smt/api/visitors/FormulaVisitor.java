@@ -19,16 +19,15 @@
  */
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * Visitor iterating through entire formula.

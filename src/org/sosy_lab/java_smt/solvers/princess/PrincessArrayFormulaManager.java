@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.parser.IExpression;
 import ap.parser.ITerm;
-
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;

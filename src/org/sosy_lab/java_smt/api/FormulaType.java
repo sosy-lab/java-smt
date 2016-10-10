@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.base.Preconditions;
-
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 

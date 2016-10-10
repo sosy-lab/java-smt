@@ -22,18 +22,15 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 /**
  * A model returned from the satisfiable solver environment.

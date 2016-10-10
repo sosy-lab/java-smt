@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import javax.annotation.Nullable;
 
 /**

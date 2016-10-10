@@ -19,12 +19,11 @@
  */
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-
-import java.util.List;
 
 /**
  * A formula visitor which allows for the default implementation.

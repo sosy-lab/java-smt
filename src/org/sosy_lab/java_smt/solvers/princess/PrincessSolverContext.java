@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -32,10 +34,6 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
-
-import java.util.Set;
-
-import javax.annotation.Nullable;
 
 public final class PrincessSolverContext extends AbstractSolverContext {
 

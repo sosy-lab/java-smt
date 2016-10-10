@@ -22,11 +22,9 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-
+import java.io.PrintWriter;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.io.PrintWriter;
 
 // reason: not maintained, some implementations for methods are missing
 class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProver {

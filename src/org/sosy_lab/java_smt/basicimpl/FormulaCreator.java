@@ -24,7 +24,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -47,15 +53,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RationalFormulaImpl;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 /**
  * This is a helper class with several methods that are commonly used

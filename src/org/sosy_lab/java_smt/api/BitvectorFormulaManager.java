@@ -19,9 +19,8 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
-
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 
 /**
  * Manager for dealing with formulas of the bitvector sort.

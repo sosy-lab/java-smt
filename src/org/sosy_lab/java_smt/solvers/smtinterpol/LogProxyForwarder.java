@@ -22,10 +22,8 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
-
-import org.sosy_lab.common.log.LogManager;
-
 import java.util.logging.Level;
+import org.sosy_lab.common.log.LogManager;
 
 /**
  * Implementation of {@link LogProxy} that forwards to {@link LogManager}.

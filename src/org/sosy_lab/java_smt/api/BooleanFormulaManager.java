@@ -20,13 +20,11 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
+import java.util.Collection;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * Manager for dealing with boolean formulas.

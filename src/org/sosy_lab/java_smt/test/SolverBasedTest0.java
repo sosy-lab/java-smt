@@ -25,9 +25,9 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.proverEnvironm
 
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.SubjectFactory;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.sosy_lab.common.ShutdownManager;
@@ -49,10 +49,6 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.UFManager;
-
-import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 /**
  * Abstract base class with helpful utilities for writing tests

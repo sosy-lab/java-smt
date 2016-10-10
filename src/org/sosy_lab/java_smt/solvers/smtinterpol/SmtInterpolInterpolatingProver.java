@@ -21,14 +21,8 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
-
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
     implements InterpolatingProverEnvironment<String> {

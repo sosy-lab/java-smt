@@ -21,7 +21,8 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
-
+import java.util.Map;
+import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -29,9 +30,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-
-import java.util.Map;
-import java.util.Map.Entry;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 

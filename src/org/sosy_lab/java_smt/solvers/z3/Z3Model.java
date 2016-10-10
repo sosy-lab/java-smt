@@ -26,17 +26,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
-
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 

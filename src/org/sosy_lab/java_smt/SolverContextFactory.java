@@ -22,7 +22,11 @@ package org.sosy_lab.java_smt;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-
+import java.lang.reflect.Constructor;
+import java.net.URLClassLoader;
+import java.util.Set;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -40,13 +44,6 @@ import org.sosy_lab.java_smt.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
-
-import java.lang.reflect.Constructor;
-import java.net.URLClassLoader;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
 
 /**
  * Factory class for loading and generating solver contexts.

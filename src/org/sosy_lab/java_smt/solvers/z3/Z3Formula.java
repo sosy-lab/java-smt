@@ -22,7 +22,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.microsoft.z3.Native;
-
+import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,8 +32,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-
-import javax.annotation.Nullable;
 
 abstract class Z3Formula implements Formula {
 

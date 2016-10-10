@@ -21,13 +21,11 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
-
+import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
-
-import java.math.BigDecimal;
 
 class Z3FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {

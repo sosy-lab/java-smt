@@ -20,17 +20,15 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
-
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
-
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Internal implementation of recursive transformation.

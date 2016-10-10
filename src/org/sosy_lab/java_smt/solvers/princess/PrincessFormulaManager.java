@@ -25,7 +25,6 @@ import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.PartialEvaluator;
-
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;

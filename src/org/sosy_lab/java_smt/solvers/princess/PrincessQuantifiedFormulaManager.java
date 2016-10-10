@@ -29,13 +29,11 @@ import ap.parser.IQuantified;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class PrincessQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<

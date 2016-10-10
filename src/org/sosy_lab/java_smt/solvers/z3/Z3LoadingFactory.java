@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -29,8 +30,6 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.InnerUtilFactory;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
-
-import javax.annotation.Nullable;
 
 /**
  * Entry point for loading Z3.

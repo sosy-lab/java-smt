@@ -20,9 +20,8 @@
 
 package org.sosy_lab.java_smt.api;
 
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
  * Interface which operates over {@link IntegerFormula}s.

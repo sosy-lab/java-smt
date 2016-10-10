@@ -21,12 +21,10 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 class SmtInterpolIntegerFormulaManager
     extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula>

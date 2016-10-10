@@ -32,7 +32,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
-
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -49,14 +54,6 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationTest;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.logging.Level;
-
-import javax.annotation.Nullable;
 
 public final class Mathsat5SolverContext extends AbstractSolverContext {
 

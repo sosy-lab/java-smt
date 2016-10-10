@@ -20,12 +20,11 @@
 
 package org.sosy_lab.java_smt.test;
 
+import java.util.Random;
+import java.util.stream.IntStream;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
-import java.util.Random;
-import java.util.stream.IntStream;
 
 /**
  * Fuzzer over the theory of integers.

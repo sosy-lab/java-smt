@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

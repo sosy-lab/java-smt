@@ -35,26 +35,21 @@ import ap.parser.IAtom;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-
-import scala.Option;
-import scala.Tuple2;
-import scala.collection.Iterator;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import scala.Option;
+import scala.Tuple2;
+import scala.collection.Iterator;
 
 class PrincessModel
     extends CachingAbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {

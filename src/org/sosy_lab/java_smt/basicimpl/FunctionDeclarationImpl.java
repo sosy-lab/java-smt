@@ -22,16 +22,13 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
-
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Nullable;
 
 /**
  * Declaration of a function.

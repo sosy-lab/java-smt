@@ -19,9 +19,8 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import org.sosy_lab.common.rationals.Rational;
-
 import java.util.Optional;
+import org.sosy_lab.common.rationals.Rational;
 
 /**
  * Interface for optimization modulo SMT.

@@ -45,9 +45,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_zext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 
-import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 /**
  * Mathsat Bitvector Theory, build out of Bitvector*Operations.

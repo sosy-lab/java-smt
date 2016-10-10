@@ -24,10 +24,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_uf;
 
 import com.google.common.primitives.Longs;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-
 import java.util.List;
+import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class Mathsat5UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 

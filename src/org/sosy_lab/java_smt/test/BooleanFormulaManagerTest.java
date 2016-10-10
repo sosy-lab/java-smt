@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.test;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
-
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;

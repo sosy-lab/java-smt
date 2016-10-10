@@ -20,14 +20,12 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
+import java.util.List;
+import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * FormulaManager class contains all operations which can be performed on

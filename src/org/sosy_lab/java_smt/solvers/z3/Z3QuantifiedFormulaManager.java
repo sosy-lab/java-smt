@@ -21,11 +21,9 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-
+import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
-
-import java.util.List;
 
 class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
 

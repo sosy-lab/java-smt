@@ -21,16 +21,14 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package,

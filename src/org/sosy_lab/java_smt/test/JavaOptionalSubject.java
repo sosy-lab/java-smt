@@ -22,9 +22,7 @@ package org.sosy_lab.java_smt.test;
 
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
-
 import java.util.Optional;
-
 import javax.annotation.Nullable;
 
 /**

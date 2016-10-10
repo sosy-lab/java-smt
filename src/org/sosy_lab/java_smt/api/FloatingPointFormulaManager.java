@@ -19,10 +19,9 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import java.math.BigDecimal;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-
-import java.math.BigDecimal;
 
 /**
  * Floating point operations.

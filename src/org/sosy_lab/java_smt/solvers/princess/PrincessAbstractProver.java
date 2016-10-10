@@ -27,23 +27,19 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.SolverException;
-
-import scala.Enumeration.Value;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverException;
+import scala.Enumeration.Value;
 
 abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E> {
 

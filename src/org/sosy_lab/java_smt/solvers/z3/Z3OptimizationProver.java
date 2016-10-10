@@ -24,7 +24,9 @@ import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
-
+import java.util.Optional;
+import java.util.logging.Level;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -34,11 +36,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.util.Optional;
-import java.util.logging.Level;
-
-import javax.annotation.Nullable;
 
 class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
 

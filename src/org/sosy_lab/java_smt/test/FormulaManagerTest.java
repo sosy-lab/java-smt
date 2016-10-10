@@ -28,7 +28,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.testing.EqualsTester;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -40,10 +42,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class FormulaManagerTest extends SolverBasedTest0 {

@@ -20,14 +20,13 @@
 
 package org.sosy_lab.java_smt.basicimpl.tactics;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   private final NNFInsideNotVisitor insideNotVisitor;

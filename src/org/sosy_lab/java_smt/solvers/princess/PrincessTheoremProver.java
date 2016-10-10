@@ -26,22 +26,17 @@ import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.INot;
-
 import com.google.common.base.Preconditions;
-
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-
-import scala.Option;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
+import scala.Option;
 
 class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     implements ProverEnvironment {

@@ -23,16 +23,13 @@ import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
 import com.google.common.truth.TestVerb;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.util.List;
 
 /**
  * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth

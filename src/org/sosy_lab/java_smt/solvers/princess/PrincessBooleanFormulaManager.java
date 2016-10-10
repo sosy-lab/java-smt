@@ -28,9 +28,7 @@ import ap.parser.IFormulaITE;
 import ap.parser.INot;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
-
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-
 import scala.Enumeration;
 
 class PrincessBooleanFormulaManager

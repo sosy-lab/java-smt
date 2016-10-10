@@ -22,7 +22,7 @@ package org.sosy_lab.java_smt.test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
-
+import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,8 +34,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.visitors.ExpectedFormulaVisitor;
-
-import java.util.List;
 
 @RunWith(Parameterized.class)
 public class UFManagerTest extends SolverBasedTest0 {

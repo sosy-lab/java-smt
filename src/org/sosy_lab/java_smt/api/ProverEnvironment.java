@@ -19,12 +19,11 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 /**
  * An interface to an incremental SMT solver

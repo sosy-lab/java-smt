@@ -21,10 +21,8 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-
 import java.util.List;
+import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class Z3UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 

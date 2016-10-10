@@ -23,10 +23,8 @@ import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-
 import java.util.Collection;
+import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class SmtInterpolBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {

@@ -19,14 +19,13 @@
  */
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-
-import java.util.List;
 
 /**
  * Visitor iterating through the boolean part of the formula.

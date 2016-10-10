@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.testing.AbstractPackageSanityTests;
-
 import org.sosy_lab.java_smt.api.FormulaType;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {

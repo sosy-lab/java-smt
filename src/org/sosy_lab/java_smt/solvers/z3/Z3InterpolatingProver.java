@@ -26,18 +26,6 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
-
-import org.sosy_lab.common.io.MoreFiles;
-import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -48,8 +36,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     implements InterpolatingProverEnvironment<Long> {

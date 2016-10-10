@@ -20,14 +20,12 @@
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {

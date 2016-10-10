@@ -44,9 +44,9 @@ import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
-
 import com.google.common.collect.ImmutableList;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -58,11 +58,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
-
 import scala.Enumeration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class PrincessFormulaCreator
     extends FormulaCreator<

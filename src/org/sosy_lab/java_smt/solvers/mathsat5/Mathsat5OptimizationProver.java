@@ -37,15 +37,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_model;
 
 import com.google.common.collect.ImmutableMap;
-
-import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -53,8 +44,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     implements OptimizationProverEnvironment {

@@ -25,7 +25,9 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-
+import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,10 +48,6 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Test that values from models are appropriately parsed.

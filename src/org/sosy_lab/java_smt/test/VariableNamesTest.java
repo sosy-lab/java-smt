@@ -29,9 +29,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,10 +47,6 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
 
 @RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")

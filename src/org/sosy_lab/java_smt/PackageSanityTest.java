@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt;
 
 import com.google.common.testing.AbstractPackageSanityTests;
-
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;

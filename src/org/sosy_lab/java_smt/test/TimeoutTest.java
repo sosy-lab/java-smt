@@ -21,7 +21,8 @@
 package org.sosy_lab.java_smt.test;
 
 import com.google.common.truth.TruthJUnit;
-
+import java.util.Random;
+import java.util.function.Supplier;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -33,9 +34,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Tactic;
-
-import java.util.Random;
-import java.util.function.Supplier;
 
 /**
  * Check that timeout is handled gracefully.

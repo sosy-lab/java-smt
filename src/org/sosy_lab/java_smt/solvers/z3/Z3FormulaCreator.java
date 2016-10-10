@@ -34,7 +34,13 @@ import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
-
+import java.lang.ref.PhantomReference;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -63,14 +69,6 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RationalFormula;
-
-import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {

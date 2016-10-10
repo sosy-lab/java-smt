@@ -21,15 +21,14 @@ package org.sosy_lab.java_smt.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnvironment<T>
     implements InterpolatingProverEnvironment<T> {

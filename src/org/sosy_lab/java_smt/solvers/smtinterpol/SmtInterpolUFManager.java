@@ -22,10 +22,8 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-
 import java.util.List;
+import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class SmtInterpolUFManager
     extends AbstractUFManager<Term, FunctionSymbol, Sort, SmtInterpolEnvironment> {

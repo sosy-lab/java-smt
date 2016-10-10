@@ -29,14 +29,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
+import java.util.Map;
+import java.util.Map.Entry;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Common base class for {@link Mathsat5TheoremProver}

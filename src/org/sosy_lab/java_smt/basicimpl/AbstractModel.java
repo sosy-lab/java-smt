@@ -22,7 +22,9 @@ package org.sosy_lab.java_smt.basicimpl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
+import java.math.BigInteger;
+import java.util.Iterator;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -31,11 +33,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-
-import java.math.BigInteger;
-import java.util.Iterator;
-
-import javax.annotation.Nullable;
 
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
 

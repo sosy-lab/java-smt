@@ -23,11 +23,9 @@ import com.google.common.collect.testing.ListTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringListGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
-
+import java.util.List;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.List;
 
 public class ObjectArrayBackedListTest extends TestCase {
 

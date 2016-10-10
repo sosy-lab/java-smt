@@ -25,19 +25,8 @@ import static scala.collection.JavaConversions.seqAsJavaList;
 import ap.SimpleAPI;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-
-import scala.collection.Seq;
-import scala.collection.mutable.ArrayBuffer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,6 +35,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
+import scala.collection.Seq;
+import scala.collection.mutable.ArrayBuffer;
 
 class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Integer>
     implements InterpolatingProverEnvironment<Integer> {

@@ -27,7 +27,9 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.TruthJUnit;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,10 +46,6 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class SolverTacticsTest extends SolverBasedTest0 {

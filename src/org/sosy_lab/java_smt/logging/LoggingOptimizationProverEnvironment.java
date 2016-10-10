@@ -21,14 +21,13 @@ package org.sosy_lab.java_smt.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
+import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-
-import java.util.Optional;
-import java.util.logging.Level;
 
 /**
  * Wrapper for an optimizing solver.

@@ -20,16 +20,14 @@
 package org.sosy_lab.java_smt.api.visitors;
 
 import com.google.common.collect.Collections2;
-
+import java.util.Collection;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Base class for visitors for boolean formulas that recursively transform

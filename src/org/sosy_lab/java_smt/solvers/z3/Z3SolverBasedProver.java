@@ -24,10 +24,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
-
-import org.sosy_lab.java_smt.api.BooleanFormula;
-
 import java.util.Collection;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 
 abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
 

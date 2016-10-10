@@ -20,16 +20,15 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.ProverWithAssumptionsWrapper;
-
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
 
 public abstract class AbstractSolverContext implements SolverContext {
 

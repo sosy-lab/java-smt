@@ -22,11 +22,9 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import ap.parser.IExpression;
-
+import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
-
-import java.util.List;
 
 class PrincessUFManager
     extends AbstractUFManager<

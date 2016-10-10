@@ -20,12 +20,11 @@
 
 package org.sosy_lab.java_smt.test;
 
+import java.util.Random;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
-
-import java.util.Random;
 
 /**
  * Boolean fuzzer, useful for testing.

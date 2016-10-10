@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.api.visitors;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;

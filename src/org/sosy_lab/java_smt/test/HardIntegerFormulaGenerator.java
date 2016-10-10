@@ -21,13 +21,11 @@
 package org.sosy_lab.java_smt.test;
 
 import com.google.common.base.Preconditions;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Generator of hard formulas using the theory of integers.

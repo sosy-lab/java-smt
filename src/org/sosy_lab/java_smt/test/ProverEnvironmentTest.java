@@ -28,7 +28,8 @@ import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNS
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 
 import com.google.common.collect.ImmutableList;
-
+import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -38,9 +39,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-
-import java.util.List;
-import java.util.Optional;
 
 @RunWith(Parameterized.class)
 public class ProverEnvironmentTest extends SolverBasedTest0 {

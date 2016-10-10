@@ -22,6 +22,8 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -34,10 +36,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
-
-import java.util.Set;
-
-import javax.annotation.Nullable;
 
 public class SmtInterpolSolverContext extends AbstractSolverContext {
 

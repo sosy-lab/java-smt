@@ -20,10 +20,8 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.Native;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
 

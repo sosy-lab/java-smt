@@ -29,7 +29,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
-
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,8 +45,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 import org.sosy_lab.java_smt.utils.UfElimination;
 import org.sosy_lab.java_smt.utils.UfElimination.Result;
-
-import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class UfEliminationTest extends SolverBasedTest0 {

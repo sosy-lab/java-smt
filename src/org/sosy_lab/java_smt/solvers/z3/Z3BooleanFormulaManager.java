@@ -21,11 +21,9 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-
 import java.util.Collection;
 import java.util.Iterator;
+import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
