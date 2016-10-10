@@ -39,8 +39,9 @@ import org.sosy_lab.java_smt.api.SolverException;
  * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth (allows to use
  * <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
- * <p>Use {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or {@link
- * TestVerb#about(com.google.common.truth.SubjectFactory)} and {@link #forSolver(SolverContext)}.
+ * <p>For a test use either {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or use
+ * {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and set a solver via the method
+ * {@link #forSolver(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {

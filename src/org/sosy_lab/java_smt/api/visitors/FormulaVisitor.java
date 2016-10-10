@@ -60,8 +60,7 @@ public interface FormulaVisitor<R> {
    *
    * @param f Formula representing the constant.
    * @param value The value of the constant. It is either of type {@link Boolean} or of a subtype of
-   *     {@link Number}, in most cases a {@link BigInteger}, {@link BigDecimal}, or {@link
-   *     Rational}.
+   *     {@link Number}, mostly a {@link BigInteger}, a {@link BigDecimal}, or a {@link Rational}.
    * @return An arbitrary return value that is be passed to the caller.
    */
   R visitConstant(Formula f, Object value);
