@@ -151,14 +151,13 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     checkNotNull(mgr);
     if (!closed) {
       if (shutdownNotifier.shouldShutdown()) {
-        creator.getEnv().removeStack(this, api);
         api.shutDown();
       } else {
         for (int i = 0; i < trackingStack.size(); i++) {
           pop();
         }
-        creator.getEnv().unregisterStack(this, api);
       }
+      creator.getEnv().unregisterStack(this);
     }
     closed = true;
   }
@@ -166,6 +165,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   /** add external definition: boolean variable. */
   void addSymbol(IFormula f) {
     Preconditions.checkState(!closed);
+    api.addBooleanVariable(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.getLast().booleanSymbols.add(f);
     }
@@ -174,6 +174,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   /** add external definition: integer variable. */
   void addSymbol(ITerm f) {
     Preconditions.checkState(!closed);
+    api.addConstant(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.getLast().intSymbols.add(f);
     }
@@ -182,6 +183,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   /** add external definition: uninterpreted function. */
   void addSymbol(IFunction f) {
     Preconditions.checkState(!closed);
+    api.addFunction(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.getLast().functionSymbols.add(f);
     }

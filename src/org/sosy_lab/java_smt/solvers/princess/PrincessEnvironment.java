@@ -54,7 +54,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -91,16 +90,6 @@ class PrincessEnvironment {
   )
   private int minAtomsForAbbreviation = 100;
 
-  @Option(
-    secure = true,
-    description =
-        "Princess needs to copy all symbols for each new prover. "
-            + "This flag allows to reuse old unused provers and avoid the overhead."
-  )
-  // TODO someone should measure the overhead, perhaps it is negligible.
-
-  private boolean reuseProvers = true;
-
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
 
@@ -131,10 +120,7 @@ class PrincessEnvironment {
    */
   private final SimpleAPI api;
 
-  private final List<PrincessAbstractProver<?, ?>> registeredProvers =
-      new ArrayList<>(); // where an API is used
-  private final List<SimpleAPI> reusableAPIs = new ArrayList<>();
-  private final Map<SimpleAPI, Boolean> allAPIs = new LinkedHashMap<>();
+  private final List<PrincessAbstractProver<?, ?>> registeredProvers = new ArrayList<>();
 
   PrincessEnvironment(
       Configuration config,
@@ -156,29 +142,13 @@ class PrincessEnvironment {
   PrincessAbstractProver<?, ?> getNewProver(
       boolean useForInterpolation, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
 
-    SimpleAPI newApi = null;
+    SimpleAPI newApi = getNewApi(useForInterpolation);
 
-    if (reuseProvers) {
-      // shortcut if we have a reusable stack
-      for (Iterator<SimpleAPI> it = reusableAPIs.iterator(); it.hasNext(); ) {
-        newApi = it.next();
-        if (allAPIs.get(newApi) == useForInterpolation) {
-          it.remove();
-          break;
-        }
-      }
-    }
-    if (newApi == null) {
-      // if not we have to create a new one
-      newApi = getNewApi(useForInterpolation);
-
-      // add all symbols, that are available until now
-      boolVariablesCache.values().forEach(newApi::addBooleanVariable);
-      intVariablesCache.values().forEach(newApi::addConstant);
-      arrayVariablesCache.values().forEach(newApi::addConstant);
-      functionsCache.values().forEach(newApi::addFunction);
-      allAPIs.put(newApi, useForInterpolation);
-    }
+    // add all symbols, that are available until now
+    boolVariablesCache.values().forEach(newApi::addBooleanVariable);
+    intVariablesCache.values().forEach(newApi::addConstant);
+    arrayVariablesCache.values().forEach(newApi::addConstant);
+    functionsCache.values().forEach(newApi::addFunction);
 
     PrincessAbstractProver<?, ?> prover;
     if (useForInterpolation) {
@@ -248,20 +218,9 @@ class PrincessEnvironment {
     return minAtomsForAbbreviation;
   }
 
-  void unregisterStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {
+  void unregisterStack(PrincessAbstractProver<?, ?> stack) {
     assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
     registeredProvers.remove(stack);
-    if (reuseProvers) {
-      reusableAPIs.add(usedAPI);
-    } else {
-      allAPIs.remove(usedAPI);
-    }
-  }
-
-  void removeStack(PrincessAbstractProver<?, ?> stack, SimpleAPI usedAPI) {
-    assert registeredProvers.contains(stack) : "cannot remove stack, it is not registered";
-    registeredProvers.remove(stack);
-    allAPIs.remove(usedAPI);
   }
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
@@ -520,27 +479,18 @@ class PrincessEnvironment {
   }
 
   private void addSymbol(IFormula symbol) {
-    for (SimpleAPI otherAPI : allAPIs.keySet()) {
-      otherAPI.addBooleanVariable(symbol);
-    }
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(symbol);
     }
   }
 
   private void addSymbol(ITerm symbol) {
-    for (SimpleAPI otherAPI : allAPIs.keySet()) {
-      otherAPI.addConstant(symbol);
-    }
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(symbol);
     }
   }
 
   private void addFunction(IFunction funcDecl) {
-    for (SimpleAPI otherAPI : allAPIs.keySet()) {
-      otherAPI.addFunction(funcDecl);
-    }
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(funcDecl);
     }
