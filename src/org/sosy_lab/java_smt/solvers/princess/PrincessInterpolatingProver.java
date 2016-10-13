@@ -58,9 +58,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    for (Integer removed : assertedFormulas.peek()) {
-      annotatedTerms.remove(removed);
-    }
+    assertedFormulas.peek().forEach(annotatedTerms::remove);
     super.pop();
   }
 
