@@ -474,10 +474,6 @@ class PrincessEnvironment {
     return api.simplify(formula);
   }
 
-  public String getVersion() {
-    return "Princess (unknown version)";
-  }
-
   private void addSymbol(IFormula symbol) {
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(symbol);

@@ -92,7 +92,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return creator.getEnv().getVersion();
+    return "Princess (unknown version)";
   }
 
   @Override
