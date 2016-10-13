@@ -48,7 +48,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   protected final ShutdownNotifier shutdownNotifier;
 
-  protected final PrincessFormulaCreator creator;
+  private final PrincessFormulaCreator creator;
   protected boolean closed = false;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
@@ -187,9 +187,9 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   }
 
   private static class Level {
-    List<IFormula> booleanSymbols = new ArrayList<>();
-    List<ITerm> intSymbols = new ArrayList<>();
-    List<IFunction> functionSymbols = new ArrayList<>();
+    final List<IFormula> booleanSymbols = new ArrayList<>();
+    final List<ITerm> intSymbols = new ArrayList<>();
+    final List<IFunction> functionSymbols = new ArrayList<>();
 
     /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
