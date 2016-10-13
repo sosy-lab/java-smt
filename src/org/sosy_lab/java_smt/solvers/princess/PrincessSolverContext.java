@@ -52,8 +52,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate pLogfileTemplate)
       throws InvalidConfigurationException {
     PrincessEnvironment env = new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier);
-    PrincessFormulaCreator creator =
-        new PrincessFormulaCreator(env, PrincessTermType.Boolean, PrincessTermType.Integer);
+    PrincessFormulaCreator creator = new PrincessFormulaCreator(env);
 
     // Create managers
     PrincessUFManager functionTheory = new PrincessUFManager(creator);

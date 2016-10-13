@@ -64,9 +64,8 @@ class PrincessFormulaCreator
     extends FormulaCreator<
         IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
 
-  PrincessFormulaCreator(
-      PrincessEnvironment pEnv, PrincessTermType pBoolType, PrincessTermType pIntegerType) {
-    super(pEnv, pBoolType, pIntegerType, null);
+  PrincessFormulaCreator(PrincessEnvironment pEnv) {
+    super(pEnv, PrincessTermType.Boolean, PrincessTermType.Integer, null);
   }
 
   @Override
