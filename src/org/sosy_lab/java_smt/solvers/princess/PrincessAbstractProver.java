@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.SimpleAPI;
-import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
@@ -124,8 +123,6 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(wasLastSatCheckSat, "model is only available for SAT environments");
     return new PrincessModel(api.partialModel(), creator);
   }
-
-  protected abstract Collection<? extends IExpression> getAssertedFormulas();
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {

@@ -109,11 +109,4 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }
-
-  @Override
-  protected Collection<? extends IExpression> getAssertedFormulas() {
-    List<IExpression> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
-  }
 }
