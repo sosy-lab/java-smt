@@ -25,5 +25,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/SoSy-Lab Common/lib/java/build/auto-value.jar"/>
+	<classpathentry kind="lib" path="/Users/pmtruth/git/java-smt/lib/java/runtime/CVC4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
