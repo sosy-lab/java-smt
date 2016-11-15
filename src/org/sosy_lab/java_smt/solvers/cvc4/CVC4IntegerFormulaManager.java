@@ -50,9 +50,10 @@ public class CVC4IntegerFormulaManager
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
     if (pI < 0) {
-      return em.mkConst(new Rational(new Integer((int) pI)));
+      // TODO fix this bug
+      return exprManager.mkConst(new Rational(new Integer((int) pI)));
     }
-    return em.mkConst(new Rational(new Integer(pI)));
+    return exprManager.mkConst(new Rational(new Integer(pI)));
   }
 
   @Override
@@ -67,22 +68,31 @@ public class CVC4IntegerFormulaManager
 
   @Override
   protected Expr divide(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
   }
 
   @Override
   protected Expr multiply(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.MULT, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
   }
 
   @Override
   protected Expr modulo(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.INTS_MODULUS, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.INTS_MODULUS, pParam1, pParam2);
   }
 
   @Override
   protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
-    return null;
+    // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
+    if (pModulo > 0) {
+      Expr n = makeNumberImpl(pModulo);
+      Expr x = subtract(pNumber1, pNumber2);
+      return exprManager.mkExpr(
+          Kind.EQUAL,
+          x,
+          exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x, n)));
+    }
+    return exprManager.mkConst(true);
   }
 
   @Override
@@ -92,7 +102,7 @@ public class CVC4IntegerFormulaManager
 
   @Override
   protected Expr makeNumberImpl(String pI) {
-    return em.mkConst(new Rational(pI));
+    return exprManager.mkConst(new Rational(pI));
   }
 
   @Override

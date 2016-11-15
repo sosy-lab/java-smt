@@ -32,59 +32,59 @@ public abstract class CVC4NumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Expr, Type, CVC4Environment, ParamFormulaType, ResultFormulaType, Expr> {
 
-  protected final ExprManager em;
+  protected final ExprManager exprManager;
   protected final CVC4Environment env;
 
   protected CVC4NumeralFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     env = pCreator.getEnv();
-    em = env.getExprManager();
+    exprManager = env.getExprManager();
   }
 
   @Override
   protected boolean isNumeral(Expr pVal) {
     return pVal.getType().isInteger()
         || pVal.getType().isFloatingPoint()
-        || pVal.getType().isReal();
+        || pVal.getType().isReal(); // TODO is bitvector numeral?
   }
 
   @Override
   protected Expr negate(Expr pParam1) {
-    return em.mkExpr(Kind.UMINUS, pParam1);
+    return exprManager.mkExpr(Kind.UMINUS, pParam1);
   }
 
   @Override
   protected Expr add(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.PLUS, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.PLUS, pParam1, pParam2);
   }
 
   @Override
   protected Expr subtract(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.MINUS, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.MINUS, pParam1, pParam2);
   }
 
   @Override
   protected Expr equal(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.EQUAL, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
 
   @Override
   protected Expr greaterThan(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.GT, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.GT, pParam1, pParam2);
   }
 
   @Override
   protected Expr greaterOrEquals(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.GEQ, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.GEQ, pParam1, pParam2);
   }
 
   @Override
   protected Expr lessThan(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.LT, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.LT, pParam1, pParam2);
   }
 
   @Override
   protected Expr lessOrEquals(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.LEQ, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.LEQ, pParam1, pParam2);
   }
 }

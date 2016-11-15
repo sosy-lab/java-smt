@@ -25,17 +25,13 @@ import com.google.common.collect.ImmutableList;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Result;
 import edu.nyu.acsys.CVC4.SmtEngine;
-import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.UnsatCore;
 
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,20 +40,19 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEnvironment {
+public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements ProverEnvironment {
 
-  private boolean closed = false;
-  private final SmtEngine smtEngine;
   private final CVC4FormulaManager mgr;
+  private final SmtEngine smtEngine;
   private final BooleanFormulaManager bfmgr;
-  private final FormulaCreator<Expr, Type, CVC4Environment, Expr> creator;
+  private boolean closed = false;
   private final List<Expr> assertedFormulas = new ArrayList<>();
 
-  protected CVC4TheoremProver(CVC4FormulaManager fMgr) {
-    mgr       = fMgr;
-    creator   = mgr.getFormulaCreator();
-    bfmgr     = fMgr.getBooleanFormulaManager();
-    smtEngine = fMgr.getEnvironment().newSMTEngine();
+  protected CVC4TheoremProver(CVC4FormulaCreator creator, CVC4FormulaManager pMgr) {
+    super(creator);
+    mgr = pMgr;
+    smtEngine = pMgr.getEnvironment().newSMTEngine();
+    bfmgr = pMgr.getBooleanFormulaManager();
   }
 
   @Override
@@ -75,10 +70,7 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula pF) {
-    Preconditions.checkState(!closed);
-    Expr exp = mgr.extractInfo(pF);
-    smtEngine.assertFormula(exp);
-    assertedFormulas.add(exp);
+    super.addConstraint0(pF);
     return null;
   }
 
@@ -120,23 +112,52 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    return new CVC4Model(smtEngine, creator, assertedFormulas);
-  }
-
-  @Override
   public void close() {
     Preconditions.checkState(!closed);
     smtEngine.delete();
     closed = true;
   }
 
-  @Override
-  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    return null;
-  }
+//  @Override
+//  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
+//      throws InterruptedException, SolverException {
+//    Preconditions.checkState(!closed);
+//    // Unpack formulas to terms.
+//    Expr[] importantFormulas = new Expr[pImportant.size()];
+//    int i = 0;
+//    for (BooleanFormula impF : pImportant) {
+//      importantFormulas[i++] = getCVC4Expr(impF);
+//    }
+//
+//    smtEngine.push();
+//
+//    while (!isUnsat()) {
+//      Expr[] valuesOfModel = new Expr[importantFormulas.length];
+//      CVC4Model model = new CVC4Model(smtEngine, creator, assertedFormulas);
+//
+//      for (int j = 0; j < importantFormulas.length; j++) {
+//        Object valueOfExpr = model.evaluateImpl(importantFormulas[j]);
+//
+//        if (valueOfExpr instanceof Boolean && !((Boolean) valueOfExpr)) {
+//          valuesOfModel[j] =
+//              getCVC4Expr(bfmgr.not(mgr.encapsulateBooleanFormula(importantFormulas[j])));
+//        } else {
+//          valuesOfModel[j] = importantFormulas[j];
+//        }
+//      }
+//
+//      List<BooleanFormula> wrapped =
+//          Lists.transform(Arrays.asList(valuesOfModel), creator.encapsulateBoolean);
+//      pCallback.apply(wrapped);
+//
+//      BooleanFormula negatedModel = bfmgr.not(bfmgr.and(wrapped));
+//      smtEngine.assertFormula(getCVC4Expr(negatedModel));
+//    }
+//
+//    // we pushed some levels on assertionStack, remove them and delete solver
+//    smtEngine.pop();
+//    return pCallback.getResult();
+//  }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
@@ -154,6 +175,13 @@ public class CVC4TheoremProver implements BasicProverEnvironment<Void>, ProverEn
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
+      throws InterruptedException, SolverException {
     // TODO Auto-generated method stub
     return null;
   }

@@ -21,9 +21,14 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 public class CVC4Formula implements Formula {
 
@@ -60,8 +65,47 @@ public class CVC4Formula implements Formula {
     return cvc4term;
   }
 
+  static final class CVC4ArrayFormula<TI extends Formula, TE extends Formula> extends CVC4Formula
+      implements ArrayFormula<TI, TE> {
+
+    private final FormulaType<TI> indexType;
+    private final FormulaType<TE> elementType;
+
+    CVC4ArrayFormula(Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      super(pTerm);
+      indexType = pIndexType;
+      elementType = pElementType;
+    }
+
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
+    }
+  }
+
+  static final class CVC4BitvectorFormula extends CVC4Formula implements BitvectorFormula {
+    CVC4BitvectorFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
+  static final class CVC4FloatingPointFormula extends CVC4Formula implements FloatingPointFormula {
+    CVC4FloatingPointFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
   static final class CVC4IntegerFormula extends CVC4Formula implements IntegerFormula {
     CVC4IntegerFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
+  static final class CVC4RationalFormula extends CVC4Formula implements RationalFormula {
+    CVC4RationalFormula(Expr pTerm) {
       super(pTerm);
     }
   }

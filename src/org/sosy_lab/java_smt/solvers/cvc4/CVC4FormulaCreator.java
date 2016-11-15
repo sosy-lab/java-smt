@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
@@ -36,18 +35,23 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BooleanFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environment, Expr> {
+public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, CVC4Environment, Expr> {
 
   private final ExprManager exprManager;
 
@@ -120,9 +124,17 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
       return (T) new CVC4BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
       return (T) new CVC4IntegerFormula(pTerm);
-    } else {
-      throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
+    } else if (pType.isRationalType()) {
+      return (T) new CVC4RationalFormula(pTerm);
+    } else if (pType.isArrayType()) {
+      ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
+      return (T) new CVC4ArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType());
+    } else if (pType.isBitvectorType()) {
+      return (T) new CVC4BitvectorFormula(pTerm);
+    } else if (pType.isFloatingPointType()) {
+      return (T) new CVC4FloatingPointFormula(pTerm);
     }
+    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
   }
 
   @Override
@@ -133,19 +145,21 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
 
   @Override
   public BitvectorFormula encapsulateBitvector(Expr pTerm) {
-    return null;
+    assert getFormulaType(pTerm).isBitvectorType();
+    return new CVC4BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
-    return null;
+    assert getFormulaType(pTerm).isFloatingPointType();
+    return new CVC4FloatingPointFormula(pTerm);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
-    return null;
+    return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   private String getName(Expr pT) {
@@ -159,6 +173,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
   }
 
   private Expr replaceArgs(Expr pT, List<Expr> pNewArgs) {
+
+    // TODO!
     throw new UnsupportedOperationException("Not implemented");
   }
 
@@ -174,6 +190,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
       } else if (type.isInteger() || type.isFloatingPoint()) {
         return visitor.visitConstant(formula, f.getConstRational());
       } else if (type.isBitVector()) {
+        // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstBitVector().getValue());
       } else {
         throw new UnsupportedOperationException("Unhandled constant kind");
@@ -185,15 +202,17 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     } else {
       String name = getName(f);
       long arity = f.getNumChildren();
-      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
       List<Formula> args = new ArrayList<>((int) arity);
+      List<FormulaType<?>> argsTypes = new ArrayList<>((int) arity);
       for (int i = 0; i < arity; i++) {
         Expr arg = f.getChild(i);
+        FormulaType<?> argType = getFormulaType(arg);
         args.add(encapsulateWithTypeOf(arg));
-        argTypes.add(getFormulaType(arg));
+        argsTypes.add(argType);
       }
 
+      // Any function application.
       Function<List<Formula>, Formula> constructor =
           new Function<List<Formula>, Formula>() {
             @Override
@@ -202,8 +221,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
             }
           };
       return visitor.visitFunction(
-          formula, args, FunctionDeclarationImpl.of(name, getDeclarationKind(f), argTypes.build(), getFormulaType(f), 1));
-
+          formula, args,
+          FunctionDeclarationImpl.of(name, getDeclarationKind(f), argsTypes, getFormulaType(f), f));
     }
   }
 

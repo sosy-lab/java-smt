@@ -32,13 +32,13 @@ import java.util.Collection;
 public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
-  private final ExprManager em;
+  private final ExprManager exprManager;
   private final CVC4Environment env;
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     env = pCreator.getEnv();
-    em = env.getExprManager();
+    exprManager = env.getExprManager();
   }
 
   @Override
@@ -48,17 +48,17 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr makeBooleanImpl(boolean pValue) {
-    return em.mkConst(pValue);
+    return exprManager.mkConst(pValue);
   }
 
   @Override
   protected Expr not(Expr pParam1) {
-    return em.mkExpr(Kind.NOT, pParam1);
+    return exprManager.mkExpr(Kind.NOT, pParam1);
   }
 
   @Override
   protected Expr and(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.AND, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.AND, pParam1, pParam2);
   }
 
   @Override
@@ -67,12 +67,12 @@ public class CVC4BooleanFormulaManager
     for (Expr e : pParams) {
       vExpr.add(e);
     }
-    return em.mkExpr(Kind.AND, vExpr);
+    return exprManager.mkExpr(Kind.AND, vExpr);
   }
 
   @Override
   protected Expr or(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.OR, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.OR, pParam1, pParam2);
   }
 
   @Override
@@ -81,17 +81,17 @@ public class CVC4BooleanFormulaManager
     for (Expr e : pParams) {
       vExpr.add(e);
     }
-    return em.mkExpr(Kind.OR, vExpr);
+    return exprManager.mkExpr(Kind.OR, vExpr);
   }
 
   @Override
   protected Expr xor(Expr pParam1, Expr pParam2) {
-    return em.mkExpr(Kind.XOR, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.XOR, pParam1, pParam2);
   }
 
   @Override
   protected Expr equivalence(Expr pBits1, Expr pBits2) {
-    return em.mkExpr(Kind.IFF, pBits1, pBits2);
+    return exprManager.mkExpr(Kind.IFF, pBits1, pBits2);
   }
 
   @Override

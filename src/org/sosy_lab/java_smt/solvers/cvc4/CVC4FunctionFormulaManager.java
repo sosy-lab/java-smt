@@ -19,16 +19,47 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.FunctionType;
+import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.Type;
+import edu.nyu.acsys.CVC4.vectorExpr;
+import edu.nyu.acsys.CVC4.vectorType;
 
-public class CVC4FunctionFormulaManager {
+import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
+
+import java.util.List;
+
+public class CVC4FunctionFormulaManager
+    extends AbstractUFManager<Expr, Expr, Type, CVC4Environment> {
 
   private final ExprManager exprManager;
   private final CVC4Environment env;
 
   protected CVC4FunctionFormulaManager(CVC4FormulaCreator pCreator) {
+    super(pCreator);
     env = pCreator.getEnv();
     exprManager = env.getExprManager();
   }
 
+  @Override
+  protected Expr declareUninterpretedFunctionImpl(
+      String pName, Type pReturnType, List<Type> pArgTypes) {
+    vectorType argTypes = new vectorType();
+    for (Type t : pArgTypes) {
+      argTypes.add(t);
+    }
+    FunctionType functionType = exprManager.mkFunctionType(argTypes, pReturnType);
+    return env.makeVariable(pName, functionType);
+  }
+
+  @Override
+  protected Expr createUninterpretedFunctionCallImpl(Expr pFunc, List<Expr> pArgs) {
+    vectorExpr args = new vectorExpr();
+    for (Expr t : pArgs) {
+      args.add(t);
+    }
+    return exprManager.mkExpr(Kind.APPLY_UF, pFunc, args);
+  }
 }

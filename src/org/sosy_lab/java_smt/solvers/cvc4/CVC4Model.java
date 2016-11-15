@@ -29,7 +29,6 @@ import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-//import org.sosy_lab.java_smt.api.TermExtractionModelIterator;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -58,6 +57,8 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
   public Object evaluateImpl(Expr f) {
     return getValue(smtEngine.getValue(f));
   }
+
+
 
   static Map<String, Object> createAllsatModel(
       SmtEngine smtEngine, Collection<Expr> assertedFormulas, CVC4FormulaCreator creator) {
@@ -115,6 +116,17 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
 
   @Override
   public Iterator<ValueAssignment> iterator() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public ImmutableList<ValueAssignment> modelToList() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public static CVC4Model create(CVC4Environment pCvc4Env, long pCvc4Model,
+      CVC4FormulaCreator pCreator) {
     // TODO Auto-generated method stub
     return null;
   }

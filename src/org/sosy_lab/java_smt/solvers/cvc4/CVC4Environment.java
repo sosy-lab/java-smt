@@ -30,20 +30,21 @@ import java.util.Map;
 
 public class CVC4Environment {
 
-  private final ExprManager em;
+  private final ExprManager exprManager;
   private final int randomSeed;
 
   private final Map<String, Expr> variablesCache = new HashMap<>();
 
   public CVC4Environment(int pRandomSeed) {
     randomSeed = pRandomSeed;
-    em = new ExprManager();
+    exprManager = new ExprManager();
   }
 
   public SmtEngine newSMTEngine() {
-    SmtEngine smtEngine = new SmtEngine(em);
+    SmtEngine smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("incremental", new SExpr(true));
     smtEngine.setOption("produce-models", new SExpr(true));
+    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
     smtEngine.setLogic("QF_UFLIRA");
@@ -51,7 +52,7 @@ public class CVC4Environment {
   }
 
   public ExprManager getExprManager() {
-    return em;
+    return exprManager;
   }
 
   public Expr makeVariable(String name, Type type) {
@@ -61,7 +62,7 @@ public class CVC4Environment {
       return oldExp;
     }
 
-    Expr exp = em.mkVar(name, type);
+    Expr exp = exprManager.mkVar(name, type);
     variablesCache.put(name, exp);
     return exp;
   }
