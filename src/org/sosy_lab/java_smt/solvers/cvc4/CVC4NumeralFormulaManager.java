@@ -22,10 +22,13 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
+
+import java.math.BigInteger;
 
 public abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
@@ -35,56 +38,94 @@ public abstract class CVC4NumeralFormulaManager<
   protected final ExprManager exprManager;
   protected final CVC4Environment env;
 
-  protected CVC4NumeralFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4NumeralFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     env = pCreator.getEnv();
     exprManager = env.getExprManager();
   }
 
+  abstract protected Type getNumeralType();
+
   @Override
-  protected boolean isNumeral(Expr pVal) {
+  public boolean isNumeral(Expr pVal) {
     return pVal.getType().isInteger()
         || pVal.getType().isFloatingPoint()
         || pVal.getType().isReal(); // TODO is bitvector numeral?
   }
 
   @Override
-  protected Expr negate(Expr pParam1) {
+  protected Expr makeNumberImpl(long i) {
+    return exprManager.mkConst(new Rational(i));
+  }
+
+  @Override
+  protected Expr makeNumberImpl(BigInteger pI) {
+    return makeNumberImpl(pI.toString());
+  }
+
+  @Override
+  protected Expr makeNumberImpl(String pI) {
+    return exprManager.mkConst(new Rational(pI));
+  }
+
+  @Override
+  protected Expr makeVariableImpl(String varName) {
+    Type type = getNumeralType();
+    return getFormulaCreator().makeVariable(type, varName);
+  }
+
+  @Override
+  public Expr divide(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
+  }
+
+  @Override
+  public Expr multiply(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
+  }
+
+  @Override
+  public Expr modulo(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.INTS_MODULUS, pParam1, pParam2);
+  }
+
+  @Override
+  public Expr negate(Expr pParam1) {
     return exprManager.mkExpr(Kind.UMINUS, pParam1);
   }
 
   @Override
-  protected Expr add(Expr pParam1, Expr pParam2) {
+  public Expr add(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.PLUS, pParam1, pParam2);
   }
 
   @Override
-  protected Expr subtract(Expr pParam1, Expr pParam2) {
+  public Expr subtract(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.MINUS, pParam1, pParam2);
   }
 
   @Override
-  protected Expr equal(Expr pParam1, Expr pParam2) {
+  public Expr equal(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
 
   @Override
-  protected Expr greaterThan(Expr pParam1, Expr pParam2) {
+  public Expr greaterThan(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.GT, pParam1, pParam2);
   }
 
   @Override
-  protected Expr greaterOrEquals(Expr pParam1, Expr pParam2) {
+  public Expr greaterOrEquals(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.GEQ, pParam1, pParam2);
   }
 
   @Override
-  protected Expr lessThan(Expr pParam1, Expr pParam2) {
+  public Expr lessThan(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.LT, pParam1, pParam2);
   }
 
   @Override
-  protected Expr lessOrEquals(Expr pParam1, Expr pParam2) {
+  public Expr lessOrEquals(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.LEQ, pParam1, pParam2);
   }
 }

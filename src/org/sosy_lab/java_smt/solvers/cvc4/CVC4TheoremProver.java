@@ -51,7 +51,7 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
   protected CVC4TheoremProver(CVC4FormulaCreator creator, CVC4FormulaManager pMgr) {
     super(creator);
     mgr = pMgr;
-    smtEngine = pMgr.getEnvironment().newSMTEngine();
+    smtEngine = creator.getSmtEngine();
     bfmgr = pMgr.getBooleanFormulaManager();
   }
 
@@ -91,6 +91,7 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
           "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
     } else {
       if (result.isSat() == Result.Sat.SAT) {
+        System.out.println("CVC4 returns SAT!");
         return false;
       } else if (result.isSat() == Result.Sat.UNSAT) {
         return true;
@@ -114,7 +115,7 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
   @Override
   public void close() {
     Preconditions.checkState(!closed);
-    smtEngine.delete();
+//    smtEngine.delete();
     closed = true;
   }
 

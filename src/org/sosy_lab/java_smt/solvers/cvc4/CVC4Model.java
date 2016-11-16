@@ -27,30 +27,25 @@ import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 
-import org.sosy_lab.java_smt.basicimpl.AbstractModel;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
+class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>{
 
   // TODO: this will not work properly, as SmtEngine is affected by
   // added assertions.
   private final SmtEngine smtEngine;
-  private final ImmutableList<Expr> assertedFormulas;
+//  private final ImmutableList<Expr> assertedFormulas;
 
-  CVC4Model(
-      SmtEngine smtEngine,
-      FormulaCreator<Expr, Type, CVC4Environment, Expr> creator,
-      Collection<Expr> assertedFormulas) {
-    super(creator);
-    this.smtEngine = smtEngine;
-    this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
+  CVC4Model(CVC4FormulaCreator pCreator) {
+    super(pCreator);
+    this.smtEngine = pCreator.getSmtEngine();
+//    this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
   @Override
@@ -115,19 +110,12 @@ class CVC4Model extends AbstractModel<Expr, Type, CVC4Environment> {
   }
 
   @Override
-  public Iterator<ValueAssignment> iterator() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   public ImmutableList<ValueAssignment> modelToList() {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public static CVC4Model create(CVC4Environment pCvc4Env, long pCvc4Model,
-      CVC4FormulaCreator pCreator) {
-    // TODO Auto-generated method stub
-    return null;
+  public static CVC4Model create(CVC4FormulaCreator pCreator) {
+    return new CVC4Model(pCreator);
   }
 }

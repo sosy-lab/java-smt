@@ -23,6 +23,7 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
+import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -31,13 +32,12 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 
 public class CVC4IntegerFormulaManager
     extends CVC4NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  protected CVC4IntegerFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4IntegerFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
   }
 
@@ -66,20 +66,7 @@ public class CVC4IntegerFormulaManager
     return decimalAsInteger(pNumber);
   }
 
-  @Override
-  protected Expr divide(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
-  }
 
-  @Override
-  protected Expr multiply(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
-  }
-
-  @Override
-  protected Expr modulo(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.INTS_MODULUS, pParam1, pParam2);
-  }
 
   @Override
   protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
@@ -93,6 +80,13 @@ public class CVC4IntegerFormulaManager
           exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x, n)));
     }
     return exprManager.mkConst(true);
+  }
+
+
+  @Override
+  public BooleanFormula modularCongruence(IntegerFormula pNumber1, IntegerFormula pNumber2,
+      BigInteger pN) {
+    return modularCongruence(pNumber1, pNumber2, pN.longValue());
   }
 
   @Override
@@ -111,130 +105,9 @@ public class CVC4IntegerFormulaManager
   }
 
   @Override
-  public IntegerFormula makeNumber(long pNumber) {
+  protected Type getNumeralType() {
     // TODO Auto-generated method stub
-    return null;
+    return getFormulaCreator().getIntegerType();
   }
 
-  @Override
-  public IntegerFormula makeNumber(BigInteger pNumber) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula makeNumber(double pNumber) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula makeNumber(BigDecimal pNumber) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula makeNumber(String pI) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula makeNumber(org.sosy_lab.common.rationals.Rational pRational) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula makeVariable(String pVar) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula negate(IntegerFormula pNumber) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula add(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula sum(List<IntegerFormula> pOperands) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula subtract(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula divide(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula modulo(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IntegerFormula multiply(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula equal(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula greaterThan(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula greaterOrEquals(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula lessThan(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula lessOrEquals(IntegerFormula pNumber1, IntegerFormula pNumber2) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula modularCongruence(IntegerFormula pNumber1, IntegerFormula pNumber2,
-      BigInteger pN) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public BooleanFormula modularCongruence(IntegerFormula pNumber1, IntegerFormula pNumber2,
-      long pN) {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

@@ -41,8 +41,7 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
 
   CVC4SolverBasedProver(CVC4FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-    smtEngine = cvc4Env.newSMTEngine();
-
+    smtEngine = pFormulaCreator.getSmtEngine();
   }
 
   @Override
@@ -92,7 +91,7 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
-    return new CVC4Model(smtEngine, creator, assertedFormulas);
+    return new CVC4Model(creator);
   }
 
   @Override

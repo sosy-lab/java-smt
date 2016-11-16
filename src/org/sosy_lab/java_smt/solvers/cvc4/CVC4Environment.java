@@ -44,10 +44,11 @@ public class CVC4Environment {
     SmtEngine smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("incremental", new SExpr(true));
     smtEngine.setOption("produce-models", new SExpr(true));
+    smtEngine.setOption("dump-models", new SExpr(true));
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
-    smtEngine.setLogic("QF_UFLIRA");
+//    smtEngine.setLogic("QF_UFLIRA");
     return smtEngine;
   }
 

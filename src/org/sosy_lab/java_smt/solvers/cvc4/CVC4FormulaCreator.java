@@ -27,6 +27,7 @@ import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -54,10 +55,16 @@ import java.util.List;
 public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, CVC4Environment, Expr> {
 
   private final ExprManager exprManager;
+  protected final SmtEngine smtEngine;
 
   protected CVC4FormulaCreator(CVC4Environment pEnv) {
     super(pEnv, pEnv.getExprManager().booleanType(), pEnv.getExprManager().integerType(), null);
     exprManager = pEnv.getExprManager();
+    smtEngine = pEnv.newSMTEngine();
+  }
+
+  protected SmtEngine getSmtEngine() {
+    return smtEngine;
   }
 
   @Override

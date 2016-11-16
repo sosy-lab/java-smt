@@ -32,13 +32,17 @@ import java.util.Collection;
 public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
-  private final ExprManager exprManager;
+  private final Expr cvc4True;
+  private final Expr cvc4False;
   private final CVC4Environment env;
+  private final ExprManager exprManager;
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     env = pCreator.getEnv();
     exprManager = env.getExprManager();
+    cvc4True = exprManager.mkConst(true);
+    cvc4False = exprManager.mkConst(false);
   }
 
   @Override
@@ -58,6 +62,17 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr and(Expr pParam1, Expr pParam2) {
+    if (isTrue(pParam1)) {
+      return pParam2;
+    } else if (isTrue(pParam2)) {
+      return pParam1;
+    } else if (isFalse(pParam1)) {
+      return cvc4False;
+    } else if (isFalse(pParam2)) {
+      return cvc4False;
+    } else if (pParam1 == pParam2) {
+      return pParam1;
+    }
     return exprManager.mkExpr(Kind.AND, pParam1, pParam2);
   }
 
@@ -72,6 +87,17 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr or(Expr pParam1, Expr pParam2) {
+    if (isTrue(pParam1)) {
+      return cvc4True;
+    } else if (isTrue(pParam2)) {
+      return cvc4True;
+    } else if (isFalse(pParam1)) {
+      return pParam2;
+    } else if (isFalse(pParam2)) {
+      return pParam1;
+    } else if (pParam1 == pParam2) {
+      return pParam1;
+    }
     return exprManager.mkExpr(Kind.OR, pParam1, pParam2);
   }
 
