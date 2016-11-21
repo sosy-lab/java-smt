@@ -23,7 +23,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.Result;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.UnsatCore;
 
@@ -79,26 +78,6 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
     Preconditions.checkState(!closed);
     assertedFormulas.remove(assertedFormulas.size() - 1);
     smtEngine.pop();
-  }
-
-  @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    Result result = smtEngine.checkSat();
-
-    if (result.isNull() || result.isUnknown()) {
-      throw new SolverException(
-          "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
-    } else {
-      if (result.isSat() == Result.Sat.SAT) {
-        System.out.println("CVC4 returns SAT!");
-        return false;
-      } else if (result.isSat() == Result.Sat.UNSAT) {
-        return true;
-      } else {
-        throw new SolverException("CVC4 returned unknown on sat check");
-      }
-    }
   }
 
   @Override

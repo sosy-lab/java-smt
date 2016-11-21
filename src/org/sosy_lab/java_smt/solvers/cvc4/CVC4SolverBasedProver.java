@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   private final SmtEngine smtEngine;
   private boolean closed = false;
-
+  private CVC4Model model = null;
   private final List<Expr> assertedFormulas = new ArrayList<>();
 
   CVC4SolverBasedProver(CVC4FormulaCreator pFormulaCreator) {
@@ -56,7 +56,7 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   public Expr addConstraint0(BooleanFormula pF) {
     Preconditions.checkState(!closed);
     Expr exp = creator.extractInfo(pF);
-    smtEngine.assertFormula(exp);
+    creator.getSmtEngine().assertFormula(exp);
     assertedFormulas.add(exp);
     return exp;
   }
@@ -71,13 +71,25 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    Result result = smtEngine.checkSat();
+    Result result = creator.getSmtEngine().checkSat();
 
     if (result.isNull() || result.isUnknown()) {
       throw new SolverException(
           "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
     } else {
       if (result.isSat() == Result.Sat.SAT) {
+        model = new CVC4Model(creator);
+//        model.createAllsatModel(smtEngine, assertedFormulas, creator);
+//        Collection<Expr> extracted = new HashSet<>();
+//        vectorExpr ve = creator.getSmtEngine().getAssertions();
+//        for(int i = 0; i < ve.size(); i++) {
+//          extracted.addAll(creator.extractVariablesAndUFs(ve.get(i), false).values());
+////          System.out.println("assertion = " + ve.get(i));
+//        }
+//        for(Expr var : extracted) {
+//          System.out.println("var = " + var);
+//          System.out.println(var + " = " + creator.getSmtEngine().getValue(var));
+//        }
         return false;
       } else if (result.isSat() == Result.Sat.UNSAT) {
         return true;
@@ -91,7 +103,7 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
-    return new CVC4Model(creator);
+    return model;
   }
 
   @Override

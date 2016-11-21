@@ -31,20 +31,22 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>{
+public class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>{
 
   // TODO: this will not work properly, as SmtEngine is affected by
   // added assertions.
   private final SmtEngine smtEngine;
+  public Map<String, Object> evaluation;
 //  private final ImmutableList<Expr> assertedFormulas;
 
   CVC4Model(CVC4FormulaCreator pCreator) {
     super(pCreator);
     this.smtEngine = pCreator.getSmtEngine();
+    evaluation = new HashMap<String, Object>();
 //    this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
@@ -55,33 +57,31 @@ class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>{
 
 
 
-  static Map<String, Object> createAllsatModel(
+  public void createAllsatModel(
       SmtEngine smtEngine, Collection<Expr> assertedFormulas, CVC4FormulaCreator creator) {
-    Map<String, Object> model = new LinkedHashMap<>();
-
     Collection<Expr> extracted = new HashSet<>();
+    System.out.println("createAllsatModel 0");
     for (Expr expr : assertedFormulas) {
       extracted.addAll(creator.extractVariablesAndUFs(expr, true).values());
     }
-
+    System.out.println("createAllsatModel 1");
     for (Expr lKeyTerm : extracted) {
-
-      Expr lValueTerm = smtEngine.getValue(lKeyTerm);
+      System.out.println("lKeyTerm = " + lKeyTerm);
+      Expr lValueTerm = creator.getSmtEngine().getValue(lKeyTerm);
       Object lValue = getValue(lValueTerm);
-
+      System.out.println("createAllsatModel 2");
       // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
       // leading to two entries for "uf(1)" (if value is 1).
-      Object existingValue = model.get(lKeyTerm.toString());
+      Object existingValue = evaluation.get(lKeyTerm.toString());
       Verify.verify(
           existingValue == null || lValue.equals(existingValue),
           "Duplicate values for model entry %s: %s and %s",
           lKeyTerm,
           existingValue,
           lValue);
-      model.put(lKeyTerm.toString(), lValue);
+      evaluation.put(lKeyTerm.toString(), lValue);
     }
-    return model;
   }
 
   private static Object getValue(Expr value) {

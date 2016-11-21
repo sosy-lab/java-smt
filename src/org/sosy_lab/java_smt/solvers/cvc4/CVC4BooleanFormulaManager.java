@@ -27,27 +27,29 @@ import edu.nyu.acsys.CVC4.vectorExpr;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
   private final Expr cvc4True;
   private final Expr cvc4False;
-  private final CVC4Environment env;
   private final ExprManager exprManager;
+  private static List<Expr> exprs = new ArrayList<>();
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    env = pCreator.getEnv();
-    exprManager = env.getExprManager();
+//    env = pCreator.getEnv();
+    exprManager = pCreator.getExprManager();
     cvc4True = exprManager.mkConst(true);
     cvc4False = exprManager.mkConst(false);
   }
 
   @Override
   protected Expr makeVariableImpl(String pVar) {
-    return env.makeVariable(pVar, getFormulaCreator().getBoolType());
+    return formulaCreator.makeVariable(getFormulaCreator().getBoolType(), pVar);
   }
 
   @Override
@@ -98,7 +100,9 @@ public class CVC4BooleanFormulaManager
     } else if (pParam1 == pParam2) {
       return pParam1;
     }
-    return exprManager.mkExpr(Kind.OR, pParam1, pParam2);
+    Expr e = exprManager.mkExpr(Kind.OR, pParam1, pParam2);
+    exprs.add(e);
+    return e;
   }
 
   @Override

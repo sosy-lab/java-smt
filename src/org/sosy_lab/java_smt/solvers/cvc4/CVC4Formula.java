@@ -30,12 +30,17 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CVC4Formula implements Formula {
 
   private final Expr cvc4term;
+  private static List<Expr> exprs = new ArrayList<>();
 
   CVC4Formula(Expr term) {
     cvc4term = term;
+    exprs.add(term);
   }
 
   @Override

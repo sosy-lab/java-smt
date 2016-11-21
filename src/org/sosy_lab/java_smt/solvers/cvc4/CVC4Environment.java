@@ -25,13 +25,17 @@ import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CVC4Environment {
 
   private final ExprManager exprManager;
-  private final int randomSeed;
+  protected final int randomSeed;
+  private SmtEngine smtEngine;
+  private static List<SmtEngine> engines = new ArrayList<>();
 
   private final Map<String, Expr> variablesCache = new HashMap<>();
 
@@ -48,6 +52,7 @@ public class CVC4Environment {
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    engines.add(smtEngine);
 //    smtEngine.setLogic("QF_UFLIRA");
     return smtEngine;
   }

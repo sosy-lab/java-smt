@@ -99,9 +99,10 @@ public class CVC4IntegerFormulaManager
     return exprManager.mkConst(new Rational(pI));
   }
 
+
   @Override
   protected Expr makeVariableImpl(String pI) {
-    return env.makeVariable(pI, getFormulaCreator().getIntegerType());
+    return formulaCreator.makeVariable(getFormulaCreator().getIntegerType(), pI);
   }
 
   @Override

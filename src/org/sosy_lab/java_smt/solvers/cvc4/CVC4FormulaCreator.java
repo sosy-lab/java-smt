@@ -27,6 +27,7 @@ import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 
@@ -50,23 +51,49 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, CVC4Environment, Expr> {
 
-  private final ExprManager exprManager;
+  protected final ExprManager exprManager;
   protected final SmtEngine smtEngine;
+  protected final Map<String, Expr> variablesCache = new HashMap<>();
 
   protected CVC4FormulaCreator(CVC4Environment pEnv) {
     super(pEnv, pEnv.getExprManager().booleanType(), pEnv.getExprManager().integerType(), null);
-    exprManager = pEnv.getExprManager();
-    smtEngine = pEnv.newSMTEngine();
+    exprManager = new ExprManager();
+//    smtEngine = pEnv.newSMTEngine();
+    smtEngine = new SmtEngine(exprManager);
+    smtEngine.setOption("incremental", new SExpr(true));
+    smtEngine.setOption("produce-models", new SExpr(true));
+    smtEngine.setOption("produce-assertions", new SExpr(true));
+    smtEngine.setOption("dump-models", new SExpr(true));
+    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+    smtEngine.setOption("output-language", new SExpr("smt2"));
+    smtEngine.setOption("random-seed", new SExpr(pEnv.randomSeed));
+  }
+
+  public Expr makeVariable(String name, Type type) {
+    if (variablesCache.containsKey(name)) {
+      Expr oldExp = variablesCache.get(name);
+      assert type.equals(oldExp.getType());
+      return oldExp;
+    }
+
+    Expr exp = exprManager.mkVar(name, type);
+    variablesCache.put(name, exp);
+    return exp;
+  }
+
+  protected ExprManager getExprManager() {
+    return exprManager;
   }
 
   protected SmtEngine getSmtEngine() {
     return smtEngine;
   }
-
   @Override
   public Type getBitvectorType(int pBitwidth) {
     return exprManager.mkBitVectorType(pBitwidth);
@@ -84,7 +111,9 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, CVC4Environm
 
   @Override
   public Expr makeVariable(Type pType, String pVarName) {
-    return exprManager.mkVar(pVarName, pType);
+    Expr var = exprManager.mkVar(pVarName, pType);
+    variablesCache.put(pVarName, var);
+    return var;
   }
 
   @Override
