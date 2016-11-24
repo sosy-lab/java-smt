@@ -217,8 +217,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return visit(visitor, input, extractInfo(input));
   }
 
-  public abstract <R> R visit(
-      FormulaVisitor<R> visitor, final Formula formula, final TFormulaInfo f);
+  public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, this::extractInfo);

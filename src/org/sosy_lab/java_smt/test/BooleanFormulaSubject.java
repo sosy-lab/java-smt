@@ -79,7 +79,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       }
 
       // get model for failure message
-      try (final Model model = prover.getModel()) {
+      try (Model model = prover.getModel()) {
         failWithBadResults(verb, expected, "has counterexample", model);
       }
     }
