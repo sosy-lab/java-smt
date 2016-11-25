@@ -46,6 +46,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
       ImmutableSet.of(
           "impossible to build a suitable congruence graph!",
           "can't build ie-local interpolant",
+          "set_raised on an already-raised proof",
           "splitting of AB-mixed terms not supported",
           "Hypothesis belongs neither to A nor to B",
           "FP<->BV combination unsupported by the current configuration",
