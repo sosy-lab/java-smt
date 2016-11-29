@@ -30,18 +30,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final CVC4FormulaCreator creator;
-  protected final CVC4Environment cvc4Env;
   protected final SmtEngine smtEngine;
 
   protected boolean closed = false;
 
   protected CVC4AbstractProver(CVC4FormulaCreator pFormulaCreator) {
     this.creator = pFormulaCreator;
-    this.cvc4Env = pFormulaCreator.getEnv();
     this.smtEngine = pFormulaCreator.getSmtEngine();
   }
 
-  protected abstract long getCVC4Model();
+  protected abstract CVC4Model getCVC4Model();
 
   @Override
   public CVC4Model getModel() {

@@ -32,15 +32,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import java.util.List;
 
 public class CVC4FunctionFormulaManager
-    extends AbstractUFManager<Expr, Expr, Type, CVC4Environment> {
+    extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
 
   private final ExprManager exprManager;
-  private final CVC4Environment env;
 
   protected CVC4FunctionFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    env = pCreator.getEnv();
-    exprManager = env.getExprManager();
+    exprManager = pCreator.getExprManager();
   }
 
   @Override
@@ -51,7 +49,7 @@ public class CVC4FunctionFormulaManager
       argTypes.add(t);
     }
     FunctionType functionType = exprManager.mkFunctionType(argTypes, pReturnType);
-    return env.makeVariable(pName, functionType);
+    return formulaCreator.makeVariable(functionType, pName);
   }
 
   @Override

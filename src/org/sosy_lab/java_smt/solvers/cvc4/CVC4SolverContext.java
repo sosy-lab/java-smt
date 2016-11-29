@@ -1,6 +1,8 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.CVC4JNI;
+import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -16,8 +18,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -25,13 +25,6 @@ import javax.annotation.Nullable;
 public final class CVC4SolverContext extends AbstractSolverContext {
   private final CVC4FormulaManager manager;
   private final CVC4FormulaCreator creator;
-  private static List<CVC4Environment> envs = new ArrayList<>();
-  private static List<CVC4FormulaCreator> fCreators = new ArrayList<>();
-
-  private static List<CVC4FormulaManager> fManagers = new ArrayList<>();
-  private static List<CVC4FunctionFormulaManager> ffManagers = new ArrayList<>();
-  private static List<CVC4BooleanFormulaManager> bfManagers = new ArrayList<>();
-  private static List<CVC4IntegerFormulaManager> ifManagers = new ArrayList<>();
 
   private CVC4SolverContext(
       CVC4FormulaCreator creator,
@@ -54,22 +47,19 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
     // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
-    final CVC4Environment env = new CVC4Environment(randomSeed);
-    envs.add(env);
+    ExprManager exprManager = new ExprManager();
+    Type boolType = exprManager.booleanType();
+    Type intType = exprManager.integerType();
 
     // Create CVC4FormulaCreator
-    CVC4FormulaCreator creator = new CVC4FormulaCreator(env);
-    fCreators.add(creator);
+    CVC4FormulaCreator creator = new CVC4FormulaCreator(randomSeed, exprManager, boolType, intType, null);
+
     // Create managers
     CVC4FunctionFormulaManager ffmgr = new CVC4FunctionFormulaManager(creator);
     CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator);
     CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
     CVC4FormulaManager manager = new CVC4FormulaManager(creator, ffmgr, bfmgr, ifmgr);
 
-//    ffManagers.add(ffmgr);
-//    bfManagers.add(bfmgr);
-//    ifManagers.add(ifmgr);
-//    fManagers.add(manager);
     return new CVC4SolverContext(creator, config, logger, manager);
   }
 

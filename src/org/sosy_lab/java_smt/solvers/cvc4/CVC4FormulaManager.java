@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 
 import org.sosy_lab.common.Appender;
@@ -28,10 +29,10 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environment, Expr> {
+class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager, Expr> {
 
   CVC4FormulaManager(
-      FormulaCreator<Expr, Type, CVC4Environment, Expr> pFormulaCreator,
+      FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator,
       CVC4FunctionFormulaManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr) {

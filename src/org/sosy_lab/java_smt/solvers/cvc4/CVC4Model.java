@@ -23,6 +23,7 @@ import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
@@ -31,22 +32,19 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
-public class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>{
+public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager>{
 
   // TODO: this will not work properly, as SmtEngine is affected by
   // added assertions.
   private final SmtEngine smtEngine;
-  public Map<String, Object> evaluation;
+
 //  private final ImmutableList<Expr> assertedFormulas;
 
   CVC4Model(CVC4FormulaCreator pCreator) {
     super(pCreator);
     this.smtEngine = pCreator.getSmtEngine();
-    evaluation = new HashMap<String, Object>();
 //    this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
@@ -60,16 +58,13 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>
   public void createAllsatModel(
       SmtEngine smtEngine, Collection<Expr> assertedFormulas, CVC4FormulaCreator creator) {
     Collection<Expr> extracted = new HashSet<>();
-    System.out.println("createAllsatModel 0");
+
     for (Expr expr : assertedFormulas) {
       extracted.addAll(creator.extractVariablesAndUFs(expr, true).values());
     }
-    System.out.println("createAllsatModel 1");
     for (Expr lKeyTerm : extracted) {
-      System.out.println("lKeyTerm = " + lKeyTerm);
       Expr lValueTerm = creator.getSmtEngine().getValue(lKeyTerm);
       Object lValue = getValue(lValueTerm);
-      System.out.println("createAllsatModel 2");
       // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
       // leading to two entries for "uf(1)" (if value is 1).

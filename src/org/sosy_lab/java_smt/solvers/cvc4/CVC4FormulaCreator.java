@@ -55,24 +55,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, CVC4Environment, Expr> {
+public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager, Expr> {
 
   protected final ExprManager exprManager;
   protected final SmtEngine smtEngine;
   protected final Map<String, Expr> variablesCache = new HashMap<>();
 
-  protected CVC4FormulaCreator(CVC4Environment pEnv) {
-    super(pEnv, pEnv.getExprManager().booleanType(), pEnv.getExprManager().integerType(), null);
-    exprManager = new ExprManager();
-//    smtEngine = pEnv.newSMTEngine();
+  protected CVC4FormulaCreator(int randomSeed, ExprManager exprManager, Type boolType, Type intType, Type rationalType) {
+    super(exprManager, boolType, intType, rationalType);
+    this.exprManager = exprManager;
     smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("incremental", new SExpr(true));
     smtEngine.setOption("produce-models", new SExpr(true));
     smtEngine.setOption("produce-assertions", new SExpr(true));
     smtEngine.setOption("dump-models", new SExpr(true));
-    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+//    smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
-    smtEngine.setOption("random-seed", new SExpr(pEnv.randomSeed));
+    smtEngine.setOption("random-seed", new SExpr(randomSeed));
   }
 
   public Expr makeVariable(String name, Type type) {
