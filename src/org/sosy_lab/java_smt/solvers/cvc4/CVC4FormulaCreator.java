@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 
-import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
@@ -60,9 +59,10 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
   protected final ExprManager exprManager;
   protected final SmtEngine smtEngine;
   protected final Map<String, Expr> variablesCache = new HashMap<>();
+  public Map<String, Type[]> arrayTypeMapping = new HashMap<>();
 
-  protected CVC4FormulaCreator(int randomSeed, ExprManager exprManager, Type boolType, Type intType, Type rationalType) {
-    super(exprManager, boolType, intType, rationalType);
+  protected CVC4FormulaCreator(int randomSeed, ExprManager exprManager, Type boolType, Type intType, Type realType) {
+    super(exprManager, boolType, intType, realType);
     this.exprManager = exprManager;
     smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("incremental", new SExpr(true));
@@ -121,12 +121,25 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
   }
 
   @Override
+  protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
+      ArrayFormula<TD, TR> pArray) {
+    return ((CVC4ArrayFormula<TD, TR>) pArray).getElementType();
+  }
+
+  @Override
+  protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
+      ArrayFormula<TD, TR> pArray) {
+    return ((CVC4ArrayFormula<TD, TR>) pArray).getIndexType();
+  }
+
+  @Override
   public FormulaType<?> getFormulaType(Expr pFormula) {
     Type t = pFormula.getType();
+
     if (t.isArray()) {
       return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(((ArrayType) t).getIndexType()),
-          getFormulaTypeFromTermType(t.getBaseType()));
+          getFormulaTypeFromTermType(arrayTypeMapping.get(pFormula.toString())[0]),
+          getFormulaTypeFromTermType(arrayTypeMapping.get(pFormula.toString())[1]));
     }
     return getFormulaTypeFromTermType(t);
   }
@@ -142,9 +155,12 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
       return FormulaType.getFloatingPointType(
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getSignificandSize());
-    } else {
+    } else{
       throw new AssertionError("Unhandled type " + t.getClass());
     }
+//    else if(t == exprManager.realType()) {
+//      FormulaType.re
+//    }
   }
 
   @SuppressWarnings("unchecked")

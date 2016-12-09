@@ -50,15 +50,19 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     ExprManager exprManager = new ExprManager();
     Type boolType = exprManager.booleanType();
     Type intType = exprManager.integerType();
+    Type realType = exprManager.realType();
 
     // Create CVC4FormulaCreator
-    CVC4FormulaCreator creator = new CVC4FormulaCreator(randomSeed, exprManager, boolType, intType, null);
+    CVC4FormulaCreator creator = new CVC4FormulaCreator(randomSeed, exprManager, boolType, intType, realType);
 
     // Create managers
-    CVC4FunctionFormulaManager ffmgr = new CVC4FunctionFormulaManager(creator);
-    CVC4BooleanFormulaManager bfmgr = new CVC4BooleanFormulaManager(creator);
-    CVC4IntegerFormulaManager ifmgr = new CVC4IntegerFormulaManager(creator);
-    CVC4FormulaManager manager = new CVC4FormulaManager(creator, ffmgr, bfmgr, ifmgr);
+    CVC4UFManager functionTheory = new CVC4UFManager(creator);
+    CVC4BooleanFormulaManager booleanTheory = new CVC4BooleanFormulaManager(creator);
+    CVC4IntegerFormulaManager integerTheory = new CVC4IntegerFormulaManager(creator);
+    CVC4RationalFormulaManager rationalTheory = new CVC4RationalFormulaManager(creator);
+    CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
+    CVC4FormulaManager manager = new CVC4FormulaManager(creator, functionTheory, booleanTheory,
+                                                        integerTheory, rationalTheory, arrayTheory);
 
     return new CVC4SolverContext(creator, config, logger, manager);
   }

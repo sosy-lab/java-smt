@@ -31,12 +31,12 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 import java.util.List;
 
-public class CVC4FunctionFormulaManager
+public class CVC4UFManager
     extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
 
   private final ExprManager exprManager;
 
-  protected CVC4FunctionFormulaManager(CVC4FormulaCreator pCreator) {
+  protected CVC4UFManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getExprManager();
   }

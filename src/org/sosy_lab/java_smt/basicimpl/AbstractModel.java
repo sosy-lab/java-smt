@@ -33,19 +33,15 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
-  public Map<String, Object> evaluation;
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
 
   protected AbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
     this.creator = creator;
-    evaluation = new HashMap<String, Object>();
   }
 
   @Nullable
