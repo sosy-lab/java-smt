@@ -67,7 +67,8 @@ Additional instructions are available at the official [OSSRH][] page.
 ### Publishing Z3
 
 To publish Z3, [download it](https://github.com/Z3Prover/z3) and build
-it with the following command in its directory on a 64bit system:
+it with the following command in its directory on a 64bit Ubuntu 14.04 system
+(building on Ubuntu 16.04 introduces unwanted dependencies to new libstdc++ and libgomp versions):
 
 ```
 ./configure --staticlib --java --git-describe && cd build && make -j 2
