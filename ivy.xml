@@ -112,7 +112,7 @@
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-327-g92cafef" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
-        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-11-04-r2697" conf="runtime-princess->runtime; contrib->sources">
+        <dependency org="org.ruemmer.philipp" name="princess" rev="2016-12-14-r2704" conf="runtime-princess->runtime; contrib->sources">
           <artifact name="princess" e:classifier="assertionless" conf="runtime-princess"/>
           <artifact name="princess" e:classifier="sources-assertionless" conf="contrib" ext="zip"/>
         </dependency>
