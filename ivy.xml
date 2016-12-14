@@ -118,7 +118,7 @@
         </dependency>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.4.1-1698-ge8f4dd7" conf="runtime-z3->solver-z3" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.5.0" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.3.14" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
 
