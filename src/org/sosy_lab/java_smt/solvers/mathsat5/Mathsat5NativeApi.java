@@ -170,6 +170,7 @@ class Mathsat5NativeApi {
   private static final ImmutableSet<String> ALLOWED_SOLVE_FAILURE_MESSAGES =
       ImmutableSet.of(
           "unsupported",
+          "can't produce proofs",
           "non-integer model value",
           "build_model: too many iterations",
           "FP<->BV combination unsupported by the current configuration");
