@@ -165,8 +165,6 @@ final class Z3SolverContext extends AbstractSolverContext {
     }
 
     long cfg = Native.mkConfig();
-    Native.setParamValue(cfg, "MODEL", "true");
-
     if (extraOptions.requireProofs) {
       Native.setParamValue(cfg, "PROOF", "true");
     }
@@ -230,11 +228,27 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+    long z3context = creator.getEnv();
+    Native.paramsSetBool(
+        z3context,
+        z3params,
+        Native.mkStringSymbol(z3context, ":model"),
+        options.contains(ProverOptions.GENERATE_MODELS));
+    Native.paramsSetBool(
+        z3context,
+        z3params,
+        Native.mkStringSymbol(z3context, ":unsat_core"),
+        options.contains(ProverOptions.GENERATE_UNSAT_CORE)
+            || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
     return new Z3TheoremProver(creator, manager, z3params, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+    long z3context = creator.getEnv();
+    Native.paramsSetBool(z3context, z3params, Native.mkStringSymbol(z3context, ":model"), true);
+    Native.paramsSetBool(
+        z3context, z3params, Native.mkStringSymbol(z3context, ":unsat_core"), false);
     return new Z3InterpolatingProver(creator, z3params, logger, dumpFailedInterpolationQueries);
   }
 
