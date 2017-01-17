@@ -10,9 +10,11 @@ try increasing the stack size with the JVM parameter `-Xss`.
 ## SMTInterpol
 
  - SMTInterpol does not support multiple concurrent stacks under the same context.
- - Variables and UFs that are used for the first time after a solver stack has been created
+ - With JavaSMT up to 1.0.1,
+variables and UFs that are used for the first time after a solver stack has been created
 will be deleted on the next call to `pop()` and will be invalid afterwards.
-This will change with one of the next SMTInterpol versions (cf. [#69](https://github.com/sosy-lab/java-smt/issues/69)).
+This will be changed in the next release of JavaSMT such that variable declarations
+in SMTInterpol work like those in other solvers.
 
 ## Z3
 
