@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
@@ -32,17 +31,18 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
 
+  private static final String Z3_INFINITY_REPRESENTATION = "oo";
+  private static final String Z3_EPSILON_NAME = "epsilon";
+
   private final FormulaManager mgr;
   private final RationalFormulaManager rfmgr;
   private final LogManager logger;
-  private static final String Z3_INFINITY_REPRESENTATION = "oo";
   private final long z3optContext;
 
   Z3OptimizationProver(FormulaManager mgr, Z3FormulaCreator creator, LogManager pLogger) {
@@ -162,12 +162,31 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     return Native.astToString(z3context, ast).contains(Z3_INFINITY_REPRESENTATION);
   }
 
-  /** Replace the epsilon in the returned formula with a numeric value. */
+  /**
+   * Replace the epsilon in the returned formula with a numeric value.
+   **/
   private long replaceEpsilon(long ast, Rational newValue) {
-    Formula z = creator.encapsulate(FormulaType.RationalType, ast);
-    Formula epsFormula = rfmgr.makeVariable("epsilon");
-    Formula out = mgr.substitute(z, ImmutableMap.of(epsFormula, rfmgr.makeNumber(newValue)));
-    return Native.simplify(z3context, creator.extractInfo(out));
+    long replacement = Native.mkReal(
+        z3context,
+        newValue.getNum().intValueExact(),
+        newValue.getDen().intValueExact());
+    long epsilon = Native.mkConst(
+        z3context,
+        Native.mkStringSymbol(z3context, Z3_EPSILON_NAME),
+        Native.mkRealSort(z3context)
+    );
+    Native.incRef(z3context, replacement);
+    try {
+      return Native.substitute(
+          z3context,
+          ast,
+          1,
+          new long[] {epsilon},
+          new long[] {replacement}
+      );
+    } finally {
+      Native.decRef(z3context, replacement);
+    }
   }
 
   private Rational rationalFromZ3AST(long ast) {
