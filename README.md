@@ -207,21 +207,24 @@ public class TestApp {
 JavaSMT relies on three dependencies from the SoSy-Lab [Common][common] library.
 These dependencies are:
 
- - [Configuration][]: SMT solvers expose many different
-    configuration options, and using the configuration object they can be
-    easily populated by the client, either from the command line or from 
-    `.properties` file.
+ - [Configuration][]: JavaSMT accepts some configuration options
+    and forwards options to the underlying SMT solver.
  - [LogManager][]: JavaSMT can be configured to provide extensive
     logging for the operations related to all SMT queries.
-    If you already use your own logging framework, you just have to create a
-    wrapper implementing `LogManager` interface.
-    [BasicLogManager][] is an implementation that delegates to the standard JDK logging API.
  - [ShutdownNotifier][] from a [ShutdownManager][]: Many SMT queries can take a very
     long time, potentially more than the user is willing to wait.
     What's more, for a solver implemented in the native code usual ways of
     interrupting a Java process (e.g. interrupt signal) would not work.
     Shutdown manager provides a solution to gracefully request termination,
     and JavaSMT and the solvers will try to respond to such requests as soon as possible.
+
+Here is how to get an instance of these dependencies:
+
+| Dependency | Dummy instance that does nothing | Regular instance |
+| --- | --- | --- |
+| [Configuration][] | [`Configuration.defaultConfiguration()`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/Configuration.html#defaultConfiguration--) | [`Configuration.fromCmdLineArguments(String[])`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/Configuration.html#fromCmdLineArguments-java.lang.String:A-) or [`Configuration.builder()...build()`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/Configuration.html#builder--) for more flexible definition of options (e.g., from `.properties` files) |
+| [LogManager][] | [`LogManager.createNullLogManager()`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/log/LogManager.html#createNullLogManager--) | [`BasicLogManager.create(Configuration)`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/log/BasicLogManager.html#create-org.sosy_lab.common.configuration.Configuration-) for logging to the JDK logging API; for other logging frameworks just write a wrapper implementing [LogManager][] |
+| [ShutdownNotifier][] | [`ShutdownNotifier.createDummy()`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html#createDummy--) | [`ShutdownManager.create().getNotifier()`](https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownManager.html#create--) |
 
 ## Solving Constraints
 
