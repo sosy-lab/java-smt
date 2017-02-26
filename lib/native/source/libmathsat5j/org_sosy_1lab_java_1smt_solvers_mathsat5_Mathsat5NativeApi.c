@@ -1135,7 +1135,7 @@ DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
 DEFINE_FUNC(void, 1free_1termination_1test) WITH_ONE_ARG(long)
   struct msat_callback_info *helper = (struct msat_callback_info *)(long)arg1;
   if (helper == NULL) {
-    throwException(jenv, "java/lang/NullPointerTest", "Argument to msat_free_termination_test may not be null");
+    throwException(jenv, "java/lang/NullPointerException", "TerminationTest may not be null");
     return;
   }
 
