@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Native.IntPtr;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Optional;
@@ -36,9 +37,6 @@ import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
-
-  private static final String Z3_INFINITY_REPRESENTATION = "oo";
-  private static final String Z3_EPSILON_NAME = "epsilon";
 
   private final FormulaManager mgr;
   private final RationalFormulaManager rfmgr;
@@ -120,22 +118,54 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    Preconditions.checkState(!closed);
-    long ast = Native.optimizeGetUpper(z3context, z3optContext, handle);
-    if (isInfinity(ast)) {
-      return Optional.empty();
-    }
-    return Optional.of(rationalFromZ3AST(replaceEpsilon(ast, epsilon)));
+    return round(handle, epsilon, Native::optimizeGetUpperAsVector);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
+    return round(handle, epsilon, Native::optimizeGetLowerAsVector);
+  }
+
+  private interface RoundingFunction {
+    long round(long context, long optContext, int handle);
+  }
+
+  private Optional<Rational> round(int handle, Rational epsilon, RoundingFunction direction) {
     Preconditions.checkState(!closed);
-    long ast = Native.optimizeGetLower(z3context, z3optContext, handle);
-    if (isInfinity(ast)) {
+
+    // Z3 exposes the rounding result as a tuple (infinity, number, epsilon)
+    long vector = direction.round(z3context, z3optContext, handle);
+    Native.astVectorIncRef(z3context, vector);
+    assert Native.astVectorSize(z3context, vector) == 3;
+
+    long inf = Native.astVectorGet(z3context, vector, 0);
+    Native.incRef(z3context, inf);
+    long value = Native.astVectorGet(z3context, vector, 1);
+    Native.incRef(z3context, value);
+    long eps = Native.astVectorGet(z3context, vector, 2);
+    Native.incRef(z3context, eps);
+
+    IntPtr ptr = new Native.IntPtr();
+    boolean status = Native.getNumeralInt(z3context, inf, ptr);
+    assert status;
+    if (ptr.value != 0) {
+
+      // Infinity.
       return Optional.empty();
     }
-    return Optional.of(rationalFromZ3AST(replaceEpsilon(ast, epsilon)));
+
+    Rational v = Rational.ofString(Native.getNumeralString(z3context, value));
+
+    status = Native.getNumeralInt(z3context, eps, ptr);
+    assert status;
+    try {
+      return Optional.of(v.plus(epsilon.times(Rational.of(ptr.value))));
+    } finally {
+      Native.astVectorDecRef(z3context, vector);
+      Native.decRef(z3context, inf);
+      Native.decRef(z3context, value);
+      Native.decRef(z3context, eps);
+    }
   }
 
   @Override
@@ -156,41 +186,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     Preconditions.checkState(!closed);
     Native.optimizeDecRef(z3context, z3optContext);
     closed = true;
-  }
-
-  private boolean isInfinity(long ast) {
-    return Native.astToString(z3context, ast).contains(Z3_INFINITY_REPRESENTATION);
-  }
-
-  /**
-   * Replace the epsilon in the returned formula with a numeric value.
-   **/
-  private long replaceEpsilon(long ast, Rational newValue) {
-    long replacement = Native.mkReal(
-        z3context,
-        newValue.getNum().intValueExact(),
-        newValue.getDen().intValueExact());
-    long epsilon = Native.mkConst(
-        z3context,
-        Native.mkStringSymbol(z3context, Z3_EPSILON_NAME),
-        Native.mkRealSort(z3context)
-    );
-    Native.incRef(z3context, replacement);
-    try {
-      return Native.substitute(
-          z3context,
-          ast,
-          1,
-          new long[] {epsilon},
-          new long[] {replacement}
-      );
-    } finally {
-      Native.decRef(z3context, replacement);
-    }
-  }
-
-  private Rational rationalFromZ3AST(long ast) {
-    return Rational.ofString(Native.getNumeralString(z3context, ast));
   }
 
   /**

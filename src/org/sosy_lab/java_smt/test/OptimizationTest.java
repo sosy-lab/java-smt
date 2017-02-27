@@ -198,4 +198,19 @@ public class OptimizationTest extends SolverBasedTest0 {
       prover.pop();
     }
   }
+
+  @Test public void testStrictConstraint() throws Exception {
+    requireRationals();
+
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+      RationalFormula x = rmgr.makeVariable("x");
+
+      prover.addConstraint(rmgr.lessThan(x, rmgr.makeNumber(1)));
+      int handle = prover.maximize(x);
+      assertThat(prover.check()).isEqualTo(OptStatus.OPT);
+
+      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of(1));
+      assertThat(prover.upper(handle, Rational.of("1/10"))).hasValue(Rational.of("9/10"));
+    }
+  }
 }
