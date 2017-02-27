@@ -31,7 +31,6 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -40,7 +39,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private final LogManager logger;
   private final long z3optContext;
 
-  Z3OptimizationProver(FormulaManager mgr, Z3FormulaCreator creator, LogManager pLogger) {
+  Z3OptimizationProver(Z3FormulaCreator creator, LogManager pLogger) {
     super(creator);
     z3optContext = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optContext);

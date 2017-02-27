@@ -240,7 +240,7 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    Z3OptimizationProver out = new Z3OptimizationProver(getFormulaManager(), creator, logger);
+    Z3OptimizationProver out = new Z3OptimizationProver(creator, logger);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;
