@@ -199,7 +199,8 @@ public class OptimizationTest extends SolverBasedTest0 {
     }
   }
 
-  @Test public void testStrictConstraint() throws Exception {
+  @Test
+  public void testStrictConstraint() throws Exception {
     requireRationals();
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
