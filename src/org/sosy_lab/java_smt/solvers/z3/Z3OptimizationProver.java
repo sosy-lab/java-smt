@@ -33,20 +33,15 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
-import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
 
-  private final FormulaManager mgr;
-  private final RationalFormulaManager rfmgr;
   private final LogManager logger;
   private final long z3optContext;
 
   Z3OptimizationProver(FormulaManager mgr, Z3FormulaCreator creator, LogManager pLogger) {
     super(creator);
-    this.mgr = mgr;
-    rfmgr = mgr.getRationalFormulaManager();
     z3optContext = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optContext);
     logger = pLogger;
