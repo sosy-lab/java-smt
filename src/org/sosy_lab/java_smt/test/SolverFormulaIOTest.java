@@ -75,14 +75,14 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void varDumpTest() {
-    BooleanFormula a = bmgr.makeVariable("a");
+    BooleanFormula a = bmgr.makeVariable("main::a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
     BooleanFormula c2 = bmgr.xor(a, b);
     BooleanFormula d = bmgr.and(c1, c2);
 
     String formDump = mgr.dumpFormula(d).toString();
-    assertThat(formDump).contains("(declare-fun a () Bool)");
+    assertThat(formDump).contains("(declare-fun |main::a| () Bool)");
     assertThat(formDump).contains("(declare-fun b () Bool)");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
