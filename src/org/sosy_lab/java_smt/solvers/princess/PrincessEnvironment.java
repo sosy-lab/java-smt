@@ -309,7 +309,7 @@ class PrincessEnvironment {
             Sets.difference(varsFromAbbrev, allVars).forEach(declaredFunctions::push);
             allVars.addAll(varsFromAbbrev);
           } else {
-            out.append("(declare-fun ").append(name);
+            out.append("(declare-fun ").append(SMTLineariser.quoteIdentifier(name));
 
             // function parameters
             out.append(" (");
@@ -347,7 +347,7 @@ class PrincessEnvironment {
             continue;
           }
 
-          out.append("(define-fun ").append(name);
+          out.append("(define-fun ").append(SMTLineariser.quoteIdentifier(name));
 
           // the type of each abbreviation
           if (fullFormula instanceof IFormula) {
