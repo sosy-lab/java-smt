@@ -104,7 +104,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     try (SmtInterpolModel model = getModel()) {
-      return model.modelToList();
+      return model.toList();
     }
   }
 

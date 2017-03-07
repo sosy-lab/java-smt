@@ -60,7 +60,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> modelToList() {
+  protected ImmutableList<ValueAssignment> toList() {
 
     Builder<ValueAssignment> assignments = ImmutableSet.builder();
 

@@ -105,11 +105,11 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     @Override
     public final Iterator<ValueAssignment> iterator() {
       if (modelAssignments == null) {
-        modelAssignments = modelToList();
+        modelAssignments = toList();
       }
       return modelAssignments.iterator();
     }
 
-    protected abstract ImmutableList<ValueAssignment> modelToList();
+    protected abstract ImmutableList<ValueAssignment> toList();
   }
 }

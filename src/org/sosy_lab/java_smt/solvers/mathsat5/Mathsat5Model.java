@@ -71,7 +71,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> modelToList() {
+  protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     Builder<ValueAssignment> assignments = ImmutableList.builder();

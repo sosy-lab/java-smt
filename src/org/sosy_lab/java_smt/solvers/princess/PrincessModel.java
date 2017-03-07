@@ -80,7 +80,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> modelToList() {
+  protected ImmutableList<ValueAssignment> toList() {
     scala.collection.Map<ModelLocation, ModelValue> interpretation = model.interpretation();
 
     // first get the addresses of arrays

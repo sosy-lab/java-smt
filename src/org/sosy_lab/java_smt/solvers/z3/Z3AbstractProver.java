@@ -129,7 +129,7 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
     try (Z3Model model = getModel()) {
-      return model.modelToList();
+      return model.toList();
     }
   }
 

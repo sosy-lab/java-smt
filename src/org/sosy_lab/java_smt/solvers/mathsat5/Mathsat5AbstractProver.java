@@ -141,7 +141,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     try (Mathsat5Model model = getModel()) {
-      return model.modelToList();
+      return model.toList();
     }
   }
 
