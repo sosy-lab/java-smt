@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -67,23 +68,17 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    push();
-    Preconditions.checkState(
-        annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core" + " over assumptions.");
-    for (BooleanFormula assumption : assumptions) {
-      String termName = generateTermName();
-      Term t = mgr.extractInfo(assumption);
-      Term annotated = env.annotate(t, new Annotation(":named", termName));
-      annotatedTerms.put(termName, t);
-      env.assertTerm(annotated);
-    }
-    if (!isUnsat()) {
+
+    Term[] assumptionTerms = assumptions.stream().map(mgr::extractInfo).toArray(Term[]::new);
+
+    if (env.checkSatWithAssumptions(assumptionTerms)) {
       return Optional.empty();
     }
-    List<BooleanFormula> out = getUnsatCore();
-    pop();
-    return Optional.of(out);
+
+    List<BooleanFormula> l = Arrays.stream(env.getUnsatCoreOverAssumptions()).map(
+        creator::encapsulateBoolean
+    ).collect(Collectors.toList());
+    return Optional.of(l);
   }
 
   @Override
@@ -107,9 +102,9 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!isClosed());
     Term[] terms = env.getUnsatCore();
-    return Lists.transform(
-        Arrays.asList(terms),
-        input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
+    return Arrays.stream(terms).map(
+        s -> creator.encapsulateBoolean(annotatedTerms.get(s.toString()))
+    ).collect(Collectors.toList());
   }
 
   @Override

@@ -282,6 +282,14 @@ class SmtInterpolEnvironment {
   }
 
   /**
+   * Check satisfiability assuming {@code assumptions}.
+   */
+  public boolean checkSatWithAssumptions(Term[] assumptions) throws InterruptedException {
+    shutdownNotifier.shutdownIfNecessary();
+    return toSATResult(script.checkSatAssuming(assumptions));
+  }
+
+  /**
    * This function causes the SatSolver to check all the terms on the stack, if their conjunction is
    * SAT or UNSAT.
    */
@@ -292,8 +300,14 @@ class SmtInterpolEnvironment {
     // so we check here, too.
     shutdownNotifier.shutdownIfNecessary();
 
-    LBool result = script.checkSat();
-    switch (result) {
+    return toSATResult(script.checkSat());
+  }
+
+  /**
+   * Convert SMTInterpol output to result or exception.
+   */
+  private boolean toSATResult(LBool pResult) throws InterruptedException {
+    switch (pResult) {
       case SAT:
         return true;
       case UNSAT:
@@ -313,9 +327,8 @@ class SmtInterpolEnvironment {
           default:
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
         }
-
       default:
-        throw new SMTLIBException("checkSat returned " + result);
+        throw new SMTLIBException("checkSat returned " + pResult);
     }
   }
 
@@ -477,6 +490,13 @@ class SmtInterpolEnvironment {
       }
       throw new AssertionError(e);
     }
+  }
+
+  /**
+   * @return UNSAT core over previously taken assumptions.
+   */
+  public Term[] getUnsatCoreOverAssumptions() {
+    return script.getUnsatAssumptions();
   }
 
   public Term[] getUnsatCore() {

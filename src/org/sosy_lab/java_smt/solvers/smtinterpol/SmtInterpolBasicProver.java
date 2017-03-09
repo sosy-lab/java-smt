@@ -42,6 +42,8 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   private boolean closed = false;
   private final SmtInterpolEnvironment env;
   private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  private final SmtInterpolFormulaManager mgr;
+
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
 
   private static final String PREFIX = "term_"; // for termnames
@@ -49,6 +51,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
       new UniqueIdGenerator(); // for different termnames
 
   SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr) {
+    mgr = pMgr;
     env = pMgr.createEnvironment();
     creator = pMgr.getFormulaCreator();
   }
@@ -104,9 +107,10 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
     closed = true;
   }
 
-  @SuppressWarnings("unused")
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Assumption-solving is not supported.");
+    return env.checkSatWithAssumptions(
+        pAssumptions.stream().map(mgr::extractInfo).toArray(Term[]::new)
+    );
   }
 }
