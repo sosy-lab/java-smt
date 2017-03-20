@@ -83,6 +83,13 @@ public class HoudiniApp {
         List<BooleanFormula> result = houdini.houdini(lemmas, transition);
 
         logger.log(Level.INFO, "Houdini returned", result);
+
+      } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+        // on some machines we support only some solvers,
+        // e.g. Windows does not have Mathsat by default.
+        // Thus we can ignore these errors.
+        logger.logf(Level.INFO, "Solver %s not available (%s)", solver, e);
       }
     }
   }
