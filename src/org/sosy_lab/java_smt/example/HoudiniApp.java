@@ -89,7 +89,7 @@ public class HoudiniApp {
         // on some machines we support only some solvers,
         // e.g. Windows does not have Mathsat by default.
         // Thus we can ignore these errors.
-        logger.logf(Level.INFO, "Solver %s not available (%s)", solver, e);
+        logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
       }
     }
   }
