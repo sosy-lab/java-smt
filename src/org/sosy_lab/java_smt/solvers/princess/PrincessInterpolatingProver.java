@@ -26,9 +26,9 @@ import ap.SimpleAPI;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,7 +84,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   @Override
   public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
-    Set<Integer> indexesOfA = new HashSet<>(pTermNamesOfA);
+    Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
     Set<Integer> indexesOfB =

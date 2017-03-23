@@ -21,12 +21,12 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,7 +83,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
 
-    Set<String> termNamesOfA = new HashSet<>(pTermNamesOfA);
+    Set<String> termNamesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
     Set<String> termNamesOfB =

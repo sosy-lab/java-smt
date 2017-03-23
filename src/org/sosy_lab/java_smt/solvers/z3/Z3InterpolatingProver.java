@@ -21,8 +21,8 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
@@ -109,7 +109,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(
         getSeqInterpolants(
-            ImmutableList.of(Sets.newHashSet(formulasOfA), Sets.newHashSet(formulasOfB))));
+            ImmutableList.of(ImmutableSet.copyOf(formulasOfA), ImmutableSet.copyOf(formulasOfB))));
   }
 
   @Override

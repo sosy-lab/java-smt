@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -413,7 +412,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   /** Optimized non-recursive flattening implementation. */
   private Set<BooleanFormula> asFuncRecursive(
       BooleanFormula f, FormulaVisitor<Set<BooleanFormula>> visitor) {
-    Set<BooleanFormula> output = new HashSet<>();
+    ImmutableSet.Builder<BooleanFormula> output = ImmutableSet.builder();
     Deque<BooleanFormula> toProcess = new ArrayDeque<>();
     Map<BooleanFormula, Set<BooleanFormula>> cache = new HashMap<>();
     toProcess.add(f);
@@ -436,7 +435,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       }
     }
 
-    return output;
+    return output.build();
   }
 
   private final FormulaVisitor<Set<BooleanFormula>> conjunctionFinder =

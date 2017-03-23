@@ -40,6 +40,7 @@ import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.util.Debug;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -234,11 +235,11 @@ class PrincessEnvironment {
     Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
     Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
-    Set<IExpression> declaredFunctions = new HashSet<>();
+    ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formula) {
       declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
     }
-    for (IExpression var : declaredFunctions) {
+    for (IExpression var : declaredFunctions.build()) {
       if (var instanceof IConstant) {
         SMTType type = constantTypes.get(((IConstant) var).c());
         if (type instanceof SMTParser2InputAbsy.SMTArray) {
@@ -283,9 +284,12 @@ class PrincessEnvironment {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
+        // allVars needs to be mutable, but declaredFunctions should have deterministic order
         Set<IExpression> allVars =
-            new HashSet<>(creator.extractVariablesAndUFs(lettedFormula, true).values());
+            ImmutableSet.copyOf(creator.extractVariablesAndUFs(lettedFormula, true).values());
         Deque<IExpression> declaredFunctions = new ArrayDeque<>(allVars);
+        allVars = new HashSet<>(allVars);
+
         Set<String> doneFunctions = new HashSet<>();
         Set<String> todoAbbrevs = new HashSet<>();
 
@@ -305,7 +309,8 @@ class PrincessEnvironment {
           if (name.startsWith("abbrev_")) {
             todoAbbrevs.add(name);
             Set<IExpression> varsFromAbbrev =
-                new HashSet<>(creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
+                ImmutableSet.copyOf(
+                    creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
             Sets.difference(varsFromAbbrev, allVars).forEach(declaredFunctions::push);
             allVars.addAll(varsFromAbbrev);
           } else {
