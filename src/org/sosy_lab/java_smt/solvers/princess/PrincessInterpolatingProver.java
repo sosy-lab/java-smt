@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.asScalaSet;
-import static scala.collection.JavaConversions.seqAsJavaList;
 
 import ap.SimpleAPI;
 import ap.parser.IFormula;
@@ -130,7 +130,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     // convert data-structure back
     // TODO check that interpolants do not contain abbreviations we did not introduce ourselves
     final List<BooleanFormula> result = new ArrayList<>();
-    for (final IFormula itp : seqAsJavaList(itps)) {
+    for (final IFormula itp : asJavaIterable(itps)) {
       result.add(mgr.encapsulateBooleanFormula(itp));
     }
     return result;

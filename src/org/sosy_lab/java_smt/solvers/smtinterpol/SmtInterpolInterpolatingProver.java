@@ -20,8 +20,8 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
@@ -182,18 +182,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
     Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(!termNames.isEmpty());
 
-    Term[] terms = new Term[termNames.size()];
-    int i = 0;
-    for (String termName : termNames) {
-      terms[i] = env.term(termName);
-      i++;
+    if (termNames.size() == 1) {
+      return env.term(Iterables.getOnlyElement(termNames));
     }
-
-    if (terms.length > 1) {
-      return env.term("and", terms);
-    } else {
-      return Iterators.getOnlyElement(Iterators.forArray(terms));
-    }
+    return env.term("and", termNames.stream().map(env::term).toArray(Term[]::new));
   }
 
   @Override

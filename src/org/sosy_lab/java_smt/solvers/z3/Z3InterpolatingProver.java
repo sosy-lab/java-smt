@@ -32,10 +32,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
@@ -92,24 +92,22 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
-  public BooleanFormula getInterpolant(final List<Long> formulasOfA)
+  public BooleanFormula getInterpolant(final List<Long> pFormulasOfA)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
+    Set<Long> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
+
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
-    // we have to handle equal formulas on the stack,
-    // so we copy the whole stack and remove the formulas of A once.
-    final List<Long> formulasOfB = new LinkedList<>();
-    assertedFormulas.forEach(formulasOfB::addAll);
-    for (long af : formulasOfA) {
-      boolean check = formulasOfB.remove(af); // remove only first occurrence
-      assert check : "formula from A must be part of all asserted formulas";
-    }
+    Set<Long> formulasOfB =
+        assertedFormulas
+            .stream()
+            .flatMap(List::stream)
+            .filter(f -> !formulasOfA.contains(f))
+            .collect(Collectors.toSet());
 
     // binary interpolant is a sequence interpolant of only 2 elements
-    return Iterables.getOnlyElement(
-        getSeqInterpolants(
-            ImmutableList.of(ImmutableSet.copyOf(formulasOfA), ImmutableSet.copyOf(formulasOfB))));
+    return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA, formulasOfB)));
   }
 
   @Override
