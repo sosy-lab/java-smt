@@ -178,16 +178,16 @@ do not require any configuration and work out of the box.
 Below is a small example showing how to initialize the library using the entry point [SolverContextFactory][]:
 
 ```java
-package org.sosy_lab.solver.test;
+package org.sosy_lab.java_smt.test;
 
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.solver.SolverContextFactory;
-import org.sosy_lab.solver.SolverContextFactory.Solvers;
-import org.sosy_lab.solver.api.SolverContext;
+import org.sosy_lab.java_smt.SolverContextFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.SolverContext;
 
 public class TestApp {
   public static void main(String[] args) throws InvalidConfigurationException {
