@@ -8,6 +8,7 @@
 	<classpathentry kind="lib" path="lib/java/test/junit.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/hamcrest-core.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/annotations.jar"/>
+	<classpathentry kind="lib" path="lib/java/build/auto-value.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
@@ -23,6 +24,5 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/SoSy-Lab Common/lib/java/build/auto-value.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
