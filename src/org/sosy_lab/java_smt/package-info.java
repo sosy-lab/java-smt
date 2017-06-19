@@ -25,8 +25,8 @@
  * {@link org.sosy_lab.java_smt.api.SolverContext} object. All operations on formulas are performed
  * using managers, available through the context object.
  *
- * <p>All interfaces which form the public API are located in the {@link org.sosy_lab.java_smt.api}
- * package.
+ * <p>All interfaces which form the public API are located in the
+ * <a href="api/package-summary.html">API package</a>.
  */
 @javax.annotation.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
