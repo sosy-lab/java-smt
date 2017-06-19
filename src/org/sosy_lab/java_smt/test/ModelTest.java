@@ -53,7 +53,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
 
-  private static final List<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
+  private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
       ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
   @Parameters(name = "{0}")

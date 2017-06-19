@@ -73,7 +73,7 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RationalFormula;
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
-  private static final Map<Integer, Object> Z3_CONSTANTS =
+  private static final ImmutableMap<Integer, Object> Z3_CONSTANTS =
       ImmutableMap.<Integer, Object>builder()
           .put(Z3_decl_kind.Z3_OP_TRUE.toInt(), true)
           .put(Z3_decl_kind.Z3_OP_FALSE.toInt(), false)

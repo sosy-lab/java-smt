@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.Classes;
@@ -224,7 +223,7 @@ public class SolverContextFactory {
       Pattern.compile("^(" + "com\\.microsoft\\.z3|" + Pattern.quote(Z3_PACKAGE) + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
-  private static final Set<String> Z3_LIBRARY_NAMES =
+  private static final ImmutableSet<String> Z3_LIBRARY_NAMES =
       ImmutableSet.of("z3", "libz3", "libz3java", "z3java");
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.

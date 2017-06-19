@@ -166,8 +166,8 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, doublePrecType);
-    checkEqualityOfNumberConstantsFor(3.40282346638528859812e+38, singlePrecType);
-    checkEqualityOfNumberConstantsFor(3.40282346638528859812e+38, doublePrecType);
+    checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, singlePrecType);
+    checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, doublePrecType);
   }
 
   @Test
