@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 import javax.annotation.CheckReturnValue;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -194,11 +193,7 @@ public class UfElimination {
     // substitute all UFs in the additional constraints,
     // required if UFs are arguments of UFs, e.g. uf(uf(1, 2), 2)
     for (int i = 0; i < depth; i++) {
-      extraConstraints =
-          extraConstraints
-              .stream()
-              .map(c -> fmgr.substitute(c, substitutions))
-              .collect(Collectors.toList());
+      extraConstraints.replaceAll(c -> fmgr.substitute(c, substitutions));
     }
 
     Map<Formula, Formula> otherSubstitution =
