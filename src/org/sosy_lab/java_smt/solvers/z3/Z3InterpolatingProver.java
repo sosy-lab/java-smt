@@ -35,7 +35,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
@@ -104,7 +103,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
             .stream()
             .flatMap(List::stream)
             .filter(f -> !formulasOfA.contains(f))
-            .collect(Collectors.toSet());
+            .collect(ImmutableSet.toImmutableSet());
 
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA, formulasOfB)));

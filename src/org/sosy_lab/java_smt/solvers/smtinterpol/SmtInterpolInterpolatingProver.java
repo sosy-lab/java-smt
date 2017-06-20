@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -91,7 +90,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
             .keySet()
             .stream()
             .filter(n -> !termNamesOfA.contains(n))
-            .collect(Collectors.toSet());
+            .collect(ImmutableSet.toImmutableSet());
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     Term termA = buildConjunctionOfNamedTerms(termNamesOfA);

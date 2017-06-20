@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -92,7 +91,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
             .keySet()
             .stream()
             .filter(f -> !indexesOfA.contains(f))
-            .collect(Collectors.toSet());
+            .collect(ImmutableSet.toImmutableSet());
 
     // get interpolant of groups
     List<BooleanFormula> itp = getSeqInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
