@@ -61,7 +61,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
-    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -80,7 +80,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
-    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");

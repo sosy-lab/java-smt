@@ -57,7 +57,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   public void testTacticTimeout() throws Exception {
     TruthJUnit.assume()
-        .withFailureMessage("Only Z3 has native tactics")
+        .withMessage("Only Z3 has native tactics")
         .that(solverToUse())
         .isEqualTo(Solvers.Z3);
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
@@ -72,7 +72,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Test
   public void testProverTimeout() throws Exception {
     TruthJUnit.assume()
-        .withFailureMessage("Princess does not support interruption")
+        .withMessage("Princess does not support interruption")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeout(() -> context.newProverEnvironment());
@@ -81,7 +81,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Test
   public void testInterpolationProverTimeout() throws Exception {
     TruthJUnit.assume()
-        .withFailureMessage("Princess does not support interruption")
+        .withMessage("Princess does not support interruption")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeout(() -> context.newProverEnvironmentWithInterpolation());

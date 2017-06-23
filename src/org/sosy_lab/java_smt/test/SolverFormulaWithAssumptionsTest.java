@@ -71,7 +71,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
       env.isUnsatWithAssumptions(ImmutableList.of());
     } catch (UnsupportedOperationException e) {
       assume()
-          .withFailureMessage("Solver " + solverToUse() + " does not support assumption-solving")
+          .withMessage("Solver %s does not support assumption-solving", solverToUse())
           .that(e)
           .isNull();
     }

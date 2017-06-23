@@ -74,7 +74,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void assumptionsWithModelTest() throws Exception {
     assume()
-        .withFailureMessage("MathSAT can't construct models for SAT check with assumptions")
+        .withMessage("MathSAT can't construct models for SAT check with assumptions")
         .that(solver)
         .isNotEqualTo(MATHSAT5);
     BooleanFormula b = bmgr.makeVariable("b");
@@ -96,7 +96,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreTest() throws Exception {
     assume()
-        .withFailureMessage("Princess does not support unsat core generation")
+        .withMessage("Princess does not support unsat core generation")
         .that(solverToUse())
         .isNotEqualTo(PRINCESS);
     try (ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
@@ -116,7 +116,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreWithAssumptionsTest() throws Exception {
     assume()
-        .withFailureMessage("Princess and Mathsat5 do not support unsat core generation")
+        .withMessage("Princess and Mathsat5 do not support unsat core generation")
         .that(solverToUse())
         .isNoneOf(PRINCESS, MATHSAT5);
     try (ProverEnvironment pe =

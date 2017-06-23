@@ -88,14 +88,14 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   private void requireMultipleStackSupport() {
     assume()
-        .withFailureMessage("Solver does not support multiple stacks yet")
+        .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
         .isNotEqualTo(Solvers.SMTINTERPOL);
   }
 
   protected final void requireUfValuesInModel() {
     assume()
-        .withFailureMessage(
+        .withMessage(
             "Integration of solver does not support retrieving values for UFs from a model")
         .that(solver)
         .isNotEqualTo(Solvers.Z3);

@@ -395,7 +395,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @SuppressWarnings("unchecked")
   public void fpInterpolation() throws Exception {
     assume()
-        .withFailureMessage("MathSAT5 does not support floating-point interpolation")
+        .withMessage("MathSAT5 does not support floating-point interpolation")
         .that(solver)
         .isNotEqualTo(Solvers.MATHSAT5);
 

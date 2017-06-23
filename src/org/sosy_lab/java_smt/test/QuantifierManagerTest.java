@@ -386,8 +386,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThat(isForall.get()).isFalse();
 
     assume()
-        .withFailureMessage(
-            "Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     assertThat(boundVars).hasSize(1);
@@ -396,7 +395,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   public void testEmpty() {
     assume()
-        .withFailureMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
+        .withMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 

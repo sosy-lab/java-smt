@@ -179,7 +179,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void twoFormulasTest() throws SolverException, InterruptedException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
-    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

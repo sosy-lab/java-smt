@@ -205,7 +205,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   private void requireSequentialItp() {
     requireInterpolation();
     assume()
-        .withFailureMessage("Solver does not support sequential interpolation.")
+        .withMessage("Solver does not support sequential interpolation.")
         .that(solver)
         .isNotEqualTo(Solvers.MATHSAT5);
   }
@@ -213,7 +213,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   private void requireTreeItp() {
     requireInterpolation();
     assume()
-        .withFailureMessage("Solver does not support tree-interpolation.")
+        .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
         .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL);
   }

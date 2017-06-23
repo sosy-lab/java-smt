@@ -270,7 +270,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testPartialModels() throws Exception {
     assume()
-        .withFailureMessage("As of now, only Z3 and Princess support partial models")
+        .withMessage("As of now, only Z3 and Princess support partial models")
         .that(solver)
         .isIn(SOLVERS_WITH_PARTIAL_MODEL);
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -287,7 +287,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testPartialModelsUF() throws Exception {
     assume()
-        .withFailureMessage("As of now, only Z3 and Princess support partial model evaluation")
+        .withMessage("As of now, only Z3 and Princess support partial model evaluation")
         .that(solver)
         .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -368,7 +368,7 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays3() throws Exception {
     requireArrays();
     assume()
-        .withFailureMessage("As of now, only Princess does not support multi-dimensional arrays")
+        .withMessage("As of now, only Princess does not support multi-dimensional arrays")
         .that(solver)
         .isNotSameAs(Solvers.PRINCESS);
 

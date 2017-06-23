@@ -161,7 +161,7 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of rationals")
+        .withMessage("Solver %s does not support the theory of rationals", solverToUse())
         .that(rmgr)
         .isNotNull();
   }
@@ -169,15 +169,14 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support the theory of bitvectors")
+        .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
         .that(bvmgr)
         .isNotNull();
   }
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support quantifiers")
+        .withMessage("Solver %s does not support quantifiers", solverToUse())
         .that(qmgr)
         .isNotNull();
   }
@@ -185,14 +184,14 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support arrays. */
   protected final void requireArrays() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of arrays")
+        .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
         .isNotNull();
   }
 
   protected final void requireFloats() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of floats")
+        .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
         .isNotNull();
   }
@@ -207,7 +206,7 @@ public abstract class SolverBasedTest0 {
       context.newOptimizationProverEnvironment().close();
     } catch (UnsupportedOperationException e) {
       assume()
-          .withFailureMessage("Solver " + solverToUse() + " does not support optimization")
+          .withMessage("Solver %s does not support optimization", solverToUse())
           .that(e)
           .isNull();
     }
@@ -218,7 +217,7 @@ public abstract class SolverBasedTest0 {
       context.newProverEnvironmentWithInterpolation().close();
     } catch (UnsupportedOperationException e) {
       assume()
-          .withFailureMessage("Solver " + solverToUse() + " does not support interpolation")
+          .withMessage("Solver %s does not support interpolation", solverToUse())
           .that(e)
           .isNull();
     }
@@ -226,7 +225,7 @@ public abstract class SolverBasedTest0 {
 
   @Deprecated
   protected final void requireFalse(String failureMessage) {
-    assume().withFailureMessage(failureMessage).fail();
+    assume().withMessage(failureMessage).fail();
   }
 
   /**

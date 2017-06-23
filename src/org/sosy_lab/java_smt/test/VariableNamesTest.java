@@ -185,11 +185,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
       assertThatFormula(bmgr.xor(var, varFromString)).isSatisfiable();
 
       assert_()
-          .withFailureMessage("name is escaped once, then the second call should escape it twice")
+          .withMessage("name is escaped once, then the second call should escape it twice")
           .that(varFromString.toString())
           .isNotEqualTo(varname);
       assert_()
-          .withFailureMessage("name is escaped once, then the second call should escape it twice")
+          .withMessage("name is escaped once, then the second call should escape it twice")
           .that(mgr.dumpFormula(varFromString).toString())
           .isNotEqualTo(mgr.dumpFormula(var).toString());
     }

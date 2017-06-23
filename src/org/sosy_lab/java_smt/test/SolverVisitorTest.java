@@ -142,7 +142,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
-        .withFailureMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
@@ -276,7 +276,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
-        .withFailureMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
