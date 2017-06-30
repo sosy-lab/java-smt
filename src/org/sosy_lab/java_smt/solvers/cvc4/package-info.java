@@ -18,7 +18,5 @@
  *  limitations under the License.
  */
 
-/**
- * Interface to the SMT solver CVC4 (based on Java Bindings generated with SWIG).
- */
+/** Interface to the SMT solver CVC4 (based on Java Bindings generated with SWIG). */
 package org.sosy_lab.java_smt.solvers.cvc4;

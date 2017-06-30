@@ -22,36 +22,33 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
-
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
-
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
-public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager>{
+public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   // TODO: this will not work properly, as SmtEngine is affected by
   // added assertions.
   private final SmtEngine smtEngine;
   private final CVC4FormulaCreator cvc4Creator;
 
-//  private final ImmutableList<Expr> assertedFormulas;
+  // private final ImmutableList<Expr> assertedFormulas;
 
   CVC4Model(CVC4FormulaCreator pCreator) {
     super(pCreator);
     this.cvc4Creator = pCreator;
     this.smtEngine = pCreator.getSmtEngine();
-//    this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
+    // this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
   @Override
@@ -59,19 +56,16 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager>{
     return getValue(smtEngine.getValue(f));
   }
 
-
-
   public Map<String, Object> createAllsatModel(
-      SmtEngine smtEngine, Collection<Expr> assertedFormulas, CVC4FormulaCreator creator) {
+      Collection<Expr> assertedFormulas, CVC4FormulaCreator creator) {
     Collection<Expr> extracted = new HashSet<>();
-    Map<String, Object> evaluation = new HashMap<String, Object>();
+    Map<String, Object> evaluation = new HashMap<>();
 
     for (Expr expr : assertedFormulas) {
       extracted.addAll(creator.extractVariablesAndUFs(expr, true).values());
     }
     for (Expr lKeyTerm : extracted) {
       Expr lValueTerm = creator.getSmtEngine().getValue(lKeyTerm);
-      Formula key = creator.encapsulateWithTypeOf(lKeyTerm);
       Object lValue = getValue(lValueTerm);
       // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
@@ -127,10 +121,11 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager>{
     return out.build();
   }
 
+  /*
   private Collection<ValueAssignment> getArrayAssignments() {
-    return null;
-
+    return new HashSet<>();
   }
+  */
 
   public static CVC4Model create(CVC4FormulaCreator pCreator) {
     return new CVC4Model(pCreator);

@@ -26,13 +26,10 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
 import edu.nyu.acsys.CVC4.vectorType;
-
+import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-import java.util.List;
-
-public class CVC4UFManager
-    extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
+public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
 
   private final ExprManager exprManager;
 

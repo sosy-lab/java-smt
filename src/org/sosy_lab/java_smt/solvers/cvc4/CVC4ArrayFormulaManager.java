@@ -23,13 +23,13 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
-
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
-public class CVC4ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
+public class CVC4ArrayFormulaManager
+    extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
   protected final ExprManager exprManager;
 
   public CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
@@ -48,12 +48,14 @@ public class CVC4ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, T
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(String pName,
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final Type cvc4ArrayType = toSolverType(arrayFormulaType);
-    ((CVC4FormulaCreator)formulaCreator).arrayTypeMapping.put(pName, new Type[]{toSolverType(pIndexType), toSolverType(pElementType)});
+    ((CVC4FormulaCreator) formulaCreator)
+        .arrayTypeMapping.put(
+            pName, new Type[] {toSolverType(pIndexType), toSolverType(pElementType)});
     return getFormulaCreator().makeVariable(cvc4ArrayType, pName);
   }
 
@@ -61,5 +63,4 @@ public class CVC4ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, T
   protected Expr equivalence(Expr pArray1, Expr pArray2) {
     return exprManager.mkExpr(Kind.EQUAL, pArray1, pArray2);
   }
-
 }

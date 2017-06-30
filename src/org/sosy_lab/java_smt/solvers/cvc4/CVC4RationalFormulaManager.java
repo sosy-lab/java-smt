@@ -21,15 +21,14 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Type;
-
+import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-import java.math.BigDecimal;
-
-public class CVC4RationalFormulaManager extends CVC4NumeralFormulaManager<NumeralFormula, RationalFormula>
-    implements RationalFormulaManager{
+public class CVC4RationalFormulaManager
+    extends CVC4NumeralFormulaManager<NumeralFormula, RationalFormula>
+    implements RationalFormulaManager {
 
   CVC4RationalFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
@@ -49,5 +48,4 @@ public class CVC4RationalFormulaManager extends CVC4NumeralFormulaManager<Numera
   protected Expr makeNumberImpl(BigDecimal pNumber) {
     return makeNumberImpl(pNumber.toPlainString());
   }
-
 }

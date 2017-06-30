@@ -21,9 +21,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
 import edu.nyu.acsys.CVC4.SmtEngine;
-
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;

@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
@@ -29,7 +27,10 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -49,19 +50,15 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager, Expr> {
+public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   protected final ExprManager exprManager;
   protected final SmtEngine smtEngine;
   protected final Map<String, Expr> variablesCache = new HashMap<>();
-  public Map<String, Type[]> arrayTypeMapping = new HashMap<>();
+  protected final Map<String, Type[]> arrayTypeMapping = new HashMap<>();
 
-  protected CVC4FormulaCreator(int randomSeed, ExprManager exprManager, Type boolType, Type intType, Type realType) {
+  protected CVC4FormulaCreator(
+      int randomSeed, ExprManager exprManager, Type boolType, Type intType, Type realType) {
     super(exprManager, boolType, intType, realType);
     this.exprManager = exprManager;
     smtEngine = new SmtEngine(exprManager);
@@ -69,7 +66,7 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
     smtEngine.setOption("produce-models", new SExpr(true));
     smtEngine.setOption("produce-assertions", new SExpr(true));
     smtEngine.setOption("dump-models", new SExpr(true));
-//    smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
   }
@@ -93,6 +90,7 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
   protected SmtEngine getSmtEngine() {
     return smtEngine;
   }
+
   @Override
   public Type getBitvectorType(int pBitwidth) {
     return exprManager.mkBitVectorType(pBitwidth);
@@ -155,12 +153,12 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
       return FormulaType.getFloatingPointType(
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getSignificandSize());
-    } else{
+    } else {
       throw new AssertionError("Unhandled type " + t.getClass());
     }
-//    else if(t == exprManager.realType()) {
-//      FormulaType.re
-//    }
+    // else if(t == exprManager.realType()) {
+    //   FormulaType.re
+    // }
   }
 
   @SuppressWarnings("unchecked")
@@ -223,11 +221,12 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
     }
   }
 
+  /*
   private Expr replaceArgs(Expr pT, List<Expr> pNewArgs) {
-
     // TODO!
     throw new UnsupportedOperationException("Not implemented");
   }
+  */
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
@@ -263,16 +262,9 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
         argsTypes.add(argType);
       }
 
-      // Any function application.
-      Function<List<Formula>, Formula> constructor =
-          new Function<List<Formula>, Formula>() {
-            @Override
-            public Formula apply(List<Formula> formulas) {
-              return encapsulateWithTypeOf(replaceArgs(f, extractInfo(formulas)));
-            }
-          };
       return visitor.visitFunction(
-          formula, args,
+          formula,
+          args,
           FunctionDeclarationImpl.of(name, getDeclarationKind(f), argsTypes, getFormulaType(f), f));
     }
   }
@@ -323,12 +315,12 @@ public class CVC4FormulaCreator extends FormulaCreator< Expr, Type, ExprManager,
   @Override
   public Expr callFunctionImpl(FunctionDeclarationImpl<?, Expr> pDeclaration, List<Expr> pArgs) {
     // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   protected Expr getBooleanVarDeclarationImpl(Expr pTFormulaInfo) {
     // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 }

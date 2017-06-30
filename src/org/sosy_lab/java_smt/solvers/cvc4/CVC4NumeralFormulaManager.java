@@ -24,11 +24,9 @@ import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
-
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
-
-import java.math.BigInteger;
 
 public abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
@@ -42,7 +40,7 @@ public abstract class CVC4NumeralFormulaManager<
     exprManager = pCreator.getExprManager();
   }
 
-  abstract protected Type getNumeralType();
+  protected abstract Type getNumeralType();
 
   @Override
   public boolean isNumeral(Expr pVal) {

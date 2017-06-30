@@ -24,14 +24,12 @@ import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class CVC4IntegerFormulaManager
     extends CVC4NumeralFormulaManager<IntegerFormula, IntegerFormula>
@@ -66,8 +64,6 @@ public class CVC4IntegerFormulaManager
     return decimalAsInteger(pNumber);
   }
 
-
-
   @Override
   protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
@@ -82,10 +78,9 @@ public class CVC4IntegerFormulaManager
     return exprManager.mkConst(true);
   }
 
-
   @Override
-  public BooleanFormula modularCongruence(IntegerFormula pNumber1, IntegerFormula pNumber2,
-      BigInteger pN) {
+  public BooleanFormula modularCongruence(
+      IntegerFormula pNumber1, IntegerFormula pNumber2, BigInteger pN) {
     return modularCongruence(pNumber1, pNumber2, pN.longValue());
   }
 
@@ -99,7 +94,6 @@ public class CVC4IntegerFormulaManager
     return exprManager.mkConst(new Rational(pI));
   }
 
-
   @Override
   protected Expr makeVariableImpl(String pI) {
     return formulaCreator.makeVariable(getFormulaCreator().getIntegerType(), pI);
@@ -110,5 +104,4 @@ public class CVC4IntegerFormulaManager
     // TODO Auto-generated method stub
     return getFormulaCreator().getIntegerType();
   }
-
 }

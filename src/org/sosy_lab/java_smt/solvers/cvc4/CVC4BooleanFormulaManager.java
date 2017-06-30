@@ -24,10 +24,8 @@ import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
-
-import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-
 import java.util.Collection;
+import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, ExprManager, Expr> {

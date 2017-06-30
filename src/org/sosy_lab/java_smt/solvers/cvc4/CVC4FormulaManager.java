@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
-
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -62,5 +61,4 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   public Appender dumpFormula(Expr pT) {
     throw new UnsupportedOperationException();
   }
-
 }
