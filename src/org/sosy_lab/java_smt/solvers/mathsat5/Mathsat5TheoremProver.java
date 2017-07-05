@@ -59,15 +59,18 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   private static Map<String, String> createConfig(Set<ProverOptions> opts) {
-    return ImmutableMap.<String, String>builder()
-        .put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false")
-        .put(
-            "unsat_core_generation",
-            opts.contains(ProverOptions.GENERATE_UNSAT_CORE)
-                    || opts.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)
-                ? "1"
-                : "0")
-        .build();
+    boolean generateUnsatCore =
+        opts.contains(ProverOptions.GENERATE_UNSAT_CORE)
+            || opts.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    ImmutableMap.Builder<String, String> configBuilder =
+        ImmutableMap.<String, String>builder()
+            .put(
+                "model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false")
+            .put("unsat_core_generation", generateUnsatCore ? "1" : "0");
+    if (generateUnsatCore) {
+      configBuilder.put("theory.bv.eager", "false");
+    }
+    return configBuilder.build();
   }
 
   @Override
