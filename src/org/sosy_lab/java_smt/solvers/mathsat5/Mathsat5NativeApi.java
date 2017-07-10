@@ -301,6 +301,8 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_equal(long e, long t1, long t2);
 
+  public static native long msat_make_eq(long e, long t1, long t2);
+
   public static native long msat_make_leq(long e, long t1, long t2);
 
   public static native long msat_make_plus(long e, long t1, long t2);
