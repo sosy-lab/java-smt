@@ -22,13 +22,11 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -107,9 +106,8 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!isClosed());
     Term[] terms = env.getUnsatCore();
-    return Lists.transform(
-        Arrays.asList(terms),
-        input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
+    return Collections3.transformedImmutableListCopy(
+        terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
   }
 
   @Override
@@ -122,7 +120,7 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
       importantTerms[i++] = mgr.extractInfo(impF);
     }
     for (Term[] model : env.checkAllSat(importantTerms)) {
-      callback.apply(Lists.transform(Arrays.asList(model), creator::encapsulateBoolean));
+      callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }
     return callback.getResult();
   }

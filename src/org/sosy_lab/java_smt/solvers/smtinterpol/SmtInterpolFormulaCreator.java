@@ -20,8 +20,8 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
-import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -38,7 +38,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
-import org.sosy_lab.java_smt.basicimpl.ObjectArrayBackedList;
 
 class SmtInterpolFormulaCreator
     extends FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
@@ -112,15 +111,6 @@ class SmtInterpolFormulaCreator
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
   }
 
-  List<Formula> encapsulate(Term[] terms) {
-    return new ObjectArrayBackedList<Term, Formula>(terms) {
-      @Override
-      protected Formula convert(Term pInput) {
-        return encapsulate(getFormulaType(pInput), pInput);
-      }
-    };
-  }
-
   /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
   private String dequote(String s) {
     int l = s.length();
@@ -169,22 +159,17 @@ class SmtInterpolFormulaCreator
 
       } else {
         final String name = func.getName();
-        List<Formula> args = encapsulate(app.getParameters());
-        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        for (Term t : app.getParameters()) {
-          argTypes.add(getFormulaType(t));
-        }
+        List<Formula> args =
+            transformedImmutableListCopy(
+                app.getParameters(), term -> encapsulate(getFormulaType(term), term));
+        List<FormulaType<?>> argTypes = transformedImmutableListCopy(args, this::getFormulaType);
 
         // Any function application.
         return visitor.visitFunction(
             f,
             args,
             FunctionDeclarationImpl.of(
-                name,
-                getDeclarationKind(app),
-                argTypes.build(),
-                getFormulaType(f),
-                app.getFunction()));
+                name, getDeclarationKind(app), argTypes, getFormulaType(f), app.getFunction()));
       }
 
     } else {
