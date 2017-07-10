@@ -60,7 +60,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -176,8 +176,7 @@ class SmtInterpolEnvironment {
       Path logfile = smtLogfile.getFreshPath();
 
       try {
-        PrintWriter out =
-            new PrintWriter(MoreFiles.openOutputFile(logfile, Charset.defaultCharset()));
+        PrintWriter out = new PrintWriter(IO.openOutputFile(logfile, Charset.defaultCharset()));
 
         out.println("(set-option :global-declarations true)");
         out.println("(set-option :random-seed " + script.getOption(":random-seed") + ")");

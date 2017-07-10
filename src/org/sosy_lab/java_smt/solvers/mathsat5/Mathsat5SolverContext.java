@@ -32,6 +32,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map.Entry;
@@ -44,7 +45,6 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.MoreFiles;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -218,7 +218,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     if (settings.logfile != null) {
       Path filename = settings.logfile.getFreshPath();
       try {
-        MoreFiles.createParentDirs(filename);
+        MoreFiles.createParentDirectories(filename);
       } catch (IOException e) {
         logger.logUserException(Level.WARNING, e, "Cannot create directory for MathSAT logfile");
       }

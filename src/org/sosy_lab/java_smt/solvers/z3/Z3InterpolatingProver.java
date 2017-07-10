@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -197,7 +197,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
     } catch (Z3Exception e) {
       if (dumpFailedInterpolationQueries != null && !creator.shutdownNotifier.shouldShutdown()) {
         try (Writer dumpFile =
-            MoreFiles.openOutputFile(
+            IO.openOutputFile(
                 dumpFailedInterpolationQueries.getFreshPath(), StandardCharsets.UTF_8)) {
           dumpFile.write(Native.solverToString(z3context, z3solver));
           dumpFile.write("\n(compute-interpolant ");

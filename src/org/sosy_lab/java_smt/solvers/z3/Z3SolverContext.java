@@ -36,7 +36,7 @@ import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -157,7 +157,7 @@ final class Z3SolverContext extends AbstractSolverContext {
       Path absolutePath = extraOptions.log.toAbsolutePath();
       try {
         // Z3 segfaults if it cannot write to the file, thus we write once first
-        MoreFiles.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
+        IO.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
         Native.openLog(absolutePath.toString());
       } catch (IOException e) {
         logger.logUserException(Level.WARNING, e, "Cannot write Z3 log file");

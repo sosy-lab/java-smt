@@ -244,7 +244,7 @@ public class SolverContextFactory {
   private static ClassLoader createZ3ClassLoader() {
     ClassLoader parentClassLoader = SolverContextFactory.class.getClassLoader();
 
-    ClassLoaderBuilder builder =
+    ClassLoaderBuilder<?> builder =
         Classes.makeExtendedURLClassLoader()
             .setParent(parentClassLoader)
             .setDirectLoadClasses(Z3_CLASSES)
