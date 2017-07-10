@@ -146,8 +146,7 @@ public class SolverContextFactory {
                 config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
 
       case PRINCESS:
-        // TODO: pass randomSeed to Princess
-        return PrincessSolverContext.create(config, shutdownNotifier, logfile);
+        return PrincessSolverContext.create(config, shutdownNotifier, logfile, (int) randomSeed);
 
       default:
         throw new AssertionError("no solver selected");

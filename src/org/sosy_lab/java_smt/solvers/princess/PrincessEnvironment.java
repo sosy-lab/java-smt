@@ -111,6 +111,7 @@ class PrincessEnvironment {
   private final Map<String, IFunction> functionsCache = new HashMap<>();
   private final Map<IFunction, PrincessTermType> functionsReturnTypes = new HashMap<>();
 
+  private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
   private final ShutdownNotifier shutdownNotifier;
 
@@ -126,12 +127,15 @@ class PrincessEnvironment {
   PrincessEnvironment(
       Configuration config,
       @Nullable final PathCounterTemplate pBasicLogfile,
-      ShutdownNotifier pShutdownNotifier)
+      ShutdownNotifier pShutdownNotifier,
+      final int pRandomSeed)
       throws InvalidConfigurationException {
     config.inject(this);
 
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
+    randomSeed = pRandomSeed;
+
     // this api is only used local in this environment, no need for interpolation
     api = getNewApi(false);
   }
@@ -201,7 +205,8 @@ class PrincessEnvironment {
             scalaDumpBasename, // scalaDumpBasename
             directory, // dumpDirectory
             SimpleAPI.apply$default$8(), // tightFunctionScopes
-            SimpleAPI.apply$default$9() // genTotalityAxioms
+            SimpleAPI.apply$default$9(), // genTotalityAxioms
+            new scala.Some<>(randomSeed) // randomSeed
             );
 
     if (useForInterpolation) {
