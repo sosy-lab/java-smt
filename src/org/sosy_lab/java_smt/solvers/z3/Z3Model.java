@@ -41,15 +41,14 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   private final long z3context;
   private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
-  @SuppressWarnings("hiding")
-  private final Z3FormulaCreator creator;
+  private final Z3FormulaCreator z3creator;
 
   private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
-    creator = pCreator;
+    z3creator = pCreator;
   }
 
   static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
@@ -64,8 +63,8 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     Verify.verify(status, "Error during model evaluation");
     long outValue = out.value;
 
-    if (creator.isConstant(outValue)) {
-      return creator.convertValue(outValue);
+    if (z3creator.isConstant(outValue)) {
+      return z3creator.convertValue(outValue);
     }
 
     // Z3 does not give us a direct API to query for "irrelevant" ASTs during evaluation.
@@ -91,7 +90,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
       Native.incRef(z3context, funcDecl);
       if (!isInternalSymbol(funcDecl)) {
-        String functionName = creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+        String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
         out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
       }
       Native.decRef(z3context, funcDecl);
@@ -106,7 +105,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
    */
   private boolean isInternalSymbol(long funcDecl) {
     return Z3_IRRELEVANT_MODEL_TERM_PATTERN
-        .matcher(creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
+        .matcher(z3creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
         .matches();
   }
 
@@ -116,7 +115,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
     long var = Native.mkApp(z3context, keyDecl, 0, new long[] {});
-    Formula key = creator.encapsulateWithTypeOf(var);
+    Formula key = z3creator.encapsulateWithTypeOf(var);
 
     long value = Native.modelGetConstInterp(z3context, model, keyDecl);
     checkReturnValue(value, keyDecl);
@@ -124,12 +123,12 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
     try {
       long symbol = Native.getDeclName(z3context, keyDecl);
-      if (creator.isConstant(value)) {
+      if (z3creator.isConstant(value)) {
         return Collections.singletonList(
             new ValueAssignment(
                 key,
-                creator.symbolToString(symbol),
-                creator.convertValue(value),
+                z3creator.symbolToString(symbol),
+                z3creator.convertValue(value),
                 ImmutableList.of()));
 
       } else if (Native.isAsArray(z3context, value)) {
@@ -180,12 +179,12 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       List<Object> innerIndices = Lists.newArrayList(upperIndices);
       innerIndices.add(evaluateImpl(arrayIndex));
 
-      if (creator.isConstant(arrayValue)) {
+      if (z3creator.isConstant(arrayValue)) {
         lst.add(
             new ValueAssignment(
-                creator.encapsulateWithTypeOf(select),
-                creator.symbolToString(arraySymbol),
-                creator.convertValue(arrayValue),
+                z3creator.encapsulateWithTypeOf(select),
+                z3creator.symbolToString(arraySymbol),
+                z3creator.convertValue(arrayValue),
                 innerIndices));
 
       } else if (Native.isAsArray(z3context, arrayValue)) {
@@ -248,7 +247,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         long entry = Native.funcInterpGetEntry(z3context, interp, interpIdx);
         Native.funcEntryIncRef(z3context, entry);
         long entryValue = Native.funcEntryGetValue(z3context, entry);
-        if (creator.isConstant(entryValue)) {
+        if (z3creator.isConstant(entryValue)) {
           lst.add(getFunctionAssignment(functionName, funcDecl, entry, entryValue));
         } else {
           // ignore values of complex types, e.g. Arrays
@@ -267,7 +266,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
    */
   private ValueAssignment getFunctionAssignment(
       String functionName, long funcDecl, long entry, long entryValue) {
-    Object value = creator.convertValue(entryValue);
+    Object value = z3creator.convertValue(entryValue);
     int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
     long[] args = new long[noArgs];
     List<Object> argumentInterpretation = new ArrayList<>();
@@ -275,11 +274,11 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     for (int k = 0; k < noArgs; k++) {
       long arg = Native.funcEntryGetArg(z3context, entry, k);
       Native.incRef(z3context, arg);
-      argumentInterpretation.add(creator.convertValue(arg));
+      argumentInterpretation.add(z3creator.convertValue(arg));
       args[k] = arg;
     }
     Formula formula =
-        creator.encapsulateWithTypeOf(Native.mkApp(z3context, funcDecl, args.length, args));
+        z3creator.encapsulateWithTypeOf(Native.mkApp(z3context, funcDecl, args.length, args));
 
     // Clean up memory.
     for (long arg : args) {
