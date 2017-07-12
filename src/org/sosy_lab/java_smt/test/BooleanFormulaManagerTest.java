@@ -20,8 +20,10 @@
 
 package org.sosy_lab.java_smt.test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
+import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,6 +72,34 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     }
     BooleanFormula f = bmgr.equivalence(var, bmgr.makeTrue());
     assertThatFormula(f).isSatisfiable();
+  }
+
+  @Test
+  public void testConjunctionCollector() {
+    List<BooleanFormula> terms =
+        ImmutableList.of(
+            bmgr.makeVariable("a"),
+            bmgr.makeTrue(),
+            bmgr.makeVariable("b"),
+            bmgr.makeVariable("c"));
+
+    // Syntactic equality to ensure that formula structure does not change
+    // when users change the method they use for creating disjunctions.
+    assertThatFormula(terms.stream().collect(bmgr.toConjunction())).isEqualTo(bmgr.and(terms));
+  }
+
+  @Test
+  public void testDisjunctionCollector() {
+    List<BooleanFormula> terms =
+        ImmutableList.of(
+            bmgr.makeVariable("a"),
+            bmgr.makeFalse(),
+            bmgr.makeVariable("b"),
+            bmgr.makeVariable("c"));
+
+    // Syntactic equality to ensure that formula structure does not change
+    // when users change the method they use for creating disjunctions.
+    assertThatFormula(terms.stream().collect(bmgr.toDisjunction())).isEqualTo(bmgr.or(terms));
   }
 
   @Test

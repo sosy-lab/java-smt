@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -140,6 +142,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.reducing(makeTrue(), this::and);
+  }
+
+  @Override
   public BooleanFormula or(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
@@ -180,6 +187,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       result = or(result, formula);
     }
     return result;
+  }
+
+  @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.reducing(makeFalse(), this::or);
   }
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);

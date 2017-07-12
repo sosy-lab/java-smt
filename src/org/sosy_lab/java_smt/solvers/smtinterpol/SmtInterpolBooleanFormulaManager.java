@@ -24,6 +24,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import java.util.Collection;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class SmtInterpolBooleanFormulaManager
@@ -96,6 +99,11 @@ class SmtInterpolBooleanFormulaManager
   }
 
   @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::and);
+  }
+
+  @Override
   public Term or(Term pBits1, Term pBits2) {
     return theory.or(pBits1, pBits2);
   }
@@ -103,6 +111,11 @@ class SmtInterpolBooleanFormulaManager
   @Override
   protected Term orImpl(Collection<Term> pParams) {
     return theory.or(pParams.toArray(new Term[pParams.size()]));
+  }
+
+  @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   @Override
