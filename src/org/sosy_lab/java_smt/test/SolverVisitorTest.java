@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -246,10 +246,9 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         bmgr.or(
             bmgr.and(bmgr.makeVariable("x"), bmgr.makeVariable("y")),
             bmgr.and(
-                ImmutableList.of(
-                    bmgr.makeVariable("z"),
-                    bmgr.makeVariable("d"),
-                    imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5)))));
+                bmgr.makeVariable("z"),
+                bmgr.makeVariable("d"),
+                imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5))));
     final Set<String> foundVars = new HashSet<>();
     bmgr.visitRecursively(
         f,
@@ -280,14 +279,13 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
-    List<BooleanFormula> usedVars =
-        ImmutableList.of("a", "b", "c", "d", "e", "f")
-            .stream()
+    BooleanFormula[] usedVars =
+        Stream.of("a", "b", "c", "d", "e", "f")
             .map(var -> bmgr.makeVariable(var))
-            .collect(Collectors.toList());
+            .toArray(BooleanFormula[]::new);
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
-    BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
+    BooleanFormula body = fuzzer.fuzz(30, usedVars);
     BooleanFormula f = qmgr.forall(quantifiedVars, body);
     BooleanFormula transformed =
         bmgr.transformRecursively(

@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -431,8 +430,8 @@ public class SolverStackTest extends SolverBasedTest0 {
       stack.push(imgr.equal(varB, zero));
       FunctionDeclaration<IntegerFormula> uf =
           fmgr.declareUF("uf", FormulaType.IntegerType, FormulaType.IntegerType);
-      stack.push(imgr.equal(fmgr.callUF(uf, ImmutableList.of(varA)), zero));
-      stack.push(imgr.equal(fmgr.callUF(uf, ImmutableList.of(varB)), zero));
+      stack.push(imgr.equal(fmgr.callUF(uf, varA), zero));
+      stack.push(imgr.equal(fmgr.callUF(uf, varB), zero));
       assertThatEnvironment(stack).isSatisfiable();
 
       Model model = stack.getModel();
@@ -443,8 +442,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       requireUfValuesInModel();
 
-      assertThat(
-              model.evaluate(fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
+      assertThat(model.evaluate(fmgr.callUF(uf, imgr.makeNumber(BigDecimal.ZERO))))
           .isEqualTo(BigInteger.ZERO);
     }
   }

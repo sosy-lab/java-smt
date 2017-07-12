@@ -530,9 +530,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void testUfWithBoolType() throws SolverException, InterruptedException {
     FunctionDeclaration<BooleanFormula> uf =
         fmgr.declareUF("fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
-    BooleanFormula uf0 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(0)));
-    BooleanFormula uf1 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(1)));
-    BooleanFormula uf2 = fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(2)));
+    BooleanFormula uf0 = fmgr.callUF(uf, imgr.makeNumber(0));
+    BooleanFormula uf1 = fmgr.callUF(uf, imgr.makeNumber(1));
+    BooleanFormula uf2 = fmgr.callUF(uf, imgr.makeNumber(2));
 
     BooleanFormula f01 = bmgr.xor(uf0, uf1);
     BooleanFormula f02 = bmgr.xor(uf0, uf2);
@@ -541,7 +541,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(f02).isSatisfiable();
     assertThatFormula(f12).isSatisfiable();
 
-    BooleanFormula f = bmgr.and(ImmutableList.of(f01, f02, f12));
+    BooleanFormula f = bmgr.and(f01, f02, f12);
     assertThatFormula(f).isUnsatisfiable();
   }
 
@@ -554,8 +554,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     FunctionDeclaration<IntegerFormula> uf =
         fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
-    IntegerFormula ufTrue = fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(true)));
-    IntegerFormula ufFalse = fmgr.callUF(uf, ImmutableList.of(bmgr.makeBoolean(false)));
+    IntegerFormula ufTrue = fmgr.callUF(uf, bmgr.makeBoolean(true));
+    IntegerFormula ufFalse = fmgr.callUF(uf, bmgr.makeBoolean(false));
 
     BooleanFormula f = bmgr.not(imgr.equal(ufTrue, ufFalse));
     assertThat(f.toString()).isEmpty();
