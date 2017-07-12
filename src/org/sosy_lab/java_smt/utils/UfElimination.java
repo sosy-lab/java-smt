@@ -30,8 +30,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Streams;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -173,15 +173,12 @@ public class UfElimination {
            * Add constraints to enforce functional consistency.
            */
           Verify.verify(args.size() == otherArgs.size());
-          Collection<BooleanFormula> argumentEquality = new ArrayList<>(args.size());
-          for (int i = 0; i < args.size(); i++) {
-            Formula arg1 = args.get(i);
-            Formula arg2 = otherArgs.get(i);
-            argumentEquality.add(makeEqual(arg1, arg2));
-          }
+          BooleanFormula argumentsEquality =
+              Streams.zip(args.stream(), otherArgs.stream(), this::makeEqual)
+                  .collect(bfmgr.toConjunction());
 
           BooleanFormula functionEquality = makeEqual(substitution, application2.getSubstitution());
-          extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquality), functionEquality));
+          extraConstraints.add(bfmgr.implication(argumentsEquality, functionEquality));
         }
       }
     }

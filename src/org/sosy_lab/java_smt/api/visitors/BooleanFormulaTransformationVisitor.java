@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.java_smt.api.visitors;
 
-import com.google.common.collect.Collections2;
-import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -72,11 +70,10 @@ public abstract class BooleanFormulaTransformationVisitor
         return bfmgr.makeBoolean(false);
       }
     }
-
-    // Filtered collections avoid extra allocations.
-    Collection<BooleanFormula> filtered =
-        Collections2.filter(processedOperands, input -> !bfmgr.isTrue(input));
-    return bfmgr.and(filtered);
+    return processedOperands
+        .stream()
+        .filter(input -> !bfmgr.isTrue(input))
+        .collect(bfmgr.toConjunction());
   }
 
   @Override
@@ -86,9 +83,10 @@ public abstract class BooleanFormulaTransformationVisitor
         return bfmgr.makeBoolean(true);
       }
     }
-    Collection<BooleanFormula> filtered =
-        Collections2.filter(processedOperands, input -> !bfmgr.isFalse(input));
-    return bfmgr.or(filtered);
+    return processedOperands
+        .stream()
+        .filter(input -> !bfmgr.isFalse(input))
+        .collect(bfmgr.toDisjunction());
   }
 
   @Override
