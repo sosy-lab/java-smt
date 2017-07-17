@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -71,9 +72,11 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr makeVariableImpl(String pVar, FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr makeVariableImpl(String varName, FloatingPointType pType) {
+    long pExponentSize = pType.getExponentSize();
+    long pMantissaSize = pType.getMantissaSize();
+    Type type = exprManager.mkFloatingPointType(pExponentSize, pMantissaSize);
+    return exprManager.mkVar(varName, type);
   }
 
   @Override
@@ -109,91 +112,76 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr negate(Expr pParam1) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_NEG, pParam1);
   }
 
   @Override
   protected Expr add(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_PLUS, pParam1, pParam2);
   }
 
   @Override
   protected Expr subtract(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_SUB, pParam1, pParam2);
   }
 
   @Override
   protected Expr divide(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_DIV, pParam1, pParam2);
   }
 
   @Override
   protected Expr multiply(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_MULT, pParam1, pParam2);
   }
 
   @Override
   protected Expr assignment(Expr pParam1, Expr pParam2) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
 
   @Override
   protected Expr equalWithFPSemantics(Expr pParam1, Expr pParam2) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_EQ, pParam1, pParam2);
   }
 
   @Override
   protected Expr greaterThan(Expr pParam1, Expr pParam2) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_GT, pParam1, pParam2);
   }
 
   @Override
   protected Expr greaterOrEquals(Expr pParam1, Expr pParam2) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_GEQ, pParam1, pParam2);
   }
 
   @Override
   protected Expr lessThan(Expr pParam1, Expr pParam2) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_LT, pParam1, pParam2);
   }
 
   @Override
   protected Expr lessOrEquals(Expr pParam1, Expr pParam2) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_LEQ, pParam1, pParam2);
   }
 
   @Override
-  protected Expr isNaN(Expr pParam) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr isNaN(Expr pParam1) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISNAN, pParam1);
   }
 
   @Override
-  protected Expr isInfinity(Expr pParam) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr isInfinity(Expr pParam1) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISINF, pParam1);
   }
 
   @Override
-  protected Expr isZero(Expr pParam) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr isZero(Expr pParam1) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISZ, pParam1);
   }
 
   @Override
-  protected Expr isSubnormal(Expr pParam) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr isSubnormal(Expr pParam1) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISSN, pParam1);
   }
 }
