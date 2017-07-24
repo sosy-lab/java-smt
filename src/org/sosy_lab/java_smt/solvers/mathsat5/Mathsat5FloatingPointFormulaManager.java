@@ -38,6 +38,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_plus;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_plus_inf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_rat_number;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_round_to_int;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_minus_inf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_nearest_even;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_plus_inf;
@@ -275,5 +276,10 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long isSubnormal(Long pParam) {
     return msat_make_fp_issubnormal(mathsatEnv, pParam);
+  }
+
+  @Override
+  protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
+    return msat_make_fp_round_to_int(mathsatEnv, getRoundingModeImpl(pRoundingMode), pFormula);
   }
 }

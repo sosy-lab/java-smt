@@ -262,4 +262,9 @@ class Z3FloatingPointFormulaManager
   protected Long isSubnormal(Long pParam) {
     return Native.mkFpaIsSubnormal(z3context, pParam);
   }
+
+  @Override
+  protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
+    return Native.mkFpaRoundToIntegral(z3context, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
 }

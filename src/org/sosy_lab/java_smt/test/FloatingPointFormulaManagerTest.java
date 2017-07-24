@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -204,6 +205,83 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
     assertThatFormula(fpmgr.equalWithFPSemantics(fpOne, signedBvToFpOne)).isTautological();
     assertThatFormula(fpmgr.equalWithFPSemantics(fpOne, unsignedBvToFpOne)).isTautological();
+  }
+
+  /** check whether rounded input is equal to result with rounding-mode. */
+  private void round0(
+      double value, double toZero, double pos, double neg, double tiesEven, double tiesAway)
+      throws Exception {
+    FloatingPointFormula f = fpmgr.makeNumber(value, singlePrecType);
+
+    // check types
+    assertThat(mgr.getFormulaType(fpmgr.round(f, FloatingPointRoundingMode.TOWARD_ZERO)))
+        .isEqualTo(singlePrecType);
+    assertThat(mgr.getFormulaType(fpmgr.round(f, FloatingPointRoundingMode.TOWARD_POSITIVE)))
+        .isEqualTo(singlePrecType);
+    assertThat(mgr.getFormulaType(fpmgr.round(f, FloatingPointRoundingMode.TOWARD_NEGATIVE)))
+        .isEqualTo(singlePrecType);
+    assertThat(mgr.getFormulaType(fpmgr.round(f, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)))
+        .isEqualTo(singlePrecType);
+    if (solver != Solvers.MATHSAT5) { // Mathsat does not support NEAREST_TIES_AWAY
+      assertThat(mgr.getFormulaType(fpmgr.round(f, FloatingPointRoundingMode.NEAREST_TIES_AWAY)))
+          .isEqualTo(singlePrecType);
+    }
+
+    // check values
+    assertEquals(
+        fpmgr.makeNumber(toZero, singlePrecType),
+        fpmgr.round(f, FloatingPointRoundingMode.TOWARD_ZERO));
+
+    assertEquals(
+        fpmgr.makeNumber(pos, singlePrecType),
+        fpmgr.round(f, FloatingPointRoundingMode.TOWARD_POSITIVE));
+
+    assertEquals(
+        fpmgr.makeNumber(neg, singlePrecType),
+        fpmgr.round(f, FloatingPointRoundingMode.TOWARD_NEGATIVE));
+
+    assertEquals(
+        fpmgr.makeNumber(tiesEven, singlePrecType),
+        fpmgr.round(f, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN));
+
+    if (solver != Solvers.MATHSAT5) { // Mathsat does not support NEAREST_TIES_AWAY
+      assertEquals(
+          fpmgr.makeNumber(tiesAway, singlePrecType),
+          fpmgr.round(f, FloatingPointRoundingMode.NEAREST_TIES_AWAY));
+    }
+  }
+
+  private void assertEquals(FloatingPointFormula f1, FloatingPointFormula f2) throws Exception {
+    assertThatFormula(fpmgr.equalWithFPSemantics(f1, f2)).isTautological();
+  }
+
+  @Test
+  public void round() throws Exception {
+
+    // constants
+    round0(0, 0, 0, 0, 0, 0);
+    round0(1, 1, 1, 1, 1, 1);
+    round0(-1, -1, -1, -1, -1, -1);
+
+    // positive odd
+    round0(1.1, 1, 2, 1, 1, 1);
+    round0(1.5, 1, 2, 1, 2, 2);
+    round0(1.9, 1, 2, 1, 2, 2);
+
+    // positive even
+    round0(10.1, 10, 11, 10, 10, 10);
+    round0(10.5, 10, 11, 10, 10, 11);
+    round0(10.9, 10, 11, 10, 11, 11);
+
+    // negative odd
+    round0(-1.1, -1, -1, -2, -1, -1);
+    round0(-1.5, -1, -1, -2, -2, -2);
+    round0(-1.9, -1, -1, -2, -2, -2);
+
+    // negative even
+    round0(-10.1, -10, -10, -11, -10, -10);
+    round0(-10.5, -10, -10, -11, -10, -11);
+    round0(-10.9, -10, -10, -11, -11, -11);
   }
 
   @Test

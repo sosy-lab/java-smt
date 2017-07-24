@@ -388,4 +388,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo isSubnormal(TFormulaInfo pParam);
+
+  @Override
+  public FloatingPointFormula round(Formula pFormula, FloatingPointRoundingMode pRoundingMode) {
+    return wrap(round(extractInfo(pFormula), pRoundingMode));
+  }
+
+  protected abstract TFormulaInfo round(
+      TFormulaInfo pFormula, FloatingPointRoundingMode pRoundingMode);
 }
