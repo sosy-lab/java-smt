@@ -403,4 +403,26 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     @SuppressWarnings("unused")
     BooleanFormula quantified = qmgr.exists(ImmutableList.of(), bmgr.makeVariable("b"));
   }
+
+  @Test
+  public void checkZ3RefCount() throws InterruptedException, SolverException {
+    assume()
+        .withMessage(
+            "Z3 counts references and something was broken. This test was added to avoid it.")
+        .that(solverToUse())
+        .isEqualTo(Solvers.Z3);
+
+    // build formula: (forall x . ((x < 5) | (7 < x + y)))
+    // quantifier-free equivalent: (2 < y)
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    BooleanFormula f =
+        qmgr.forall(
+            x,
+            bmgr.or(
+                imgr.lessThan(x, imgr.makeNumber(5)),
+                imgr.lessThan(imgr.makeNumber(7), imgr.add(x, y))));
+    @SuppressWarnings("unused")
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+  }
 }
