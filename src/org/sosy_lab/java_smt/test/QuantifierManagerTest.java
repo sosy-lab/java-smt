@@ -414,14 +414,14 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
-    IntegerFormula x = imgr.makeVariable("x");
-    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula xx = imgr.makeVariable("x");
+    IntegerFormula yy = imgr.makeVariable("y");
     BooleanFormula f =
         qmgr.forall(
-            x,
+            xx,
             bmgr.or(
-                imgr.lessThan(x, imgr.makeNumber(5)),
-                imgr.lessThan(imgr.makeNumber(7), imgr.add(x, y))));
+                imgr.lessThan(xx, imgr.makeNumber(5)),
+                imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
     @SuppressWarnings("unused")
     BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
   }
