@@ -588,7 +588,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     for (String tactic : pTactics) {
       long tacticResult = applyTactic(z3context, overallResult, tactic);
       if (overallResult != pF) {
-        Native.decRef(z3context, overallResult);
+        Native.applyResultDecRef(z3context, overallResult);
       }
       overallResult = tacticResult;
     }
