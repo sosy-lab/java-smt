@@ -416,9 +416,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
             bmgr.or(
                 imgr.lessThan(xx, imgr.makeNumber(5)),
                 imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
-    @SuppressWarnings("unused")
     BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
-
     assertThatFormula(qFreeF).isEquivalentTo(imgr.lessThan(imgr.makeNumber(2), yy));
   }
 }
