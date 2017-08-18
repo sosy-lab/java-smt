@@ -405,13 +405,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void checkZ3RefCount() throws InterruptedException, SolverException {
-    assume()
-        .withMessage(
-            "Z3 counts references and something was broken. This test was added to avoid it.")
-        .that(solverToUse())
-        .isEqualTo(Solvers.Z3);
-
+  public void checkQuantifierElimination() throws InterruptedException, SolverException {
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
     IntegerFormula xx = imgr.makeVariable("x");
@@ -424,5 +418,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
                 imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
     @SuppressWarnings("unused")
     BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+
+    assertThatFormula(qFreeF).isEquivalentTo(imgr.lessThan(imgr.makeNumber(2), yy));
   }
 }
