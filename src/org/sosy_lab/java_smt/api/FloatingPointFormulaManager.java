@@ -75,7 +75,7 @@ public interface FloatingPointFormulaManager {
       FloatingPointType targetType,
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
-  FloatingPointFormula round(Formula formula, FloatingPointRoundingMode roundingMode);
+  FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 
   // ----------------- Arithmetic relations, return type NumeralFormula -----------------
 
