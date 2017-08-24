@@ -1,0 +1,44 @@
+version: build {build} {branch}
+
+os: Visual Studio 2015
+
+clone_depth: 1
+
+install:
+  - ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      if (!(Test-Path -Path "C:\ant\apache-ant-1.9.9" )) {
+        (new-object System.Net.WebClient).DownloadFile(
+        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip',
+          'C:\ant-bin.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
+      }
+  - cmd: SET PATH=C:\ant\apache-ant-1.9.9\bin;%JAVA_HOME%\bin;%PATH%
+  - cmd: SET IVY_CACHE_DIR=C:\ivy
+  - cmd: echo %USERPROFILE%
+  - cmd: echo %PATH%
+  - cmd: java -version
+
+build_script:
+  - ant build
+
+test_script:
+  - ant unit-tests
+
+on_finish:
+  - ps: |
+      $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+      $file = '.\junit\TESTS-TestSuites.xml'
+      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
+
+cache:
+  - C:\ant
+  - C:\ivy
+
+notifications:
+  - provider: Email
+    to:
+      - java-smt-dev@googlegroups.com
+    on_build_success: false
+    on_build_status_changed: true
