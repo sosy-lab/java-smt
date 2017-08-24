@@ -32,6 +32,10 @@ on_finish:
       $file = '.\junit\TESTS-TestSuites.xml'
       (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
 
+artifacts:
+  - path: JUnit.html
+    name: JUnit Report
+
 cache:
   - C:\ant
   - C:\ivy
