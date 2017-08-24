@@ -31,10 +31,8 @@ on_finish:
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       $file = '.\junit\TESTS-TestSuites.xml'
       (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
-
-artifacts:
-  - path: JUnit.html
-    name: JUnit Report
+  - ps: |
+      Push-AppveyorArtifact JUnit.html -DeploymentName "JUnit Report"
 
 cache:
   - C:\ant
