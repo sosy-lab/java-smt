@@ -165,7 +165,9 @@ public abstract class SolverBasedTest0 {
 
   @After
   public final void closeSolver() throws Exception {
-    context.close();
+    if (context != null) {
+      context.close();
+    }
   }
 
   /** Skip test if the solver does not support rationals. */
