@@ -64,7 +64,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @After
   public void closeEnvironment() {
-    env.close();
+    if (env != null) {
+      env.close();
+    }
   }
 
   private static final String EXPECTED_RESULT = "AllSatTest_unsat";

@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -77,16 +79,29 @@ public class TranslateFormulaTest {
     SolverContextFactory factory =
         new SolverContextFactory(empty, logger, ShutdownManager.create().getNotifier());
 
-    from = factory.generateContext(translateFrom);
-    to = factory.generateContext(translateTo);
+    try {
+      from = factory.generateContext(translateFrom);
+      to = factory.generateContext(translateTo);
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
+    }
     managerFrom = from.getFormulaManager();
     managerTo = to.getFormulaManager();
   }
 
   @After
   public void close() throws Exception {
-    from.close();
-    to.close();
+    if (from != null) {
+      from.close();
+    }
+    if (to != null) {
+      to.close();
+    }
   }
 
   @Test

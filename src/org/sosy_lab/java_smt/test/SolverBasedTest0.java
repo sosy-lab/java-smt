@@ -34,6 +34,7 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -120,7 +121,16 @@ public abstract class SolverBasedTest0 {
     config = createTestConfigBuilder().build();
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
-    context = factory.generateContext();
+    try {
+      context = factory.generateContext();
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
+    }
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();
@@ -155,7 +165,9 @@ public abstract class SolverBasedTest0 {
 
   @After
   public final void closeSolver() throws Exception {
-    context.close();
+    if (context != null) {
+      context.close();
+    }
   }
 
   /** Skip test if the solver does not support rationals. */
