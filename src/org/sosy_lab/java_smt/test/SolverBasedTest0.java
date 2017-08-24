@@ -29,11 +29,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.junit.After;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -120,7 +122,14 @@ public abstract class SolverBasedTest0 {
     config = createTestConfigBuilder().build();
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
-    context = factory.generateContext();
+    try {
+      context = factory.generateContext();
+    } catch (InvalidConfigurationException e) {
+      if (e.getCause() instanceof UnsatisfiedLinkError) {
+        throw new AssumptionViolatedException(e.getMessage(), e);
+      }
+      throw e;
+    }
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();
