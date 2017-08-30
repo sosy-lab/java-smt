@@ -195,6 +195,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     }
   }
 
+  @Test
   public void testBoolVariableNameInVisitor() {
     BooleanFormula var = createVariableWith(bmgr::makeVariable);
 
