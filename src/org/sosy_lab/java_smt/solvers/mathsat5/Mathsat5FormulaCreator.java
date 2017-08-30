@@ -375,7 +375,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return new BigInteger(matcher.group(1));
   }
 
-  //TODO: change this to the latest version
+  // TODO: change this to the latest version
   // (if possible try to use a BitvectorFormula instance here)
   private static BigInteger parseBitvector(String lTermRepresentation) {
     // the term is of the format "<VALUE>_<WIDTH>"

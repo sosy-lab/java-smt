@@ -50,7 +50,7 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
   @Override
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    //throw new UnsupportedOperationException("Please implement me!");
+    // throw new UnsupportedOperationException("Please implement me!");
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final Long mathsatArrayType = toSolverType(arrayFormulaType);

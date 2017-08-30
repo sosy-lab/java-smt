@@ -352,7 +352,7 @@ class PrincessEnvironment {
           String name =
               getName(getOnlyElement(creator.extractVariablesAndUFs(abbrev, true).values()));
 
-          //only add the necessary abbreviations
+          // only add the necessary abbreviations
           if (!todoAbbrevs.contains(name)) {
             continue;
           }

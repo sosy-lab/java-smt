@@ -139,12 +139,14 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public List<BooleanFormula> getSeqInterpolants(List<Set<Integer>> partitionedFormulas) {
     // TODO is fallback to loop sound?
 
-    //final List<BooleanFormula> itps = new ArrayList<>();
-    //for (int i = 0; i < partitionedFormulas.size(); i++) {
-    //  itps.add(getInterpolant(
-    //      Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
-    //}
-    //return itps;
+    /*
+    final List<BooleanFormula> itps = new ArrayList<>();
+    for (int i = 0; i < partitionedFormulas.size(); i++) {
+     itps.add(getInterpolant(
+         Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
+    }
+    return itps;
+    */
 
     throw new UnsupportedOperationException(
         "directly receiving an inductive sequence of interpolants is not supported."

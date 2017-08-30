@@ -109,41 +109,41 @@ public class SolverStackTest extends SolverBasedTest0 {
     BooleanFormula b = bmgr.makeVariable("bool_b" + i);
     BooleanFormula or = bmgr.or(a, b);
 
-    stack.push(or); //L1
+    stack.push(or); // L1
     assertThatEnvironment(stack).isSatisfiable();
     BooleanFormula c = bmgr.makeVariable("bool_c" + i);
     BooleanFormula d = bmgr.makeVariable("bool_d" + i);
     BooleanFormula and = bmgr.and(c, d);
 
-    stack.push(and); //L2
+    stack.push(and); // L2
     assertThatEnvironment(stack).isSatisfiable();
 
     BooleanFormula notOr = bmgr.not(or);
 
-    stack.push(notOr); //L3
+    stack.push(notOr); // L3
     assertThatEnvironment(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
 
-    stack.pop(); //L2
+    stack.pop(); // L2
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.pop(); //L1
+    stack.pop(); // L1
     assertThatEnvironment(stack).isSatisfiable();
 
     // we are lower than before creating c and d.
     // however we assume that they are usable now (this violates SMTlib).
-    stack.push(and); //L2
+    stack.push(and); // L2
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.pop(); //L1
+    stack.pop(); // L1
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.push(notOr); //L2
+    stack.push(notOr); // L2
     assertThatEnvironment(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
 
-    stack.pop(); //L1
+    stack.pop(); // L1
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.pop(); //L0 empty stack
+    stack.pop(); // L0 empty stack
   }
 
   @Test
@@ -168,41 +168,41 @@ public class SolverStackTest extends SolverBasedTest0 {
     X b = nmgr.makeVariable("num_b" + i);
     BooleanFormula leqAB = nmgr.lessOrEquals(a, b);
 
-    stack.push(leqAB); //L1
+    stack.push(leqAB); // L1
     assertThatEnvironment(stack).isSatisfiable();
     X c = nmgr.makeVariable("num_c" + i);
     X d = nmgr.makeVariable("num_d" + i);
     BooleanFormula eqCD = nmgr.lessOrEquals(c, d);
 
-    stack.push(eqCD); //L2
+    stack.push(eqCD); // L2
     assertThatEnvironment(stack).isSatisfiable();
 
     BooleanFormula gtAB = nmgr.greaterThan(a, b);
 
-    stack.push(gtAB); //L3
+    stack.push(gtAB); // L3
     assertThatEnvironment(stack).isUnsatisfiable(); // "<=" AND ">" --> UNSAT
 
-    stack.pop(); //L2
+    stack.pop(); // L2
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.pop(); //L1
+    stack.pop(); // L1
     assertThatEnvironment(stack).isSatisfiable();
 
     // we are lower than before creating c and d.
     // however we assume that they are usable now (this violates SMTlib).
-    stack.push(eqCD); //L2
+    stack.push(eqCD); // L2
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.pop(); //L1
+    stack.pop(); // L1
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.push(gtAB); //L2
+    stack.push(gtAB); // L2
     assertThatEnvironment(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
 
-    stack.pop(); //L1
+    stack.pop(); // L1
     assertThatEnvironment(stack).isSatisfiable();
 
-    stack.pop(); //L0 empty stack
+    stack.pop(); // L0 empty stack
   }
 
   @Test
@@ -320,10 +320,10 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack1.pop(); // L1
     stack1.pop(); // L0
 
-    stack1.push(a); //L1
+    stack1.push(a); // L1
     assertThatEnvironment(stack1).isSatisfiable();
 
-    stack2.push(not); //L1
+    stack2.push(not); // L1
     assertThatEnvironment(stack2).isSatisfiable();
 
     stack1.pop(); // L0

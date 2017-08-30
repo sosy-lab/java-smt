@@ -191,7 +191,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       interpolationResult =
           Native.getInterpolant(
               z3context,
-              proof, //refutation of premises := proof
+              proof, // refutation of premises := proof
               root, // last element is end of chain (root of tree), pattern := interpolation tree
               Native.mkParams(z3context));
     } catch (Z3Exception e) {

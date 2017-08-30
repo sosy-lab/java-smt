@@ -88,7 +88,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void varDumpTest2() {
-    //always true
+    // always true
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
@@ -353,17 +353,17 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     BooleanFormula b1 = bmgr.makeVariable("q");
     BooleanFormula b2 = bmgr.makeVariable("u");
 
-    //1st execution
+    // 1st execution
     BooleanFormula f1 = imgr.equal(imgr.add(i1, i2), erg);
     BooleanFormula comp1 = imgr.greaterOrEquals(i1, i2);
     BooleanFormula x1 = bmgr.xor(b1, f1);
     BooleanFormula comb1 = bmgr.and(x1, comp1);
 
-    //rest
+    // rest
     BooleanFormula r1a = bmgr.or(comb1, b2);
     BooleanFormula r1b = bmgr.and(r1a, b1);
 
-    //rest
+    // rest
     BooleanFormula r2a = imgr.equal(i1, i2);
     BooleanFormula r2b = bmgr.and(r2a, comb1);
 
