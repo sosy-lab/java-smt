@@ -22,9 +22,9 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
-import com.google.common.truth.TestVerb;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -40,8 +40,8 @@ import org.sosy_lab.java_smt.api.SolverException;
  * <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use either {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or use
- * {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and set a solver via the method
- * {@link #forSolver(SolverContext)}.
+ * {@link StandardSubjectBuilder#about(com.google.common.truth.SubjectFactory)} and set a solver via
+ * the method {@link #forSolver(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {

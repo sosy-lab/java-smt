@@ -20,9 +20,9 @@
 package org.sosy_lab.java_smt.test;
 
 import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import com.google.common.truth.SubjectFactory;
-import com.google.common.truth.TestVerb;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -36,7 +36,8 @@ import org.sosy_lab.java_smt.api.SolverException;
  * use <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)}, or
- * {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and {@link #proverEnvironment()}.
+ * {@link StandardSubjectBuilder#about(com.google.common.truth.SubjectFactory)} and {@link
+ * #proverEnvironment()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class ProverEnvironmentSubject
