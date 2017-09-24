@@ -148,7 +148,17 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetMultipleUFs() throws SolverException, InterruptedException {
+  public void testGetUFwithMoreParams() throws Exception {
+    IntegerFormula x =
+        fmgr.declareAndCallUF(
+            "UF",
+            IntegerType,
+            ImmutableList.of(imgr.makeVariable("arg1"), imgr.makeVariable("arg2")));
+    testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+  }
+
+  @Test
+  public void testGetMultipleUFs() throws Exception {
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
     FunctionDeclaration<IntegerFormula> declaration =
