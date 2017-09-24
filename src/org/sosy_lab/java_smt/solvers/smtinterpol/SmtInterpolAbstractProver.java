@@ -98,7 +98,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   public SmtInterpolModel getModel() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return new SmtInterpolModel(env.getModel(), creator, getAssertedTerms());
+    return new SmtInterpolModel(env.getModel(), creator);
   }
 
   @Override
@@ -111,8 +111,6 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   protected static String generateTermName() {
     return PREFIX + termIdGenerator.getFreshId();
   }
-
-  protected abstract Collection<Term> getAssertedTerms();
 
   @Override
   public List<BooleanFormula> getUnsatCore() {

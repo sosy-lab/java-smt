@@ -46,10 +46,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   private final Model model;
   private final SmtInterpolFormulaCreator formulaCreator;
 
-  SmtInterpolModel(
-      Model pModel,
-      FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator,
-      @SuppressWarnings("unused") Collection<Term> assertedTerms) {
+  SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator) {
     super(pCreator);
     formulaCreator = (SmtInterpolFormulaCreator) pCreator;
     model = pModel;
