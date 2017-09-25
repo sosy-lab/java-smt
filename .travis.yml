@@ -21,7 +21,7 @@ matrix:
         - ant unit-tests-coverage
     - env: NAME='Create Javadoc'
       script:
-        - ant javadoc
+        - ant javadoc collect-options
     - env: NAME=Checkstyle
       script:
         - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
