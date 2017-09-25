@@ -45,6 +45,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -621,6 +622,44 @@ public class ModelTest extends SolverBasedTest0 {
         ValueAssignment v = m.iterator().next();
         assertThat("x".equals(v.getName())).isTrue();
         assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
+      }
+    }
+  }
+
+  @Test
+  public void arrayTest() throws SolverException, InterruptedException {
+    requireArrays();
+    requireOptimization();
+
+    BooleanFormula formula =
+        context
+            .getFormulaManager()
+            .parse(
+                "(declare-fun A1 () (Array Int Int))"
+                    + "(declare-fun A2 () (Array Int Int))"
+                    + "(declare-fun X () Int)"
+                    + "(declare-fun Y () Int)"
+                    + "(assert (= A1 (store A2 X Y)))");
+
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+      prover.push(formula);
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment v : m) {
+          // dummy-check for TRUE, such that the JUnit-test is not useless :-)
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+        }
+      }
+    }
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(formula);
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment v : m) {
+          // dummy-check for TRUE, such that the JUnit-test is not useless :-)
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+        }
       }
     }
   }
