@@ -291,6 +291,7 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 ## Further Documentation
 
  - [JavaDoc][]
+ - [ConfigurationOptions][]
  - [Changelog](https://github.com/sosy-lab/java-smt/blob/master/CHANGELOG.md)
  - [Documentation For Developers](https://github.com/sosy-lab/java-smt/blob/master/Developers.md)
  - [Known Issues](https://github.com/sosy-lab/java-smt/blob/master/KnownIssues.md)
@@ -318,6 +319,7 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 [SolverContextFactory]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/SolverContextFactory.html
 [HoudiniApp]: https://github.com/sosy-lab/java-smt/blob/master/src/org/sosy_lab/java_smt/example/HoudiniApp.java
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
+[ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [George Karpenkov]: http://metaworld.me
 [Philipp Wendler]: https://www.philippwendler.de/

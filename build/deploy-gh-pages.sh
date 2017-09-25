@@ -5,6 +5,7 @@ rm -rf gh-pages || true
 mkdir -p gh-pages/api
 cp -r website/* gh-pages
 cp -r Javadoc/* gh-pages/api
+cp bin/org/sosy_lab/java_smt/ConfigurationOptions.txt gh-pages/
 
 cd gh-pages
 git init
