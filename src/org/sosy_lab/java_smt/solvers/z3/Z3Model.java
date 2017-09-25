@@ -136,6 +136,17 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         Native.incRef(z3context, arrayFormula);
         return getArrayAssignments(symbol, arrayFormula, value, Collections.emptyList());
 
+      } else if (Native.isApp(z3context, value) && 1 == Native.getAppNumArgs(z3context, value)) {
+        // Sometimes we get an array of zeros as "((as const (Array Int Int)) 0)".
+        // We return the plain value with no argumentInterpretations, as assignment "arr[*] = 0",
+        // because there is no better way of modeling a whole array.
+        return Collections.singletonList(
+            new ValueAssignment(
+                key,
+                z3creator.symbolToString(symbol),
+                z3creator.convertValue(Native.getAppArg(z3context, value, 0)),
+                ImmutableList.of()));
+
       } else {
         throw new UnsupportedOperationException(
             "unknown model evaluation: " + Native.astToString(z3context, value));
