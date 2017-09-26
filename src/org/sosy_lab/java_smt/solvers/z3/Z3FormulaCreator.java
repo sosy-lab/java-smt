@@ -521,7 +521,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    *     FloatingPointRoundingMode}.
    */
   public Object convertValue(long value) {
-    assert isConstant(value) : "value is not constant";
+    assert isConstant(value) : "value is not constant: " + Native.astToString(environment, value);
     Native.incRef(environment, value);
 
     Object constantValue =
