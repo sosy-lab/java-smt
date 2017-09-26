@@ -83,7 +83,13 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   final class ValueAssignment {
 
-    /** the key should be of simple formula-type (Boolean/Integer/Rational/BitVector). */
+    /**
+     * the key should be of simple formula-type (Boolean/Integer/Rational/BitVector).
+     *
+     * <p>For UFs we use the application of the UF with arguments.
+     *
+     * <p>For arrays we use the selection-statement with an index.
+     */
     private final Formula key;
 
     /** the key should be boolean or numeral (Rational/Double/BigInteger/Long/Integer). */
@@ -92,10 +98,23 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /**
      * arguments can have any type. We would prefer numerals (like value), but we also allow
      * Formulas.
+     *
+     * <p>For UFs we use the arguments.
+     *
+     * <p>For arrays we use the index of a selection or an empty list for wildcard-selection, if the
+     * whole array is filled with a constant value. In the latter case any additionally given
+     * array-assignment overrides the wildcard-selection for the given index. Example: "arr=0,
+     * arr[2]=3" corresponds to an array {0,0,3,0,...}.
      */
     private final ImmutableList<Object> argumentsInterpretation;
 
-    /** The name should be a 'useful' identifier for the current assignment, without parameters. */
+    /**
+     * The name should be a 'useful' identifier for the current assignment.
+     *
+     * <p>For UFs we use their name without parameters.
+     *
+     * <p>For arrays we use the name without any index.
+     */
     private final String name;
 
     public ValueAssignment(
