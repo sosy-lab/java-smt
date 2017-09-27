@@ -107,8 +107,10 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
    */
   private boolean isInternalSymbol(long funcDecl) {
     return Z3_IRRELEVANT_MODEL_TERM_PATTERN
-        .matcher(z3creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
-        .matches();
+            .matcher(z3creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
+            .matches()
+        || Z3_decl_kind.Z3_OP_SELECT
+            == Z3_decl_kind.fromInt(Native.getDeclKind(z3context, funcDecl));
   }
 
   /** @return ValueAssignments for a constant declaration in the model */
@@ -335,13 +337,17 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   private ValueAssignment getFunctionAssignment(
       String functionName, long funcDecl, long entry, long entryValue) {
     Object value = z3creator.convertValue(entryValue);
-    int noArgs = Native.funcEntryGetNumArgs(z3context, entry);
-    long[] args = new long[noArgs];
+    int numArgs = Native.funcEntryGetNumArgs(z3context, entry);
+    long[] args = new long[numArgs];
     List<Object> argumentInterpretation = new ArrayList<>();
 
-    for (int k = 0; k < noArgs; k++) {
+    for (int k = 0; k < numArgs; k++) {
       long arg = Native.funcEntryGetArg(z3context, entry, k);
       Native.incRef(z3context, arg);
+      // indirect assignments
+      assert !Native.isAsArray(z3context, arg)
+          : "unexpected array-reference as evaluation of a UF parameter: "
+              + Native.astToString(z3context, arg);
       argumentInterpretation.add(z3creator.convertValue(arg));
       args[k] = arg;
     }
