@@ -25,6 +25,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -635,22 +636,217 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
+  static final String SMALL_ARRAY_QUERY =
+      "(declare-fun A1 () (Array Int Int))"
+          + "(declare-fun A2 () (Array Int Int))"
+          + "(declare-fun X () Int)"
+          + "(declare-fun Y () Int)"
+          + "(assert (= A1 (store A2 X Y)))";
+
+  static final String BIG_ARRAY_QUERY =
+      "(declare-fun |V#2@| () Int)"
+          + "(declare-fun z3name!115 () Int)"
+          + "(declare-fun P42 () Bool)"
+          + "(declare-fun M@3 () Int)"
+          + "(declare-fun P43 () Bool)"
+          + "(declare-fun |V#1@| () Int)"
+          + "(declare-fun z3name!114 () Int)"
+          + "(declare-fun P44 () Bool)"
+          + "(declare-fun M@2 () Int)"
+          + "(declare-fun P45 () Bool)"
+          + "(declare-fun |It15@5| () Int)"
+          + "(declare-fun |It13@5| () Int)"
+          + "(declare-fun |H@12| () (Array Int Int))"
+          + "(declare-fun |H@13| () (Array Int Int))"
+          + "(declare-fun |It14@5| () Int)"
+          + "(declare-fun |IN@5| () Int)"
+          + "(declare-fun |It12@5| () Int)"
+          + "(declare-fun |It11@5| () Int)"
+          + "(declare-fun |It9@5| () Int)"
+          + "(declare-fun |H@11| () (Array Int Int))"
+          + "(declare-fun |It10@5| () Int)"
+          + "(declare-fun |It8@5| () Int)"
+          + "(declare-fun |Anew@3| () Int)"
+          + "(declare-fun |Aprev@3| () Int)"
+          + "(declare-fun |H@10| () (Array Int Int))"
+          + "(declare-fun |At7@5| () Int)"
+          + "(declare-fun |H@9| () (Array Int Int))"
+          + "(declare-fun |At6@5| () Int)"
+          + "(declare-fun |Anext@3| () Int)"
+          + "(declare-fun |H@8| () (Array Int Int))"
+          + "(declare-fun |At5@5| () Int)"
+          + "(declare-fun |H@7| () (Array Int Int))"
+          + "(declare-fun |At4@5| () Int)"
+          + "(declare-fun |at3@5| () Int)"
+          + "(declare-fun |ahead@3| () Int)"
+          + "(declare-fun |anew@3| () Int)"
+          + "(declare-fun gl@ () Int)"
+          + "(declare-fun |It7@5| () Int)"
+          + "(declare-fun |It6@5| () Int)"
+          + "(declare-fun |It5@5| () Int)"
+          + "(declare-fun |Ivalue@3| () Int)"
+          + "(declare-fun i@2 () (Array Int Int))"
+          + "(declare-fun i@3 () (Array Int Int))"
+          + "(declare-fun P46 () Bool)"
+          + "(declare-fun |It4@5| () Int)"
+          + "(declare-fun |It4@3| () Int)"
+          + "(declare-fun |IT@5| () Int)"
+          + "(declare-fun |gl_read::T@4| () Int)"
+          + "(declare-fun __VERIFIER_nondet_int@4 () Int)"
+          + "(declare-fun |It15@3| () Int)"
+          + "(declare-fun |It13@3| () Int)"
+          + "(declare-fun |H@6| () (Array Int Int))"
+          + "(declare-fun |It14@3| () Int)"
+          + "(declare-fun |IN@3| () Int)"
+          + "(declare-fun |It12@3| () Int)"
+          + "(declare-fun |It11@3| () Int)"
+          + "(declare-fun |It9@3| () Int)"
+          + "(declare-fun |H@5| () (Array Int Int))"
+          + "(declare-fun |It10@3| () Int)"
+          + "(declare-fun |It8@3| () Int)"
+          + "(declare-fun |Anew@2| () Int)"
+          + "(declare-fun |Aprev@2| () Int)"
+          + "(declare-fun |H@4| () (Array Int Int))"
+          + "(declare-fun |At7@3| () Int)"
+          + "(declare-fun |H@3| () (Array Int Int))"
+          + "(declare-fun |At6@3| () Int)"
+          + "(declare-fun |Anext@2| () Int)"
+          + "(declare-fun |H@2| () (Array Int Int))"
+          + "(declare-fun |At5@3| () Int)"
+          + "(declare-fun |H@1| () (Array Int Int))"
+          + "(declare-fun |At4@3| () Int)"
+          + "(declare-fun |at3@3| () Int)"
+          + "(declare-fun |ahead@2| () Int)"
+          + "(declare-fun |anew@2| () Int)"
+          + "(declare-fun |It7@3| () Int)"
+          + "(declare-fun |It6@3| () Int)"
+          + "(declare-fun |It5@3| () Int)"
+          + "(declare-fun |Ivalue@2| () Int)"
+          + "(declare-fun i@1 () (Array Int Int))"
+          + "(declare-fun P47 () Bool)"
+          + "(declare-fun |IT@3| () Int)"
+          + "(declare-fun |gl_read::T@3| () Int)"
+          + "(declare-fun __VERIFIER_nondet_int@2 () Int)"
+          + "(assert "
+          + "  (and (not (<= gl@ 0))"
+          + "       (not (<= gl@ (- 64)))"
+          + "       (= |gl_read::T@3| __VERIFIER_nondet_int@2)"
+          + "       (= |Ivalue@2| |gl_read::T@3|)"
+          + "       (= |It4@3| 20)"
+          + "       (= |IT@3| z3name!114)"
+          + "       (not (<= |V#1@| 0))"
+          + "       (= |IN@3| |IT@3|)"
+          + "       (not (<= |V#1@| (+ 64 gl@)))"
+          + "       (not (<= |V#1@| (- 160)))"
+          + "       (not (<= (+ |V#1@| (* 8 |It4@3|)) 0))"
+          + "       (or (and P47 (not (<= |IN@3| 0))) (and (not P47) (not (>= |IN@3| 0))))"
+          + "       (= i@2 (store i@1 |IN@3| |Ivalue@2|))"
+          + "       (= |It5@3| |IN@3|)"
+          + "       (= |It6@3| (+ 4 |It5@3|))"
+          + "       (= |It7@3| |It6@3|)"
+          + "       (= |anew@2| |It7@3|)"
+          + "       (= |ahead@2| gl@)"
+          + "       (= |at3@3| (select |H@1| |ahead@2|))"
+          + "       (= |Anew@2| |anew@2|)"
+          + "       (= |Aprev@2| |ahead@2|)"
+          + "       (= |Anext@2| |at3@3|)"
+          + "       (= |At4@3| |Anext@2|)"
+          + "       (= |At5@3| (+ 4 |At4@3|))"
+          + "       (= |H@2| (store |H@1| |At5@3| |Anew@2|))"
+          + "       (= |H@3| (store |H@2| |Anew@2| |Anext@2|))"
+          + "       (= |At6@3| |Anew@2|)"
+          + "       (= |At7@3| (+ 4 |At6@3|))"
+          + "       (= |H@4| (store |H@3| |At7@3| |Aprev@2|))"
+          + "       (= |H@5| (store |H@4| |Aprev@2| |Anew@2|))"
+          + "       (= |It8@3| |IN@3|)"
+          + "       (= |It9@3| (+ 12 |It8@3|))"
+          + "       (= |It10@3| |IN@3|)"
+          + "       (= |It11@3| (+ 12 |It10@3|))"
+          + "       (= |H@6| (store |H@5| |It9@3| |It11@3|))"
+          + "       (= |It12@3| |IN@3|)"
+          + "       (= |It13@3| (+ 12 |It12@3|))"
+          + "       (= |It14@3| |IN@3|)"
+          + "       (= |It15@3| (+ 12 |It14@3|))"
+          + "       (= |H@7| (store |H@6| |It13@3| |It15@3|))"
+          + "       (= |gl_read::T@4| __VERIFIER_nondet_int@4)"
+          + "       (= |Ivalue@3| |gl_read::T@4|)"
+          + "       (= |It4@5| 20)"
+          + "       (= |IT@5| z3name!115)"
+          + "       (not (<= |V#2@| 0))"
+          + "       (= |IN@5| |IT@5|)"
+          + "       (not (<= |V#2@| (+ |V#1@| (* 8 |It4@3|))))"
+          + "       (not (<= |V#2@| (+ 160 |V#1@|)))"
+          + "       (not (<= |V#2@| (- 160)))"
+          + "       (not (<= (+ |V#2@| (* 8 |It4@5|)) 0))"
+          + "       (or (and P46 (not (<= |IN@5| 0))) (and (not P46) (not (>= |IN@5| 0))))"
+          + "       (= i@3 (store i@2 |IN@5| |Ivalue@3|))"
+          + "       (= |It5@5| |IN@5|)"
+          + "       (= |It6@5| (+ 4 |It5@5|))"
+          + "       (= |It7@5| |It6@5|)"
+          + "       (= |anew@3| |It7@5|)"
+          + "       (= |ahead@3| gl@)"
+          + "       (= |at3@5| (select |H@7| |ahead@3|))"
+          + "       (= |Anew@3| |anew@3|)"
+          + "       (= |Aprev@3| |ahead@3|)"
+          + "       (= |Anext@3| |at3@5|)"
+          + "       (= |At4@5| |Anext@3|)"
+          + "       (= |At5@5| (+ 4 |At4@5|))"
+          + "       (= |H@8| (store |H@7| |At5@5| |Anew@3|))"
+          + "       (= |H@9| (store |H@8| |Anew@3| |Anext@3|))"
+          + "       (= |At6@5| |Anew@3|)"
+          + "       (= |At7@5| (+ 4 |At6@5|))"
+          + "       (= |H@10| (store |H@9| |At7@5| |Aprev@3|))"
+          + "       (= |H@11| (store |H@10| |Aprev@3| |Anew@3|))"
+          + "       (= |It8@5| |IN@5|)"
+          + "       (= |It9@5| (+ 12 |It8@5|))"
+          + "       (= |It10@5| |IN@5|)"
+          + "       (= |It11@5| (+ 12 |It10@5|))"
+          + "       (= |H@12| (store |H@11| |It9@5| |It11@5|))"
+          + "       (= |It12@5| |IN@5|)"
+          + "       (= |It13@5| (+ 12 |It12@5|))"
+          + "       (= |It14@5| |IN@5|)"
+          + "       (= |It15@5| (+ 12 |It14@5|))"
+          + "       (= |H@13| (store |H@12| |It13@5| |It15@5|))"
+          + "       (or (and P45 (not (= M@2 0)))  (and (not P45) (= z3name!114 0)))"
+          + "       (or (and P44 (= M@2 0)) (and (not P44) (= z3name!114 |V#1@|)))"
+          + "       (or (and P43 (not (= M@3 0))) (and (not P43) (= z3name!115 0)))"
+          + "       (or (and P42 (= M@3 0)) (and (not P42) (= z3name!115 |V#2@|)))))";
+
+  static final String SMALL_BV_FLOAT_QUERY =
+      "(declare-fun |f@2| () (_ FloatingPoint 8 23))"
+          + "(declare-fun |p@3| () (_ BitVec 32))"
+          + "(declare-fun *float@1 () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
+          + "(declare-fun |i@3| () (_ BitVec 32))"
+          + "(declare-fun |Ai@| () (_ BitVec 32))"
+          + "(declare-fun *unsigned_int@1 () (Array (_ BitVec 32) (_ BitVec 32)))"
+          + "(assert (and (bvslt #x00000000 |Ai@|)"
+          + "     (bvslt #x00000000 (bvadd |Ai@| #x00000020))"
+          + "     (= |i@3| #x00000000)"
+          + "     (= |p@3| |Ai@|)"
+          + "     (= (select *unsigned_int@1 |Ai@|) |i@3|)"
+          + "     (= |f@2| (select *float@1 |p@3|))"
+          + "     (not (fp.eq ((_ to_fp 11 52) roundNearestTiesToEven |f@2|)"
+          + "                 (_ +zero 11 52)))))";
+
+  static final String SMALL_BV_FLOAT_QUERY2 =
+      "(declare-fun a () (_ FloatingPoint 8 23))"
+          + "(declare-fun A () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
+          + "(assert (= a (select A #x00000000)))";
+
   @Test
   public void arrayTest() throws SolverException, InterruptedException {
     requireArrays();
     requireOptimization();
+    requireFloats();
+    requireBitvectors();
+    // only Z3 fulfills these requirements
 
-    BooleanFormula formula =
-        context
-            .getFormulaManager()
-            .parse(
-                "(declare-fun A1 () (Array Int Int))"
-                    + "(declare-fun A2 () (Array Int Int))"
-                    + "(declare-fun X () Int)"
-                    + "(declare-fun Y () Int)"
-                    + "(assert (= A1 (store A2 X Y)))");
-
-    checkModelIteration(formula, true);
-    checkModelIteration(formula, false);
-   }
+    for (String query :
+        Lists.newArrayList(
+            SMALL_ARRAY_QUERY, BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
+      BooleanFormula formula = context.getFormulaManager().parse(query);
+      checkModelIteration(formula, true);
+      checkModelIteration(formula, false);
+    }
+  }
 }
