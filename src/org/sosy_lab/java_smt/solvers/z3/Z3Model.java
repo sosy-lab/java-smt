@@ -26,6 +26,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
+import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -136,19 +138,17 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         Native.incRef(z3context, arrayFormula);
         return getArrayAssignments(symbol, arrayFormula, value, Collections.emptyList());
 
-      } else if (Native.isApp(z3context, value) && 1 == Native.getAppNumArgs(z3context, value)) {
+      } else if (Native.isApp(z3context, value)) {
         long decl = Native.getAppDecl(z3context, value);
-        long name = Native.getDeclName(z3context, decl);
-        if ("const".equals(Native.getSymbolString(z3context, name))) {
-          // Sometimes we get an array of zeros as "((as const (Array Int Int)) 0)".
-          // We return the plain value with no argumentInterpretations, as assignment "arr = 0",
-          // because there is no better way of modeling a whole array.
-          return Collections.singletonList(
-              new ValueAssignment(
-                  key,
-                  z3creator.symbolToString(symbol),
-                  z3creator.convertValue(Native.getAppArg(z3context, value, 0)),
-                  ImmutableList.of()));
+        Native.incRef(z3context, decl);
+        Z3_sort_kind sortKind =
+            Z3_sort_kind.fromInt(Native.getSortKind(z3context, Native.getSort(z3context, value)));
+        assert sortKind == Z3_sort_kind.Z3_ARRAY_SORT : "unexpected sort: " + sortKind;
+
+        try {
+          return getConstantArrayAssignment(symbol, value, decl);
+        } finally {
+          Native.decRef(z3context, decl);
         }
       }
 
@@ -159,6 +159,60 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       // cleanup outdated data
       Native.decRef(z3context, value);
     }
+  }
+
+  /** unrolls an constant array assignment. */
+  private Collection<ValueAssignment> getConstantArrayAssignment(
+      long arraySymbol, long value, long decl) {
+
+    long arrayFormula = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
+    Native.incRef(z3context, arrayFormula);
+
+    Z3_decl_kind declKind = Z3_decl_kind.fromInt(Native.getDeclKind(z3context, decl));
+    int numArgs = Native.getAppNumArgs(z3context, value);
+
+    List<ValueAssignment> out = new ArrayList<>();
+
+    // unroll an array...
+    while (Z3_decl_kind.Z3_OP_STORE == declKind) {
+      assert numArgs == 3;
+
+      long arrayIndex = Native.getAppArg(z3context, value, 1);
+      Native.incRef(z3context, arrayIndex);
+      long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
+      Native.incRef(z3context, select);
+
+      out.add(
+          new ValueAssignment(
+              z3creator.encapsulateWithTypeOf(select),
+              z3creator.symbolToString(arraySymbol),
+              z3creator.convertValue(Native.getAppArg(z3context, value, 2)),
+              ImmutableList.of(evaluateImpl(arrayIndex))));
+
+      Native.decRef(z3context, arrayIndex);
+
+      // recursive unrolling
+      value = Native.getAppArg(z3context, value, 0);
+      decl = Native.getAppDecl(z3context, value);
+      declKind = Z3_decl_kind.fromInt(Native.getDeclKind(z3context, decl));
+      numArgs = Native.getAppNumArgs(z3context, value);
+    }
+
+    // ...until its end
+    if (Z3_decl_kind.Z3_OP_CONST_ARRAY == declKind) {
+      assert numArgs == 1;
+      // We have an array of zeros (=default value) as "((as const (Array Int Int)) 0)".
+      // We return the plain value with no argumentInterpretations, as assignment "arr = 0",
+      // because there is no better way of modeling a whole array.
+      out.add(
+          new ValueAssignment(
+              z3creator.encapsulateWithTypeOf(arrayFormula),
+              z3creator.symbolToString(arraySymbol),
+              z3creator.convertValue(Native.getAppArg(z3context, value, 0)), // default is 0
+              ImmutableList.of())); // wildcard index
+    }
+
+    return out;
   }
 
   /**
