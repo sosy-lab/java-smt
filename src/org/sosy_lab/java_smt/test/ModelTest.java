@@ -36,6 +36,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -45,7 +46,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -583,14 +583,23 @@ public class ModelTest extends SolverBasedTest0 {
 
     BooleanFormula f = bmgr.and(a1, bvmgr.lessThan(num0, adr, true), bmgr.not(a2));
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    checkModelIteration(f, true);
+    checkModelIteration(f, false);
+  }
+
+  private void checkModelIteration(BooleanFormula f, boolean useOptProver)
+      throws SolverException, InterruptedException {
+    try (BasicProverEnvironment<?> prover =
+        useOptProver
+            ? context.newOptimizationProverEnvironment()
+            : context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
-        // TODO the model is not correct for Z3, check this!
-
-        // dummy-check for TRUE, such that the JUnit-test is not useless :-)
-        assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
       }
     }
   }
@@ -641,26 +650,7 @@ public class ModelTest extends SolverBasedTest0 {
                     + "(declare-fun Y () Int)"
                     + "(assert (= A1 (store A2 X Y)))");
 
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
-      prover.push(formula);
-      assertThat(prover.isUnsat()).isFalse();
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment v : m) {
-          // dummy-check for TRUE, such that the JUnit-test is not useless :-)
-          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
-        }
-      }
-    }
-
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(formula);
-      assertThat(prover.isUnsat()).isFalse();
-      try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment v : m) {
-          // dummy-check for TRUE, such that the JUnit-test is not useless :-)
-          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
-        }
-      }
-    }
-  }
+    checkModelIteration(formula, true);
+    checkModelIteration(formula, false);
+   }
 }
