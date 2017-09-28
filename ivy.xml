@@ -62,14 +62,18 @@
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="22.0" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="23.1-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="22.0" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="23.1-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build.xml for upgrading. -->
         <dependency org="org.apache.ivy" name="ivy" rev="${ivy.target_version}" conf="build->default"/>
+
+        <!-- Google Auto-Value
+             Library for auto-generating value types. -->
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.5" conf="build->default"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -123,11 +127,7 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.5.0-273-g899843b" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
 
-        <!-- Google Auto-Value
-             Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.3" conf="build->default"/>
-
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.0.21"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.1.1"/>
     </dependencies>
 </ivy-module>
