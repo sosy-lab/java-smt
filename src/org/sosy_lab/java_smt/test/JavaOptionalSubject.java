@@ -20,7 +20,7 @@
 
 package org.sosy_lab.java_smt.test;
 
-import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -31,8 +31,8 @@ import javax.annotation.Nullable;
  */
 @Deprecated // Uses Truth8's OptionalSubject instead
 public class JavaOptionalSubject extends Subject<JavaOptionalSubject, Optional<?>> {
-  JavaOptionalSubject(FailureStrategy failureStrategy, @Nullable Optional<?> subject) {
-    super(failureStrategy, subject);
+  JavaOptionalSubject(FailureMetadata metadata, @Nullable Optional<?> subject) {
+    super(metadata, subject);
   }
 
   public void isPresent() {

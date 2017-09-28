@@ -19,10 +19,10 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
-import com.google.common.truth.SubjectFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -43,24 +43,43 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class ProverEnvironmentSubject
     extends Subject<ProverEnvironmentSubject, BasicProverEnvironment<?>> {
 
+  @Deprecated
   private ProverEnvironmentSubject(
       FailureStrategy pFailureStrategy, BasicProverEnvironment<?> pStack) {
     super(pFailureStrategy, pStack);
   }
 
+  private ProverEnvironmentSubject(FailureMetadata pMetadata, BasicProverEnvironment<?> pStack) {
+    super(pMetadata, pStack);
+  }
+
   /**
    * Use this for checking assertions about ProverEnvironments with Truth: <code>
    * assert_().about(proverEnvironment()).that(stack).is...()</code>.
+   *
+   * @deprecated Use {@link #proverEnvironments()}
    */
-  public static SubjectFactory<ProverEnvironmentSubject, BasicProverEnvironment<?>>
+  @Deprecated
+  public static com.google.common.truth.SubjectFactory<
+          ProverEnvironmentSubject, BasicProverEnvironment<?>>
       proverEnvironment() {
-    return new SubjectFactory<ProverEnvironmentSubject, BasicProverEnvironment<?>>() {
+    return new com.google.common.truth.SubjectFactory<
+        ProverEnvironmentSubject, BasicProverEnvironment<?>>() {
       @Override
       public ProverEnvironmentSubject getSubject(
           FailureStrategy pFs, BasicProverEnvironment<?> pFormula) {
         return new ProverEnvironmentSubject(pFs, pFormula);
       }
     };
+  }
+
+  /**
+   * Use this for checking assertions about ProverEnvironments with Truth: <code>
+   * assert_().about(proverEnvironments()).that(stack).is...()</code>.
+   */
+  public static Subject.Factory<ProverEnvironmentSubject, BasicProverEnvironment<?>>
+      proverEnvironments() {
+    return (metadata, formula) -> new ProverEnvironmentSubject(metadata, formula);
   }
 
   /**

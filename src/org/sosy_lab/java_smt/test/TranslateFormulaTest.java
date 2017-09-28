@@ -137,6 +137,6 @@ public class TranslateFormulaTest {
 
   protected final BooleanFormulaSubject assertThatFormula(
       BooleanFormula formula, SolverContext context) {
-    return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
+    return assert_().about(BooleanFormulaSubject.booleanFormulasOf(context)).that(formula);
   }
 }

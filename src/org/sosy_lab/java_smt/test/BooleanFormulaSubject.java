@@ -21,10 +21,10 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
-import com.google.common.truth.SubjectFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -48,25 +48,43 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   private final SolverContext context;
 
+  @Deprecated
   private BooleanFormulaSubject(
       FailureStrategy pFailureStrategy, BooleanFormula pFormula, SolverContext pMgr) {
     super(pFailureStrategy, pFormula);
     context = checkNotNull(pMgr);
   }
 
+  private BooleanFormulaSubject(
+      FailureMetadata pMetadata, BooleanFormula pFormula, SolverContext pMgr) {
+    super(pMetadata, pFormula);
+    context = checkNotNull(pMgr);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
    * Truth: <code>assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula).is...()</code>
-   * .
+   *
+   * @deprecated Use {@link #booleanFormulasOf(SolverContext)}
    */
-  public static SubjectFactory<BooleanFormulaSubject, BooleanFormula> forSolver(
-      final SolverContext context) {
-    return new SubjectFactory<BooleanFormulaSubject, BooleanFormula>() {
+  @Deprecated
+  public static com.google.common.truth.SubjectFactory<BooleanFormulaSubject, BooleanFormula>
+      forSolver(final SolverContext context) {
+    return new com.google.common.truth.SubjectFactory<BooleanFormulaSubject, BooleanFormula>() {
       @Override
       public BooleanFormulaSubject getSubject(FailureStrategy pFs, BooleanFormula pFormula) {
         return new BooleanFormulaSubject(pFs, pFormula, context);
       }
     };
+  }
+
+  /**
+   * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
+   * Truth: <code>assert_().about(booleanFormulasOf(context)).that(formula).is...()</code>.
+   */
+  public static Subject.Factory<BooleanFormulaSubject, BooleanFormula> booleanFormulasOf(
+      final SolverContext context) {
+    return (metadata, formula) -> new BooleanFormulaSubject(metadata, formula, context);
   }
 
   private void checkIsUnsat(final BooleanFormula subject, final String verb, final Object expected)

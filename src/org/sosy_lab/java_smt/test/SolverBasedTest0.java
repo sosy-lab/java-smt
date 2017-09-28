@@ -21,10 +21,10 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.proverEnvironment;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.proverEnvironments;
 
-import com.google.common.truth.FailureStrategy;
-import com.google.common.truth.SubjectFactory;
+import com.google.common.truth.FailureMetadata;
+import com.google.common.truth.Subject;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -245,7 +245,7 @@ public abstract class SolverBasedTest0 {
    * assertThatFormula(formula).is...()</code>.
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
-    return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
+    return assert_().about(BooleanFormulaSubject.booleanFormulasOf(context)).that(formula);
   }
 
   /**
@@ -253,18 +253,19 @@ public abstract class SolverBasedTest0 {
    * assertThatEnvironment(stack).is...()</code>.
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
-    return assert_().about(proverEnvironment()).that(prover);
+    return assert_().about(proverEnvironments()).that(prover);
   }
 
+  @SuppressWarnings("deprecation")
   @Deprecated
   protected final JavaOptionalSubject assertThatOptional(Optional<?> pOptional) {
     return assert_()
         .about(
-            new SubjectFactory<JavaOptionalSubject, Optional<?>>() {
+            new Subject.Factory<JavaOptionalSubject, Optional<?>>() {
               @Override
-              public JavaOptionalSubject getSubject(
-                  FailureStrategy pFailureStrategy, Optional<?> pOptional) {
-                return new JavaOptionalSubject(pFailureStrategy, pOptional);
+              public JavaOptionalSubject createSubject(
+                  FailureMetadata pMetadata, Optional<?> pOptional) {
+                return new JavaOptionalSubject(pMetadata, pOptional);
               }
             })
         .that(pOptional);
