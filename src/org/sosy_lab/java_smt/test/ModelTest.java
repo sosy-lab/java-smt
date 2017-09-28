@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -159,7 +160,7 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(imgr.equal(arg1, imgr.makeNumber(3)));
       prover.push(imgr.equal(arg2, imgr.makeNumber(4)));
 
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
@@ -200,7 +201,7 @@ public class ModelTest extends SolverBasedTest0 {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
@@ -237,7 +238,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testEmptyStackModel() throws Exception {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
         assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
@@ -256,7 +257,7 @@ public class ModelTest extends SolverBasedTest0 {
   public void testNonExistantSymbol() throws Exception {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeBoolean(true));
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
@@ -278,7 +279,7 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       prover.push(imgr.equal(x, x));
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(x)).isEqualTo(null);
         assertThat(m).isEmpty();
@@ -297,7 +298,7 @@ public class ModelTest extends SolverBasedTest0 {
       IntegerFormula f = fmgr.declareAndCallUF("f", IntegerType, x);
 
       prover.push(imgr.equal(x, imgr.makeNumber(1)));
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(f)).isEqualTo(null);
@@ -330,7 +331,7 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(imgr.equal(amgr.select(updated, imgr.makeNumber(1)), imgr.makeNumber(1)));
 
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
@@ -448,7 +449,7 @@ public class ModelTest extends SolverBasedTest0 {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         @SuppressWarnings("unused")
@@ -489,7 +490,7 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
 
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
@@ -516,7 +517,7 @@ public class ModelTest extends SolverBasedTest0 {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(constraint);
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);

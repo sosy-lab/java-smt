@@ -21,7 +21,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.proverEnvironments;
+import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
@@ -245,15 +246,18 @@ public abstract class SolverBasedTest0 {
    * assertThatFormula(formula).is...()</code>.
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
-    return assert_().about(BooleanFormulaSubject.booleanFormulasOf(context)).that(formula);
+    return assertUsing(context).that(formula);
   }
 
   /**
    * Use this for checking assertions about ProverEnvironments with Truth: <code>
    * assertThatEnvironment(stack).is...()</code>.
+   *
+   * <p>For new code, we suggest using {@link
+   * ProverEnvironmentSubject#assertThat(BasicProverEnvironment)} with a static import.
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
-    return assert_().about(proverEnvironments()).that(prover);
+    return assertThat(prover);
   }
 
   @SuppressWarnings("deprecation")

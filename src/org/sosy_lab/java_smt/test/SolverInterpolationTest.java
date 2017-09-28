@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -139,7 +140,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     T TC = stack.push(C);
     T TD = stack.push(D);
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     BooleanFormula itp = stack.getInterpolant(ImmutableList.of());
     BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
@@ -179,7 +180,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     T TA = stack.push(A);
     T TB = stack.push(B);
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     BooleanFormula itp0 = stack.getInterpolant(ImmutableList.of());
     BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
@@ -246,7 +247,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     Set<T> TC = Sets.newHashSet(stack.push(C));
     Set<T> TD = Sets.newHashSet(stack.push(D));
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(TA, TB, TC, TD));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants(ImmutableList.of(TD, TC, TB, TA));
@@ -354,7 +355,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     Set<T> TD = Sets.newHashSet(stack.push(pD));
     Set<T> TE = Sets.newHashSet(stack.push(pE));
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     // we build a very simple tree:
     // A  D
@@ -395,7 +396,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     Set<T> TD = Sets.newHashSet(stack.push(pD));
     Set<T> TE = Sets.newHashSet(stack.push(pE));
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     // we build a simple tree:
     // ABCD
@@ -437,7 +438,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     Set<T> TD = Sets.newHashSet(stack.push(pD));
     Set<T> TE = Sets.newHashSet(stack.push(pE));
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     // we build a simple degenerated tree:
     // A
@@ -501,7 +502,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     Set<T> TR2 = Sets.newHashSet(stack.push(R2));
     Set<T> TD = Sets.newHashSet(stack.push(D));
 
-    assertThatEnvironment(stack).isUnsatisfiable();
+    assertThat(stack).isUnsatisfiable();
 
     // we build a simple tree:
     // A
@@ -550,7 +551,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
       throws SolverException, InterruptedException {
     // a=>b  <-->  !a||b
     stack.push(bmgr.or(bmgr.not(a), b));
-    assertThatEnvironment(stack).isSatisfiable();
+    assertThat(stack).isSatisfiable();
     stack.pop();
   }
 }

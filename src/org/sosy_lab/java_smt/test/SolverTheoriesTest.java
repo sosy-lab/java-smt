@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
@@ -755,7 +756,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(y_equal_3);
       env.push(z_equal_4);
       env.push(z_equal_x_mult_y);
-      assertThatEnvironment(env).isUnsatisfiable();
+      assertThat(env).isUnsatisfiable();
     }
   }
 
@@ -787,7 +788,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(y_equal_2);
       env.push(z_equal_3);
       env.push(z_equal_x_div_y);
-      assertThatEnvironment(env).isUnsatisfiable();
+      assertThat(env).isUnsatisfiable();
     }
   }
 }

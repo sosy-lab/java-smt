@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
@@ -429,7 +430,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       prover.push(posInfEq);
       prover.push(negInfEq);
 
-      assertThatEnvironment(prover).isSatisfiable();
+      assertThat(prover).isSatisfiable();
 
       try (Model model = prover.getModel()) {
 
@@ -485,7 +486,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       Object itpGroup1 = prover.push(f1);
       prover.push(f2);
 
-      assertThatEnvironment(prover).isUnsatisfiable();
+      assertThat(prover).isUnsatisfiable();
 
       BooleanFormula itp = prover.getInterpolant(ImmutableList.of(itpGroup1));
       assertThatFormula(f1).implies(itp);

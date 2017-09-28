@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assert_;
+
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
@@ -80,6 +82,14 @@ public class ProverEnvironmentSubject
   public static Subject.Factory<ProverEnvironmentSubject, BasicProverEnvironment<?>>
       proverEnvironments() {
     return (metadata, formula) -> new ProverEnvironmentSubject(metadata, formula);
+  }
+
+  /**
+   * Use this for checking assertions about ProverEnvironments with Truth: <code>
+   * assertThat(stack).is...()</code>.
+   */
+  public static final ProverEnvironmentSubject assertThat(BasicProverEnvironment<?> prover) {
+    return assert_().about(proverEnvironments()).that(prover);
   }
 
   /**

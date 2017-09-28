@@ -26,6 +26,7 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -104,7 +105,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
       pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
       pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
-      assertThatEnvironment(pe).isUnsatisfiable();
+      assertThat(pe).isUnsatisfiable();
       List<BooleanFormula> unsatCore = pe.getUnsatCore();
       assertThat(unsatCore)
           .containsExactly(

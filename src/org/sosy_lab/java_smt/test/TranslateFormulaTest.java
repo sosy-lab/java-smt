@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import org.junit.After;
 import org.junit.Before;
@@ -110,7 +110,7 @@ public class TranslateFormulaTest {
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
 
-    assertThatFormula(createTestFormula(managerTo), to).isEquivalentTo(parsed);
+    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
   }
 
   @Test
@@ -118,7 +118,7 @@ public class TranslateFormulaTest {
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
 
-    assertThatFormula(createTestFormula(managerTo), to).isEquivalentTo(parsed);
+    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {
@@ -133,10 +133,5 @@ public class TranslateFormulaTest {
             bfmgr.or(ifmgr.equal(x, y), ifmgr.equal(x, ifmgr.makeNumber(2))),
             bfmgr.or(ifmgr.equal(y, z), ifmgr.equal(z, ifmgr.makeNumber(10))));
     return t;
-  }
-
-  protected final BooleanFormulaSubject assertThatFormula(
-      BooleanFormula formula, SolverContext context) {
-    return assert_().about(BooleanFormulaSubject.booleanFormulasOf(context)).that(formula);
   }
 }

@@ -20,9 +20,11 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.SimpleSubjectBuilder;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -85,6 +87,15 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   public static Subject.Factory<BooleanFormulaSubject, BooleanFormula> booleanFormulasOf(
       final SolverContext context) {
     return (metadata, formula) -> new BooleanFormulaSubject(metadata, formula, context);
+  }
+
+  /**
+   * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
+   * Truth: <code>assertUsing(context)).that(formula).is...()</code>.
+   */
+  public static SimpleSubjectBuilder<BooleanFormulaSubject, BooleanFormula> assertUsing(
+      final SolverContext context) {
+    return assert_().about(booleanFormulasOf(context));
   }
 
   private void checkIsUnsat(final BooleanFormula subject, final String verb, final Object expected)
