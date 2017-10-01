@@ -258,22 +258,23 @@ class SmtInterpolFormulaCreator
       return FunctionDeclarationKind.IMPLIES;
     } else if (symbol == t.mXor) {
       return FunctionDeclarationKind.XOR;
+    }
 
-      // Polymorphic function symbols are more difficult.
-    } else if (symbol.getName().equals("=")) {
-      return FunctionDeclarationKind.EQ;
-    } else if (symbol.getName().equals("distinct")) {
-      return FunctionDeclarationKind.DISTINCT;
-    } else if (symbol.getName().equals("ite")) {
-      return FunctionDeclarationKind.ITE;
-    } else if (symbol.getName().equals("select")) {
-      return FunctionDeclarationKind.SELECT;
-    } else if (symbol.getName().equals("store")) {
-      return FunctionDeclarationKind.STORE;
-    } else {
-
-      // TODO: other declaration kinds!
-      return FunctionDeclarationKind.OTHER;
+    // Polymorphic function symbols are more difficult.
+    switch (symbol.getName()) {
+      case "=":
+        return FunctionDeclarationKind.EQ;
+      case "distinct":
+        return FunctionDeclarationKind.DISTINCT;
+      case "ite":
+        return FunctionDeclarationKind.ITE;
+      case "select":
+        return FunctionDeclarationKind.SELECT;
+      case "store":
+        return FunctionDeclarationKind.STORE;
+      default:
+        // TODO: other declaration kinds!
+        return FunctionDeclarationKind.OTHER;
     }
   }
 
