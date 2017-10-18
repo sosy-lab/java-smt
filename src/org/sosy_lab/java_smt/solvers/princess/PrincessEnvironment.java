@@ -145,9 +145,9 @@ class PrincessEnvironment {
    * shared in all registered APIs.
    */
   PrincessAbstractProver<?, ?> getNewProver(
-      boolean useForInterpolation, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
+      boolean useForInterpolation, boolean unsatCores, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
 
-    SimpleAPI newApi = getNewApi(useForInterpolation);
+    SimpleAPI newApi = getNewApi(useForInterpolation || unsatCores);
 
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(newApi::addBooleanVariable);
@@ -159,14 +159,14 @@ class PrincessEnvironment {
     if (useForInterpolation) {
       prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier);
     } else {
-      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier);
+      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier, unsatCores);
     }
     registeredProvers.add(prover);
     return prover;
   }
 
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  private SimpleAPI getNewApi(boolean useForInterpolation) {
+  private SimpleAPI getNewApi(boolean constructProofs) {
     File directory = null;
     String smtDumpBasename = null;
     String scalaDumpBasename = null;
@@ -209,8 +209,8 @@ class PrincessEnvironment {
             new scala.Some<>(randomSeed) // randomSeed
             );
 
-    if (useForInterpolation) {
-      newApi.setConstructProofs(true); // needed for interpolation
+    if (constructProofs) { // needed for interpolation and unsat cores
+      newApi.setConstructProofs(true);
     }
 
     return newApi;

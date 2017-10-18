@@ -91,13 +91,25 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
   }
 
+  protected int addAssertedFormula(AF f) {
+    assertedFormulas.peek().add(f);
+    final int id = trackingStack.peek().constraintNum++;
+    return id;
+  }
+
   @Override
   public final void push() {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     assertedFormulas.push(new ArrayList<>());
     api.push();
-    trackingStack.push(new Level());
+
+    final int oldConstraintNum;
+    if (trackingStack.isEmpty())
+      oldConstraintNum = 0;
+    else
+      oldConstraintNum = trackingStack.peek().constraintNum;
+    trackingStack.push(new Level(oldConstraintNum));
   }
 
   @Override
@@ -190,6 +202,13 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     final List<IFormula> booleanSymbols = new ArrayList<>();
     final List<ITerm> intSymbols = new ArrayList<>();
     final List<IFunction> functionSymbols = new ArrayList<>();
+    // the number of constraints asserted up to this point, this is needed
+    // for unsat core computation
+    int constraintNum = 0;
+
+    public Level(int constraintNum) {
+      this.constraintNum = constraintNum;
+    }
 
     /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
