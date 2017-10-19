@@ -105,10 +105,11 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     api.push();
 
     final int oldConstraintNum;
-    if (trackingStack.isEmpty())
+    if (trackingStack.isEmpty()) {
       oldConstraintNum = 0;
-    else
+    } else {
       oldConstraintNum = trackingStack.peek().constraintNum;
+    }
     trackingStack.push(new Level(oldConstraintNum));
   }
 
@@ -206,7 +207,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     // for unsat core computation
     int constraintNum = 0;
 
-    public Level(int constraintNum) {
+    Level(int constraintNum) {
       this.constraintNum = constraintNum;
     }
 

@@ -23,8 +23,8 @@ import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.asScalaSet;
 
 import ap.SimpleAPI;
-import ap.parser.IFormula;
 import ap.basetypes.Tree;
+import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -143,19 +143,20 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     Preconditions.checkState(!closed);
 
     // reconstruct the trees from the labels in post-order
-    final ArrayList<Tree<scala.collection.immutable.Set<Object>>> partTrees =
-      new ArrayList<Tree<scala.collection.immutable.Set<Object>>>();
+    final List<Tree<scala.collection.immutable.Set<Object>>> partTrees =
+      new ArrayList<>();
 
     for (int i = 0; i < partitionedFormulas.size(); ++i) {
       final ArrayBuffer<Tree<scala.collection.immutable.Set<Object>>> children =
         new ArrayBuffer<>();
-      for (int j = startOfSubTree[i]; j < i; ++j)
+      for (int j = startOfSubTree[i]; j < i; ++j) {
         if (partTrees.get(j) != null) {
           children.$plus$eq(partTrees.get(j));
           partTrees.set(j, null);
         }
+      }
 
-      partTrees.add(new Tree<scala.collection.immutable.Set<Object>>(
+      partTrees.add(new Tree<>(
         asScalaSet(partitionedFormulas.get(i)).toSet(),
         children.toList()
       ));
@@ -183,8 +184,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   private void tree2List(Tree<IFormula> tree,
                          List<BooleanFormula> result) {
-    for (Tree<IFormula> subTree : asJavaIterable(tree.children()))
+    for (Tree<IFormula> subTree : asJavaIterable(tree.children())) {
       tree2List(subTree, result);
+    }
     result.add(mgr.encapsulateBooleanFormula(tree.d()));
   }
 }

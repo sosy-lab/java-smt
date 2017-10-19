@@ -59,8 +59,9 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     Preconditions.checkState(!closed);
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
     final int formulaId = addAssertedFormula(t);
-    if (computeUnsatCores)
+    if (computeUnsatCores) {
       api.setPartitionNumber(formulaId);
+    }
     addConstraint0(t);
     return null;
   }
@@ -68,16 +69,18 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed && computeUnsatCores);
-    final List<BooleanFormula> result = new ArrayList<BooleanFormula>();
+    final List<BooleanFormula> result = new ArrayList<>();
     final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
 
     int cnt = 0;
-    for (List<IExpression> formulas : assertedFormulas)
+    for (List<IExpression> formulas : assertedFormulas) {
       for (IExpression formula : formulas) {
-          if (core.contains(cnt))
+          if (core.contains(cnt)) {
             result.add(mgr.encapsulateBooleanFormula(formula));
+          }
           ++cnt;
       }
+    }
 
     return result;
   }
