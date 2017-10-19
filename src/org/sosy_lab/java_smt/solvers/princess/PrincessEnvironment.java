@@ -145,8 +145,10 @@ class PrincessEnvironment {
    * shared in all registered APIs.
    */
   PrincessAbstractProver<?, ?> getNewProver(
-      boolean useForInterpolation, boolean unsatCores,
-      PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
+      boolean useForInterpolation,
+      boolean unsatCores,
+      PrincessFormulaManager mgr,
+      PrincessFormulaCreator creator) {
 
     SimpleAPI newApi = getNewApi(useForInterpolation || unsatCores);
 

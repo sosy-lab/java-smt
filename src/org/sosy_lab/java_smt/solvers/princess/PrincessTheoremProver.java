@@ -75,10 +75,10 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     int cnt = 0;
     for (List<IExpression> formulas : assertedFormulas) {
       for (IExpression formula : formulas) {
-          if (core.contains(cnt)) {
-            result.add(mgr.encapsulateBooleanFormula(formula));
-          }
-          ++cnt;
+        if (core.contains(cnt)) {
+          result.add(mgr.encapsulateBooleanFormula(formula));
+        }
+        ++cnt;
       }
     }
 

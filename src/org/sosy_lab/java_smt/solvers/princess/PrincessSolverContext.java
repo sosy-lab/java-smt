@@ -74,10 +74,9 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     if (options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       throw new UnsupportedOperationException(
-        "Princess does not support unsat core generation with assumptions yet");
+          "Princess does not support unsat core generation with assumptions yet");
     }
-    final boolean unsatCores =
-      options.contains(ProverOptions.GENERATE_UNSAT_CORE);
+    final boolean unsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
     return new ReusableStackTheoremProver(
         (PrincessTheoremProver) creator.getEnv().getNewProver(false, unsatCores, manager, creator));
   }
