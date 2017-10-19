@@ -7,7 +7,7 @@
       <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 
       <description homepage="https://github.com/sosy-lab/java-smt">
-          Java wrapper for Z3, MathSAT5, SMTInterpol, Princess SMT solvers.
+          Java wrapper for Z3, MathSAT5, SMTInterpol, Princess, CVC4 SMT solvers.
       </description>
     </info>
 
@@ -24,9 +24,10 @@
         <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
         <conf name="runtime-princess" extends="core" description="only one solver included"/>
         <conf name="runtime-z3" extends="core" description="only one solver included"/>
+        <conf name="runtime-cvc4" extends="core" description="only one solver included"/>
 
         <!-- The normal dependencies with all solvers included. -->
-        <conf name="runtime" extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3" description="all solvers included"/>
+        <conf name="runtime" extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4" description="all solvers included"/>
 
         <!-- Dependencies needed for building or running tests. -->
         <conf name="test" visibility="private" description="for developing and testing"/>
@@ -124,6 +125,7 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.4.1" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.5.0-273-g899843b" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="custom1-1.5-prerelease" conf="runtime-cvc4->solver-cvc4" />
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.1.1"/>
