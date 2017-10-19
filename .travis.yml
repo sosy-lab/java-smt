@@ -30,7 +30,7 @@ matrix:
         - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
     - env: NAME='Check source-code format'
       script:
-        - ant format-source && git diff -s --exit-code
+        - ant format-source && git diff --exit-code
 deploy:
   - skip_cleanup: true
     provider: script
