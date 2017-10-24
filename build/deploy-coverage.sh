@@ -9,7 +9,8 @@ if ! [ -f "$COVERAGE_FILE" ] ; then
 fi
 
 # From https://github.com/codacy/codacy-coverage-reporter#travis-ci
-CODACY_COVERAGE_REPORTER_URL="$(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)"
+# The option --insecure might help against GitHub-API-issues, causing responses containing "null".
+CODACY_COVERAGE_REPORTER_URL="$(curl -k https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)"
 echo "Downloading Codacy Coverage Reporter from $CODACY_COVERAGE_REPORTER_URL"
 wget -O codacy-coverage-reporter-assembly-latest.jar "$CODACY_COVERAGE_REPORTER_URL"
 
