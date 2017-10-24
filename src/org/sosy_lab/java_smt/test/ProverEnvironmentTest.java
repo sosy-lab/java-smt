@@ -96,10 +96,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTest() throws Exception {
-    assume()
-        .withMessage("Princess does not support unsat core generation")
-        .that(solverToUse())
-        .isNotEqualTo(PRINCESS);
     try (ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));

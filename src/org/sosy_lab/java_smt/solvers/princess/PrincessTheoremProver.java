@@ -41,12 +41,16 @@ import scala.Option;
 class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     implements ProverEnvironment {
 
+  private final boolean computeUnsatCores;
+
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      boolean computeUnsatCores) {
     super(pMgr, creator, pApi, pShutdownNotifier);
+    this.computeUnsatCores = computeUnsatCores;
   }
 
   @Override
@@ -54,14 +58,31 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    assertedFormulas.peek().add(t);
+    final int formulaId = addAssertedFormula(t);
+    if (computeUnsatCores) {
+      api.setPartitionNumber(formulaId);
+    }
     addConstraint0(t);
     return null;
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException();
+    Preconditions.checkState(!closed && computeUnsatCores);
+    final List<BooleanFormula> result = new ArrayList<>();
+    final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
+
+    int cnt = 0;
+    for (List<IExpression> formulas : assertedFormulas) {
+      for (IExpression formula : formulas) {
+        if (core.contains(cnt)) {
+          result.add(mgr.encapsulateBooleanFormula(formula));
+        }
+        ++cnt;
+      }
+    }
+
+    return result;
   }
 
   @Override

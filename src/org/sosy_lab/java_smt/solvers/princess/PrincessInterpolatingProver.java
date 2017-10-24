@@ -23,6 +23,7 @@ import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.asScalaSet;
 
 import ap.SimpleAPI;
+import ap.basetypes.Tree;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -137,9 +138,48 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
-    throw new UnsupportedOperationException(
-        "Direct generation of tree interpolants is not supported.\n"
-            + "Use another solver or another strategy for interpolants.");
+      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) throws SolverException {
+    Preconditions.checkState(!closed);
+
+    // reconstruct the trees from the labels in post-order
+    final List<Tree<scala.collection.immutable.Set<Object>>> partTrees = new ArrayList<>();
+
+    for (int i = 0; i < partitionedFormulas.size(); ++i) {
+      final ArrayBuffer<Tree<scala.collection.immutable.Set<Object>>> children =
+          new ArrayBuffer<>();
+      for (int j = startOfSubTree[i]; j < i; ++j) {
+        if (partTrees.get(j) != null) {
+          children.$plus$eq(partTrees.get(j));
+          partTrees.set(j, null);
+        }
+      }
+
+      partTrees.add(new Tree<>(asScalaSet(partitionedFormulas.get(i)).toSet(), children.toList()));
+    }
+
+    final Tree<scala.collection.immutable.Set<Object>> partitions =
+        partTrees.get(partTrees.size() - 1);
+
+    final Tree<IFormula> itps;
+    try {
+      itps = api.getTreeInterpolant(partitions, api.getTreeInterpolant$default$2());
+    } catch (StackOverflowError e) {
+      // Princess is recursive and thus produces stack overflows on large formulas.
+      // Princess itself also catches StackOverflowError and returns "OutOfMemory" in checkSat(),
+      // so we can do the same for getInterpolants().
+      throw new SolverException(
+          "Princess ran out of stack memory, try increasing the stack size.", e);
+    }
+
+    final List<BooleanFormula> result = new ArrayList<>();
+    tree2List(itps, result);
+    return result;
+  }
+
+  private void tree2List(Tree<IFormula> tree, List<BooleanFormula> result) {
+    for (Tree<IFormula> subTree : asJavaIterable(tree.children())) {
+      tree2List(subTree, result);
+    }
+    result.add(mgr.encapsulateBooleanFormula(tree.d()));
   }
 }
