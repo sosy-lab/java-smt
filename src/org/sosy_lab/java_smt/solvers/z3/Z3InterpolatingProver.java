@@ -125,6 +125,9 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       List<Set<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    assert InterpolatingProverEnvironment.checkTreeStructure(
+        partitionedFormulas.size(), startOfSubTree);
+
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
     // build conjunction of each partition

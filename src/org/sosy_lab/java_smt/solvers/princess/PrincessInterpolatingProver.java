@@ -143,6 +143,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   public List<BooleanFormula> getTreeInterpolants(
       List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) throws SolverException {
     Preconditions.checkState(!closed);
+    assert InterpolatingProverEnvironment.checkTreeStructure(
+        partitionedFormulas.size(), startOfSubTree);
 
     // reconstruct the trees from the labels in post-order
     final Deque<Tree<scala.collection.immutable.Set<Object>>> stack = new ArrayDeque<>();

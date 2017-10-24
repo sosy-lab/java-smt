@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
@@ -120,4 +121,22 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    */
   boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
+
+  /** Checks for a valid subtree-structure. This code is taken from SMTinterpol. */
+  static boolean checkTreeStructure(int numOfPartitions, int[] startOfSubTree) {
+    Preconditions.checkArgument(
+        numOfPartitions == startOfSubTree.length,
+        "partitions and subtree table mus have equal length.");
+    for (int i = 0; i < numOfPartitions; i++) {
+      Preconditions.checkArgument(startOfSubTree[i] >= 0, "tree contains negative node.");
+      int j = i;
+      while (startOfSubTree[i] < j) {
+        j = startOfSubTree[j - 1];
+      }
+      Preconditions.checkArgument(startOfSubTree[i] == j, "invalid leaf of tree.");
+    }
+    Preconditions.checkArgument(startOfSubTree[numOfPartitions - 1] == 0, "invalid root of tree.");
+
+    return true;
+  }
 }

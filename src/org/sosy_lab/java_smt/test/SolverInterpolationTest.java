@@ -532,6 +532,147 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkImplies(stack, bmgr.and(itps.get(3), itps.get(4), R2), bmgr.makeBoolean(false));
   }
 
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
+  public <T> void treeInterpolation3() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula five = imgr.makeNumber(5);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+    IntegerFormula b = imgr.makeVariable("b" + i);
+    IntegerFormula c = imgr.makeVariable("c" + i);
+    IntegerFormula d = imgr.makeVariable("d" + i);
+    IntegerFormula e = imgr.makeVariable("e" + i);
+
+    // build formula:  1 = A = B = C = D+1 and D = E = 5
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, b);
+    BooleanFormula R1 = imgr.equal(b, c);
+    BooleanFormula C = imgr.equal(c, imgr.add(d, one));
+    BooleanFormula R2 = imgr.equal(d, e);
+    BooleanFormula D = imgr.equal(e, five);
+
+    Set<T> TB = Sets.newHashSet(stack.push(A), stack.push(B));
+    Set<T> TR1 = Sets.newHashSet(stack.push(R1));
+    Set<T> TC = Sets.newHashSet(stack.push(A), stack.push(C));
+    Set<T> TR2 = Sets.newHashSet(stack.push(R2));
+    Set<T> TD = Sets.newHashSet(stack.push(A), stack.push(D));
+
+    assertThat(stack).isUnsatisfiable();
+
+    // we build a simple tree:
+    // A+B A+C
+    //  | /
+    //  R1 A+D
+    //  | /
+    //  R2
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(
+            ImmutableList.of(TB, TC, TR1, TD, TR2), // post-order
+            new int[] {0, 1, 0, 3, 0}); // left-most node in current subtree
+
+    for (int j = 0; j < 6; j++) {
+      stack.pop(); // clear stack, such that we can re-use the solver
+    }
+
+    checkImplies(stack, bmgr.and(A, B), itps.get(0));
+    checkImplies(stack, bmgr.and(A, C), itps.get(1));
+    checkImplies(stack, bmgr.and(itps.get(0), itps.get(1), R1), itps.get(2));
+    checkImplies(stack, bmgr.and(A, D), itps.get(3));
+    checkImplies(stack, bmgr.and(itps.get(2), itps.get(3), R2), bmgr.makeBoolean(false));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    assertThat(stack).isUnsatisfiable();
+
+    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  public <T> void treeInterpolationMalFormed2() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    assertThat(stack).isUnsatisfiable();
+
+    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  public <T> void treeInterpolationMalFormed3() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    assertThat(stack).isUnsatisfiable();
+
+    stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    assertThat(stack).isUnsatisfiable();
+
+    stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    assertThat(stack).isUnsatisfiable();
+
+    stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    assertThat(stack).isUnsatisfiable();
+
+    stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
+  }
+
   private void checkItpSequence(
       InterpolatingProverEnvironment<?> stack,
       List<BooleanFormula> formulas,
