@@ -28,6 +28,7 @@ import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.TreeTraverser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -171,15 +172,14 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
           "Princess ran out of stack memory, try increasing the stack size.", e);
     }
 
-    final List<BooleanFormula> result = new ArrayList<>();
-    tree2List(itps, result);
-    return result;
+    return tree2List(itps);
   }
 
-  private void tree2List(Tree<IFormula> tree, List<BooleanFormula> result) {
-    for (Tree<IFormula> subTree : asJavaIterable(tree.children())) {
-      tree2List(subTree, result);
-    }
-    result.add(mgr.encapsulateBooleanFormula(tree.d()));
+  /** returns a post-order iteration of the tree. */
+  private List<BooleanFormula> tree2List(Tree<IFormula> tree) {
+    return TreeTraverser.<Tree<IFormula>>using(node -> asJavaIterable(node.children()))
+        .postOrderTraversal(tree)
+        .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
+        .toList();
   }
 }
