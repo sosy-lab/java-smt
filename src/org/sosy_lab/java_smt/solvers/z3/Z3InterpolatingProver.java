@@ -152,10 +152,10 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
       } else { // if (currentSubtree <= lastSubtree) {
         // merge-point in tree, several children at a node -> pop from stack and conjunct
-        final List<Long> children = new ArrayList<>();
+        final Deque<Long> children = new ArrayDeque<>();
         while (!stack.isEmpty() && currentSubtree <= stack.peek().getRootOfTree()) {
           // adding at front is important for tree-structure!
-          children.add(0, stack.pop().getInterpolationPoint());
+          children.addFirst(stack.pop().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
         conjunction = Native.mkAnd(z3context, children.size(), Longs.toArray(children));
