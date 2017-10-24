@@ -29,7 +29,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.TreeTraverser;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,27 +145,30 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     Preconditions.checkState(!closed);
 
     // reconstruct the trees from the labels in post-order
-    final List<Tree<scala.collection.immutable.Set<Object>>> partTrees = new ArrayList<>();
+    final Deque<Tree<scala.collection.immutable.Set<Object>>> stack = new ArrayDeque<>();
+    final Deque<Integer> subtreeStarts = new ArrayDeque<>();
 
     for (int i = 0; i < partitionedFormulas.size(); ++i) {
-      final ArrayBuffer<Tree<scala.collection.immutable.Set<Object>>> children =
-          new ArrayBuffer<>();
-      for (int j = startOfSubTree[i]; j < i; ++j) {
-        if (partTrees.get(j) != null) {
-          children.$plus$eq(partTrees.get(j));
-          partTrees.set(j, null);
-        }
+      Preconditions.checkState(stack.size() == subtreeStarts.size());
+      int start = startOfSubTree[i];
+      ArrayBuffer<Tree<scala.collection.immutable.Set<Object>>> children = new ArrayBuffer<>();
+      // while-loop: inner node -> merge children
+      // otherwise:  leaf-node  -> start new subtree, no children
+      while (!subtreeStarts.isEmpty() && start <= subtreeStarts.peek()) {
+        subtreeStarts.pop();
+        children.$plus$eq(stack.pop());
       }
-
-      partTrees.add(new Tree<>(asScalaSet(partitionedFormulas.get(i)).toSet(), children.toList()));
+      subtreeStarts.push(start);
+      stack.push(new Tree<>(asScalaSet(partitionedFormulas.get(i)).toSet(), children.toList()));
     }
 
-    final Tree<scala.collection.immutable.Set<Object>> partitions =
-        partTrees.get(partTrees.size() - 1);
+    Preconditions.checkState(subtreeStarts.peek() == 0, "subtree of root should start at 0.");
+    Tree<scala.collection.immutable.Set<Object>> root = stack.pop();
+    Preconditions.checkState(stack.isEmpty(), "root should be last element in stack.");
 
     final Tree<IFormula> itps;
     try {
-      itps = api.getTreeInterpolant(partitions, api.getTreeInterpolant$default$2());
+      itps = api.getTreeInterpolant(root, api.getTreeInterpolant$default$2());
     } catch (StackOverflowError e) {
       // Princess is recursive and thus produces stack overflows on large formulas.
       // Princess itself also catches StackOverflowError and returns "OutOfMemory" in checkSat(),
