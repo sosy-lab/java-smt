@@ -71,11 +71,11 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    * model after a sat-query returned {@link OptStatus#OPT}. For integer formulas, we expect the
    * optimal assignment.
    *
-   * <p><b>Example 1</b>: For the constraint 'x<10' with a real x, the upper bound of x is
-   * '10-epsilon' (epsilon can even be set to zero). The model can return the assignment x=9. To get
-   * an optimal assignment, query the solver with an additional constraint 'x == 10-epsilon'.
+   * <p>Example 1: For the constraint 'x&lt;10' with a real x, the upper bound of x is '10-epsilon'
+   * (epsilon can even be set to zero). The model can return the assignment x=9. To get an optimal
+   * assignment, query the solver with an additional constraint 'x == 10-epsilon'.
    *
-   * <p><b>Example 2</b>: For the constraint 'x<10' with a integer x, the upper bound of x is '9'
+   * <p>Example 2: For the constraint 'x&lt;10' with a integer x, the upper bound of x is '9'
    * (epsilon is irrelevant here and can be zero). The model returns the optimal assignment x=9.
    */
   @Override

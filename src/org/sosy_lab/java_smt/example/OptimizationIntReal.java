@@ -22,8 +22,8 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * Example for optimizing 'x' with the constraint '0 <= x < 10'. We show the difference between
- * optimizing in integer and rational logic.
+ * Example for optimizing 'x' with the constraint '0 &lt;= x &lt; 10'. We show the difference
+ * between optimizing in integer and rational logic.
  */
 public class OptimizationIntReal {
 
