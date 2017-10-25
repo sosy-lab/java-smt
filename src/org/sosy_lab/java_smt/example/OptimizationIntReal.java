@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class OptimizationIntReal {
 
   /** A correct value is determined in a region of size EPSILON around the real bound. */
-  private static Rational EPSILON = Rational.ofString("1/1000");
+  private static final Rational EPSILON = Rational.ofString("1/1000");
 
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
