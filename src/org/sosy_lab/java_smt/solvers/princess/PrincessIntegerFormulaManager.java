@@ -23,7 +23,7 @@ import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
-import ap.theories.BitShiftMultiplication;
+import ap.theories.nia.GroebnerMultiplication;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
@@ -82,29 +82,27 @@ class PrincessIntegerFormulaManager
 
   private IExpression modularCongruence0(IExpression pNumber1, IExpression pNumber2, ITerm n) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    ITerm x = subtract(pNumber1, pNumber2);
-    return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
+//    ITerm x = subtract(pNumber1, pNumber2);
+//    return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
+//  exists v0. pNumber1 - pNumber2 + v0*n == 0
+    ITerm diff = subtract(pNumber1, pNumber2);
+    ITerm sum = add(diff, multiply(IExpression.v(0), n));
+    return IExpression.ex(IExpression.eqZero(sum));
   }
 
   @Override
   public IExpression divide(IExpression pNumber1, IExpression pNumber2) {
-    return BitShiftMultiplication.eDiv((ITerm) pNumber1, (ITerm) pNumber2);
+    return GroebnerMultiplication.eDiv((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   public IExpression modulo(IExpression pNumber1, IExpression pNumber2) {
-    return BitShiftMultiplication.eMod((ITerm) pNumber1, (ITerm) pNumber2);
+    return GroebnerMultiplication.eMod((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   public IExpression multiply(IExpression pNumber1, IExpression pNumber2) {
-    IExpression result;
-    try {
-      result = ((ITerm) pNumber1).$times((ITerm) pNumber2);
-    } catch (IllegalArgumentException e) {
-      result = BitShiftMultiplication.mult((ITerm) pNumber1, (ITerm) pNumber2);
-    }
-    return result;
+    return GroebnerMultiplication.mult((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
