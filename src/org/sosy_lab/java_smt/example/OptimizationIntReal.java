@@ -30,6 +30,10 @@ public class OptimizationIntReal {
   /** A correct value is determined in a region of size EPSILON around the real bound. */
   private static final Rational EPSILON = Rational.ofString("1/1000");
 
+  private OptimizationIntReal() {
+    // never called
+  }
+
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
     Configuration config = Configuration.defaultConfiguration();

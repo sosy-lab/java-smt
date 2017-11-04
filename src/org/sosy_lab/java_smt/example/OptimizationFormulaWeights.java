@@ -26,6 +26,10 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class OptimizationFormulaWeights {
 
+  private OptimizationFormulaWeights() {
+    // never called
+  }
+
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
     Configuration config = Configuration.defaultConfiguration();
