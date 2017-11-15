@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
@@ -200,6 +201,22 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       boolean pSigned,
       FormulaType.FloatingPointType pTargetType,
       TFormulaInfo pRoundingMode);
+
+  @Override
+  public FloatingPointFormula fromIeeeBitvector(
+      BitvectorFormula pNumber, FloatingPointType pTargetType) {
+    return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
+  }
+
+  protected abstract TFormulaInfo fromIeeeBitvectorImpl(
+      TFormulaInfo pNumber, FloatingPointType pTargetType);
+
+  @Override
+  public BitvectorFormula toIeeeBitvector(FloatingPointFormula pNumber) {
+    return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
+  }
+
+  protected abstract TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {

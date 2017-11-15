@@ -204,6 +204,17 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
+  protected Long fromIeeeBitvectorImpl(Long pNumber, FloatingPointType pTargetType) {
+    return Mathsat5NativeApi.msat_make_fp_from_ieeebv(
+        mathsatEnv, pTargetType.getExponentSize(), pTargetType.getMantissaSize(), pNumber);
+  }
+
+  @Override
+  protected Long toIeeeBitvectorImpl(Long pNumber) {
+    return Mathsat5NativeApi.msat_make_fp_as_ieeebv(mathsatEnv, pNumber);
+  }
+
+  @Override
   public Long negate(Long pNumber) {
     return msat_make_fp_neg(mathsatEnv, pNumber);
   }

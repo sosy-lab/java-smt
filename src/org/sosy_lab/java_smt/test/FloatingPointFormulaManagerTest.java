@@ -407,6 +407,45 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void fpIeeeConversionTypes() throws Exception {
+    assume()
+        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
+    assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
+        .isEqualTo(FormulaType.getBitvectorTypeWithSize(32));
+  }
+
+  @Test
+  public void fpIeeeConversion() throws Exception {
+    assume()
+        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
+    assertThatFormula(
+            fpmgr.assignment(
+                var, fpmgr.fromIeeeBitvector(fpmgr.toIeeeBitvector(var), singlePrecType)))
+        .isTautological();
+  }
+
+  @Test
+  public void ieeeFpConversion() throws Exception {
+    assume()
+        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
+    assertThatFormula(
+            bvmgr.equal(var, fpmgr.toIeeeBitvector(fpmgr.fromIeeeBitvector(var, singlePrecType))))
+        .isTautological();
+  }
+
+  @Test
   public void fpModelValue() throws Exception {
     FloatingPointFormula zeroVar = fpmgr.makeVariable("zero", singlePrecType);
     BooleanFormula zeroEq = fpmgr.assignment(zeroVar, zero);
