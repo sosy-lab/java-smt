@@ -199,6 +199,11 @@ public abstract class FormulaType<T extends Formula> {
       return mantissaSize;
     }
 
+    /** Return the total size of a value of this type in bits. */
+    public int getTotalSize() {
+      return exponentSize + mantissaSize + 1;
+    }
+
     @Override
     public int hashCode() {
       return (31 + exponentSize) * 31 + mantissaSize;
