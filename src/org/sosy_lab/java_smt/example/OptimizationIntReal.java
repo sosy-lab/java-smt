@@ -54,7 +54,7 @@ public class OptimizationIntReal {
     // create solver context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment(); ) {
+        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager nmgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -77,7 +77,7 @@ public class OptimizationIntReal {
     // create solver context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment(); ) {
+        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       RationalFormulaManager nmgr = context.getFormulaManager().getRationalFormulaManager();

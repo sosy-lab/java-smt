@@ -39,7 +39,7 @@ public class OptimizationFormulaWeights {
 
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment(); ) {
+        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
