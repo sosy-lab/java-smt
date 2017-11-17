@@ -20,6 +20,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -789,6 +791,38 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(z_equal_3);
       env.push(z_equal_x_div_y);
       assertThat(env).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void bvInRange() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    assertThatFormula(
+            bvmgr.equal(
+                bvmgr.add(bvmgr.makeBitvector(4, 15), bvmgr.makeBitvector(4, -8)),
+                bvmgr.makeBitvector(4, 7)))
+        .isTautological();
+  }
+
+  @Test
+  public void bvOutOfRange() {
+    requireBitvectors();
+    assume()
+        .withMessage("TODO: Z3BitvectorFormulaManager does not correctly implement this")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    try {
+      bvmgr.makeBitvector(4, 32);
+      fail();
+    } catch (IllegalArgumentException expected) {
+    }
+
+    try {
+      bvmgr.makeBitvector(4, -9);
+      fail();
+    } catch (IllegalArgumentException expected) {
     }
   }
 }
