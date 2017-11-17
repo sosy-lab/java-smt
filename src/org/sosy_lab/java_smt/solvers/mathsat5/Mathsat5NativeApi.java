@@ -311,9 +311,13 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_times(long e, long t1, long t2);
 
+  public static native long msat_make_divide(long e, long t1, long t2);
+
   public static native long msat_make_floor(long e, long t);
 
   public static native long msat_make_number(long e, String num_rep);
+
+  public static native long msat_make_int_number(long e, int value);
 
   public static native long msat_make_int_modular_congruence(
       long e, String modulo, long t1, long t2);
@@ -337,6 +341,8 @@ class Mathsat5NativeApi {
   public static native long msat_make_int_from_sbv(long e, long t);
 
   public static native long msat_make_bv_number(long e, String numRep, int width, int base);
+
+  public static native long msat_make_bv_int_number(long e, int value, int width);
 
   public static native long msat_make_bv_concat(long e, long t1, long t2);
 
@@ -532,6 +538,8 @@ class Mathsat5NativeApi {
   public static native boolean msat_term_is_plus(long e, long t);
 
   public static native boolean msat_term_is_times(long e, long t);
+
+  public static native boolean msat_term_is_divide(long e, long t);
 
   public static native boolean msat_term_is_floor(long e, long t);
 
