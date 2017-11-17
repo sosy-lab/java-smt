@@ -61,9 +61,9 @@ The following features are supported:
     
 ### Multithreading Support
 
-All solvers except for MathSAT5 fully support multithreading, provided
-that different threads use different contexts, and _all_ operations on a
-single context are performed from a single thread.
+All solvers support multithreading (MathSAT only since JavaSMT 1.0.1-164-gd14ed28),
+provided that different threads use different contexts,
+and _all_ operations on a single context are performed from a single thread.
 Interruption using [ShutdownNotifier][] may be used to interrupt a
 a solver from any thread.
 
