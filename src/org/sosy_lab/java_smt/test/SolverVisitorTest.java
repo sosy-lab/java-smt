@@ -24,6 +24,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +37,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -84,6 +87,64 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             // we need a subclass, because the original class is 'abstract'
           };
       assertThatFormula(bmgr.visit(bf, identityVisitor)).isEqualTo(bf);
+    }
+  }
+
+  @Test
+  public void bitvectorIdVisit() {
+    requireBitvectors();
+    BitvectorType bv8 = BitvectorType.getBitvectorTypeWithSize(8);
+    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
+    BitvectorFormula y = bvmgr.makeVariable(bv8, "y");
+
+    for (Formula f :
+        ImmutableList.of(
+            bvmgr.add(x, y),
+            bvmgr.subtract(x, y),
+            bvmgr.multiply(x, y),
+            bvmgr.and(x, y),
+            bvmgr.or(x, y),
+            bvmgr.xor(x, y),
+            bvmgr.lessThan(x, y, true),
+            bvmgr.lessThan(x, y, false),
+            bvmgr.lessOrEquals(x, y, true),
+            bvmgr.lessOrEquals(x, y, false),
+            bvmgr.greaterThan(x, y, true),
+            bvmgr.greaterThan(x, y, false),
+            bvmgr.greaterOrEquals(x, y, true),
+            bvmgr.greaterOrEquals(x, y, false),
+            bvmgr.divide(x, y, true),
+            bvmgr.divide(x, y, false),
+            bvmgr.modulo(x, y, true),
+            bvmgr.modulo(x, y, false),
+            bvmgr.not(x),
+            bvmgr.negate(x),
+            bvmgr.extract(x, 7, 5, true),
+            bvmgr.extract(x, 7, 5, false),
+            bvmgr.concat(x, y))) {
+      FormulaVisitor<Formula> identityVisitor =
+          new DefaultFormulaVisitor<Formula>() {
+
+            @Override
+            public Formula visitFunction(
+                Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+              functionDeclaration.getKind();
+              Truth.assert_()
+                  .withMessage("unexpected kind of function '%s'.", functionDeclaration)
+                  .that(functionDeclaration.getKind())
+                  .isNotEqualTo(FunctionDeclarationKind.OTHER);
+              for (Formula arg : args) {
+                mgr.visit(arg, this);
+              }
+              return visitDefault(f);
+            }
+
+            @Override
+            protected Formula visitDefault(Formula pF) {
+              return pF;
+            }
+          };
+      assertThat(mgr.visit(f, identityVisitor)).isEqualTo(f);
     }
   }
 

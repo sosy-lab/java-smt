@@ -23,6 +23,24 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_WRITE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ADD;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_AND;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_CONCAT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_EXTRACT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_MUL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NEG;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NOT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_OR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SDIV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SREM;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SUB;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UDIV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
@@ -328,6 +346,44 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.SELECT;
       case MSAT_TAG_ARRAY_WRITE:
         return FunctionDeclarationKind.STORE;
+
+      case MSAT_TAG_BV_EXTRACT:
+        return FunctionDeclarationKind.BV_EXTRACT;
+      case MSAT_TAG_BV_CONCAT:
+        return FunctionDeclarationKind.BV_CONCAT;
+      case MSAT_TAG_BV_NOT:
+        return FunctionDeclarationKind.BV_NOT;
+      case MSAT_TAG_BV_NEG:
+        return FunctionDeclarationKind.BV_NEG;
+      case MSAT_TAG_BV_AND:
+        return FunctionDeclarationKind.BV_AND;
+      case MSAT_TAG_BV_OR:
+        return FunctionDeclarationKind.BV_OR;
+      case MSAT_TAG_BV_XOR:
+        return FunctionDeclarationKind.BV_XOR;
+      case MSAT_TAG_BV_ULT:
+        return FunctionDeclarationKind.BV_ULT;
+      case MSAT_TAG_BV_SLT:
+        return FunctionDeclarationKind.BV_SLT;
+      case MSAT_TAG_BV_ULE:
+        return FunctionDeclarationKind.BV_ULE;
+      case MSAT_TAG_BV_SLE:
+        return FunctionDeclarationKind.BV_SLE;
+      case MSAT_TAG_BV_ADD:
+        return FunctionDeclarationKind.BV_ADD;
+      case MSAT_TAG_BV_SUB:
+        return FunctionDeclarationKind.BV_SUB;
+      case MSAT_TAG_BV_MUL:
+        return FunctionDeclarationKind.BV_MUL;
+      case MSAT_TAG_BV_UDIV:
+        return FunctionDeclarationKind.BV_UDIV;
+      case MSAT_TAG_BV_SDIV:
+        return FunctionDeclarationKind.BV_SDIV;
+      case MSAT_TAG_BV_UREM:
+        return FunctionDeclarationKind.BV_UREM;
+      case MSAT_TAG_BV_SREM:
+        return FunctionDeclarationKind.BV_SREM;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }

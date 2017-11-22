@@ -499,6 +499,52 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
         // TODO: different handling for integer division?
         return FunctionDeclarationKind.DIV;
+
+      case Z3_OP_EXTRACT:
+        return FunctionDeclarationKind.BV_EXTRACT;
+      case Z3_OP_CONCAT:
+        return FunctionDeclarationKind.BV_CONCAT;
+      case Z3_OP_BNOT:
+        return FunctionDeclarationKind.BV_NOT;
+      case Z3_OP_BNEG:
+        return FunctionDeclarationKind.BV_NEG;
+      case Z3_OP_BAND:
+        return FunctionDeclarationKind.BV_AND;
+      case Z3_OP_BOR:
+        return FunctionDeclarationKind.BV_OR;
+      case Z3_OP_BXOR:
+        return FunctionDeclarationKind.BV_XOR;
+      case Z3_OP_ULT:
+        return FunctionDeclarationKind.BV_ULT;
+      case Z3_OP_SLT:
+        return FunctionDeclarationKind.BV_SLT;
+      case Z3_OP_ULEQ:
+        return FunctionDeclarationKind.BV_ULE;
+      case Z3_OP_SLEQ:
+        return FunctionDeclarationKind.BV_SLE;
+      case Z3_OP_UGT:
+        return FunctionDeclarationKind.BV_UGT;
+      case Z3_OP_SGT:
+        return FunctionDeclarationKind.BV_SGT;
+      case Z3_OP_UGEQ:
+        return FunctionDeclarationKind.BV_UGE;
+      case Z3_OP_SGEQ:
+        return FunctionDeclarationKind.BV_SGE;
+      case Z3_OP_BADD:
+        return FunctionDeclarationKind.BV_ADD;
+      case Z3_OP_BSUB:
+        return FunctionDeclarationKind.BV_SUB;
+      case Z3_OP_BMUL:
+        return FunctionDeclarationKind.BV_MUL;
+      case Z3_OP_BUDIV:
+        return FunctionDeclarationKind.BV_UDIV;
+      case Z3_OP_BSDIV:
+        return FunctionDeclarationKind.BV_SDIV;
+      case Z3_OP_BUREM:
+        return FunctionDeclarationKind.BV_UREM;
+      case Z3_OP_BSREM:
+        return FunctionDeclarationKind.BV_SREM;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }

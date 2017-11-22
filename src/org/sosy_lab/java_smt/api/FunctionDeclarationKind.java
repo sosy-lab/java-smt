@@ -93,6 +93,80 @@ public enum FunctionDeclarationKind {
   /** Unary comparison with zero. */
   GTE_ZERO,
 
+  // Simple bitvector operations
+
+  /** Extraction over bitvectors. */
+  BV_EXTRACT,
+
+  /** Concatenation over bitvectors. */
+  BV_CONCAT,
+
+  /** Bitwise negation of a bitvector. */
+  BV_NOT,
+
+  /** Negation of a bitvector. */
+  BV_NEG,
+
+  /** Bitwise OR over bitvectors. */
+  BV_OR,
+
+  /** Bitwise AND over bitvectors. */
+  BV_AND,
+
+  /** Bitwise XOR over bitvectors. */
+  BV_XOR,
+
+  /** Subtraction over bitvectors. */
+  BV_SUB,
+
+  /** Addition over bitvectors. */
+  BV_ADD,
+
+  /** Signed division over bitvectors. */
+  BV_SDIV,
+
+  /** Unsigned division over bitvectors. */
+  BV_UDIV,
+
+  /** Signed remainder over bitvectors. */
+  BV_SREM,
+
+  /** Unsigned remainder over bitvectors. */
+  BV_UREM,
+
+  /** Multiplication over bitvectors. */
+  BV_MUL,
+
+  /** Modulo operator over bitvectors. */
+  BV_MODULO,
+
+  /** Signed less-than over bitvectors. */
+  BV_ULT,
+
+  /** Unsigned less-than over bitvectors. */
+  BV_SLT,
+
+  /** Unsigned less-than-or-equal over bitvectors. */
+  BV_ULE,
+
+  /** Signed greater-than-or-equal over bitvectors. */
+  BV_SLE,
+
+  /** Signed greater-than over bitvectors. */
+  BV_UGT,
+
+  /** Unsigned greater-than over bitvectors. */
+  BV_SGT,
+
+  /** Unsigned greater-than-or-equal over bitvectors. */
+  BV_UGE,
+
+  /** Signed greater-than-or-equal over bitvectors. */
+  BV_SGE,
+
+  /** Equality over bitvectors. Binary equality is modeled with {@code IFF}. */
+  BV_EQ,
+
   /**
    * Solvers support a lot of different built-in theories. We enforce standardization only across a
    * small subset.
