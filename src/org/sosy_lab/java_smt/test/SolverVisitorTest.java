@@ -62,7 +62,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-      functionDeclaration.getKind();
       Truth.assert_()
           .withMessage(
               "unexpected declaration kind '%s' in function '%s' with args '%s'.",
