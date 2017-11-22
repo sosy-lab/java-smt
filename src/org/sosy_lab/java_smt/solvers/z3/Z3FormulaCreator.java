@@ -545,6 +545,39 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_OP_BSREM:
         return FunctionDeclarationKind.BV_SREM;
 
+      case Z3_OP_FPA_NEG:
+        return FunctionDeclarationKind.FP_NEG;
+      case Z3_OP_FPA_SUB:
+        return FunctionDeclarationKind.FP_SUB;
+      case Z3_OP_FPA_ADD:
+        return FunctionDeclarationKind.FP_ADD;
+      case Z3_OP_FPA_DIV:
+        return FunctionDeclarationKind.FP_DIV;
+      case Z3_OP_FPA_MUL:
+        return FunctionDeclarationKind.FP_MUL;
+      case Z3_OP_FPA_LT:
+        return FunctionDeclarationKind.FP_LT;
+      case Z3_OP_FPA_LE:
+        return FunctionDeclarationKind.FP_LE;
+      case Z3_OP_FPA_GE:
+        return FunctionDeclarationKind.FP_GE;
+      case Z3_OP_FPA_GT:
+        return FunctionDeclarationKind.FP_GT;
+      case Z3_OP_FPA_EQ:
+        return FunctionDeclarationKind.FP_EQ;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
+        return FunctionDeclarationKind.FP_ROUND_EVEN;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
+        return FunctionDeclarationKind.FP_ROUND_AWAY;
+      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
+        return FunctionDeclarationKind.FP_ROUND_POSITIVE;
+      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
+        return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
+      case Z3_OP_FPA_RM_TOWARD_ZERO:
+        return FunctionDeclarationKind.FP_ROUND_ZERO;
+      case Z3_OP_FPA_ROUND_TO_INTEGRAL:
+        return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }

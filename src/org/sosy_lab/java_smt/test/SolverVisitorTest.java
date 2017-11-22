@@ -39,8 +39,11 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -54,6 +57,29 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
+
+  private final class FunctionDeclarationVisitor extends DefaultFormulaVisitor<Formula> {
+    @Override
+    public Formula visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      functionDeclaration.getKind();
+      Truth.assert_()
+          .withMessage(
+              "unexpected declaration kind '%s' in function '%s' with args '%s'.",
+              functionDeclaration, f, args)
+          .that(functionDeclaration.getKind())
+          .isNotEqualTo(FunctionDeclarationKind.OTHER);
+      for (Formula arg : args) {
+        mgr.visit(arg, this);
+      }
+      return visitDefault(f);
+    }
+
+    @Override
+    protected Formula visitDefault(Formula pF) {
+      return pF;
+    }
+  }
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -99,6 +125,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (Formula f :
         ImmutableList.of(
+            bvmgr.equal(x, y),
             bvmgr.add(x, y),
             bvmgr.subtract(x, y),
             bvmgr.multiply(x, y),
@@ -122,29 +149,34 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             bvmgr.extract(x, 7, 5, true),
             bvmgr.extract(x, 7, 5, false),
             bvmgr.concat(x, y))) {
-      FormulaVisitor<Formula> identityVisitor =
-          new DefaultFormulaVisitor<Formula>() {
+      mgr.visit(f, new FunctionDeclarationVisitor());
+    }
+  }
 
-            @Override
-            public Formula visitFunction(
-                Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-              functionDeclaration.getKind();
-              Truth.assert_()
-                  .withMessage("unexpected kind of function '%s'.", functionDeclaration)
-                  .that(functionDeclaration.getKind())
-                  .isNotEqualTo(FunctionDeclarationKind.OTHER);
-              for (Formula arg : args) {
-                mgr.visit(arg, this);
-              }
-              return visitDefault(f);
-            }
+  @Test
+  public void floatIdVisit() {
+    requireFloats();
+    FloatingPointType fp = FloatingPointType.getSinglePrecisionFloatingPointType();
+    FloatingPointFormula x = fpmgr.makeVariable("x", fp);
+    FloatingPointFormula y = fpmgr.makeVariable("y", fp);
 
-            @Override
-            protected Formula visitDefault(Formula pF) {
-              return pF;
-            }
-          };
-      assertThat(mgr.visit(f, identityVisitor)).isEqualTo(f);
+    for (Formula f :
+        ImmutableList.of(
+            fpmgr.equalWithFPSemantics(x, y),
+            fpmgr.add(x, y),
+            fpmgr.subtract(x, y),
+            fpmgr.multiply(x, y),
+            fpmgr.lessThan(x, y),
+            fpmgr.lessOrEquals(x, y),
+            fpmgr.greaterThan(x, y),
+            fpmgr.greaterOrEquals(x, y),
+            fpmgr.divide(x, y),
+            fpmgr.round(x, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN),
+            // fpmgr.round(x, FloatingPointRoundingMode.NEAREST_TIES_AWAY),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_POSITIVE),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_NEGATIVE),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
     }
   }
 

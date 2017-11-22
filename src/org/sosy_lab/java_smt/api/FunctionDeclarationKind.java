@@ -167,6 +167,58 @@ public enum FunctionDeclarationKind {
   /** Equality over bitvectors. Binary equality is modeled with {@code IFF}. */
   BV_EQ,
 
+  // Simple floating point operations
+
+  /** Negation of a floating point. */
+  FP_NEG,
+
+  /** Subtraction over floating points. */
+  FP_SUB,
+
+  /** Addition over floating points. */
+  FP_ADD,
+
+  /** Division over floating points. */
+  FP_DIV,
+
+  /** Multiplication over floating points. */
+  FP_MUL,
+
+  /** Less-than over floating points. */
+  FP_LT,
+
+  /** Less-than-or-equal over floating points. */
+  FP_LE,
+
+  /** Greater-than-or-equal over floating points. */
+  FP_GE,
+
+  /** Greater-than over floating points. */
+  FP_GT,
+
+  /** Equal over floating points. */
+  FP_EQ,
+
+  /** Rounding over floating points. */
+  FP_ROUND_EVEN,
+
+  /** Rounding over floating points. */
+  FP_ROUND_AWAY,
+
+  /** Rounding over floating points. */
+  FP_ROUND_POSITIVE,
+
+  /** Rounding over floating points. */
+  FP_ROUND_NEGATIVE,
+
+  /** Rounding over floating points. */
+  FP_ROUND_ZERO,
+
+  /** Rounding over floating points. */
+  FP_ROUND_TO_INTEGRAL,
+
+  // default case
+
   /**
    * Solvers support a lot of different built-in theories. We enforce standardization only across a
    * small subset.
