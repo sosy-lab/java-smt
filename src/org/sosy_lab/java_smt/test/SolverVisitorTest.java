@@ -302,6 +302,22 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void recursiveTransformationVisitorTest2() throws Exception {
+    BooleanFormula f = imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1));
+    BooleanFormula transformed =
+        mgr.transformRecursively(
+            f,
+            new FormulaTransformationVisitor(mgr) {
+              @Override
+              public Formula visitFreeVariable(Formula f, String name) {
+                return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
+              }
+            });
+    assertThatFormula(transformed)
+        .isEquivalentTo(imgr.equal(imgr.makeVariable("y'"), imgr.makeNumber(1)));
+  }
+
+  @Test
   public void booleanRecursiveTraversalTest() throws Exception {
     BooleanFormula f =
         bmgr.or(
