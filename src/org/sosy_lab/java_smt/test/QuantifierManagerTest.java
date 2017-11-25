@@ -76,7 +76,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   private BooleanFormula forall_x_a_at_x_eq_0;
 
   @Before
-  public void setUp() throws SolverException, InterruptedException {
+  public void setUp() {
     assert amgr != null;
     requireArrays();
     requireQuantifiers();

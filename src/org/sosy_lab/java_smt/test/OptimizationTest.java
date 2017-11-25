@@ -62,7 +62,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Before
-  public void skipUnsupportedSolvers() throws SolverException, InterruptedException {
+  public void skipUnsupportedSolvers() {
     requireOptimization();
   }
 
