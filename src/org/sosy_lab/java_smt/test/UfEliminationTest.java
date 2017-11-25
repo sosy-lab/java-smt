@@ -64,7 +64,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   private UfElimination ackermannization;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     ackermannization = SolverUtils.ufElimination(mgr);
   }
 

@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 
 /** Testing formula serialization. */
 @RunWith(Parameterized.class)
@@ -74,7 +75,7 @@ public class TranslateFormulaTest {
   }
 
   @Before
-  public void initSolvers() throws Exception {
+  public void initSolvers() throws InvalidConfigurationException {
     Configuration empty = Configuration.builder().build();
     SolverContextFactory factory =
         new SolverContextFactory(empty, logger, ShutdownManager.create().getNotifier());
@@ -95,7 +96,7 @@ public class TranslateFormulaTest {
   }
 
   @After
-  public void close() throws Exception {
+  public void close() {
     if (from != null) {
       from.close();
     }
@@ -105,7 +106,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testDumpingAndParsing() throws Exception {
+  public void testDumpingAndParsing() throws SolverException, InterruptedException {
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
@@ -114,7 +115,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslating() throws Exception {
+  public void testTranslating() throws SolverException, InterruptedException {
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
 

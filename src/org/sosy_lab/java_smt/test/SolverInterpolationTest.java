@@ -70,7 +70,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public <T> void simpleInterpolation() throws Exception {
+  public <T> void simpleInterpolation() throws SolverException, InterruptedException {
     requireInterpolation();
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {

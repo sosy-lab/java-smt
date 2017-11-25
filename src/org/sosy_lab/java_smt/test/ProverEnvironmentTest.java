@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class ProverEnvironmentTest extends SolverBasedTest0 {
@@ -58,7 +59,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void assumptionsTest() throws Exception {
+  public void assumptionsTest() throws SolverException, InterruptedException {
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -73,7 +74,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void assumptionsWithModelTest() throws Exception {
+  public void assumptionsWithModelTest() throws SolverException, InterruptedException {
     assume()
         .withMessage("MathSAT can't construct models for SAT check with assumptions")
         .that(solver)
@@ -95,7 +96,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void unsatCoreTest() throws Exception {
+  public void unsatCoreTest() throws SolverException, InterruptedException {
     try (ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
@@ -111,7 +112,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void unsatCoreWithAssumptionsTest() throws Exception {
+  public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
         .withMessage("Princess and Mathsat5 do not support unsat core generation")
         .that(solverToUse())

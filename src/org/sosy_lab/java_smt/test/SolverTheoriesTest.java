@@ -67,7 +67,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void basicBoolTest() throws Exception {
+  public void basicBoolTest() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeBoolean(false);
     BooleanFormula c = bmgr.xor(a, b);
@@ -88,7 +88,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void basisRatTest() throws Exception {
+  public void basisRatTest() throws SolverException, InterruptedException {
     requireRationals();
 
     RationalFormula a = rmgr.makeVariable("int_c");
@@ -99,7 +99,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest1() throws Exception {
+  public void intTest1() throws SolverException, InterruptedException {
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula num = imgr.makeNumber(2);
 
@@ -108,7 +108,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest2() throws Exception {
+  public void intTest2() throws SolverException, InterruptedException {
     IntegerFormula a = imgr.makeVariable("int_b");
     IntegerFormula num = imgr.makeNumber(1);
 
@@ -117,7 +117,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest3_DivModLinear() throws Exception {
+  public void intTest3_DivModLinear() throws SolverException, InterruptedException {
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -158,7 +158,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest3_DivModNonLinear() throws Exception {
+  public void intTest3_DivModNonLinear() throws SolverException, InterruptedException {
     // not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
 
@@ -187,7 +187,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest3_DivMod_NegativeNumbersLinear() throws Exception {
+  public void intTest3_DivMod_NegativeNumbersLinear() throws SolverException, InterruptedException {
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -244,7 +244,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest3_DivMod_NegativeNumbersNonLinear() throws Exception {
+  public void intTest3_DivMod_NegativeNumbersNonLinear()
+      throws SolverException, InterruptedException {
     // TODO not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
 
@@ -275,7 +276,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTestBV_DivMod() throws Exception {
+  public void intTestBV_DivMod() throws SolverException, InterruptedException {
     requireBitvectors();
 
     BitvectorFormula a = bvmgr.makeVariable(32, "int_a");
@@ -320,7 +321,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTestBV_DivMod_NegativeNumbers() throws Exception {
+  public void intTestBV_DivMod_NegativeNumbers() throws SolverException, InterruptedException {
     requireBitvectors();
 
     BitvectorFormula a = bvmgr.makeVariable(32, "int_a");
@@ -378,7 +379,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest4_ModularCongruence_Simple() throws Exception {
+  public void intTest4_ModularCongruence_Simple() throws SolverException, InterruptedException {
     final IntegerFormula x = imgr.makeVariable("x");
     final BooleanFormula f1 = imgr.modularCongruence(x, imgr.makeNumber(0), 2);
     final BooleanFormula f2 = imgr.equal(x, imgr.makeNumber(1));
@@ -387,7 +388,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest4_ModularCongruence() throws Exception {
+  public void intTest4_ModularCongruence() throws SolverException, InterruptedException {
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -430,7 +431,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void intTest4_ModularCongruence_NegativeNumbers() throws Exception {
+  public void intTest4_ModularCongruence_NegativeNumbers()
+      throws SolverException, InterruptedException {
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -452,7 +454,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testHardCongruence() throws Exception {
+  public void testHardCongruence() throws SolverException, InterruptedException {
     IntegerFormula a, b, c;
     a = imgr.makeVariable("a");
     b = imgr.makeVariable("b");
@@ -489,7 +491,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void realTest() throws Exception {
+  public void realTest() throws SolverException, InterruptedException {
     requireRationals();
 
     RationalFormula a = rmgr.makeVariable("int_c");
@@ -500,7 +502,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void test_BitvectorIsZeroAfterShiftLeft() throws Exception {
+  public void test_BitvectorIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
     requireBitvectors();
 
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
@@ -572,7 +574,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void quantifierEliminationTest1() throws Exception {
+  public void quantifierEliminationTest1() throws SolverException, InterruptedException {
     requireQuantifiers();
 
     IntegerFormula var_B = imgr.makeVariable("b");
@@ -595,7 +597,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   @Ignore
-  public void quantifierEliminationTest2() throws Exception {
+  public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
 
     IntegerFormula i1 = imgr.makeVariable("i@1");
