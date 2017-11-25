@@ -104,6 +104,7 @@ public class OptimizationIntReal {
       OptStatus status = prover.check();
       assert status == OptStatus.OPT;
       Optional<Rational> lower = prover.lower(handleX, EPSILON);
+      assert lower.isPresent();
       logger.log(Level.INFO, "lower bound:", lower.get(), "with model:", prover.getModel());
     }
     prover.pop();
@@ -115,6 +116,7 @@ public class OptimizationIntReal {
       OptStatus status = prover.check();
       assert status == OptStatus.OPT;
       Optional<Rational> upper = prover.upper(handleX, EPSILON);
+      assert upper.isPresent();
       logger.log(Level.INFO, "upper bound:", upper.get(), "with model:", prover.getModel());
     }
     prover.pop();
