@@ -151,9 +151,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       throws Exception {
     FloatingPointFormula doubleNumber = fpmgr.makeNumber(value, type);
     FloatingPointFormula stringNumber = fpmgr.makeNumber(Double.toString(value), type);
-    FloatingPointFormula bigDecimalNumber = fpmgr.makeNumber(new BigDecimal(value), type);
+    FloatingPointFormula bigDecimalNumber = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     FloatingPointFormula rationalNumber =
-        fpmgr.makeNumber(Rational.ofBigDecimal(new BigDecimal(value)), type);
+        fpmgr.makeNumber(Rational.ofBigDecimal(BigDecimal.valueOf(value)), type);
 
     BooleanFormula eq1 = fpmgr.equalWithFPSemantics(doubleNumber, stringNumber);
     BooleanFormula eq2 = fpmgr.equalWithFPSemantics(doubleNumber, bigDecimalNumber);
