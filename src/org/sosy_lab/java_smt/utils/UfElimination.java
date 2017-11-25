@@ -149,7 +149,7 @@ public class UfElimination {
 
     int depth = getNestingDepthOfUfs(f);
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = findUFs(f);
-    ufs = merge(ufs, pOtherResult);
+    merge(ufs, pOtherResult);
 
     ImmutableMap.Builder<Formula, Formula> substitutionsBuilder = ImmutableMap.builder();
     List<BooleanFormula> extraConstraints = new ArrayList<>();
@@ -201,7 +201,7 @@ public class UfElimination {
     return new Result(formulaWithoutUFs, constraints, allSubstitutions, copyOf(ufs));
   }
 
-  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> merge(
+  private void merge(
       Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs,
       Result pPreviousResult) {
     for (Entry<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufInOtherFormula :
@@ -210,7 +210,6 @@ public class UfElimination {
         pUfs.put(ufInOtherFormula.getKey(), ufInOtherFormula.getValue());
       }
     }
-    return pUfs;
   }
 
   @SuppressWarnings("unchecked")
