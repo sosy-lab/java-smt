@@ -89,7 +89,7 @@ class IntegerTheoryFuzzer {
   }
 
   private IntegerFormula getConstant() {
-    return ifmgr.makeNumber(r.nextInt(2 * maxConstant) - maxConstant);
+    return ifmgr.makeNumber((long) r.nextInt(2 * maxConstant) - maxConstant);
   }
 
   private IntegerFormula getVar() {
