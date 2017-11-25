@@ -62,12 +62,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    TFormulaInfo out = roundingModes.get(pFloatingPointRoundingMode);
-    if (out == null) {
-      out = getRoundingModeImpl(pFloatingPointRoundingMode);
-      roundingModes.put(pFloatingPointRoundingMode, out);
-    }
-    return out;
+    return roundingModes.computeIfAbsent(pFloatingPointRoundingMode, this::getRoundingModeImpl);
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
