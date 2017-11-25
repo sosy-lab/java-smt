@@ -19,15 +19,11 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.truth.FailureMetadata;
-import com.google.common.truth.Subject;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -258,20 +254,5 @@ public abstract class SolverBasedTest0 {
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
     return assertThat(prover);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  protected final JavaOptionalSubject assertThatOptional(Optional<?> pOptional) {
-    return assert_()
-        .about(
-            new Subject.Factory<JavaOptionalSubject, Optional<?>>() {
-              @Override
-              public JavaOptionalSubject createSubject(
-                  FailureMetadata pMetadata, Optional<?> pOptional) {
-                return new JavaOptionalSubject(pMetadata, pOptional);
-              }
-            })
-        .that(pOptional);
   }
 }
