@@ -6,6 +6,8 @@ addons:
     packages:
       - oracle-java8-installer
       - jq
+  sonarcloud:
+    organization: 'java-smt'
 env:
   global:
     - GH_REF: github.com/sosy-lab/java-smt.git
@@ -31,6 +33,9 @@ matrix:
     - env: NAME='Check source-code format'
       script:
         - ant format-source && git diff --exit-code
+    - env: NAME='SonarCube'
+      script:
+        - sonar-scanner
 deploy:
   - skip_cleanup: true
     provider: script
@@ -50,3 +55,4 @@ git:
 cache:
   directories:
   - $HOME/.ivy2
+  - $HOME/.sonar/cache
