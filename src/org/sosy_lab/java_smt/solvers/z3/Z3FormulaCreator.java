@@ -544,6 +544,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_UREM;
       case Z3_OP_BSREM:
         return FunctionDeclarationKind.BV_SREM;
+      case Z3_OP_BSHL:
+        return FunctionDeclarationKind.BV_SHL;
+      case Z3_OP_BLSHR:
+        return FunctionDeclarationKind.BV_LSHR;
+      case Z3_OP_BASHR:
+        return FunctionDeclarationKind.BV_ASHR;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;

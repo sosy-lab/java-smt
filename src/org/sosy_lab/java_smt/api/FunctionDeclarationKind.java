@@ -137,9 +137,6 @@ public enum FunctionDeclarationKind {
   /** Multiplication over bitvectors. */
   BV_MUL,
 
-  /** Modulo operator over bitvectors. */
-  BV_MODULO,
-
   /** Signed less-than over bitvectors. */
   BV_ULT,
 
@@ -166,6 +163,15 @@ public enum FunctionDeclarationKind {
 
   /** Equality over bitvectors. Binary equality is modeled with {@code IFF}. */
   BV_EQ,
+
+  /** Logical left-shift over bitvectors (fill from right with zeroes). */
+  BV_SHL,
+
+  /** Logical right-shift over bitvectors (fill from left with zeroes). */
+  BV_LSHR,
+
+  /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
+  BV_ASHR,
 
   // Simple floating point operations
 
