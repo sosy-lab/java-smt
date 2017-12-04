@@ -2,7 +2,6 @@ package org.sosy_lab.java_smt.example;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -99,8 +98,11 @@ public class OptimizationFormulaWeights {
 
     // for integer theory we get the optimal solution directly as model.
     // ideal solution: sum=32 with e.g. x=0,y=6,z=4  or  x=0,y=7,z=3  or  x=0,y=8,z=2 ...
-    Optional<Rational> sum = prover.upper(handle, Rational.ZERO);
-    assert sum.isPresent();
-    logger.log(Level.INFO, "maximal sum ", sum.get(), "with model", prover.getModel());
+    logger.log(
+        Level.INFO,
+        "maximal sum ",
+        prover.upper(handle, Rational.ZERO).get(),
+        "with model",
+        prover.getModel());
   }
 }
