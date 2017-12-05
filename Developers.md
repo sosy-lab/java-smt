@@ -17,7 +17,7 @@ for more information.
 
 We rely on [Travis][] continuous
 integration, which picks up code style violations, compile warnings for both
-ECJ and javac, and [FindBugs](http://findbugs.sourceforge.net/) errors.
+ECJ and javac, and [SpotBugs](https://github.com/spotbugs/spotbugs) errors.
 
 ## Releasing JavaSMT
 
