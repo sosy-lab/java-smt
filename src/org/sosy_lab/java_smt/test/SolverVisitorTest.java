@@ -216,12 +216,12 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     FormulaVisitor<TraversalProcess> nameExtractor =
         new DefaultFormulaVisitor<TraversalProcess>() {
           @Override
-          protected TraversalProcess visitDefault(Formula f) {
+          protected TraversalProcess visitDefault(Formula formula) {
             return TraversalProcess.CONTINUE;
           }
 
           @Override
-          public TraversalProcess visitFreeVariable(Formula f, String name) {
+          public TraversalProcess visitFreeVariable(Formula formula, String name) {
             usedVariables.add(name);
             return TraversalProcess.CONTINUE;
           }
@@ -321,8 +321,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             f,
             new FormulaTransformationVisitor(mgr) {
               @Override
-              public Formula visitFreeVariable(Formula f, String name) {
-                return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
+              public Formula visitFreeVariable(Formula formula, String name) {
+                return mgr.makeVariable(mgr.getFormulaType(formula), name + "'");
               }
             });
     assertThatFormula(transformed)
@@ -341,8 +341,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             f,
             new FormulaTransformationVisitor(mgr) {
               @Override
-              public Formula visitFreeVariable(Formula f, String name) {
-                return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
+              public Formula visitFreeVariable(Formula formula, String name) {
+                return mgr.makeVariable(mgr.getFormulaType(formula), name + "'");
               }
             });
     assertThatFormula(transformed)

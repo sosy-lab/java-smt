@@ -264,9 +264,9 @@ public class UfElimination {
     return result.get();
   }
 
-  private int getNestingDepthOfUfs(Formula f) {
+  private int getNestingDepthOfUfs(Formula pFormula) {
     return fmgr.visit(
-        f,
+        pFormula,
         new DefaultFormulaVisitor<Integer>() {
 
           @Override
@@ -298,11 +298,12 @@ public class UfElimination {
         });
   }
 
-  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> findUFs(Formula f) {
+  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> findUFs(
+      Formula pFormula) {
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = HashMultimap.create();
 
     fmgr.visitRecursively(
-        f,
+        pFormula,
         new DefaultFormulaVisitor<TraversalProcess>() {
 
           @Override
