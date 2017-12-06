@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -118,7 +119,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void bitvectorIdVisit() {
     requireBitvectors();
-    BitvectorType bv8 = BitvectorType.getBitvectorTypeWithSize(8);
+    BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     BitvectorFormula y = bvmgr.makeVariable(bv8, "y");
 
@@ -155,7 +156,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void floatIdVisit() {
     requireFloats();
-    FloatingPointType fp = FloatingPointType.getSinglePrecisionFloatingPointType();
+    FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
     FloatingPointFormula x = fpmgr.makeVariable("x", fp);
     FloatingPointFormula y = fpmgr.makeVariable("y", fp);
 

@@ -108,7 +108,7 @@ class PrincessModel
     while (it1.hasNext()) {
       Tuple2<ModelLocation, ModelValue> entry = it1.next();
       if (entry._1 instanceof ConstantLoc) {
-        ITerm maybeArray = ITerm.i(((ConstantLoc) entry._1).c());
+        ITerm maybeArray = IExpression.i(((ConstantLoc) entry._1).c());
         if (creator.getEnv().hasArrayType(maybeArray) && entry._2 instanceof IntValue) {
           arrays.put(((IntValue) entry._2).v(), maybeArray);
         }
@@ -127,7 +127,7 @@ class PrincessModel
       return new ValueAssignment(fKey, key.toString(), fValue, Collections.emptyList());
 
     } else if (key instanceof ConstantLoc) {
-      ITerm term = ITerm.i(((ConstantLoc) key).c());
+      ITerm term = IExpression.i(((ConstantLoc) key).c());
       if (creator.getEnv().hasArrayType(term)) {
         // array-access, for explanation see #getArrayAddresses
         return null;
@@ -145,7 +145,8 @@ class PrincessModel
         IdealInt arrayIndex = cKey.args().apply(1);
         ITerm arrayF = arrays.get(arrayId);
         Formula select =
-            creator.encapsulateWithTypeOf(creator.getEnv().makeSelect(arrayF, ITerm.i(arrayIndex)));
+            creator.encapsulateWithTypeOf(
+                creator.getEnv().makeSelect(arrayF, IExpression.i(arrayIndex)));
         return new ValueAssignment(
             select, arrayF.toString(), fValue, Collections.singleton(arrayIndex.bigIntValue()));
 
@@ -160,7 +161,8 @@ class PrincessModel
         IdealInt arrayContent = cKey.args().apply(2);
         ITerm arrayF = arrays.get(arrayId);
         Formula select =
-            creator.encapsulateWithTypeOf(creator.getEnv().makeSelect(arrayF, ITerm.i(arrayIndex)));
+            creator.encapsulateWithTypeOf(
+                creator.getEnv().makeSelect(arrayF, IExpression.i(arrayIndex)));
         return new ValueAssignment(
             select,
             arrayF.toString(),
@@ -173,7 +175,7 @@ class PrincessModel
         List<ITerm> argTerms = new ArrayList<>();
         for (IdealInt arg : seqAsJavaList(cKey.args())) {
           argumentInterpretation.add(arg.bigIntValue());
-          argTerms.add(ITerm.i(arg));
+          argTerms.add(IExpression.i(arg));
         }
         Formula fKey =
             creator.encapsulateWithTypeOf(new IFunApp(cKey.f(), asScalaBuffer(argTerms)));

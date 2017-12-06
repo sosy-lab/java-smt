@@ -41,7 +41,6 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.NumeralType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -636,7 +635,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     requireArrays();
     ArrayFormula<IntegerFormula, IntegerFormula> _arrayVar =
-        amgr.makeArray("b", NumeralType.IntegerType, NumeralType.IntegerType);
+        amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
     assertThat(mgr.getFormulaType(_arrayVar)).isInstanceOf(FormulaType.ArrayFormulaType.class);
   }
 
@@ -649,7 +648,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     IntegerFormula _i_plus_1 = imgr.add(_i, _1);
 
     ArrayFormula<IntegerFormula, IntegerFormula> _b =
-        amgr.makeArray("b", NumeralType.IntegerType, NumeralType.IntegerType);
+        amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula _b_at_i_plus_1 = amgr.select(_b, _i_plus_1);
 
     if (solver == Solvers.MATHSAT5) {
@@ -694,8 +693,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, RationalFormula>> multi =
         amgr.makeArray(
             "multi",
-            NumeralType.IntegerType,
-            FormulaType.getArrayType(NumeralType.IntegerType, NumeralType.RationalType));
+            FormulaType.IntegerType,
+            FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.RationalType));
 
     RationalFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
 
@@ -716,9 +715,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, BitvectorFormula>> multi =
         amgr.makeArray(
             "multi",
-            NumeralType.IntegerType,
+            FormulaType.IntegerType,
             FormulaType.getArrayType(
-                NumeralType.IntegerType, FormulaType.getBitvectorTypeWithSize(32)));
+                FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(32)));
 
     BitvectorFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
 
