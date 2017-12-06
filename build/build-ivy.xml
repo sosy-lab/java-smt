@@ -80,12 +80,6 @@
             <replacetoken>sosy_lab</replacetoken>
             <replacevalue>sosy-lab</replacevalue>
         </replace>
-
-        <!-- SMTInterpol is temporarily published under our own namespace -->
-        <replace file="pom.xml">
-            <replacetoken>de.uni-freiburg.informatik.ultimate</replacetoken>
-            <replacevalue>org.sosy-lab</replacevalue>
-        </replace>
     </target>
 
 </project>
