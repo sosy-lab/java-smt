@@ -5,14 +5,14 @@ rm -rf gh-pages || true
 mkdir -p gh-pages/api
 cp -r website/* gh-pages
 cp -r Javadoc/* gh-pages/api
-cp bin/org/sosy_lab/java_smt/ConfigurationOptions.txt gh-pages/
+find bin -name ConfigurationOptions.txt -exec cp {} gh-pages/ \;
+
+# we need to tell git who we are
+git config --global user.name "${GIT_NAME}"
+git config --global user.email "${GIT_EMAIL}"
 
 cd gh-pages
 git init
-
-# inside this git repo we'll pretend to be a new user
-git config user.name "${GIT_NAME}"
-git config user.email "${GIT_EMAIL2}"
 
 # The first and only commit to this new Git repo contains all the
 # files present with the commit message "Deploy to GitHub Pages".

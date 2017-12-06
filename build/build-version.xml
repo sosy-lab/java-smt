@@ -4,10 +4,13 @@
 
     <!-- Targets for determining the version number based on the version-control revision. -->
 
-    <target name="determine-version">
+    <!-- Keep this file synchronized between SoSy-Lab Java-Common-Lib and JavaSMT. -->
+
+    <target name="determine-version" unless="version">
         <exec executable="git"
                 outputproperty="version"
-                failonerror="true">
+                failonerror="true"
+                logerror="true">
             <arg value="describe"/>
             <arg value="--always"/>
             <arg value="--dirty"/>

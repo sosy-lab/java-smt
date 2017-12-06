@@ -93,6 +93,8 @@
       <property name="tokens" value="BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,LAND,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,TYPE_EXTENSION_AND"/>
       <property name="allowEmptyConstructors" value="true"/>
       <property name="allowEmptyMethods" value="true"/>
+      <property name="allowEmptyTypes" value="true"/>
+      <property name="allowEmptyLambdas" value="true"/>
       <property name="ignoreEnhancedForColon" value="false"/>
     </module>
     <module name="NoWhitespaceBefore">
@@ -126,7 +128,6 @@
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>
-    <module name="MissingSwitchDefault"/>
     <module name="MultipleVariableDeclarations"/>
     <module name="NoClone"/>
     <module name="NoFinalizer"/>
@@ -181,7 +182,6 @@
   <module name="Header">
     <property name="header" value="/*\n *  JavaSMT is an API wrapper for a collection of SMT solvers.\n *  This file is part of JavaSMT.\n *\n *  Copyright (C) 2007-2015  Dirk Beyer\n *  All rights reserved.\n *\n *  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);\n *  you may not use this file except in compliance with the License.\n *  You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n *  Unless required by applicable law or agreed to in writing, software\n *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,\n *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n *  See the License for the specific language governing permissions and\n *  limitations under the License.\n */"/>
     <property name="severity" value="ignore"/>
-    <property name="ignoreLines" value="5"/>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
