@@ -454,10 +454,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testHardCongruence() throws SolverException, InterruptedException {
-    IntegerFormula a, b, c;
-    a = imgr.makeVariable("a");
-    b = imgr.makeVariable("b");
-    c = imgr.makeVariable("c");
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula c = imgr.makeVariable("c");
     List<BooleanFormula> constraints = new ArrayList<>();
     Random r = new Random(42);
     int bitSize = 8;
