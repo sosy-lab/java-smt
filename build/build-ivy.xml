@@ -67,19 +67,4 @@
         <ivy:resolve conf="contrib" log="download-only"/>
         <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
     </target>
-
-    <target name="gen-pom" depends="load-ivy, determine-version" description="Generate a POM file from Ivy metadata">
-        <property name="ivy.pom.version" value="${version}"/>
-
-        <ivy:makepom ivyfile="${ivy.dep.file}" pomfile="pom.xml" conf="core,runtime-z3,runtime-smtinterpol" templatefile="pom_template.xml">
-            <mapping conf="core,runtime-smtinterpol" scope="compile"/>
-        </ivy:makepom>
-
-        <!-- Maven group is "sosy-lab", not "sosy_lab"-->
-        <replace file="pom.xml">
-            <replacetoken>sosy_lab</replacetoken>
-            <replacevalue>sosy-lab</replacevalue>
-        </replace>
-    </target>
-
 </project>
