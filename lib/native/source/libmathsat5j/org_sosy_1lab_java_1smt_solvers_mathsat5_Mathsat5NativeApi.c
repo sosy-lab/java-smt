@@ -372,6 +372,7 @@ make_term_binary(eq)
 make_term_binary(leq)
 make_term_binary(plus)
 make_term_binary(times)
+make_term_binary(divide)
 
 DEFINE_FUNC(jterm, 1make_1int_1modular_1congruence) WITH_FOUR_ARGS(jenv, string, jterm, jterm)
 ENV_ARG(1)
@@ -393,6 +394,12 @@ ENV_ARG(1)
 STRING_ARG(2)
 CALL2(msat_term, make_number)
 FREE_STRING_ARG(2)
+TERM_RETURN
+
+DEFINE_FUNC(jterm, 1make_1int_1number) WITH_TWO_ARGS(jenv, int)
+ENV_ARG(1)
+SIMPLE_ARG(int, 2)
+CALL2(msat_term, make_int_number)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1make_1term_1ite) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
@@ -466,6 +473,13 @@ SIMPLE_ARG(size_t, 3)
 SIMPLE_ARG(size_t, 4)
 CALL4(msat_term, make_bv_number)
 FREE_STRING_ARG(2)
+TERM_RETURN
+
+DEFINE_FUNC(jterm, 1make_1bv_1int_1number) WITH_THREE_ARGS(jenv, int, int)
+ENV_ARG(1)
+SIMPLE_ARG(int, 2)
+SIMPLE_ARG(size_t, 3)
+CALL3(msat_term, make_bv_int_number)
 TERM_RETURN
 
 #define make_term_bv_binary(name) \
@@ -735,6 +749,7 @@ func2_term_is(equal, 1equal)
 func2_term_is(leq, 1leq)
 func2_term_is(plus, 1plus)
 func2_term_is(times, 1times)
+func2_term_is(divide, 1divide)
 
 func2_term_is(floor, 1floor)
 func2_term_is(array_read, 1array_1read)

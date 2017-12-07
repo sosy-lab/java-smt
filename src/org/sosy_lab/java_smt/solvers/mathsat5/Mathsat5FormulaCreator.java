@@ -23,13 +23,44 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_WRITE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ADD;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_AND;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ASHR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_CONCAT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_EXTRACT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_LSHL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_LSHR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_MUL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NEG;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NOT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_OR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SDIV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SREM;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SUB;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UDIV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ADD;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_DIV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_EQ;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LE;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MUL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_NEG;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ROUND_TO_INT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SUB;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
@@ -328,6 +359,84 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.SELECT;
       case MSAT_TAG_ARRAY_WRITE:
         return FunctionDeclarationKind.STORE;
+
+      case MSAT_TAG_BV_EXTRACT:
+        return FunctionDeclarationKind.BV_EXTRACT;
+      case MSAT_TAG_BV_CONCAT:
+        return FunctionDeclarationKind.BV_CONCAT;
+      case MSAT_TAG_BV_NOT:
+        return FunctionDeclarationKind.BV_NOT;
+      case MSAT_TAG_BV_NEG:
+        return FunctionDeclarationKind.BV_NEG;
+      case MSAT_TAG_BV_AND:
+        return FunctionDeclarationKind.BV_AND;
+      case MSAT_TAG_BV_OR:
+        return FunctionDeclarationKind.BV_OR;
+      case MSAT_TAG_BV_XOR:
+        return FunctionDeclarationKind.BV_XOR;
+      case MSAT_TAG_BV_ULT:
+        return FunctionDeclarationKind.BV_ULT;
+      case MSAT_TAG_BV_SLT:
+        return FunctionDeclarationKind.BV_SLT;
+      case MSAT_TAG_BV_ULE:
+        return FunctionDeclarationKind.BV_ULE;
+      case MSAT_TAG_BV_SLE:
+        return FunctionDeclarationKind.BV_SLE;
+      case MSAT_TAG_BV_ADD:
+        return FunctionDeclarationKind.BV_ADD;
+      case MSAT_TAG_BV_SUB:
+        return FunctionDeclarationKind.BV_SUB;
+      case MSAT_TAG_BV_MUL:
+        return FunctionDeclarationKind.BV_MUL;
+      case MSAT_TAG_BV_UDIV:
+        return FunctionDeclarationKind.BV_UDIV;
+      case MSAT_TAG_BV_SDIV:
+        return FunctionDeclarationKind.BV_SDIV;
+      case MSAT_TAG_BV_UREM:
+        return FunctionDeclarationKind.BV_UREM;
+      case MSAT_TAG_BV_SREM:
+        return FunctionDeclarationKind.BV_SREM;
+      case MSAT_TAG_BV_LSHL:
+        return FunctionDeclarationKind.BV_SHL;
+      case MSAT_TAG_BV_LSHR:
+        return FunctionDeclarationKind.BV_LSHR;
+      case MSAT_TAG_BV_ASHR:
+        return FunctionDeclarationKind.BV_ASHR;
+
+      case MSAT_TAG_FP_NEG:
+        return FunctionDeclarationKind.FP_NEG;
+      case MSAT_TAG_FP_ADD:
+        return FunctionDeclarationKind.FP_ADD;
+      case MSAT_TAG_FP_SUB:
+        return FunctionDeclarationKind.FP_SUB;
+      case MSAT_TAG_FP_DIV:
+        return FunctionDeclarationKind.FP_DIV;
+      case MSAT_TAG_FP_MUL:
+        return FunctionDeclarationKind.FP_MUL;
+      case MSAT_TAG_FP_LT:
+        return FunctionDeclarationKind.FP_LT;
+      case MSAT_TAG_FP_LE:
+        return FunctionDeclarationKind.FP_LE;
+      case MSAT_TAG_FP_EQ:
+        return FunctionDeclarationKind.FP_EQ;
+      case MSAT_TAG_FP_ROUND_TO_INT:
+        return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
+
+      case MSAT_TAG_UNKNOWN:
+        switch (msat_decl_get_name(decl)) {
+          case "`fprounding_even`":
+            return FunctionDeclarationKind.FP_ROUND_EVEN;
+          case "`fprounding_plus_inf`":
+            return FunctionDeclarationKind.FP_ROUND_POSITIVE;
+          case "`fprounding_minus_inf`":
+            return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
+          case "`fprounding_zero`":
+            return FunctionDeclarationKind.FP_ROUND_ZERO;
+
+          default:
+            return FunctionDeclarationKind.OTHER;
+        }
+
       default:
         return FunctionDeclarationKind.OTHER;
     }

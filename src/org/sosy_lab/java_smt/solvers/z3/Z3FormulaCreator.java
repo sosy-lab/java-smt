@@ -499,6 +499,91 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
         // TODO: different handling for integer division?
         return FunctionDeclarationKind.DIV;
+
+      case Z3_OP_EXTRACT:
+        return FunctionDeclarationKind.BV_EXTRACT;
+      case Z3_OP_CONCAT:
+        return FunctionDeclarationKind.BV_CONCAT;
+      case Z3_OP_BNOT:
+        return FunctionDeclarationKind.BV_NOT;
+      case Z3_OP_BNEG:
+        return FunctionDeclarationKind.BV_NEG;
+      case Z3_OP_BAND:
+        return FunctionDeclarationKind.BV_AND;
+      case Z3_OP_BOR:
+        return FunctionDeclarationKind.BV_OR;
+      case Z3_OP_BXOR:
+        return FunctionDeclarationKind.BV_XOR;
+      case Z3_OP_ULT:
+        return FunctionDeclarationKind.BV_ULT;
+      case Z3_OP_SLT:
+        return FunctionDeclarationKind.BV_SLT;
+      case Z3_OP_ULEQ:
+        return FunctionDeclarationKind.BV_ULE;
+      case Z3_OP_SLEQ:
+        return FunctionDeclarationKind.BV_SLE;
+      case Z3_OP_UGT:
+        return FunctionDeclarationKind.BV_UGT;
+      case Z3_OP_SGT:
+        return FunctionDeclarationKind.BV_SGT;
+      case Z3_OP_UGEQ:
+        return FunctionDeclarationKind.BV_UGE;
+      case Z3_OP_SGEQ:
+        return FunctionDeclarationKind.BV_SGE;
+      case Z3_OP_BADD:
+        return FunctionDeclarationKind.BV_ADD;
+      case Z3_OP_BSUB:
+        return FunctionDeclarationKind.BV_SUB;
+      case Z3_OP_BMUL:
+        return FunctionDeclarationKind.BV_MUL;
+      case Z3_OP_BUDIV:
+        return FunctionDeclarationKind.BV_UDIV;
+      case Z3_OP_BSDIV:
+        return FunctionDeclarationKind.BV_SDIV;
+      case Z3_OP_BUREM:
+        return FunctionDeclarationKind.BV_UREM;
+      case Z3_OP_BSREM:
+        return FunctionDeclarationKind.BV_SREM;
+      case Z3_OP_BSHL:
+        return FunctionDeclarationKind.BV_SHL;
+      case Z3_OP_BLSHR:
+        return FunctionDeclarationKind.BV_LSHR;
+      case Z3_OP_BASHR:
+        return FunctionDeclarationKind.BV_ASHR;
+
+      case Z3_OP_FPA_NEG:
+        return FunctionDeclarationKind.FP_NEG;
+      case Z3_OP_FPA_SUB:
+        return FunctionDeclarationKind.FP_SUB;
+      case Z3_OP_FPA_ADD:
+        return FunctionDeclarationKind.FP_ADD;
+      case Z3_OP_FPA_DIV:
+        return FunctionDeclarationKind.FP_DIV;
+      case Z3_OP_FPA_MUL:
+        return FunctionDeclarationKind.FP_MUL;
+      case Z3_OP_FPA_LT:
+        return FunctionDeclarationKind.FP_LT;
+      case Z3_OP_FPA_LE:
+        return FunctionDeclarationKind.FP_LE;
+      case Z3_OP_FPA_GE:
+        return FunctionDeclarationKind.FP_GE;
+      case Z3_OP_FPA_GT:
+        return FunctionDeclarationKind.FP_GT;
+      case Z3_OP_FPA_EQ:
+        return FunctionDeclarationKind.FP_EQ;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
+        return FunctionDeclarationKind.FP_ROUND_EVEN;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
+        return FunctionDeclarationKind.FP_ROUND_AWAY;
+      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
+        return FunctionDeclarationKind.FP_ROUND_POSITIVE;
+      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
+        return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
+      case Z3_OP_FPA_RM_TOWARD_ZERO:
+        return FunctionDeclarationKind.FP_ROUND_ZERO;
+      case Z3_OP_FPA_ROUND_TO_INTEGRAL:
+        return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }

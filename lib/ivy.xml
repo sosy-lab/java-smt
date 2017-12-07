@@ -37,8 +37,8 @@
         <!-- Dependencies needed for running CheckStyle. -->
         <conf name="checkstyle" visibility="private" description="for developing and testing"/>
 
-        <!-- Dependencies needed for running FindBugs. -->
-        <conf name="findbugs" visibility="private" description="for developing and testing"/>
+        <!-- Dependencies needed for running SpotBugs. -->
+        <conf name="spotbugs" visibility="private" description="for developing and testing"/>
 
         <!-- Additional files like JavaDocs or source code that will help developers.
              These are not downloaded by default, but only when "ant install-contrib" is called. -->
@@ -109,9 +109,11 @@
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.24.2" conf="checkstyle->default"/>
 
-        <!-- FindBugs -->
-        <dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1" conf="findbugs->default"/>
-        <dependency org="com.google.code.findbugs" name="annotations" rev="3.0.1" conf="build->default"/>
+        <!-- SpotBugs -->
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.1" conf="spotbugs->default"/>
+        <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.1" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-335-g4c543a5" conf="runtime-smtinterpol->master; contrib->sources"/>
@@ -121,7 +123,7 @@
         </dependency>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.4.1" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.0" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="z3-4.5.0-273-g899843b" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
 

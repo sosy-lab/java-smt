@@ -54,6 +54,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           "unknown constraint in the ItpMapper",
           "AB-mixed term not found in eq_itp map",
           "uncolored atom found in Array proof",
+          "uncolorable Array proof",
           "arr: proof splitting not supported");
 
   Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {

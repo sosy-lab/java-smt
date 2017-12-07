@@ -84,6 +84,10 @@ class Mathsat5BitvectorFormulaManager
 
   @Override
   public Long makeBitvectorImpl(int pLength, long pI) {
+    int i = (int) pI;
+    if (i == pI && i > 0) { // fits into an int
+      return Mathsat5NativeApi.msat_make_bv_int_number(mathsatEnv, i, pLength);
+    }
     return makeBitvectorImpl(pLength, BigInteger.valueOf(pI));
   }
 

@@ -31,6 +31,8 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+import ap.parser.ITimes;
+import com.google.common.base.Preconditions;
 import java.util.List;
 import scala.collection.mutable.ArrayBuffer;
 
@@ -114,8 +116,46 @@ abstract class PrincessFunctionDeclaration {
     }
 
     @Override
+    public boolean equals(Object o) {
+      if (!(o instanceof PrincessByExampleDeclaration)) {
+        return false;
+      }
+      PrincessByExampleDeclaration other = (PrincessByExampleDeclaration) o;
+      return example.equals(other.example);
+    }
+
+    @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       return example.update(scala.collection.JavaConversions.asScalaBuffer(args));
+    }
+
+    @Override
+    public int hashCode() {
+      return example.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return example.toString();
+    }
+  }
+
+  static class PrincessMultiplyDeclaration extends PrincessFunctionDeclaration {
+
+    static final PrincessMultiplyDeclaration INSTANCE = new PrincessMultiplyDeclaration() {};
+
+    private PrincessMultiplyDeclaration() {}
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      Preconditions.checkArgument(args.size() == 2);
+      if (args.get(0) instanceof IIntLit) {
+        return new ITimes(((IIntLit) args.get(0)).value(), (ITerm) args.get(1));
+      } else if (args.get(1) instanceof IIntLit) {
+        return new ITimes(((IIntLit) args.get(1)).value(), (ITerm) args.get(0));
+      } else {
+        throw new AssertionError("unexpected args for multiplication");
+      }
     }
   }
 }

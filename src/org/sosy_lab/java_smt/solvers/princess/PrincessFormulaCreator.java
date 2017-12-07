@@ -53,11 +53,13 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
 import scala.Enumeration;
 
 class PrincessFormulaCreator
@@ -175,6 +177,26 @@ class PrincessFormulaCreator
       // atom and constant are variables
     } else if (input instanceof IAtom || input instanceof IConstant) {
       return visitor.visitFreeVariable(f, input.toString());
+
+      // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
+    } else if (input instanceof ITimes) {
+      assert input.length() == 1;
+
+      ITimes multiplication = (ITimes) input;
+      IIntLit coeff = new IIntLit(multiplication.coeff());
+      FormulaType<IntegerFormula> coeffType = FormulaType.IntegerType;
+      IExpression factor = multiplication.subterm();
+      FormulaType<?> factorType = getFormulaType(factor);
+
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulate(coeffType, coeff), encapsulate(factorType, factor)),
+          FunctionDeclarationImpl.of(
+              getName(input),
+              getDeclarationKind(input),
+              ImmutableList.of(coeffType, factorType),
+              getFormulaType(f),
+              PrincessMultiplyDeclaration.INSTANCE));
 
     } else {
       int arity = input.length();

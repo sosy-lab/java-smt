@@ -7,7 +7,7 @@
     <property file="build.properties"/>
     <property environment="env"/>
 
-    <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, findbugs"/>
+    <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
     <property name="jar.excludes" value=""/>
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
@@ -27,7 +27,7 @@
     <import file="build/build-junit.xml"/>
     <import file="build/build-format-source.xml"/>
     <import file="build/build-checkstyle.xml"/>
-    <import file="build/build-findbugs.xml"/>
+    <import file="build/build-spotbugs.xml"/>
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
     <import file="build/build-maven-publish.xml"/>
@@ -73,5 +73,5 @@
 
     <target name="build-dependencies" depends="init, resolve-dependencies"/>
 
-    <target name="standard-checks" depends="tests, findbugs, checkstyle, javadoc"/>
+    <target name="standard-checks" depends="tests, spotbugs, checkstyle, javadoc"/>
 </project>

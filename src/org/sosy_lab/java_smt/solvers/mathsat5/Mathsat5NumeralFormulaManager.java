@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
@@ -49,8 +50,12 @@ abstract class Mathsat5NumeralFormulaManager<
   }
 
   @Override
-  public Long makeNumberImpl(long pI) {
-    return msat_make_number(mathsatEnv, Long.toString(pI));
+  public Long makeNumberImpl(long pNumber) {
+    int i = (int) pNumber;
+    if (i == pNumber) { // fits in an int
+      return msat_make_int_number(mathsatEnv, i);
+    }
+    return msat_make_number(mathsatEnv, Long.toString(pNumber));
   }
 
   @Override

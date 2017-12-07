@@ -431,12 +431,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     while (!toProcess.isEmpty()) {
       BooleanFormula s = toProcess.pop();
-      Set<BooleanFormula> out = cache.get(s);
-      if (out == null) {
-
-        out = formulaCreator.visit(s, visitor);
-        cache.put(s, out);
-      }
+      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> formulaCreator.visit(ss, visitor));
       if (out.size() == 1 && s.equals(out.iterator().next())) {
         output.add(s);
       }

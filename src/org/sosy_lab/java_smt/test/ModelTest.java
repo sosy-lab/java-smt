@@ -72,7 +72,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegers() throws Exception {
+  public void testGetSmallIntegers() throws SolverException, InterruptedException {
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.makeVariable("x"),
@@ -81,7 +81,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetNegativeIntegers() throws Exception {
+  public void testGetNegativeIntegers() throws SolverException, InterruptedException {
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
         imgr.makeVariable("x"),
@@ -90,7 +90,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetLargeIntegers() throws Exception {
+  public void testGetLargeIntegers() throws SolverException, InterruptedException {
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(large)),
@@ -100,7 +100,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegralRationals() throws Exception {
+  public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
     requireRationals();
     assert rmgr != null;
     testModelGetters(
@@ -111,7 +111,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetLargeIntegralRationals() throws Exception {
+  public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
     requireRationals();
     assert rmgr != null;
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
@@ -123,7 +123,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetRationals() throws Exception {
+  public void testGetRationals() throws SolverException, InterruptedException {
     requireRationals();
     assert rmgr != null;
     testModelGetters(
@@ -134,19 +134,19 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetBooleans() throws Exception {
+  public void testGetBooleans() throws SolverException, InterruptedException {
     testModelGetters(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true, "x");
   }
 
   @Test
-  public void testGetUFs() throws Exception {
+  public void testGetUFs() throws SolverException, InterruptedException {
     IntegerFormula x =
         fmgr.declareAndCallUF("UF", IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
     testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
   }
 
   @Test
-  public void testGetMultipleUFs() throws Exception {
+  public void testGetMultipleUFs() throws SolverException, InterruptedException {
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
     FunctionDeclaration<IntegerFormula> declaration =
@@ -184,7 +184,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testQuantifiedUF() throws Exception {
+  public void testQuantifiedUF() throws SolverException, InterruptedException {
     requireQuantifiers();
 
     IntegerFormula var = imgr.makeVariable("var");
@@ -216,7 +216,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetBitvectors() throws Exception {
+  public void testGetBitvectors() throws SolverException, InterruptedException {
     requireBitvectors();
     assert bvmgr != null;
 
@@ -228,7 +228,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetModelAssignments() throws Exception {
+  public void testGetModelAssignments() throws SolverException, InterruptedException {
     testModelIterator(
         bmgr.and(
             imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)),
@@ -236,7 +236,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testEmptyStackModel() throws Exception {
+  public void testEmptyStackModel() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       assertThat(prover).isSatisfiable();
       try (Model m = prover.getModel()) {
@@ -254,7 +254,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNonExistantSymbol() throws Exception {
+  public void testNonExistantSymbol() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeBoolean(true));
       assertThat(prover).isSatisfiable();
@@ -271,7 +271,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testPartialModels() throws Exception {
+  public void testPartialModels() throws SolverException, InterruptedException {
     assume()
         .withMessage("As of now, only Z3 and Princess support partial models")
         .that(solver)
@@ -288,7 +288,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testPartialModelsUF() throws Exception {
+  public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
         .withMessage("As of now, only Z3 and Princess support partial model evaluation")
         .that(solver)
@@ -307,7 +307,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testEvaluatingConstants() throws Exception {
+  public void testEvaluatingConstants() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
@@ -319,7 +319,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays() throws Exception {
+  public void testGetArrays() throws SolverException, InterruptedException {
     requireArrays();
     assert amgr != null;
 
@@ -343,7 +343,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays2() throws Exception {
+  public void testGetArrays2() throws SolverException, InterruptedException {
     requireArrays();
 
     BooleanFormula f =
@@ -368,7 +368,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays3() throws Exception {
+  public void testGetArrays3() throws SolverException, InterruptedException {
     requireArrays();
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
@@ -408,7 +408,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays4() throws Exception {
+  public void testGetArrays4() throws SolverException, InterruptedException {
     requireArrays();
 
     // create formula for "arr[5]==x && x==123"
@@ -434,7 +434,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testGetArrays4invalid() throws Exception {
+  public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireArrays();
 
     // create formula for "arr[5]==x && x==123"
@@ -461,7 +461,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5() throws Exception {
+  public void testGetArrays5() throws SolverException, InterruptedException {
     requireArrays();
 
     // create formula for "arr[5]==x && x==123"
@@ -503,7 +503,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   private void testModelGetters(
       BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
-      throws Exception {
+      throws SolverException, InterruptedException {
     testModelGetters(constraint, variable, expectedValue, varName, false);
   }
 
@@ -513,7 +513,7 @@ public class ModelTest extends SolverBasedTest0 {
       Object expectedValue,
       String varName,
       boolean isArray)
-      throws Exception {
+      throws SolverException, InterruptedException {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(constraint);

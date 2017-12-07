@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
+import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class OptimizationTest extends SolverBasedTest0 {
@@ -61,12 +62,12 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Before
-  public void skipUnsupportedSolvers() throws Exception {
+  public void skipUnsupportedSolvers() {
     requireOptimization();
   }
 
   @Test
-  public void testUnbounded() throws Exception {
+  public void testUnbounded() throws SolverException, InterruptedException {
     requireRationals();
     assert rmgr != null;
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
@@ -83,7 +84,7 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void testUnfeasible() throws Exception {
+  public void testUnfeasible() throws SolverException, InterruptedException {
     requireRationals();
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");
@@ -96,7 +97,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testOptimal() throws Exception {
+  public void testOptimal() throws SolverException, InterruptedException {
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       IntegerFormula x = imgr.makeVariable("x");
@@ -138,7 +139,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testSwitchingObjectives() throws Exception {
+  public void testSwitchingObjectives() throws SolverException, InterruptedException {
     requireRationals();
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
@@ -191,7 +192,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testStrictConstraint() throws Exception {
+  public void testStrictConstraint() throws SolverException, InterruptedException {
     requireRationals();
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {

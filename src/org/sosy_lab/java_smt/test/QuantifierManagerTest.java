@@ -76,7 +76,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   private BooleanFormula forall_x_a_at_x_eq_0;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     assert amgr != null;
     requireArrays();
     requireQuantifiers();
@@ -287,7 +287,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testBlah() throws Exception {
+  public void testBlah() throws SolverException, InterruptedException {
     IntegerFormula z = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
     assert qmgr != null;

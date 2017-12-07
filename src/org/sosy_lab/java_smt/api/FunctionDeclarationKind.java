@@ -93,6 +93,138 @@ public enum FunctionDeclarationKind {
   /** Unary comparison with zero. */
   GTE_ZERO,
 
+  // Simple bitvector operations
+
+  /** Extraction over bitvectors. */
+  BV_EXTRACT,
+
+  /** Concatenation over bitvectors. */
+  BV_CONCAT,
+
+  /** Bitwise negation of a bitvector. */
+  BV_NOT,
+
+  /** Negation of a bitvector. */
+  BV_NEG,
+
+  /** Bitwise OR over bitvectors. */
+  BV_OR,
+
+  /** Bitwise AND over bitvectors. */
+  BV_AND,
+
+  /** Bitwise XOR over bitvectors. */
+  BV_XOR,
+
+  /** Subtraction over bitvectors. */
+  BV_SUB,
+
+  /** Addition over bitvectors. */
+  BV_ADD,
+
+  /** Signed division over bitvectors. */
+  BV_SDIV,
+
+  /** Unsigned division over bitvectors. */
+  BV_UDIV,
+
+  /** Signed remainder over bitvectors. */
+  BV_SREM,
+
+  /** Unsigned remainder over bitvectors. */
+  BV_UREM,
+
+  /** Multiplication over bitvectors. */
+  BV_MUL,
+
+  /** Signed less-than over bitvectors. */
+  BV_ULT,
+
+  /** Unsigned less-than over bitvectors. */
+  BV_SLT,
+
+  /** Unsigned less-than-or-equal over bitvectors. */
+  BV_ULE,
+
+  /** Signed greater-than-or-equal over bitvectors. */
+  BV_SLE,
+
+  /** Signed greater-than over bitvectors. */
+  BV_UGT,
+
+  /** Unsigned greater-than over bitvectors. */
+  BV_SGT,
+
+  /** Unsigned greater-than-or-equal over bitvectors. */
+  BV_UGE,
+
+  /** Signed greater-than-or-equal over bitvectors. */
+  BV_SGE,
+
+  /** Equality over bitvectors. Binary equality is modeled with {@code IFF}. */
+  BV_EQ,
+
+  /** Logical left-shift over bitvectors (fill from right with zeroes). */
+  BV_SHL,
+
+  /** Logical right-shift over bitvectors (fill from left with zeroes). */
+  BV_LSHR,
+
+  /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
+  BV_ASHR,
+
+  // Simple floating point operations
+
+  /** Negation of a floating point. */
+  FP_NEG,
+
+  /** Subtraction over floating points. */
+  FP_SUB,
+
+  /** Addition over floating points. */
+  FP_ADD,
+
+  /** Division over floating points. */
+  FP_DIV,
+
+  /** Multiplication over floating points. */
+  FP_MUL,
+
+  /** Less-than over floating points. */
+  FP_LT,
+
+  /** Less-than-or-equal over floating points. */
+  FP_LE,
+
+  /** Greater-than-or-equal over floating points. */
+  FP_GE,
+
+  /** Greater-than over floating points. */
+  FP_GT,
+
+  /** Equal over floating points. */
+  FP_EQ,
+
+  /** Rounding over floating points. */
+  FP_ROUND_EVEN,
+
+  /** Rounding over floating points. */
+  FP_ROUND_AWAY,
+
+  /** Rounding over floating points. */
+  FP_ROUND_POSITIVE,
+
+  /** Rounding over floating points. */
+  FP_ROUND_NEGATIVE,
+
+  /** Rounding over floating points. */
+  FP_ROUND_ZERO,
+
+  /** Rounding over floating points. */
+  FP_ROUND_TO_INTEGRAL,
+
+  // default case
+
   /**
    * Solvers support a lot of different built-in theories. We enforce standardization only across a
    * small subset.

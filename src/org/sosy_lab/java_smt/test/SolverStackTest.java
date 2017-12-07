@@ -148,13 +148,13 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void singleStackTestInteger() throws Exception {
+  public void singleStackTestInteger() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(imgr, env);
   }
 
   @Test
-  public void singleStackTestRational() throws Exception {
+  public void singleStackTestRational() throws SolverException, InterruptedException {
     requireRationals();
     assert rmgr != null;
 
@@ -163,7 +163,8 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
-      NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack) throws Exception {
+      NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack)
+      throws SolverException, InterruptedException {
     int i = index.getFreshId();
     X a = nmgr.makeVariable("num_a" + i);
     X b = nmgr.makeVariable("num_b" + i);
@@ -308,7 +309,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void dualStackTest() throws Exception {
+  public void dualStackTest() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -332,7 +333,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void dualStackTest2() throws Exception {
+  public void dualStackTest2() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -361,7 +362,7 @@ public class SolverStackTest extends SolverBasedTest0 {
    * for BMC with induction (where we create new formulas while there is something on the stack).
    */
   @Test
-  public void dualStackGlobalDeclarations() throws Exception {
+  public void dualStackGlobalDeclarations() throws SolverException, InterruptedException {
     // Create non-empty stack
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeVariable("bool_a"));
@@ -384,7 +385,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void modelForUnsatFormula() throws Exception {
+  public void modelForUnsatFormula() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -396,7 +397,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormula() throws Exception {
+  public void modelForSatFormula() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula a = imgr.makeVariable("a");
       stack.push(imgr.greaterThan(a, imgr.makeNumber(0)));
@@ -409,7 +410,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormulaWithLargeValue() throws Exception {
+  public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       BigInteger val = BigInteger.TEN.pow(1000);
       IntegerFormula a = imgr.makeVariable("a");
@@ -422,7 +423,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormulaWithUF() throws Exception {
+  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
       IntegerFormula varA = imgr.makeVariable("a");

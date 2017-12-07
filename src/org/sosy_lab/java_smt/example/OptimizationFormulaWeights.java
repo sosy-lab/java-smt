@@ -26,6 +26,10 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class OptimizationFormulaWeights {
 
+  private OptimizationFormulaWeights() {
+    // never called
+  }
+
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
     Configuration config = Configuration.defaultConfiguration();
@@ -35,7 +39,7 @@ public class OptimizationFormulaWeights {
 
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment(); ) {
+        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -82,7 +86,7 @@ public class OptimizationFormulaWeights {
             bmgr.ifThenElse(imgr.lessOrEquals(x, four), scoreHigh, scoreBasic), // important
             bmgr.ifThenElse(imgr.lessOrEquals(y, zero), scoreMedium, scoreBasic), // less important
             bmgr.ifThenElse(imgr.lessOrEquals(y, four), scoreMedium, scoreBasic), // less important
-            bmgr.ifThenElse(imgr.lessOrEquals(x, zero), scoreLow, scoreBasic), // not important
+            bmgr.ifThenElse(imgr.lessOrEquals(z, zero), scoreLow, scoreBasic), // not important
             bmgr.ifThenElse(imgr.lessOrEquals(z, four), scoreHigh, scoreBasic) // important
             );
 
@@ -93,7 +97,7 @@ public class OptimizationFormulaWeights {
     assert response == OptStatus.OPT;
 
     // for integer theory we get the optimal solution directly as model.
-    // ideal solution: sum=30 with e.g. x=0,y=6,z=4
+    // ideal solution: sum=32 with e.g. x=0,y=6,z=4  or  x=0,y=7,z=3  or  x=0,y=8,z=2 ...
     logger.log(
         Level.INFO,
         "maximal sum ",

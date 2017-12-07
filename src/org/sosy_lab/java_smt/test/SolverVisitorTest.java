@@ -24,6 +24,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +37,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -51,6 +57,28 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
+
+  private final class FunctionDeclarationVisitor extends DefaultFormulaVisitor<Formula> {
+    @Override
+    public Formula visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      Truth.assert_()
+          .withMessage(
+              "unexpected declaration kind '%s' in function '%s' with args '%s'.",
+              functionDeclaration, f, args)
+          .that(functionDeclaration.getKind())
+          .isNotEqualTo(FunctionDeclarationKind.OTHER);
+      for (Formula arg : args) {
+        mgr.visit(arg, this);
+      }
+      return visitDefault(f);
+    }
+
+    @Override
+    protected Formula visitDefault(Formula pF) {
+      return pF;
+    }
+  }
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -84,6 +112,70 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             // we need a subclass, because the original class is 'abstract'
           };
       assertThatFormula(bmgr.visit(bf, identityVisitor)).isEqualTo(bf);
+    }
+  }
+
+  @Test
+  public void bitvectorIdVisit() {
+    requireBitvectors();
+    BitvectorType bv8 = BitvectorType.getBitvectorTypeWithSize(8);
+    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
+    BitvectorFormula y = bvmgr.makeVariable(bv8, "y");
+
+    for (Formula f :
+        ImmutableList.of(
+            bvmgr.equal(x, y),
+            bvmgr.add(x, y),
+            bvmgr.subtract(x, y),
+            bvmgr.multiply(x, y),
+            bvmgr.and(x, y),
+            bvmgr.or(x, y),
+            bvmgr.xor(x, y),
+            bvmgr.lessThan(x, y, true),
+            bvmgr.lessThan(x, y, false),
+            bvmgr.lessOrEquals(x, y, true),
+            bvmgr.lessOrEquals(x, y, false),
+            bvmgr.greaterThan(x, y, true),
+            bvmgr.greaterThan(x, y, false),
+            bvmgr.greaterOrEquals(x, y, true),
+            bvmgr.greaterOrEquals(x, y, false),
+            bvmgr.divide(x, y, true),
+            bvmgr.divide(x, y, false),
+            bvmgr.modulo(x, y, true),
+            bvmgr.modulo(x, y, false),
+            bvmgr.not(x),
+            bvmgr.negate(x),
+            bvmgr.extract(x, 7, 5, true),
+            bvmgr.extract(x, 7, 5, false),
+            bvmgr.concat(x, y))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
+    }
+  }
+
+  @Test
+  public void floatIdVisit() {
+    requireFloats();
+    FloatingPointType fp = FloatingPointType.getSinglePrecisionFloatingPointType();
+    FloatingPointFormula x = fpmgr.makeVariable("x", fp);
+    FloatingPointFormula y = fpmgr.makeVariable("y", fp);
+
+    for (Formula f :
+        ImmutableList.of(
+            fpmgr.equalWithFPSemantics(x, y),
+            fpmgr.add(x, y),
+            fpmgr.subtract(x, y),
+            fpmgr.multiply(x, y),
+            fpmgr.lessThan(x, y),
+            fpmgr.lessOrEquals(x, y),
+            fpmgr.greaterThan(x, y),
+            fpmgr.greaterOrEquals(x, y),
+            fpmgr.divide(x, y),
+            fpmgr.round(x, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN),
+            // fpmgr.round(x, FloatingPointRoundingMode.NEAREST_TIES_AWAY),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_POSITIVE),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_NEGATIVE),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
     }
   }
 
@@ -238,6 +330,22 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 imgr.equal(
                     imgr.add(imgr.makeVariable("x'"), imgr.makeVariable("y'")), imgr.makeNumber(1)),
                 imgr.equal(imgr.makeVariable("z'"), imgr.makeNumber(10))));
+  }
+
+  @Test
+  public void recursiveTransformationVisitorTest2() throws Exception {
+    BooleanFormula f = imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1));
+    BooleanFormula transformed =
+        mgr.transformRecursively(
+            f,
+            new FormulaTransformationVisitor(mgr) {
+              @Override
+              public Formula visitFreeVariable(Formula f, String name) {
+                return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
+              }
+            });
+    assertThatFormula(transformed)
+        .isEquivalentTo(imgr.equal(imgr.makeVariable("y'"), imgr.makeNumber(1)));
   }
 
   @Test
