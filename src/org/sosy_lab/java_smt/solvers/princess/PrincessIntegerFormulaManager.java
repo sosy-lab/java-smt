@@ -24,6 +24,7 @@ import ap.parser.IExpression;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.nia.GroebnerMultiplication;
+import ap.types.Sort;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
@@ -64,7 +65,7 @@ class PrincessIntegerFormulaManager
 
   @Override
   protected IExpression makeVariableImpl(String varName) {
-    PrincessTermType t = getFormulaCreator().getIntegerType();
+    Sort t = getFormulaCreator().getIntegerType();
     return getFormulaCreator().makeVariable(t, varName);
   }
 

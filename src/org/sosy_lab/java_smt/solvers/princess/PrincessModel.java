@@ -35,6 +35,7 @@ import ap.parser.IAtom;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
+import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -52,12 +53,12 @@ import scala.Tuple2;
 import scala.collection.Iterator;
 
 class PrincessModel
-    extends CachingAbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
+    extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PartialModel model;
 
   PrincessModel(
       PartialModel partialModel,
-      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment, ?> creator) {
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator) {
     super(creator);
     this.model = partialModel;
   }

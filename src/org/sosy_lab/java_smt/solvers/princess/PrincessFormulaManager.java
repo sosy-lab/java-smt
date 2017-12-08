@@ -25,6 +25,7 @@ import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.PartialEvaluator;
+import ap.types.Sort;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -32,7 +33,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class PrincessFormulaManager
     extends AbstractFormulaManager<
-        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
+        IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessFormulaCreator creator;
 

@@ -44,6 +44,9 @@ import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
+import ap.types.Sort;
+import ap.theories.ModuloArithmetic;
+import ap.theories.SimpleArray;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,43 +67,55 @@ import scala.Enumeration;
 
 class PrincessFormulaCreator
     extends FormulaCreator<
-        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
+        IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessTermType.Boolean, PrincessTermType.Integer, null);
+    super(pEnv, PrincessEnvironment.BoolSort, PrincessEnvironment.IntegerSort, null);
   }
 
   @Override
   public FormulaType<?> getFormulaType(IExpression pFormula) {
-    if (getEnv().hasArrayType(pFormula)) {
-      return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
-    } else if (pFormula instanceof IFormula) {
+    if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
-      return FormulaType.IntegerType;
+      final Sort sort = Sort.sortOf((ITerm)pFormula);
+      if (sort == PrincessEnvironment.BoolSort)
+        return FormulaType.BooleanType;
+      else if (sort == PrincessEnvironment.IntegerSort)
+        return FormulaType.IntegerType;
+      else if (sort instanceof SimpleArray.ArraySort)
+        return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
+      else {
+        scala.Option<Object> bitWidth =
+          ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+        if (bitWidth.isDefined()) {
+          return FormulaType.getBitvectorTypeWithSize((Integer)bitWidth.get());
+        }
+      }
     }
     throw new IllegalArgumentException("Unknown formula type");
   }
 
   @Override
-  public IExpression makeVariable(PrincessTermType type, String varName) {
+  public IExpression makeVariable(Sort type, String varName) {
     return getEnv().makeVariable(type, varName);
   }
-
+    
   @Override
-  public PrincessTermType getBitvectorType(int pBitwidth) {
-    throw new UnsupportedOperationException("Bitvector theory is not supported by Princess");
+  public Sort getBitvectorType(int pBitwidth) {
+    return ModuloArithmetic.UnsignedBVSort$.MODULE$.apply(pBitwidth);
   }
 
   @Override
-  public PrincessTermType getFloatingPointType(FormulaType.FloatingPointType type) {
+  public Sort getFloatingPointType(FormulaType.FloatingPointType type) {
     throw new UnsupportedOperationException("FloatingPoint theory is not supported by Princess");
   }
 
   @Override
-  public PrincessTermType getArrayType(PrincessTermType pIndexType, PrincessTermType pElementType) {
+  public Sort getArrayType(Sort pIndexType, Sort pElementType) {
     // no special cases here, princess does only support int arrays with int indexes
-    return PrincessTermType.Array;
+    // TODO: check sorts
+    return SimpleArray.ArraySort$.MODULE$.apply(1);
   }
 
   @SuppressWarnings("unchecked")
@@ -198,6 +213,36 @@ class PrincessFormulaCreator
               getFormulaType(f),
               PrincessMultiplyDeclaration.INSTANCE));
 
+    } else if (getDeclarationKind(input) == FunctionDeclarationKind.EQ_ZERO) {
+      final ITerm lhs = ((IIntFormula)input).t();
+      final Sort sort = Sort.sortOf(lhs);
+      if (sort == PrincessEnvironment.BoolSort) {
+        // this is really a Boolean formula, visit the lhs of the equation
+        return visit(visitor, f, lhs);
+      } else {
+        // TODO: check whether this is an equation between two terms
+
+        ImmutableList.Builder<Formula> args = ImmutableList.builder();
+        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+
+        FormulaType<?> argumentType = getFormulaType(lhs);
+        args.add(encapsulate(argumentType, lhs));
+        argTypes.add(argumentType);
+
+        PrincessFunctionDeclaration solverDeclaration =
+          new PrincessByExampleDeclaration(input);
+        FunctionDeclarationKind kind = getDeclarationKind(input);
+
+        return visitor.visitFunction(
+            f,
+            args.build(),
+            FunctionDeclarationImpl.of(
+                getName(input),
+                getDeclarationKind(input),
+                argTypes.build(),
+                getFormulaType(f),
+                solverDeclaration));
+      }
     } else {
       int arity = input.length();
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
@@ -276,6 +321,8 @@ class PrincessFormulaCreator
   }
 
   public IExpression makeFunction(PrincessFunctionDeclaration pFuncDecl, List<IExpression> args) {
+System.out.println(pFuncDecl);
+System.out.println(args);
     return pFuncDecl.makeApp(getEnv(), args);
   }
 

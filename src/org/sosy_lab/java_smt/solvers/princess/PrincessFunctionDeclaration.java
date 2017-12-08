@@ -32,6 +32,9 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.ITimes;
+import ap.types.Sort;
+import ap.types.SortedIFunction;
+import ap.types.SortedIFunction$;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import scala.collection.mutable.ArrayBuffer;
@@ -58,6 +61,7 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
 
+      // TODO: check argument types
       checkArgument(args.size() == app.arity(), "functiontype has different number of args.");
 
       final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
@@ -72,19 +76,15 @@ abstract class PrincessFunctionDeclaration {
         }
         argsBuf.$plus$eq(termArg);
       }
-      IExpression returnFormula = new IFunApp(app, argsBuf.toSeq());
-      PrincessTermType returnType = env.getReturnTypeForFunction(app);
+      IFunApp returnFormula = new IFunApp(app, argsBuf.toSeq());
+      Sort returnType = SortedIFunction$.MODULE$.iResultSort(app, returnFormula.args());
 
       // boolean term, so we have to use the fun-applier instead of the function itself
-      if (returnType == PrincessTermType.Boolean) {
+      if (returnType == PrincessEnvironment.BoolSort) {
         BooleanFunApplier ap = new BooleanFunApplier(app);
         return ap.apply(argsBuf);
-
-      } else if (returnType == PrincessTermType.Integer) {
-        return returnFormula;
       } else {
-        throw new AssertionError(
-            "Not possible to have return types for functions other than bool or int.");
+        return returnFormula;
       }
     }
 
