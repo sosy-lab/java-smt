@@ -37,6 +37,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -241,6 +242,62 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     BooleanFormula B = imgr.equal(a, b);
     BooleanFormula C = imgr.equal(b, c);
     BooleanFormula D = imgr.equal(c, zero);
+
+    Set<T> TA = Sets.newHashSet(stack.push(A));
+    Set<T> TB = Sets.newHashSet(stack.push(B));
+    Set<T> TC = Sets.newHashSet(stack.push(C));
+    Set<T> TD = Sets.newHashSet(stack.push(D));
+
+    assertThat(stack).isUnsatisfiable();
+
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants(ImmutableList.of(TA, TC, TB, TD));
+
+    List<BooleanFormula> itps4 =
+        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
+    List<BooleanFormula> itps5 =
+        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
+    List<BooleanFormula> itps6 =
+        stack.getSeqInterpolants(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
+
+    stack.pop(); // clear stack, such that we can re-use the solver
+    stack.pop();
+    stack.pop();
+    stack.pop();
+
+    checkItpSequence(stack, ImmutableList.of(A, B, C, D), itps1);
+    checkItpSequence(stack, ImmutableList.of(D, C, B, A), itps2);
+    checkItpSequence(stack, ImmutableList.of(A, C, B, D), itps3);
+    checkItpSequence(stack, ImmutableList.of(A, A, A, C, B, D, D), itps4);
+    checkItpSequence(stack, ImmutableList.of(A, A, B, C, D, A, D), itps5);
+    checkItpSequence(stack, ImmutableList.of(B, C, D, A, A, A, D), itps6);
+  }
+
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
+  public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
+
+    requireSequentialItp();
+    requireBitvectors();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+    int width = 8;
+
+    BitvectorFormula zero = bvmgr.makeBitvector(width, 0);
+    BitvectorFormula one = bvmgr.makeBitvector(width, 1);
+
+    BitvectorFormula a = bvmgr.makeVariable(width, "a" + i);
+    BitvectorFormula b = bvmgr.makeVariable(width, "b" + i);
+    BitvectorFormula c = bvmgr.makeVariable(width, "c" + i);
+
+    // build formula:  1 = A = B = C = 0
+    BooleanFormula A = bvmgr.equal(one, a);
+    BooleanFormula B = bvmgr.equal(a, b);
+    BooleanFormula C = bvmgr.equal(b, c);
+    BooleanFormula D = bvmgr.equal(c, zero);
 
     Set<T> TA = Sets.newHashSet(stack.push(A));
     Set<T> TB = Sets.newHashSet(stack.push(B));

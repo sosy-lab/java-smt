@@ -43,6 +43,7 @@ final class PrincessFormulaManager
       PrincessUFManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
+      PrincessBitvectorFormulaManager pBitpreciseManager,
       PrincessArrayFormulaManager pArrayManager,
       PrincessQuantifiedFormulaManager pQuantifierManager) {
     super(
@@ -51,7 +52,7 @@ final class PrincessFormulaManager
         pBooleanManager,
         pIntegerManager,
         null,
-        null,
+        pBitpreciseManager,
         null,
         pQuantifierManager,
         pArrayManager);

@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
 
@@ -53,6 +54,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -124,7 +126,18 @@ class PrincessFormulaCreator
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(final T pFormula) {
-    if (pFormula instanceof ArrayFormula<?, ?>) {
+    if (pFormula instanceof BitvectorFormula) {
+      ITerm input = (ITerm)extractInfo(pFormula);
+      Sort sort = Sort.sortOf(input);
+      scala.Option<Object> bitWidth =
+        ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+       checkArgument(
+          bitWidth.isDefined(),
+          "BitvectorFormula with actual type " + sort + ": " + pFormula);
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize((Integer)bitWidth.get());
+
+    } else if (pFormula instanceof ArrayFormula<?, ?>) {
       final FormulaType<?> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<?, ?>) pFormula);
       final FormulaType<?> arrayElementType =
           getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
