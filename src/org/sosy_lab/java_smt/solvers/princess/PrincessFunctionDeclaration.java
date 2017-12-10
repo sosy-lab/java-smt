@@ -32,6 +32,7 @@ import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.ITimes;
+import ap.theories.nia.GroebnerMultiplication;
 import ap.types.Sort;
 import ap.types.SortedIFunction;
 import ap.types.SortedIFunction$;
@@ -162,13 +163,8 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       Preconditions.checkArgument(args.size() == 2);
-      if (args.get(0) instanceof IIntLit) {
-        return new ITimes(((IIntLit) args.get(0)).value(), (ITerm) args.get(1));
-      } else if (args.get(1) instanceof IIntLit) {
-        return new ITimes(((IIntLit) args.get(1)).value(), (ITerm) args.get(0));
-      } else {
-        throw new AssertionError("unexpected args for multiplication");
-      }
+      return GroebnerMultiplication.mult((ITerm)args.get(0),
+                                         (ITerm)args.get(1));
     }
   }
 }

@@ -33,6 +33,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
 import ap.parser.IFunApp;
+import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
@@ -47,6 +48,7 @@ import ap.terfor.conjunctions.Quantifier;
 import ap.types.Sort;
 import ap.theories.ModuloArithmetic;
 import ap.theories.SimpleArray;
+import ap.theories.MulTheory;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
@@ -263,10 +265,19 @@ class PrincessFormulaCreator
         args.add(encapsulate(argumentType, arg));
         argTypes.add(argumentType);
       }
+
       PrincessFunctionDeclaration solverDeclaration;
       FunctionDeclarationKind kind = getDeclarationKind(input);
-      if (input instanceof IFunApp && kind == FunctionDeclarationKind.UF) {
-        solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+
+      if (input instanceof IFunApp) {
+        if (kind == FunctionDeclarationKind.UF) {
+          solverDeclaration =
+            new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+        } else if (kind == FunctionDeclarationKind.MUL) {
+          solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
+        } else {
+          solverDeclaration = new PrincessByExampleDeclaration(input);
+        }
       } else {
         solverDeclaration = new PrincessByExampleDeclaration(input);
       }
@@ -276,7 +287,7 @@ class PrincessFormulaCreator
           args.build(),
           FunctionDeclarationImpl.of(
               getName(input),
-              getDeclarationKind(input),
+              kind,
               argTypes.build(),
               getFormulaType(f),
               solverDeclaration));
@@ -290,10 +301,13 @@ class PrincessFormulaCreator
     if (input instanceof IFormulaITE || input instanceof ITermITE) {
       return FunctionDeclarationKind.ITE;
     } else if (input instanceof IFunApp) {
-      if (((IFunApp) input).fun().name().equals("select")) {
+      final IFunction fun = ((IFunApp) input).fun();
+      if (SimpleArray.Select$.MODULE$.unapply(fun)) {
         return FunctionDeclarationKind.SELECT;
-      } else if (((IFunApp) input).fun().name().equals("store")) {
+      } else if (SimpleArray.Store$.MODULE$.unapply(fun)) {
         return FunctionDeclarationKind.STORE;
+      } else if (MulTheory.Mul$.MODULE$.unapply(fun)) {
+        return FunctionDeclarationKind.MUL;
       }
       return FunctionDeclarationKind.UF;
     } else if (isBinaryFunction(input, IBinJunctor.And())) {
