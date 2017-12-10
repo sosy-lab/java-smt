@@ -140,6 +140,19 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
+  static class PrincessEquationDeclaration extends PrincessFunctionDeclaration {
+
+    static final PrincessEquationDeclaration INSTANCE = new PrincessEquationDeclaration() {};
+
+    private PrincessEquationDeclaration() {}
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      Preconditions.checkArgument(args.size() == 2);
+      return ((ITerm) args.get(0)).$eq$eq$eq((ITerm) args.get(1));
+    }
+  }
+
   static class PrincessMultiplyDeclaration extends PrincessFunctionDeclaration {
 
     static final PrincessMultiplyDeclaration INSTANCE = new PrincessMultiplyDeclaration() {};

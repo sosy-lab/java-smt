@@ -63,6 +63,7 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessEquationDeclaration;
 import scala.Enumeration;
 
 class PrincessFormulaCreator
@@ -216,21 +217,30 @@ class PrincessFormulaCreator
     } else if (getDeclarationKind(input) == FunctionDeclarationKind.EQ_ZERO) {
       final ITerm lhs = ((IIntFormula)input).t();
       final Sort sort = Sort.sortOf(lhs);
+
       if (sort == PrincessEnvironment.BoolSort) {
         // this is really a Boolean formula, visit the lhs of the equation
         return visit(visitor, f, lhs);
       } else {
-        // TODO: check whether this is an equation between two terms
+
+        scala.Option<scala.Tuple2<ap.parser.ITerm, ap.parser.ITerm>> maybeArgs =
+          IExpression.Eq$.MODULE$.unapply((IFormula)input);
+
+        assert maybeArgs.isDefined();
+
+        final ITerm left = maybeArgs.get()._1;
+        final ITerm right = maybeArgs.get()._2;
 
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
-        FormulaType<?> argumentType = getFormulaType(lhs);
-        args.add(encapsulate(argumentType, lhs));
-        argTypes.add(argumentType);
+        FormulaType<?> argumentTypeLeft = getFormulaType(left);
+        args.add(encapsulate(argumentTypeLeft, left));
+        argTypes.add(argumentTypeLeft);
+        FormulaType<?> argumentTypeRight = getFormulaType(right);
+        args.add(encapsulate(argumentTypeRight, right));
+        argTypes.add(argumentTypeRight);
 
-        PrincessFunctionDeclaration solverDeclaration =
-          new PrincessByExampleDeclaration(input);
         FunctionDeclarationKind kind = getDeclarationKind(input);
 
         return visitor.visitFunction(
@@ -241,7 +251,7 @@ class PrincessFormulaCreator
                 getDeclarationKind(input),
                 argTypes.build(),
                 getFormulaType(f),
-                solverDeclaration));
+                PrincessEquationDeclaration.INSTANCE));
       }
     } else {
       int arity = input.length();
