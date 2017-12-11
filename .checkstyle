@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="false">
-  <local-check-config name="SoSy-Lab Common" location=".settings/checkstyle.xml" type="project" description="">
+  <local-check-config name="SoSy-Lab Common" location="build/checkstyle.xml" type="project" description="">
     <additional-data name="protect-config-file" value="false"/>
   </local-check-config>
-  <local-check-config name="Test-Code Configuration" location=".settings/checkstyle.test.xml" type="project" description="">
+  <local-check-config name="Test-Code Configuration" location="build/checkstyle.test.xml" type="project" description="">
     <additional-data name="protect-config-file" value="false"/>
   </local-check-config>
   <fileset name="regular" enabled="true" check-config-name="SoSy-Lab Common" local="true">

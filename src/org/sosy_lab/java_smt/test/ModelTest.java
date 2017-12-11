@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -391,10 +392,10 @@ public class ModelTest extends SolverBasedTest0 {
             IntegerFormula,
             ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
         arrType =
-            ArrayFormulaType.getArrayType(
+            FormulaType.getArrayType(
                 IntegerType,
-                ArrayFormulaType.getArrayType(
-                    IntegerType, ArrayFormulaType.getArrayType(IntegerType, IntegerType)));
+                FormulaType.getArrayType(
+                    IntegerType, FormulaType.getArrayType(IntegerType, IntegerType)));
     testModelGetters(
         f,
         amgr.select(
@@ -426,7 +427,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(
         f,
         amgr.select(
-            amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)),
+            amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)),
             imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arr",
@@ -454,8 +455,7 @@ public class ModelTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         @SuppressWarnings("unused")
         Object evaluation =
-            m.evaluate(
-                amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)));
+            m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
       }
     }
   }
@@ -479,7 +479,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(
         f,
         amgr.select(
-            amgr.makeArray("arr", ArrayFormulaType.getArrayType(IntegerType, IntegerType)),
+            amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)),
             imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arr",
@@ -556,7 +556,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireBitvectors();
     // only Z3 fulfills these requirements
 
-    BitvectorType t32 = BitvectorType.getBitvectorTypeWithSize(32);
+    BitvectorType t32 = FormulaType.getBitvectorTypeWithSize(32);
     FunctionDeclaration<BitvectorFormula> si1 = fmgr.declareUF("*signed_int@1", t32, t32);
     FunctionDeclaration<BitvectorFormula> si2 = fmgr.declareUF("*signed_int@2", t32, t32);
     BitvectorFormula ctr = bvmgr.makeVariable(t32, "*signed_int@1@counter");

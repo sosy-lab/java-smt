@@ -75,10 +75,9 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     requireInterpolation();
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      IntegerFormula x, y, z;
-      x = imgr.makeVariable("x");
-      y = imgr.makeVariable("y");
-      z = imgr.makeVariable("z");
+      IntegerFormula x = imgr.makeVariable("x");
+      IntegerFormula y = imgr.makeVariable("y");
+      IntegerFormula z = imgr.makeVariable("z");
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
@@ -96,10 +95,9 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
     requireInterpolation();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      IntegerFormula x, y, z;
-      x = imgr.makeVariable("x");
-      y = imgr.makeVariable("y");
-      z = imgr.makeVariable("z");
+      IntegerFormula x = imgr.makeVariable("x");
+      IntegerFormula y = imgr.makeVariable("y");
+      IntegerFormula z = imgr.makeVariable("z");
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));

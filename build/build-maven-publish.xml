@@ -1,4 +1,6 @@
-<project name="maven" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="maven" basedir="."
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <!-- Defined maven snapshots and staging repository id and url -->
     <property name="ossrh-snapshots-repository-url"
@@ -8,6 +10,20 @@
 
     <!-- There server id in the Maven settings.xml -->
     <property name="ossrh-server-id" value="ossrh" />
+
+    <target name="gen-pom" depends="load-ivy, determine-version" description="Generate a POM file from Ivy metadata">
+        <property name="ivy.pom.version" value="${version}"/>
+
+        <ivy:makepom ivyfile="${ivy.dep.file}" pomfile="pom.xml" conf="core,runtime-z3,runtime-smtinterpol" templatefile="pom_template.xml">
+            <mapping conf="core,runtime-smtinterpol" scope="compile"/>
+        </ivy:makepom>
+
+        <!-- Maven group is "sosy-lab", not "sosy_lab"-->
+        <replace file="pom.xml">
+            <replacetoken>sosy_lab</replacetoken>
+            <replacevalue>sosy-lab</replacevalue>
+        </replace>
+    </target>
 
     <target name="deploy-to-maven-central" depends="dist, gen-pom, jar"
         description="deploy snapshot version to Maven snapshot repository">

@@ -43,7 +43,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
@@ -243,7 +242,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public void testInvalidFloatVariable() {
     requireFloats();
     createVariableWith(
-        v -> fpmgr.makeVariable(v, FloatingPointType.getSinglePrecisionFloatingPointType()));
+        v -> fpmgr.makeVariable(v, FormulaType.getSinglePrecisionFloatingPointType()));
   }
 
   @Test

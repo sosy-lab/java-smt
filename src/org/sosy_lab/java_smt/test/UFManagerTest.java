@@ -73,9 +73,9 @@ public class UFManagerTest extends SolverBasedTest0 {
     }
   }
 
-  private FunctionDeclaration<?> getDeclaration(Formula f) {
+  private FunctionDeclaration<?> getDeclaration(Formula pFormula) {
     return mgr.visit(
-        f,
+        pFormula,
         new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
           @Override
           public FunctionDeclaration<?> visitFunction(

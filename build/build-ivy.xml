@@ -68,24 +68,10 @@
         <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
     </target>
 
-    <target name="gen-pom" depends="load-ivy, determine-version" description="Generate a POM file from Ivy metadata">
-        <property name="ivy.pom.version" value="${version}"/>
-
-        <ivy:makepom ivyfile="${ivy.dep.file}" pomfile="pom.xml" conf="core,runtime-z3,runtime-smtinterpol" templatefile="pom_template.xml">
-            <mapping conf="core,runtime-smtinterpol" scope="compile"/>
-        </ivy:makepom>
-
-        <!-- Maven group is "sosy-lab", not "sosy_lab"-->
-        <replace file="pom.xml">
-            <replacetoken>sosy_lab</replacetoken>
-            <replacevalue>sosy-lab</replacevalue>
-        </replace>
-
-        <!-- SMTInterpol is temporarily published under our own namespace -->
-        <replace file="pom.xml">
-            <replacetoken>de.uni-freiburg.informatik.ultimate</replacetoken>
-            <replacevalue>org.sosy-lab</replacevalue>
-        </replace>
+    <target name="update-lib" depends="load-ivy" description="Update the version of a library to the latest one">
+        <property name="update-lib.revision" value="latest.release"/>
+        <ivy:findrevision organisation="${update-lib.org}" module="${update-lib.module}" revision="${update-lib.revision}" property="update-lib.version"/>
+        <echo message="Found version ${update-lib.version} of ${update-lib.org}/${update-lib.module}"/>
+        <replaceregexp file="${ivy.dep.file.ivy.instance}" match='(org="${update-lib.org}" name="${update-lib.module}" rev=)"[0-9a-zA-Z+-.]*"' replace='\1"${update-lib.version}"' byline="true"/>
     </target>
-
 </project>

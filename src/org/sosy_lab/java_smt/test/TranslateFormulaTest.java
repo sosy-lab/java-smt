@@ -125,10 +125,9 @@ public class TranslateFormulaTest {
   private BooleanFormula createTestFormula(FormulaManager mgr) {
     BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
     IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
-    IntegerFormula x, y, z;
-    x = ifmgr.makeVariable("x");
-    y = ifmgr.makeVariable("y");
-    z = ifmgr.makeVariable("z");
+    IntegerFormula x = ifmgr.makeVariable("x");
+    IntegerFormula y = ifmgr.makeVariable("y");
+    IntegerFormula z = ifmgr.makeVariable("z");
     BooleanFormula t =
         bfmgr.and(
             bfmgr.or(ifmgr.equal(x, y), ifmgr.equal(x, ifmgr.makeNumber(2))),
