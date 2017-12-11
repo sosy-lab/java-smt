@@ -35,8 +35,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -94,11 +96,13 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // The tests in this class use quantifiers and thus solver failures are expected.
     // We do not ignore all SolverExceptions in order to not hide bugs,
     // but only for Princess which is known to not be able to solve all tests here.
-    if (solverUnderTest == Solvers.PRINCESS) {
-      TruthJUnit.assume().fail(e.getMessage());
-    }
+//    if (solverUnderTest == Solvers.PRINCESS) {
+//      TruthJUnit.assume().fail(e.getMessage());
+//    }
     throw e;
   }
+
+  private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
   @Test
   public void testForallArrayConjunctUnsat() throws SolverException, InterruptedException {
@@ -418,5 +422,28 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
                 imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
     BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
     assertThatFormula(qFreeF).isEquivalentTo(imgr.lessThan(imgr.makeNumber(2), yy));
+  }
+
+  @Test
+  public void checkBVQuantifierElimination() throws InterruptedException, SolverException {
+    requireBitvectors();
+
+    // build formula: exists y : bv[2]. x * y = 1
+    // quantifier-free equivalent: x = 1 | x = 3
+    //                      or     extract_0_0 x = 1
+
+    int i = index.getFreshId();
+    int width = 2;
+
+    BitvectorFormula xx = bvmgr.makeVariable(width, "x" + i);
+    BitvectorFormula yy = bvmgr.makeVariable(width, "y" + i);
+    BooleanFormula f =
+        qmgr.exists(
+            yy,
+            bvmgr.equal(bvmgr.multiply(xx, yy), bvmgr.makeBitvector(width, 1)));
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+
+    assertThatFormula(qFreeF).isEquivalentTo(
+        bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
   }
 }

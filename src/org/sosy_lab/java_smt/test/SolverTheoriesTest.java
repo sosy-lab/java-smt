@@ -666,6 +666,11 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
+    assume()
+        .withMessage("Solver does not support bit-vector arrays.")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
+
     BitvectorFormula _i = mgr.getBitvectorFormulaManager().makeVariable(64, "i");
     ArrayFormula<BitvectorFormula, BitvectorFormula> _b =
         amgr.makeArray(
@@ -709,6 +714,11 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void testNestedBitVectorArray() {
     requireArrays();
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver does not support bit-vector arrays.")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula _i = imgr.makeVariable("i");
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, BitvectorFormula>> multi =

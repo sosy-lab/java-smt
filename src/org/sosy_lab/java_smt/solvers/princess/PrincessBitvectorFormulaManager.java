@@ -136,11 +136,24 @@ class PrincessBitvectorFormulaManager
 
   @Override
   protected IExpression makeBitvectorImpl(int pLength, long pI) {
-    return ModuloArithmetic$.MODULE$.bv(pLength, IdealInt.apply(pI));
+    return makeBitvectorImpl(pLength, BigInteger.valueOf(pI));
   }
 
   @Override
   protected IExpression makeBitvectorImpl(int pLength, BigInteger pI) {
+    BigInteger n = BigInteger.valueOf(2).pow(pLength);
+    if (pI.signum() < 0) {
+      BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
+      if (pI.compareTo(max.negate()) < 0) {
+        throw new IllegalArgumentException(
+            pI + " is too small for a bitvector with length " + pLength);
+      }
+      pI = pI.add(n);
+    }
+    if (pI.compareTo(n) >= 0) {
+      throw new IllegalArgumentException(
+          pI + " is too big for a bitvector with length " + pLength);
+    }
     return ModuloArithmetic$.MODULE$.bv(pLength, IdealInt.apply(pI));
   }
 

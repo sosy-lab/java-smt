@@ -46,13 +46,18 @@ import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
+import ap.terfor.preds.Predicate;
 import ap.types.Sort;
 import ap.theories.ModuloArithmetic;
+import ap.theories.ModuloArithmetic$;
 import ap.theories.SimpleArray;
 import ap.theories.MulTheory;
+import ap.theories.nia.GroebnerMultiplication$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -73,6 +78,47 @@ import scala.Enumeration;
 class PrincessFormulaCreator
     extends FormulaCreator<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
+
+  // Hash-maps from interpreted functions and predicates to their corresponding
+  // Java-SMT kind
+  private static final Map<IFunction, FunctionDeclarationKind> theoryFunctionKind =
+    new HashMap<> ();
+  private static final Map<Predicate, FunctionDeclarationKind> theoryPredKind =
+    new HashMap<> ();
+
+  static {
+    final ModuloArithmetic$ modmod = ModuloArithmetic$.MODULE$;
+    theoryFunctionKind.put(modmod.bv_concat(),  FunctionDeclarationKind.BV_CONCAT);
+    theoryFunctionKind.put(modmod.bv_extract(), FunctionDeclarationKind.BV_EXTRACT);
+    theoryFunctionKind.put(modmod.bv_not(),     FunctionDeclarationKind.BV_NOT);
+    theoryFunctionKind.put(modmod.bv_neg(),     FunctionDeclarationKind.BV_NEG);
+    theoryFunctionKind.put(modmod.bv_and(),     FunctionDeclarationKind.BV_AND);
+    theoryFunctionKind.put(modmod.bv_or(),      FunctionDeclarationKind.BV_OR);
+    theoryFunctionKind.put(modmod.bv_add(),     FunctionDeclarationKind.BV_ADD);
+    theoryFunctionKind.put(modmod.bv_sub(),     FunctionDeclarationKind.BV_SUB);
+    theoryFunctionKind.put(modmod.bv_mul(),     FunctionDeclarationKind.BV_MUL);
+    theoryFunctionKind.put(modmod.bv_udiv(),    FunctionDeclarationKind.BV_UDIV);
+    theoryFunctionKind.put(modmod.bv_sdiv(),    FunctionDeclarationKind.BV_SDIV);
+    theoryFunctionKind.put(modmod.bv_urem(),    FunctionDeclarationKind.BV_UREM);
+    theoryFunctionKind.put(modmod.bv_srem(),    FunctionDeclarationKind.BV_SREM);
+    // modmod.bv_smod()?
+    theoryFunctionKind.put(modmod.bv_shl(),     FunctionDeclarationKind.BV_SHL);
+    theoryFunctionKind.put(modmod.bv_lshr(),    FunctionDeclarationKind.BV_LSHR);
+    theoryFunctionKind.put(modmod.bv_ashr(),    FunctionDeclarationKind.BV_ASHR);
+    theoryFunctionKind.put(modmod.bv_xor(),     FunctionDeclarationKind.BV_XOR);
+    // modmod.bv_xnor()?
+    // modmod.bv_comp()?
+
+    // casts to integer, sign/zero-extension?
+
+    theoryPredKind    .put(modmod.bv_ult(),     FunctionDeclarationKind.BV_ULT);
+    theoryPredKind    .put(modmod.bv_ule(),     FunctionDeclarationKind.BV_ULE);
+    theoryPredKind    .put(modmod.bv_slt(),     FunctionDeclarationKind.BV_SLT);
+    theoryPredKind    .put(modmod.bv_sle(),     FunctionDeclarationKind.BV_SLE);
+
+    theoryFunctionKind.put(GroebnerMultiplication$.MODULE$.mul(),
+                           FunctionDeclarationKind.MUL);
+  }
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
     super(pEnv, PrincessEnvironment.BoolSort, PrincessEnvironment.IntegerSort, null);
@@ -205,8 +251,9 @@ class PrincessFormulaCreator
     } else if (input instanceof IVariable) {
       return visitor.visitBoundVariable(f, ((IVariable) input).index());
 
-      // atom and constant are variables
-    } else if (input instanceof IAtom || input instanceof IConstant) {
+      // nullary atoms and constant are variables
+    } else if (((input instanceof IAtom) && ((IAtom)input).args().isEmpty()) ||
+               input instanceof IConstant) {
       return visitor.visitFreeVariable(f, input.toString());
 
       // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
@@ -229,100 +276,119 @@ class PrincessFormulaCreator
               getFormulaType(f),
               PrincessMultiplyDeclaration.INSTANCE));
 
-    } else if (getDeclarationKind(input) == FunctionDeclarationKind.EQ_ZERO) {
-      final ITerm lhs = ((IIntFormula)input).t();
-      final Sort sort = Sort.sortOf(lhs);
-
-      if (sort == PrincessEnvironment.BoolSort) {
-        // this is really a Boolean formula, visit the lhs of the equation
-        return visit(visitor, f, lhs);
-      } else {
-
-        scala.Option<scala.Tuple2<ap.parser.ITerm, ap.parser.ITerm>> maybeArgs =
-          IExpression.Eq$.MODULE$.unapply((IFormula)input);
-
-        assert maybeArgs.isDefined();
-
-        final ITerm left = maybeArgs.get()._1;
-        final ITerm right = maybeArgs.get()._2;
-
-        ImmutableList.Builder<Formula> args = ImmutableList.builder();
-        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-
-        FormulaType<?> argumentTypeLeft = getFormulaType(left);
-        args.add(encapsulate(argumentTypeLeft, left));
-        argTypes.add(argumentTypeLeft);
-        FormulaType<?> argumentTypeRight = getFormulaType(right);
-        args.add(encapsulate(argumentTypeRight, right));
-        argTypes.add(argumentTypeRight);
-
-        FunctionDeclarationKind kind = getDeclarationKind(input);
-
-        return visitor.visitFunction(
-            f,
-            args.build(),
-            FunctionDeclarationImpl.of(
-                getName(input),
-                getDeclarationKind(input),
-                argTypes.build(),
-                getFormulaType(f),
-                PrincessEquationDeclaration.INSTANCE));
-      }
     } else {
-      int arity = input.length();
-      ImmutableList.Builder<Formula> args = ImmutableList.builder();
-      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-      for (int i = 0; i < arity; i++) {
-        IExpression arg = input.apply(i);
-        FormulaType<?> argumentType = getFormulaType(arg);
-        args.add(encapsulate(argumentType, arg));
-        argTypes.add(argumentType);
-      }
+        
+        // then we have to check the declaration kind
+        final FunctionDeclarationKind kind = getDeclarationKind(input);
 
-      PrincessFunctionDeclaration solverDeclaration;
-      FunctionDeclarationKind kind = getDeclarationKind(input);
+        if (kind == FunctionDeclarationKind.EQ) {
+            scala.Option<scala.Tuple2<ap.parser.ITerm, ap.parser.ITerm>> maybeArgs =
+                IExpression.Eq$.MODULE$.unapply((IFormula)input);
 
-      if (input instanceof IFunApp) {
-        if (kind == FunctionDeclarationKind.UF) {
-          solverDeclaration =
-            new PrincessIFunctionDeclaration(((IFunApp) input).fun());
-        } else if (kind == FunctionDeclarationKind.MUL) {
-          solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
+            assert maybeArgs.isDefined();
+
+            final ITerm left = maybeArgs.get()._1;
+            final ITerm right = maybeArgs.get()._2;
+
+            ImmutableList.Builder<Formula> args = ImmutableList.builder();
+            ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+
+            FormulaType<?> argumentTypeLeft = getFormulaType(left);
+            args.add(encapsulate(argumentTypeLeft, left));
+            argTypes.add(argumentTypeLeft);
+            FormulaType<?> argumentTypeRight = getFormulaType(right);
+            args.add(encapsulate(argumentTypeRight, right));
+            argTypes.add(argumentTypeRight);
+
+            return visitor.visitFunction(
+                       f,
+                       args.build(),
+                       FunctionDeclarationImpl.of(
+                             getName(input),
+                             FunctionDeclarationKind.EQ,
+                             argTypes.build(),
+                             getFormulaType(f),
+                             PrincessEquationDeclaration.INSTANCE));
+
+        } else if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula) {
+
+            assert ((IIntFormula)input).rel().equals(IIntRelation.EqZero());
+
+            // this is really a Boolean formula, visit the lhs of the equation
+            return visit(visitor, f, ((IIntFormula)input).t());
+
         } else {
-          solverDeclaration = new PrincessByExampleDeclaration(input);
-        }
-      } else {
-        solverDeclaration = new PrincessByExampleDeclaration(input);
-      }
 
-      return visitor.visitFunction(
-          f,
-          args.build(),
-          FunctionDeclarationImpl.of(
-              getName(input),
-              kind,
-              argTypes.build(),
-              getFormulaType(f),
-              solverDeclaration));
+            ImmutableList.Builder<Formula> args = ImmutableList.builder();
+            ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+            int arity = input.length();
+            for (int i = 0; i < arity; i++) {
+                IExpression arg = input.apply(i);
+                FormulaType<?> argumentType = getFormulaType(arg);
+                args.add(encapsulate(argumentType, arg));
+                argTypes.add(argumentType);
+            }
+
+            PrincessFunctionDeclaration solverDeclaration;
+
+            if (input instanceof IFunApp) {
+                if (kind == FunctionDeclarationKind.UF) {
+                    solverDeclaration =
+                        new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+                } else if (kind == FunctionDeclarationKind.MUL) {
+                    solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
+                } else {
+                    solverDeclaration = new PrincessByExampleDeclaration(input);
+                }
+            } else {
+                solverDeclaration = new PrincessByExampleDeclaration(input);
+            }
+
+            return visitor.visitFunction(
+                       f,
+                       args.build(),
+                       FunctionDeclarationImpl.of(
+                            getName(input),
+                            kind,
+                            argTypes.build(),
+                            getFormulaType(f),
+                            solverDeclaration));
+        }
     }
   }
 
+  private void extractArgs(IExpression input,
+                           ImmutableList.Builder<Formula> args,
+                           ImmutableList.Builder<FormulaType<?>> argTypes) {
+  }
+
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
-    assert !(input instanceof IAtom || input instanceof IConstant)
+    assert !(((input instanceof IAtom) && ((IAtom)input).args().isEmpty()) ||
+             input instanceof IConstant)
         : "Variables should be handled somewhere else";
 
     if (input instanceof IFormulaITE || input instanceof ITermITE) {
       return FunctionDeclarationKind.ITE;
     } else if (input instanceof IFunApp) {
       final IFunction fun = ((IFunApp) input).fun();
-      if (SimpleArray.Select$.MODULE$.unapply(fun)) {
+      final FunctionDeclarationKind theoryKind = theoryFunctionKind.get(fun);
+      if (theoryKind != null) {
+        return theoryKind;
+      } else if (SimpleArray.Select$.MODULE$.unapply(fun)) {
         return FunctionDeclarationKind.SELECT;
       } else if (SimpleArray.Store$.MODULE$.unapply(fun)) {
         return FunctionDeclarationKind.STORE;
-      } else if (MulTheory.Mul$.MODULE$.unapply(fun)) {
-        return FunctionDeclarationKind.MUL;
+      } else {
+        return FunctionDeclarationKind.UF;
       }
-      return FunctionDeclarationKind.UF;
+    } else if (input instanceof IAtom) {
+      final Predicate pred = ((IAtom)input).pred();
+      final FunctionDeclarationKind theoryKind = theoryPredKind.get(pred);
+      if (theoryKind != null) {
+        return theoryKind;
+      } else {
+        return FunctionDeclarationKind.UF;
+      }
     } else if (isBinaryFunction(input, IBinJunctor.And())) {
       return FunctionDeclarationKind.AND;
     } else if (isBinaryFunction(input, IBinJunctor.Or())) {
@@ -339,7 +405,15 @@ class PrincessFormulaCreator
     } else if (input instanceof IIntFormula) {
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {
-        return FunctionDeclarationKind.EQ_ZERO;
+        final Sort sort = Sort.sortOf(((IIntFormula)input).t());
+        if (sort == PrincessEnvironment.BoolSort) {
+          // this is really a Boolean formula, it has to be UF
+          return FunctionDeclarationKind.UF;
+        } else if (sort == PrincessEnvironment.IntegerSort) {
+          return FunctionDeclarationKind.EQ_ZERO;
+        } else {
+          return FunctionDeclarationKind.EQ;
+        }
       } else if (f.rel().equals(IIntRelation.GeqZero())) {
         return FunctionDeclarationKind.GTE_ZERO;
       } else {

@@ -556,6 +556,11 @@ public class ModelTest extends SolverBasedTest0 {
     requireBitvectors();
     // only Z3 fulfills these requirements
 
+    assume()
+        .withMessage("solver does not implement optimisation")
+        .that(solverToUse())
+        .isEqualTo(Solvers.Z3);
+
     BitvectorType t32 = FormulaType.getBitvectorTypeWithSize(32);
     FunctionDeclaration<BitvectorFormula> si1 = fmgr.declareUF("*signed_int@1", t32, t32);
     FunctionDeclaration<BitvectorFormula> si2 = fmgr.declareUF("*signed_int@2", t32, t32);

@@ -202,6 +202,66 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkItpSequence(stack, ImmutableList.of(B, A), ImmutableList.of(itpB));
   }
 
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
+  public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
+    requireInterpolation();
+    requireBitvectors();
+
+    // Z3 does not fully support interpolation for bit-vectors
+    assume()
+        .withMessage("As of now, Z3 does not fully support bit-vector interpolation")
+        .that(solver)
+        .isNotSameAs(Solvers.Z3);
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+    int width = 8;
+
+    BitvectorFormula n130 = bvmgr.makeBitvector(width, 130);
+
+    BitvectorFormula a = bvmgr.makeVariable(width, "a" + i);
+    BitvectorFormula b = bvmgr.makeVariable(width, "b" + i);
+    BitvectorFormula c = bvmgr.makeVariable(width, "c" + i);
+
+    // build formula:  b = a + 130, b > a, c = b + 130, c > b
+    BooleanFormula A = bvmgr.equal(b, bvmgr.add(a, n130));
+    BooleanFormula B = bvmgr.greaterThan(b, a, false);
+    BooleanFormula C = bvmgr.equal(c, bvmgr.add(b, n130));
+    BooleanFormula D = bvmgr.greaterThan(c, b, false);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+    T TD = stack.push(D);
+
+    assertThat(stack).isUnsatisfiable();
+
+    BooleanFormula itp = stack.getInterpolant(ImmutableList.of());
+    BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
+    BooleanFormula itpAB = stack.getInterpolant(ImmutableList.of(TA, TB));
+    BooleanFormula itpABC = stack.getInterpolant(ImmutableList.of(TA, TB, TC));
+    BooleanFormula itpD = stack.getInterpolant(ImmutableList.of(TD));
+    BooleanFormula itpDC = stack.getInterpolant(ImmutableList.of(TD, TC));
+    BooleanFormula itpDCB = stack.getInterpolant(ImmutableList.of(TD, TC, TB));
+    BooleanFormula itpABCD = stack.getInterpolant(ImmutableList.of(TA, TB, TC, TD));
+
+    stack.pop(); // clear stack, such that we can re-use the solver
+    stack.pop();
+    stack.pop();
+    stack.pop();
+
+    // special cases: start and end of sequence might need special handling in the solver
+    assertThat(bmgr.makeBoolean(true)).isEqualTo(itp);
+    assertThat(bmgr.makeBoolean(false)).isEqualTo(itpABCD);
+
+    // we check here the stricter properties for sequential interpolants,
+    // but this simple example should work for all solvers
+    checkItpSequence(stack, ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
+    checkItpSequence(stack, ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
+  }
+
   private void requireSequentialItp() {
     requireInterpolation();
     assume()
