@@ -28,6 +28,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -296,7 +297,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public Map<String, Formula> extractVariablesAndUFs(
       final Formula pFormula, final boolean extractUF) {
 
-    final ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
+    final Map<String, Formula> found = new LinkedHashMap<>();
     visitRecursively(
         new DefaultFormulaVisitor<TraversalProcess>() {
 
@@ -322,7 +323,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
           }
         },
         pFormula);
-    return found.build();
+    return ImmutableMap.copyOf(found);
   }
 
   @SuppressWarnings("unchecked")
