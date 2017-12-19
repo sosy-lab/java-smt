@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -295,7 +296,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public Map<String, Formula> extractVariablesAndUFs(
       final Formula pFormula, final boolean extractUF) {
 
-    final Map<String, Formula> found = new HashMap<>();
+    final ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     visitRecursively(
         new DefaultFormulaVisitor<TraversalProcess>() {
 
@@ -321,7 +322,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
           }
         },
         pFormula);
-    return found;
+    return found.build();
   }
 
   @SuppressWarnings("unchecked")
