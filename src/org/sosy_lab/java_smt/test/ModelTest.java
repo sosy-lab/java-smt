@@ -155,9 +155,24 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula app1 = fmgr.callUF(declaration, arg1);
     IntegerFormula app2 = fmgr.callUF(declaration, arg2);
 
+    ImmutableList<ValueAssignment> expectedModel =
+        ImmutableList.of(
+            new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
+            new ValueAssignment(arg2, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
+            new ValueAssignment(
+                fmgr.callUF(declaration, imgr.makeNumber(3)),
+                "UF",
+                BigInteger.valueOf(1),
+                ImmutableList.of(BigInteger.valueOf(3))),
+            new ValueAssignment(
+                fmgr.callUF(declaration, imgr.makeNumber(4)),
+                "UF",
+                BigInteger.valueOf(2),
+                ImmutableList.of(BigInteger.valueOf(4))));
+
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(imgr.equal(app1, imgr.makeNumber(1)));
-      prover.push(imgr.equal(app2, imgr.makeNumber(2)));
+      prover.push(
+          bmgr.and(imgr.equal(app1, imgr.makeNumber(1)), imgr.equal(app2, imgr.makeNumber(2))));
       prover.push(imgr.equal(arg1, imgr.makeNumber(3)));
       prover.push(imgr.equal(arg2, imgr.makeNumber(4)));
 
@@ -166,21 +181,9 @@ public class ModelTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
         assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
-        assertThat(m)
-            .containsExactly(
-                new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
-                new ValueAssignment(arg1, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
-                new ValueAssignment(
-                    fmgr.callUF(declaration, imgr.makeNumber(3)),
-                    "UF",
-                    BigInteger.valueOf(1),
-                    ImmutableList.of(BigInteger.valueOf(3))),
-                new ValueAssignment(
-                    fmgr.callUF(declaration, imgr.makeNumber(4)),
-                    "UF",
-                    BigInteger.valueOf(2),
-                    ImmutableList.of(BigInteger.valueOf(4))));
+        assertThat(m).containsExactlyElementsIn(expectedModel);
       }
+      assertThat(prover.getModelAssignments()).containsExactlyElementsIn(expectedModel);
     }
   }
 
