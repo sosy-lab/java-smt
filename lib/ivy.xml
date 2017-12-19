@@ -119,7 +119,7 @@
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.1-335-g4c543a5" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
-        <dependency org="uuverifiers" name="princess_2.12" rev="2017-07-17-assertionless" conf="runtime-princess->default; contrib->sources">
+        <dependency org="uuverifiers" name="princess_2.12" rev="2017-12-06-assertionless" conf="runtime-princess->default; contrib->sources">
         </dependency>
 
         <!-- Solver Binaries -->
