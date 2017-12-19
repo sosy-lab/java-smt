@@ -294,6 +294,20 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return found;
   }
 
+  /**
+   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean, BiConsumer)} which unwraps both
+   * input and output.
+   */
+  public void extractVariablesAndUFs(
+      final TFormulaInfo pFormula,
+      final boolean extractUFs,
+      final BiConsumer<String, TFormulaInfo> pConsumer) {
+    extractVariablesAndUFs(
+        encapsulateWithTypeOf(pFormula),
+        extractUFs,
+        (name, f) -> pConsumer.accept(name, extractInfo(f)));
+  }
+
   /** Extract all free variables from the formula, optionally including UFs. */
   public void extractVariablesAndUFs(
       final Formula pFormula,
