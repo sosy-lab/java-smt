@@ -44,7 +44,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public T push(BooleanFormula f) {
+  public T push(BooleanFormula f) throws InterruptedException {
     logger.log(Level.FINE, "up to level " + level++);
     logger.log(Level.FINE, "formula pushed:", f);
     return wrapped.push(f);
@@ -57,7 +57,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public T addConstraint(BooleanFormula constraint) {
+  public T addConstraint(BooleanFormula constraint) throws InterruptedException {
     return wrapped.addConstraint(constraint);
   }
 

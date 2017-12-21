@@ -36,7 +36,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   @Nullable
   @CanIgnoreReturnValue
-  default T push(BooleanFormula f) {
+  default T push(BooleanFormula f) throws InterruptedException {
     push();
     return addConstraint(f);
   }
@@ -47,7 +47,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   /** Add constraint to the context. */
   @Nullable
   @CanIgnoreReturnValue
-  T addConstraint(BooleanFormula constraint);
+  T addConstraint(BooleanFormula constraint) throws InterruptedException;
 
   /** Create backtracking point. */
   void push();

@@ -76,7 +76,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   }
 
   @Override
-  public Long addConstraint(BooleanFormula f) {
+  public Long addConstraint(BooleanFormula f) throws InterruptedException {
     long e = super.addConstraint0(f);
     assertedFormulas.peek().add(e);
     return e;

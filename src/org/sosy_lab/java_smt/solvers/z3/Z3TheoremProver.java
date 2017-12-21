@@ -64,7 +64,7 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula f) {
+  public Void addConstraint(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);
 
     if (storedConstraints != null) { // Unsat core generation is on.
@@ -176,10 +176,14 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
             }
           });
 
-      long negatedModel =
-          Native.mkNot(z3context, Native.mkAnd(z3context, valuesOfModel.length, valuesOfModel));
-      Native.incRef(z3context, negatedModel);
-      Native.solverAssert(z3context, z3solver, negatedModel);
+      try {
+        long negatedModel =
+            Native.mkNot(z3context, Native.mkAnd(z3context, valuesOfModel.length, valuesOfModel));
+        Native.incRef(z3context, negatedModel);
+        Native.solverAssert(z3context, z3solver, negatedModel);
+      } catch (Z3Exception e) {
+        throw creator.handleZ3Exception(e);
+      }
     }
 
     // we pushed some levels on assertionStack, remove them and delete solver

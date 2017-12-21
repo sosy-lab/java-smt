@@ -35,7 +35,7 @@ public class ReusableStackInterpolatingProver<T>
   }
 
   @Override
-  public T addConstraint(BooleanFormula pConstraint) {
+  public T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     return delegate.addConstraint(pConstraint);
   }
 

@@ -42,7 +42,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    */
   @Override
   @CanIgnoreReturnValue
-  default T push(BooleanFormula f) {
+  default T push(BooleanFormula f) throws InterruptedException {
     // Java8 does not support overriding of default-interface-methods,
     // thus we forward to the super-interface here.
     return BasicProverEnvironment.super.push(f);

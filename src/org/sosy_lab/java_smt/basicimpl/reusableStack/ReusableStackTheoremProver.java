@@ -34,7 +34,7 @@ public class ReusableStackTheoremProver extends ReusableStackAbstractProver<Void
   }
 
   @Override
-  public Void addConstraint(BooleanFormula pConstraint) {
+  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     return delegate.addConstraint(pConstraint);
   }
 

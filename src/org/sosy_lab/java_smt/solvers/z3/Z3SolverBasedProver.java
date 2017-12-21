@@ -89,11 +89,15 @@ abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
   }
 
   @CanIgnoreReturnValue
-  protected long addConstraint0(BooleanFormula f) {
+  protected long addConstraint0(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
-    Native.solverAssert(z3context, z3solver, e);
+    try {
+      Native.solverAssert(z3context, z3solver, e);
+    } catch (Z3Exception exception) {
+      throw creator.handleZ3Exception(exception);
+    }
     Native.decRef(z3context, e);
     return e;
   }
