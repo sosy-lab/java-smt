@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -38,15 +37,6 @@ class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnviron
   LoggingInterpolatingProverEnvironment(LogManager logger, InterpolatingProverEnvironment<T> ipe) {
     super(ipe, logger);
     this.wrapped = checkNotNull(ipe);
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    logger.log(Level.FINE, "assumptions:", pAssumptions);
-    boolean result = wrapped.isUnsatWithAssumptions(pAssumptions);
-    logger.log(Level.FINE, "unsat-check returned:", result);
-    return result;
   }
 
   @Override

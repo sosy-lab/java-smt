@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -111,15 +110,6 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    *     procedure is incomplete
    */
   List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree)
-      throws SolverException, InterruptedException;
-
-  /**
-   * Check whether the conjunction of all formulas on the stack together with the list of
-   * assumptions is satisfiable.
-   *
-   * @param assumptions A list of literals.
-   */
-  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 
   /** Checks for a valid subtree-structure. This code is taken from SMTinterpol. */

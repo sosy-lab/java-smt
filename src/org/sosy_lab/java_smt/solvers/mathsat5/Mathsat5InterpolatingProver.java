@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
@@ -31,7 +30,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,14 +81,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public void push() {
     Preconditions.checkState(!closed);
     msat_push_backtrack_point(curEnv);
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    return !msat_check_sat_with_assumptions(
-        curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
   }
 
   @Override

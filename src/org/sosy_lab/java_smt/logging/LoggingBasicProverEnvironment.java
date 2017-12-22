@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.logging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -70,6 +71,15 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     boolean result = wrapped.isUnsat();
+    logger.log(Level.FINE, "unsat-check returned:", result);
+    return result;
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    logger.log(Level.FINE, "assumptions:", pAssumptions);
+    boolean result = wrapped.isUnsatWithAssumptions(pAssumptions);
     logger.log(Level.FINE, "unsat-check returned:", result);
     return result;
   }

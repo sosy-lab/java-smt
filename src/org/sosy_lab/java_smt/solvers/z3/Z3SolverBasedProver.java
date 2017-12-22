@@ -54,6 +54,7 @@ abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
+  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);

@@ -32,15 +32,15 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
 
-class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
+class Z3OptimizationProver extends Z3SolverBasedProver<Void>
+    implements OptimizationProverEnvironment {
 
   private final LogManager logger;
   private final long z3optContext;
 
-  Z3OptimizationProver(Z3FormulaCreator creator, LogManager pLogger) {
-    super(creator);
+  Z3OptimizationProver(Z3FormulaCreator creator, LogManager pLogger, long z3params) {
+    super(creator, z3params);
     z3optContext = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optContext);
     logger = pLogger;
@@ -70,7 +70,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public OptStatus check() throws InterruptedException, SolverException {
+  public OptStatus check() throws InterruptedException, Z3SolverException {
     Preconditions.checkState(!closed);
     int status;
     try {
@@ -105,7 +105,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     return check() == OptStatus.UNSAT;
   }

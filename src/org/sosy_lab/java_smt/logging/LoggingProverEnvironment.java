@@ -43,14 +43,6 @@ class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    boolean result = wrapped.isUnsatWithAssumptions(assumptions);
-    logger.log(Level.FINE, "unsat-check returned:", result);
-    return result;
-  }
-
-  @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);

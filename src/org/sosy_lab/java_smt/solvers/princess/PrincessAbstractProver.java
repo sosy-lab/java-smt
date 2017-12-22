@@ -144,7 +144,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     }
   }
 
-  @SuppressWarnings("unused")
+  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Solving with assumptions is not supported.");

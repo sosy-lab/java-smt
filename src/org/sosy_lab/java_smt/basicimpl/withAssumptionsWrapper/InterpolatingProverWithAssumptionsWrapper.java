@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -89,15 +88,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    clearAssumptions();
-
-    solverAssumptionsAsFormula.addAll(assumptions);
-    for (BooleanFormula formula : assumptions) {
-      solverAssumptionsFromPush.add(delegate.push(formula));
-    }
-    return delegate.isUnsat();
+  protected void registerPushedFormula(T pPushResult) {
+    solverAssumptionsFromPush.add(pPushResult);
   }
 
   @Override

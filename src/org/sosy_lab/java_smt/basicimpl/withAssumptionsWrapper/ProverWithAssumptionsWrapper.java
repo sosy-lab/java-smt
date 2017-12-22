@@ -36,18 +36,6 @@ public class ProverWithAssumptionsWrapper
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    clearAssumptions();
-
-    solverAssumptionsAsFormula.addAll(assumptions);
-    for (BooleanFormula formula : assumptions) {
-      delegate.push(formula);
-    }
-    return delegate.isUnsat();
-  }
-
-  @Override
   public List<BooleanFormula> getUnsatCore() {
     return delegate.getUnsatCore();
   }

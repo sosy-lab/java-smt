@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -66,6 +67,20 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
     clearAssumptions();
     return delegate.isUnsat();
   }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    clearAssumptions();
+    solverAssumptionsAsFormula.addAll(assumptions);
+    for (BooleanFormula formula : assumptions) {
+      registerPushedFormula(delegate.push(formula));
+    }
+    return delegate.isUnsat();
+  }
+
+  /** overridden in sub-class. */
+  protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
 
   @Override
   public Model getModel() throws SolverException {

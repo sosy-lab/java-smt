@@ -104,7 +104,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
     closed = true;
   }
 
-  @SuppressWarnings("unused")
+  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Assumption-solving is not supported.");

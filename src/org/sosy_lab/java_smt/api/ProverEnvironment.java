@@ -56,15 +56,6 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
       throws InterruptedException, SolverException;
 
   /**
-   * Check whether the conjunction of all formulas on the stack together with the list of
-   * assumptions is satisfiable.
-   *
-   * @param assumptions A list of literals.
-   */
-  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
-
-  /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
    * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    *

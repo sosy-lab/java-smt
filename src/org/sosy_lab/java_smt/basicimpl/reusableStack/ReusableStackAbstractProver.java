@@ -23,7 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -43,6 +45,12 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(size >= 0);
     return delegate.isUnsat();
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    return delegate.isUnsatWithAssumptions(pAssumptions);
   }
 
   @Override

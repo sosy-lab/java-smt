@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.basicimpl.reusableStack;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -56,11 +55,5 @@ public class ReusableStackInterpolatingProver<T>
       List<Set<T>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    return delegate.isUnsatWithAssumptions(pAssumptions);
   }
 }

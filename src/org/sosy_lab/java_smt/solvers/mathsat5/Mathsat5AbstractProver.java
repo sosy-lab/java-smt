@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
@@ -29,9 +30,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -67,6 +70,14 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     return !msat_check_sat(curEnv);
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    return !msat_check_sat_with_assumptions(
+        curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
   }
 
   @Override

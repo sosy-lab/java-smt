@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.Collection;
 import javax.annotation.Nullable;
 
 /**
@@ -54,6 +55,15 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   boolean isUnsat() throws SolverException, InterruptedException;
+
+  /**
+   * Check whether the conjunction of all formulas on the stack together with the list of
+   * assumptions is satisfiable.
+   *
+   * @param assumptions A list of literals.
+   */
+  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
 
   /**
    * Get a satisfying assignment. This should be called only immediately after an {@link #isUnsat()}

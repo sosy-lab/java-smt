@@ -50,12 +50,6 @@ public class ReusableStackTheoremProver extends ReusableStackAbstractProver<Void
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    return delegate.isUnsatWithAssumptions(assumptions);
-  }
-
-  @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     return delegate.unsatCoreOverAssumptions(assumptions);

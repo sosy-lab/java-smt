@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_all_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
@@ -143,14 +142,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
             }
           });
     }
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    return !msat_check_sat_with_assumptions(
-        curEnv, Mathsat5FormulaManager.getMsatTerm(assumptions));
   }
 
   @Override
