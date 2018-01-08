@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.truth.FailureMetadata;
-import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.SimpleSubjectBuilder;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
@@ -42,42 +41,18 @@ import org.sosy_lab.java_smt.api.SolverException;
  * <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use either {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or use
- * {@link StandardSubjectBuilder#about(com.google.common.truth.SubjectFactory)} and set a solver via
- * the method {@link #forSolver(SolverContext)}.
+ * {@link StandardSubjectBuilder#about(com.google.common.truth.Subject.Factory)} and set a solver
+ * via the method {@link #booleanFormulasOf(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {
 
   private final SolverContext context;
 
-  @Deprecated
-  private BooleanFormulaSubject(
-      FailureStrategy pFailureStrategy, BooleanFormula pFormula, SolverContext pMgr) {
-    super(pFailureStrategy, pFormula);
-    context = checkNotNull(pMgr);
-  }
-
   private BooleanFormulaSubject(
       FailureMetadata pMetadata, BooleanFormula pFormula, SolverContext pMgr) {
     super(pMetadata, pFormula);
     context = checkNotNull(pMgr);
-  }
-
-  /**
-   * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
-   * Truth: <code>assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula).is...()</code>
-   *
-   * @deprecated Use {@link #booleanFormulasOf(SolverContext)}
-   */
-  @Deprecated
-  public static com.google.common.truth.SubjectFactory<BooleanFormulaSubject, BooleanFormula>
-      forSolver(final SolverContext context) {
-    return new com.google.common.truth.SubjectFactory<BooleanFormulaSubject, BooleanFormula>() {
-      @Override
-      public BooleanFormulaSubject getSubject(FailureStrategy pFs, BooleanFormula pFormula) {
-        return new BooleanFormulaSubject(pFs, pFormula, context);
-      }
-    };
   }
 
   /**

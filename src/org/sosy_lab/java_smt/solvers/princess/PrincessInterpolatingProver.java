@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.collect.FluentIterable.from;
 import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.asScalaSet;
 
@@ -28,7 +29,7 @@ import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.TreeTraverser;
+import com.google.common.graph.Traverser;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -184,8 +185,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   /** returns a post-order iteration of the tree. */
   private List<BooleanFormula> tree2List(Tree<IFormula> tree) {
-    return TreeTraverser.<Tree<IFormula>>using(node -> asJavaIterable(node.children()))
-        .postOrderTraversal(tree)
+    return from(Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
+            .depthFirstPostOrder(tree))
         .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
         .toList();
   }
