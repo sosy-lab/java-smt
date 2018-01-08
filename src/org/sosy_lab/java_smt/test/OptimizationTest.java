@@ -69,7 +69,6 @@ public class OptimizationTest extends SolverBasedTest0 {
   @Test
   public void testUnbounded() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");
       RationalFormula obj = rmgr.makeVariable("obj");

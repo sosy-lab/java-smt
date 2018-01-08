@@ -103,7 +103,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("x"),
@@ -114,7 +113,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(large)),
@@ -126,7 +124,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetRationals() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
         rmgr.makeVariable("x"),
@@ -222,8 +219,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetBitvectors() throws SolverException, InterruptedException {
     requireBitvectors();
-    assert bvmgr != null;
-
     testModelGetters(
         bvmgr.equal(bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE)),
         bvmgr.makeVariable(1, "x"),
@@ -325,8 +320,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetArrays() throws SolverException, InterruptedException {
     requireArrays();
-    assert amgr != null;
-
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", IntegerType, IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
