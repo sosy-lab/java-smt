@@ -26,100 +26,25 @@ import com.google.common.base.VerifyException;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
 
 class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnvironment {
 
-  private final UniqueIdGenerator trackId = new UniqueIdGenerator();
-  private final FormulaManager mgr;
-
-  private static final String UNSAT_CORE_TEMP_VARNAME = "Z3_UNSAT_CORE_%d";
-
-  private final @Nullable Map<String, BooleanFormula> storedConstraints;
-
   Z3TheoremProver(
-      Z3FormulaCreator creator, Z3FormulaManager pMgr, long z3params, Set<ProverOptions> opts) {
-    super(creator, z3params);
-    mgr = pMgr;
-    if (opts.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      storedConstraints = new HashMap<>();
-    } else {
-      storedConstraints = null;
-    }
+      Z3FormulaCreator creator, Z3FormulaManager pMgr, long z3params, boolean pEnableUnsatCores) {
+    super(creator, z3params, pMgr, pEnableUnsatCores);
   }
 
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
-
-    if (storedConstraints != null) { // Unsat core generation is on.
-      long e = Z3FormulaManager.getZ3Expr(f);
-      Native.incRef(z3context, e);
-      String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
-      BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
-
-      Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
-      storedConstraints.put(varName, f);
-      Native.decRef(z3context, e);
-    } else {
-      super.addConstraint0(f);
-    }
+    super.addConstraint0(f);
     return null;
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    if (!isUnsatWithAssumptions(assumptions)) {
-      return Optional.empty();
-    }
-    List<BooleanFormula> core = new ArrayList<>();
-    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
-    Native.astVectorIncRef(z3context, unsatCore);
-    for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
-      long ast = Native.astVectorGet(z3context, unsatCore, i);
-      core.add(creator.encapsulateBoolean(ast));
-    }
-    Native.astVectorDecRef(z3context, unsatCore);
-    return Optional.of(core);
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    if (storedConstraints == null) {
-      throw new UnsupportedOperationException(
-          "Option to generate the UNSAT core wasn't enabled when creating"
-              + " the prover environment.");
-    }
-
-    List<BooleanFormula> constraints = new ArrayList<>();
-    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
-    Native.astVectorIncRef(z3context, unsatCore);
-    for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
-      long ast = Native.astVectorGet(z3context, unsatCore, i);
-      Native.incRef(z3context, ast);
-      String varName = Native.astToString(z3context, ast);
-      Native.decRef(z3context, ast);
-      constraints.add(storedConstraints.get(varName));
-    }
-    Native.astVectorDecRef(z3context, unsatCore);
-    return constraints;
   }
 
   @Override

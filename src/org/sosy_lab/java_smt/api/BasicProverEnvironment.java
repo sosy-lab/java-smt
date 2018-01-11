@@ -22,7 +22,10 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 /**
  * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment} that
@@ -82,6 +85,23 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
   ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException;
+
+  /**
+   * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
+   * returned <code>false</code>.
+   */
+  List<BooleanFormula> getUnsatCore();
+
+  /**
+   * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
+   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
+   *
+   * @param assumptions Selected assumptions
+   * @return Empty optional if the constraints with assumptions are satisfiable, subset of
+   *     assumptions which is unsatisfiable with the original constraints otherwise.
+   */
+  Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after

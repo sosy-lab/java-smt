@@ -25,7 +25,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.collect.Collections3;
@@ -45,28 +44,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    push();
-    Preconditions.checkState(
-        annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core" + " over assumptions.");
-    for (BooleanFormula assumption : assumptions) {
-      String termName = generateTermName();
-      Term t = mgr.extractInfo(assumption);
-      Term annotated = env.annotate(t, new Annotation(":named", termName));
-      annotatedTerms.put(termName, t);
-      env.assertTerm(annotated);
-    }
-    if (!isUnsat()) {
-      return Optional.empty();
-    }
-    List<BooleanFormula> out = getUnsatCore();
-    pop();
-    return Optional.of(out);
-  }
-
-  @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!isClosed());
@@ -81,14 +58,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     }
     assertedFormulas.peek().add(t);
     return null;
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!isClosed());
-    Term[] terms = env.getUnsatCore();
-    return Collections3.transformedImmutableListCopy(
-        terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
   }
 
   @Override

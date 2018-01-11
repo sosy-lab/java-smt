@@ -83,12 +83,14 @@ public class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> options) {
     return new ReusableStackInterpolatingProver<>(environment.getInterpolator(manager));
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> options) {
     throw new UnsupportedOperationException("SMTInterpol does not support optimization");
   }
 

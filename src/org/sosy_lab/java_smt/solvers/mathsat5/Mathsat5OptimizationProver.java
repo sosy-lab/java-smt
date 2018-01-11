@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
@@ -51,6 +52,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
@@ -69,14 +71,16 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   /** Stack of the objective maps. Some duplication, but shouldn't be too important. */
   private final Deque<ImmutableMap<Integer, Integer>> stack;
 
-  Mathsat5OptimizationProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
-    super(pMgr, createConfig(), creator);
+  Mathsat5OptimizationProver(
+      Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator, Set<ProverOptions> options) {
+    super(pMgr, options, creator);
     objectiveMap = new HashMap<>();
     stack = new ArrayDeque<>();
   }
 
-  private static Map<String, String> createConfig() {
-    return ImmutableMap.<String, String>builder().put("model_generation", "true").build();
+  @Override
+  protected void createConfig(Map<String, String> pConfig) {
+    pConfig.put("model_generation", "true");
   }
 
   @Override

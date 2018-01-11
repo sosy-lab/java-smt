@@ -25,8 +25,10 @@ import static scala.collection.JavaConversions.asScalaSet;
 
 import ap.SimpleAPI;
 import ap.basetypes.Tree;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Traverser;
@@ -56,7 +58,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, creator, pApi, pShutdownNotifier);
+    super(pMgr, creator, pApi, pShutdownNotifier, true);
   }
 
   @Override
@@ -83,6 +85,11 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     assertedFormulas.peek().add(termIndex);
     annotatedTerms.put(termIndex, t);
     return termIndex;
+  }
+
+  @Override
+  protected Iterable<IExpression> getAssertedFormulas() {
+    return FluentIterable.concat(assertedFormulas).transform(annotatedTerms::get);
   }
 
   @Override

@@ -28,13 +28,13 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
@@ -55,16 +55,16 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           "uncolorable Array proof",
           "arr: proof splitting not supported");
 
-  Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
-    super(pMgr, createConfig(), creator);
+  Mathsat5InterpolatingProver(
+      Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator, Set<ProverOptions> options) {
+    super(pMgr, options, creator);
   }
 
-  private static Map<String, String> createConfig() {
-    return ImmutableMap.<String, String>builder()
-        .put("interpolation", "true")
-        .put("model_generation", "true")
-        .put("theory.bv.eager", "false")
-        .build();
+  @Override
+  protected void createConfig(Map<String, String> pConfig) {
+    pConfig.put("interpolation", "true");
+    pConfig.put("model_generation", "true");
+    pConfig.put("theory.bv.eager", "false");
   }
 
   @Override

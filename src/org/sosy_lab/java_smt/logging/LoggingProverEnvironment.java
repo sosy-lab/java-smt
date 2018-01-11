@@ -21,13 +21,10 @@ package org.sosy_lab.java_smt.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -40,28 +37,6 @@ class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
   LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
     super(pe, logger);
     this.wrapped = checkNotNull(pe);
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);
-    logger.log(Level.FINE, "unsat-check returned:", !result.isPresent());
-    return result;
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    Model m = wrapped.getModel();
-    logger.log(Level.FINE, "model", m);
-    return m;
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    List<BooleanFormula> unsatCore = wrapped.getUnsatCore();
-    logger.log(Level.FINE, "unsat-core", unsatCore);
-    return unsatCore;
   }
 
   @Override

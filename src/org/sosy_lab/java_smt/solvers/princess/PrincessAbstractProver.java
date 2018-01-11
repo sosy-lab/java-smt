@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.SimpleAPI;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -47,6 +49,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   protected final ShutdownNotifier shutdownNotifier;
+  protected final boolean computeUnsatCores;
 
   private final PrincessFormulaCreator creator;
   protected boolean closed = false;
@@ -56,11 +59,13 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      boolean pComputeUnsatCores) {
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
+    this.computeUnsatCores = pComputeUnsatCores;
   }
 
   /**
@@ -148,6 +153,30 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Solving with assumptions is not supported.");
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed && computeUnsatCores);
+    final List<BooleanFormula> result = new ArrayList<>();
+    final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
+
+    int cnt = 0;
+    for (IExpression formula : getAssertedFormulas()) {
+      if (core.contains(cnt)) {
+        result.add(mgr.encapsulateBooleanFormula(formula));
+      }
+      ++cnt;
+    }
+    return result;
+  }
+
+  protected abstract Iterable<IExpression> getAssertedFormulas();
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }
 
   /**

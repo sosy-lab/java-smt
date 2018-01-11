@@ -24,6 +24,8 @@ import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.IntPtr;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
@@ -31,7 +33,9 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     implements OptimizationProverEnvironment {
@@ -39,8 +43,13 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
   private final LogManager logger;
   private final long z3optContext;
 
-  Z3OptimizationProver(Z3FormulaCreator creator, LogManager pLogger, long z3params) {
-    super(creator, z3params);
+  Z3OptimizationProver(
+      Z3FormulaCreator creator,
+      LogManager pLogger,
+      long z3params,
+      FormulaManager pMgr,
+      boolean pEnableUnsatCores) {
+    super(creator, z3params, pMgr, pEnableUnsatCores);
     z3optContext = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optContext);
     logger = pLogger;
@@ -173,6 +182,19 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     long params = Native.mkParams(z3context);
     Native.paramsSetSymbol(z3context, params, keySymbol, valueSymbol);
     Native.optimizeSetParams(z3context, z3optContext, params);
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    throw new UnsupportedOperationException(
+        "unsat core computation is not available for optimization prover environment.");
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException(
+        "unsat core computation is not available for optimization prover environment.");
   }
 
   @Override

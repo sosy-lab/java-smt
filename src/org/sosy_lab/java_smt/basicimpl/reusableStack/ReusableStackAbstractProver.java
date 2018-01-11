@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -76,6 +78,17 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(size >= 0);
     return delegate.getModelAssignments();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    return delegate.getUnsatCore();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    return delegate.unsatCoreOverAssumptions(assumptions);
   }
 
   @Override

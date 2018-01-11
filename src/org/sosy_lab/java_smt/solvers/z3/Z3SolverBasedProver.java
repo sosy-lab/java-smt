@@ -25,9 +25,17 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -35,6 +43,7 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
+  private final FormulaManager mgr;
 
   protected boolean closed = false;
 
@@ -42,12 +51,19 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
 
   private int level = 0;
 
-  Z3SolverBasedProver(Z3FormulaCreator pCreator, long z3params) {
+  private static final String UNSAT_CORE_TEMP_VARNAME = "Z3_UNSAT_CORE_%d";
+  private final UniqueIdGenerator trackId = new UniqueIdGenerator();
+  private final @Nullable Map<String, BooleanFormula> storedConstraints;
+
+  Z3SolverBasedProver(
+      Z3FormulaCreator pCreator, long z3params, FormulaManager pMgr, boolean enableUnsatCores) {
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
+    mgr = pMgr;
     Native.solverIncRef(z3context, z3solver);
     Native.solverSetParams(z3context, z3solver, z3params);
+    storedConstraints = enableUnsatCores ? new HashMap<>() : null;
   }
 
   @Override
@@ -117,11 +133,21 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
     try {
-      Native.solverAssert(z3context, z3solver, e);
+      if (storedConstraints != null) { // Unsat core generation is on.
+        String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
+        BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
+
+        Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
+        storedConstraints.put(varName, f);
+        Native.decRef(z3context, e);
+      } else {
+        Native.solverAssert(z3context, z3solver, e);
+      }
     } catch (Z3Exception exception) {
       throw creator.handleZ3Exception(exception);
     }
     Native.decRef(z3context, e);
+
     return e;
   }
 
@@ -142,6 +168,45 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
 
   protected int getLevel() {
     return level;
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed);
+    if (storedConstraints == null) {
+      throw new UnsupportedOperationException(
+          "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
+    }
+
+    List<BooleanFormula> constraints = new ArrayList<>();
+    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
+    Native.astVectorIncRef(z3context, unsatCore);
+    for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
+      long ast = Native.astVectorGet(z3context, unsatCore, i);
+      Native.incRef(z3context, ast);
+      String varName = Native.astToString(z3context, ast);
+      Native.decRef(z3context, ast);
+      constraints.add(storedConstraints.get(varName));
+    }
+    Native.astVectorDecRef(z3context, unsatCore);
+    return constraints;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    if (!isUnsatWithAssumptions(assumptions)) {
+      return Optional.empty();
+    }
+    List<BooleanFormula> core = new ArrayList<>();
+    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
+    Native.astVectorIncRef(z3context, unsatCore);
+    for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
+      long ast = Native.astVectorGet(z3context, unsatCore, i);
+      core.add(creator.encapsulateBoolean(ast));
+    }
+    Native.astVectorDecRef(z3context, unsatCore);
+    return Optional.of(core);
   }
 
   @Override

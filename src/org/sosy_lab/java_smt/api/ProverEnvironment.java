@@ -19,11 +19,8 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 /**
  * An interface to an incremental SMT solver with methods for pushing and popping formulas as well
@@ -39,12 +36,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 public interface ProverEnvironment extends BasicProverEnvironment<Void> {
 
   /**
-   * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
-   * returned <code>false</code>.
-   */
-  List<BooleanFormula> getUnsatCore();
-
-  /**
    * Get all satisfying assignments of the current environment with regards to a subset of terms,
    * and create a region representing all those models.
    *
@@ -54,17 +45,6 @@ public interface ProverEnvironment extends BasicProverEnvironment<Void> {
    */
   <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
-
-  /**
-   * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
-   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
-   *
-   * @param assumptions Selected assumptions
-   * @return Empty optional if the constraints with assumptions are satisfiable, subset of
-   *     assumptions which is unsatisfiable with the original constraints otherwise.
-   */
-  Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
 
   /**
    * Interface for the {@link #allSat} callback.

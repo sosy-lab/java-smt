@@ -25,18 +25,25 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
@@ -50,21 +57,35 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   protected boolean closed = false;
 
   protected Mathsat5AbstractProver(
-      Mathsat5SolverContext pContext, Map<String, String> pConfig, Mathsat5FormulaCreator creator) {
+      Mathsat5SolverContext pContext, Set<ProverOptions> opts, Mathsat5FormulaCreator creator) {
     context = pContext;
     this.creator = creator;
-    curConfig = buildConfig(pConfig);
+    curConfig = buildConfig(opts);
     curEnv = context.createEnvironment(curConfig);
     terminationTest = context.addTerminationTest(curEnv);
   }
 
-  private long buildConfig(Map<String, String> pConfig) {
+  private long buildConfig(Set<ProverOptions> opts) {
+    Map<String, String> config = new LinkedHashMap<>();
+    boolean generateUnsatCore =
+        opts.contains(ProverOptions.GENERATE_UNSAT_CORE)
+            || opts.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    config.put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false");
+    config.put("unsat_core_generation", generateUnsatCore ? "1" : "0");
+    if (generateUnsatCore) {
+      config.put("theory.bv.eager", "false");
+    }
+    createConfig(config); // ask sub-classes for their options
+
     long cfg = msat_create_config();
-    for (Entry<String, String> entry : pConfig.entrySet()) {
+    for (Entry<String, String> entry : config.entrySet()) {
       msat_set_option_checked(cfg, entry.getKey(), entry.getValue());
     }
     return cfg;
   }
+
+  /** add needed options into the given map. */
+  protected abstract void createConfig(Map<String, String> pConfig);
 
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
@@ -102,6 +123,24 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   public void pop() {
     Preconditions.checkState(!closed);
     msat_pop_backtrack_point(curEnv);
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed);
+    long[] terms = msat_get_unsat_core(curEnv);
+    List<BooleanFormula> result = new ArrayList<>(terms.length);
+    for (long t : terms) {
+      result.add(creator.encapsulateBoolean(t));
+    }
+    return result;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      @SuppressWarnings("unused") Collection<BooleanFormula> assumptions) {
+    throw new UnsupportedOperationException(
+        "Mathsat5 does not support finding UNSAT core over " + "assumptions");
   }
 
   @Override

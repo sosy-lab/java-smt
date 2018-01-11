@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.basicimpl.reusableStack;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -39,19 +37,8 @@ public class ReusableStackTheoremProver extends ReusableStackAbstractProver<Void
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    return delegate.getUnsatCore();
-  }
-
-  @Override
   public <T> T allSat(ProverEnvironment.AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     return delegate.allSat(callback, important);
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    return delegate.unsatCoreOverAssumptions(assumptions);
   }
 }

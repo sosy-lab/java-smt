@@ -27,10 +27,9 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.INot;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -41,16 +40,13 @@ import scala.Option;
 class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     implements ProverEnvironment {
 
-  private final boolean computeUnsatCores;
-
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier,
       boolean computeUnsatCores) {
-    super(pMgr, creator, pApi, pShutdownNotifier);
-    this.computeUnsatCores = computeUnsatCores;
+    super(pMgr, creator, pApi, pShutdownNotifier, computeUnsatCores);
   }
 
   @Override
@@ -67,22 +63,8 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed && computeUnsatCores);
-    final List<BooleanFormula> result = new ArrayList<>();
-    final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
-
-    int cnt = 0;
-    for (List<IExpression> formulas : assertedFormulas) {
-      for (IExpression formula : formulas) {
-        if (core.contains(cnt)) {
-          result.add(mgr.encapsulateBooleanFormula(formula));
-        }
-        ++cnt;
-      }
-    }
-
-    return result;
+  protected Iterable<IExpression> getAssertedFormulas() {
+    return Iterables.concat(assertedFormulas);
   }
 
   @Override
@@ -123,11 +105,5 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
 
     return callback.getResult();
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }
 }

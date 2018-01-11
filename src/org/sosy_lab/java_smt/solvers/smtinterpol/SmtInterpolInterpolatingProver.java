@@ -153,13 +153,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
   }
 
   @Override
-  public void close() {
-    assertedFormulas.clear();
-    annotatedTerms.clear();
-    super.close();
-  }
-
-  @Override
   protected Collection<Term> getAssertedTerms() {
     return annotatedTerms.values();
   }

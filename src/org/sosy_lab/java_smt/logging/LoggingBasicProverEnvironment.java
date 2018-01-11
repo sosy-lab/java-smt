@@ -23,6 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -96,6 +98,21 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
     return m;
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    List<BooleanFormula> unsatCore = wrapped.getUnsatCore();
+    logger.log(Level.FINE, "unsat-core", unsatCore);
+    return unsatCore;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);
+    logger.log(Level.FINE, "unsat-check returned:", !result.isPresent());
+    return result;
   }
 
   @Override

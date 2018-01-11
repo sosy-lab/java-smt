@@ -22,17 +22,12 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_all_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -53,23 +48,13 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
 
-    super(pMgr, createConfig(options), creator);
+    super(pMgr, options, creator);
     shutdownNotifier = pShutdownNotifier;
   }
 
-  private static Map<String, String> createConfig(Set<ProverOptions> opts) {
-    boolean generateUnsatCore =
-        opts.contains(ProverOptions.GENERATE_UNSAT_CORE)
-            || opts.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
-    ImmutableMap.Builder<String, String> configBuilder =
-        ImmutableMap.<String, String>builder()
-            .put(
-                "model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false")
-            .put("unsat_core_generation", generateUnsatCore ? "1" : "0");
-    if (generateUnsatCore) {
-      configBuilder.put("theory.bv.eager", "false");
-    }
-    return configBuilder.build();
+  @Override
+  protected void createConfig(Map<String, String> pConfig) {
+    // nothing to do
   }
 
   @Override
@@ -84,17 +69,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   public void push() {
     Preconditions.checkState(!closed);
     msat_push_backtrack_point(curEnv);
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    long[] terms = msat_get_unsat_core(curEnv);
-    List<BooleanFormula> result = new ArrayList<>(terms.length);
-    for (long t : terms) {
-      result.add(creator.encapsulateBoolean(t));
-    }
-    return result;
   }
 
   @Override
@@ -142,12 +116,5 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
             }
           });
     }
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(
-        "Mathsat5 does not support finding UNSAT core over " + "assumptions");
   }
 }

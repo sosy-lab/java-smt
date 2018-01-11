@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -90,6 +91,24 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   @Override
   public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
     return delegate.getModelAssignments();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    return delegate.getUnsatCore();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+    clearAssumptions();
+    return delegate.unsatCoreOverAssumptions(pAssumptions);
+    //    if (isUnsatWithAssumptions(pAssumptions)) {
+    //      // TODO project to pAssumptions?
+    //      return Optional.of(getUnsatCore());
+    //    } else {
+    //      return Optional.empty();
+    //    }
   }
 
   @Override
