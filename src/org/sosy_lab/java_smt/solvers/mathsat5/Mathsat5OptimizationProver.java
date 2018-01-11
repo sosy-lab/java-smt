@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -72,8 +73,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   private final Deque<ImmutableMap<Integer, Integer>> stack;
 
   Mathsat5OptimizationProver(
-      Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator, Set<ProverOptions> options) {
-    super(pMgr, options, creator);
+      Mathsat5SolverContext pMgr,
+      ShutdownNotifier pShutdownNotifier,
+      Mathsat5FormulaCreator creator,
+      Set<ProverOptions> options) {
+    super(pMgr, options, creator, pShutdownNotifier);
     objectiveMap = new HashMap<>();
     stack = new ArrayDeque<>();
   }

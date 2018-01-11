@@ -20,10 +20,7 @@
 
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
-import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
 
 public class ProverWithAssumptionsWrapper
     extends BasicProverWithAssumptionsWrapper<Void, ProverEnvironment>
@@ -31,12 +28,5 @@ public class ProverWithAssumptionsWrapper
 
   public ProverWithAssumptionsWrapper(ProverEnvironment pDelegate) {
     super(pDelegate);
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    clearAssumptions();
-    return delegate.allSat(pCallback, pImportant);
   }
 }

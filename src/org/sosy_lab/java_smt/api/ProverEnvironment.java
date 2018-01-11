@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import java.util.List;
 import org.sosy_lab.common.ShutdownNotifier;
 
 /**
@@ -33,34 +32,4 @@ import org.sosy_lab.common.ShutdownNotifier;
  * shutdown request via the {@link ShutdownNotifier}. It is not guaranteed, though, that solvers
  * respond in a timely manner (or at all) to shutdown or interrupt requests.
  */
-public interface ProverEnvironment extends BasicProverEnvironment<Void> {
-
-  /**
-   * Get all satisfying assignments of the current environment with regards to a subset of terms,
-   * and create a region representing all those models.
-   *
-   * @param important A set of variables appearing in f. Only these variables will appear in the
-   *     region.
-   * @return A region representing all satisfying models of the formula.
-   */
-  <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException;
-
-  /**
-   * Interface for the {@link #allSat} callback.
-   *
-   * @param <T> The result type of the callback, passed through by {@link #allSat}.
-   */
-  interface AllSatCallback<T> {
-
-    /**
-     * Callback for each possible satisfying assignment to given {@code important} predicates. If
-     * the predicate is assigned {@code true} in the model, it is returned as-is in the list, and
-     * otherwise it is negated. TODO: this interface does not work properly for negated predicates.
-     */
-    void apply(List<BooleanFormula> model);
-
-    /** Returning the result generated after all the {@link #apply} calls have went through. */
-    T getResult() throws InterruptedException;
-  }
-}
+public interface ProverEnvironment extends BasicProverEnvironment<Void> {}

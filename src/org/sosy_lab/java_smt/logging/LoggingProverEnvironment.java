@@ -19,31 +19,14 @@
  */
 package org.sosy_lab.java_smt.logging;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.List;
-import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
 
 /** Wraps a prover environment with a logging object. */
 class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
     implements ProverEnvironment {
 
-  private final ProverEnvironment wrapped;
-
   LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
     super(pe, logger);
-    this.wrapped = checkNotNull(pe);
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    T result = wrapped.allSat(callback, important);
-    logger.log(Level.FINE, "allsat-result:", result);
-    return result;
   }
 }

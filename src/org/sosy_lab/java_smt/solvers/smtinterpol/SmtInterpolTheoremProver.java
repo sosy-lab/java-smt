@@ -27,11 +27,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
 
 class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     implements ProverEnvironment {
@@ -58,21 +56,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     }
     assertedFormulas.peek().add(t);
     return null;
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    Preconditions.checkState(!isClosed());
-    Term[] importantTerms = new Term[important.size()];
-    int i = 0;
-    for (BooleanFormula impF : important) {
-      importantTerms[i++] = mgr.extractInfo(impF);
-    }
-    for (Term[] model : env.checkAllSat(importantTerms)) {
-      callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
-    }
-    return callback.getResult();
   }
 
   @Override

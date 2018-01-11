@@ -19,19 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.VerifyException;
 import com.microsoft.z3.Native;
-import com.microsoft.z3.Z3Exception;
-import com.microsoft.z3.enumerations.Z3_decl_kind;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
 
 class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnvironment {
 
@@ -45,74 +36,5 @@ class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnviron
   public Void addConstraint(BooleanFormula f) throws InterruptedException {
     super.addConstraint0(f);
     return null;
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-
-    // Unpack formulas to terms.
-    long[] importantFormulas = new long[important.size()];
-    int i = 0;
-    for (BooleanFormula impF : important) {
-      importantFormulas[i++] = Z3FormulaManager.getZ3Expr(impF);
-    }
-
-    try {
-      Native.solverPush(z3context, z3solver);
-    } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
-    }
-
-    while (!isUnsat()) {
-      long[] valuesOfModel = new long[importantFormulas.length];
-      long z3model = Native.solverGetModel(z3context, z3solver);
-
-      for (int j = 0; j < importantFormulas.length; j++) {
-        long funcDecl = Native.getAppDecl(z3context, importantFormulas[j]);
-        long valueOfExpr = Native.modelGetConstInterp(z3context, z3model, funcDecl);
-        if (valueOfExpr == 0) {
-          // In theory, this is a legal return value for modelGetConstInterp and means
-          // that the value doesn't matter.
-          // However, we have never seen this value so far except in case of shutdowns.
-          creator.shutdownNotifier.shutdownIfNecessary();
-          // If it ever happens in a legitimate usecase, we need to remove the following
-          // exception and handle it by passing a partial model to the callback.
-          throw new VerifyException(
-              "Z3 claims that the value of "
-                  + Native.astToString(z3context, importantFormulas[j])
-                  + " does not matter in allSat call.");
-        }
-
-        if (isOP(z3context, valueOfExpr, Z3_decl_kind.Z3_OP_FALSE.toInt())) {
-          valuesOfModel[j] = Native.mkNot(z3context, importantFormulas[j]);
-          Native.incRef(z3context, valuesOfModel[j]);
-        } else {
-          valuesOfModel[j] = importantFormulas[j];
-        }
-      }
-
-      callback.apply(
-          new LongArrayBackedList<BooleanFormula>(valuesOfModel) {
-            @Override
-            protected BooleanFormula convert(long pE) {
-              return creator.encapsulateBoolean(pE);
-            }
-          });
-
-      try {
-        long negatedModel =
-            Native.mkNot(z3context, Native.mkAnd(z3context, valuesOfModel.length, valuesOfModel));
-        Native.incRef(z3context, negatedModel);
-        Native.solverAssert(z3context, z3solver, negatedModel);
-      } catch (Z3Exception e) {
-        throw creator.handleZ3Exception(e);
-      }
-    }
-
-    // we pushed some levels on assertionStack, remove them and delete solver
-    Native.solverPop(z3context, z3solver, 1);
-    return callback.getResult();
   }
 }

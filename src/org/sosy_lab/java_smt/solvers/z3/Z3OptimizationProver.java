@@ -176,6 +176,11 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     return Native.optimizeGetModel(z3context, z3optSolver);
   }
 
+  @Override
+  protected void assertContraint(long negatedModel) {
+    Native.optimizeAssert(z3context, z3optSolver, negatedModel);
+  }
+
   void setParam(String key, String value) {
     long keySymbol = Native.mkStringSymbol(z3context, key);
     long valueSymbol = Native.mkStringSymbol(z3context, value);

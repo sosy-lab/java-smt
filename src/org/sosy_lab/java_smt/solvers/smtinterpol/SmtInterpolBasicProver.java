@@ -148,4 +148,19 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    Preconditions.checkState(!isClosed());
+    Term[] importantTerms = new Term[important.size()];
+    int i = 0;
+    for (BooleanFormula impF : important) {
+      importantTerms[i++] = mgr.extractInfo(impF);
+    }
+    for (Term[] model : env.checkAllSat(importantTerms)) {
+      callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
+    }
+    return callback.getResult();
+  }
 }

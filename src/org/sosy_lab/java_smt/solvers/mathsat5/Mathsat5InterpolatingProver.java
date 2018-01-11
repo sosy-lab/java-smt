@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -56,8 +57,11 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           "arr: proof splitting not supported");
 
   Mathsat5InterpolatingProver(
-      Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator, Set<ProverOptions> options) {
-    super(pMgr, options, creator);
+      Mathsat5SolverContext pMgr,
+      ShutdownNotifier pShutdownNotifier,
+      Mathsat5FormulaCreator creator,
+      Set<ProverOptions> options) {
+    super(pMgr, options, creator, pShutdownNotifier);
   }
 
   @Override
@@ -150,5 +154,13 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");
+  }
+
+  @Override
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important) {
+    // TODO how can we support allsat in MathSat5-interpolation-prover?
+    // error: "allsat is not compatible wwith proof generation"
+    throw new UnsupportedOperationException(
+        "allsat computation is not possible with interpolation prover.");
   }
 }

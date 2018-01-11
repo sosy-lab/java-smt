@@ -20,22 +20,14 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.SimpleAPI;
-import ap.parser.IBinFormula;
-import ap.parser.IBinJunctor;
-import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-import ap.parser.INot;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-import scala.Option;
 
 class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     implements ProverEnvironment {
@@ -65,45 +57,5 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
   @Override
   protected Iterable<IExpression> getAssertedFormulas() {
     return Iterables.concat(assertedFormulas);
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-
-    // unpack formulas to terms
-    List<IFormula> importantFormulas = new ArrayList<>(important.size());
-    for (BooleanFormula impF : important) {
-      importantFormulas.add((IFormula) mgr.extractInfo(impF));
-    }
-
-    api.push();
-    while (!isUnsat()) {
-      shutdownNotifier.shutdownIfNecessary();
-
-      IFormula newFormula = new IBoolLit(true); // neutral element for AND
-      List<BooleanFormula> wrappedPartialModel = new ArrayList<>(important.size());
-      for (final IFormula f : importantFormulas) {
-        final Option<Object> value = api.evalPartial(f);
-        if (value.isDefined()) {
-          final boolean isTrueValue = (boolean) value.get();
-          final IFormula newElement = isTrueValue ? f : new INot(f);
-
-          wrappedPartialModel.add(mgr.encapsulateBooleanFormula(newElement));
-          newFormula = new IBinFormula(IBinJunctor.And(), newFormula, newElement);
-        }
-      }
-      callback.apply(wrappedPartialModel);
-
-      // add negation of current formula to get a new model in next iteration
-      addConstraint0(new INot(newFormula));
-    }
-    shutdownNotifier.shutdownIfNecessary();
-    api.pop();
-
-    wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
-
-    return callback.getResult();
   }
 }

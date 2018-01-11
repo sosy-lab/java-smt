@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
@@ -33,33 +34,60 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.ProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class SolverAllSatTest extends SolverBasedTest0 {
 
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
+  @Parameters(name = "solver {0} with prover {1}")
+  public static Iterable<Object[]> getAllSolvers() {
+    List<Object[]> junitParams = new ArrayList<>();
+    for (Solvers solver : Solvers.values()) {
+      junitParams.add(new Object[] {solver, "normal"});
+      junitParams.add(new Object[] {solver, "itp"});
+      junitParams.add(new Object[] {solver, "opt"});
+    }
+    return junitParams;
   }
 
   @Parameter(0)
   public Solvers solver;
+
+  @Parameter(1)
+  public String proverEnv;
 
   @Override
   protected Solvers solverToUse() {
     return solver;
   }
 
-  private ProverEnvironment env;
+  private BasicProverEnvironment<?> env;
 
   @Before
   public void setupEnvironment() {
-    env = context.newProverEnvironment();
+    switch (proverEnv) {
+      case "normal":
+        env = context.newProverEnvironment();
+        break;
+      case "itp":
+
+        // TODO how can we support allsat in MathSat5-interpolation-prover?
+        assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
+
+        env = context.newProverEnvironmentWithInterpolation();
+        break;
+
+      case "opt":
+        requireOptimization();
+        env = context.newOptimizationProverEnvironment();
+        break;
+      default:
+        throw new AssertionError("unexpected");
+    }
   }
 
   @After

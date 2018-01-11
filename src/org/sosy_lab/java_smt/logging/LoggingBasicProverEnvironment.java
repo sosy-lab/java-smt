@@ -120,4 +120,12 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     wrapped.close();
     logger.log(Level.FINER, "closed");
   }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    R result = wrapped.allSat(callback, important);
+    logger.log(Level.FINE, "allsat-result:", result);
+    return result;
+  }
 }
