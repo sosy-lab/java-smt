@@ -79,8 +79,7 @@ public class SmtInterpolSolverContext extends AbstractSolverContext {
         environment.getStackDepth() == 0,
         "Not allowed to create a new prover environment while solver stack is still non-empty, "
             + "parallel stacks are not supported.");
-    return new ReusableStackTheoremProver(
-        new SmtInterpolTheoremProver(manager, manager.getFormulaCreator(), options));
+    return new ReusableStackTheoremProver(new SmtInterpolTheoremProver(manager, options));
   }
 
   @Override

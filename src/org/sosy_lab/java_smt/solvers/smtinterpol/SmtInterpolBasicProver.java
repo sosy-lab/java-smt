@@ -29,7 +29,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -40,15 +42,18 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
 
   private boolean closed = false;
-  private final SmtInterpolEnvironment env;
-  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  protected final SmtInterpolEnvironment env;
+  protected final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  protected final SmtInterpolFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
+  protected final Map<String, Term> annotatedTerms = new HashMap<>(); // Collection of termNames
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames
 
   SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr) {
+    mgr = pMgr;
     env = pMgr.createEnvironment();
     creator = pMgr.getFormulaCreator();
   }

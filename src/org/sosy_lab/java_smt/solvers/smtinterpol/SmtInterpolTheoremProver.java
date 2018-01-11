@@ -19,18 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Preconditions;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
-import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -39,27 +33,14 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     implements ProverEnvironment {
 
-  private final SmtInterpolFormulaManager mgr;
-  private final SmtInterpolEnvironment env;
-  private final Map<String, Term> annotatedTerms; // Collection of termNames
-  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
 
-  SmtInterpolTheoremProver(
-      SmtInterpolFormulaManager pMgr,
-      FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> pCreator,
-      Set<ProverOptions> options) {
+  SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
     super(pMgr);
-    mgr = pMgr;
-    env = mgr.createEnvironment();
-    creator = pCreator;
-    checkNotNull(env);
-    annotatedTerms = new HashMap<>();
     generateUnsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
   }
 

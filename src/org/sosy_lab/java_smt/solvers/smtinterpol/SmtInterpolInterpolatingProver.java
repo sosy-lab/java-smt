@@ -26,9 +26,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -37,16 +35,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
-  private final SmtInterpolFormulaManager mgr;
-  private final SmtInterpolEnvironment env;
-
-  private final Map<String, Term> annotatedTerms; // Collection of termNames
-
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
     super(pMgr);
-    mgr = pMgr;
-    env = mgr.createEnvironment();
-    annotatedTerms = new HashMap<>();
   }
 
   @Override
