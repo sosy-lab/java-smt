@@ -20,22 +20,31 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverException;
 
-abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
+abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
+
+  protected final Z3FormulaCreator creator;
+  protected final long z3context;
+
+  protected boolean closed = false;
 
   protected final long z3solver;
 
   private int level = 0;
 
   Z3SolverBasedProver(Z3FormulaCreator pCreator, long z3params) {
-    super(pCreator);
-
+    creator = pCreator;
+    z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
     Native.solverSetParams(z3context, z3solver, z3params);
@@ -85,6 +94,19 @@ abstract class Z3SolverBasedProver<T> extends Z3AbstractProver<T> {
   }
 
   @Override
+  public Z3Model getModel() {
+    Preconditions.checkState(!closed);
+    return Z3Model.create(z3context, getZ3Model(), creator);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    Preconditions.checkState(!closed);
+    try (Z3Model model = getModel()) {
+      return model.modelToList();
+    }
+  }
+
   protected long getZ3Model() {
     return Native.solverGetModel(z3context, z3solver);
   }
