@@ -41,7 +41,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     implements OptimizationProverEnvironment {
 
   private final LogManager logger;
-  private final long z3optContext;
+  private final long z3optSolver;
 
   Z3OptimizationProver(
       Z3FormulaCreator creator,
@@ -50,8 +50,8 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
       FormulaManager pMgr,
       boolean pEnableUnsatCores) {
     super(creator, z3params, pMgr, pEnableUnsatCores);
-    z3optContext = Native.mkOptimize(z3context);
-    Native.optimizeIncRef(z3context, z3optContext);
+    z3optSolver = Native.mkOptimize(z3context);
+    Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
   }
 
@@ -60,7 +60,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     long z3Constraint = creator.extractInfo(constraint);
-    Native.optimizeAssert(z3context, z3optContext, z3Constraint);
+    Native.optimizeAssert(z3context, z3optSolver, z3Constraint);
     return null;
   }
 
@@ -68,14 +68,14 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
   public int maximize(Formula objective) {
     Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
-    return Native.optimizeMaximize(z3context, z3optContext, z3Objective.getFormulaInfo());
+    return Native.optimizeMaximize(z3context, z3optSolver, z3Objective.getFormulaInfo());
   }
 
   @Override
   public int minimize(Formula objective) {
     Preconditions.checkState(!closed);
     Z3Formula z3Objective = (Z3Formula) objective;
-    return Native.optimizeMinimize(z3context, z3optContext, z3Objective.getFormulaInfo());
+    return Native.optimizeMinimize(z3context, z3optSolver, z3Objective.getFormulaInfo());
   }
 
   @Override
@@ -83,7 +83,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     Preconditions.checkState(!closed);
     int status;
     try {
-      status = Native.optimizeCheck(z3context, z3optContext);
+      status = Native.optimizeCheck(z3context, z3optSolver);
     } catch (Z3Exception ex) {
       throw creator.handleZ3Exception(ex);
     }
@@ -94,7 +94,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
       logger.log(
           Level.INFO,
           "Solver returned an unknown status, explanation: ",
-          Native.optimizeGetReasonUnknown(z3context, z3optContext));
+          Native.optimizeGetReasonUnknown(z3context, z3optSolver));
       return OptStatus.UNDEF;
     } else {
       return OptStatus.OPT;
@@ -104,13 +104,13 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    Native.optimizePush(z3context, z3optContext);
+    Native.optimizePush(z3context, z3optSolver);
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    Native.optimizePop(z3context, z3optContext);
+    Native.optimizePop(z3context, z3optSolver);
   }
 
   @Override
@@ -137,7 +137,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     Preconditions.checkState(!closed);
 
     // Z3 exposes the rounding result as a tuple (infinity, number, epsilon)
-    long vector = direction.round(z3context, z3optContext, handle);
+    long vector = direction.round(z3context, z3optSolver, handle);
     Native.astVectorIncRef(z3context, vector);
     assert Native.astVectorSize(z3context, vector) == 3;
 
@@ -173,7 +173,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
 
   @Override
   protected long getZ3Model() {
-    return Native.optimizeGetModel(z3context, z3optContext);
+    return Native.optimizeGetModel(z3context, z3optSolver);
   }
 
   void setParam(String key, String value) {
@@ -181,7 +181,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
     long valueSymbol = Native.mkStringSymbol(z3context, value);
     long params = Native.mkParams(z3context);
     Native.paramsSetSymbol(z3context, params, keySymbol, valueSymbol);
-    Native.optimizeSetParams(z3context, z3optContext, params);
+    Native.optimizeSetParams(z3context, z3optSolver, params);
   }
 
   @Override
@@ -200,7 +200,7 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
   @Override
   public void close() {
     Preconditions.checkState(!closed);
-    Native.optimizeDecRef(z3context, z3optContext);
+    Native.optimizeDecRef(z3context, z3optSolver);
     closed = true;
   }
 
@@ -211,6 +211,6 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
   @Override
   public String toString() {
     Preconditions.checkState(!closed);
-    return Native.optimizeToString(z3context, z3optContext);
+    return Native.optimizeToString(z3context, z3optSolver);
   }
 }
