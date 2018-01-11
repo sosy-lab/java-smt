@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.microsoft.z3.Native;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
