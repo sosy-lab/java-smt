@@ -29,6 +29,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -133,21 +136,14 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas) {
-    // TODO is fallback to loop sound?
-
-    /*
+      List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    // the fallback to a loop is sound and returns an inductive sequence of interpolants
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 0; i < partitionedFormulas.size(); i++) {
-     itps.add(getInterpolant(
-         Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
+      itps.add(
+          getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }
     return itps;
-    */
-
-    throw new UnsupportedOperationException(
-        "directly receiving an inductive sequence of interpolants is not supported."
-            + "Use another solver or another strategy for interpolants.");
   }
 
   @Override
