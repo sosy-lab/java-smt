@@ -30,7 +30,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T>>
@@ -103,7 +102,7 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   }
 
   @Override
-  public <R> R allSat(ProverEnvironment.AllSatCallback<R> callback, List<BooleanFormula> important)
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     return delegate.allSat(callback, important);
   }

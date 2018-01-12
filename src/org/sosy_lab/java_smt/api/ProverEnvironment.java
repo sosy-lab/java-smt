@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import java.util.List;
 import org.sosy_lab.common.ShutdownNotifier;
 
 /**
@@ -34,6 +35,21 @@ import org.sosy_lab.common.ShutdownNotifier;
  */
 public interface ProverEnvironment extends BasicProverEnvironment<Void> {
 
-  /** For backwards compatibility of client code. */
-  interface AllSatCallback<R> extends BasicProverEnvironment.AllSatCallback<R> {}
+  /**
+   * Interface for the {@link #allSat} callback.
+   *
+   * @param <R> The result type of the callback, passed through by {@link #allSat}.
+   */
+  interface AllSatCallback<R> {
+
+    /**
+     * Callback for each possible satisfying assignment to given {@code important} predicates. If
+     * the predicate is assigned {@code true} in the model, it is returned as-is in the list, and
+     * otherwise it is negated. TODO: this interface does not work properly for negated predicates.
+     */
+    void apply(List<BooleanFormula> model);
+
+    /** Returning the result generated after all the {@link #apply} calls have went through. */
+    R getResult() throws InterruptedException;
+  }
 }

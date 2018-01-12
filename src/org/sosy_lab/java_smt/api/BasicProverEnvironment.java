@@ -135,21 +135,6 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Interface for the {@link #allSat} callback.
-   *
-   * @param <R> The result type of the callback, passed through by {@link #allSat}.
-   */
-  interface AllSatCallback<R> {
-
-    /**
-     * Callback for each possible satisfying assignment to given {@code important} predicates. If
-     * the predicate is assigned {@code true} in the model, it is returned as-is in the list, and
-     * otherwise it is negated. TODO: this interface does not work properly for negated predicates.
-     */
-    void apply(List<BooleanFormula> model);
-
-    /** Returning the result generated after all the {@link #apply} calls have went through. */
-    R getResult() throws InterruptedException;
-  }
+  /** For backwards compatibility of client code the interface is in the sub-class. */
+  interface AllSatCallback<R> extends ProverEnvironment.AllSatCallback<R> {}
 }
