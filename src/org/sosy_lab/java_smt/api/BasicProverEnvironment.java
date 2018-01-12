@@ -89,19 +89,28 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   /**
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
    * returned <code>false</code>.
+   *
+   * <p>We provide a default implementation to be backwards compatible for client code.
    */
-  List<BooleanFormula> getUnsatCore();
+  default List<BooleanFormula> getUnsatCore() {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
    * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    *
+   * <p>We provide a default implementation to be backwards compatible for client code.
+   *
    * @param assumptions Selected assumptions
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
-  Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
+  @SuppressWarnings("unused")
+  default Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after
@@ -114,12 +123,17 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get all satisfying assignments of the current environment with regards to a subset of terms,
    * and create a region representing all those models.
    *
+   * <p>We provide a default implementation to be backwards compatible for client code.
+   *
    * @param important A set of variables appearing in f. Only these variables will appear in the
    *     region.
    * @return A region representing all satisfying models of the formula.
    */
-  <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException;
+  @SuppressWarnings("unused")
+  default <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Interface for the {@link #allSat} callback.

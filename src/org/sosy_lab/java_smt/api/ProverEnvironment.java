@@ -19,6 +19,9 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.common.ShutdownNotifier;
 
 /**
@@ -32,4 +35,8 @@ import org.sosy_lab.common.ShutdownNotifier;
  * shutdown request via the {@link ShutdownNotifier}. It is not guaranteed, though, that solvers
  * respond in a timely manner (or at all) to shutdown or interrupt requests.
  */
-public interface ProverEnvironment extends BasicProverEnvironment<Void> {}
+public interface ProverEnvironment extends BasicProverEnvironment<Void> {
+
+  /** For backwards compatibility of client code. */
+  interface AllSatCallback<R> extends BasicProverEnvironment.AllSatCallback<R> {}
+}
