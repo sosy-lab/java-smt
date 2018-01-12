@@ -108,8 +108,18 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    checkForLiterals(pAssumptions);
     return !msat_check_sat_with_assumptions(
         curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
+  }
+
+  private void checkForLiterals(Collection<BooleanFormula> formulas) {
+    for (BooleanFormula f : formulas) {
+      if (!Mathsat5NativeApi.msat_term_is_boolean_constant(
+          curEnv, Mathsat5FormulaManager.getMsatTerm(f))) {
+        throw new UnsupportedOperationException("formula is not a literal: " + f);
+      }
+    }
   }
 
   @Override
