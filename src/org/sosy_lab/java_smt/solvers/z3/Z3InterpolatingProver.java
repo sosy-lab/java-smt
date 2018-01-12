@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
@@ -113,7 +114,8 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Long>> partitionedFormulas)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
@@ -125,7 +127,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Long>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment.checkTreeStructure(

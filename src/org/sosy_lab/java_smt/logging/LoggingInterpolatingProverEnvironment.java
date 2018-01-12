@@ -21,8 +21,8 @@ package org.sosy_lab.java_smt.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -49,7 +49,7 @@ class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnviron
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
     logger.log(Level.FINE, "formulasOfA:", partitionedFormulas);
     List<BooleanFormula> bf = wrapped.getSeqInterpolants(partitionedFormulas);
@@ -59,7 +59,7 @@ class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnviron
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<T>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     logger.log(Level.FINE, "formulasOfA:", partitionedFormulas);
     logger.log(Level.FINE, "startOfSubTree:", startOfSubTree);

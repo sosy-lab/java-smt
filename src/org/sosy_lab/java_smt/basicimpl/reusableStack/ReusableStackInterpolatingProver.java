@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.basicimpl.reusableStack;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -45,14 +45,14 @@ public class ReusableStackInterpolatingProver<T>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<T>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     return delegate.getSeqInterpolants(pPartitionedFormulas);
   }
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
   }

@@ -29,6 +29,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -131,7 +132,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<Integer>> partitionedFormulas) {
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Integer>> partitionedFormulas) {
     // TODO is fallback to loop sound?
 
     /*
@@ -150,7 +152,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");

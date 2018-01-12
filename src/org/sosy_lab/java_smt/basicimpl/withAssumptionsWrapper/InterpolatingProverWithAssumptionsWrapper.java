@@ -23,8 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -67,7 +67,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<T>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     if (solverAssumptionsAsFormula.isEmpty()) {
       return delegate.getSeqInterpolants(pPartitionedFormulas);
@@ -78,7 +78,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     if (solverAssumptionsAsFormula.isEmpty()) {
       return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);

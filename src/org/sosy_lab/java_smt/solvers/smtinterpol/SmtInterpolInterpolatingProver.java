@@ -90,7 +90,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<String>> partitionedTermNames)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<String>> partitionedTermNames)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
 
@@ -111,7 +112,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<String>> partitionedTermNames, int[] startOfSubTree)
+      List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     assert InterpolatingProverEnvironment.checkTreeStructure(
@@ -142,7 +143,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
     return mgr.encapsulateBooleanFormula(itp[0]);
   }
 
-  private Term buildConjunctionOfNamedTerms(Set<String> termNames) {
+  private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
     Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(!termNames.isEmpty());
 

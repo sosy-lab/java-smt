@@ -21,7 +21,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.collect.FluentIterable.from;
 import static scala.collection.JavaConversions.asJavaIterable;
-import static scala.collection.JavaConversions.asScalaSet;
+import static scala.collection.JavaConversions.collectionAsScalaIterable;
 
 import ap.SimpleAPI;
 import ap.basetypes.Tree;
@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Traverser;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -113,14 +114,14 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> partitions)
-      throws SolverException {
+  public List<BooleanFormula> getSeqInterpolants(
+      final List<? extends Collection<Integer>> partitions) throws SolverException {
     Preconditions.checkState(!closed);
 
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
-    for (Set<Integer> partition : partitions) {
-      args.$plus$eq(asScalaSet(partition).toSet());
+    for (Collection<Integer> partition : partitions) {
+      args.$plus$eq(collectionAsScalaIterable(partition).toSet());
     }
 
     // do the hard work
@@ -149,7 +150,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) throws SolverException {
+      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
+      throws SolverException {
     Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
@@ -169,7 +171,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
         children.$plus$eq(stack.pop());
       }
       subtreeStarts.push(start);
-      stack.push(new Tree<>(asScalaSet(partitionedFormulas.get(i)).toSet(), children.toList()));
+      stack.push(
+          new Tree<>(
+              collectionAsScalaIterable(partitionedFormulas.get(i)).toSet(), children.toList()));
     }
 
     Preconditions.checkState(subtreeStarts.peek() == 0, "subtree of root should start at 0.");
