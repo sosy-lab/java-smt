@@ -19,9 +19,6 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.common.ShutdownNotifier;
 
 /**
