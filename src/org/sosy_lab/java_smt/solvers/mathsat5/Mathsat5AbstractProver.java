@@ -31,6 +31,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_boolean_constant;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_not;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -115,9 +118,14 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {
     for (BooleanFormula f : formulas) {
-      if (!Mathsat5NativeApi.msat_term_is_boolean_constant(
-          curEnv, Mathsat5FormulaManager.getMsatTerm(f))) {
-        throw new UnsupportedOperationException("formula is not a literal: " + f);
+      long t = Mathsat5FormulaManager.getMsatTerm(f);
+      if (msat_term_is_boolean_constant(curEnv, t)) {
+        // boolean constant is valid
+      } else if (msat_term_is_not(curEnv, t)
+          && msat_term_is_boolean_constant(curEnv, msat_term_get_arg(t, 0))) {
+        // negated boolean constant is valid
+      } else {
+        throw new UnsupportedOperationException("formula is not a (negated) literal: " + f);
       }
     }
   }

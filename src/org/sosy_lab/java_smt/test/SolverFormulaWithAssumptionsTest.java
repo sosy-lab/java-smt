@@ -188,14 +188,23 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void assumptionsTest1() throws SolverException, InterruptedException {
+    /*
+    (declare-fun A () Bool)
+    (push 1)
+    (check-sat-assumptions (A))
+    (assert (not A))
+    (check-sat-assumptions (A))
+    */
+
+    // TODO: disabled for MathSat5. Is this a bug in MathSat5?
+    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
+
     BooleanFormula a = bmgr.makeVariable("a");
-    BooleanFormula b = bmgr.makeVariable("b");
     try (ProverEnvironment pe = context.newProverEnvironment()) {
       pe.push();
-      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(bmgr.not(a)))).isFalse();
-      pe.addConstraint(a);
-      pe.addConstraint(bmgr.xor(a, b));
-      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(b))).isTrue();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(a))).isFalse();
+      pe.addConstraint(bmgr.not(a));
+      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(a))).isTrue();
     }
   }
 }
