@@ -45,7 +45,6 @@ JavaSMT can express formulas in the following theories:
  - Floating point
  - Array
  - Uninterpreted Function
- - Bitvectors
 
 The following features are supported:
 
