@@ -12,6 +12,7 @@ Unified Java API for SMT solvers.
 # Project Description & Philosophy
 
 JavaSMT is a common API layer for accessing various SMT solvers.
+It was published as a [paper](http://doi.org/10.1007/978-3-319-48869-1_11) at [VSTTE 2016](https://www.cs.toronto.edu/~chechik/vstte16/).
 
 It was created out of our experience integrating and using different SMT solvers
 in the [CPAchecker][] project.
@@ -323,4 +324,4 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 [George Karpenkov]: http://metaworld.me
 [Philipp Wendler]: https://www.philippwendler.de/
 [Thomas Stieglmaier]: https://stieglmaier.me/
-[Karlheinz Friedberger]: https://www.sosy-lab.org/people-friedberger.php
+[Karlheinz Friedberger]: https://www.sosy-lab.org/people/friedberger
