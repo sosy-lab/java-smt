@@ -90,7 +90,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
      *
      * <p>For arrays we use the selection-statement with an index.
      */
-    private final Formula key;
+    private final Formula keyFormula;
 
     /** the key should be boolean or numeral (Rational/Double/BigInteger/Long/Integer). */
     private final Object value;
@@ -118,9 +118,9 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     private final String name;
 
     public ValueAssignment(
-        Formula key, String name, Object value, Collection<?> argumentInterpretation) {
+        Formula keyFormula, String name, Object value, Collection<?> argumentInterpretation) {
 
-      this.key = Preconditions.checkNotNull(key);
+      this.keyFormula = Preconditions.checkNotNull(keyFormula);
       this.name = Preconditions.checkNotNull(name);
       this.value = Preconditions.checkNotNull(value);
       this.argumentsInterpretation = ImmutableList.copyOf(argumentInterpretation);
@@ -128,7 +128,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
     /** The formula AST which is assigned a given value. */
     public Formula getKey() {
-      return key;
+      return keyFormula;
     }
 
     /** Variable name for variables, function name for UFs, and array name for arrays. */
