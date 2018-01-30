@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
@@ -82,9 +83,7 @@ class PrincessModel
 
     // then iterate over the model and generate the assignments
     Builder<ValueAssignment> assignments = ImmutableSet.builder();
-    Iterator<Tuple2<ModelLocation, ModelValue>> it2 = interpretation.iterator();
-    while (it2.hasNext()) {
-      Tuple2<ModelLocation, ModelValue> entry = it2.next();
+    for (Tuple2<ModelLocation, ModelValue> entry : asJavaIterable(interpretation)) {
       ValueAssignment assignment = getAssignment(entry._1, entry._2, arrays);
       if (assignment != null) {
         assignments.add(assignment);
@@ -104,9 +103,7 @@ class PrincessModel
   private Map<IdealInt, ITerm> getArrayAddresses(
       scala.collection.Map<ModelLocation, ModelValue> interpretation) {
     Map<IdealInt, ITerm> arrays = new HashMap<>();
-    Iterator<Tuple2<ModelLocation, ModelValue>> it1 = interpretation.iterator();
-    while (it1.hasNext()) {
-      Tuple2<ModelLocation, ModelValue> entry = it1.next();
+    for (Tuple2<ModelLocation, ModelValue> entry : asJavaIterable(interpretation)) {
       if (entry._1 instanceof ConstantLoc) {
         ITerm maybeArray = IExpression.i(((ConstantLoc) entry._1).c());
         if (creator.getEnv().hasArrayType(maybeArray) && entry._2 instanceof IntValue) {
