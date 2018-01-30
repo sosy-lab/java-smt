@@ -182,11 +182,9 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
       // "Key" is purposefully not included in the comparison,
       // name and arguments should be sufficient.
-      boolean out =
-          name.equals(other.name)
-              && value.equals(other.value)
-              && argumentsInterpretation.equals(other.argumentsInterpretation);
-      return out;
+      return name.equals(other.name)
+          && value.equals(other.value)
+          && argumentsInterpretation.equals(other.argumentsInterpretation);
     }
 
     @Override
