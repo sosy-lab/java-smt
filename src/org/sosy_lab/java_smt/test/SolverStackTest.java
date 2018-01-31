@@ -258,6 +258,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack.addConstraint(q1);
     assertThat(stack).isSatisfiable();
     Model m1 = stack.getModel();
+    assertThat(m1).isNotEmpty();
     stack.pop();
 
     stack.push();
@@ -266,6 +267,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack.addConstraint(q1);
     assertThat(stack).isSatisfiable();
     Model m2 = stack.getModel();
+    assertThat(m2).isNotEmpty();
     stack.pop();
   }
 
