@@ -247,6 +247,28 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack.pop();
   }
 
+  /** Create a symbol on a level and pop this level. Symbol must remain valid and usable! */
+  @SuppressWarnings("unused")
+  @Test
+  public void symbolsOnStackTest() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+
+    stack.push();
+    BooleanFormula q1 = bmgr.makeVariable("q");
+    stack.addConstraint(q1);
+    assertThat(stack).isSatisfiable();
+    Model m1 = stack.getModel();
+    stack.pop();
+
+    stack.push();
+    BooleanFormula q2 = bmgr.makeVariable("q");
+    assertThat(q2).isEqualTo(q1);
+    stack.addConstraint(q1);
+    assertThat(stack).isSatisfiable();
+    Model m2 = stack.getModel();
+    stack.pop();
+  }
+
   @Test
   public void constraintTestBool1() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("bool_a");

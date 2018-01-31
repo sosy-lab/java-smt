@@ -251,7 +251,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(!closed);
     api.addBooleanVariable(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().booleanSymbols.add(f);
+      trackingStack.peek().booleanSymbols.add(f);
     }
   }
 
@@ -260,7 +260,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(!closed);
     api.addConstant(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().intSymbols.add(f);
+      trackingStack.peek().intSymbols.add(f);
     }
   }
 
@@ -269,7 +269,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(!closed);
     api.addFunction(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().functionSymbols.add(f);
+      trackingStack.peek().functionSymbols.add(f);
     }
   }
 
@@ -290,6 +290,11 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
       this.booleanSymbols.addAll(other.booleanSymbols);
       this.intSymbols.addAll(other.intSymbols);
       this.functionSymbols.addAll(other.functionSymbols);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("{%s, %s, %s}", booleanSymbols, intSymbols, functionSymbols);
     }
   }
 }
