@@ -167,4 +167,22 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assertThat(callback.models)
         .containsExactly(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(bmgr.not(v1), v2));
   }
+
+  @Test
+  public void allSatTest_nondetValue() throws SolverException, InterruptedException {
+    BooleanFormula v1 = bmgr.makeVariable("b1");
+    BooleanFormula v2 = bmgr.makeVariable("b2");
+
+    env.push(v1);
+
+    TestAllSatCallback callback = new TestAllSatCallback();
+
+    assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
+
+    assertThat(callback.models)
+        .isAnyOf(
+            ImmutableList.of(ImmutableList.of(v1)),
+            ImmutableList.of(ImmutableList.of(v1, v2), ImmutableList.of(v1, bmgr.not(v2))),
+            ImmutableList.of(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(v1, v2)));
+  }
 }
