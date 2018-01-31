@@ -50,7 +50,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 import scala.Tuple2;
-import scala.collection.Iterator;
 
 class PrincessModel
     extends CachingAbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
