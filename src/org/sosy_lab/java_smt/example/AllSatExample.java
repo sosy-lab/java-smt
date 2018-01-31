@@ -76,7 +76,7 @@ public class AllSatExample {
 
     prover.addConstraint(bfmgr.implication(p, q));
 
-    AllSatCallback<List<List<BooleanFormula>>> ascb =
+    return prover.allSat(
         new AllSatCallback<List<List<BooleanFormula>>>() {
 
           List<List<BooleanFormula>> models = new ArrayList<>();
@@ -90,11 +90,8 @@ public class AllSatExample {
           public List<List<BooleanFormula>> getResult() {
             return models;
           }
-        };
-
-    prover.allSat(ascb, Lists.newArrayList(p, q));
-
-    return ascb.getResult();
+        },
+        Lists.newArrayList(q, p));
   }
 
   /** For boolean symbols we can also ask the model directly for evaluations of symbols. */
