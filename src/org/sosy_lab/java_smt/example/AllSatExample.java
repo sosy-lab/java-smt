@@ -1,5 +1,6 @@
 package org.sosy_lab.java_smt.example;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
@@ -32,6 +35,7 @@ public class AllSatExample {
   private final BooleanFormulaManager bfmgr;
   private final IntegerFormulaManager ifmgr;
   private final ProverEnvironment prover;
+  private final SolverContext context;
 
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
@@ -57,6 +61,10 @@ public class AllSatExample {
         prover.push();
         System.out.println(ase.allSatIntegers());
         prover.pop();
+
+        prover.push();
+        System.out.println(ase.allSatIntegers2());
+        prover.pop();
       }
     }
   }
@@ -65,6 +73,7 @@ public class AllSatExample {
     bfmgr = pContext.getFormulaManager().getBooleanFormulaManager();
     ifmgr = pContext.getFormulaManager().getIntegerFormulaManager();
     prover = pProver;
+    context = pContext;
   }
 
   /** For boolean symbols we can directly use the method {@link ProverEnvironment#allSat}. */
@@ -146,12 +155,12 @@ public class AllSatExample {
 
     List<List<ValueAssignment>> models = new ArrayList<>();
 
-    // loop over all possible models
+    // loop over all possible models for "1<=a<=10 AND 1<=b<=10 AND a==2*b"
     while (!prover.isUnsat()) {
       models.add(prover.getModelAssignments());
       try (Model model = prover.getModel()) {
 
-        // convert model into formula
+        // convert model into formula, assuming we know all symbols and know they are integers
         BooleanFormula modelAsFormula =
             bfmgr.and(
                 ifmgr.equal(a, num(model.evaluate(a))), ifmgr.equal(b, num(model.evaluate(b))));
@@ -162,6 +171,54 @@ public class AllSatExample {
     }
 
     return models;
+  }
+
+  /**
+   * For integer formulas, we can implement the allsat-loop and collect all models when iterating.
+   */
+  private List<List<ValueAssignment>> allSatIntegers2()
+      throws InterruptedException, SolverException {
+
+    IntegerFormula a = ifmgr.makeVariable("a");
+    BooleanFormula p = bfmgr.makeVariable("p");
+    BooleanFormula q = bfmgr.makeVariable("q");
+
+    prover.addConstraint(ifmgr.lessOrEquals(num(1), a));
+    prover.addConstraint(ifmgr.lessOrEquals(a, num(3)));
+    prover.addConstraint(bfmgr.equivalence(p, q));
+
+    List<List<ValueAssignment>> models = new ArrayList<>();
+
+    // loop over all possible models for "1<=a<=3 AND p=q"
+    while (!prover.isUnsat()) {
+      final ImmutableList<ValueAssignment> modelAssignments = prover.getModelAssignments();
+
+      models.add(modelAssignments);
+
+      final List<BooleanFormula> modelAssignmentsAsFormulas = new ArrayList<>();
+      for (ValueAssignment va : modelAssignments) {
+        modelAssignmentsAsFormulas.add(getFormulaForValueAssignment(va));
+      }
+
+      // prevent next model from using the same assignment as a previous model
+      prover.addConstraint(bfmgr.not(bfmgr.and(modelAssignmentsAsFormulas)));
+    }
+
+    return models;
+  }
+
+  /** convert the ValueAssignment into a boolean formula. */
+  private BooleanFormula getFormulaForValueAssignment(ValueAssignment va) {
+    Formula key = va.getKey();
+    FormulaType<Formula> sort = context.getFormulaManager().getFormulaType(key);
+    if (sort.isBooleanType()) {
+      return bfmgr.equivalence((BooleanFormula) key, bfmgr.makeBoolean((boolean) va.getValue()));
+    } else if (sort.isIntegerType()) {
+      return ifmgr.equal((IntegerFormula) key, ifmgr.makeNumber((BigInteger) va.getValue()));
+    } else {
+      throw new AssertionError(
+          String.format("unexpected formula type '%s' for formula '%s'", sort, key));
+    }
   }
 
   private IntegerFormula num(int number) {
