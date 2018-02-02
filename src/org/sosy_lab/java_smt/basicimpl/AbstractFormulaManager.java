@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -39,6 +42,8 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
@@ -379,5 +384,37 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             }
           }
         });
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public BooleanFormula makeEqual(Formula pFormula1, Formula pFormula2) {
+    FormulaType<?> pType = getFormulaType(pFormula1);
+    assert getFormulaType(pFormula1).equals(getFormulaType(pFormula2))
+        : String.format(
+            "Trying to equalize two formulas %s and %s of different types %s and %s",
+            pFormula1, pFormula2, pType, getFormulaType(pFormula2));
+    if (pType.isBooleanType()) {
+      return getBooleanFormulaManager()
+          .equivalence((BooleanFormula) pFormula1, (BooleanFormula) pFormula2);
+    } else if (pType.isIntegerType()) {
+      return getIntegerFormulaManager()
+          .equal((IntegerFormula) pFormula1, (IntegerFormula) pFormula2);
+    } else if (pType.isRationalType()) {
+      return getRationalFormulaManager()
+          .equal((RationalFormula) pFormula1, (RationalFormula) pFormula2);
+    } else if (pType.isBitvectorType()) {
+      return getBitvectorFormulaManager()
+          .equal((BitvectorFormula) pFormula1, (BitvectorFormula) pFormula2);
+    } else if (pType.isFloatingPointType()) {
+      return getFloatingPointFormulaManager()
+          .assignment((FloatingPointFormula) pFormula1, (FloatingPointFormula) pFormula2);
+    } else if (pType.isArrayType()) {
+      @SuppressWarnings("rawtypes")
+      ArrayFormula f2 = (ArrayFormula) pFormula2;
+      return getArrayFormulaManager().equivalence((ArrayFormula<?, ?>) pFormula1, f2);
+    }
+    throw new IllegalArgumentException(
+        "Cannot make equality of formulas with type " + pType + " in the Solver!");
   }
 }
