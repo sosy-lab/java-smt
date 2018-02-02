@@ -140,6 +140,10 @@ class PrincessModel
         IdealInt arrayId = cKey.args().apply(0);
         IdealInt arrayIndex = cKey.args().apply(1);
         ITerm arrayF = arrays.get(arrayId);
+        if (arrayF == null) {
+          // intermediate array store, like a tmp-variable, happens for repeated store-operations
+          return null;
+        }
         Formula select =
             creator.encapsulateWithTypeOf(
                 creator.getEnv().makeSelect(arrayF, IExpression.i(arrayIndex)));
@@ -149,13 +153,13 @@ class PrincessModel
       } else if ("store/3".equals(cKey.f().toString())) {
         // array-access, for explanation see #getArrayAddresses
         IdealInt arrayId = cKey.args().apply(0);
-
-        // we expect "store(0,5,123)=0" where "0" is the arrayId
-        assert arrayId.bigIntValue().equals(fValue);
-
         IdealInt arrayIndex = cKey.args().apply(1);
         IdealInt arrayContent = cKey.args().apply(2);
         ITerm arrayF = arrays.get(arrayId);
+        if (arrayF == null) {
+          // intermediate array store, like a tmp-variable, happens for repeated store-operations
+          return null;
+        }
         Formula select =
             creator.encapsulateWithTypeOf(
                 creator.getEnv().makeSelect(arrayF, IExpression.i(arrayIndex)));
