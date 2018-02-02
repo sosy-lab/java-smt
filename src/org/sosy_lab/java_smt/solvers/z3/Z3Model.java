@@ -216,14 +216,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     if (Z3_decl_kind.Z3_OP_CONST_ARRAY == declKind) {
       assert numArgs == 1;
       // We have an array of zeros (=default value) as "((as const (Array Int Int)) 0)".
-      // We return the plain value with no argumentInterpretations, as assignment "arr = 0",
-      // because there is no better way of modeling a whole array.
-      out.add(
-          new ValueAssignment(
-              z3creator.encapsulateWithTypeOf(arrayFormula),
-              z3creator.symbolToString(arraySymbol),
-              z3creator.convertValue(Native.getAppArg(z3context, value, 0)), // default is 0
-              ImmutableList.of())); // wildcard index
+      // There is no way of modeling a whole array, thus we ignore it.
     }
 
     return out;
