@@ -31,7 +31,9 @@ import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -175,21 +177,31 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
     List<ValueAssignment> out = new ArrayList<>();
 
+    // avoid doubled ValueAssignments for cases like "(store (store ARR 0 0) 0 1)",
+    // where we could (but should not!) unroll the array into "[ARR[0]=1, ARR[0]=1]"
+    Set<Long> indizes = new HashSet<>();
+
     // unroll an array...
     while (Z3_decl_kind.Z3_OP_STORE == declKind) {
       assert numArgs == 3;
 
       long arrayIndex = Native.getAppArg(z3context, value, 1);
       Native.incRef(z3context, arrayIndex);
-      long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
-      Native.incRef(z3context, select);
 
-      out.add(
-          new ValueAssignment(
-              z3creator.encapsulateWithTypeOf(select),
-              z3creator.symbolToString(arraySymbol),
-              z3creator.convertValue(Native.getAppArg(z3context, value, 2)),
-              ImmutableList.of(evaluateImpl(arrayIndex))));
+      if (indizes.add(arrayIndex)) {
+        long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
+        Native.incRef(z3context, select);
+
+        long nestedValue = Native.getAppArg(z3context, value, 2);
+        Native.incRef(z3context, nestedValue);
+
+        out.add(
+            new ValueAssignment(
+                z3creator.encapsulateWithTypeOf(select),
+                z3creator.symbolToString(arraySymbol),
+                z3creator.convertValue(nestedValue),
+                ImmutableList.of(evaluateImpl(arrayIndex))));
+      }
 
       Native.decRef(z3context, arrayIndex);
 
