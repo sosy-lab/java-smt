@@ -809,6 +809,28 @@ public class ModelTest extends SolverBasedTest0 {
           + "       (or (and P43 (not (= M@3 0))) (and (not P43) (= z3name!115 0)))"
           + "       (or (and P42 (= M@3 0)) (and (not P42) (= z3name!115 |V#2@|)))))";
 
+  static final String UGLY_ARRAY_QUERY =
+      "(declare-fun V () Int)"
+          + "(declare-fun W () Int)"
+          + "(declare-fun A () Int)"
+          + "(declare-fun B () Int)"
+          + "(declare-fun U () Int)"
+          + "(declare-fun G () Int)"
+          + "(declare-fun ARR () (Array Int Int))"
+          + "(declare-fun EMPTY () (Array Int Int))"
+          + "(assert "
+          + "  (and (> (+ V U) 0)"
+          + "       (not (= B (- 4)))"
+          + "       (= ARR (store (store (store EMPTY G B) B G) A W))"
+          + "       ))";
+
+  static final String UGLY_ARRAY_QUERY_2 =
+      "(declare-fun A () Int)"
+          + "(declare-fun B () Int)"
+          + "(declare-fun ARR () (Array Int Int))"
+          + "(declare-fun EMPTY () (Array Int Int))"
+          + "(assert (and (= A 0) (= B 0) (= ARR (store (store EMPTY A 1) B 2))))";
+
   static final String SMALL_BV_FLOAT_QUERY =
       "(declare-fun |f@2| () (_ FloatingPoint 8 23))"
           + "(declare-fun |p@3| () (_ BitVec 32))"
@@ -831,7 +853,18 @@ public class ModelTest extends SolverBasedTest0 {
           + "(assert (= a (select A #x00000000)))";
 
   @Test
-  public void arrayTest() throws SolverException, InterruptedException {
+  public void arrayTest1() throws SolverException, InterruptedException {
+    requireArrays();
+
+    for (String query :
+        Lists.newArrayList(SMALL_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
+      BooleanFormula formula = context.getFormulaManager().parse(query);
+      checkModelIteration(formula, false);
+    }
+  }
+
+  @Test
+  public void arrayTest2() throws SolverException, InterruptedException {
     requireArrays();
     requireOptimization();
     requireFloats();
@@ -839,8 +872,7 @@ public class ModelTest extends SolverBasedTest0 {
     // only Z3 fulfills these requirements
 
     for (String query :
-        Lists.newArrayList(
-            SMALL_ARRAY_QUERY, BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
+        Lists.newArrayList(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, true);
       checkModelIteration(formula, false);
