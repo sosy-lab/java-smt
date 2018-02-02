@@ -152,7 +152,8 @@ class PrincessModel
 
       } else if ("store/3".equals(cKey.f().toString())) {
         // array-access, for explanation see #getArrayAddresses
-        IdealInt arrayId = cKey.args().apply(0);
+        // IdealInt sourceArray = cKey.args().apply(0);
+        IdealInt arrayId = ((SimpleAPI.IntValue) value).v();
         IdealInt arrayIndex = cKey.args().apply(1);
         IdealInt arrayContent = cKey.args().apply(2);
         ITerm arrayF = arrays.get(arrayId);
