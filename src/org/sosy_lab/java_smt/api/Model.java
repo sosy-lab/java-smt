@@ -92,6 +92,12 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
      */
     private final Formula keyFormula;
 
+    /** the value should be of simple formula-type (Boolean/Integer/Rational/BitVector). */
+    private final Formula valueFormula;
+
+    /** the equality of key and value. */
+    private final BooleanFormula formula;
+
     /** the key should be boolean or numeral (Rational/Double/BigInteger/Long/Integer). */
     private final Object value;
 
@@ -118,9 +124,16 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     private final String name;
 
     public ValueAssignment(
-        Formula keyFormula, String name, Object value, Collection<?> argumentInterpretation) {
+        Formula keyFormula,
+        Formula valueFormula,
+        BooleanFormula formula,
+        String name,
+        Object value,
+        Collection<?> argumentInterpretation) {
 
       this.keyFormula = Preconditions.checkNotNull(keyFormula);
+      this.valueFormula = Preconditions.checkNotNull(valueFormula);
+      this.formula = Preconditions.checkNotNull(formula);
       this.name = Preconditions.checkNotNull(name);
       this.value = Preconditions.checkNotNull(value);
       this.argumentsInterpretation = ImmutableList.copyOf(argumentInterpretation);
@@ -129,6 +142,16 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /** The formula AST which is assigned a given value. */
     public Formula getKey() {
       return keyFormula;
+    }
+
+    /** The formula AST which is assigned to a given key. */
+    public Formula getValueAsFormula() {
+      return valueFormula;
+    }
+
+    /** The formula AST representing the equality of key and value. */
+    public BooleanFormula getAssignmentAsFormula() {
+      return formula;
     }
 
     /** Variable name for variables, function name for UFs, and array name for arrays. */

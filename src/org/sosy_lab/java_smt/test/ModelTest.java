@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -152,17 +153,38 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula app1 = fmgr.callUF(declaration, arg1);
     IntegerFormula app2 = fmgr.callUF(declaration, arg2);
 
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula three = imgr.makeNumber(3);
+    IntegerFormula four = imgr.makeNumber(4);
+
     ImmutableList<ValueAssignment> expectedModel =
         ImmutableList.of(
-            new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
-            new ValueAssignment(arg2, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
             new ValueAssignment(
-                fmgr.callUF(declaration, imgr.makeNumber(3)),
+                arg1,
+                three,
+                imgr.equal(arg1, three),
+                "arg1",
+                BigInteger.valueOf(3),
+                ImmutableList.of()),
+            new ValueAssignment(
+                arg2,
+                four,
+                imgr.equal(arg2, four),
+                "arg2",
+                BigInteger.valueOf(4),
+                ImmutableList.of()),
+            new ValueAssignment(
+                fmgr.callUF(declaration, three),
+                one,
+                imgr.equal(fmgr.callUF(declaration, three), one),
                 "UF",
                 BigInteger.valueOf(1),
                 ImmutableList.of(BigInteger.valueOf(3))),
             new ValueAssignment(
-                fmgr.callUF(declaration, imgr.makeNumber(4)),
+                fmgr.callUF(declaration, four),
+                imgr.makeNumber(2),
+                imgr.equal(fmgr.callUF(declaration, four), two),
                 "UF",
                 BigInteger.valueOf(2),
                 ImmutableList.of(BigInteger.valueOf(4))));
@@ -199,6 +221,7 @@ public class ModelTest extends SolverBasedTest0 {
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
     BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    IntegerFormula one = imgr.makeNumber(1);
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
@@ -211,7 +234,12 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(m)
             .contains(
                 new ValueAssignment(
-                    funcAtZero, func, BigInteger.ONE, ImmutableList.of(BigInteger.ZERO)));
+                    funcAtZero,
+                    one,
+                    imgr.equal(funcAtZero, one),
+                    func,
+                    BigInteger.ONE,
+                    ImmutableList.of(BigInteger.ZERO)));
       }
     }
   }
@@ -511,12 +539,18 @@ public class ModelTest extends SolverBasedTest0 {
       boolean isArray)
       throws SolverException, InterruptedException {
 
+    List<BooleanFormula> modelAssignments = new ArrayList<>();
+
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(constraint);
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
+
+        for (ValueAssignment va : m) {
+          modelAssignments.add(va.getAssignmentAsFormula());
+        }
 
         List<ValueAssignment> relevantAssignments =
             prover
@@ -544,6 +578,8 @@ public class ModelTest extends SolverBasedTest0 {
         }
       }
     }
+
+    assertThatFormula(bmgr.and(modelAssignments)).implies(constraint);
   }
 
   @Test

@@ -23,6 +23,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_read;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
@@ -40,7 +41,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
@@ -83,16 +83,19 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   private ValueAssignment getAssignment(long key, long value) {
-    Formula fKey = creator.encapsulateWithTypeOf(key);
-    Object fValue = formulaCreator.convertValue(key, value);
     List<Object> argumentInterpretation = new ArrayList<>();
-
     for (int i = 0; i < msat_term_arity(key); i++) {
       long arg = msat_term_get_arg(key, i);
       argumentInterpretation.add(evaluateImpl(arg));
     }
 
-    return new ValueAssignment(fKey, formulaCreator.getName(key), fValue, argumentInterpretation);
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(key),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(msat_make_eq(creator.getEnv(), key, value)),
+        formulaCreator.getName(key),
+        formulaCreator.convertValue(key, value),
+        argumentInterpretation);
   }
 
   /** split an array-assignment into several assignments for all positions */
@@ -111,6 +114,8 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
         assignments.add(
             new ValueAssignment(
                 creator.encapsulateWithTypeOf(select),
+                creator.encapsulateWithTypeOf(content),
+                creator.encapsulateBoolean(msat_make_eq(creator.getEnv(), select, content)),
                 formulaCreator.getName(symbol),
                 evaluateImpl(content),
                 innerIndices));

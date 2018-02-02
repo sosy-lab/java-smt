@@ -121,18 +121,21 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
     long var = Native.mkApp(z3context, keyDecl, 0, new long[] {});
-    Formula key = z3creator.encapsulateWithTypeOf(var);
-
     long value = Native.modelGetConstInterp(z3context, model, keyDecl);
     checkReturnValue(value, keyDecl);
     Native.incRef(z3context, value);
+
+    long equality = Native.mkEq(z3context, var, value);
+    Native.incRef(z3context, equality);
 
     try {
       long symbol = Native.getDeclName(z3context, keyDecl);
       if (z3creator.isConstant(value)) {
         return Collections.singletonList(
             new ValueAssignment(
-                key,
+                z3creator.encapsulateWithTypeOf(var),
+                z3creator.encapsulateWithTypeOf(value),
+                z3creator.encapsulateBoolean(equality),
                 z3creator.symbolToString(symbol),
                 z3creator.convertValue(value),
                 ImmutableList.of()));
@@ -195,9 +198,14 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         long nestedValue = Native.getAppArg(z3context, value, 2);
         Native.incRef(z3context, nestedValue);
 
+        long equality = Native.mkEq(z3context, select, nestedValue);
+        Native.incRef(z3context, equality);
+
         out.add(
             new ValueAssignment(
                 z3creator.encapsulateWithTypeOf(select),
+                z3creator.encapsulateWithTypeOf(nestedValue),
+                z3creator.encapsulateBoolean(equality),
                 z3creator.symbolToString(arraySymbol),
                 z3creator.convertValue(nestedValue),
                 ImmutableList.of(evaluateImpl(arrayIndex))));
@@ -255,9 +263,15 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       innerIndices.add(evaluateImpl(arrayIndex));
 
       if (z3creator.isConstant(arrayValue)) {
+
+        long equality = Native.mkEq(z3context, select, arrayValue);
+        Native.incRef(z3context, equality);
+
         lst.add(
             new ValueAssignment(
                 z3creator.encapsulateWithTypeOf(select),
+                z3creator.encapsulateWithTypeOf(arrayValue),
+                z3creator.encapsulateBoolean(equality),
                 z3creator.symbolToString(arraySymbol),
                 z3creator.convertValue(arrayValue),
                 innerIndices));
@@ -356,15 +370,23 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       argumentInterpretation.add(z3creator.convertValue(arg));
       args[k] = arg;
     }
-    Formula formula =
-        z3creator.encapsulateWithTypeOf(Native.mkApp(z3context, funcDecl, args.length, args));
 
+    long func = Native.mkApp(z3context, funcDecl, args.length, args);
     // Clean up memory.
     for (long arg : args) {
       Native.decRef(z3context, arg);
     }
 
-    return new ValueAssignment(formula, functionName, value, argumentInterpretation);
+    long equality = Native.mkEq(z3context, func, entryValue);
+    Native.incRef(z3context, equality);
+
+    return new ValueAssignment(
+        z3creator.encapsulateWithTypeOf(func),
+        z3creator.encapsulateWithTypeOf(entryValue),
+        z3creator.encapsulateBoolean(equality),
+        functionName,
+        value,
+        argumentInterpretation);
   }
 
   @Override

@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -109,6 +108,8 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
           assignments.add(
               new ValueAssignment(
                   creator.encapsulateWithTypeOf(select),
+                  creator.encapsulateWithTypeOf(model.evaluate(content)),
+                  creator.encapsulateBoolean(creator.getEnv().term("=", select, content)),
                   symbol,
                   evaluateImpl(content),
                   innerIndices));
@@ -125,15 +126,19 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   }
 
   private ValueAssignment getAssignment(String key, ApplicationTerm term) {
-    Formula fKey = creator.encapsulateWithTypeOf(term);
-    Object fValue = evaluateImpl(term);
     List<Object> argumentInterpretation = new ArrayList<>();
-
     for (Term param : term.getParameters()) {
       argumentInterpretation.add(evaluateImpl(param));
     }
 
-    return new ValueAssignment(fKey, key, fValue, argumentInterpretation);
+    Term value = model.evaluate(term);
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(term),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(creator.getEnv().term("=", term, value)),
+        key,
+        evaluateImpl(term),
+        argumentInterpretation);
   }
 
   @Override
