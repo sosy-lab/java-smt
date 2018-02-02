@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -809,6 +809,50 @@ public class ModelTest extends SolverBasedTest0 {
           + "       (or (and P43 (not (= M@3 0))) (and (not P43) (= z3name!115 0)))"
           + "       (or (and P42 (= M@3 0)) (and (not P42) (= z3name!115 |V#2@|)))))";
 
+  static final String MEDIUM_ARRAY_QUERY =
+      "(declare-fun |H@1| () (Array Int Int))"
+          + "(declare-fun |H@2| () (Array Int Int))"
+          + "(declare-fun |H@3| () (Array Int Int))"
+          + "(declare-fun |H@4| () (Array Int Int))"
+          + "(declare-fun |H@5| () (Array Int Int))"
+          + "(declare-fun |H@6| () (Array Int Int))"
+          + "(declare-fun |H@7| () (Array Int Int))"
+          + "(declare-fun |H@8| () (Array Int Int))"
+          + "(declare-fun |H@9| () (Array Int Int))"
+          + "(declare-fun |H@10| () (Array Int Int))"
+          + "(declare-fun |H@11| () (Array Int Int))"
+          + "(declare-fun |H@12| () (Array Int Int))"
+          + "(declare-fun |H@13| () (Array Int Int))"
+          + "(declare-fun I10 () Int)"
+          + "(declare-fun I11 () Int)"
+          + "(declare-fun I12 () Int)"
+          + "(declare-fun I13 () Int)"
+          + "(declare-fun I14 () Int)"
+          + "(declare-fun I15 () Int)"
+          + "(declare-fun |at3@5| () Int)"
+          + "(declare-fun |at3@3| () Int)"
+          + "(declare-fun |At5@3| () Int)"
+          + "(declare-fun |At7@3| () Int)"
+          + "(declare-fun |At7@5| () Int)"
+          + "(declare-fun |ahead@3| () Int)"
+          + "(declare-fun |ahead@2| () Int)"
+          + "(declare-fun |At5@5| () Int)"
+          + "(assert "
+          + "  (and (not (<= |ahead@2| 0))"
+          + "       (= |H@2| (store |H@1| |At5@3| 1))"
+          + "       (= |H@3| (store |H@2| 3 1))"
+          + "       (= |H@4| (store |H@3| 4 1))"
+          + "       (= |H@5| (store |H@4| 5 1))"
+          + "       (= |H@6| (store |H@5| 6 1))"
+          + "       (= |H@7| (store |H@6| 7 1))"
+          + "       (= |H@8| (store |H@7| 8 1))"
+          + "       (= |at3@3| (select |H@1| |ahead@2|))"
+          + "       (= |at3@5| (select |H@7| |ahead@3|))"
+          + "       (= I11 (+ 12 I10))"
+          + "       (= I13 (+ 12 I12))"
+          + "       (= I15 (+ 12 I14))"
+          + "       ))";
+
   static final String UGLY_ARRAY_QUERY =
       "(declare-fun V () Int)"
           + "(declare-fun W () Int)"
@@ -857,7 +901,8 @@ public class ModelTest extends SolverBasedTest0 {
     requireArrays();
 
     for (String query :
-        Lists.newArrayList(SMALL_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
+        Lists.newArrayList(
+            SMALL_ARRAY_QUERY, MEDIUM_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, false);
     }
