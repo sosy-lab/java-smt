@@ -623,6 +623,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   private void checkModelIteration(BooleanFormula f, boolean useOptProver)
       throws SolverException, InterruptedException {
+    ImmutableList<ValueAssignment> assignments;
     try (BasicProverEnvironment<?> prover =
         useOptProver
             ? context.newOptimizationProverEnvironment()
@@ -634,8 +635,25 @@ public class ModelTest extends SolverBasedTest0 {
           // Check that we can iterate through with no crashes.
         }
         assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+
+        assignments = prover.getModelAssignments();
       }
     }
+
+    List<BooleanFormula> assignmentFormulas = new ArrayList<>();
+    for (ValueAssignment va : assignments) {
+      assignmentFormulas.add(va.getAssignmentAsFormula());
+      assertThatFormula(va.getAssignmentAsFormula())
+          .isEqualTo(mgr.makeEqual(va.getKey(), va.getValueAsFormula()));
+    }
+
+    // Check that model is not contradicting
+    assertThatFormula(bmgr.and(assignmentFormulas)).isSatisfiable();
+
+    // Check that model does not contradict formula.
+    // Check for implication is not possible, because formula "x=y" does not imply "{x=0,y=0}" and
+    // formula "A = (store EMPTY x y)" is not implied by "{x=0,y=0,(select A 0)=0}" (EMPTY != A).
+    assertThatFormula(bmgr.and(f, bmgr.and(assignmentFormulas))).isSatisfiable();
   }
 
   @Test
