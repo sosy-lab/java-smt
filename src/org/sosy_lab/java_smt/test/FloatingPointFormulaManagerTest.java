@@ -386,7 +386,6 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     assertThat(mgr.extractVariables(zero)).isEmpty();
     assertThat(mgr.extractVariablesAndUFs(zero)).isEmpty();
 
-    FloatingPointFormula one = fpmgr.makeNumber(1.0, singlePrecType);
     assertThat(mgr.extractVariables(one)).isEmpty();
     assertThat(mgr.extractVariablesAndUFs(one)).isEmpty();
 
