@@ -218,10 +218,4 @@ public interface FormulaManager {
    * @return Formula belonging to {@code this} context.
    */
   BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
-
-  /**
-   * Short-cut in cases where the type of the formula is unknown. Delegates to the corresponding
-   * [boolean, integer, bitvector, ...] formula manager.
-   */
-  BooleanFormula makeEqual(Formula pFormula1, Formula pFormula2);
 }

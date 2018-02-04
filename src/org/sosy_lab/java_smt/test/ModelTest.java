@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -50,6 +51,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -644,7 +646,7 @@ public class ModelTest extends SolverBasedTest0 {
     for (ValueAssignment va : assignments) {
       assignmentFormulas.add(va.getAssignmentAsFormula());
       assertThatFormula(va.getAssignmentAsFormula())
-          .isEqualTo(mgr.makeEqual(va.getKey(), va.getValueAsFormula()));
+          .isEqualTo(makeAssignment(va.getKey(), va.getValueAsFormula()));
     }
 
     // Check that model is not contradicting
@@ -654,6 +656,36 @@ public class ModelTest extends SolverBasedTest0 {
     // Check for implication is not possible, because formula "x=y" does not imply "{x=0,y=0}" and
     // formula "A = (store EMPTY x y)" is not implied by "{x=0,y=0,(select A 0)=0}" (EMPTY != A).
     assertThatFormula(bmgr.and(f, bmgr.and(assignmentFormulas))).isSatisfiable();
+  }
+
+  /**
+   * Short-cut in cases where the type of the formula is unknown. Delegates to the corresponding
+   * [boolean, integer, bitvector, ...] formula manager.
+   */
+  @SuppressWarnings("unchecked")
+  private BooleanFormula makeAssignment(Formula pFormula1, Formula pFormula2) {
+    FormulaType<?> pType = mgr.getFormulaType(pFormula1);
+    assert mgr.getFormulaType(pFormula1).equals(mgr.getFormulaType(pFormula2))
+        : String.format(
+            "Trying to equalize two formulas %s and %s of different types %s and %s",
+            pFormula1, pFormula2, pType, mgr.getFormulaType(pFormula2));
+    if (pType.isBooleanType()) {
+      return bmgr.equivalence((BooleanFormula) pFormula1, (BooleanFormula) pFormula2);
+    } else if (pType.isIntegerType()) {
+      return imgr.equal((IntegerFormula) pFormula1, (IntegerFormula) pFormula2);
+    } else if (pType.isRationalType()) {
+      return rmgr.equal((RationalFormula) pFormula1, (RationalFormula) pFormula2);
+    } else if (pType.isBitvectorType()) {
+      return bvmgr.equal((BitvectorFormula) pFormula1, (BitvectorFormula) pFormula2);
+    } else if (pType.isFloatingPointType()) {
+      return fpmgr.assignment((FloatingPointFormula) pFormula1, (FloatingPointFormula) pFormula2);
+    } else if (pType.isArrayType()) {
+      @SuppressWarnings("rawtypes")
+      ArrayFormula f2 = (ArrayFormula) pFormula2;
+      return amgr.equivalence((ArrayFormula<?, ?>) pFormula1, f2);
+    }
+    throw new IllegalArgumentException(
+        "Cannot make equality of formulas with type " + pType + " in the Solver!");
   }
 
   @Test
