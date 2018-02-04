@@ -459,7 +459,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     IntegerFormula c = imgr.makeVariable("c");
     List<BooleanFormula> constraints = new ArrayList<>();
     Random r = new Random(42);
-    int bitSize = 8;
+    int bitSize = 7; // difficulty
     BigInteger prime1 = BigInteger.probablePrime(bitSize, r);
     BigInteger prime2 = BigInteger.probablePrime(bitSize + 1, r);
     BigInteger prime3 = BigInteger.probablePrime(bitSize + 2, r);
