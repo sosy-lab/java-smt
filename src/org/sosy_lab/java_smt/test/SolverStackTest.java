@@ -378,6 +378,19 @@ public class SolverStackTest extends SolverBasedTest0 {
     assertThat(stack1).isSatisfiable();
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void avoidDualStacksIfNotSupported() throws InterruptedException {
+    assume()
+        .withMessage("Solver does not support multiple stacks yet")
+        .that(solver)
+        .isEqualTo(Solvers.SMTINTERPOL);
+
+    BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
+    stack1.push(bmgr.makeTrue());
+
+    // creating a new environment is not allowed with non-empty stack -> fail
+    newEnvironmentForTest();
+  }
   /**
    * This test checks that a SMT solver uses "global declarations": regardless of the stack at
    * declaration time, declarations always live for the full life time of the solver (i.e., they do

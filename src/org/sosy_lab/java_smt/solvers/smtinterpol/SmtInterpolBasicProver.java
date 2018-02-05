@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
@@ -56,6 +58,10 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
       new UniqueIdGenerator(); // for different termnames
 
   SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr) {
+    checkState(
+        pMgr.getEnvironment().getStackDepth() == 0,
+        "Not allowed to create a new prover environment while solver stack is still non-empty, "
+            + "parallel stacks are not supported.");
     mgr = pMgr;
     env = pMgr.createEnvironment();
     creator = pMgr.getFormulaCreator();
