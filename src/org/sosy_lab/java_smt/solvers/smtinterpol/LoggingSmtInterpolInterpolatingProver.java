@@ -54,7 +54,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   public String addConstraint(BooleanFormula f) {
     out.print("(assert (" + f + "))");
     String result = super.addConstraint(f);
-    out.print(" ; annotated term: " + result);
+    out.println(" ; annotated term: " + result);
     return result;
   }
 
