@@ -66,7 +66,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   }
 
   @Override
-  public final void push() {
+  public void push() {
     Preconditions.checkState(!closed);
     assertedFormulas.push(new ArrayList<>());
     env.push(1);

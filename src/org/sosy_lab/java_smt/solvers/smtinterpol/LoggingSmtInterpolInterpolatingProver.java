@@ -21,8 +21,10 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Joiner;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.PrintWriter;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -37,15 +39,44 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
+  public void push() {
+    out.println("(push 1)");
+    super.push();
+  }
+
+  @Override
   public void pop() {
     out.println("(pop 1)");
     super.pop();
   }
 
   @Override
+  public String addConstraint(BooleanFormula f) {
+    out.print("(assert (" + f + "))");
+    String result = super.addConstraint(f);
+    out.print(" ; annotated term: " + result);
+    return result;
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    out.println("(get-unsat-core)");
+    return super.getUnsatCore();
+  }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> predicates)
+      throws InterruptedException, SolverException {
+    out.println("(all-sat (" + Joiner.on(", ").join(predicates) + "))");
+    return super.allSat(callback, predicates);
+  }
+
+  @Override
   public boolean isUnsat() throws InterruptedException {
-    out.println("(check-sat)");
-    return super.isUnsat();
+    out.print("(check-sat)");
+    boolean isUnsat = super.isUnsat();
+    out.println(" ; " + (isUnsat ? "UNSAT" : "SAT"));
+    return isUnsat;
   }
 
   @Override
