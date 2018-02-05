@@ -15,8 +15,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
@@ -197,7 +195,7 @@ public class AllSatExample {
 
       final List<BooleanFormula> modelAssignmentsAsFormulas = new ArrayList<>();
       for (ValueAssignment va : modelAssignments) {
-        modelAssignmentsAsFormulas.add(getFormulaForValueAssignment(va));
+        modelAssignmentsAsFormulas.add(va.getAssignmentAsFormula());
       }
 
       // prevent next model from using the same assignment as a previous model
@@ -205,20 +203,6 @@ public class AllSatExample {
     }
 
     return models;
-  }
-
-  /** convert the ValueAssignment into a boolean formula. */
-  private BooleanFormula getFormulaForValueAssignment(ValueAssignment va) {
-    Formula key = va.getKey();
-    FormulaType<Formula> sort = context.getFormulaManager().getFormulaType(key);
-    if (sort.isBooleanType()) {
-      return bfmgr.equivalence((BooleanFormula) key, bfmgr.makeBoolean((boolean) va.getValue()));
-    } else if (sort.isIntegerType()) {
-      return ifmgr.equal((IntegerFormula) key, ifmgr.makeNumber((BigInteger) va.getValue()));
-    } else {
-      throw new AssertionError(
-          String.format("unexpected formula type '%s' for formula '%s'", sort, key));
-    }
   }
 
   private IntegerFormula num(int number) {
