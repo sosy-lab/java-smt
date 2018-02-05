@@ -389,7 +389,8 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack1.push(bmgr.makeTrue());
 
     // creating a new environment is not allowed with non-empty stack -> fail
-    newEnvironmentForTest();
+    @SuppressWarnings("unused")
+    BasicProverEnvironment<?> unused = newEnvironmentForTest();
   }
   /**
    * This test checks that a SMT solver uses "global declarations": regardless of the stack at
