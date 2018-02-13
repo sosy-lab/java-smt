@@ -21,10 +21,10 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static scala.collection.JavaConversions.asJavaIterable;
+import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
 import static scala.collection.JavaConversions.seqAsJavaList;
-import static scala.collection.JavaConversions.asScalaBuffer;
 
 import ap.SimpleAPI;
 import ap.parser.IAtom;
@@ -394,36 +394,39 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(Sort type, String varname) {
     if (type == BoolSort) {
-        if (boolVariablesCache.containsKey(varname)) {
-            return boolVariablesCache.get(varname);
-        } else {
-            IFormula var = api.createBooleanVariable(varname);
-            addSymbol(var);
-            boolVariablesCache.put(varname, var);
-            return var;
-          }
+      if (boolVariablesCache.containsKey(varname)) {
+        return boolVariablesCache.get(varname);
+      } else {
+        IFormula var = api.createBooleanVariable(varname);
+        addSymbol(var);
+        boolVariablesCache.put(varname, var);
+        return var;
+      }
     } else {
-        if (sortedVariablesCache.containsKey(varname)) {
-            return sortedVariablesCache.get(varname);
-        } else {
-            ITerm var = api.createConstant(varname, type);
-            addSymbol(var);
-            sortedVariablesCache.put(varname, var);
-            return var;
-          }
+      if (sortedVariablesCache.containsKey(varname)) {
+        return sortedVariablesCache.get(varname);
+      } else {
+        ITerm var = api.createConstant(varname, type);
+        addSymbol(var);
+        sortedVariablesCache.put(varname, var);
+        return var;
+      }
     }
   }
 
-  /**
-   * This function declares a new functionSymbol with the given argument types and result.
-   */
+  /** This function declares a new functionSymbol with the given argument types and result. */
   public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
-//      assert returnType == functionsReturnTypes.get(functionsCache.get(name));
+      //      assert returnType == functionsReturnTypes.get(functionsCache.get(name));
       return functionsCache.get(name);
     } else {
-      IFunction funcDecl = api.createFunction(name, asScalaBuffer(args), returnType,
-                                              false, SimpleAPI.FunctionalityMode$.MODULE$.Full());
+      IFunction funcDecl =
+          api.createFunction(
+              name,
+              asScalaBuffer(args),
+              returnType,
+              false,
+              SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
       functionsCache.put(name, funcDecl);
       return funcDecl;
@@ -442,10 +445,10 @@ class PrincessEnvironment {
 
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
-        final ITerm t = (ITerm)exp;
-        return Sort.sortOf(t) instanceof SimpleArray.ArraySort;
+      final ITerm t = (ITerm) exp;
+      return Sort.sortOf(t) instanceof SimpleArray.ArraySort;
     } else {
-        return false;
+      return false;
     }
   }
 

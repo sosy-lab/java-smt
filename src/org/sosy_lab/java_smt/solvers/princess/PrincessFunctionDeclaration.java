@@ -161,8 +161,7 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       Preconditions.checkArgument(args.size() == 2);
-      return GroebnerMultiplication.mult((ITerm)args.get(0),
-                                         (ITerm)args.get(1));
+      return GroebnerMultiplication.mult((ITerm) args.get(0), (ITerm) args.get(1));
     }
   }
 }

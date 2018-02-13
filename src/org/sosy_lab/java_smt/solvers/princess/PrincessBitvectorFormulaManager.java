@@ -51,8 +51,7 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression divide(
-      IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression divide(IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
       return ModuloArithmetic$.MODULE$.bvsdiv((ITerm) pParam1, (ITerm) pParam2);
     } else {
@@ -61,8 +60,7 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression modulo(
-      IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression modulo(IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
       return ModuloArithmetic$.MODULE$.bvsrem((ITerm) pParam1, (ITerm) pParam2);
     } else {
@@ -81,20 +79,17 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression greaterThan(
-      IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression greaterThan(IExpression pParam1, IExpression pParam2, boolean signed) {
     return lessThan(pParam2, pParam1, signed);
   }
 
   @Override
-  protected IExpression greaterOrEquals(
-      IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression greaterOrEquals(IExpression pParam1, IExpression pParam2, boolean signed) {
     return lessOrEquals(pParam2, pParam1, signed);
   }
 
   @Override
-  protected IExpression lessThan(
-      IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression lessThan(IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
       return ModuloArithmetic$.MODULE$.bvslt((ITerm) pParam1, (ITerm) pParam2);
     } else {
@@ -103,8 +98,7 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression lessOrEquals(
-      IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression lessOrEquals(IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
       return ModuloArithmetic$.MODULE$.bvsle((ITerm) pParam1, (ITerm) pParam2);
     } else {
@@ -149,8 +143,7 @@ class PrincessBitvectorFormulaManager
       pI = pI.add(n);
     }
     if (pI.compareTo(n) >= 0) {
-      throw new IllegalArgumentException(
-          pI + " is too big for a bitvector with length " + pLength);
+      throw new IllegalArgumentException(pI + " is too big for a bitvector with length " + pLength);
     }
     return ModuloArithmetic$.MODULE$.bv(pLength, IdealInt.apply(pI));
   }
@@ -162,8 +155,7 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression shiftRight(
-      IExpression pNumber, IExpression toShift, boolean signed) {
+  protected IExpression shiftRight(IExpression pNumber, IExpression toShift, boolean signed) {
     if (signed) {
       return ModuloArithmetic$.MODULE$.bvashr((ITerm) pNumber, (ITerm) toShift);
     } else {
@@ -182,20 +174,17 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression extract(
-      IExpression pNumber, int pMsb, int pLsb, boolean pSigned) {
+  protected IExpression extract(IExpression pNumber, int pMsb, int pLsb, boolean pSigned) {
     // TODO: pSigned?
     return ModuloArithmetic$.MODULE$.extract(pMsb, pLsb, (ITerm) pNumber);
   }
 
   @Override
-  protected IExpression extend(IExpression pNumber, int pExtensionBits,
-                               boolean pSigned) {
+  protected IExpression extend(IExpression pNumber, int pExtensionBits, boolean pSigned) {
     if (pSigned) {
       return ModuloArithmetic$.MODULE$.sign_extend(pExtensionBits, (ITerm) pNumber);
     } else {
       return ModuloArithmetic$.MODULE$.zero_extend(pExtensionBits, (ITerm) pNumber);
     }
   }
-
 }

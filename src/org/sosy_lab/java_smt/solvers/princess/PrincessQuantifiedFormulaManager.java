@@ -43,8 +43,7 @@ class PrincessQuantifiedFormulaManager
   private final PrincessEnvironment env;
 
   PrincessQuantifiedFormulaManager(
-      FormulaCreator<
-              IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
           pCreator) {
     super(pCreator);
     env = getFormulaCreator().getEnv();

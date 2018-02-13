@@ -57,8 +57,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 import scala.Tuple2;
 
-class PrincessModel
-    extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
+class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PartialModel model;
 
   PrincessModel(

@@ -430,12 +430,10 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     BitvectorFormula xx = bvmgr.makeVariable(width, "x" + i);
     BitvectorFormula yy = bvmgr.makeVariable(width, "y" + i);
     BooleanFormula f =
-        qmgr.exists(
-            yy,
-            bvmgr.equal(bvmgr.multiply(xx, yy), bvmgr.makeBitvector(width, 1)));
+        qmgr.exists(yy, bvmgr.equal(bvmgr.multiply(xx, yy), bvmgr.makeBitvector(width, 1)));
     BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
 
-    assertThatFormula(qFreeF).isEquivalentTo(
-        bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
+    assertThatFormula(qFreeF)
+        .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
   }
 }

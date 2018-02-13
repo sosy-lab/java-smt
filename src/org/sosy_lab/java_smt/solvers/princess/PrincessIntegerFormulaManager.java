@@ -83,9 +83,9 @@ class PrincessIntegerFormulaManager
 
   private IExpression modularCongruence0(IExpression pNumber1, IExpression pNumber2, ITerm n) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-//    ITerm x = subtract(pNumber1, pNumber2);
-//    return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
-//  exists v0. pNumber1 - pNumber2 + v0*n == 0
+    //    ITerm x = subtract(pNumber1, pNumber2);
+    //    return x.$eq$eq$eq(n.$times(BitShiftMultiplication.eDiv(x, n)));
+    //  exists v0. pNumber1 - pNumber2 + v0*n == 0
     ITerm diff = subtract(pNumber1, pNumber2);
     ITerm sum = add(diff, multiply(IExpression.v(0), n));
     return IExpression.ex(IExpression.eqZero(sum));

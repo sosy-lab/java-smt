@@ -26,8 +26,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 
 class PrincessUFManager
-    extends AbstractUFManager<
-        IExpression, PrincessFunctionDeclaration, Sort, PrincessEnvironment> {
+    extends AbstractUFManager<IExpression, PrincessFunctionDeclaration, Sort, PrincessEnvironment> {
 
   private final PrincessFormulaCreator creator;
 

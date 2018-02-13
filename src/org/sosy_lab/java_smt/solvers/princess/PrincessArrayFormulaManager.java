@@ -35,8 +35,7 @@ class PrincessArrayFormulaManager
   private final PrincessEnvironment env;
 
   PrincessArrayFormulaManager(
-      FormulaCreator<
-              IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
           pFormulaCreator) {
     super(pFormulaCreator);
     env = pFormulaCreator.getEnv();
