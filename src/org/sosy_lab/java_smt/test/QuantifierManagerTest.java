@@ -95,9 +95,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // The tests in this class use quantifiers and thus solver failures are expected.
     // We do not ignore all SolverExceptions in order to not hide bugs,
     // but only for Princess which is known to not be able to solve all tests here.
-//    if (solverUnderTest == Solvers.PRINCESS) {
-//      TruthJUnit.assume().fail(e.getMessage());
-//    }
+    if (solverUnderTest == Solvers.PRINCESS) {
+      TruthJUnit.assume().fail(e.getMessage());
+    }
     throw e;
   }
 

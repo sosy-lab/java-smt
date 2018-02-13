@@ -66,7 +66,7 @@ class PrincessBitvectorFormulaManager
   protected IExpression modulo(
       IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
-      return ModuloArithmetic$.MODULE$.bvsmod((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvsrem((ITerm)pParam1, (ITerm)pParam2);
     } else {
       return ModuloArithmetic$.MODULE$.bvurem((ITerm)pParam1, (ITerm)pParam2);
     }
