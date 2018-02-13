@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import ap.parser.IExpression;
 import ap.types.Sort;
 import java.util.List;

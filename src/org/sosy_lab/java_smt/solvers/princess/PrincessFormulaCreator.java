@@ -51,7 +51,6 @@ import ap.types.Sort;
 import ap.theories.ModuloArithmetic;
 import ap.theories.ModuloArithmetic$;
 import ap.theories.SimpleArray;
-import ap.theories.MulTheory;
 import ap.theories.nia.GroebnerMultiplication$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;

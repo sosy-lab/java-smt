@@ -27,7 +27,6 @@ import static scala.collection.JavaConversions.seqAsJavaList;
 import static scala.collection.JavaConversions.asScalaBuffer;
 
 import ap.SimpleAPI;
-import ap.SimpleAPI$;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
@@ -36,7 +35,6 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
 import ap.parser.SMTLineariser;
-import ap.parser.SMTParser2InputAbsy;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;

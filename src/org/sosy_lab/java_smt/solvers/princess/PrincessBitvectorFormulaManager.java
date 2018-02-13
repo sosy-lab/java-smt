@@ -21,13 +21,11 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
-import ap.parser.IFormula;
 import ap.parser.ITerm;
 import ap.theories.ModuloArithmetic$;
 import ap.types.Sort;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 class PrincessBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<
@@ -39,26 +37,26 @@ class PrincessBitvectorFormulaManager
 
   @Override
   protected IExpression negate(IExpression pParam1) {
-    return ModuloArithmetic$.MODULE$.bvneg((ITerm)pParam1);
+    return ModuloArithmetic$.MODULE$.bvneg((ITerm) pParam1);
   }
 
   @Override
   protected IExpression add(IExpression pParam1, IExpression pParam2) {
-    return ModuloArithmetic$.MODULE$.bvadd((ITerm)pParam1, (ITerm)pParam2);
+    return ModuloArithmetic$.MODULE$.bvadd((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override
   protected IExpression subtract(IExpression pParam1, IExpression pParam2) {
-    return ModuloArithmetic$.MODULE$.bvsub((ITerm)pParam1, (ITerm)pParam2);
+    return ModuloArithmetic$.MODULE$.bvsub((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override
   protected IExpression divide(
       IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
-      return ModuloArithmetic$.MODULE$.bvsdiv((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvsdiv((ITerm) pParam1, (ITerm) pParam2);
     } else {
-      return ModuloArithmetic$.MODULE$.bvudiv((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvudiv((ITerm) pParam1, (ITerm) pParam2);
     }
   }
 
@@ -66,15 +64,15 @@ class PrincessBitvectorFormulaManager
   protected IExpression modulo(
       IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
-      return ModuloArithmetic$.MODULE$.bvsrem((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvsrem((ITerm) pParam1, (ITerm) pParam2);
     } else {
-      return ModuloArithmetic$.MODULE$.bvurem((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvurem((ITerm) pParam1, (ITerm) pParam2);
     }
   }
 
   @Override
   protected IExpression multiply(IExpression pParam1, IExpression pParam2) {
-    return ModuloArithmetic$.MODULE$.bvmul((ITerm)pParam1, (ITerm)pParam2);
+    return ModuloArithmetic$.MODULE$.bvmul((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override
@@ -98,9 +96,9 @@ class PrincessBitvectorFormulaManager
   protected IExpression lessThan(
       IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
-      return ModuloArithmetic$.MODULE$.bvslt((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvslt((ITerm) pParam1, (ITerm) pParam2);
     } else {
-      return ModuloArithmetic$.MODULE$.bvult((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvult((ITerm) pParam1, (ITerm) pParam2);
     }
   }
 
@@ -108,30 +106,30 @@ class PrincessBitvectorFormulaManager
   protected IExpression lessOrEquals(
       IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
-      return ModuloArithmetic$.MODULE$.bvsle((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvsle((ITerm) pParam1, (ITerm) pParam2);
     } else {
-      return ModuloArithmetic$.MODULE$.bvule((ITerm)pParam1, (ITerm)pParam2);
+      return ModuloArithmetic$.MODULE$.bvule((ITerm) pParam1, (ITerm) pParam2);
     }
   }
 
   @Override
   protected IExpression not(IExpression pParam1) {
-    return ModuloArithmetic$.MODULE$.bvnot((ITerm)pParam1);
+    return ModuloArithmetic$.MODULE$.bvnot((ITerm) pParam1);
   }
 
   @Override
   protected IExpression and(IExpression pParam1, IExpression pParam2) {
-    return ModuloArithmetic$.MODULE$.bvand((ITerm)pParam1, (ITerm)pParam2);
+    return ModuloArithmetic$.MODULE$.bvand((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override
   protected IExpression or(IExpression pParam1, IExpression pParam2) {
-    return ModuloArithmetic$.MODULE$.bvor((ITerm)pParam1, (ITerm)pParam2);
+    return ModuloArithmetic$.MODULE$.bvor((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override
   protected IExpression xor(IExpression pParam1, IExpression pParam2) {
-    return ModuloArithmetic$.MODULE$.bvxor((ITerm)pParam1, (ITerm)pParam2);
+    return ModuloArithmetic$.MODULE$.bvxor((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override
@@ -167,36 +165,36 @@ class PrincessBitvectorFormulaManager
   protected IExpression shiftRight(
       IExpression pNumber, IExpression toShift, boolean signed) {
     if (signed) {
-      return ModuloArithmetic$.MODULE$.bvashr((ITerm)pNumber, (ITerm)toShift);
+      return ModuloArithmetic$.MODULE$.bvashr((ITerm) pNumber, (ITerm) toShift);
     } else {
-      return ModuloArithmetic$.MODULE$.bvlshr((ITerm)pNumber, (ITerm)toShift);
+      return ModuloArithmetic$.MODULE$.bvlshr((ITerm) pNumber, (ITerm) toShift);
     }
   }
 
   @Override
   protected IExpression shiftLeft(IExpression pExtract, IExpression pExtract2) {
-    return ModuloArithmetic$.MODULE$.bvshl((ITerm)pExtract, (ITerm)pExtract2);
+    return ModuloArithmetic$.MODULE$.bvshl((ITerm) pExtract, (ITerm) pExtract2);
   }
 
   @Override
   protected IExpression concat(IExpression number, IExpression pAppend) {
-    return ModuloArithmetic$.MODULE$.concat((ITerm)number, (ITerm)pAppend);
+    return ModuloArithmetic$.MODULE$.concat((ITerm) number, (ITerm) pAppend);
   }
 
   @Override
   protected IExpression extract(
       IExpression pNumber, int pMsb, int pLsb, boolean pSigned) {
     // TODO: pSigned?
-    return ModuloArithmetic$.MODULE$.extract(pMsb, pLsb, (ITerm)pNumber);
+    return ModuloArithmetic$.MODULE$.extract(pMsb, pLsb, (ITerm) pNumber);
   }
 
   @Override
   protected IExpression extend(IExpression pNumber, int pExtensionBits,
                                boolean pSigned) {
     if (pSigned) {
-      return ModuloArithmetic$.MODULE$.sign_extend(pExtensionBits, (ITerm)pNumber);
+      return ModuloArithmetic$.MODULE$.sign_extend(pExtensionBits, (ITerm) pNumber);
     } else {
-      return ModuloArithmetic$.MODULE$.zero_extend(pExtensionBits, (ITerm)pNumber);
+      return ModuloArithmetic$.MODULE$.zero_extend(pExtensionBits, (ITerm) pNumber);
     }
   }
 
