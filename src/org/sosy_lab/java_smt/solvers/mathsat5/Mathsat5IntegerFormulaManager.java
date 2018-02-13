@@ -19,13 +19,16 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static com.google.common.base.Verify.verify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_modular_congruence;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
+import com.google.common.base.Splitter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -66,13 +69,13 @@ class Mathsat5IntegerFormulaManager
     if (n.startsWith("(")) {
       n = n.substring(1, n.length() - 1);
     }
-    String[] frac = n.split("/");
-    if (frac.length == 1) {
+    List<String> frac = Splitter.on('/').splitToList(n);
+    if (frac.size() == 1) {
       // cannot multiply with term 1/n because the result will have type rat instead of int
       return super.divide(pNumber1, pNumber2);
     } else {
-      assert (frac.length == 2);
-      n = frac[1] + "/" + frac[0];
+      verify(frac.size() == 2);
+      n = frac.get(1) + "/" + frac.get(0);
     }
     t2 = msat_make_number(mathsatEnv, n);
     return msat_make_times(mathsatEnv, t2, t1);

@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
@@ -45,9 +46,7 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   @Override
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
-    Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
-    Collections.addAll(opts, options);
-    ProverEnvironment out = newProverEnvironment0(opts);
+    ProverEnvironment out = newProverEnvironment0(toSet(options));
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
@@ -60,9 +59,10 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation() {
+  public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
+      ProverOptions... options) {
 
-    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0();
+    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0(toSet(options));
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
@@ -71,7 +71,18 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
-  protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0();
+  protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet);
+
+  @SuppressWarnings("resource")
+  @Override
+  public final OptimizationProverEnvironment newOptimizationProverEnvironment(
+      ProverOptions... options) {
+    return newOptimizationProverEnvironment0(toSet(options));
+  }
+
+  protected abstract OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet);
 
   /**
    * Whether the solver supports solving under some given assumptions (with all corresponding
@@ -89,4 +100,10 @@ public abstract class AbstractSolverContext implements SolverContext {
    * class is undefined.
    */
   protected abstract boolean supportsAssumptionSolving();
+
+  private static Set<ProverOptions> toSet(ProverOptions... options) {
+    Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
+    Collections.addAll(opts, options);
+    return opts;
+  }
 }

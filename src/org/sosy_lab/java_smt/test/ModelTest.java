@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -41,6 +42,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -49,6 +51,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -103,7 +106,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("x"),
@@ -114,7 +116,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(large)),
@@ -126,7 +127,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetRationals() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
         rmgr.makeVariable("x"),
@@ -155,9 +155,45 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula app1 = fmgr.callUF(declaration, arg1);
     IntegerFormula app2 = fmgr.callUF(declaration, arg2);
 
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula three = imgr.makeNumber(3);
+    IntegerFormula four = imgr.makeNumber(4);
+
+    ImmutableList<ValueAssignment> expectedModel =
+        ImmutableList.of(
+            new ValueAssignment(
+                arg1,
+                three,
+                imgr.equal(arg1, three),
+                "arg1",
+                BigInteger.valueOf(3),
+                ImmutableList.of()),
+            new ValueAssignment(
+                arg2,
+                four,
+                imgr.equal(arg2, four),
+                "arg2",
+                BigInteger.valueOf(4),
+                ImmutableList.of()),
+            new ValueAssignment(
+                fmgr.callUF(declaration, three),
+                one,
+                imgr.equal(fmgr.callUF(declaration, three), one),
+                "UF",
+                BigInteger.valueOf(1),
+                ImmutableList.of(BigInteger.valueOf(3))),
+            new ValueAssignment(
+                fmgr.callUF(declaration, four),
+                imgr.makeNumber(2),
+                imgr.equal(fmgr.callUF(declaration, four), two),
+                "UF",
+                BigInteger.valueOf(2),
+                ImmutableList.of(BigInteger.valueOf(4))));
+
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(imgr.equal(app1, imgr.makeNumber(1)));
-      prover.push(imgr.equal(app2, imgr.makeNumber(2)));
+      prover.push(
+          bmgr.and(imgr.equal(app1, imgr.makeNumber(1)), imgr.equal(app2, imgr.makeNumber(2))));
       prover.push(imgr.equal(arg1, imgr.makeNumber(3)));
       prover.push(imgr.equal(arg2, imgr.makeNumber(4)));
 
@@ -166,21 +202,9 @@ public class ModelTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
         assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
-        assertThat(m)
-            .containsExactly(
-                new ValueAssignment(arg1, "arg1", BigInteger.valueOf(3), ImmutableList.of()),
-                new ValueAssignment(arg1, "arg2", BigInteger.valueOf(4), ImmutableList.of()),
-                new ValueAssignment(
-                    fmgr.callUF(declaration, imgr.makeNumber(3)),
-                    "UF",
-                    BigInteger.valueOf(1),
-                    ImmutableList.of(BigInteger.valueOf(3))),
-                new ValueAssignment(
-                    fmgr.callUF(declaration, imgr.makeNumber(4)),
-                    "UF",
-                    BigInteger.valueOf(2),
-                    ImmutableList.of(BigInteger.valueOf(4))));
+        assertThat(m).containsExactlyElementsIn(expectedModel);
       }
+      assertThat(prover.getModelAssignments()).containsExactlyElementsIn(expectedModel);
     }
   }
 
@@ -199,6 +223,7 @@ public class ModelTest extends SolverBasedTest0 {
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
     BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    IntegerFormula one = imgr.makeNumber(1);
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
@@ -211,7 +236,12 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(m)
             .contains(
                 new ValueAssignment(
-                    funcAtZero, func, BigInteger.ONE, ImmutableList.of(BigInteger.ZERO)));
+                    funcAtZero,
+                    one,
+                    imgr.equal(funcAtZero, one),
+                    func,
+                    BigInteger.ONE,
+                    ImmutableList.of(BigInteger.ZERO)));
       }
     }
   }
@@ -219,8 +249,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetBitvectors() throws SolverException, InterruptedException {
     requireBitvectors();
-    assert bvmgr != null;
-
     testModelGetters(
         bvmgr.equal(bvmgr.makeVariable(1, "x"), bvmgr.makeBitvector(1, BigInteger.ONE)),
         bvmgr.makeVariable(1, "x"),
@@ -322,8 +350,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetArrays() throws SolverException, InterruptedException {
     requireArrays();
-    assert amgr != null;
-
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", IntegerType, IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
@@ -515,12 +541,18 @@ public class ModelTest extends SolverBasedTest0 {
       boolean isArray)
       throws SolverException, InterruptedException {
 
+    List<BooleanFormula> modelAssignments = new ArrayList<>();
+
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(constraint);
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
+
+        for (ValueAssignment va : m) {
+          modelAssignments.add(va.getAssignmentAsFormula());
+        }
 
         List<ValueAssignment> relevantAssignments =
             prover
@@ -548,6 +580,8 @@ public class ModelTest extends SolverBasedTest0 {
         }
       }
     }
+
+    assertThatFormula(bmgr.and(modelAssignments)).implies(constraint);
   }
 
   @Test
@@ -596,6 +630,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   private void checkModelIteration(BooleanFormula f, boolean useOptProver)
       throws SolverException, InterruptedException {
+    ImmutableList<ValueAssignment> assignments;
     try (BasicProverEnvironment<?> prover =
         useOptProver
             ? context.newOptimizationProverEnvironment()
@@ -607,8 +642,55 @@ public class ModelTest extends SolverBasedTest0 {
           // Check that we can iterate through with no crashes.
         }
         assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+
+        assignments = prover.getModelAssignments();
       }
     }
+
+    List<BooleanFormula> assignmentFormulas = new ArrayList<>();
+    for (ValueAssignment va : assignments) {
+      assignmentFormulas.add(va.getAssignmentAsFormula());
+      assertThatFormula(va.getAssignmentAsFormula())
+          .isEqualTo(makeAssignment(va.getKey(), va.getValueAsFormula()));
+    }
+
+    // Check that model is not contradicting
+    assertThatFormula(bmgr.and(assignmentFormulas)).isSatisfiable();
+
+    // Check that model does not contradict formula.
+    // Check for implication is not possible, because formula "x=y" does not imply "{x=0,y=0}" and
+    // formula "A = (store EMPTY x y)" is not implied by "{x=0,y=0,(select A 0)=0}" (EMPTY != A).
+    assertThatFormula(bmgr.and(f, bmgr.and(assignmentFormulas))).isSatisfiable();
+  }
+
+  /**
+   * Short-cut in cases where the type of the formula is unknown. Delegates to the corresponding
+   * [boolean, integer, bitvector, ...] formula manager.
+   */
+  @SuppressWarnings("unchecked")
+  private BooleanFormula makeAssignment(Formula pFormula1, Formula pFormula2) {
+    FormulaType<?> pType = mgr.getFormulaType(pFormula1);
+    assert mgr.getFormulaType(pFormula1).equals(mgr.getFormulaType(pFormula2))
+        : String.format(
+            "Trying to equalize two formulas %s and %s of different types %s and %s",
+            pFormula1, pFormula2, pType, mgr.getFormulaType(pFormula2));
+    if (pType.isBooleanType()) {
+      return bmgr.equivalence((BooleanFormula) pFormula1, (BooleanFormula) pFormula2);
+    } else if (pType.isIntegerType()) {
+      return imgr.equal((IntegerFormula) pFormula1, (IntegerFormula) pFormula2);
+    } else if (pType.isRationalType()) {
+      return rmgr.equal((RationalFormula) pFormula1, (RationalFormula) pFormula2);
+    } else if (pType.isBitvectorType()) {
+      return bvmgr.equal((BitvectorFormula) pFormula1, (BitvectorFormula) pFormula2);
+    } else if (pType.isFloatingPointType()) {
+      return fpmgr.assignment((FloatingPointFormula) pFormula1, (FloatingPointFormula) pFormula2);
+    } else if (pType.isArrayType()) {
+      @SuppressWarnings("rawtypes")
+      ArrayFormula f2 = (ArrayFormula) pFormula2;
+      return amgr.equivalence((ArrayFormula<?, ?>) pFormula1, f2);
+    }
+    throw new IllegalArgumentException(
+        "Cannot make equality of formulas with type " + pType + " in the Solver!");
   }
 
   @Test
@@ -818,6 +900,72 @@ public class ModelTest extends SolverBasedTest0 {
           + "       (or (and P43 (not (= M@3 0))) (and (not P43) (= z3name!115 0)))"
           + "       (or (and P42 (= M@3 0)) (and (not P42) (= z3name!115 |V#2@|)))))";
 
+  static final String MEDIUM_ARRAY_QUERY =
+      "(declare-fun |H@1| () (Array Int Int))"
+          + "(declare-fun |H@2| () (Array Int Int))"
+          + "(declare-fun |H@3| () (Array Int Int))"
+          + "(declare-fun |H@4| () (Array Int Int))"
+          + "(declare-fun |H@5| () (Array Int Int))"
+          + "(declare-fun |H@6| () (Array Int Int))"
+          + "(declare-fun |H@7| () (Array Int Int))"
+          + "(declare-fun |H@8| () (Array Int Int))"
+          + "(declare-fun |H@9| () (Array Int Int))"
+          + "(declare-fun |H@10| () (Array Int Int))"
+          + "(declare-fun |H@11| () (Array Int Int))"
+          + "(declare-fun |H@12| () (Array Int Int))"
+          + "(declare-fun |H@13| () (Array Int Int))"
+          + "(declare-fun I10 () Int)"
+          + "(declare-fun I11 () Int)"
+          + "(declare-fun I12 () Int)"
+          + "(declare-fun I13 () Int)"
+          + "(declare-fun I14 () Int)"
+          + "(declare-fun I15 () Int)"
+          + "(declare-fun |at3@5| () Int)"
+          + "(declare-fun |at3@3| () Int)"
+          + "(declare-fun |At5@3| () Int)"
+          + "(declare-fun |At7@3| () Int)"
+          + "(declare-fun |At7@5| () Int)"
+          + "(declare-fun |ahead@3| () Int)"
+          + "(declare-fun |ahead@2| () Int)"
+          + "(declare-fun |At5@5| () Int)"
+          + "(assert "
+          + "  (and (not (<= |ahead@2| 0))"
+          + "       (= |H@2| (store |H@1| |At5@3| 1))"
+          + "       (= |H@3| (store |H@2| 3 1))"
+          + "       (= |H@4| (store |H@3| 4 1))"
+          + "       (= |H@5| (store |H@4| 5 1))"
+          + "       (= |H@6| (store |H@5| 6 1))"
+          + "       (= |H@7| (store |H@6| 7 1))"
+          + "       (= |H@8| (store |H@7| 8 1))"
+          + "       (= |at3@3| (select |H@1| |ahead@2|))"
+          + "       (= |at3@5| (select |H@7| |ahead@3|))"
+          + "       (= I11 (+ 12 I10))"
+          + "       (= I13 (+ 12 I12))"
+          + "       (= I15 (+ 12 I14))"
+          + "       ))";
+
+  static final String UGLY_ARRAY_QUERY =
+      "(declare-fun V () Int)"
+          + "(declare-fun W () Int)"
+          + "(declare-fun A () Int)"
+          + "(declare-fun B () Int)"
+          + "(declare-fun U () Int)"
+          + "(declare-fun G () Int)"
+          + "(declare-fun ARR () (Array Int Int))"
+          + "(declare-fun EMPTY () (Array Int Int))"
+          + "(assert "
+          + "  (and (> (+ V U) 0)"
+          + "       (not (= B (- 4)))"
+          + "       (= ARR (store (store (store EMPTY G B) B G) A W))"
+          + "       ))";
+
+  static final String UGLY_ARRAY_QUERY_2 =
+      "(declare-fun A () Int)"
+          + "(declare-fun B () Int)"
+          + "(declare-fun ARR () (Array Int Int))"
+          + "(declare-fun EMPTY () (Array Int Int))"
+          + "(assert (and (= A 0) (= B 0) (= ARR (store (store EMPTY A 1) B 2))))";
+
   static final String SMALL_BV_FLOAT_QUERY =
       "(declare-fun |f@2| () (_ FloatingPoint 8 23))"
           + "(declare-fun |p@3| () (_ BitVec 32))"
@@ -840,7 +988,19 @@ public class ModelTest extends SolverBasedTest0 {
           + "(assert (= a (select A #x00000000)))";
 
   @Test
-  public void arrayTest() throws SolverException, InterruptedException {
+  public void arrayTest1() throws SolverException, InterruptedException {
+    requireArrays();
+
+    for (String query :
+        Lists.newArrayList(
+            SMALL_ARRAY_QUERY, MEDIUM_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
+      BooleanFormula formula = context.getFormulaManager().parse(query);
+      checkModelIteration(formula, false);
+    }
+  }
+
+  @Test
+  public void arrayTest2() throws SolverException, InterruptedException {
     requireArrays();
     requireOptimization();
     requireFloats();
@@ -848,8 +1008,7 @@ public class ModelTest extends SolverBasedTest0 {
     // only Z3 fulfills these requirements
 
     for (String query :
-        Lists.newArrayList(
-            SMALL_ARRAY_QUERY, BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
+        Lists.newArrayList(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, true);
       checkModelIteration(formula, false);

@@ -19,70 +19,26 @@
  */
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Preconditions;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
-import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     implements ProverEnvironment {
 
-  private final SmtInterpolFormulaManager mgr;
-  private final SmtInterpolEnvironment env;
-  private final Map<String, Term> annotatedTerms; // Collection of termNames
-  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
   private final boolean generateUnsatCores;
 
-  SmtInterpolTheoremProver(
-      SmtInterpolFormulaManager pMgr,
-      FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> pCreator,
-      Set<ProverOptions> options) {
+  SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
     super(pMgr);
-    mgr = pMgr;
-    env = mgr.createEnvironment();
-    creator = pCreator;
-    checkNotNull(env);
-    annotatedTerms = new HashMap<>();
     generateUnsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    push();
-    Preconditions.checkState(
-        annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core" + " over assumptions.");
-    for (BooleanFormula assumption : assumptions) {
-      String termName = generateTermName();
-      Term t = mgr.extractInfo(assumption);
-      Term annotated = env.annotate(t, new Annotation(":named", termName));
-      annotatedTerms.put(termName, t);
-      env.assertTerm(annotated);
-    }
-    if (!isUnsat()) {
-      return Optional.empty();
-    }
-    List<BooleanFormula> out = getUnsatCore();
-    pop();
-    return Optional.of(out);
   }
 
   @Override
@@ -100,29 +56,6 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     }
     assertedFormulas.peek().add(t);
     return null;
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!isClosed());
-    Term[] terms = env.getUnsatCore();
-    return Collections3.transformedImmutableListCopy(
-        terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    Preconditions.checkState(!isClosed());
-    Term[] importantTerms = new Term[important.size()];
-    int i = 0;
-    for (BooleanFormula impF : important) {
-      importantTerms[i++] = mgr.extractInfo(impF);
-    }
-    for (Term[] model : env.checkAllSat(importantTerms)) {
-      callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
-    }
-    return callback.getResult();
   }
 
   @Override

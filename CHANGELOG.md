@@ -1,5 +1,25 @@
 # JavaSMT ChangeLog
 
+## JavaSMT 2.0.0
+
+### Changes in the API
+ - New solver versions:
+    - MathSAT: 5.5.0
+    - OptiMathSAT: 1.4.0.10
+    - Princess: 2017-12-06-assertionless
+    - SMTInterpol: 2.1-335-g4c543a5
+    - Z3: z3-4.6.0-9-g36204fa
+ - Methods for computing a model, unsat core and allsat are moved from
+   `ProverEnvironment` upwards into `BasicProverEnvironment` and can now also
+   be used in `InterpolatingProverEnvironment`
+ - New methods to convert IEEE bitvectors to floats and vice versa.
+ - Improved handling of exceptions
+
+### Improvements and Fixes
+ - Improve instantiation procedure of Z3 and Princess
+ - Remove some non-determinism and prefer deterministic data structures
+ - Fix model generation for SMTInterpol in case of multiple UF assignments
+
 ## JavaSMT 1.0.0
 
  - Floating point rounding mode can be now specified for all operations in

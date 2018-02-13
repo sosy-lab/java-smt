@@ -188,7 +188,8 @@ public interface FormulaManager {
    * Extract the names of all free variables and UFs in a formula.
    *
    * @param f The input formula
-   * @return Map from variable names to the corresponding formulas.
+   * @return Map from variable names to the corresponding formulas. If an UF occurs multiple times
+   *     in the input formula, an arbitrary instance of an application of this UF is in the map.
    */
   Map<String, Formula> extractVariablesAndUFs(Formula f);
 

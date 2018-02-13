@@ -37,6 +37,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -97,18 +98,40 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTest() throws SolverException, InterruptedException {
-    try (ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
-      pe.push();
-      pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-      pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
-      pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
-      assertThat(pe).isUnsatisfiable();
-      List<BooleanFormula> unsatCore = pe.getUnsatCore();
-      assertThat(unsatCore)
-          .containsExactly(
-              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
-              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+      unsatCoreTest0(pe);
     }
+    try (BasicProverEnvironment<?> pe =
+        context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
+      unsatCoreTest0(pe);
+    }
+  }
+
+  @Test
+  public void unsatCoreTestForOptimizationProver() throws SolverException, InterruptedException {
+    requireOptimization();
+
+    // Z3 does not implement unsat core for optimization
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+
+    try (BasicProverEnvironment<?> pe =
+        context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
+      unsatCoreTest0(pe);
+    }
+  }
+
+  private void unsatCoreTest0(BasicProverEnvironment<?> pe)
+      throws InterruptedException, SolverException {
+    pe.push();
+    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
+    pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
+    assertThat(pe).isUnsatisfiable();
+    List<BooleanFormula> unsatCore = pe.getUnsatCore();
+    assertThat(unsatCore)
+        .containsExactly(
+            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
+            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
   }
 
   @Test

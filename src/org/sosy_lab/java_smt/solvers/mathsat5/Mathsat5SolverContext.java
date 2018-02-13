@@ -248,13 +248,15 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    return new Mathsat5InterpolatingProver(this, creator);
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> options) {
+    return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    return new Mathsat5OptimizationProver(this, creator);
+  public OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> options) {
+    return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options);
   }
 
   @Override

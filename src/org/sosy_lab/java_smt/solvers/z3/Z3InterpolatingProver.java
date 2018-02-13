@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +42,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -59,8 +61,10 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       Z3FormulaCreator creator,
       long z3params,
       LogManager pLogger,
-      @Nullable PathCounterTemplate pDumpFailedInterpolationQueries) {
-    super(creator, z3params);
+      @Nullable PathCounterTemplate pDumpFailedInterpolationQueries,
+      FormulaManager pMgr,
+      boolean pEnableUnsatCores) {
+    super(creator, z3params, pMgr, pEnableUnsatCores);
     logger = pLogger;
     dumpFailedInterpolationQueries = pDumpFailedInterpolationQueries;
 
@@ -76,7 +80,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   }
 
   @Override
-  public Long addConstraint(BooleanFormula f) {
+  public Long addConstraint(BooleanFormula f) throws InterruptedException {
     long e = super.addConstraint0(f);
     assertedFormulas.peek().add(e);
     return e;
@@ -110,7 +114,8 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Long>> partitionedFormulas)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
@@ -122,7 +127,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Long>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment.checkTreeStructure(

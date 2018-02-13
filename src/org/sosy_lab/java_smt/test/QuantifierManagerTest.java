@@ -79,7 +79,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Before
   public void setUp() {
-    assert amgr != null;
     requireArrays();
     requireQuantifiers();
 
@@ -280,7 +279,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testSimple() throws SolverException, InterruptedException {
     // forall x . x+2 = x+1+1  is SAT
-    assert qmgr != null;
     BooleanFormula f =
         qmgr.forall(
             ImmutableList.of(x),
@@ -294,7 +292,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   public void testBlah() throws SolverException, InterruptedException {
     IntegerFormula z = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
-    assert qmgr != null;
     BooleanFormula f =
         qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), imgr.equal(z, y)));
     assertThatFormula(f).isSatisfiable();
@@ -302,7 +299,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEquals() {
-    assert qmgr != null;
     BooleanFormula f1 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
     BooleanFormula f2 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
 
@@ -312,7 +308,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testQELight() throws InterruptedException {
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
-    assert qmgr != null;
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
         qmgr.exists(
@@ -325,7 +320,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionForall() {
-    assert qmgr != null;
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
 
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -357,8 +351,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionExists() {
-    assert qmgr != null;
-
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
     final AtomicBoolean isForall = new AtomicBoolean(false);

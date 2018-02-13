@@ -19,18 +19,22 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.collect.FluentIterable.from;
 import static scala.collection.JavaConversions.asJavaIterable;
-import static scala.collection.JavaConversions.asScalaSet;
+import static scala.collection.JavaConversions.collectionAsScalaIterable;
 
 import ap.SimpleAPI;
 import ap.basetypes.Tree;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.TreeTraverser;
+import com.google.common.graph.Traverser;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +59,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, creator, pApi, pShutdownNotifier);
+    super(pMgr, creator, pApi, pShutdownNotifier, true);
   }
 
   @Override
@@ -85,6 +89,11 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
+  protected Iterable<IExpression> getAssertedFormulas() {
+    return FluentIterable.concat(assertedFormulas).transform(annotatedTerms::get);
+  }
+
+  @Override
   public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
     Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
@@ -105,14 +114,14 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(final List<Set<Integer>> partitions)
-      throws SolverException {
+  public List<BooleanFormula> getSeqInterpolants(
+      final List<? extends Collection<Integer>> partitions) throws SolverException {
     Preconditions.checkState(!closed);
 
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
-    for (Set<Integer> partition : partitions) {
-      args.$plus$eq(asScalaSet(partition).toSet());
+    for (Collection<Integer> partition : partitions) {
+      args.$plus$eq(collectionAsScalaIterable(partition).toSet());
     }
 
     // do the hard work
@@ -141,7 +150,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) throws SolverException {
+      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
+      throws SolverException {
     Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
@@ -161,7 +171,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
         children.$plus$eq(stack.pop());
       }
       subtreeStarts.push(start);
-      stack.push(new Tree<>(asScalaSet(partitionedFormulas.get(i)).toSet(), children.toList()));
+      stack.push(
+          new Tree<>(
+              collectionAsScalaIterable(partitionedFormulas.get(i)).toSet(), children.toList()));
     }
 
     Preconditions.checkState(subtreeStarts.peek() == 0, "subtree of root should start at 0.");
@@ -184,8 +196,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   /** returns a post-order iteration of the tree. */
   private List<BooleanFormula> tree2List(Tree<IFormula> tree) {
-    return TreeTraverser.<Tree<IFormula>>using(node -> asJavaIterable(node.children()))
-        .postOrderTraversal(tree)
+    return from(Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
+            .depthFirstPostOrder(tree))
         .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
         .toList();
   }

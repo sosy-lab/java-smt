@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.truth.FailureMetadata;
-import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,41 +37,15 @@ import org.sosy_lab.java_smt.api.SolverException;
  * use <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)}, or
- * {@link StandardSubjectBuilder#about(com.google.common.truth.SubjectFactory)} and {@link
- * #proverEnvironment()}.
+ * {@link StandardSubjectBuilder#about(com.google.common.truth.Subject.Factory)} and {@link
+ * #proverEnvironments()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class ProverEnvironmentSubject
     extends Subject<ProverEnvironmentSubject, BasicProverEnvironment<?>> {
 
-  @Deprecated
-  private ProverEnvironmentSubject(
-      FailureStrategy pFailureStrategy, BasicProverEnvironment<?> pStack) {
-    super(pFailureStrategy, pStack);
-  }
-
   private ProverEnvironmentSubject(FailureMetadata pMetadata, BasicProverEnvironment<?> pStack) {
     super(pMetadata, pStack);
-  }
-
-  /**
-   * Use this for checking assertions about ProverEnvironments with Truth: <code>
-   * assert_().about(proverEnvironment()).that(stack).is...()</code>.
-   *
-   * @deprecated Use {@link #proverEnvironments()}
-   */
-  @Deprecated
-  public static com.google.common.truth.SubjectFactory<
-          ProverEnvironmentSubject, BasicProverEnvironment<?>>
-      proverEnvironment() {
-    return new com.google.common.truth.SubjectFactory<
-        ProverEnvironmentSubject, BasicProverEnvironment<?>>() {
-      @Override
-      public ProverEnvironmentSubject getSubject(
-          FailureStrategy pFs, BasicProverEnvironment<?> pFormula) {
-        return new ProverEnvironmentSubject(pFs, pFormula);
-      }
-    };
   }
 
   /**

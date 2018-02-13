@@ -31,10 +31,11 @@ import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Z3Model extends CachingAbstractModel<Long, Long, Long> {
@@ -119,18 +120,21 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
     long var = Native.mkApp(z3context, keyDecl, 0, new long[] {});
-    Formula key = z3creator.encapsulateWithTypeOf(var);
-
     long value = Native.modelGetConstInterp(z3context, model, keyDecl);
     checkReturnValue(value, keyDecl);
     Native.incRef(z3context, value);
+
+    long equality = Native.mkEq(z3context, var, value);
+    Native.incRef(z3context, equality);
 
     try {
       long symbol = Native.getDeclName(z3context, keyDecl);
       if (z3creator.isConstant(value)) {
         return Collections.singletonList(
             new ValueAssignment(
-                key,
+                z3creator.encapsulateWithTypeOf(var),
+                z3creator.encapsulateWithTypeOf(value),
+                z3creator.encapsulateBoolean(equality),
                 z3creator.symbolToString(symbol),
                 z3creator.convertValue(value),
                 ImmutableList.of()));
@@ -175,21 +179,36 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
     List<ValueAssignment> out = new ArrayList<>();
 
+    // avoid doubled ValueAssignments for cases like "(store (store ARR 0 0) 0 1)",
+    // where we could (but should not!) unroll the array into "[ARR[0]=1, ARR[0]=1]"
+    Set<Long> indizes = new HashSet<>();
+
     // unroll an array...
     while (Z3_decl_kind.Z3_OP_STORE == declKind) {
       assert numArgs == 3;
 
       long arrayIndex = Native.getAppArg(z3context, value, 1);
       Native.incRef(z3context, arrayIndex);
-      long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
-      Native.incRef(z3context, select);
 
-      out.add(
-          new ValueAssignment(
-              z3creator.encapsulateWithTypeOf(select),
-              z3creator.symbolToString(arraySymbol),
-              z3creator.convertValue(Native.getAppArg(z3context, value, 2)),
-              ImmutableList.of(evaluateImpl(arrayIndex))));
+      if (indizes.add(arrayIndex)) {
+        long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
+        Native.incRef(z3context, select);
+
+        long nestedValue = Native.getAppArg(z3context, value, 2);
+        Native.incRef(z3context, nestedValue);
+
+        long equality = Native.mkEq(z3context, select, nestedValue);
+        Native.incRef(z3context, equality);
+
+        out.add(
+            new ValueAssignment(
+                z3creator.encapsulateWithTypeOf(select),
+                z3creator.encapsulateWithTypeOf(nestedValue),
+                z3creator.encapsulateBoolean(equality),
+                z3creator.symbolToString(arraySymbol),
+                z3creator.convertValue(nestedValue),
+                ImmutableList.of(evaluateImpl(arrayIndex))));
+      }
 
       Native.decRef(z3context, arrayIndex);
 
@@ -204,14 +223,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     if (Z3_decl_kind.Z3_OP_CONST_ARRAY == declKind) {
       assert numArgs == 1;
       // We have an array of zeros (=default value) as "((as const (Array Int Int)) 0)".
-      // We return the plain value with no argumentInterpretations, as assignment "arr = 0",
-      // because there is no better way of modeling a whole array.
-      out.add(
-          new ValueAssignment(
-              z3creator.encapsulateWithTypeOf(arrayFormula),
-              z3creator.symbolToString(arraySymbol),
-              z3creator.convertValue(Native.getAppArg(z3context, value, 0)), // default is 0
-              ImmutableList.of())); // wildcard index
+      // There is no way of modeling a whole array, thus we ignore it.
     }
 
     return out;
@@ -250,9 +262,15 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       innerIndices.add(evaluateImpl(arrayIndex));
 
       if (z3creator.isConstant(arrayValue)) {
+
+        long equality = Native.mkEq(z3context, select, arrayValue);
+        Native.incRef(z3context, equality);
+
         lst.add(
             new ValueAssignment(
                 z3creator.encapsulateWithTypeOf(select),
+                z3creator.encapsulateWithTypeOf(arrayValue),
+                z3creator.encapsulateBoolean(equality),
                 z3creator.symbolToString(arraySymbol),
                 z3creator.convertValue(arrayValue),
                 innerIndices));
@@ -351,15 +369,23 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       argumentInterpretation.add(z3creator.convertValue(arg));
       args[k] = arg;
     }
-    Formula formula =
-        z3creator.encapsulateWithTypeOf(Native.mkApp(z3context, funcDecl, args.length, args));
 
+    long func = Native.mkApp(z3context, funcDecl, args.length, args);
     // Clean up memory.
     for (long arg : args) {
       Native.decRef(z3context, arg);
     }
 
-    return new ValueAssignment(formula, functionName, value, argumentInterpretation);
+    long equality = Native.mkEq(z3context, func, entryValue);
+    Native.incRef(z3context, equality);
+
+    return new ValueAssignment(
+        z3creator.encapsulateWithTypeOf(func),
+        z3creator.encapsulateWithTypeOf(entryValue),
+        z3creator.encapsulateBoolean(equality),
+        functionName,
+        value,
+        argumentInterpretation);
   }
 
   @Override

@@ -23,7 +23,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -43,6 +47,12 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(size >= 0);
     return delegate.isUnsat();
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    return delegate.isUnsatWithAssumptions(pAssumptions);
   }
 
   @Override
@@ -71,6 +81,17 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   }
 
   @Override
+  public List<BooleanFormula> getUnsatCore() {
+    return delegate.getUnsatCore();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    return delegate.unsatCoreOverAssumptions(assumptions);
+  }
+
+  @Override
   public void close() {
     while (size > 0) {
       pop();
@@ -78,5 +99,11 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
     Preconditions.checkState(size == 0);
     delegate.pop(); // remove initial level
     delegate.close();
+  }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    return delegate.allSat(callback, important);
   }
 }

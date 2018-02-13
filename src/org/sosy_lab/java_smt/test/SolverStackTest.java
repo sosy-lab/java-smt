@@ -156,7 +156,6 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void singleStackTestRational() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
 
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(rmgr, env);
@@ -245,6 +244,30 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack.push();
     stack.pop();
     thrown.expect(RuntimeException.class);
+    stack.pop();
+  }
+
+  /** Create a symbol on a level and pop this level. Symbol must remain valid and usable! */
+  @SuppressWarnings("unused")
+  @Test
+  public void symbolsOnStackTest() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+
+    stack.push();
+    BooleanFormula q1 = bmgr.makeVariable("q");
+    stack.addConstraint(q1);
+    assertThat(stack).isSatisfiable();
+    Model m1 = stack.getModel();
+    assertThat(m1).isNotEmpty();
+    stack.pop();
+
+    stack.push();
+    BooleanFormula q2 = bmgr.makeVariable("q");
+    assertThat(q2).isEqualTo(q1);
+    stack.addConstraint(q1);
+    assertThat(stack).isSatisfiable();
+    Model m2 = stack.getModel();
+    assertThat(m2).isNotEmpty();
     stack.pop();
   }
 
@@ -355,6 +378,20 @@ public class SolverStackTest extends SolverBasedTest0 {
     assertThat(stack1).isSatisfiable();
   }
 
+  @Test(expected = IllegalStateException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void avoidDualStacksIfNotSupported() throws InterruptedException {
+    assume()
+        .withMessage("Solver does not support multiple stacks yet")
+        .that(solver)
+        .isEqualTo(Solvers.SMTINTERPOL);
+
+    BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
+    stack1.push(bmgr.makeTrue());
+
+    // creating a new environment is not allowed with non-empty stack -> fail
+    newEnvironmentForTest();
+  }
   /**
    * This test checks that a SMT solver uses "global declarations": regardless of the stack at
    * declaration time, declarations always live for the full life time of the solver (i.e., they do

@@ -21,7 +21,9 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -279,7 +281,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   @Override
   public Map<String, Formula> extractVariables(Formula f) {
-    return formulaCreator.extractVariablesAndUFs(f, false);
+    ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
+    formulaCreator.extractVariablesAndUFs(f, false, found::put);
+    return found.build();
   }
 
   /**
@@ -289,7 +293,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   @Override
   public Map<String, Formula> extractVariablesAndUFs(Formula f) {
-    return formulaCreator.extractVariablesAndUFs(f, true);
+    // Need LinkedHashMap because we can find duplicate keys with different values,
+    // and ImmutableMap.Builder rejects them.
+    Map<String, Formula> found = new LinkedHashMap<>();
+    formulaCreator.extractVariablesAndUFs(f, true, found::put);
+    return ImmutableMap.copyOf(found);
   }
 
   @Override

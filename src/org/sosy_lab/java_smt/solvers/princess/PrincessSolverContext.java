@@ -77,20 +77,29 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       throw new UnsupportedOperationException(
           "Princess does not support unsat core generation with assumptions yet");
     }
-    final boolean unsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
     return new ReusableStackTheoremProver(
-        (PrincessTheoremProver) creator.getEnv().getNewProver(false, unsatCores, manager, creator));
+        (PrincessTheoremProver)
+            creator
+                .getEnv()
+                .getNewProver(
+                    false, options.contains(ProverOptions.GENERATE_UNSAT_CORE), manager, creator));
   }
 
   @SuppressWarnings("resource")
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> options) {
     return new ReusableStackInterpolatingProver<>(
-        (PrincessInterpolatingProver) creator.getEnv().getNewProver(true, false, manager, creator));
+        (PrincessInterpolatingProver)
+            creator
+                .getEnv()
+                .getNewProver(
+                    true, options.contains(ProverOptions.GENERATE_UNSAT_CORE), manager, creator));
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> options) {
     throw new UnsupportedOperationException("Princess does not support optimization");
   }
 

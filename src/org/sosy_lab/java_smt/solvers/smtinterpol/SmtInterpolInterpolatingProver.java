@@ -26,9 +26,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -37,16 +35,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
-  private final SmtInterpolFormulaManager mgr;
-  private final SmtInterpolEnvironment env;
-
-  private final Map<String, Term> annotatedTerms; // Collection of termNames
-
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
     super(pMgr);
-    mgr = pMgr;
-    env = mgr.createEnvironment();
-    annotatedTerms = new HashMap<>();
   }
 
   @Override
@@ -100,7 +90,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<String>> partitionedTermNames)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<String>> partitionedTermNames)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
 
@@ -121,7 +112,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<String>> partitionedTermNames, int[] startOfSubTree)
+      List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     assert InterpolatingProverEnvironment.checkTreeStructure(
@@ -152,7 +143,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
     return mgr.encapsulateBooleanFormula(itp[0]);
   }
 
-  private Term buildConjunctionOfNamedTerms(Set<String> termNames) {
+  private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
     Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(!termNames.isEmpty());
 
@@ -160,13 +151,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
       return env.term(Iterables.getOnlyElement(termNames));
     }
     return env.term("and", termNames.stream().map(env::term).toArray(Term[]::new));
-  }
-
-  @Override
-  public void close() {
-    assertedFormulas.clear();
-    annotatedTerms.clear();
-    super.close();
   }
 
   @Override

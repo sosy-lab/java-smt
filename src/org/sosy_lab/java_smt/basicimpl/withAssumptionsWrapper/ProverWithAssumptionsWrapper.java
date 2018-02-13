@@ -20,12 +20,7 @@
 
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
 
 public class ProverWithAssumptionsWrapper
     extends BasicProverWithAssumptionsWrapper<Void, ProverEnvironment>
@@ -33,42 +28,5 @@ public class ProverWithAssumptionsWrapper
 
   public ProverWithAssumptionsWrapper(ProverEnvironment pDelegate) {
     super(pDelegate);
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    clearAssumptions();
-
-    solverAssumptionsAsFormula.addAll(assumptions);
-    for (BooleanFormula formula : assumptions) {
-      delegate.push(formula);
-    }
-    return delegate.isUnsat();
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    return delegate.getUnsatCore();
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    clearAssumptions();
-    return delegate.allSat(pCallback, pImportant);
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    clearAssumptions();
-    return delegate.unsatCoreOverAssumptions(pAssumptions);
-    //    if (isUnsatWithAssumptions(pAssumptions)) {
-    //      // TODO project to pAssumptions?
-    //      return Optional.of(getUnsatCore());
-    //    } else {
-    //      return Optional.empty();
-    //    }
   }
 }
