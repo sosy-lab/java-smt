@@ -94,8 +94,8 @@ class PrincessEnvironment {
   )
   private int minAtomsForAbbreviation = 100;
 
-  public static final Sort BoolSort = Sort$.MODULE$.Bool();
-  public static final Sort IntegerSort = Sort.Integer$.MODULE$;
+  public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
+  public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
@@ -243,8 +243,6 @@ class PrincessEnvironment {
         triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
 
     List<? extends IExpression> formula = seqAsJavaList(triple._1());
-    Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
-    Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formula) {
@@ -393,7 +391,7 @@ class PrincessEnvironment {
   }
 
   public IExpression makeVariable(Sort type, String varname) {
-    if (type == BoolSort) {
+    if (type == BOOL_SORT) {
       if (boolVariablesCache.containsKey(varname)) {
         return boolVariablesCache.get(varname);
       } else {

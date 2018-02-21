@@ -79,7 +79,7 @@ abstract class PrincessFunctionDeclaration {
       Sort returnType = SortedIFunction$.MODULE$.iResultSort(app, returnFormula.args());
 
       // boolean term, so we have to use the fun-applier instead of the function itself
-      if (returnType == PrincessEnvironment.BoolSort) {
+      if (returnType == PrincessEnvironment.BOOL_SORT) {
         BooleanFunApplier ap = new BooleanFunApplier(app);
         return ap.apply(argsBuf);
       } else {

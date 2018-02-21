@@ -116,7 +116,7 @@ class PrincessFormulaCreator
   }
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessEnvironment.BoolSort, PrincessEnvironment.IntegerSort, null);
+    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null);
   }
 
   @Override
@@ -125,11 +125,12 @@ class PrincessFormulaCreator
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
       final Sort sort = Sort.sortOf((ITerm) pFormula);
-      if (sort == PrincessEnvironment.BoolSort) return FormulaType.BooleanType;
-      else if (sort == PrincessEnvironment.IntegerSort) return FormulaType.IntegerType;
-      else if (sort instanceof SimpleArray.ArraySort)
+      if (sort == PrincessEnvironment.BOOL_SORT) {
+        return FormulaType.BooleanType;
+      } else if (sort == PrincessEnvironment.INTEGER_SORT) { return FormulaType.IntegerType;
+      } else if (sort instanceof SimpleArray.ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
-      else {
+      } else {
         scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
         if (bitWidth.isDefined()) {
           return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
@@ -341,11 +342,6 @@ class PrincessFormulaCreator
     }
   }
 
-  private void extractArgs(
-      IExpression input,
-      ImmutableList.Builder<Formula> args,
-      ImmutableList.Builder<FormulaType<?>> argTypes) {}
-
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
     assert !(((input instanceof IAtom) && ((IAtom) input).args().isEmpty())
             || input instanceof IConstant)
@@ -390,10 +386,10 @@ class PrincessFormulaCreator
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {
         final Sort sort = Sort.sortOf(((IIntFormula) input).t());
-        if (sort == PrincessEnvironment.BoolSort) {
+        if (sort == PrincessEnvironment.BOOL_SORT) {
           // this is really a Boolean formula, it has to be UF
           return FunctionDeclarationKind.UF;
-        } else if (sort == PrincessEnvironment.IntegerSort) {
+        } else if (sort == PrincessEnvironment.INTEGER_SORT) {
           return FunctionDeclarationKind.EQ_ZERO;
         } else {
           return FunctionDeclarationKind.EQ;
