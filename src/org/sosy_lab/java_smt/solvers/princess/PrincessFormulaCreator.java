@@ -127,7 +127,8 @@ class PrincessFormulaCreator
       final Sort sort = Sort.sortOf((ITerm) pFormula);
       if (sort == PrincessEnvironment.BOOL_SORT) {
         return FormulaType.BooleanType;
-      } else if (sort == PrincessEnvironment.INTEGER_SORT) { return FormulaType.IntegerType;
+      } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+        return FormulaType.IntegerType;
       } else if (sort instanceof SimpleArray.ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
       } else {
