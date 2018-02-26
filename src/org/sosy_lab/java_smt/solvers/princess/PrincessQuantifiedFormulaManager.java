@@ -29,6 +29,7 @@ import ap.parser.IQuantified;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
+import ap.types.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -37,13 +38,12 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class PrincessQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<
-        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
+        IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessEnvironment env;
 
   PrincessQuantifiedFormulaManager(
-      FormulaCreator<
-              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
           pCreator) {
     super(pCreator);
     env = getFormulaCreator().getEnv();
@@ -58,6 +58,7 @@ class PrincessQuantifiedFormulaManager
       // Body already contains bound variables.
       return new IQuantified(pq, (IFormula) body);
     } else {
+      // TODO: add support for boolean quantification!
       return IExpression.quanConsts(
           pq, iterableAsScalaIterable(toConstantTerm(vars)), (IFormula) body);
     }

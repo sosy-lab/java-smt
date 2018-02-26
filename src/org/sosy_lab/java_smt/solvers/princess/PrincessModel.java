@@ -41,6 +41,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -56,13 +57,12 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 import scala.Tuple2;
 
-class PrincessModel
-    extends CachingAbstractModel<IExpression, PrincessTermType, PrincessEnvironment> {
+class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PartialModel model;
 
   PrincessModel(
       PartialModel partialModel,
-      FormulaCreator<IExpression, PrincessTermType, PrincessEnvironment, ?> creator) {
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator) {
     super(creator);
     this.model = partialModel;
   }
