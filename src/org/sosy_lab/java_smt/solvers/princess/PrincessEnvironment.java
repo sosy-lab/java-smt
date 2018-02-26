@@ -39,6 +39,7 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.theories.SimpleArray;
+import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.util.Debug;
@@ -415,8 +416,14 @@ class PrincessEnvironment {
   /** This function declares a new functionSymbol with the given argument types and result. */
   public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
-      //      assert returnType == functionsReturnTypes.get(functionsCache.get(name));
-      return functionsCache.get(name);
+      final IFunction res = functionsCache.get(name);
+      assert (res instanceof MonoSortedIFunction)
+          ? (((MonoSortedIFunction) res).resSort().equals(returnType)
+              && ((MonoSortedIFunction) res).argSorts().equals(args))
+          : (returnType == INTEGER_SORT
+              && res.arity() == args.size()
+              && args.stream().allMatch(s -> s == INTEGER_SORT));
+      return res;
     } else {
       IFunction funcDecl =
           api.createFunction(
