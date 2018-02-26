@@ -419,7 +419,7 @@ class PrincessEnvironment {
       final IFunction res = functionsCache.get(name);
       assert (res instanceof MonoSortedIFunction)
           ? (((MonoSortedIFunction) res).resSort().equals(returnType)
-              && ((MonoSortedIFunction) res).argSorts().equals(args))
+              && seqAsJavaList(((MonoSortedIFunction) res).argSorts()).equals(args))
           : (returnType == INTEGER_SORT
               && res.arity() == args.size()
               && args.stream().allMatch(s -> s == INTEGER_SORT));
