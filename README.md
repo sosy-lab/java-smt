@@ -33,7 +33,7 @@ Currently, we support the following SMT solvers:
  - [OptiMathSAT](http://optimathsat.disi.unitn.it/)
  - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
  - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
- 
+
 Support for CVC4 is planned in the near future (cf. [#2](https://github.com/sosy-lab/java-smt/issues/2)).
 
 ## Supported Features
@@ -58,7 +58,7 @@ The following features are supported:
  - Interpolation, including tree and sequential
  - Formula transformation using built-in tactics
  - Formula introspection using visitors
-    
+
 ### Multithreading Support
 
 All solvers support multithreading (MathSAT only since JavaSMT 1.0.1-164-gd14ed28),
@@ -145,7 +145,7 @@ be followed:
    which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1558-gf96cfea.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
- 
+
 ### Binaries for Native Solvers (MathSAT and Z3)
 
 When using Ivy for installation on a 64-bit Linux platform,
@@ -298,14 +298,14 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 
 ## Authors
 
- - Project maintainer: [George Karpenkov][]
+ - Project maintainers: [George Karpenkov][], [Karlheinz Friedberger][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions: [Thomas Stieglmaier][], [Karlheinz Friedberger][], and others.
+ - Contributions: [Thomas Stieglmaier][] and others.
 
 ### Additional Acknowledgements
 
  - Profiled with [jProfiler][] Java Profiler.
- 
+
 [CPAchecker]: https://cpachecker.sosy-lab.org/
 [jProfiler]: https://www.ej-technologies.com/products/jprofiler/overview.html
 [common]: https://github.com/sosy-lab/java-common-lib

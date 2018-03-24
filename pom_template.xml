@@ -19,7 +19,7 @@
 
     <organization>
         <name>Software Systems Lab</name>
-        <url>http://www.sosy-lab.org/</url>
+        <url>https://www.sosy-lab.org/</url>
     </organization>
 
     <scm>
@@ -38,9 +38,17 @@
             </roles>
         </developer>
         <developer>
+            <name>Karlheinz Friedberger</name>
+            <email>kfriedberger@gmail.com</email>
+            <url>https://www.sosy-lab.org/people/friedberger/</url>
+            <roles>
+                <role>project maintainer</role>
+            </roles>
+        </developer>
+        <developer>
             <name>Dirk Beyer</name>
             <email>dirk.beyer@sosy-lab.org</email>
-            <url>http://www.sosy-lab.org/~dbeyer/</url>
+            <url>https://www.sosy-lab.org/people/beyer/</url>
             <organization>Software Systems Lab</organization>
             <organizationUrl>http://www.sosy-lab.org/</organizationUrl>
             <roles>
