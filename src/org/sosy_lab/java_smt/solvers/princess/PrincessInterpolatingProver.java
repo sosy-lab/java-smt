@@ -25,12 +25,14 @@ import static scala.collection.JavaConversions.collectionAsScalaIterable;
 
 import ap.SimpleAPI;
 import ap.basetypes.Tree;
+import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.graph.Traverser;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -191,7 +193,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
           "Princess ran out of stack memory, try increasing the stack size.", e);
     }
 
-    return tree2List(itps);
+    List<BooleanFormula> result = tree2List(itps);
+    assert result.size() == startOfSubTree.length - 1;
+    return result;
   }
 
   /** returns a post-order iteration of the tree. */

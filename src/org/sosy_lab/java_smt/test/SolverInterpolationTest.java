@@ -25,6 +25,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.List;
@@ -693,6 +694,8 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
             ImmutableList.of(TB, TC, TR1, TD, TR2), // post-order
             new int[] {0, 1, 0, 3, 0}); // left-most node in current subtree
 
+    assertThat(itps).hasSize(4);
+
     for (int j = 0; j < 6; j++) {
       stack.pop(); // clear stack, such that we can re-use the solver
     }
@@ -702,6 +705,71 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkImplies(stack, bmgr.and(itps.get(0), itps.get(1), R1), itps.get(2));
     checkImplies(stack, bmgr.and(A, D), itps.get(3));
     checkImplies(stack, bmgr.and(itps.get(2), itps.get(3), R2), bmgr.makeBoolean(false));
+  }
+
+  @Test
+  public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula: 1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    List<T> formulas = Lists.newArrayList(stack.push(A), stack.push(B));
+
+    assertThat(stack).isUnsatisfiable();
+
+    List<BooleanFormula> itp = stack.getTreeInterpolants0(formulas, new int[] {0, 0});
+    assertThat(itp).hasSize(1);
+  }
+
+  @Test
+  public <T> void treeInterpolationBranching() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula a = imgr.makeVariable("a" + i);
+    IntegerFormula b = imgr.makeVariable("b" + i);
+    IntegerFormula c = imgr.makeVariable("c" + i);
+    IntegerFormula d = imgr.makeVariable("d" + i);
+    IntegerFormula e = imgr.makeVariable("e" + i);
+
+    // build formula: 1 = A = B = C = D = E = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, b);
+    BooleanFormula C = imgr.equal(b, c);
+    BooleanFormula D = imgr.equal(c, d);
+    BooleanFormula E = imgr.equal(d, e);
+    BooleanFormula F = imgr.equal(e, zero);
+
+    List<T> formulas =
+        Lists.newArrayList(
+            stack.push(A),
+            stack.push(B),
+            stack.push(C),
+            stack.push(D),
+            stack.push(E),
+            stack.push(F));
+
+    assertThat(stack).isUnsatisfiable();
+
+    List<BooleanFormula> itp = stack.getTreeInterpolants0(formulas, new int[] {0, 1, 2, 3, 4, 0});
+    assertThat(itp).hasSize(5);
   }
 
   @Test(expected = IllegalArgumentException.class)

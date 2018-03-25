@@ -130,6 +130,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, Stri
     for (Term itp : itps) {
       result.add(mgr.encapsulateBooleanFormula(itp));
     }
+    assert result.size() == startOfSubTree.length - 1;
     return result;
   }
 

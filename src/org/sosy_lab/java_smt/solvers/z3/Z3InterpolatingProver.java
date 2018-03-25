@@ -230,6 +230,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       result.add(
           creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult, i)));
     }
+    assert result.size() == startOfSubTree.length - 1;
 
     // cleanup
     Native.decRef(z3context, proof);
