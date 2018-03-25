@@ -200,9 +200,13 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   /** returns a post-order iteration of the tree. */
   private List<BooleanFormula> tree2List(Tree<IFormula> tree) {
-    return from(Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
-            .depthFirstPostOrder(tree))
-        .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
-        .toList();
+    List<BooleanFormula> lst =
+        from(Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
+                .depthFirstPostOrder(tree))
+            .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
+            .toList();
+    // root of interpolation tree is false, and we have to remove it.
+    assert Iterables.getLast(lst).equals(mgr.encapsulateBooleanFormula(new IBoolLit(false)));
+    return lst.subList(0, lst.size() - 1);
   }
 }
