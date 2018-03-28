@@ -773,6 +773,34 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void composedLinearMultiplication() throws SolverException, InterruptedException {
+    IntegerFormula i2 = imgr.makeNumber(2);
+    IntegerFormula i3 = imgr.makeNumber(3);
+    IntegerFormula i4 = imgr.makeNumber(4);
+    IntegerFormula x = imgr.makeVariable("x");
+
+    // MULT should be supported by all solvers, DIV/MOD are missing in Mathsat.
+    IntegerFormula mult = imgr.multiply(x, imgr.add(i2, imgr.add(i3, i4)));
+    IntegerFormula div;
+    IntegerFormula mod;
+    try {
+      div = imgr.divide(x, imgr.add(i2, imgr.add(i3, i4)));
+      mod = imgr.modulo(x, imgr.add(i2, imgr.add(i3, i4)));
+    } catch (UnsupportedOperationException e) {
+      // do nothing, this exception is fine here, because solvers do not need
+      // to support non-linear arithmetic, we can then skip the test completely
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    }
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      env.push(imgr.greaterThan(mult, i4));
+      env.push(imgr.greaterThan(div, i4));
+      env.push(imgr.greaterThan(mod, i2));
+      assertThat(env).isSatisfiable();
+    }
+  }
+
+  @Test
   public void multiplicationSquares() throws SolverException, InterruptedException {
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -859,7 +887,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void multiplication3() throws SolverException, InterruptedException {
+  public void multiplicationCubic() throws SolverException, InterruptedException {
     IntegerFormula i125 = imgr.makeNumber(125);
     IntegerFormula i27 = imgr.makeNumber(27);
     IntegerFormula i5 = imgr.makeNumber(5);
