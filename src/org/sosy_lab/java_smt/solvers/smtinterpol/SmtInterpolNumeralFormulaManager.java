@@ -83,6 +83,8 @@ abstract class SmtInterpolNumeralFormulaManager<
           }
         } else if ("ite".equals(func.getName())) {
           waitlist.add(params[2]);
+        } else {
+          return false;
         }
       } else {
         return false;
