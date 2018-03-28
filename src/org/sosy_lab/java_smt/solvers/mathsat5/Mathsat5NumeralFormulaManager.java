@@ -92,11 +92,7 @@ abstract class Mathsat5NumeralFormulaManager<
 
   @Override
   public Long multiply(Long pNumber1, Long pNumber2) {
-    if (isNumeral(pNumber1) || isNumeral(pNumber2)) {
-      return msat_make_times(mathsatEnv, pNumber1, pNumber2);
-    } else {
-      return super.multiply(pNumber1, pNumber2);
-    }
+    return msat_make_times(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
