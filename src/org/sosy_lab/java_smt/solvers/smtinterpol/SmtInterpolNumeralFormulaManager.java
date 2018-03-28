@@ -36,7 +36,8 @@ abstract class SmtInterpolNumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType, FunctionSymbol> {
 
-  private final Set<String> NUMERIC_FUNCTIONS = Sets.newHashSet("+", "-", "*", "/", "div", "mod");
+  private static final Set<String> NUMERIC_FUNCTIONS =
+      Sets.newHashSet("+", "-", "*", "/", "div", "mod");
 
   protected final SmtInterpolEnvironment env;
   private final SmtInterpolFormulaCreator creator;
