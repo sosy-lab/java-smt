@@ -773,6 +773,130 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void multiplicationSquares() throws SolverException, InterruptedException {
+    IntegerFormula i2 = imgr.makeNumber(2);
+    IntegerFormula i3 = imgr.makeNumber(3);
+    IntegerFormula i4 = imgr.makeNumber(4);
+    IntegerFormula i5 = imgr.makeNumber(5);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    IntegerFormula xx;
+    IntegerFormula yy;
+    IntegerFormula zz;
+    try {
+      xx = imgr.multiply(x, x);
+      yy = imgr.multiply(y, y);
+      zz = imgr.multiply(z, z);
+    } catch (UnsupportedOperationException e) {
+      // do nothing, this exception is fine here, because solvers do not need
+      // to support non-linear arithmetic, we can then skip the test completely
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    }
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      // check x*x + y*y = z*z
+      env.push(imgr.equal(zz, imgr.add(xx, yy)));
+
+      {
+        // SAT with x=4 and y=3
+        env.push(imgr.equal(x, i3));
+        env.push(imgr.equal(y, i4));
+        assertThat(env).isSatisfiable();
+        env.pop();
+        env.pop();
+      }
+      { // SAT with z=5
+        env.push(imgr.equal(z, i5));
+        assertThat(env).isSatisfiable();
+        env.pop();
+      }
+      {
+        // UNSAT with z=5 and x=2
+        env.push(imgr.equal(z, i5));
+        env.push(imgr.equal(x, i2));
+        assertThat(env).isUnsatisfiable();
+        env.pop();
+        env.pop();
+      }
+      { // UNSAT with z=5 and x>3 and y>3
+        env.push(imgr.equal(z, i5));
+        env.push(imgr.greaterThan(x, i3));
+        env.push(imgr.greaterThan(y, i3));
+        assertThat(env).isUnsatisfiable();
+        env.pop();
+        env.pop();
+        env.pop();
+      }
+    }
+  }
+
+  @Test
+  public void multiplicationFactors() throws SolverException, InterruptedException {
+    IntegerFormula i37 = imgr.makeNumber(37);
+    IntegerFormula i1 = imgr.makeNumber(1);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+
+    IntegerFormula x_mult_y;
+    try {
+      x_mult_y = imgr.multiply(x, y);
+    } catch (UnsupportedOperationException e) {
+      // do nothing, this exception is fine here, because solvers do not need
+      // to support non-linear arithmetic, we can then skip the test completely
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    }
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      env.push(imgr.equal(x_mult_y, i37));
+      assertThat(env).isSatisfiable();
+      env.push(imgr.greaterThan(x, i1));
+      env.push(imgr.greaterThan(y, i1));
+      assertThat(env).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void multiplication3() throws SolverException, InterruptedException {
+    IntegerFormula i125 = imgr.makeNumber(125);
+    IntegerFormula i27 = imgr.makeNumber(27);
+    IntegerFormula i5 = imgr.makeNumber(5);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+
+    IntegerFormula xxx;
+    IntegerFormula yyy;
+    try {
+      xxx = imgr.multiply(x, imgr.multiply(x, x));
+      yyy = imgr.multiply(y, imgr.multiply(y, y));
+    } catch (UnsupportedOperationException e) {
+      // do nothing, this exception is fine here, because solvers do not need
+      // to support non-linear arithmetic, we can then skip the test completely
+      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    }
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      env.push(imgr.equal(xxx, i125));
+      env.push(imgr.equal(yyy, i27));
+      assertThat(env).isSatisfiable();
+      env.push(imgr.lessThan(x, i5));
+      assertThat(env).isUnsatisfiable();
+    }
+
+    try (ProverEnvironment env = context.newProverEnvironment()) {
+      env.push(imgr.equal(imgr.add(xxx, yyy), imgr.add(i27, i125)));
+      env.push(imgr.lessThan(y, i5));
+      env.push(imgr.equal(x, i5));
+      assertThat(env).isSatisfiable();
+      env.pop();
+      env.push(imgr.lessThan(x, i5));
+      assertThat(env).isUnsatisfiable();
+    }
+  }
+
+  @Test
   public void nonLinearDivision() throws SolverException, InterruptedException {
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
