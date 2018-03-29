@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -36,8 +36,9 @@ abstract class SmtInterpolNumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType, FunctionSymbol> {
 
-  private static final Set<String> NUMERIC_FUNCTIONS =
-      Sets.newHashSet("+", "-", "*", "/", "div", "mod");
+  /** Operators for arithmetic functions that return a numeric value. */
+  private static final ImmutableSet<String> NUMERIC_FUNCTIONS =
+      ImmutableSet.of("+", "-", "*", "/", "div", "mod");
 
   protected final SmtInterpolEnvironment env;
   private final SmtInterpolFormulaCreator creator;
@@ -82,6 +83,8 @@ abstract class SmtInterpolNumeralFormulaManager<
             waitlist.add(param);
           }
         } else if ("ite".equals(func.getName())) {
+          // ignore condition, just use the if- and then-case
+          waitlist.add(params[1]);
           waitlist.add(params[2]);
         } else {
           return false;
