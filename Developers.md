@@ -53,12 +53,45 @@ release as follows:
 
 Release to Maven Central is currently not fully automated due to the bug in the
 ANT script provided by Maven Central documentation.
+For publishing to Maven Central, we use the [Nexus Repository Manager](https://oss.sonatype.org/).
+
+#### Requirements
+
+Please make sure that you have a valid user account and configured your local settings accordingly.
+For example, insert the following content into `~/.m2/settings.xml`:
+```xml
+<settings>
+  <servers>
+    <server>
+      <id>ossrh</id>
+      <username>USER</username>
+      <password>PASSWORD</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>gpg</id>
+      <properties>
+        <gpg.executable>gpg2</gpg.executable>
+        <!-- optional <gpg.passphrase>PASSPHRASE</gpg.passphrase> -->
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+```
+
+#### Publishing
 
 The following steps are required:
 
  - Run the `stage` ANT target.
- - Login to [Nexus Repository Manager](https://oss.sonatype.org/)
- - Run `close` and `release` tasks on the pushed bundle.
+   (There is currently no need to change any label from `SNAPSHOT` to `RELEASE` or vice versa,
+   as written somewhere in the documentation, because we only produce `RELEASE` versions.)
+ - Login to [Nexus Repository Manager](https://oss.sonatype.org/) 
+   and open the [list of staging repositories](https://oss.sonatype.org/#stagingRepositories).
+ - Run `close` and `release` tasks on your pushed bundle 
+   (see [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html) for details).
+ - After some delay (a few hours or days) the release is automatically synced to Maven Central.
 
 Additional instructions are available at the official [OSSRH][] page.
 
