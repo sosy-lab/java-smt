@@ -1014,4 +1014,23 @@ public class ModelTest extends SolverBasedTest0 {
       checkModelIteration(formula, false);
     }
   }
+
+  @Test
+  public void multiCloseTest() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+      assertThat(prover).isSatisfiable();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+        // close the model several times
+        for (int i = 0; i < 10; i++) {
+          m.close();
+        }
+      }
+      // close the prover several times
+      for (int i = 0; i < 10; i++) {
+        prover.close();
+      }
+    }
+  }
 }

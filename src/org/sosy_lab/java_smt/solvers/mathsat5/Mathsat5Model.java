@@ -33,6 +33,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_array_write;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
@@ -47,6 +48,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
+  private boolean closed = false;
 
   Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
     super(creator);
@@ -56,12 +58,14 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public Object evaluateImpl(Long f) {
+    Preconditions.checkState(!closed);
     long term = msat_model_eval(model, f);
     return formulaCreator.convertValue(f, term);
   }
 
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
+    Preconditions.checkState(!closed);
     Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
@@ -127,6 +131,9 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public void close() {
-    msat_destroy_model(model);
+    if (!closed) {
+      msat_destroy_model(model);
+      closed = true;
+    }
   }
 }

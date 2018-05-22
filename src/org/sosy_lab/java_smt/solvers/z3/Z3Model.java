@@ -45,6 +45,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
   private final Z3FormulaCreator z3creator;
+  private boolean closed = false;
 
   private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
@@ -61,6 +62,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   @Nullable
   @Override
   public Object evaluateImpl(Long f) {
+    Preconditions.checkState(!closed);
     Native.LongPtr out = new Native.LongPtr();
     boolean status = Native.modelEval(z3context, model, f, false, out);
     Verify.verify(status, "Error during model evaluation");
@@ -78,6 +80,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
+    Preconditions.checkState(!closed);
     Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
@@ -390,11 +393,15 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public String toString() {
+    Preconditions.checkState(!closed);
     return Native.modelToString(z3context, model);
   }
 
   @Override
   public void close() {
-    Native.modelDecRef(z3context, model);
+    if (!closed) {
+      Native.modelDecRef(z3context, model);
+      closed = true;
+    }
   }
 }
