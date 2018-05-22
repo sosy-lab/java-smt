@@ -174,11 +174,12 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
-    msat_destroy_env(curEnv);
-    msat_free_termination_test(terminationTest);
-    msat_destroy_config(curConfig);
-    closed = true;
+    if (!closed) {
+      msat_destroy_env(curEnv);
+      msat_free_termination_test(terminationTest);
+      msat_destroy_config(curConfig);
+      closed = true;
+    }
   }
 
   @Override

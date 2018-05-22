@@ -216,17 +216,18 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkArgument(
-        Native.solverGetNumScopes(z3context, z3solver) >= 0,
-        "a negative number of scopes is not allowed");
+    if (!closed) {
+      Preconditions.checkArgument(
+          Native.solverGetNumScopes(z3context, z3solver) >= 0,
+          "a negative number of scopes is not allowed");
 
-    while (level > 0) {
-      pop();
+      while (level > 0) {
+        pop();
+      }
+      Native.solverDecRef(z3context, z3solver);
+
+      closed = true;
     }
-    Native.solverDecRef(z3context, z3solver);
-
-    closed = true;
   }
 
   @Override

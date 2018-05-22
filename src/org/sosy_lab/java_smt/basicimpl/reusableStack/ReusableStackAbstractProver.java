@@ -36,16 +36,23 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
     implements BasicProverEnvironment<T> {
 
   D delegate;
+
+  /**
+   * track size of nested stack.
+   *
+   * <p>Size=1 indicates a first level on the nested stack and provides an empty stack for users.
+   */
   private int size;
 
   ReusableStackAbstractProver(D pDelegate) {
     delegate = checkNotNull(pDelegate);
     delegate.push(); // create initial empty level that can be popped on close().
+    size++;
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(size >= 0);
+    Preconditions.checkState(size >= 1);
     return delegate.isUnsat();
   }
 
@@ -63,20 +70,20 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
 
   @Override
   public void pop() {
-    Preconditions.checkState(size > 0);
+    Preconditions.checkState(size > 1);
     size--;
     delegate.pop();
   }
 
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(size >= 0);
+    Preconditions.checkState(size >= 1);
     return delegate.getModel();
   }
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(size >= 0);
+    Preconditions.checkState(size >= 1);
     return delegate.getModelAssignments();
   }
 
@@ -93,12 +100,16 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
 
   @Override
   public void close() {
-    while (size > 0) {
+    while (size > 1) {
       pop();
     }
-    Preconditions.checkState(size == 0);
-    delegate.pop(); // remove initial level
-    delegate.close();
+    if (size == 1) {
+      delegate.pop(); // remove initial level
+      size--;
+      delegate.close();
+    } else {
+      Preconditions.checkState(size == 0);
+    }
   }
 
   @Override
