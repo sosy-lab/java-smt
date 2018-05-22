@@ -487,9 +487,10 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("resource")
   public void multiCloseTest() throws SolverException, InterruptedException {
-    try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
-
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+    try {
       // do something on the stack
       stack.push();
       stack.pop();
@@ -497,6 +498,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       assertThat(stack).isSatisfiable();
       stack.push();
 
+    } finally {
       // close the stack several times, closing should be idempotent
       for (int i = 0; i < 10; i++) {
         stack.close();
