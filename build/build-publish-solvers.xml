@@ -26,8 +26,8 @@
             <arg value="describe" />
         </exec>
         <copy file="lib/native/source/libz3j/libz3.so" tofile="libz3-${z3.version}.so"/>
-        <copy file="${z3.path}/build/libz3java.so" tofile="libz3java-${z3.version}.so"/>
-        <copy file="${z3.path}/build/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
+        <copy file="${z3.path}/libz3java.so" tofile="libz3java-${z3.version}.so"/>
+        <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
 
     <target name="publish-z3" depends="package-z3, load-ivy"

@@ -107,7 +107,7 @@ it with the following command in its directory on a 64bit Ubuntu 14.04 system
 ./configure --staticlib --java --git-describe && cd build && make -j 2
 ```
 
-Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
+Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of directory with the Z3 binaries:
 ```
 ant publish-z3 -Dz3.path=$Z3_DIR
 ```

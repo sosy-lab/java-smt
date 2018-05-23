@@ -21,11 +21,9 @@ Z3_ARCHIVE_FILENAME="libz3.a"
 COMPILER_CMD="gcc"
 Z3_LIBNAME="-lz3"
 
-Z3_DIR="$1"
-Z3_SRC_DIR="$Z3_DIR"/src/api
-Z3_LIB_DIR="$Z3_DIR"/build
+Z3_LIB_DIR="$1"
 if [ ! -f "$Z3_LIB_DIR/$Z3_SO_FILENAME" ]; then
-    echo "You need to specify the directory with the successfully built Z3 on the command line!"
+    echo "You need to specify the directory with the Z3 binaries on the command line!"
     exit 1
 fi
 if [ ! -f "$Z3_LIB_DIR/$Z3_ARCHIVE_FILENAME" ]; then
@@ -37,7 +35,7 @@ fi
 $COMPILER_CMD memcpy_wrapper.c -fPIC -c
 
 echo "Wrapping the libz3.a with a patched memcpy in order to support legacy systems"
-$COMPILER_CMD -Wall -o libz3.so -shared -Wl,-soname,libz3.so memcpy_wrapper.o -L. -L$Z3_LIB_DIR -L$Z3_DIR -Wl,-Bstatic -Wl,--whole-archive -lz3 -Wl,--no-whole-archive -Wl,-Bdynamic -Wl,--wrap=memcpy -lrt -lc -lm -lstdc++ -fopenmp
+$COMPILER_CMD -Wall -o libz3.so -shared -Wl,-soname,libz3.so memcpy_wrapper.o -L. -L$Z3_LIB_DIR -Wl,-Bstatic -Wl,--whole-archive -lz3 -Wl,--no-whole-archive -Wl,-Bdynamic -Wl,--wrap=memcpy -lrt -lc -lm -lstdc++ -fopenmp
 
 MISSING_SYMBOLS="$(readelf -Ws $Z3_SO_FILENAME | grep NOTYPE | grep GLOBAL | grep UND)"
 if [ ! -z "$MISSING_SYMBOLS" ]; then
