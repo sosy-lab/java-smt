@@ -31,11 +31,8 @@ if [ ! -f "$Z3_LIB_DIR/$Z3_ARCHIVE_FILENAME" ]; then
     exit 1
 fi
 
-# Create memcpy_wrapper.o
-$COMPILER_CMD memcpy_wrapper.c -fPIC -c
-
-echo "Wrapping the libz3.a with a patched memcpy in order to support legacy systems"
-$COMPILER_CMD -Wall -o libz3.so -shared -Wl,-soname,libz3.so memcpy_wrapper.o -L. -L$Z3_LIB_DIR -Wl,-Bstatic -Wl,--whole-archive -lz3 -Wl,--no-whole-archive -Wl,-Bdynamic -Wl,--wrap=memcpy -lrt -lc -lm -lstdc++ -fopenmp
+echo "Linking libz3.so"
+$COMPILER_CMD -Wall -o libz3.so -shared -Wl,-soname,libz3.so -L$Z3_LIB_DIR -Wl,-Bstatic -Wl,--whole-archive -lz3 -Wl,--no-whole-archive -Wl,-Bdynamic -lrt -lc -lm -lstdc++ -fopenmp
 
 MISSING_SYMBOLS="$(readelf -Ws $Z3_SO_FILENAME | grep NOTYPE | grep GLOBAL | grep UND)"
 if [ ! -z "$MISSING_SYMBOLS" ]; then
