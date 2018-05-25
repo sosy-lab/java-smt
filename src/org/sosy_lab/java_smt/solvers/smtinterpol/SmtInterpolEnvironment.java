@@ -74,20 +74,18 @@ import org.sosy_lab.java_smt.api.SolverException;
 class SmtInterpolEnvironment {
 
   @Option(
-    secure = true,
-    description =
-        "Double check generated results like interpolants and models whether they are correct"
-  )
+      secure = true,
+      description =
+          "Double check generated results like interpolants and models whether they are correct")
   private boolean checkResults = false;
 
   private final @Nullable PathCounterTemplate smtLogfile;
 
   @Option(
-    secure = true,
-    description =
-        "Further options that will be set to true for SMTInterpol "
-            + "in addition to the default options. Format is 'option1,option2,option3'"
-  )
+      secure = true,
+      description =
+          "Further options that will be set to true for SMTInterpol "
+              + "in addition to the default options. Format is 'option1,option2,option3'")
   private List<String> furtherOptions = ImmutableList.of();
 
   private final LogManager logger;

@@ -52,23 +52,20 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings */
   @Option(
-    secure = true,
-    description = "Engine to use for the optimization",
-    values = {"basic", "farkas", "symba"}
-  )
+      secure = true,
+      description = "Engine to use for the optimization",
+      values = {"basic", "farkas", "symba"})
   String optimizationEngine = "basic";
 
   @Option(
-    secure = true,
-    description = "Ordering for objectives in the optimization context",
-    values = {"lex", "pareto", "box"}
-  )
+      secure = true,
+      description = "Ordering for objectives in the optimization context",
+      values = {"lex", "pareto", "box"})
   String objectivePrioritizationMode = "box";
 
   @Option(
-    secure = true,
-    description = "Dump failed interpolation queries to this file in SMTLIB2 format"
-  )
+      secure = true,
+      description = "Dump failed interpolation queries to this file in SMTLIB2 format")
   @FileOption(Type.OUTPUT_FILE)
   private @Nullable PathCounterTemplate dumpFailedInterpolationQueries =
       PathCounterTemplate.ofFormatString("z3-failed-interpolation-query.%d.smt2");
@@ -88,11 +85,10 @@ final class Z3SolverContext extends AbstractSolverContext {
     boolean requireProofs = true;
 
     @Option(
-      secure = true,
-      description =
-          "Activate replayable logging in Z3."
-              + " The log can be given as an input to the solver and replayed."
-    )
+        secure = true,
+        description =
+            "Activate replayable logging in Z3."
+                + " The log can be given as an input to the solver and replayed.")
     @FileOption(Type.OUTPUT_FILE)
     @Nullable
     Path log = null;

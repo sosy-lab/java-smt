@@ -61,11 +61,10 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private static class Mathsat5Settings {
 
     @Option(
-      secure = true,
-      description =
-          "Further options that will be passed to Mathsat in addition to the default options. "
-              + "Format is 'key1=value1,key2=value2'"
-    )
+        secure = true,
+        description =
+            "Further options that will be passed to Mathsat in addition to the default options. "
+                + "Format is 'key1=value1,key2=value2'")
     private String furtherOptions = "";
 
     @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")

@@ -29,7 +29,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 abstract class PrincessNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        IExpression, Sort, PrincessEnvironment, ParamFormulaType, ResultFormulaType,
+        IExpression,
+        Sort,
+        PrincessEnvironment,
+        ParamFormulaType,
+        ResultFormulaType,
         PrincessFunctionDeclaration> {
 
   PrincessNumeralFormulaManager(PrincessFormulaCreator pCreator) {
