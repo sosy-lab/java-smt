@@ -1038,4 +1038,25 @@ public class ModelTest extends SolverBasedTest0 {
       }
     }
   }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void modelAfterSolverCloseTest() throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+    assertThat(prover).isSatisfiable();
+    Model m = prover.getModel();
+
+    // close prover first
+    prover.close();
+
+    // try to access model, this should either fail fast or succeed
+    try {
+      assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+    } catch (IllegalStateException e) {
+      // ignore
+    } finally {
+      m.close();
+    }
+  }
 }

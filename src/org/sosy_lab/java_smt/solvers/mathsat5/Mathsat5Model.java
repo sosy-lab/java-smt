@@ -50,15 +50,20 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   private final Mathsat5FormulaCreator formulaCreator;
   private boolean closed = false;
 
-  Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
+  /** for detecting closed environments, Exception is better than SegFault. */
+  private final Mathsat5AbstractProver<?> prover;
+
+  Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
     super(creator);
     this.model = model;
     formulaCreator = creator;
+    prover = pProver;
   }
 
   @Override
   public Object evaluateImpl(Long f) {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     long term = msat_model_eval(model, f);
     return formulaCreator.convertValue(f, term);
   }
@@ -66,6 +71,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
