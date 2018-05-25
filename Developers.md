@@ -99,17 +99,35 @@ Additional instructions are available at the official [OSSRH][] page.
 
 ### Publishing Z3
 
-To publish Z3, [download it](https://github.com/Z3Prover/z3) and build
+We prefer to use the official Z3 binaries,
+please build from source only if necessary (e.g., in case of an important bugfix).
+
+To publish Z3, download the **Ubuntu 14.04** binary for the [latest release](https://github.com/Z3Prover/z3/releases)
+and unzip it.
+Then execute the following command in the JavaSMT directory,
+where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
+and `$Z3_VERSION` is the version number:
+```
+ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
+```
+Finally follow the instructions shown in the message at the end.
+
+As long as [PR #1650](https://github.com/Z3Prover/z3/pull/1650) is not merged,
+you need to run the following command before running ant:
+```
+patchelf --set-soname libz3.so libz3.so
+```
+
+To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
 it with the following command in its directory on a 64bit Ubuntu 14.04 system
 (building on Ubuntu 16.04 introduces unwanted dependencies to new libstdc++ and libgomp versions):
 
 ```
 ./configure --staticlib --java --git-describe && cd build && make -j 2
 ```
-
-Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of directory with the Z3 binaries:
+Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR
+ant publish-z3 -Dz3.path=$Z3_DIR/build
 ```
 Finally follow the instructions shown in the message at the end.
 
