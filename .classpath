@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/java/test/hamcrest-core.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/spotbugs-annotations.jar" sourcepath="lib/java-contrib/spotbugs-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/jsr305.jar" sourcepath="lib/java-contrib/jsr305-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/build/auto-value.jar"/>
+	<classpathentry kind="lib" path="lib/java/build/auto-value-annotations.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>

@@ -73,7 +73,8 @@
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.5" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.6" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.6" conf="build->default"/>
 
         <!-- JUnit
              Testing framework. -->

@@ -16,9 +16,12 @@
     <path id="errorprone">
         <pathelement location="${ivy.lib.dir}/build/error_prone_ant.jar"/>
     </path>
+    <path id="processorpath">
+        <fileset dir="${ivy.lib.dir}" includes="build/*.jar"/>
+    </path>
 
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
-    <target name="build-project" depends="build-dependencies">
+    <target name="build-project" unless="skipBuild" depends="build-dependencies">
         <depend srcdir="${source.dir}" destdir="${class.dir}"/>
         <mkdir dir="${source.generated.dir}"/>
         <javac debug="true"
@@ -35,6 +38,7 @@
             <compilerarg value="-Xlint:-processing"/>
             <compilerarg value="-Werror"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
+            <compilerarg value="-processorpath"/><compilerarg pathref="processorpath"/>
             <compilerclasspath refid="errorprone"/>
         </javac>
     </target>
@@ -69,6 +73,7 @@
             <compilerarg value="-properties"/>
             <compilerarg value="${ivy.lib.dir}/build/org.eclipse.jdt.core.prefs"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
+            <compilerarg value="-processorpath"/><compilerarg pathref="processorpath"/>
             <compilerclasspath refid="ecj"/>
         </javac>
     </target>
