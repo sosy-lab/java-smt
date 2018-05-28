@@ -44,6 +44,12 @@ public interface BooleanFormulaManager {
   /** Shortcut for {@code makeBoolean(false)}. */
   BooleanFormula makeFalse();
 
+  /**
+   * Creates a variable with exactly the given name.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the name "AS IS".
+   * {Formula#toString} can return a different String than the given one.
+   */
   BooleanFormula makeVariable(String pVar);
 
   /**

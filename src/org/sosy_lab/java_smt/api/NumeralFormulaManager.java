@@ -53,6 +53,12 @@ public interface NumeralFormulaManager<
 
   ResultFormulaType makeNumber(Rational pRational);
 
+  /**
+   * Creates a variable with exactly the given name.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the name "AS IS".
+   * {Formula#toString} can return a different String than the given one.
+   */
   ResultFormulaType makeVariable(String pVar);
 
   FormulaType<ResultFormulaType> getFormulaType();

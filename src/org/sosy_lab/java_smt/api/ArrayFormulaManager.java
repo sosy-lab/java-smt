@@ -48,9 +48,11 @@ public interface ArrayFormulaManager {
       ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue);
 
   /**
-   * Declare a new array.
+   * Declare a new array with exactly the given name.
    *
-   * @param pName The name of the array variable
+   * @param pName The name of the array variable. This method does not quote or unquote the given
+   *     name, but uses the name "AS IS". {Formula#toString} can return a different String than the
+   *     given one.
    * @param pIndexType The type of the array index
    * @param pElementType The type of the array elements
    * @return Formula that represents the array
