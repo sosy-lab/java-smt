@@ -22,8 +22,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
-import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
+import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -32,6 +32,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
@@ -44,8 +46,11 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 @RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
@@ -83,7 +88,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "}",
           "[]",
           "\"",
+          "\"\"",
+          "\"\"\"",
+          "'",
           "''",
+          "'''",
           "\n",
           "\t",
           "\u0000",
@@ -110,6 +119,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "|test|",
           "t|e|s|t",
           "\"\"",
+          "\\|\\|",
           "\\",
           "| this is a quoted symbol |",
           "| so is \n  this one |",
@@ -154,35 +164,140 @@ public class VariableNamesTest extends SolverBasedTest0 {
     createVariableWith(bmgr::makeVariable);
   }
 
-  @Test
-  public void testBoolVariableEscaping() throws SolverException, InterruptedException {
-    BooleanFormula var = createVariableWith(bmgr::makeVariable);
+  private <T extends Formula> void testName0(
+      Function<String, T> creator, BiFunction<T, T, BooleanFormula> eq, boolean isUF)
+      throws SolverException, InterruptedException {
 
-    if (varname.equals(var.toString())) {
-      // Check that variable is indeed the same if we re-create it
-      BooleanFormula varFromString = bmgr.makeVariable(var.toString());
-      assertThatFormula(var).isEquivalentTo(varFromString);
+    // create a variable
+    T var = createVariableWith(creator);
 
-    } else {
-      // escaped name
-      assertThat(var.toString()).startsWith("|");
-      assertThat(var.toString()).endsWith("|");
-
-      // creating it again should result in another (new) variable,
-      // but creating it again does not work with SMTInterpol
-      assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
-      BooleanFormula varFromString = bmgr.makeVariable(var.toString());
-      assertThatFormula(bmgr.xor(var, varFromString)).isSatisfiable();
-
-      assert_()
-          .withMessage("name is escaped once, then the second call should escape it twice")
-          .that(varFromString.toString())
-          .isNotEqualTo(varname);
-      assert_()
-          .withMessage("name is escaped once, then the second call should escape it twice")
-          .that(mgr.dumpFormula(varFromString).toString())
-          .isNotEqualTo(mgr.dumpFormula(var).toString());
+    // check whether it exists with the given name
+    Map<String, Formula> map = mgr.extractVariables(var);
+    if (isUF) {
+      assertThat(map).isEmpty();
+      map = mgr.extractVariablesAndUFs(var);
     }
+    assertThat(map).hasSize(1);
+    assertThat(map).containsEntry(varname, var);
+
+    // check whether we can create the same variable again
+    T var2 = createVariableWith(creator);
+    // for simple formulas, we can expect a direct equality
+    // (for complex formulas this is not satisfied)
+    assertThat(var2).isEqualTo(var);
+    assertThat(var2.toString()).isEqualTo(var.toString());
+
+    varname = "|" + varname + "|";
+
+    // try to create a new (!) variable with a different name, the escaped previous name.
+    try {
+      T var3 = createVariableWith(creator);
+      assertThat(var3).isNotEqualTo(var);
+      assertThatFormula(bmgr.not(eq.apply(var, var3))).isSatisfiable();
+
+    } catch (IllegalArgumentException e) {
+      if (Solvers.SMTINTERPOL == solver) {
+        // ignore, SMTInterpol does not like "|" and "\\" in symbols, due to logging.
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  @Test
+  public void testNameBool() throws SolverException, InterruptedException {
+    testName0(bmgr::makeVariable, bmgr::equivalence, false);
+  }
+
+  @Test
+  public void testNameInt() throws SolverException, InterruptedException {
+    testName0(imgr::makeVariable, imgr::equal, false);
+  }
+
+  @Test
+  public void testNameRat() throws SolverException, InterruptedException {
+    requireRationals();
+    testName0(rmgr::makeVariable, rmgr::equal, false);
+  }
+
+  @Test
+  public void testNameBV() throws SolverException, InterruptedException {
+    requireBitvectors();
+    testName0(s -> bvmgr.makeVariable(4, s), bvmgr::equal, false);
+  }
+
+  @Test
+  public void testNameFloat() throws SolverException, InterruptedException {
+    requireFloats();
+    testName0(
+        s -> fpmgr.makeVariable(s, FormulaType.getSinglePrecisionFloatingPointType()),
+        fpmgr::equalWithFPSemantics,
+        false);
+  }
+
+  @Test
+  public void testNameArray() throws SolverException, InterruptedException {
+    requireArrays();
+    testName0(s -> amgr.makeArray(s, IntegerType, IntegerType), amgr::equivalence, false);
+  }
+
+  @Test
+  public void testNameUF1Bool() throws SolverException, InterruptedException {
+    testName0(
+        s -> fmgr.declareAndCallUF(s, BooleanType, imgr.makeNumber(0)), bmgr::equivalence, true);
+  }
+
+  @Test
+  public void testNameUF1Int() throws SolverException, InterruptedException {
+    testName0(s -> fmgr.declareAndCallUF(s, IntegerType, imgr.makeNumber(0)), imgr::equal, true);
+  }
+
+  @Test
+  public void testNameUF2Bool() throws SolverException, InterruptedException {
+    IntegerFormula zero = imgr.makeNumber(0);
+    testName0(s -> fmgr.declareAndCallUF(s, BooleanType, zero, zero), bmgr::equivalence, true);
+  }
+
+  @Test
+  public void testNameUF2Int() throws SolverException, InterruptedException {
+    IntegerFormula zero = imgr.makeNumber(0);
+    testName0(s -> fmgr.declareAndCallUF(s, IntegerType, zero, zero), imgr::equal, true);
+  }
+
+  @Test
+  public void testNameExists() {
+    requireQuantifiers();
+
+    IntegerFormula var = createVariableWith(imgr::makeVariable);
+    IntegerFormula zero = imgr.makeNumber(0);
+    BooleanFormula exists = qmgr.exists(var, imgr.equal(var, zero));
+
+    // check whether it exists with the given name
+    assertThat(mgr.extractVariablesAndUFs(exists)).isEmpty();
+
+    mgr.visit(
+        exists,
+        new DefaultFormulaVisitor<Void>() {
+
+          @Override
+          public Void visitQuantifier(
+              BooleanFormula pF,
+              Quantifier pQuantifier,
+              List<Formula> pBoundVariables,
+              BooleanFormula pBody) {
+            for (Formula f : pBoundVariables) {
+              Map<String, Formula> map = mgr.extractVariables(f);
+              assertThat(map).hasSize(1);
+              assertThat(map).containsEntry(varname, f);
+            }
+            return null;
+          }
+
+          @Override
+          protected Void visitDefault(Formula pF) {
+            return null;
+          }
+        });
   }
 
   @Test
@@ -239,6 +354,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @Test
   public void testArrayVariable() {
     requireArrays();
-    createVariableWith(v -> amgr.makeArray(v, FormulaType.IntegerType, FormulaType.IntegerType));
+    createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType));
   }
 }
