@@ -1,0 +1,5 @@
+include: /build/gitlab-ci.yml
+
+variables:
+  PROJECT_PATH: "sosy-lab/software/java-smt"
+  GH_REF: "github.com/sosy-lab/java-smt"
