@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
@@ -30,6 +31,7 @@ import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.NoopScript;
 import de.uni_freiburg.informatik.ultimate.logic.QuotedObject;
 import de.uni_freiburg.informatik.ultimate.logic.ReasonUnknown;
 import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
@@ -234,6 +236,7 @@ class SmtInterpolEnvironment {
    */
   @CanIgnoreReturnValue
   public FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
+    checkSymbol(fun);
     FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
 
     if (fsym == null) {
@@ -353,15 +356,18 @@ class SmtInterpolEnvironment {
   }
 
   public Term term(String funcname, Term... params) {
+    checkSymbol(funcname);
     return script.term(funcname, params);
   }
 
   public Term term(
       String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
+    checkSymbol(funcname);
     return script.term(funcname, indices, returnSort, params);
   }
 
   public TermVariable variable(String varname, Sort sort) {
+    checkSymbol(varname);
     return script.variable(varname, sort);
   }
 
@@ -491,5 +497,19 @@ class SmtInterpolEnvironment {
     QuotedObject program = (QuotedObject) script.getInfo(":name");
     QuotedObject version = (QuotedObject) script.getInfo(":version");
     return program.getValue() + " " + version.getValue();
+  }
+
+  /**
+   * Copied from {@link NoopScript#checkSymbol}.
+   *
+   * <p>Check that the symbol does not contain characters that would make it impossible to use it in
+   * a LoggingScript. These are | and \.
+   *
+   * @param symbol the symbol to check
+   * @throws IllegalArgumentException if symbol contains | or \.
+   */
+  private void checkSymbol(String symbol) throws SMTLIBException {
+    Preconditions.checkArgument(
+        symbol.indexOf('|') == -1 && symbol.indexOf('\\') == -1, "Symbol must not contain | or \\");
   }
 }
