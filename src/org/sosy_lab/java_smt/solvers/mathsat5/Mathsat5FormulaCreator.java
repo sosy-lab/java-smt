@@ -299,6 +299,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
     } else {
 
+      final String name = msat_decl_get_name(msat_term_get_decl(f));
+      if (arity == 0 && name.startsWith("'")) {
+        // symbols starting with "'" are missed as constants, but seen as functions of type OTHER
+        return visitor.visitFreeVariable(formula, name);
+      }
+
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
@@ -308,7 +314,6 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         argTypes.add(argumentType);
       }
 
-      String name = msat_decl_get_name(msat_term_get_decl(f));
       return visitor.visitFunction(
           formula,
           args.build(),
