@@ -104,14 +104,88 @@ public class VariableNamesTest extends SolverBasedTest0 {
           " \" can occur too ",
           " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984");
 
-  private static final ImmutableSet<String> POSSIBLY_UNSUPPORTED_NAMES =
+  private static final ImmutableSet<String> SIMPLE_KEYWORDS =
       ImmutableSet.of(
+          "!",
+          "+",
+          "-",
+          "*",
+          "/",
+          "=",
+          "<",
+          ">",
+          "<=",
+          ">=",
           "true",
           "false",
           "and",
           "or",
           "select",
           "store",
+          "xor",
+          "distinct");
+  private static final ImmutableSet<String> SMTLIB2_KEYWORDS =
+      ImmutableSet.of(
+          "let",
+          "forall",
+          "exists",
+          "match",
+          "Bool",
+          "continued-execution",
+          "error",
+          "immediate-exit",
+          "incomplete",
+          "logic",
+          "memout",
+          "sat",
+          "success",
+          "theory",
+          "unknown",
+          "unsupported",
+          "unsat",
+          "_",
+          "as",
+          "BINARY",
+          "DECIMAL",
+          "exists",
+          "HEXADECIMAL",
+          "forall",
+          "let",
+          "match",
+          "NUMERAL",
+          "par",
+          "STRING",
+          "assert",
+          "check-sat",
+          "check-sat-assuming",
+          "declare-const",
+          "declare-datatype",
+          "declare-datatypes",
+          "declare-fun",
+          "declare-sort",
+          "define-fun",
+          "define-fun-rec",
+          "define-sort",
+          "echo",
+          "exit",
+          "get-assertions",
+          "get-assignment",
+          "get-info",
+          "get-model",
+          "get-option",
+          "get-proof",
+          "get-unsat-assumptions",
+          "get-unsat-core",
+          "get-value",
+          "pop",
+          "push",
+          "reset",
+          "reset-assertions",
+          "set-info",
+          "set-logic",
+          "set-option");
+  private static final ImmutableSet<String> POSSIBLY_UNSUPPORTED_NAMES =
+      ImmutableSet.of(
           "|",
           "||",
           "|||",
@@ -129,7 +203,12 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @SuppressWarnings("unchecked")
   @Parameters(name = "{0} with varname {1}")
   public static List<Object[]> getAllCombinations() {
-    List<String> allNames = from(NAMES).append(POSSIBLY_UNSUPPORTED_NAMES).toList();
+    List<String> allNames =
+        from(NAMES)
+            .append(SIMPLE_KEYWORDS)
+            .append(SMTLIB2_KEYWORDS)
+            .append(POSSIBLY_UNSUPPORTED_NAMES)
+            .toList();
     return Lists.transform(
         Lists.cartesianProduct(Arrays.asList(Solvers.values()), allNames), List::toArray);
   }
@@ -149,13 +228,17 @@ public class VariableNamesTest extends SolverBasedTest0 {
   private <T extends Formula> T createVariableWith(Function<String, T> creator) {
     try {
       return creator.apply(varname);
-    } catch (RuntimeException e) {
-      if (POSSIBLY_UNSUPPORTED_NAMES.contains(varname)) {
-        // Solvers may or may not support variables with this name
+    } catch (IllegalArgumentException e) {
+      if (SIMPLE_KEYWORDS.contains(varname)) {
         throw new AssumptionViolatedException("unsupported variable name", e);
-      } else {
-        throw e;
       }
+      if (SMTLIB2_KEYWORDS.contains(varname) || POSSIBLY_UNSUPPORTED_NAMES.contains(varname)) {
+        if (solver == Solvers.SMTINTERPOL) {
+          // SMTInterpol has no support for keywords and also escaped names as identifiers.
+          throw new AssumptionViolatedException("unsupported variable name", e);
+        }
+      }
+      throw e;
     }
   }
 
@@ -186,6 +269,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
     // (for complex formulas this is not satisfied)
     assertThat(var2).isEqualTo(var);
     assertThat(var2.toString()).isEqualTo(var.toString());
+
+    // check whether SMTLIB2-dump is possible
+    @SuppressWarnings("unused")
+    String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
 
     varname = "|" + varname + "|";
 
@@ -325,6 +412,13 @@ public class VariableNamesTest extends SolverBasedTest0 {
     BooleanFormula var = createVariableWith(bmgr::makeVariable);
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(var).toString();
+  }
+
+  @Test
+  public void testEqBoolVariableDump() {
+    BooleanFormula var = createVariableWith(bmgr::makeVariable);
+    @SuppressWarnings("unused")
+    String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
   }
 
   @Test
