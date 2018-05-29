@@ -25,6 +25,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -74,6 +75,10 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 @Options(prefix = "solver.smtinterpol")
 class SmtInterpolEnvironment {
+
+  /** SMTInterpol does not allow to use key-functions as identifiers. */
+  private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS =
+      ImmutableSet.of("true", "false", "select", "store", "or", "and", "xor", "distinct");
 
   @Option(
       secure = true,
@@ -511,5 +516,9 @@ class SmtInterpolEnvironment {
   private void checkSymbol(String symbol) throws SMTLIBException {
     Preconditions.checkArgument(
         symbol.indexOf('|') == -1 && symbol.indexOf('\\') == -1, "Symbol must not contain | or \\");
+    Preconditions.checkArgument(
+        !UNSUPPORTED_IDENTIFIERS.contains(symbol),
+        "SMTInterpol does not support %s as identifier.",
+        symbol);
   }
 }
