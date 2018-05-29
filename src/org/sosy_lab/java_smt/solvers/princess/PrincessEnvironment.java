@@ -33,6 +33,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
+import ap.parser.IIntFormula;
 import ap.parser.ITerm;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
@@ -374,6 +375,8 @@ class PrincessEnvironment {
     } else if (var instanceof IFunApp) {
       String fullStr = ((IFunApp) var).fun().toString();
       return fullStr.substring(0, fullStr.indexOf('/'));
+    } else if (var instanceof IIntFormula) {
+      return getName(((IIntFormula) var).t());
     }
 
     throw new IllegalArgumentException("The given parameter is no variable or function");
