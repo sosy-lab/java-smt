@@ -361,13 +361,11 @@ class SmtInterpolEnvironment {
   }
 
   public Term term(String funcname, Term... params) {
-    checkSymbol(funcname);
     return script.term(funcname, params);
   }
 
   public Term term(
       String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
-    checkSymbol(funcname);
     return script.term(funcname, indices, returnSort, params);
   }
 
