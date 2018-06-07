@@ -52,6 +52,16 @@ public interface FloatingPointFormulaManager {
   FloatingPointFormula makeNumber(
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
+  /**
+   * Creates a variable with exactly the given name.
+   *
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * Formula#BASIC_OPERATORS}, {@link Formula#SMTLIB2_KEYWORDS}, and {@link
+   * Formula#DISALLOWED_CHARACTERS} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   */
   FloatingPointFormula makeVariable(String pVar, FloatingPointType type);
 
   FloatingPointFormula makePlusInfinity(FloatingPointType type);

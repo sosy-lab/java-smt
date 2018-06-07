@@ -50,9 +50,13 @@ public interface ArrayFormulaManager {
   /**
    * Declare a new array with exactly the given name.
    *
-   * @param pName The name of the array variable. This method does not quote or unquote the given
-   *     name, but uses the name "AS IS". {Formula#toString} can return a different String than the
-   *     given one.
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * Formula#BASIC_OPERATORS}, {@link Formula#SMTLIB2_KEYWORDS}, and {@link
+   * Formula#DISALLOWED_CHARACTERS} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   *
    * @param pIndexType The type of the array index
    * @param pElementType The type of the array elements
    * @return Formula that represents the array
