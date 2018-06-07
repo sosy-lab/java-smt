@@ -20,7 +20,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -31,16 +31,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
  * @param <TFormulaInfo> the solver specific type.
  */
 abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {
-
-  /**
-   * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them.
-   */
-  private static final ImmutableSet<String> BASIC_OPERATORS =
-      ImmutableSet.of("!", "+", "-", "*", "/", "=", "<", "<=", ">", ">=");
 
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
@@ -88,7 +78,12 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
   protected static void checkVariableName(final String pVar) {
     Preconditions.checkArgument(!pVar.isEmpty(), "Identifier for variable should not be empty.");
     Preconditions.checkArgument(
-        !BASIC_OPERATORS.contains(pVar),
-        "Identifier for variable should not be a keyword of SMT-LIB");
+        !Formula.BASIC_OPERATORS.contains(pVar), "Identifier should not be a simple operator.");
+    Preconditions.checkArgument(
+        !Formula.SMTLIB2_KEYWORDS.contains(pVar),
+        "Identifier should not be a keyword of SMT-LIB2.");
+    Preconditions.checkArgument(
+        Iterables.all(Formula.DISALLOWED_CHARACTERS, c -> pVar.indexOf(c) == -1),
+        "Identifier should contain an escape character of SMT-LIB2.");
   }
 }

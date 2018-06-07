@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.junit.Assert;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +45,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -58,19 +61,13 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
-          "as",
-          "exists",
-          "forall",
-          "par",
-          "let",
-          "BINARY",
-          "DECIMAL",
-          "HEXADECIAML",
-          "NUMERAL",
-          "STRING",
-          "define-fun",
+          "javasmt",
+          "sosylab",
+          "test",
+          "foo",
+          "bar",
+          "baz",
           "declare",
-          "get-model",
           "exit",
           "(exit)",
           "!=",
@@ -104,27 +101,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
           " \" can occur too ",
           " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984");
 
-  private static final ImmutableSet<String> SIMPLE_KEYWORDS =
-      ImmutableSet.of(
-          "!",
-          "+",
-          "-",
-          "*",
-          "/",
-          "=",
-          "<",
-          ">",
-          "<=",
-          ">=",
-          "true",
-          "false",
-          "and",
-          "or",
-          "select",
-          "store",
-          "xor",
-          "distinct");
-  private static final ImmutableSet<String> SMTLIB2_KEYWORDS =
+  private static final ImmutableSet<String> FURTHER_SMTLIB2_KEYWORDS =
       ImmutableSet.of(
           "let",
           "forall",
@@ -184,7 +161,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "set-info",
           "set-logic",
           "set-option");
-  private static final ImmutableSet<String> POSSIBLY_UNSUPPORTED_NAMES =
+
+  private static final ImmutableSet<String> UNSUPPORTED_NAMES =
       ImmutableSet.of(
           "|",
           "||",
@@ -192,7 +170,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "|test",
           "|test|",
           "t|e|s|t",
-          "\"\"",
+          "\\",
+          "\\s",
           "\\|\\|",
           "\\",
           "| this is a quoted symbol |",
@@ -205,9 +184,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public static List<Object[]> getAllCombinations() {
     List<String> allNames =
         from(NAMES)
-            .append(SIMPLE_KEYWORDS)
-            .append(SMTLIB2_KEYWORDS)
-            .append(POSSIBLY_UNSUPPORTED_NAMES)
+            .append(Formula.BASIC_OPERATORS)
+            .append(Formula.SMTLIB2_KEYWORDS)
+            .append(FURTHER_SMTLIB2_KEYWORDS)
+            .append(UNSUPPORTED_NAMES)
             .toList();
     return Lists.transform(
         Lists.cartesianProduct(Arrays.asList(Solvers.values()), allNames), List::toArray);
@@ -226,20 +206,20 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator) {
-    try {
-      return creator.apply(varname);
-    } catch (IllegalArgumentException e) {
-      if (SIMPLE_KEYWORDS.contains(varname)) {
+    final T result;
+    if (Formula.BASIC_OPERATORS.contains(varname)
+        || Formula.SMTLIB2_KEYWORDS.contains(varname)
+        || Iterables.any(Formula.DISALLOWED_CHARACTERS, c -> varname.indexOf(c) != -1)) {
+      try {
+        result = creator.apply(varname);
+      } catch (IllegalArgumentException e) {
         throw new AssumptionViolatedException("unsupported variable name", e);
       }
-      if (SMTLIB2_KEYWORDS.contains(varname) || POSSIBLY_UNSUPPORTED_NAMES.contains(varname)) {
-        if (solver == Solvers.SMTINTERPOL) {
-          // SMTInterpol has no support for keywords and also escaped names as identifiers.
-          throw new AssumptionViolatedException("unsupported variable name", e);
-        }
-      }
-      throw e;
+      Assert.assertTrue("should not be reachable", false);
+    } else {
+      result = creator.apply(varname);
     }
+    return result;
   }
 
   @Test
@@ -269,26 +249,23 @@ public class VariableNamesTest extends SolverBasedTest0 {
     // (for complex formulas this is not satisfied)
     assertThat(var2).isEqualTo(var);
     assertThat(var2.toString()).isEqualTo(var.toString());
+    assertThatFormula(eq.apply(var, var2)).isSatisfiable();
+    if (var instanceof FloatingPointFormula) {
+      // special case: NaN != NaN
+      assertThatFormula(bmgr.not(eq.apply(var, var2))).isSatisfiable();
+    } else {
+      assertThatFormula(bmgr.not(eq.apply(var, var2))).isUnsatisfiable();
+    }
 
     // check whether SMTLIB2-dump is possible
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
 
-    varname = "|" + varname + "|";
-
     // try to create a new (!) variable with a different name, the escaped previous name.
-    try {
-      T var3 = createVariableWith(creator);
-      assertThat(var3).isNotEqualTo(var);
-      assertThatFormula(bmgr.not(eq.apply(var, var3))).isSatisfiable();
-
-    } catch (IllegalArgumentException e) {
-      if (Solvers.SMTINTERPOL == solver) {
-        // ignore, SMTInterpol does not like "|" and "\\" in symbols, due to logging.
-      } else {
-        throw e;
-      }
-    }
+    varname = "|" + varname + "|";
+    @SuppressWarnings("unused")
+    T var3 = createVariableWith(creator);
+    Assert.assertTrue("should not be reachable", false);
   }
 
   @Test
