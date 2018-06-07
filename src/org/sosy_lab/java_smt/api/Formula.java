@@ -33,7 +33,7 @@ public interface Formula {
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
-  public static final ImmutableSet<String> BASIC_OPERATORS =
+  static final ImmutableSet<String> BASIC_OPERATORS =
       ImmutableSet.of("!", "+", "-", "*", "/", "=", "<", ">", "<=", ">=");
 
   /**
@@ -44,7 +44,7 @@ public interface Formula {
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
-  public static final ImmutableSet<String> SMTLIB2_KEYWORDS =
+  static final ImmutableSet<String> SMTLIB2_KEYWORDS =
       ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct");
 
   /**
@@ -55,7 +55,7 @@ public interface Formula {
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
-  public static final ImmutableSet<Character> DISALLOWED_CHARACTERS = ImmutableSet.of('|', '\\');
+  static final ImmutableSet<Character> DISALLOWED_CHARACTERS = ImmutableSet.of('|', '\\');
 
   /**
    * returns an arbitrary representation of the formula, might be human- or machine-readable.
