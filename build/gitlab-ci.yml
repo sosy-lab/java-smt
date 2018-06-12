@@ -87,7 +87,7 @@ spotbugs:
   <<: *binary_check
   script:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
-    - 'ant $ANT_PROPS_CHECKS run-spotbugs -Dspotbugs.output=text && cat SpotBugs.xml && test \! -s SpotBugs.xml'
+    - 'test \! -f SpotBugs.html'
   dependencies:
     - build-dependencies
     - build:jdk-8
