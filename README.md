@@ -311,7 +311,6 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [NativeLibraries]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/NativeLibraries.html
 [Configuration]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/configuration/package-summary.html
-[BasicLogManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/log/BasicLogManager.html
 [LogManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/log/LogManager.html
 [SolverContext]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/api/SolverContext.html
 [SolverContextFactory]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/SolverContextFactory.html
