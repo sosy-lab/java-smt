@@ -413,8 +413,6 @@ class PrincessFormulaCreator
   }
 
   public IExpression makeFunction(PrincessFunctionDeclaration pFuncDecl, List<IExpression> args) {
-    System.out.println(pFuncDecl);
-    System.out.println(args);
     return pFuncDecl.makeApp(getEnv(), args);
   }
 
