@@ -21,7 +21,9 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
@@ -41,23 +43,50 @@ abstract class SmtInterpolNumeralFormulaManager<
       ImmutableSet.of("+", "-", "*", "/", "div", "mod");
 
   protected final SmtInterpolEnvironment env;
-  private final SmtInterpolFormulaCreator creator;
 
   SmtInterpolNumeralFormulaManager(
       SmtInterpolFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    creator = pCreator;
     env = pCreator.getEnv();
   }
 
+  /** check for ConstantTerm with Number or ApplicationTerm with negative Number */
   @Override
-  protected boolean isNumeral(Term val) {
-    return creator.isNumber(val);
+  protected final boolean isNumeral(Term t) {
+    boolean is = false;
+    // ConstantTerm with Number --> "123"
+    if (t instanceof ConstantTerm) {
+      Object value = ((ConstantTerm) t).getValue();
+      if (value instanceof Number || value instanceof Rational) {
+        is = true;
+      }
+
+    } else if (t instanceof ApplicationTerm) {
+      ApplicationTerm at = (ApplicationTerm) t;
+
+      // ApplicationTerm with negative Number --> "(- 123)"
+      if ("-".equals(at.getFunction().getName())
+          && (at.getParameters().length == 1)
+          && isNumeral(at.getParameters()[0])) {
+        is = true;
+
+        // ApplicationTerm with Division --> "(/ 1 5)"
+      } else if ("/".equals(at.getFunction().getName())
+          && (at.getParameters().length == 2)
+          && isNumeral(at.getParameters()[0])
+          && isNumeral(at.getParameters()[1])) {
+        is = true;
+      }
+    }
+
+    // TODO hex or binary data, string?
+    return is;
   }
 
   /**
    * Check whether the current term is numeric and the value of a term is determined by only
-   * numerals, i.e. no variable is contained.
+   * numerals, i.e. no variable is contained. This method should check as precisely as possible the
+   * situations in which SMTInterpol supports arithmetic operations like multiplications.
    *
    * <p>Example: TRUE for "1", "2+3", "ite(x,2,3) and FALSE for "x", "x+2", "ite(1=2,x,0)"
    */
@@ -70,7 +99,7 @@ abstract class SmtInterpolNumeralFormulaManager<
       if (!finished.add(t)) {
         continue;
       }
-      if (creator.isNumber(t)) {
+      if (isNumeral(t)) {
         // true, skip and check others
       } else if (t instanceof ApplicationTerm) {
         final ApplicationTerm app = (ApplicationTerm) t;

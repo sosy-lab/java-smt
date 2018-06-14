@@ -191,38 +191,6 @@ class SmtInterpolFormulaCreator
     }
   }
 
-  /** check for ConstantTerm with Number or ApplicationTerm with negative Number */
-  public boolean isNumber(Term t) {
-    boolean is = false;
-    // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
-      if (value instanceof Number || value instanceof Rational) {
-        is = true;
-      }
-
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
-
-      // ApplicationTerm with negative Number --> "(- 123)"
-      if ("-".equals(at.getFunction().getName())
-          && (at.getParameters().length == 1)
-          && isNumber(at.getParameters()[0])) {
-        is = true;
-
-        // ApplicationTerm with Division --> "(/ 1 5)"
-      } else if ("/".equals(at.getFunction().getName())
-          && (at.getParameters().length == 2)
-          && isNumber(at.getParameters()[0])
-          && isNumber(at.getParameters()[1])) {
-        is = true;
-      }
-    }
-
-    // TODO hex or binary data, string?
-    return is;
-  }
-
   private static boolean isVariable(Term t) {
     // A variable is the same as an UF without parameters
     return t.getTheory().mTrue != t
