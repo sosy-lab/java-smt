@@ -513,8 +513,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public Long callFunctionImpl(FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
-    return msat_make_term(environment, declaration.getSolverDeclaration(), Longs.toArray(args));
+  public Long callFunctionImpl(Long declaration, List<Long> args) {
+    return msat_make_term(environment, declaration, Longs.toArray(args));
   }
 
   @Override

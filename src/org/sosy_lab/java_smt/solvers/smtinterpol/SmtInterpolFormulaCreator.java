@@ -285,10 +285,8 @@ class SmtInterpolFormulaCreator
   }
 
   @Override
-  public Term callFunctionImpl(
-      FunctionDeclarationImpl<?, FunctionSymbol> declaration, List<Term> args) {
-    return environment.term(
-        declaration.getSolverDeclaration().getName(), args.toArray(new Term[args.size()]));
+  public Term callFunctionImpl(FunctionSymbol declaration, List<Term> args) {
+    return environment.term(declaration.getName(), args.toArray(new Term[args.size()]));
   }
 
   @Override

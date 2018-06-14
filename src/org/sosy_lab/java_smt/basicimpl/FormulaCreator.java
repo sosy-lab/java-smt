@@ -346,11 +346,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     return encapsulate(
         declaration.getType(),
-        callFunctionImpl((FunctionDeclarationImpl<T, TFuncDecl>) declaration, extractInfo(args)));
+        callFunctionImpl(
+            ((FunctionDeclarationImpl<T, TFuncDecl>) declaration).getSolverDeclaration(),
+            extractInfo(args)));
   }
 
-  public abstract TFormulaInfo callFunctionImpl(
-      FunctionDeclarationImpl<?, TFuncDecl> declaration, List<TFormulaInfo> args);
+  public abstract TFormulaInfo callFunctionImpl(TFuncDecl declaration, List<TFormulaInfo> args);
 
   public abstract TFuncDecl declareUFImpl(String pName, TType pReturnType, List<TType> pArgTypes);
 

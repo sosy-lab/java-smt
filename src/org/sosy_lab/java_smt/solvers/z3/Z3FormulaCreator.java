@@ -650,9 +650,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public Long callFunctionImpl(FunctionDeclarationImpl<?, Long> declaration, List<Long> args) {
-    return Native.mkApp(
-        environment, declaration.getSolverDeclaration(), args.size(), Longs.toArray(args));
+  public Long callFunctionImpl(Long declaration, List<Long> args) {
+    return Native.mkApp(environment, declaration, args.size(), Longs.toArray(args));
   }
 
   @Override

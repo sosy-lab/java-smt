@@ -420,8 +420,8 @@ class PrincessFormulaCreator
 
   @Override
   public IExpression callFunctionImpl(
-      FunctionDeclarationImpl<?, PrincessFunctionDeclaration> declaration, List<IExpression> args) {
-    return declaration.getSolverDeclaration().makeApp(environment, args);
+      PrincessFunctionDeclaration declaration, List<IExpression> args) {
+    return declaration.makeApp(environment, args);
   }
 
   @Override
