@@ -37,8 +37,9 @@ class Mathsat5IntegerFormulaManager
     extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  Mathsat5IntegerFormulaManager(Mathsat5FormulaCreator pCreator) {
-    super(pCreator);
+  Mathsat5IntegerFormulaManager(
+      Mathsat5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

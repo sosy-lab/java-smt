@@ -36,8 +36,9 @@ abstract class PrincessNumeralFormulaManager<
         ResultFormulaType,
         PrincessFunctionDeclaration> {
 
-  PrincessNumeralFormulaManager(PrincessFormulaCreator pCreator) {
-    super(pCreator);
+  PrincessNumeralFormulaManager(
+      PrincessFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

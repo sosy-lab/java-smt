@@ -39,6 +39,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
@@ -80,6 +81,15 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Default rounding mode for floating point operations.")
   private FloatingPointRoundingMode floatingPointRoundingMode =
       FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+
+  @Option(
+      secure = true,
+      description =
+          "Use non-linear arithmetic of the solver if supported and throw exception otherwise, "
+              + "approximate non-linear arithmetic with UFs if unsupported, "
+              + "or always approximate non-linear arithmetic. "
+              + "This affects only the theories of integer and rational arithmetic.")
+  private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -131,11 +141,17 @@ public class SolverContextFactory {
     switch (solverToCreate) {
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
-            config, logger, shutdownNotifier, logfile, randomSeed);
+            config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);
 
       case MATHSAT5:
         return Mathsat5SolverContext.create(
-            logger, config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
+            logger,
+            config,
+            shutdownNotifier,
+            logfile,
+            randomSeed,
+            floatingPointRoundingMode,
+            nonLinearArithmetic);
 
       case Z3:
 
@@ -143,10 +159,17 @@ public class SolverContextFactory {
         // java.library.path without affecting the main class loader.
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
             .generateSolverContext(
-                config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
+                config,
+                logger,
+                shutdownNotifier,
+                logfile,
+                randomSeed,
+                floatingPointRoundingMode,
+                nonLinearArithmetic);
 
       case PRINCESS:
-        return PrincessSolverContext.create(config, shutdownNotifier, logfile, (int) randomSeed);
+        return PrincessSolverContext.create(
+            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       default:
         throw new AssertionError("no solver selected");
@@ -208,7 +231,8 @@ public class SolverContextFactory {
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
         long randomSeed,
-        FloatingPointRoundingMode pFloatingPointRoundingMode)
+        FloatingPointRoundingMode pFloatingPointRoundingMode,
+        NonLinearArithmetic pNonLinearArithmetic)
         throws InvalidConfigurationException;
   }
 

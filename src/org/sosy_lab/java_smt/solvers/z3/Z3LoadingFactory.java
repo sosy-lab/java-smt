@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.InnerUtilFactory;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 /**
  * Entry point for loading Z3.
@@ -45,10 +46,17 @@ public class Z3LoadingFactory extends InnerUtilFactory {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
-      FloatingPointRoundingMode pFloatingPointRoundingMode)
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
 
     return Z3SolverContext.create(
-        logger, config, pShutdownNotifier, solverLogfile, randomSeed, pFloatingPointRoundingMode);
+        logger,
+        config,
+        pShutdownNotifier,
+        solverLogfile,
+        randomSeed,
+        pFloatingPointRoundingMode,
+        pNonLinearArithmetic);
   }
 }

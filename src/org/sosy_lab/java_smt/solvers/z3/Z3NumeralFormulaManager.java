@@ -33,8 +33,8 @@ abstract class Z3NumeralFormulaManager<
 
   protected final long z3context;
 
-  Z3NumeralFormulaManager(Z3FormulaCreator pCreator) {
-    super(pCreator);
+  Z3NumeralFormulaManager(Z3FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
     this.z3context = pCreator.getEnv();
   }
 

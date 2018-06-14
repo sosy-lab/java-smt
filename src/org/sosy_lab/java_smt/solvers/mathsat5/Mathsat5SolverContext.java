@@ -52,6 +52,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationTest;
 
@@ -148,7 +149,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogFile,
       long randomSeed,
-      FloatingPointRoundingMode pFloatingPointRoundingMode)
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
 
     // Init Msat
@@ -180,8 +182,10 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     // Create managers
     Mathsat5UFManager functionTheory = new Mathsat5UFManager(creator);
     Mathsat5BooleanFormulaManager booleanTheory = new Mathsat5BooleanFormulaManager(creator);
-    Mathsat5IntegerFormulaManager integerTheory = new Mathsat5IntegerFormulaManager(creator);
-    Mathsat5RationalFormulaManager rationalTheory = new Mathsat5RationalFormulaManager(creator);
+    Mathsat5IntegerFormulaManager integerTheory =
+        new Mathsat5IntegerFormulaManager(creator, pNonLinearArithmetic);
+    Mathsat5RationalFormulaManager rationalTheory =
+        new Mathsat5RationalFormulaManager(creator, pNonLinearArithmetic);
     Mathsat5BitvectorFormulaManager bitvectorTheory =
         Mathsat5BitvectorFormulaManager.create(creator);
     Mathsat5FloatingPointFormulaManager floatingPointTheory =

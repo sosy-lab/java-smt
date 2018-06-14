@@ -19,7 +19,10 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,6 +30,7 @@ import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
@@ -35,6 +39,10 @@ import org.sosy_lab.java_smt.api.NumeralFormulaManager;
  * helper for implementing {@link NumeralFormulaManager}. It handles all the unwrapping and wrapping
  * from {@link Formula} instances to solver-specific formula representations, such that the concrete
  * class needs to handle only its own internal types.
+ *
+ * @implSpec The method {@link #getFormulaType()} must be safe to be called from the constructor
+ *     (the default implementations of {@link org.sosy_lab.java_smt.api.IntegerFormulaManager} and
+ *     {@link org.sosy_lab.java_smt.api.RationalFormulaManager} satisfy this).
  */
 public abstract class AbstractNumeralFormulaManager<
         TFormulaInfo,
@@ -46,15 +54,46 @@ public abstract class AbstractNumeralFormulaManager<
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
 
+  public enum NonLinearArithmetic {
+    USE,
+    APPROXIMATE_FALLBACK,
+    APPROXIMATE_ALWAYS,
+  }
+
+  private final NonLinearArithmetic nonLinearArithmetic;
+
+  private final TFuncDecl multUfDecl;
+  private final TFuncDecl divUfDecl;
+  private final TFuncDecl modUfDecl;
+
   protected AbstractNumeralFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
+      NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator);
+    nonLinearArithmetic = checkNotNull(pNonLinearArithmetic);
+
+    multUfDecl = createBinaryFunction("*");
+    divUfDecl = createBinaryFunction("/");
+    modUfDecl = createBinaryFunction("%");
+  }
+
+  private TFuncDecl createBinaryFunction(String name) {
+    TType formulaType = toSolverType(getFormulaType());
+    return formulaCreator.declareUFImpl(
+        getFormulaType() + "_" + name + "_",
+        formulaType,
+        ImmutableList.of(formulaType, formulaType));
+  }
+
+  private TFormulaInfo makeUf(TFuncDecl decl, TFormulaInfo t1, TFormulaInfo t2) {
+    return formulaCreator.callFunctionImpl(decl, ImmutableList.of(t1, t2));
   }
 
   protected ResultFormulaType wrap(TFormulaInfo pTerm) {
     return getFormulaCreator().encapsulate(getFormulaType(), pTerm);
   }
 
+  /** Check whether the argument is a numeric constant (including negated constants). */
   protected abstract boolean isNumeral(TFormulaInfo val);
 
   @Override
@@ -191,7 +230,26 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType divide(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-    return wrap(divide(param1, param2));
+    TFormulaInfo result;
+    // division is always non-linear for ints, and for rationals if param2 is not a constant:
+    // http://smtlib.cs.uiowa.edu/logics-all.shtml#LIA
+    // http://smtlib.cs.uiowa.edu/logics-all.shtml#LRA
+    if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS
+        && (getFormulaType().equals(FormulaType.IntegerType) || !isNumeral(param2))) {
+      result = makeUf(divUfDecl, param1, param2);
+    } else {
+      try {
+        result = divide(param1, param2);
+      } catch (UnsupportedOperationException e) {
+        if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
+          result = makeUf(divUfDecl, param1, param2);
+        } else {
+          assert nonLinearArithmetic == NonLinearArithmetic.USE;
+          throw e;
+        }
+      }
+    }
+    return wrap(result);
   }
 
   /**
@@ -209,7 +267,22 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType modulo(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-    return wrap(modulo(param1, param2));
+    TFormulaInfo result;
+    if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+      result = makeUf(modUfDecl, param1, param2);
+    } else {
+      try {
+        result = modulo(param1, param2);
+      } catch (UnsupportedOperationException e) {
+        if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
+          result = makeUf(modUfDecl, param1, param2);
+        } else {
+          assert nonLinearArithmetic == NonLinearArithmetic.USE;
+          throw e;
+        }
+      }
+    }
+    return wrap(result);
   }
 
   /**
@@ -266,7 +339,24 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType multiply(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-    return wrap(multiply(param1, param2));
+    TFormulaInfo result;
+    if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS
+        && !isNumeral(param1)
+        && !isNumeral(param2)) {
+      result = makeUf(multUfDecl, param1, param2);
+    } else {
+      try {
+        result = multiply(param1, param2);
+      } catch (UnsupportedOperationException e) {
+        if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
+          result = makeUf(multUfDecl, param1, param2);
+        } else {
+          assert nonLinearArithmetic == NonLinearArithmetic.USE;
+          throw e;
+        }
+      }
+    }
+    return wrap(result);
   }
 
   /**

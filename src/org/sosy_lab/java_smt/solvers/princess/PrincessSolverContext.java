@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
@@ -50,7 +51,8 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
-      int pRandomSeed)
+      int pRandomSeed,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
     PrincessEnvironment env =
         new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
@@ -59,7 +61,8 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     // Create managers
     PrincessUFManager functionTheory = new PrincessUFManager(creator);
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
-    PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
+    PrincessIntegerFormulaManager integerTheory =
+        new PrincessIntegerFormulaManager(creator, pNonLinearArithmetic);
     PrincessBitvectorFormulaManager bitvectorTheory = new PrincessBitvectorFormulaManager(creator);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =

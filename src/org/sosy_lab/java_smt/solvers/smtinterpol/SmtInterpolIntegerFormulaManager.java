@@ -30,8 +30,9 @@ class SmtInterpolIntegerFormulaManager
     extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  SmtInterpolIntegerFormulaManager(SmtInterpolFormulaCreator pCreator) {
-    super(pCreator);
+  SmtInterpolIntegerFormulaManager(
+      SmtInterpolFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

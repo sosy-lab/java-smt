@@ -39,8 +39,9 @@ abstract class Mathsat5NumeralFormulaManager<
 
   final long mathsatEnv;
 
-  Mathsat5NumeralFormulaManager(Mathsat5FormulaCreator pCreator) {
-    super(pCreator);
+  Mathsat5NumeralFormulaManager(
+      Mathsat5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
     this.mathsatEnv = pCreator.getEnv();
   }
 

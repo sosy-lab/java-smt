@@ -34,8 +34,9 @@ class PrincessIntegerFormulaManager
     extends PrincessNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  PrincessIntegerFormulaManager(PrincessFormulaCreator pCreator) {
-    super(pCreator);
+  PrincessIntegerFormulaManager(
+      PrincessFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

@@ -43,8 +43,9 @@ abstract class SmtInterpolNumeralFormulaManager<
   protected final SmtInterpolEnvironment env;
   private final SmtInterpolFormulaCreator creator;
 
-  SmtInterpolNumeralFormulaManager(SmtInterpolFormulaCreator pCreator) {
-    super(pCreator);
+  SmtInterpolNumeralFormulaManager(
+      SmtInterpolFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
     creator = pCreator;
     env = pCreator.getEnv();
   }

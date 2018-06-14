@@ -45,6 +45,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 @Options(prefix = "solver.z3")
@@ -121,7 +122,8 @@ final class Z3SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
-      FloatingPointRoundingMode pFloatingPointRoundingMode)
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -195,8 +197,10 @@ final class Z3SolverContext extends AbstractSolverContext {
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);
     Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
-    Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
-    Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
+    Z3IntegerFormulaManager integerTheory =
+        new Z3IntegerFormulaManager(creator, pNonLinearArithmetic);
+    Z3RationalFormulaManager rationalTheory =
+        new Z3RationalFormulaManager(creator, pNonLinearArithmetic);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
     Z3FloatingPointFormulaManager floatingPointTheory =
         new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);

@@ -30,8 +30,9 @@ class Mathsat5RationalFormulaManager
     extends Mathsat5NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  Mathsat5RationalFormulaManager(Mathsat5FormulaCreator pCreator) {
-    super(pCreator);
+  Mathsat5RationalFormulaManager(
+      Mathsat5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
@@ -52,7 +53,8 @@ public class SmtInterpolSolverContext extends AbstractSolverContext {
       LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate smtLogfile,
-      long randomSeed)
+      long randomSeed,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
     SmtInterpolEnvironment env =
         new SmtInterpolEnvironment(config, logger, pShutdownNotifier, smtLogfile, randomSeed);
@@ -60,9 +62,10 @@ public class SmtInterpolSolverContext extends AbstractSolverContext {
     SmtInterpolUFManager functionTheory = new SmtInterpolUFManager(creator);
     SmtInterpolBooleanFormulaManager booleanTheory =
         new SmtInterpolBooleanFormulaManager(creator, env.getTheory());
-    SmtInterpolIntegerFormulaManager integerTheory = new SmtInterpolIntegerFormulaManager(creator);
+    SmtInterpolIntegerFormulaManager integerTheory =
+        new SmtInterpolIntegerFormulaManager(creator, pNonLinearArithmetic);
     SmtInterpolRationalFormulaManager rationalTheory =
-        new SmtInterpolRationalFormulaManager(creator);
+        new SmtInterpolRationalFormulaManager(creator, pNonLinearArithmetic);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
