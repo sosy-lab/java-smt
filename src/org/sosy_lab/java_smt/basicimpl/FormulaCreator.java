@@ -352,6 +352,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public abstract TFormulaInfo callFunctionImpl(
       FunctionDeclarationImpl<?, TFuncDecl> declaration, List<TFormulaInfo> args);
 
+  public abstract TFuncDecl declareUFImpl(String pName, TType pReturnType, List<TType> pArgTypes);
+
   public TFuncDecl getBooleanVarDeclaration(BooleanFormula var) {
     return getBooleanVarDeclarationImpl(extractInfo(var));
   }

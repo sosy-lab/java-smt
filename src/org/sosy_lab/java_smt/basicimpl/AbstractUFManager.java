@@ -46,9 +46,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     super(pCreator);
   }
 
-  protected abstract TFunctionDecl declareUninterpretedFunctionImpl(
-      String pName, TType pReturnType, List<TType> pArgTypes);
-
   @Override
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
@@ -63,7 +60,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
         FunctionDeclarationKind.UF,
         pArgTypes,
         pReturnType,
-        declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes));
+        formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
   }
 
   @Override

@@ -279,6 +279,12 @@ class SmtInterpolFormulaCreator
   }
 
   @Override
+  public FunctionSymbol declareUFImpl(String pName, Sort returnType, List<Sort> pArgs) {
+    Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
+    return environment.declareFun(pName, types, returnType);
+  }
+
+  @Override
   public Term callFunctionImpl(
       FunctionDeclarationImpl<?, FunctionSymbol> declaration, List<Term> args) {
     return environment.term(

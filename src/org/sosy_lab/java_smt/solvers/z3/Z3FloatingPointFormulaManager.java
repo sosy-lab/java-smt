@@ -32,17 +32,13 @@ class Z3FloatingPointFormulaManager
 
   private static final FloatingPointType highPrec = FormulaType.getFloatingPointType(15, 112);
 
-  private final Z3UFManager ufmgr;
   private final long z3context;
   private final long roundingMode;
 
   Z3FloatingPointFormulaManager(
-      Z3FormulaCreator creator,
-      Z3UFManager pUFMgr,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+      Z3FormulaCreator creator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(creator);
     z3context = creator.getEnv();
-    ufmgr = pUFMgr;
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -181,10 +177,11 @@ class Z3FloatingPointFormulaManager
   private Long genericCast(Long pNumber, FormulaType<?> pTargetType) {
     FormulaType<?> argType = getFormulaCreator().getFormulaType(pNumber);
     long castFuncDecl =
-        ufmgr.declareUninterpretedFunctionImpl(
-            "__cast_" + argType + "_to_" + pTargetType,
-            toSolverType(pTargetType),
-            ImmutableList.of(toSolverType(argType)));
+        getFormulaCreator()
+            .declareUFImpl(
+                "__cast_" + argType + "_to_" + pTargetType,
+                toSolverType(pTargetType),
+                ImmutableList.of(toSolverType(argType)));
     return Native.mkApp(z3context, castFuncDecl, 1, new long[] {pNumber});
   }
 

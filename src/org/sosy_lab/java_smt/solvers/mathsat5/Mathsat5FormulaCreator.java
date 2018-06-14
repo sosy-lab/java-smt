@@ -73,6 +73,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_function_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
@@ -501,6 +502,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     // TODO: calculate negative value?
     String term = matcher.group(1);
     return new BigInteger(term);
+  }
+
+  @Override
+  public Long declareUFImpl(String pName, Long returnType, List<Long> pArgTypes) {
+    long[] types = Longs.toArray(pArgTypes);
+    long msatFuncType = msat_get_function_type(environment, types, types.length, returnType);
+    long decl = msat_declare_function(environment, pName, msatFuncType);
+    return decl;
   }
 
   @Override

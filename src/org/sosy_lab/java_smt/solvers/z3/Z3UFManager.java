@@ -19,28 +19,11 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.primitives.Longs;
-import com.microsoft.z3.Native;
-import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class Z3UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 
-  private final long z3context;
-
   Z3UFManager(Z3FormulaCreator creator) {
     super(creator);
-    this.z3context = creator.getEnv();
-  }
-
-  @Override
-  protected Long declareUninterpretedFunctionImpl(
-      String pName, Long returnType, List<Long> pArgTypes) {
-
-    long symbol = Native.mkStringSymbol(z3context, pName);
-    long[] sorts = Longs.toArray(pArgTypes);
-    long func = Native.mkFuncDecl(z3context, symbol, sorts.length, sorts, returnType);
-    Native.incRef(z3context, func);
-    return func;
   }
 }
