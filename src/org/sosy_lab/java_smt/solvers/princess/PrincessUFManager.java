@@ -28,17 +28,8 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 class PrincessUFManager
     extends AbstractUFManager<IExpression, PrincessFunctionDeclaration, Sort, PrincessEnvironment> {
 
-  private final PrincessFormulaCreator creator;
-
   PrincessUFManager(PrincessFormulaCreator creator) {
     super(creator);
-    this.creator = creator;
-  }
-
-  @Override
-  protected IExpression createUninterpretedFunctionCallImpl(
-      PrincessFunctionDeclaration pFuncDecl, List<IExpression> pArgs) {
-    return creator.makeFunction(pFuncDecl, pArgs);
   }
 
   @Override

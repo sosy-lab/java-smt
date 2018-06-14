@@ -41,12 +41,6 @@ class Mathsat5UFManager extends AbstractUFManager<Long, Long, Long, Long> {
   }
 
   @Override
-  protected Long createUninterpretedFunctionCallImpl(Long funcDecl, List<Long> pArgs) {
-    long[] args = Longs.toArray(pArgs);
-    return createUIFCallImpl(funcDecl, args);
-  }
-
-  @Override
   protected Long declareUninterpretedFunctionImpl(
       String pName, Long returnType, List<Long> pArgTypes) {
     long[] types = Longs.toArray(pArgTypes);

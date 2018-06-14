@@ -73,9 +73,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     return declareUF(pName, pReturnType, Arrays.asList(pArgs));
   }
 
-  protected abstract TFormulaInfo createUninterpretedFunctionCallImpl(
-      TFunctionDecl func, List<TFormulaInfo> pArgs);
-
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     return formulaCreator.callFunction(funcType, Arrays.asList(args));

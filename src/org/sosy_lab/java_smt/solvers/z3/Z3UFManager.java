@@ -34,11 +34,6 @@ class Z3UFManager extends AbstractUFManager<Long, Long, Long, Long> {
   }
 
   @Override
-  protected Long createUninterpretedFunctionCallImpl(Long funcDecl, List<Long> pArgs) {
-    return Native.mkApp(z3context, funcDecl, pArgs.size(), Longs.toArray(pArgs));
-  }
-
-  @Override
   protected Long declareUninterpretedFunctionImpl(
       String pName, Long returnType, List<Long> pArgTypes) {
 

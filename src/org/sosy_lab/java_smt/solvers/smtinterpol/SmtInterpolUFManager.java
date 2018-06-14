@@ -33,12 +33,6 @@ class SmtInterpolUFManager
   }
 
   @Override
-  public Term createUninterpretedFunctionCallImpl(FunctionSymbol funcDecl, List<Term> pArgs) {
-    Term[] args = pArgs.toArray(new Term[pArgs.size()]);
-    return funcDecl.getTheory().term(funcDecl, args);
-  }
-
-  @Override
   protected FunctionSymbol declareUninterpretedFunctionImpl(
       String pName, Sort returnType, List<Sort> pArgs) {
     Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
