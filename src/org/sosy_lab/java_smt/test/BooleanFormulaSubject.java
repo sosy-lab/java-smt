@@ -102,7 +102,8 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   /** Check that the subject is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    if (context.getFormulaManager().getBooleanFormulaManager().isFalse(actual())) {
+    final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
+    if (bmgr.isFalse(actual())) {
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
@@ -116,6 +117,12 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       // Try to report unsat core for failure message if the solver supports it.
+      for (BooleanFormula part : bmgr.toConjunctionArgs(actual(), true)) {
+        prover.push(part);
+      }
+      if (!prover.isUnsat()) {
+        throw new AssertionError("repated satisfiability check returned different result");
+      }
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
       if (unsatCore.isEmpty() || (unsatCore.size() == 1 && actual().equals(unsatCore.get(0)))) {
         // empty or trivial unsat core
