@@ -19,14 +19,9 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static com.google.common.base.Verify.verify;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_divide;
 
-import com.google.common.base.Splitter;
 import java.math.BigDecimal;
-import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -56,26 +51,6 @@ class Mathsat5RationalFormulaManager
 
   @Override
   public Long divide(Long pNumber1, Long pNumber2) {
-    if (!isNumeral(pNumber2)) {
-      return super.divide(pNumber1, pNumber2);
-    }
-    long mathsatEnv = getFormulaCreator().getEnv();
-    long t1 = pNumber1;
-    long t2 = pNumber2;
-
-    // invert t2 and multiply with it
-    String n = msat_term_repr(t2);
-    if (n.startsWith("(")) {
-      n = n.substring(1, n.length() - 1);
-    }
-    List<String> frac = Splitter.on('/').splitToList(n);
-    if (frac.size() == 1) {
-      n = "1/" + n;
-    } else {
-      verify(frac.size() == 2);
-      n = frac.get(1) + "/" + frac.get(0);
-    }
-    t2 = msat_make_number(mathsatEnv, n);
-    return msat_make_times(mathsatEnv, t2, t1);
+    return msat_make_divide(mathsatEnv, pNumber1, pNumber2);
   }
 }

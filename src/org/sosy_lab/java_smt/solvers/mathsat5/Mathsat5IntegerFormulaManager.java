@@ -19,16 +19,17 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static com.google.common.base.Verify.verify;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_divide;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_floor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_modular_congruence;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_term_ite;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import com.google.common.base.Splitter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -55,30 +56,27 @@ class Mathsat5IntegerFormulaManager
     return decimalAsInteger(pNumber);
   }
 
+  private long ceil(long t) {
+    final long minusOne = msat_make_number(mathsatEnv, "-1");
+    return msat_make_times(
+        mathsatEnv,
+        msat_make_floor(mathsatEnv, msat_make_times(mathsatEnv, t, minusOne)),
+        minusOne);
+  }
+
   @Override
   public Long divide(Long pNumber1, Long pNumber2) {
-    if (!isNumeral(pNumber2)) {
-      return super.divide(pNumber1, pNumber2);
-    }
-    long mathsatEnv = getFormulaCreator().getEnv();
-    long t1 = pNumber1;
-    long t2 = pNumber2;
-
-    // invert t2 and multiply with it
-    String n = msat_term_repr(t2);
-    if (n.startsWith("(")) {
-      n = n.substring(1, n.length() - 1);
-    }
-    List<String> frac = Splitter.on('/').splitToList(n);
-    if (frac.size() == 1) {
-      // cannot multiply with term 1/n because the result will have type rat instead of int
-      return super.divide(pNumber1, pNumber2);
-    } else {
-      verify(frac.size() == 2);
-      n = frac.get(1) + "/" + frac.get(0);
-    }
-    t2 = msat_make_number(mathsatEnv, n);
-    return msat_make_times(mathsatEnv, t2, t1);
+    // Follow SMTLib rounding definition (http://smtlib.cs.uiowa.edu/theories-Ints.shtml):
+    // (t2 <= 0) ? ceil(t1/t2) : floor(t1/t2)
+    // (t2 <= 0) ? -floor(-(t1/t2)) : floor(t1/2)
+    // According to Alberto Griggio, it is not worth hand-optimizing this,
+    // MathSAT will simplify this to something like floor(1/t2 * t1) for linear queries anyway.
+    final long div = msat_make_divide(mathsatEnv, pNumber1, pNumber2);
+    return msat_make_term_ite(
+        mathsatEnv,
+        msat_make_leq(mathsatEnv, pNumber2, msat_make_int_number(mathsatEnv, 0)),
+        ceil(div),
+        msat_make_floor(mathsatEnv, div));
   }
 
   @Override
@@ -92,7 +90,6 @@ class Mathsat5IntegerFormulaManager
   }
 
   protected Long modularCongruence0(Long pNumber1, Long pNumber2, String pModulo) {
-    return msat_make_int_modular_congruence(
-        getFormulaCreator().getEnv(), pModulo, pNumber1, pNumber2);
+    return msat_make_int_modular_congruence(mathsatEnv, pModulo, pNumber1, pNumber2);
   }
 }

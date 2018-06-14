@@ -37,7 +37,7 @@ abstract class Mathsat5NumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
 
-  private final long mathsatEnv;
+  final long mathsatEnv;
 
   Mathsat5NumeralFormulaManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);

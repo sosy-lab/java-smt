@@ -136,7 +136,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       throw new AssumptionViolatedException("Support for operation DIV is optional", e);
     }
     BooleanFormula fADiv3 = imgr.equal(imgr.divide(a, num3), num3);
-    BooleanFormula fAMod5 = imgr.equal(imgr.modulo(a, num5), num0);
+    BooleanFormula fAMod5;
+    try {
+      fAMod5 = imgr.equal(imgr.modulo(a, num5), num0);
+    } catch (UnsupportedOperationException e) {
+      throw new AssumptionViolatedException("Support for operation MOD is optional", e);
+    }
     BooleanFormula fAMod3 = imgr.equal(imgr.modulo(a, num3), num1);
 
     // check division-by-constant, a=10 && b=2 && a/5=b
@@ -210,7 +215,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     }
     BooleanFormula fADiv3 = imgr.equal(imgr.divide(a, num3), numNeg4);
     BooleanFormula fADivNeg3 = imgr.equal(imgr.divide(a, numNeg3), num4);
-    BooleanFormula fAMod5 = imgr.equal(imgr.modulo(a, num5), num0);
+    BooleanFormula fAMod5;
+    try {
+      fAMod5 = imgr.equal(imgr.modulo(a, num5), num0);
+    } catch (UnsupportedOperationException e) {
+      throw new AssumptionViolatedException("Support for operation MOD is optional", e);
+    }
     BooleanFormula fAMod3 = imgr.equal(imgr.modulo(a, num3), num2);
     BooleanFormula fAModNeg3 = imgr.equal(imgr.modulo(a, numNeg3), num2);
 
@@ -954,6 +964,32 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(z_equal_x_div_y);
       assertThat(env).isUnsatisfiable();
     }
+  }
+
+  @Test
+  public void integerDivisionRounding() throws SolverException, InterruptedException {
+    IntegerFormula varSeven = imgr.makeVariable("a");
+    IntegerFormula varEight = imgr.makeVariable("b");
+
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula three = imgr.makeNumber(3);
+
+    // Test that 8/3 and 7/3 are rounded as expected for all combinations of positive/negative
+    // numbers
+    BooleanFormula f =
+        bmgr.and(
+            imgr.equal(varSeven, imgr.makeNumber(7)),
+            imgr.equal(varEight, imgr.makeNumber(8)),
+            imgr.equal(imgr.divide(varSeven, three), two),
+            imgr.equal(imgr.divide(imgr.negate(varSeven), three), imgr.negate(three)),
+            imgr.equal(imgr.divide(varSeven, imgr.negate(three)), imgr.negate(two)),
+            imgr.equal(imgr.divide(imgr.negate(varSeven), imgr.negate(three)), three),
+            imgr.equal(imgr.divide(varEight, three), two),
+            imgr.equal(imgr.divide(imgr.negate(varEight), three), imgr.negate(three)),
+            imgr.equal(imgr.divide(varEight, imgr.negate(three)), imgr.negate(two)),
+            imgr.equal(imgr.divide(imgr.negate(varEight), imgr.negate(three)), three));
+
+    assertThatFormula(f).isSatisfiable();
   }
 
   @Test
