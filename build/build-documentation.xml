@@ -50,6 +50,9 @@
             <link href="https://google.github.io/truth/api/latest/"/>
             <link href="https://sosy-lab.github.io/java-common-lib/api/"/>
             <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
+            <tag name="apiNote" description="API Note:"/>
+            <tag name="implSpec" description="Implementation Requirements:"/>
+            <tag name="implNote" description="Implementation Note:"/>
         </javadoc>
     </target>
 
