@@ -27,7 +27,7 @@
         <echo message="Options collected." level="info"/>
     </target>
 
-    <target name="javadoc">
+    <target name="javadoc" depends="build-project">
         <javadoc
             destdir="${documentation.javadoc.dir}"
             classpathref="classpath"
