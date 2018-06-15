@@ -207,7 +207,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator) {
     final T result;
-    if (FormulaManager.isValidName(varname)) {
+    if (!FormulaManager.isValidName(varname)) {
       try {
         result = creator.apply(varname);
       } catch (IllegalArgumentException e) {

@@ -266,7 +266,7 @@ public interface FormulaManager {
     if (FormulaManager.SMTLIB2_KEYWORDS.contains(pVar)) {
       return false;
     }
-    if (Iterables.all(FormulaManager.DISALLOWED_CHARACTERS, c -> pVar.indexOf(c) == -1)) {
+    if (Iterables.any(FormulaManager.DISALLOWED_CHARACTERS, c -> pVar.indexOf(c) != -1)) {
       return false;
     }
     return true;
