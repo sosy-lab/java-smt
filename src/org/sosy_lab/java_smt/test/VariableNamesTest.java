@@ -27,7 +27,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,6 +46,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -184,8 +184,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public static List<Object[]> getAllCombinations() {
     List<String> allNames =
         from(NAMES)
-            .append(Formula.BASIC_OPERATORS)
-            .append(Formula.SMTLIB2_KEYWORDS)
+            .append(FormulaManager.BASIC_OPERATORS)
+            .append(FormulaManager.SMTLIB2_KEYWORDS)
             .append(FURTHER_SMTLIB2_KEYWORDS)
             .append(UNSUPPORTED_NAMES)
             .toList();
@@ -207,9 +207,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator) {
     final T result;
-    if (Formula.BASIC_OPERATORS.contains(varname)
-        || Formula.SMTLIB2_KEYWORDS.contains(varname)
-        || Iterables.any(Formula.DISALLOWED_CHARACTERS, c -> varname.indexOf(c) != -1)) {
+    if (FormulaManager.isValidName(varname)) {
       try {
         result = creator.apply(varname);
       } catch (IllegalArgumentException e) {

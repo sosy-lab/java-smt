@@ -50,8 +50,8 @@ public interface UFManager {
    * Declares and calls an uninterpreted function with exactly the given name.
    *
    * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
-   * Formula#BASIC_OPERATORS}, {@link Formula#SMTLIB2_KEYWORDS}, and {@link
-   * Formula#DISALLOWED_CHARACTERS} for further information.
+   * FormulaManager#BASIC_OPERATORS}, {@link FormulaManager#SMTLIB2_KEYWORDS}, and {@link
+   * FormulaManager#DISALLOWED_CHARACTERS} for further information.
    *
    * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
    * {@link Formula#toString} can return a different String than the given one.

@@ -20,9 +20,11 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 /**
@@ -75,15 +77,21 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
     return t;
   }
 
+  /**
+   * This method is similar to {@link FormulaManager#isValidName} and throws an exception for
+   * invalid symbol names. While {@link FormulaManager#isValidName} can be used from users, this
+   * method should be used internally to validate user-given symbol names.
+   */
   protected static void checkVariableName(final String pVar) {
     Preconditions.checkArgument(!pVar.isEmpty(), "Identifier for variable should not be empty.");
     Preconditions.checkArgument(
-        !Formula.BASIC_OPERATORS.contains(pVar), "Identifier should not be a simple operator.");
+        !FormulaManager.BASIC_OPERATORS.contains(pVar),
+        "Identifier should not be a simple operator.");
     Preconditions.checkArgument(
-        !Formula.SMTLIB2_KEYWORDS.contains(pVar),
+        !FormulaManager.SMTLIB2_KEYWORDS.contains(pVar),
         "Identifier should not be a keyword of SMT-LIB2.");
     Preconditions.checkArgument(
-        Iterables.all(Formula.DISALLOWED_CHARACTERS, c -> pVar.indexOf(c) == -1),
+        Iterables.all(ImmutableSet.of('|', '\\'), c -> pVar.indexOf(c) == -1),
         "Identifier should contain an escape character of SMT-LIB2.");
   }
 }

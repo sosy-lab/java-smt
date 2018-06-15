@@ -19,43 +19,10 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.collect.ImmutableSet;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
 /** An arbitrary SMT formula. */
 public interface Formula {
-
-  /**
-   * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
-  ImmutableSet<String> BASIC_OPERATORS =
-      ImmutableSet.of("!", "+", "-", "*", "/", "=", "<", ">", "<=", ">=");
-
-  /**
-   * Avoid using basic keywords of SMT-LIB2 as names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
-  ImmutableSet<String> SMTLIB2_KEYWORDS =
-      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct");
-
-  /**
-   * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
-  ImmutableSet<Character> DISALLOWED_CHARACTERS = ImmutableSet.of('|', '\\');
 
   /**
    * returns an arbitrary representation of the formula, might be human- or machine-readable.
