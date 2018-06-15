@@ -45,7 +45,7 @@ public class ExceptionHandlerTest extends SolverBasedTest0 {
 
   @Test(expected = Exception.class)
   @SuppressWarnings("CheckReturnValue")
-  public void testErrorHandling() throws Exception {
+  public void testErrorHandling() {
     // Will exit(1) without an exception handler.
     rmgr.makeNumber("not-a-number");
   }

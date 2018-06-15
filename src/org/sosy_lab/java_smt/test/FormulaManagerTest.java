@@ -191,7 +191,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void variableNameExtractorTest() throws Exception {
+  public void variableNameExtractorTest() {
     BooleanFormula constr =
         bmgr.or(
             imgr.equal(
@@ -204,7 +204,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void ufNameExtractorTest() throws Exception {
+  public void ufNameExtractorTest() {
     BooleanFormula constraint =
         imgr.equal(
             fmgr.declareAndCallUF(

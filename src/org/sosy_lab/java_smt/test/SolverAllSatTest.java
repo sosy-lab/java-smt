@@ -109,7 +109,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     }
 
     @Override
-    public String getResult() throws InterruptedException {
+    public String getResult() {
       return EXPECTED_RESULT;
     }
   }

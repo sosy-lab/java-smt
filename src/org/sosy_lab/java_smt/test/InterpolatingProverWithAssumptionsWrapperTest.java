@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
 
@@ -29,8 +28,7 @@ public class InterpolatingProverWithAssumptionsWrapperTest
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes", "resource"})
-  protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
-      throws InvalidConfigurationException {
+  protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
     final InterpolatingProverEnvironment<?> proverEnvironment =
         context.newProverEnvironmentWithInterpolation();
     return new InterpolatingProverWithAssumptionsWrapper(proverEnvironment, mgr);

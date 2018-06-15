@@ -248,7 +248,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testVisitingTrue() throws Exception {
+  public void testVisitingTrue() {
 
     // Check that "true" is correctly treated as a constant.
     BooleanFormula t = bmgr.makeBoolean(true);
@@ -273,7 +273,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testCorrectFunctionNames() throws Exception {
+  public void testCorrectFunctionNames() {
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula ab = bmgr.and(a, b);
@@ -350,7 +350,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void booleanRecursiveTraversalTest() throws Exception {
+  public void booleanRecursiveTraversalTest() {
     BooleanFormula f =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("x"), bmgr.makeVariable("y")),
@@ -380,7 +380,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testTransformationInsideQuantifiers() throws Exception {
+  public void testTransformationInsideQuantifiers() {
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()

@@ -161,7 +161,7 @@ public abstract class SolverBasedTest0 {
   }
 
   @After
-  public final void closeSolver() throws Exception {
+  public final void closeSolver() {
     if (context != null) {
       context.close();
     }

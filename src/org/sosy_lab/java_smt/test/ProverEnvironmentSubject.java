@@ -89,7 +89,7 @@ public class ProverEnvironmentSubject
     // get unsat core for failure message if possible
     if (actual() instanceof ProverEnvironment) {
       try {
-        final List<BooleanFormula> unsatCore = ((ProverEnvironment) actual()).getUnsatCore();
+        final List<BooleanFormula> unsatCore = actual().getUnsatCore();
         if (!unsatCore.isEmpty()) {
           failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
           return;
