@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -35,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import org.junit.Assert;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -215,10 +215,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
     if (!mgr.isValidName(varname)) {
       try {
         result = creator.apply(varname);
+        fail();
       } catch (IllegalArgumentException e) {
         throw new AssumptionViolatedException("unsupported variable name", e);
       }
-      Assert.assertTrue("should not be reachable", false);
     } else {
       result = creator.apply(varname);
     }
@@ -268,7 +268,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     varname = "|" + varname + "|";
     @SuppressWarnings("unused")
     T var3 = createVariableWith(creator);
-    Assert.assertTrue("should not be reachable", false);
+    fail();
   }
 
   @Test
@@ -440,10 +440,9 @@ public class VariableNamesTest extends SolverBasedTest0 {
       try {
         // should throw exception
         AbstractFormulaManager.checkVariableName(varname);
+        fail();
       } catch (IllegalArgumentException e) {
-        throw new AssumptionViolatedException("unsupported variable name", e);
       }
-      Assert.assertTrue("should not be reachable", false);
     }
   }
 }
