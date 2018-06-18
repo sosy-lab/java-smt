@@ -141,10 +141,8 @@ deploy-coverage:
       - $CI_PROJECT_PATH == $PROJECT_PATH # not on forks
   except:
     variables:
-      - $CODACY_PROJECT_TOKEN == '' # required for job
-      - $CODACY_PROJECT_TOKEN == null
-      - $GH_TOKEN == '' # required for job
-      - $GH_TOKEN == null
+      - $CODACY_PROJECT_TOKEN == null # required for job
+      - $GH_TOKEN == null # required for job
   cache:
     paths:
       - "codacy-coverage-reporter-assembly*.jar"
@@ -162,5 +160,4 @@ deploy-gh-pages:
       - $CI_PROJECT_PATH == $PROJECT_PATH # not on forks
   except:
     variables:
-      - $GH_TOKEN == '' # required for job
-      - $GH_TOKEN == null
+      - $GH_TOKEN == null # required for job
