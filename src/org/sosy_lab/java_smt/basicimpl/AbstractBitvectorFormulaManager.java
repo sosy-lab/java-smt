@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -245,7 +246,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeVariable(int pLength, String pVar) {
-    AbstractFormulaManager.checkVariableName(pVar);
+    checkVariableName(pVar);
     return wrap(makeVariableImpl(pLength, pVar));
   }
 

@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Lists;
 import java.util.Arrays;
@@ -84,7 +85,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
-    AbstractFormulaManager.checkVariableName(name);
+    checkVariableName(name);
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     return callUF(func, pArgs);
@@ -93,7 +94,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    AbstractFormulaManager.checkVariableName(name);
+    checkVariableName(name);
     return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
 }

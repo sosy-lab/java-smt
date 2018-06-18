@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -69,7 +70,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula makeVariable(String pVar) {
-    AbstractFormulaManager.checkVariableName(pVar);
+    checkVariableName(pVar);
     return wrap(makeVariableImpl(pVar));
   }
 
