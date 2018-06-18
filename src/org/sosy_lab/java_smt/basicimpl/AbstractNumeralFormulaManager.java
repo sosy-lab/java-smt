@@ -179,7 +179,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeVariable(String pVar) {
-    checkVariableName(pVar);
+    AbstractFormulaManager.checkVariableName(pVar);
     return wrap(makeVariableImpl(pVar));
   }
 

@@ -46,7 +46,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -54,6 +53,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 @RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
@@ -162,6 +162,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "set-logic",
           "set-option");
 
+  /**
+   * Some special chars are not allowed to appear in symbol names. See {@link
+   * AbstractFormulaManager#DISALLOWED_CHARACTERS}.
+   */
+  @SuppressWarnings("javadoc")
   private static final ImmutableSet<String> UNSUPPORTED_NAMES =
       ImmutableSet.of(
           "|",
@@ -184,8 +189,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public static List<Object[]> getAllCombinations() {
     List<String> allNames =
         from(NAMES)
-            .append(FormulaManager.BASIC_OPERATORS)
-            .append(FormulaManager.SMTLIB2_KEYWORDS)
+            .append(AbstractFormulaManager.BASIC_OPERATORS)
+            .append(AbstractFormulaManager.SMTLIB2_KEYWORDS)
             .append(FURTHER_SMTLIB2_KEYWORDS)
             .append(UNSUPPORTED_NAMES)
             .toList();
@@ -207,7 +212,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator) {
     final T result;
-    if (!FormulaManager.isValidName(varname)) {
+    if (!mgr.isValidName(varname)) {
       try {
         result = creator.apply(varname);
       } catch (IllegalArgumentException e) {

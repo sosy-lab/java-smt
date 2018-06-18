@@ -69,7 +69,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula makeVariable(String pVar) {
-    checkVariableName(pVar);
+    AbstractFormulaManager.checkVariableName(pVar);
     return wrap(makeVariableImpl(pVar));
   }
 

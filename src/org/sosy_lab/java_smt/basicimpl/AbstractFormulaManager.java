@@ -21,7 +21,11 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,6 +58,40 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
  */
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FormulaManager {
+
+  /**
+   * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
+   *
+   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
+   * misguide the user. Most solvers even would allow such identifiers directly, currently only
+   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
+   * solvers.
+   */
+  @VisibleForTesting
+  public static final ImmutableSet<String> BASIC_OPERATORS =
+      ImmutableSet.of("!", "+", "-", "*", "/", "%", "=", "<", ">", "<=", ">=");
+
+  /**
+   * Avoid using basic keywords of SMT-LIB2 as names for symbols.
+   *
+   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
+   * misguide the user. Most solvers even would allow such identifiers directly, currently only
+   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
+   * solvers.
+   */
+  @VisibleForTesting
+  public static final ImmutableSet<String> SMTLIB2_KEYWORDS =
+      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct");
+
+  /**
+   * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
+   *
+   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
+   * misguide the user. Most solvers even would allow such identifiers directly, currently only
+   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
+   * solvers.
+   */
+  static final CharMatcher DISALLOWED_CHARACTERS = CharMatcher.anyOf("|\\");
 
   private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       arrayManager;
@@ -307,7 +345,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
-    AbstractBaseFormulaManager.checkVariableName(name);
+    AbstractFormulaManager.checkVariableName(name);
     Formula t;
     if (formulaType.isBooleanType()) {
       t = booleanManager.makeVariable(name);
@@ -379,5 +417,56 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             }
           }
         });
+  }
+
+  /**
+   * Check whether the given String can be used as symbol/name for variables or undefined functions.
+   * We disallow some keywords from SMTLib2 and other basic operators to be used as symbols.
+   *
+   * <p>This method must be kept in sync with {@link #checkVariableName}.
+   */
+  @Override
+  public boolean isValidName(String pVar) {
+    if (pVar.isEmpty()) {
+      return false;
+    }
+    if (BASIC_OPERATORS.contains(pVar)) {
+      return false;
+    }
+    if (SMTLIB2_KEYWORDS.contains(pVar)) {
+      return false;
+    }
+    if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method is similar to {@link #isValidName} and throws an exception for invalid symbol
+   * names. While {@link #isValidName} can be used from users, this method should be used internally
+   * to validate user-given symbol names.
+   *
+   * <p>This method must be kept in sync with {@link #isValidName}.
+   */
+  static void checkVariableName(final String variableName) {
+    final String help = "Use FormulaManager#isValidName to check your identifier before using it.";
+    Preconditions.checkArgument(
+        !variableName.isEmpty(), "Identifier for variable should not be empty.");
+    Preconditions.checkArgument(
+        !AbstractFormulaManager.BASIC_OPERATORS.contains(variableName),
+        "Identifier '%s' should not be a simple operator. %s",
+        variableName,
+        help);
+    Preconditions.checkArgument(
+        !AbstractFormulaManager.SMTLIB2_KEYWORDS.contains(variableName),
+        "Identifier '%s' should not be a keyword of SMT-LIB2. ",
+        variableName,
+        help);
+    Preconditions.checkArgument(
+        AbstractFormulaManager.DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
+        "Identifier '%s' should contain an escape character of SMT-LIB2. ",
+        variableName,
+        help);
   }
 }

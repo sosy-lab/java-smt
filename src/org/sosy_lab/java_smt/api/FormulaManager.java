@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.List;
 import java.util.Map;
@@ -31,38 +29,6 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
-
-  /**
-   * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
-  ImmutableSet<String> BASIC_OPERATORS =
-      ImmutableSet.of("!", "+", "-", "*", "/", "%", "=", "<", ">", "<=", ">=");
-
-  /**
-   * Avoid using basic keywords of SMT-LIB2 as names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
-  ImmutableSet<String> SMTLIB2_KEYWORDS =
-      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct");
-
-  /**
-   * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
-  ImmutableSet<Character> DISALLOWED_CHARACTERS = ImmutableSet.of('|', '\\');
 
   /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
@@ -255,21 +221,6 @@ public interface FormulaManager {
 
   /**
    * Check whether the given String can be used as symbol/name for variables or undefined functions.
-   * We disallow some keywords from SMTLib2 and other basic operators to be used as symbols.
    */
-  static boolean isValidName(String pVar) {
-    if (pVar.isEmpty()) {
-      return false;
-    }
-    if (FormulaManager.BASIC_OPERATORS.contains(pVar)) {
-      return false;
-    }
-    if (FormulaManager.SMTLIB2_KEYWORDS.contains(pVar)) {
-      return false;
-    }
-    if (Iterables.any(FormulaManager.DISALLOWED_CHARACTERS, c -> pVar.indexOf(c) != -1)) {
-      return false;
-    }
-    return true;
-  }
+  boolean isValidName(String variableName);
 }

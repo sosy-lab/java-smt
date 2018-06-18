@@ -245,7 +245,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeVariable(int pLength, String pVar) {
-    checkVariableName(pVar);
+    AbstractFormulaManager.checkVariableName(pVar);
     return wrap(makeVariableImpl(pLength, pVar));
   }
 

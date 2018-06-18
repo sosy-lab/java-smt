@@ -51,8 +51,7 @@ public interface ArrayFormulaManager {
    * Declare a new array with exactly the given name.
    *
    * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
-   * FormulaManager#BASIC_OPERATORS}, {@link FormulaManager#SMTLIB2_KEYWORDS}, and {@link
-   * FormulaManager#DISALLOWED_CHARACTERS} for further information.
+   * FormulaManager#isValidName} for further information.
    *
    * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
    * {@link Formula#toString} can return a different String than the given one.
