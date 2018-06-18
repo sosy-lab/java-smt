@@ -41,7 +41,8 @@ public interface FormulaManager {
    * solvers.
    */
   ImmutableSet<String> BASIC_OPERATORS =
-      ImmutableSet.of("!", "+", "-", "*", "/", "=", "<", ">", "<=", ">=");
+      ImmutableSet.of("!", "+", "-", "*", "/", "%", "=", "<", ">", "<=", ">=");
+
   /**
    * Avoid using basic keywords of SMT-LIB2 as names for symbols.
    *
