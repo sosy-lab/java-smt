@@ -449,7 +449,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * <p>This method must be kept in sync with {@link #isValidName}.
    */
-  static void checkVariableName(final String variableName) {
+  @VisibleForTesting
+  public static void checkVariableName(final String variableName) {
     final String help = "Use FormulaManager#isValidName to check your identifier before using it.";
     Preconditions.checkArgument(
         !variableName.isEmpty(), "Identifier for variable should not be empty.");

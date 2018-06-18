@@ -430,4 +430,20 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireArrays();
     createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType));
   }
+
+  @Test
+  public void sameBehaviorTest() {
+    if (mgr.isValidName(varname)) {
+      // should pass without exception
+      AbstractFormulaManager.checkVariableName(varname);
+    } else {
+      try {
+        // should throw exception
+        AbstractFormulaManager.checkVariableName(varname);
+      } catch (IllegalArgumentException e) {
+        throw new AssumptionViolatedException("unsupported variable name", e);
+      }
+      Assert.assertTrue("should not be reachable", false);
+    }
+  }
 }
