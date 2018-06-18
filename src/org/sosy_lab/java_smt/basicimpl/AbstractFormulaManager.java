@@ -461,13 +461,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         help);
     Preconditions.checkArgument(
         !AbstractFormulaManager.SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' should not be a keyword of SMT-LIB2. ",
+        "Identifier '%s' should not be a keyword of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         AbstractFormulaManager.DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
-        "Identifier '%s' should contain an escape character of SMT-LIB2. ",
+        "Identifier '%s' should contain an escape character %s of SMT-LIB2. %s",
         variableName,
+        DISALLOWED_CHARACTERS, // toString prints UTF8-encoded escape sequence, better than nothing.
         help);
   }
 }
