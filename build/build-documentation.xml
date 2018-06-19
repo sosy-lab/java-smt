@@ -9,6 +9,7 @@
     <!-- These properties can be overridden from including file. -->
     <property name="documentation.options.file" value="${class.dir}/org/sosy_lab/${package}/ConfigurationOptions.txt"/>
     <property name="documentation.javadoc.dir" value="Javadoc"/>
+    <property name="documentation.javadoc.exclude" value=""/>
 
     <target name="collect-options" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
@@ -37,14 +38,11 @@
             failonerror="true"
             failonwarning="true"
             overview="doc/javadoc_overview.html"
+            excludepackagenames="${documentation.javadoc.exclude}"
             >
 
             <fileset dir="${source.dir}" defaultexcludes="yes">
                 <exclude name="**/*Test.java"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/mathsat5/*"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/princess/*"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/smtinterpol/*"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/z3/*"/>
             </fileset>
             <link href="https://docs.oracle.com/javase/8/docs/api/"/>
             <link href="https://google.github.io/guava/releases/snapshot/api/docs/"/>
