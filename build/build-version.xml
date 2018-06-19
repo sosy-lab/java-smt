@@ -4,7 +4,10 @@
 
     <!-- Targets for determining the version number based on the version-control revision. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Java-Common-Lib and JavaSMT. -->
+    <!-- DO NOT EDIT LOCALLY!
+         Keep this file synchronized with
+         https://gitlab.com/sosy-lab/software/java-project-template
+    -->
 
     <target name="determine-version" unless="version">
         <exec executable="git"

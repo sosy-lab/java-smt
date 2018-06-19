@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e # exit with nonzero exit code if anything fails
 
+# DO NOT EDIT LOCALLY!
+# Keep this file synchronized with
+# https://gitlab.com/sosy-lab/software/java-project-template
+
 COVERAGE_FILE=junit/coverage.xml
 
 if ! [ -f "$COVERAGE_FILE" ] ; then
