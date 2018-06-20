@@ -1,3 +1,4 @@
 <factorypath>
     <factorypathentry kind="WKSPJAR" id="/JavaSMT/lib/java/build/auto-value.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="WKSPJAR" id="/JavaSMT/lib/java/runtime/common.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>
