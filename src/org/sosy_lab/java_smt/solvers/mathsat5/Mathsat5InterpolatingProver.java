@@ -59,6 +59,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           "uncolored atom found in Array proof",
           "uncolorable Array proof",
           "arr: proof splitting not supported");
+  private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGE_PREFIXES =
+      ImmutableSet.of("uncolorable NA lemma");
 
   Mathsat5InterpolatingProver(
       Mathsat5SolverContext pMgr,
@@ -124,10 +126,13 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
     } catch (IllegalArgumentException e) {
-      if (ALLOWED_FAILURE_MESSAGES.contains(e.getMessage())) {
+      final String message = e.getMessage();
+      if (!Strings.isNullOrEmpty(message)
+          && (ALLOWED_FAILURE_MESSAGES.contains(message)
+              || ALLOWED_FAILURE_MESSAGE_PREFIXES.stream().anyMatch(message::startsWith))) {
         // This is not a bug in our code,
         // but a problem of MathSAT which happens during interpolation
-        throw new SolverException(e.getMessage(), e);
+        throw new SolverException(message, e);
       }
       throw e;
     }
