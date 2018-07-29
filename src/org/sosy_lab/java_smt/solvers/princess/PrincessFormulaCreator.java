@@ -52,6 +52,7 @@ import ap.theories.ModuloArithmetic$;
 import ap.theories.SimpleArray;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
+import ap.types.Sort$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,7 +125,7 @@ class PrincessFormulaCreator
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
-      final Sort sort = Sort.sortOf((ITerm) pFormula);
+      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
       if (sort == PrincessEnvironment.BOOL_SORT) {
         return FormulaType.BooleanType;
       } else if (sort == PrincessEnvironment.INTEGER_SORT) {
@@ -168,7 +169,7 @@ class PrincessFormulaCreator
   public <T extends Formula> FormulaType<T> getFormulaType(final T pFormula) {
     if (pFormula instanceof BitvectorFormula) {
       ITerm input = (ITerm) extractInfo(pFormula);
-      Sort sort = Sort.sortOf(input);
+      Sort sort = Sort$.MODULE$.sortOf(input);
       scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
       checkArgument(
           bitWidth.isDefined(), "BitvectorFormula with actual type " + sort + ": " + pFormula);
@@ -386,7 +387,7 @@ class PrincessFormulaCreator
     } else if (input instanceof IIntFormula) {
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {
-        final Sort sort = Sort.sortOf(((IIntFormula) input).t());
+        final Sort sort = Sort$.MODULE$.sortOf(((IIntFormula) input).t());
         if (sort == PrincessEnvironment.BOOL_SORT) {
           // this is really a Boolean formula, it has to be UF
           return FunctionDeclarationKind.UF;
