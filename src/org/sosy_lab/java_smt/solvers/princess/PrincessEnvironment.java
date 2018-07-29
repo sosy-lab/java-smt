@@ -454,7 +454,7 @@ class PrincessEnvironment {
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
       final ITerm t = (ITerm) exp;
-      return Sort.sortOf(t) instanceof SimpleArray.ArraySort;
+      return Sort$.MODULE$.sortOf(t) instanceof SimpleArray.ArraySort;
     } else {
       return false;
     }
