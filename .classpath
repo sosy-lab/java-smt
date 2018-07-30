@@ -13,7 +13,9 @@
 	<classpathentry kind="lib" path="lib/java/runtime/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime/princess_2.12.jar" sourcepath="lib/java-contrib/princess_2.12-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/scala-library.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime/princess-smt-parser_2.12.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/java-cup-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/com.microsoft.z3.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
@@ -24,7 +26,5 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/java/runtime/princess-assertionless.jar" sourcepath="lib/java-contrib/princess-sources.zip"/>
-	<classpathentry kind="lib" path="lib/java/runtime/princess.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
