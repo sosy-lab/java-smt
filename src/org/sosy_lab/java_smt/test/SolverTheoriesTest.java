@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -1022,5 +1023,14 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       fail();
     } catch (IllegalArgumentException expected) {
     }
+  }
+
+  @Test
+  public void bvITETest() {
+    requireBitvectors();
+    BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
+    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
+    @SuppressWarnings("unused") // we only want to get a correctly typed formula
+    BitvectorFormula ite = bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
   }
 }

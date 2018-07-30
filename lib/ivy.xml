@@ -120,7 +120,7 @@
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-12-g3d15a15c" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
-        <dependency org="uuverifiers" name="princess_2.12" rev="2018-05-25-assertionless" conf="runtime-princess->default; contrib->sources">
+        <dependency org="uuverifiers" name="princess_2.12" rev="2018-07-30-assertionless" conf="runtime-princess->default; contrib->sources">
           <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
