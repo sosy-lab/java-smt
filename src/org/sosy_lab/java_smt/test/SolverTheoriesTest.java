@@ -1026,6 +1026,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void bvITETest() {
     requireBitvectors();
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
