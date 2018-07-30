@@ -1030,7 +1030,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     requireBitvectors();
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
-    @SuppressWarnings("unused") // we only want to get a correctly typed formula
-    BitvectorFormula ite = bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
+    bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
   }
 }
