@@ -188,7 +188,8 @@ public interface FormulaManager {
    * Extract the names of all free variables and UFs in a formula.
    *
    * @param f The input formula
-   * @return Map from variable names to the corresponding formulas.
+   * @return Map from variable names to the corresponding formulas. If an UF occurs multiple times
+   *     in the input formula, an arbitrary instance of an application of this UF is in the map.
    */
   Map<String, Formula> extractVariablesAndUFs(Formula f);
 
@@ -217,4 +218,27 @@ public interface FormulaManager {
    * @return Formula belonging to {@code this} context.
    */
   BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
+
+  /**
+   * Check whether the given String can be used as symbol/name for variables or undefined functions.
+   *
+   * <p>We explicitly state that with further development of SMT solvers and the SMTLib
+   * specification, the list of forbidden variable names may change in the future. Users should if
+   * possible not use logical or mathematical operators, or keywords strongly depending on SMTlib.
+   *
+   * <p>If a variable name is rejected, a possibility is escaping, e.g. either substituting the
+   * whole variable name or just every invalid character with an escaped form. We recommend to use
+   * an escape sequence based on the token "JAVASMT", because it might be unusual enough to appear
+   * when encoding a user's problem in SMT. Please not that you might also have to handle escaping
+   * the escape sequence. Examples:
+   *
+   * <ul>
+   *   <li>the invalid variable name <code>"="</code> (logical operator for equality) can be
+   *       replaced with a string <code>"JAVASMT_EQUALS"</code>.
+   *   <li>the invalid SMTlib-escaped variable name <code>"|test|"</code> (the solver SMTInterpol
+   *       does not allow the pipe symbol <code>"|"</code> in names) can be replaced with <code>
+   *       "JAVASMT_PIPEtestJAVASMT_PIPE"</code>.
+   * </ul>
+   */
+  boolean isValidName(String variableName);
 }

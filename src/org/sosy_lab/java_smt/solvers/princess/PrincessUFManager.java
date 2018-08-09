@@ -19,41 +19,14 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import ap.parser.IExpression;
-import java.util.List;
+import ap.types.Sort;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 
 class PrincessUFManager
-    extends AbstractUFManager<
-        IExpression, PrincessFunctionDeclaration, PrincessTermType, PrincessEnvironment> {
-
-  private final PrincessFormulaCreator creator;
+    extends AbstractUFManager<IExpression, PrincessFunctionDeclaration, Sort, PrincessEnvironment> {
 
   PrincessUFManager(PrincessFormulaCreator creator) {
     super(creator);
-    this.creator = creator;
-  }
-
-  @Override
-  protected IExpression createUninterpretedFunctionCallImpl(
-      PrincessFunctionDeclaration pFuncDecl, List<IExpression> pArgs) {
-    return creator.makeFunction(pFuncDecl, pArgs);
-  }
-
-  @Override
-  protected PrincessFunctionDeclaration declareUninterpretedFunctionImpl(
-      String pName, PrincessTermType pReturnType, List<PrincessTermType> args) {
-    checkArgument(
-        pReturnType == PrincessTermType.Integer || pReturnType == PrincessTermType.Boolean,
-        "Princess does not support return types of UFs other than Integer");
-    checkArgument(
-        args.stream().allMatch(PrincessTermType.Integer::equals),
-        "Princess does not support argument types of UFs other than Integer");
-
-    return new PrincessIFunctionDeclaration(
-        getFormulaCreator().getEnv().declareFun(pName, args.size(), pReturnType));
   }
 }

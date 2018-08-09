@@ -19,43 +19,11 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_function_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_uf;
-
-import com.google.common.primitives.Longs;
-import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class Mathsat5UFManager extends AbstractUFManager<Long, Long, Long, Long> {
 
-  private final long mathsatEnv;
-
   Mathsat5UFManager(Mathsat5FormulaCreator pCreator) {
     super(pCreator);
-    this.mathsatEnv = pCreator.getEnv();
-  }
-
-  public long createUIFCallImpl(long funcDecl, long[] args) {
-    return msat_make_uf(mathsatEnv, funcDecl, args);
-  }
-
-  @Override
-  protected Long createUninterpretedFunctionCallImpl(Long funcDecl, List<Long> pArgs) {
-    long[] args = Longs.toArray(pArgs);
-    return createUIFCallImpl(funcDecl, args);
-  }
-
-  @Override
-  protected Long declareUninterpretedFunctionImpl(
-      String pName, Long returnType, List<Long> pArgTypes) {
-    long[] types = Longs.toArray(pArgTypes);
-    return createFunctionImpl(pName, returnType, types);
-  }
-
-  public long createFunctionImpl(String pName, long returnType, long[] msatTypes) {
-    long msatFuncType = msat_get_function_type(mathsatEnv, msatTypes, msatTypes.length, returnType);
-    long decl = msat_declare_function(mathsatEnv, pName, msatFuncType);
-    return decl;
   }
 }

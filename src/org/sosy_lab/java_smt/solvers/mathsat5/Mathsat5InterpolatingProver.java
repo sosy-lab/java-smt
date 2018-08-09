@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
@@ -29,14 +28,18 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
@@ -54,18 +57,24 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           "unknown constraint in the ItpMapper",
           "AB-mixed term not found in eq_itp map",
           "uncolored atom found in Array proof",
+          "uncolorable Array proof",
           "arr: proof splitting not supported");
+  private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGE_PREFIXES =
+      ImmutableSet.of("uncolorable NA lemma");
 
-  Mathsat5InterpolatingProver(Mathsat5SolverContext pMgr, Mathsat5FormulaCreator creator) {
-    super(pMgr, createConfig(), creator);
+  Mathsat5InterpolatingProver(
+      Mathsat5SolverContext pMgr,
+      ShutdownNotifier pShutdownNotifier,
+      Mathsat5FormulaCreator creator,
+      Set<ProverOptions> options) {
+    super(pMgr, options, creator, pShutdownNotifier);
   }
 
-  private static Map<String, String> createConfig() {
-    return ImmutableMap.<String, String>builder()
-        .put("interpolation", "true")
-        .put("model_generation", "true")
-        .put("theory.bv.eager", "false")
-        .build();
+  @Override
+  protected void createConfig(Map<String, String> pConfig) {
+    pConfig.put("interpolation", "true");
+    pConfig.put("model_generation", "true");
+    pConfig.put("theory.bv.eager", "false");
   }
 
   @Override
@@ -82,14 +91,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public void push() {
     Preconditions.checkState(!closed);
     msat_push_backtrack_point(curEnv);
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    return !msat_check_sat_with_assumptions(
-        curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
   }
 
   @Override
@@ -125,10 +126,13 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
     } catch (IllegalArgumentException e) {
-      if (ALLOWED_FAILURE_MESSAGES.contains(e.getMessage())) {
+      final String message = e.getMessage();
+      if (!Strings.isNullOrEmpty(message)
+          && (ALLOWED_FAILURE_MESSAGES.contains(message)
+              || ALLOWED_FAILURE_MESSAGE_PREFIXES.stream().anyMatch(message::startsWith))) {
         // This is not a bug in our code,
         // but a problem of MathSAT which happens during interpolation
-        throw new SolverException(e.getMessage(), e);
+        throw new SolverException(message, e);
       }
       throw e;
     }
@@ -136,26 +140,30 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<Integer>> partitionedFormulas) {
-    // TODO is fallback to loop sound?
-
-    //final List<BooleanFormula> itps = new ArrayList<>();
-    //for (int i = 0; i < partitionedFormulas.size(); i++) {
-    //  itps.add(getInterpolant(
-    //      Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
-    //}
-    //return itps;
-
-    throw new UnsupportedOperationException(
-        "directly receiving an inductive sequence of interpolants is not supported."
-            + "Use another solver or another strategy for interpolants.");
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    // the fallback to a loop is sound and returns an inductive sequence of interpolants
+    final List<BooleanFormula> itps = new ArrayList<>();
+    for (int i = 0; i < partitionedFormulas.size(); i++) {
+      itps.add(
+          getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
+    }
+    return itps;
   }
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Integer>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");
+  }
+
+  @Override
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important) {
+    // TODO how can we support allsat in MathSat5-interpolation-prover?
+    // error: "allsat is not compatible wwith proof generation"
+    throw new UnsupportedOperationException(
+        "allsat computation is not possible with interpolation prover.");
   }
 }

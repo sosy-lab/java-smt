@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -71,7 +73,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
       env.isUnsatWithAssumptions(ImmutableList.of());
     } catch (UnsupportedOperationException e) {
       assume()
-          .withFailureMessage("Solver " + solverToUse() + " does not support assumption-solving")
+          .withMessage("Solver %s does not support assumption-solving", solverToUse())
           .that(e)
           .isNull();
     }
@@ -180,6 +182,29 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
       for (BooleanFormula f : toCheckUnsat) {
         assertThatFormula(f).isUnsatisfiable();
       }
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void assumptionsTest1() throws SolverException, InterruptedException {
+    /*
+    (declare-fun A () Bool)
+    (push 1)
+    (check-sat-assumptions (A))
+    (assert (not A))
+    (check-sat-assumptions (A))
+    */
+
+    // TODO: disabled for MathSat5. Is this a bug in MathSat5?
+    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
+
+    BooleanFormula a = bmgr.makeVariable("a");
+    try (ProverEnvironment pe = context.newProverEnvironment()) {
+      pe.push();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(a))).isFalse();
+      pe.addConstraint(bmgr.not(a));
+      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(a))).isTrue();
     }
   }
 }

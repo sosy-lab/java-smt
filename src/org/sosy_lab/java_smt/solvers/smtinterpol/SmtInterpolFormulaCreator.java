@@ -20,8 +20,8 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
-import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -38,7 +38,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
-import org.sosy_lab.java_smt.basicimpl.ObjectArrayBackedList;
 
 class SmtInterpolFormulaCreator
     extends FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
@@ -112,15 +111,6 @@ class SmtInterpolFormulaCreator
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
   }
 
-  List<Formula> encapsulate(Term[] terms) {
-    return new ObjectArrayBackedList<Term, Formula>(terms) {
-      @Override
-      protected Formula convert(Term pInput) {
-        return encapsulate(getFormulaType(pInput), pInput);
-      }
-    };
-  }
-
   /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
   private String dequote(String s) {
     int l = s.length();
@@ -169,22 +159,17 @@ class SmtInterpolFormulaCreator
 
       } else {
         final String name = func.getName();
-        List<Formula> args = encapsulate(app.getParameters());
-        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        for (Term t : app.getParameters()) {
-          argTypes.add(getFormulaType(t));
-        }
+        List<Formula> args =
+            transformedImmutableListCopy(
+                app.getParameters(), term -> encapsulate(getFormulaType(term), term));
+        List<FormulaType<?>> argTypes = transformedImmutableListCopy(args, this::getFormulaType);
 
         // Any function application.
         return visitor.visitFunction(
             f,
             args,
             FunctionDeclarationImpl.of(
-                name,
-                getDeclarationKind(app),
-                argTypes.build(),
-                getFormulaType(f),
-                app.getFunction()));
+                name, getDeclarationKind(app), argTypes, getFormulaType(f), app.getFunction()));
       }
 
     } else {
@@ -204,38 +189,6 @@ class SmtInterpolFormulaCreator
     } else {
       return dequote(t.toString());
     }
-  }
-
-  /** check for ConstantTerm with Number or ApplicationTerm with negative Number */
-  public boolean isNumber(Term t) {
-    boolean is = false;
-    // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
-      if (value instanceof Number || value instanceof Rational) {
-        is = true;
-      }
-
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
-
-      // ApplicationTerm with negative Number --> "(- 123)"
-      if ("-".equals(at.getFunction().getName())
-          && (at.getParameters().length == 1)
-          && isNumber(at.getParameters()[0])) {
-        is = true;
-
-        // ApplicationTerm with Division --> "(/ 1 5)"
-      } else if ("/".equals(at.getFunction().getName())
-          && (at.getParameters().length == 2)
-          && isNumber(at.getParameters()[0])
-          && isNumber(at.getParameters()[1])) {
-        is = true;
-      }
-    }
-
-    // TODO hex or binary data, string?
-    return is;
   }
 
   private static boolean isVariable(Term t) {
@@ -273,30 +226,35 @@ class SmtInterpolFormulaCreator
       return FunctionDeclarationKind.IMPLIES;
     } else if (symbol == t.mXor) {
       return FunctionDeclarationKind.XOR;
+    }
 
-      // Polymorphic function symbols are more difficult.
-    } else if (symbol.getName().equals("=")) {
-      return FunctionDeclarationKind.EQ;
-    } else if (symbol.getName().equals("distinct")) {
-      return FunctionDeclarationKind.DISTINCT;
-    } else if (symbol.getName().equals("ite")) {
-      return FunctionDeclarationKind.ITE;
-    } else if (symbol.getName().equals("select")) {
-      return FunctionDeclarationKind.SELECT;
-    } else if (symbol.getName().equals("store")) {
-      return FunctionDeclarationKind.STORE;
-    } else {
-
-      // TODO: other declaration kinds!
-      return FunctionDeclarationKind.OTHER;
+    // Polymorphic function symbols are more difficult.
+    switch (symbol.getName()) {
+      case "=":
+        return FunctionDeclarationKind.EQ;
+      case "distinct":
+        return FunctionDeclarationKind.DISTINCT;
+      case "ite":
+        return FunctionDeclarationKind.ITE;
+      case "select":
+        return FunctionDeclarationKind.SELECT;
+      case "store":
+        return FunctionDeclarationKind.STORE;
+      default:
+        // TODO: other declaration kinds!
+        return FunctionDeclarationKind.OTHER;
     }
   }
 
   @Override
-  public Term callFunctionImpl(
-      FunctionDeclarationImpl<?, FunctionSymbol> declaration, List<Term> args) {
-    return environment.term(
-        declaration.getSolverDeclaration().getName(), args.toArray(new Term[args.size()]));
+  public FunctionSymbol declareUFImpl(String pName, Sort returnType, List<Sort> pArgs) {
+    Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
+    return environment.declareFun(pName, types, returnType);
+  }
+
+  @Override
+  public Term callFunctionImpl(FunctionSymbol declaration, List<Term> args) {
+    return environment.term(declaration.getName(), args.toArray(new Term[args.size()]));
   }
 
   @Override

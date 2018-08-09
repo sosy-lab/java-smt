@@ -19,10 +19,13 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
@@ -61,12 +64,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    TFormulaInfo out = roundingModes.get(pFloatingPointRoundingMode);
-    if (out == null) {
-      out = getRoundingModeImpl(pFloatingPointRoundingMode);
-      roundingModes.put(pFloatingPointRoundingMode, out);
-    }
-    return out;
+    return roundingModes.computeIfAbsent(pFloatingPointRoundingMode, this::getRoundingModeImpl);
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
@@ -200,6 +198,22 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       boolean pSigned,
       FormulaType.FloatingPointType pTargetType,
       TFormulaInfo pRoundingMode);
+
+  @Override
+  public FloatingPointFormula fromIeeeBitvector(
+      BitvectorFormula pNumber, FloatingPointType pTargetType) {
+    return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
+  }
+
+  protected abstract TFormulaInfo fromIeeeBitvectorImpl(
+      TFormulaInfo pNumber, FloatingPointType pTargetType);
+
+  @Override
+  public BitvectorFormula toIeeeBitvector(FloatingPointFormula pNumber) {
+    return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
+  }
+
+  protected abstract TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {
@@ -388,4 +402,13 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo isSubnormal(TFormulaInfo pParam);
+
+  @Override
+  public FloatingPointFormula round(
+      FloatingPointFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
+    return wrap(round(extractInfo(pFormula), pRoundingMode));
+  }
+
+  protected abstract TFormulaInfo round(
+      TFormulaInfo pFormula, FloatingPointRoundingMode pRoundingMode);
 }

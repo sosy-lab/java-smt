@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -39,6 +41,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 
 /** Testing formula serialization. */
 @RunWith(Parameterized.class)
@@ -72,56 +75,63 @@ public class TranslateFormulaTest {
   }
 
   @Before
-  public void initSolvers() throws Exception {
+  public void initSolvers() throws InvalidConfigurationException {
     Configuration empty = Configuration.builder().build();
     SolverContextFactory factory =
         new SolverContextFactory(empty, logger, ShutdownManager.create().getNotifier());
 
-    from = factory.generateContext(translateFrom);
-    to = factory.generateContext(translateTo);
+    try {
+      from = factory.generateContext(translateFrom);
+      to = factory.generateContext(translateTo);
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
+    }
     managerFrom = from.getFormulaManager();
     managerTo = to.getFormulaManager();
   }
 
   @After
-  public void close() throws Exception {
-    from.close();
-    to.close();
+  public void close() {
+    if (from != null) {
+      from.close();
+    }
+    if (to != null) {
+      to.close();
+    }
   }
 
   @Test
-  public void testDumpingAndParsing() throws Exception {
+  public void testDumpingAndParsing() throws SolverException, InterruptedException {
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
 
-    assertThatFormula(createTestFormula(managerTo), to).isEquivalentTo(parsed);
+    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
   }
 
   @Test
-  public void testTranslating() throws Exception {
+  public void testTranslating() throws SolverException, InterruptedException {
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
 
-    assertThatFormula(createTestFormula(managerTo), to).isEquivalentTo(parsed);
+    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {
     BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
     IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
-    IntegerFormula x, y, z;
-    x = ifmgr.makeVariable("x");
-    y = ifmgr.makeVariable("y");
-    z = ifmgr.makeVariable("z");
+    IntegerFormula x = ifmgr.makeVariable("x");
+    IntegerFormula y = ifmgr.makeVariable("y");
+    IntegerFormula z = ifmgr.makeVariable("z");
     BooleanFormula t =
         bfmgr.and(
             bfmgr.or(ifmgr.equal(x, y), ifmgr.equal(x, ifmgr.makeNumber(2))),
             bfmgr.or(ifmgr.equal(y, z), ifmgr.equal(z, ifmgr.makeNumber(10))));
     return t;
-  }
-
-  protected final BooleanFormulaSubject assertThatFormula(
-      BooleanFormula formula, SolverContext context) {
-    return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
   }
 }

@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.parser.IExpression;
 import ap.parser.ITerm;
+import ap.types.Sort;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -29,13 +30,12 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class PrincessArrayFormulaManager
     extends AbstractArrayFormulaManager<
-        IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration> {
+        IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
   private final PrincessEnvironment env;
 
   PrincessArrayFormulaManager(
-      FormulaCreator<
-              IExpression, PrincessTermType, PrincessEnvironment, PrincessFunctionDeclaration>
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
           pFormulaCreator) {
     super(pFormulaCreator);
     env = pFormulaCreator.getEnv();
@@ -56,11 +56,12 @@ class PrincessArrayFormulaManager
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
     // other types in arrays are not supported in princess
+    // TODO: check
     assert pIndexType.isIntegerType() && pElementType.isIntegerType();
 
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
-    final PrincessTermType arrayType = toSolverType(arrayFormulaType);
+    final Sort arrayType = toSolverType(arrayFormulaType);
 
     return getFormulaCreator().makeVariable(arrayType, pName);
   }

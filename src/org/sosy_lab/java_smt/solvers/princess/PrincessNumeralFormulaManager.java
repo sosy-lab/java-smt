@@ -22,17 +22,23 @@ package org.sosy_lab.java_smt.solvers.princess;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.ITerm;
+import ap.types.Sort;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
 abstract class PrincessNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        IExpression, PrincessTermType, PrincessEnvironment, ParamFormulaType, ResultFormulaType,
+        IExpression,
+        Sort,
+        PrincessEnvironment,
+        ParamFormulaType,
+        ResultFormulaType,
         PrincessFunctionDeclaration> {
 
-  PrincessNumeralFormulaManager(PrincessFormulaCreator pCreator) {
-    super(pCreator);
+  PrincessNumeralFormulaManager(
+      PrincessFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

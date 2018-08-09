@@ -23,13 +23,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.NoopScript;
 import de.uni_freiburg.informatik.ultimate.logic.QuotedObject;
 import de.uni_freiburg.informatik.ultimate.logic.ReasonUnknown;
 import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
@@ -60,7 +63,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -73,21 +76,23 @@ import org.sosy_lab.java_smt.api.SolverException;
 @Options(prefix = "solver.smtinterpol")
 class SmtInterpolEnvironment {
 
+  /** SMTInterpol does not allow to use key-functions as identifiers. */
+  private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS =
+      ImmutableSet.of("true", "false", "select", "store", "or", "and", "xor", "distinct");
+
   @Option(
-    secure = true,
-    description =
-        "Double check generated results like interpolants and models whether they are correct"
-  )
+      secure = true,
+      description =
+          "Double check generated results like interpolants and models whether they are correct")
   private boolean checkResults = false;
 
   private final @Nullable PathCounterTemplate smtLogfile;
 
   @Option(
-    secure = true,
-    description =
-        "Further options that will be set to true for SMTInterpol "
-            + "in addition to the default options. Format is 'option1,option2,option3'"
-  )
+      secure = true,
+      description =
+          "Further options that will be set to true for SMTInterpol "
+              + "in addition to the default options. Format is 'option1,option2,option3'")
   private List<String> furtherOptions = ImmutableList.of();
 
   private final LogManager logger;
@@ -176,8 +181,7 @@ class SmtInterpolEnvironment {
       Path logfile = smtLogfile.getFreshPath();
 
       try {
-        PrintWriter out =
-            new PrintWriter(MoreFiles.openOutputFile(logfile, Charset.defaultCharset()));
+        PrintWriter out = new PrintWriter(IO.openOutputFile(logfile, Charset.defaultCharset()));
 
         out.println("(set-option :global-declarations true)");
         out.println("(set-option :random-seed " + script.getOption(":random-seed") + ")");
@@ -237,6 +241,7 @@ class SmtInterpolEnvironment {
    */
   @CanIgnoreReturnValue
   public FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
+    checkSymbol(fun);
     FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
 
     if (fsym == null) {
@@ -365,6 +370,7 @@ class SmtInterpolEnvironment {
   }
 
   public TermVariable variable(String varname, Sort sort) {
+    checkSymbol(varname);
     return script.variable(varname, sort);
   }
 
@@ -494,5 +500,23 @@ class SmtInterpolEnvironment {
     QuotedObject program = (QuotedObject) script.getInfo(":name");
     QuotedObject version = (QuotedObject) script.getInfo(":version");
     return program.getValue() + " " + version.getValue();
+  }
+
+  /**
+   * Copied from {@link NoopScript#checkSymbol}.
+   *
+   * <p>Check that the symbol does not contain characters that would make it impossible to use it in
+   * a LoggingScript. These are | and \.
+   *
+   * @param symbol the symbol to check
+   * @throws IllegalArgumentException if symbol contains | or \.
+   */
+  private void checkSymbol(String symbol) throws SMTLIBException {
+    Preconditions.checkArgument(
+        symbol.indexOf('|') == -1 && symbol.indexOf('\\') == -1, "Symbol must not contain | or \\");
+    Preconditions.checkArgument(
+        !UNSUPPORTED_IDENTIFIERS.contains(symbol),
+        "SMTInterpol does not support %s as identifier.",
+        symbol);
   }
 }

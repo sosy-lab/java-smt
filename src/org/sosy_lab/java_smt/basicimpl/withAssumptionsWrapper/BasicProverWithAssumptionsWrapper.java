@@ -21,7 +21,9 @@ package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -51,7 +53,8 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public T addConstraint(BooleanFormula constraint) {
+  public T addConstraint(BooleanFormula constraint) throws InterruptedException {
+    clearAssumptions();
     return delegate.addConstraint(constraint);
   }
 
@@ -68,6 +71,20 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    clearAssumptions();
+    solverAssumptionsAsFormula.addAll(assumptions);
+    for (BooleanFormula formula : assumptions) {
+      registerPushedFormula(delegate.push(formula));
+    }
+    return delegate.isUnsat();
+  }
+
+  /** overridden in sub-class. */
+  protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
+
+  @Override
   public Model getModel() throws SolverException {
     return delegate.getModel();
   }
@@ -78,7 +95,32 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
+  public List<BooleanFormula> getUnsatCore() {
+    return delegate.getUnsatCore();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+    clearAssumptions();
+    return delegate.unsatCoreOverAssumptions(pAssumptions);
+    //    if (isUnsatWithAssumptions(pAssumptions)) {
+    //      // TODO project to pAssumptions?
+    //      return Optional.of(getUnsatCore());
+    //    } else {
+    //      return Optional.empty();
+    //    }
+  }
+
+  @Override
   public void close() {
     delegate.close();
+  }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
+      throws InterruptedException, SolverException {
+    clearAssumptions();
+    return delegate.allSat(pCallback, pImportant);
   }
 }

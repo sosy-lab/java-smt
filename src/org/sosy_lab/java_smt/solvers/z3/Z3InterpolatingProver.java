@@ -31,17 +31,18 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -60,8 +61,10 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       Z3FormulaCreator creator,
       long z3params,
       LogManager pLogger,
-      @Nullable PathCounterTemplate pDumpFailedInterpolationQueries) {
-    super(creator, z3params);
+      @Nullable PathCounterTemplate pDumpFailedInterpolationQueries,
+      FormulaManager pMgr,
+      boolean pEnableUnsatCores) {
+    super(creator, z3params, pMgr, pEnableUnsatCores);
     logger = pLogger;
     dumpFailedInterpolationQueries = pDumpFailedInterpolationQueries;
 
@@ -77,7 +80,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   }
 
   @Override
-  public Long addConstraint(BooleanFormula f) {
+  public Long addConstraint(BooleanFormula f) throws InterruptedException {
     long e = super.addConstraint0(f);
     assertedFormulas.peek().add(e);
     return e;
@@ -104,14 +107,15 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
             .stream()
             .flatMap(List::stream)
             .filter(f -> !formulasOfA.contains(f))
-            .collect(Collectors.toSet());
+            .collect(ImmutableSet.toImmutableSet());
 
     // binary interpolant is a sequence interpolant of only 2 elements
     return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA, formulasOfB)));
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<Set<Long>> partitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Long>> partitionedFormulas)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
@@ -123,9 +127,12 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<Set<Long>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    assert InterpolatingProverEnvironment.checkTreeStructure(
+        partitionedFormulas.size(), startOfSubTree);
+
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
 
     // build conjunction of each partition
@@ -153,10 +160,10 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
 
       } else { // if (currentSubtree <= lastSubtree) {
         // merge-point in tree, several children at a node -> pop from stack and conjunct
-        final List<Long> children = new ArrayList<>();
+        final Deque<Long> children = new ArrayDeque<>();
         while (!stack.isEmpty() && currentSubtree <= stack.peek().getRootOfTree()) {
           // adding at front is important for tree-structure!
-          children.add(0, stack.pop().getInterpolationPoint());
+          children.addFirst(stack.pop().getInterpolationPoint());
         }
         children.add(conjunctionFormulas[i]); // add the node itself
         conjunction = Native.mkAnd(z3context, children.size(), Longs.toArray(children));
@@ -192,13 +199,13 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       interpolationResult =
           Native.getInterpolant(
               z3context,
-              proof, //refutation of premises := proof
+              proof, // refutation of premises := proof
               root, // last element is end of chain (root of tree), pattern := interpolation tree
               Native.mkParams(z3context));
     } catch (Z3Exception e) {
       if (dumpFailedInterpolationQueries != null && !creator.shutdownNotifier.shouldShutdown()) {
         try (Writer dumpFile =
-            MoreFiles.openOutputFile(
+            IO.openOutputFile(
                 dumpFailedInterpolationQueries.getFreshPath(), StandardCharsets.UTF_8)) {
           dumpFile.write(Native.solverToString(z3context, z3solver));
           dumpFile.write("\n(compute-interpolant ");
@@ -223,6 +230,7 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
       result.add(
           creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult, i)));
     }
+    assert result.size() == startOfSubTree.length - 1;
 
     // cleanup
     Native.decRef(z3context, proof);
@@ -281,7 +289,10 @@ class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
   @Override
   public void close() {
     super.close();
-    Preconditions.checkState(assertedFormulas.size() == 1);
+    Preconditions.checkState(
+        assertedFormulas.size() <= 1,
+        "stack must be empty (if already closed) or "
+            + "contains only the initial level (to be removed)");
     assertedFormulas.clear();
   }
 

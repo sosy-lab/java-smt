@@ -24,20 +24,27 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -51,6 +58,28 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
+
+  private final class FunctionDeclarationVisitor extends DefaultFormulaVisitor<Formula> {
+    @Override
+    public Formula visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      Truth.assert_()
+          .withMessage(
+              "unexpected declaration kind '%s' in function '%s' with args '%s'.",
+              functionDeclaration, f, args)
+          .that(functionDeclaration.getKind())
+          .isNotEqualTo(FunctionDeclarationKind.OTHER);
+      for (Formula arg : args) {
+        mgr.visit(arg, this);
+      }
+      return visitDefault(f);
+    }
+
+    @Override
+    protected Formula visitDefault(Formula pF) {
+      return pF;
+    }
+  }
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -84,6 +113,70 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             // we need a subclass, because the original class is 'abstract'
           };
       assertThatFormula(bmgr.visit(bf, identityVisitor)).isEqualTo(bf);
+    }
+  }
+
+  @Test
+  public void bitvectorIdVisit() {
+    requireBitvectors();
+    BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
+    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
+    BitvectorFormula y = bvmgr.makeVariable(bv8, "y");
+
+    for (Formula f :
+        ImmutableList.of(
+            bvmgr.equal(x, y),
+            bvmgr.add(x, y),
+            bvmgr.subtract(x, y),
+            bvmgr.multiply(x, y),
+            bvmgr.and(x, y),
+            bvmgr.or(x, y),
+            bvmgr.xor(x, y),
+            bvmgr.lessThan(x, y, true),
+            bvmgr.lessThan(x, y, false),
+            bvmgr.lessOrEquals(x, y, true),
+            bvmgr.lessOrEquals(x, y, false),
+            bvmgr.greaterThan(x, y, true),
+            bvmgr.greaterThan(x, y, false),
+            bvmgr.greaterOrEquals(x, y, true),
+            bvmgr.greaterOrEquals(x, y, false),
+            bvmgr.divide(x, y, true),
+            bvmgr.divide(x, y, false),
+            bvmgr.modulo(x, y, true),
+            bvmgr.modulo(x, y, false),
+            bvmgr.not(x),
+            bvmgr.negate(x),
+            bvmgr.extract(x, 7, 5, true),
+            bvmgr.extract(x, 7, 5, false),
+            bvmgr.concat(x, y))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
+    }
+  }
+
+  @Test
+  public void floatIdVisit() {
+    requireFloats();
+    FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
+    FloatingPointFormula x = fpmgr.makeVariable("x", fp);
+    FloatingPointFormula y = fpmgr.makeVariable("y", fp);
+
+    for (Formula f :
+        ImmutableList.of(
+            fpmgr.equalWithFPSemantics(x, y),
+            fpmgr.add(x, y),
+            fpmgr.subtract(x, y),
+            fpmgr.multiply(x, y),
+            fpmgr.lessThan(x, y),
+            fpmgr.lessOrEquals(x, y),
+            fpmgr.greaterThan(x, y),
+            fpmgr.greaterOrEquals(x, y),
+            fpmgr.divide(x, y),
+            fpmgr.round(x, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN),
+            // fpmgr.round(x, FloatingPointRoundingMode.NEAREST_TIES_AWAY),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_POSITIVE),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_NEGATIVE),
+            fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
     }
   }
 
@@ -123,12 +216,12 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     FormulaVisitor<TraversalProcess> nameExtractor =
         new DefaultFormulaVisitor<TraversalProcess>() {
           @Override
-          protected TraversalProcess visitDefault(Formula f) {
+          protected TraversalProcess visitDefault(Formula formula) {
             return TraversalProcess.CONTINUE;
           }
 
           @Override
-          public TraversalProcess visitFreeVariable(Formula f, String name) {
+          public TraversalProcess visitFreeVariable(Formula formula, String name) {
             usedVariables.add(name);
             return TraversalProcess.CONTINUE;
           }
@@ -142,7 +235,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
-        .withFailureMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
@@ -155,7 +248,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testVisitingTrue() throws Exception {
+  public void testVisitingTrue() {
 
     // Check that "true" is correctly treated as a constant.
     BooleanFormula t = bmgr.makeBoolean(true);
@@ -180,7 +273,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testCorrectFunctionNames() throws Exception {
+  public void testCorrectFunctionNames() {
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula ab = bmgr.and(a, b);
@@ -228,8 +321,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             f,
             new FormulaTransformationVisitor(mgr) {
               @Override
-              public Formula visitFreeVariable(Formula f, String name) {
-                return mgr.makeVariable(mgr.getFormulaType(f), name + "'");
+              public Formula visitFreeVariable(Formula formula, String name) {
+                return mgr.makeVariable(mgr.getFormulaType(formula), name + "'");
               }
             });
     assertThatFormula(transformed)
@@ -241,15 +334,30 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void booleanRecursiveTraversalTest() throws Exception {
+  public void recursiveTransformationVisitorTest2() throws Exception {
+    BooleanFormula f = imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1));
+    BooleanFormula transformed =
+        mgr.transformRecursively(
+            f,
+            new FormulaTransformationVisitor(mgr) {
+              @Override
+              public Formula visitFreeVariable(Formula formula, String name) {
+                return mgr.makeVariable(mgr.getFormulaType(formula), name + "'");
+              }
+            });
+    assertThatFormula(transformed)
+        .isEquivalentTo(imgr.equal(imgr.makeVariable("y'"), imgr.makeNumber(1)));
+  }
+
+  @Test
+  public void booleanRecursiveTraversalTest() {
     BooleanFormula f =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("x"), bmgr.makeVariable("y")),
             bmgr.and(
-                ImmutableList.of(
-                    bmgr.makeVariable("z"),
-                    bmgr.makeVariable("d"),
-                    imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5)))));
+                bmgr.makeVariable("z"),
+                bmgr.makeVariable("d"),
+                imgr.equal(imgr.makeVariable("gg"), imgr.makeNumber(5))));
     final Set<String> foundVars = new HashSet<>();
     bmgr.visitRecursively(
         f,
@@ -272,22 +380,21 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testTransformationInsideQuantifiers() throws Exception {
+  public void testTransformationInsideQuantifiers() {
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
-        .withFailureMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
-    List<BooleanFormula> usedVars =
-        ImmutableList.of("a", "b", "c", "d", "e", "f")
-            .stream()
+    BooleanFormula[] usedVars =
+        Stream.of("a", "b", "c", "d", "e", "f")
             .map(var -> bmgr.makeVariable(var))
-            .collect(Collectors.toList());
+            .toArray(BooleanFormula[]::new);
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
-    BooleanFormula body = fuzzer.fuzz(30, usedVars.toArray(new BooleanFormula[usedVars.size()]));
+    BooleanFormula body = fuzzer.fuzz(30, usedVars);
     BooleanFormula f = qmgr.forall(quantifiedVars, body);
     BooleanFormula transformed =
         bmgr.transformRecursively(

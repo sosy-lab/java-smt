@@ -23,6 +23,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_read;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
@@ -32,6 +33,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_array_write;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
@@ -40,28 +42,36 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
+  private boolean closed = false;
 
-  Mathsat5Model(long model, Mathsat5FormulaCreator creator) {
+  /** for detecting closed environments, Exception is better than SegFault. */
+  private final Mathsat5AbstractProver<?> prover;
+
+  Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
     super(creator);
     this.model = model;
     formulaCreator = creator;
+    prover = pProver;
   }
 
   @Override
   public Object evaluateImpl(Long f) {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     long term = msat_model_eval(model, f);
     return formulaCreator.convertValue(f, term);
   }
 
   @Override
   protected ImmutableList<ValueAssignment> modelToList() {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
@@ -83,16 +93,19 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   private ValueAssignment getAssignment(long key, long value) {
-    Formula fKey = creator.encapsulateWithTypeOf(key);
-    Object fValue = formulaCreator.convertValue(key, value);
     List<Object> argumentInterpretation = new ArrayList<>();
-
     for (int i = 0; i < msat_term_arity(key); i++) {
       long arg = msat_term_get_arg(key, i);
       argumentInterpretation.add(evaluateImpl(arg));
     }
 
-    return new ValueAssignment(fKey, formulaCreator.getName(key), fValue, argumentInterpretation);
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(key),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(msat_make_eq(creator.getEnv(), key, value)),
+        formulaCreator.getName(key),
+        formulaCreator.convertValue(key, value),
+        argumentInterpretation);
   }
 
   /** split an array-assignment into several assignments for all positions */
@@ -111,6 +124,8 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
         assignments.add(
             new ValueAssignment(
                 creator.encapsulateWithTypeOf(select),
+                creator.encapsulateWithTypeOf(content),
+                creator.encapsulateBoolean(msat_make_eq(creator.getEnv(), select, content)),
                 formulaCreator.getName(symbol),
                 evaluateImpl(content),
                 innerIndices));
@@ -122,6 +137,9 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public void close() {
-    msat_destroy_model(model);
+    if (!closed) {
+      msat_destroy_model(model);
+      closed = true;
+    }
   }
 }

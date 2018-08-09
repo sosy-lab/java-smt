@@ -33,6 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
 
 /** Check that timeout is handled gracefully. */
@@ -55,9 +56,9 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void testTacticTimeout() throws Exception {
+  public void testTacticTimeout() throws InterruptedException {
     TruthJUnit.assume()
-        .withFailureMessage("Only Z3 has native tactics")
+        .withMessage("Only Z3 has native tactics")
         .that(solverToUse())
         .isEqualTo(Solvers.Z3);
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
@@ -70,32 +71,32 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testProverTimeout() throws Exception {
+  public void testProverTimeout() throws SolverException, InterruptedException {
     TruthJUnit.assume()
-        .withFailureMessage("Princess does not support interruption")
+        .withMessage("Princess does not support interruption")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeout(() -> context.newProverEnvironment());
   }
 
   @Test
-  public void testInterpolationProverTimeout() throws Exception {
+  public void testInterpolationProverTimeout() throws SolverException, InterruptedException {
     TruthJUnit.assume()
-        .withFailureMessage("Princess does not support interruption")
+        .withMessage("Princess does not support interruption")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeout(() -> context.newProverEnvironmentWithInterpolation());
   }
 
   @Test
-  public void testOptimizationProverTimeout() throws Exception {
+  public void testOptimizationProverTimeout() throws SolverException, InterruptedException {
     requireOptimization();
     testBasicProverTimeout(() -> context.newOptimizationProverEnvironment());
   }
 
   @SuppressWarnings("CheckReturnValue")
   private void testBasicProverTimeout(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws Exception {
+      throws SolverException, InterruptedException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     BooleanFormula instance = gen.generate(20);
     expectedEx.expect(InterruptedException.class);

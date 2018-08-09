@@ -20,8 +20,11 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -29,8 +32,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
@@ -40,15 +47,22 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
 
   private boolean closed = false;
-  private final SmtInterpolEnvironment env;
-  private final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  protected final SmtInterpolEnvironment env;
+  protected final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  protected final SmtInterpolFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
+  protected final Map<String, Term> annotatedTerms = new HashMap<>(); // Collection of termNames
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames
 
   SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr) {
+    checkState(
+        pMgr.getEnvironment().getStackDepth() == 0,
+        "Not allowed to create a new prover environment while solver stack is still non-empty, "
+            + "parallel stacks are not supported.");
+    mgr = pMgr;
     env = pMgr.createEnvironment();
     creator = pMgr.getFormulaCreator();
   }
@@ -58,7 +72,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   }
 
   @Override
-  public final void push() {
+  public void push() {
     Preconditions.checkState(!closed);
     assertedFormulas.push(new ArrayList<>());
     env.push(1);
@@ -97,16 +111,62 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   protected abstract Collection<Term> getAssertedTerms();
 
   @Override
+  public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!isClosed());
+    Term[] terms = env.getUnsatCore();
+    return Collections3.transformedImmutableListCopy(
+        terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws InterruptedException {
+    push();
+    Preconditions.checkState(
+        annotatedTerms.isEmpty(),
+        "Empty environment required for UNSAT core" + " over assumptions.");
+    for (BooleanFormula assumption : assumptions) {
+      String termName = generateTermName();
+      Term t = mgr.extractInfo(assumption);
+      Term annotated = env.annotate(t, new Annotation(":named", termName));
+      annotatedTerms.put(termName, t);
+      env.assertTerm(annotated);
+    }
+    if (!isUnsat()) {
+      return Optional.empty();
+    }
+    List<BooleanFormula> out = getUnsatCore();
+    pop();
+    return Optional.of(out);
+  }
+
+  @Override
   public void close() {
     Preconditions.checkState(!closed);
     assertedFormulas.clear();
+    annotatedTerms.clear();
     env.pop(env.getStackDepth());
     closed = true;
   }
 
-  @SuppressWarnings("unused")
+  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Assumption-solving is not supported.");
+  }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    Preconditions.checkState(!isClosed());
+    Term[] importantTerms = new Term[important.size()];
+    int i = 0;
+    for (BooleanFormula impF : important) {
+      importantTerms[i++] = mgr.extractInfo(impF);
+    }
+    for (Term[] model : env.checkAllSat(importantTerms)) {
+      callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
+    }
+    return callback.getResult();
   }
 }

@@ -51,11 +51,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/build/auto-value.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/build/auto-value-annotations.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java/build/auto-value.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/build/auto-value-annotations.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -74,15 +74,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/test/junit.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/findbugs/findbugs.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

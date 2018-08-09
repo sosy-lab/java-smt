@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Lists;
 import java.util.Arrays;
@@ -46,9 +47,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     super(pCreator);
   }
 
-  protected abstract TFunctionDecl declareUninterpretedFunctionImpl(
-      String pName, TType pReturnType, List<TType> pArgTypes);
-
   @Override
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
@@ -63,7 +61,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
         FunctionDeclarationKind.UF,
         pArgTypes,
         pReturnType,
-        declareUninterpretedFunctionImpl(pName, toSolverType(pReturnType), argTypes));
+        formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
   }
 
   @Override
@@ -72,9 +70,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
 
     return declareUF(pName, pReturnType, Arrays.asList(pArgs));
   }
-
-  protected abstract TFormulaInfo createUninterpretedFunctionCallImpl(
-      TFunctionDecl func, List<TFormulaInfo> pArgs);
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
@@ -90,6 +85,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
+    checkVariableName(name);
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     return callUF(func, pArgs);
@@ -98,6 +94,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
+    checkVariableName(name);
     return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
 }

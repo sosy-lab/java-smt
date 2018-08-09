@@ -26,6 +26,7 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -36,9 +37,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class ProverEnvironmentTest extends SolverBasedTest0 {
@@ -57,7 +60,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void assumptionsTest() throws Exception {
+  public void assumptionsTest() throws SolverException, InterruptedException {
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -72,9 +75,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void assumptionsWithModelTest() throws Exception {
+  public void assumptionsWithModelTest() throws SolverException, InterruptedException {
     assume()
-        .withFailureMessage("MathSAT can't construct models for SAT check with assumptions")
+        .withMessage("MathSAT can't construct models for SAT check with assumptions")
         .that(solver)
         .isNotEqualTo(MATHSAT5);
     BooleanFormula b = bmgr.makeVariable("b");
@@ -94,29 +97,47 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void unsatCoreTest() throws Exception {
-    assume()
-        .withFailureMessage("Princess does not support unsat core generation")
-        .that(solverToUse())
-        .isNotEqualTo(PRINCESS);
-    try (ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
-      pe.push();
-      pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-      pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
-      pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
-      assertThatEnvironment(pe).isUnsatisfiable();
-      List<BooleanFormula> unsatCore = pe.getUnsatCore();
-      assertThat(unsatCore)
-          .containsExactly(
-              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
-              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+  public void unsatCoreTest() throws SolverException, InterruptedException {
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+      unsatCoreTest0(pe);
+    }
+    try (BasicProverEnvironment<?> pe =
+        context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
+      unsatCoreTest0(pe);
     }
   }
 
   @Test
-  public void unsatCoreWithAssumptionsTest() throws Exception {
+  public void unsatCoreTestForOptimizationProver() throws SolverException, InterruptedException {
+    requireOptimization();
+
+    // Z3 does not implement unsat core for optimization
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+
+    try (BasicProverEnvironment<?> pe =
+        context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
+      unsatCoreTest0(pe);
+    }
+  }
+
+  private void unsatCoreTest0(BasicProverEnvironment<?> pe)
+      throws InterruptedException, SolverException {
+    pe.push();
+    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
+    pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
+    assertThat(pe).isUnsatisfiable();
+    List<BooleanFormula> unsatCore = pe.getUnsatCore();
+    assertThat(unsatCore)
+        .containsExactly(
+            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
+            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+  }
+
+  @Test
+  public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
-        .withFailureMessage("Princess and Mathsat5 do not support unsat core generation")
+        .withMessage("Princess and Mathsat5 do not support unsat core generation")
         .that(solverToUse())
         .isNoneOf(PRINCESS, MATHSAT5);
     try (ProverEnvironment pe =

@@ -34,9 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
 import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -70,15 +68,16 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (Term t : assertedTerms) {
-      for (Entry<String, Term> entry : creator.extractVariablesAndUFs(t, true).entrySet()) {
-        if (entry.getValue().getSort().isArraySort()) {
-          assignments.addAll(
-              getArrayAssignment(
-                  entry.getKey(), entry.getValue(), entry.getValue(), Collections.emptyList()));
-        } else {
-          assignments.add(getAssignment(entry.getKey(), (ApplicationTerm) entry.getValue()));
-        }
-      }
+      creator.extractVariablesAndUFs(
+          t,
+          true,
+          (name, f) -> {
+            if (f.getSort().isArraySort()) {
+              assignments.addAll(getArrayAssignment(name, f, f, Collections.emptyList()));
+            } else {
+              assignments.add(getAssignment(name, (ApplicationTerm) f));
+            }
+          });
     }
 
     return assignments.build().asList();
@@ -109,6 +108,8 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
           assignments.add(
               new ValueAssignment(
                   creator.encapsulateWithTypeOf(select),
+                  creator.encapsulateWithTypeOf(model.evaluate(content)),
+                  creator.encapsulateBoolean(creator.getEnv().term("=", select, content)),
                   symbol,
                   evaluateImpl(content),
                   innerIndices));
@@ -125,15 +126,19 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   }
 
   private ValueAssignment getAssignment(String key, ApplicationTerm term) {
-    Formula fKey = creator.encapsulateWithTypeOf(term);
-    Object fValue = evaluateImpl(term);
     List<Object> argumentInterpretation = new ArrayList<>();
-
     for (Term param : term.getParameters()) {
       argumentInterpretation.add(evaluateImpl(param));
     }
 
-    return new ValueAssignment(fKey, key, fValue, argumentInterpretation);
+    Term value = model.evaluate(term);
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(term),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(creator.getEnv().term("=", term, value)),
+        key,
+        evaluateImpl(term),
+        argumentInterpretation);
   }
 
   @Override

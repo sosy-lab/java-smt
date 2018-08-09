@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
+
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;

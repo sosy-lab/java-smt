@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
@@ -49,50 +50,71 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   public static SolverContext create(
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
-      @Nullable PathCounterTemplate pLogfileTemplate)
+      @Nullable PathCounterTemplate pLogfileTemplate,
+      int pRandomSeed,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
-    PrincessEnvironment env = new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier);
+    PrincessEnvironment env =
+        new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
     PrincessFormulaCreator creator = new PrincessFormulaCreator(env);
 
     // Create managers
     PrincessUFManager functionTheory = new PrincessUFManager(creator);
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
-    PrincessIntegerFormulaManager integerTheory = new PrincessIntegerFormulaManager(creator);
+    PrincessIntegerFormulaManager integerTheory =
+        new PrincessIntegerFormulaManager(creator, pNonLinearArithmetic);
+    PrincessBitvectorFormulaManager bitvectorTheory = new PrincessBitvectorFormulaManager(creator);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
         new PrincessQuantifiedFormulaManager(creator);
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, arrayTheory, quantifierTheory);
+            creator,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            bitvectorTheory,
+            arrayTheory,
+            quantifierTheory);
     return new PrincessSolverContext(manager, creator);
   }
 
   @SuppressWarnings("resource")
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    if (options.contains(ProverOptions.GENERATE_UNSAT_CORE)
-        || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
-      throw new UnsupportedOperationException("Princess does not support unsat core generation");
+    if (options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      throw new UnsupportedOperationException(
+          "Princess does not support unsat core generation with assumptions yet");
     }
     return new ReusableStackTheoremProver(
-        (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator));
+        (PrincessTheoremProver)
+            creator
+                .getEnv()
+                .getNewProver(
+                    false, options.contains(ProverOptions.GENERATE_UNSAT_CORE), manager, creator));
   }
 
   @SuppressWarnings("resource")
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> options) {
     return new ReusableStackInterpolatingProver<>(
-        (PrincessInterpolatingProver) creator.getEnv().getNewProver(true, manager, creator));
+        (PrincessInterpolatingProver)
+            creator
+                .getEnv()
+                .getNewProver(
+                    true, options.contains(ProverOptions.GENERATE_UNSAT_CORE), manager, creator));
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
+  public OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> options) {
     throw new UnsupportedOperationException("Princess does not support optimization");
   }
 
   @Override
   public String getVersion() {
-    return "Princess (unknown version)";
+    return "Princess (" + ap.SimpleAPI.version() + ")";
   }
 
   @Override

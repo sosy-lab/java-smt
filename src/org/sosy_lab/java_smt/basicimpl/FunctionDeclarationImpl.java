@@ -44,7 +44,7 @@ public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDe
       List<FormulaType<?>> pArgumentTypes,
       FormulaType<F> pReturnType,
       T pSolverDeclaration) {
-    solverDeclaration = pSolverDeclaration;
+    solverDeclaration = Preconditions.checkNotNull(pSolverDeclaration);
     argumentTypes = ImmutableList.copyOf(pArgumentTypes);
     returnType = Preconditions.checkNotNull(pReturnType);
     name = Preconditions.checkNotNull(pName);

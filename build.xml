@@ -7,10 +7,11 @@
     <property file="build.properties"/>
     <property environment="env"/>
 
-    <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, findbugs"/>
+    <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
     <property name="jar.excludes" value=""/>
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
+    <property name="documentation.javadoc.exclude" value="org.sosy_lab.java_smt.solvers.mathsat5,org.sosy_lab.java_smt.solvers.princess,org.sosy_lab.java_smt.solvers.smtinterpol,org.sosy_lab.java_smt.solvers.z3"/>
 
     <!-- Maven Central metadata -->
     <property name="ivy.pom.description" value="Unified acccess layer to SMT solvers"/>
@@ -27,14 +28,14 @@
     <import file="build/build-junit.xml"/>
     <import file="build/build-format-source.xml"/>
     <import file="build/build-checkstyle.xml"/>
-    <import file="build/build-findbugs.xml"/>
+    <import file="build/build-spotbugs.xml"/>
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
     <import file="build/build-maven-publish.xml"/>
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-value.jar build/error_prone_annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
     </path>
 
 
@@ -73,5 +74,5 @@
 
     <target name="build-dependencies" depends="init, resolve-dependencies"/>
 
-    <target name="standard-checks" depends="tests, findbugs, checkstyle, javadoc"/>
+    <target name="standard-checks" depends="tests, spotbugs, checkstyle, javadoc"/>
 </project>

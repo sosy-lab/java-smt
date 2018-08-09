@@ -43,11 +43,21 @@ public interface UFManager {
    */
   <T extends Formula> T callUF(FunctionDeclaration<T> funcType, List<? extends Formula> args);
 
+  /** @see #callUF(FunctionDeclaration, List) */
   <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args);
 
-  /** Declares and calls an uninterpreted function. */
+  /**
+   * Declares and calls an uninterpreted function with exactly the given name.
+   *
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   */
   <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs);
 
+  /** @see #declareAndCallUF(String, FormulaType, List) */
   <T extends Formula> T declareAndCallUF(String name, FormulaType<T> pReturnType, Formula... pArgs);
 }

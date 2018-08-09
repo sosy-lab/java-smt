@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class SmtInterpolUFManager
@@ -30,18 +29,5 @@ class SmtInterpolUFManager
 
   SmtInterpolUFManager(SmtInterpolFormulaCreator creator) {
     super(creator);
-  }
-
-  @Override
-  public Term createUninterpretedFunctionCallImpl(FunctionSymbol funcDecl, List<Term> pArgs) {
-    Term[] args = pArgs.toArray(new Term[pArgs.size()]);
-    return funcDecl.getTheory().term(funcDecl, args);
-  }
-
-  @Override
-  protected FunctionSymbol declareUninterpretedFunctionImpl(
-      String pName, Sort returnType, List<Sort> pArgs) {
-    Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
-    return getFormulaCreator().getEnv().declareFun(pName, types, returnType);
   }
 }

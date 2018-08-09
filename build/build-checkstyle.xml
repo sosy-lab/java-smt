@@ -5,7 +5,11 @@
 
     <!-- Targets for running Checkstyle. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
+    <!-- DO NOT EDIT LOCALLY!
+         Keep this file synchronized with
+         https://gitlab.com/sosy-lab/software/java-project-template
+    -->
+
     <property name="checkstyle.output" value="xml"/>
 
     <target name="run-checkstyle" depends="resolve-dependencies">
@@ -14,12 +18,12 @@
         </path>
         <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" uri="antlib:com.puppycrawl.tools.checkstyle.ant" classpathref="checkstyle.lib.path"/>
 
-        <cs:checkstyle config=".settings/checkstyle.xml">
+        <cs:checkstyle config="build/checkstyle.xml" classpathref="checkstyle.lib.path">
             <fileset dir="${source.dir}" includes="**/*.java" excludes="**/*Test.java **/*Test0.java **/*TestSuite.java"/>
             <formatter type="${checkstyle.output}" toFile="Checkstyle.xml"/>
         </cs:checkstyle>
 
-        <cs:checkstyle config=".settings/checkstyle.test.xml">
+        <cs:checkstyle config="build/checkstyle.test.xml" classpathref="checkstyle.lib.path">
             <fileset dir="${source.dir}" includes="**/*Test.java **/*Test0.java **/*TestSuite.java"/>
             <formatter type="${checkstyle.output}" toFile="Checkstyle.Test.xml"/>
         </cs:checkstyle>

@@ -21,8 +21,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -88,14 +88,14 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   private void requireMultipleStackSupport() {
     assume()
-        .withFailureMessage("Solver does not support multiple stacks yet")
+        .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
         .isNotEqualTo(Solvers.SMTINTERPOL);
   }
 
   protected final void requireUfValuesInModel() {
     assume()
-        .withFailureMessage(
+        .withMessage(
             "Integration of solver does not support retrieving values for UFs from a model")
         .that(solver)
         .isNotEqualTo(Solvers.Z3);
@@ -110,100 +110,100 @@ public class SolverStackTest extends SolverBasedTest0 {
     BooleanFormula b = bmgr.makeVariable("bool_b" + i);
     BooleanFormula or = bmgr.or(a, b);
 
-    stack.push(or); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.push(or); // L1
+    assertThat(stack).isSatisfiable();
     BooleanFormula c = bmgr.makeVariable("bool_c" + i);
     BooleanFormula d = bmgr.makeVariable("bool_d" + i);
     BooleanFormula and = bmgr.and(c, d);
 
-    stack.push(and); //L2
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.push(and); // L2
+    assertThat(stack).isSatisfiable();
 
     BooleanFormula notOr = bmgr.not(or);
 
-    stack.push(notOr); //L3
-    assertThatEnvironment(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
+    stack.push(notOr); // L3
+    assertThat(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
 
-    stack.pop(); //L2
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L2
+    assertThat(stack).isSatisfiable();
 
-    stack.pop(); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L1
+    assertThat(stack).isSatisfiable();
 
     // we are lower than before creating c and d.
     // however we assume that they are usable now (this violates SMTlib).
-    stack.push(and); //L2
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.push(and); // L2
+    assertThat(stack).isSatisfiable();
 
-    stack.pop(); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L1
+    assertThat(stack).isSatisfiable();
 
-    stack.push(notOr); //L2
-    assertThatEnvironment(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
+    stack.push(notOr); // L2
+    assertThat(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
 
-    stack.pop(); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L1
+    assertThat(stack).isSatisfiable();
 
-    stack.pop(); //L0 empty stack
+    stack.pop(); // L0 empty stack
   }
 
   @Test
-  public void singleStackTestInteger() throws Exception {
+  public void singleStackTestInteger() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(imgr, env);
   }
 
   @Test
-  public void singleStackTestRational() throws Exception {
+  public void singleStackTestRational() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
 
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(rmgr, env);
   }
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
-      NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack) throws Exception {
+      NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack)
+      throws SolverException, InterruptedException {
     int i = index.getFreshId();
     X a = nmgr.makeVariable("num_a" + i);
     X b = nmgr.makeVariable("num_b" + i);
     BooleanFormula leqAB = nmgr.lessOrEquals(a, b);
 
-    stack.push(leqAB); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.push(leqAB); // L1
+    assertThat(stack).isSatisfiable();
     X c = nmgr.makeVariable("num_c" + i);
     X d = nmgr.makeVariable("num_d" + i);
     BooleanFormula eqCD = nmgr.lessOrEquals(c, d);
 
-    stack.push(eqCD); //L2
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.push(eqCD); // L2
+    assertThat(stack).isSatisfiable();
 
     BooleanFormula gtAB = nmgr.greaterThan(a, b);
 
-    stack.push(gtAB); //L3
-    assertThatEnvironment(stack).isUnsatisfiable(); // "<=" AND ">" --> UNSAT
+    stack.push(gtAB); // L3
+    assertThat(stack).isUnsatisfiable(); // "<=" AND ">" --> UNSAT
 
-    stack.pop(); //L2
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L2
+    assertThat(stack).isSatisfiable();
 
-    stack.pop(); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L1
+    assertThat(stack).isSatisfiable();
 
     // we are lower than before creating c and d.
     // however we assume that they are usable now (this violates SMTlib).
-    stack.push(eqCD); //L2
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.push(eqCD); // L2
+    assertThat(stack).isSatisfiable();
 
-    stack.pop(); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L1
+    assertThat(stack).isSatisfiable();
 
-    stack.push(gtAB); //L2
-    assertThatEnvironment(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
+    stack.push(gtAB); // L2
+    assertThat(stack).isUnsatisfiable(); // "or" AND "not or" --> UNSAT
 
-    stack.pop(); //L1
-    assertThatEnvironment(stack).isSatisfiable();
+    stack.pop(); // L1
+    assertThat(stack).isSatisfiable();
 
-    stack.pop(); //L0 empty stack
+    stack.pop(); // L0 empty stack
   }
 
   @Test
@@ -247,18 +247,42 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack.pop();
   }
 
+  /** Create a symbol on a level and pop this level. Symbol must remain valid and usable! */
+  @SuppressWarnings("unused")
+  @Test
+  public void symbolsOnStackTest() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+
+    stack.push();
+    BooleanFormula q1 = bmgr.makeVariable("q");
+    stack.addConstraint(q1);
+    assertThat(stack).isSatisfiable();
+    Model m1 = stack.getModel();
+    assertThat(m1).isNotEmpty();
+    stack.pop();
+
+    stack.push();
+    BooleanFormula q2 = bmgr.makeVariable("q");
+    assertThat(q2).isEqualTo(q1);
+    stack.addConstraint(q1);
+    assertThat(stack).isSatisfiable();
+    Model m2 = stack.getModel();
+    assertThat(m2).isNotEmpty();
+    stack.pop();
+  }
+
   @Test
   public void constraintTestBool1() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.addConstraint(a);
-      assertThatEnvironment(stack).isSatisfiable();
+      assertThat(stack).isSatisfiable();
     }
 
     try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
       stack2.addConstraint(bmgr.not(a));
-      assertThatEnvironment(stack2).isSatisfiable();
+      assertThat(stack2).isSatisfiable();
     }
   }
 
@@ -268,12 +292,12 @@ public class SolverStackTest extends SolverBasedTest0 {
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(a);
-      assertThatEnvironment(stack).isSatisfiable();
+      assertThat(stack).isSatisfiable();
     }
 
     try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
       stack2.addConstraint(bmgr.not(a));
-      assertThatEnvironment(stack2).isSatisfiable();
+      assertThat(stack2).isSatisfiable();
     }
   }
 
@@ -283,7 +307,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(a);
-      assertThatEnvironment(stack).isSatisfiable();
+      assertThat(stack).isSatisfiable();
     }
 
     try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
@@ -296,7 +320,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   public void constraintTestBool4() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.addConstraint(bmgr.makeVariable("bool_a"));
-    assertThatEnvironment(stack).isSatisfiable();
+    assertThat(stack).isSatisfiable();
     thrown.expect(RuntimeException.class);
     stack.pop();
   }
@@ -304,11 +328,11 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void satTestBool5() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
-    assertThatEnvironment(stack).isSatisfiable();
+    assertThat(stack).isSatisfiable();
   }
 
   @Test
-  public void dualStackTest() throws Exception {
+  public void dualStackTest() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -321,18 +345,18 @@ public class SolverStackTest extends SolverBasedTest0 {
     stack1.pop(); // L1
     stack1.pop(); // L0
 
-    stack1.push(a); //L1
-    assertThatEnvironment(stack1).isSatisfiable();
+    stack1.push(a); // L1
+    assertThat(stack1).isSatisfiable();
 
-    stack2.push(not); //L1
-    assertThatEnvironment(stack2).isSatisfiable();
+    stack2.push(not); // L1
+    assertThat(stack2).isSatisfiable();
 
     stack1.pop(); // L0
     stack2.pop(); // L0
   }
 
   @Test
-  public void dualStackTest2() throws Exception {
+  public void dualStackTest2() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -342,18 +366,32 @@ public class SolverStackTest extends SolverBasedTest0 {
     BasicProverEnvironment<?> stack2 = newEnvironmentForTest();
     stack1.push(a); // L1
     stack1.push(bmgr.makeBoolean(true)); // L2
-    assertThatEnvironment(stack1).isSatisfiable();
+    assertThat(stack1).isSatisfiable();
     stack2.push(not); // L1
-    assertThatEnvironment(stack2).isSatisfiable();
+    assertThat(stack2).isSatisfiable();
     stack1.pop(); // L1
-    assertThatEnvironment(stack1).isSatisfiable();
+    assertThat(stack1).isSatisfiable();
     stack1.pop(); // L1
-    assertThatEnvironment(stack1).isSatisfiable();
+    assertThat(stack1).isSatisfiable();
     stack2.pop(); // L1
-    assertThatEnvironment(stack2).isSatisfiable();
-    assertThatEnvironment(stack1).isSatisfiable();
+    assertThat(stack2).isSatisfiable();
+    assertThat(stack1).isSatisfiable();
   }
 
+  @Test(expected = IllegalStateException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void avoidDualStacksIfNotSupported() throws InterruptedException {
+    assume()
+        .withMessage("Solver does not support multiple stacks yet")
+        .that(solver)
+        .isEqualTo(Solvers.SMTINTERPOL);
+
+    BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
+    stack1.push(bmgr.makeTrue());
+
+    // creating a new environment is not allowed with non-empty stack -> fail
+    newEnvironmentForTest();
+  }
   /**
    * This test checks that a SMT solver uses "global declarations": regardless of the stack at
    * declaration time, declarations always live for the full life time of the solver (i.e., they do
@@ -361,7 +399,7 @@ public class SolverStackTest extends SolverBasedTest0 {
    * for BMC with induction (where we create new formulas while there is something on the stack).
    */
   @Test
-  public void dualStackGlobalDeclarations() throws Exception {
+  public void dualStackGlobalDeclarations() throws SolverException, InterruptedException {
     // Create non-empty stack
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeVariable("bool_a"));
@@ -372,7 +410,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
     // Clear stack (without global declarations b gets deleted)
     stack1.push(b);
-    assertThatEnvironment(stack1).isSatisfiable();
+    assertThat(stack1).isSatisfiable();
     stack1.pop();
     stack1.pop();
     stack1.close();
@@ -384,11 +422,11 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void modelForUnsatFormula() throws Exception {
+  public void modelForUnsatFormula() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
-      assertThatEnvironment(stack).isUnsatisfiable();
+      assertThat(stack).isUnsatisfiable();
 
       thrown.expect(Exception.class);
       stack.getModel();
@@ -396,12 +434,12 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormula() throws Exception {
+  public void modelForSatFormula() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula a = imgr.makeVariable("a");
       stack.push(imgr.greaterThan(a, imgr.makeNumber(0)));
       stack.push(imgr.lessThan(a, imgr.makeNumber(2)));
-      assertThatEnvironment(stack).isSatisfiable();
+      assertThat(stack).isSatisfiable();
 
       Model model = stack.getModel();
       assertThat(model.evaluate(a)).isEqualTo(BigInteger.ONE);
@@ -409,12 +447,12 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormulaWithLargeValue() throws Exception {
+  public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       BigInteger val = BigInteger.TEN.pow(1000);
       IntegerFormula a = imgr.makeVariable("a");
       stack.push(imgr.equal(a, imgr.makeNumber(val)));
-      assertThatEnvironment(stack).isSatisfiable();
+      assertThat(stack).isSatisfiable();
 
       Model model = stack.getModel();
       assertThat(model.evaluate(a)).isEqualTo(val);
@@ -422,7 +460,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormulaWithUF() throws Exception {
+  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
       IntegerFormula varA = imgr.makeVariable("a");
@@ -431,9 +469,9 @@ public class SolverStackTest extends SolverBasedTest0 {
       stack.push(imgr.equal(varB, zero));
       FunctionDeclaration<IntegerFormula> uf =
           fmgr.declareUF("uf", FormulaType.IntegerType, FormulaType.IntegerType);
-      stack.push(imgr.equal(fmgr.callUF(uf, ImmutableList.of(varA)), zero));
-      stack.push(imgr.equal(fmgr.callUF(uf, ImmutableList.of(varB)), zero));
-      assertThatEnvironment(stack).isSatisfiable();
+      stack.push(imgr.equal(fmgr.callUF(uf, varA), zero));
+      stack.push(imgr.equal(fmgr.callUF(uf, varB), zero));
+      assertThat(stack).isSatisfiable();
 
       Model model = stack.getModel();
 
@@ -443,9 +481,28 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       requireUfValuesInModel();
 
-      assertThat(
-              model.evaluate(fmgr.callUF(uf, ImmutableList.of(imgr.makeNumber(BigDecimal.ZERO)))))
+      assertThat(model.evaluate(fmgr.callUF(uf, imgr.makeNumber(BigDecimal.ZERO))))
           .isEqualTo(BigInteger.ZERO);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void multiCloseTest() throws SolverException, InterruptedException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+    try {
+      // do something on the stack
+      stack.push();
+      stack.pop();
+      stack.push(imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      assertThat(stack).isSatisfiable();
+      stack.push();
+
+    } finally {
+      // close the stack several times, closing should be idempotent
+      for (int i = 0; i < 10; i++) {
+        stack.close();
+      }
     }
   }
 }

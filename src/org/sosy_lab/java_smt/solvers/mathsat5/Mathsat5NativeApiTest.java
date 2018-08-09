@@ -46,15 +46,22 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import org.junit.After;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class Mathsat5NativeApiTest {
 
-  static {
-    NativeLibraries.loadLibrary("mathsat5j");
+  @BeforeClass
+  public static void loadMathsat() {
+    try {
+      NativeLibraries.loadLibrary("mathsat5j");
+    } catch (UnsatisfiedLinkError e) {
+      throw new AssumptionViolatedException("MathSAT5 is not available", e);
+    }
   }
 
   private long env;

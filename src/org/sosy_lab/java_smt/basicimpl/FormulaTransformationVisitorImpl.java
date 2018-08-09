@@ -41,8 +41,8 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
       FormulaVisitor<? extends Formula> delegate,
       Deque<Formula> toProcess,
       Map<Formula, Formula> pCache) {
-    this.toProcess = toProcess;
-    this.pCache = pCache;
+    this.toProcess = Preconditions.checkNotNull(toProcess);
+    this.pCache = Preconditions.checkNotNull(pCache);
     this.delegate = Preconditions.checkNotNull(delegate);
   }
 
@@ -54,6 +54,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   @Override
   public Void visitBoundVariable(Formula f, int deBruijnIdx) {
+    Preconditions.checkNotNull(f);
 
     // Bound variable transformation is not allowed.
     pCache.put(f, f);
@@ -62,6 +63,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   @Override
   public Void visitConstant(Formula f, Object value) {
+    Preconditions.checkNotNull(f);
     pCache.put(f, delegate.visitConstant(f, value));
     return null;
   }
@@ -69,6 +71,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   @Override
   public Void visitFunction(
       Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+    Preconditions.checkNotNull(f);
 
     boolean allArgumentsTransformed = true;
 
@@ -92,7 +95,9 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
       // Create an processed version of the
       // function application.
-      toProcess.pop();
+      if (!toProcess.isEmpty()) {
+        toProcess.pop();
+      }
       Formula out = delegate.visitFunction(f, newArgs, functionDeclaration);
       Formula prev = pCache.put(f, out);
       assert prev == null;
@@ -103,6 +108,11 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   @Override
   public Void visitQuantifier(
       BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body) {
+    Preconditions.checkNotNull(f);
+    Preconditions.checkNotNull(quantifier);
+    Preconditions.checkNotNull(boundVariables);
+    Preconditions.checkNotNull(body);
+
     BooleanFormula transformedBody = (BooleanFormula) pCache.get(body);
 
     if (transformedBody != null) {

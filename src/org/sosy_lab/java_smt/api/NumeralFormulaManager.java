@@ -53,6 +53,15 @@ public interface NumeralFormulaManager<
 
   ResultFormulaType makeNumber(Rational pRational);
 
+  /**
+   * Creates a variable with exactly the given name.
+   *
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   */
   ResultFormulaType makeVariable(String pVar);
 
   FormulaType<ResultFormulaType> getFormulaType();

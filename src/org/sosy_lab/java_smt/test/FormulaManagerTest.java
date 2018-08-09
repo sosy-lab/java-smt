@@ -26,7 +26,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.testing.EqualsTester;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -61,7 +60,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
-    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -69,9 +68,9 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     IntegerFormula variable4 = imgr.makeVariable("variable4");
 
     FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+        fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula input = bmgr.xor(f1, f2);
 
     BooleanFormula out = mgr.substitute(input, ImmutableMap.of());
@@ -80,7 +79,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
-    assume().withFailureMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
+    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -88,9 +87,9 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     IntegerFormula variable4 = imgr.makeVariable("variable4");
 
     FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+        fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula input = bmgr.xor(f1, f2);
 
     Map<BooleanFormula, BooleanFormula> substitution =
@@ -185,15 +184,14 @@ public class FormulaManagerTest extends SolverBasedTest0 {
             fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType),
             fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
         .addEqualityGroup(f_b)
-        .addEqualityGroup(fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(0))))
+        .addEqualityGroup(fmgr.callUF(f_b, imgr.makeNumber(0)))
         .addEqualityGroup(
-            fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(1))),
-            fmgr.callUF(f_b, ImmutableList.of(imgr.makeNumber(1))))
+            fmgr.callUF(f_b, imgr.makeNumber(1)), fmgr.callUF(f_b, imgr.makeNumber(1)))
         .testEquals();
   }
 
   @Test
-  public void variableNameExtractorTest() throws Exception {
+  public void variableNameExtractorTest() {
     BooleanFormula constr =
         bmgr.or(
             imgr.equal(
@@ -206,7 +204,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void ufNameExtractorTest() throws Exception {
+  public void ufNameExtractorTest() {
     BooleanFormula constraint =
         imgr.equal(
             fmgr.declareAndCallUF(

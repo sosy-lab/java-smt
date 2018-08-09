@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static scala.collection.JavaConversions.asJavaIterable;
+import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 import static scala.collection.JavaConversions.mapAsJavaMap;
 import static scala.collection.JavaConversions.seqAsJavaList;
@@ -32,12 +33,16 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
+import ap.parser.IIntFormula;
 import ap.parser.ITerm;
 import ap.parser.SMTLineariser;
-import ap.parser.SMTParser2InputAbsy;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
+import ap.theories.SimpleArray;
+import ap.types.MonoSortedIFunction;
+import ap.types.Sort;
+import ap.types.Sort$;
 import ap.util.Debug;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -84,12 +89,14 @@ import scala.collection.Seq;
 class PrincessEnvironment {
 
   @Option(
-    secure = true,
-    description =
-        "The number of atoms a term has to have before"
-            + " it gets abbreviated if there are more identical terms."
-  )
+      secure = true,
+      description =
+          "The number of atoms a term has to have before"
+              + " it gets abbreviated if there are more identical terms.")
   private int minAtomsForAbbreviation = 100;
+
+  public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
+  public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
@@ -105,12 +112,11 @@ class PrincessEnvironment {
    */
   private final Map<String, IFormula> boolVariablesCache = new HashMap<>();
 
-  private final Map<String, ITerm> intVariablesCache = new HashMap<>();
-  private final Map<String, ITerm> arrayVariablesCache = new HashMap<>();
+  private final Map<String, ITerm> sortedVariablesCache = new HashMap<>();
 
   private final Map<String, IFunction> functionsCache = new HashMap<>();
-  private final Map<IFunction, PrincessTermType> functionsReturnTypes = new HashMap<>();
 
+  private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
   private final ShutdownNotifier shutdownNotifier;
 
@@ -126,12 +132,15 @@ class PrincessEnvironment {
   PrincessEnvironment(
       Configuration config,
       @Nullable final PathCounterTemplate pBasicLogfile,
-      ShutdownNotifier pShutdownNotifier)
+      ShutdownNotifier pShutdownNotifier,
+      final int pRandomSeed)
       throws InvalidConfigurationException {
     config.inject(this);
 
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
+    randomSeed = pRandomSeed;
+
     // this api is only used local in this environment, no need for interpolation
     api = getNewApi(false);
   }
@@ -141,28 +150,30 @@ class PrincessEnvironment {
    * shared in all registered APIs.
    */
   PrincessAbstractProver<?, ?> getNewProver(
-      boolean useForInterpolation, PrincessFormulaManager mgr, PrincessFormulaCreator creator) {
+      boolean useForInterpolation,
+      boolean unsatCores,
+      PrincessFormulaManager mgr,
+      PrincessFormulaCreator creator) {
 
-    SimpleAPI newApi = getNewApi(useForInterpolation);
+    SimpleAPI newApi = getNewApi(useForInterpolation || unsatCores);
 
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(newApi::addBooleanVariable);
-    intVariablesCache.values().forEach(newApi::addConstant);
-    arrayVariablesCache.values().forEach(newApi::addConstant);
+    sortedVariablesCache.values().forEach(newApi::addConstant);
     functionsCache.values().forEach(newApi::addFunction);
 
     PrincessAbstractProver<?, ?> prover;
     if (useForInterpolation) {
       prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier);
     } else {
-      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier);
+      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier, unsatCores);
     }
     registeredProvers.add(prover);
     return prover;
   }
 
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  private SimpleAPI getNewApi(boolean useForInterpolation) {
+  private SimpleAPI getNewApi(boolean constructProofs) {
     File directory = null;
     String smtDumpBasename = null;
     String scalaDumpBasename = null;
@@ -201,11 +212,12 @@ class PrincessEnvironment {
             scalaDumpBasename, // scalaDumpBasename
             directory, // dumpDirectory
             SimpleAPI.apply$default$8(), // tightFunctionScopes
-            SimpleAPI.apply$default$9() // genTotalityAxioms
+            SimpleAPI.apply$default$9(), // genTotalityAxioms
+            new scala.Some<>(randomSeed) // randomSeed
             );
 
-    if (useForInterpolation) {
-      newApi.setConstructProofs(true); // needed for interpolation
+    if (constructProofs) { // needed for interpolation and unsat cores
+      newApi.setConstructProofs(true);
     }
 
     return newApi;
@@ -227,13 +239,12 @@ class PrincessEnvironment {
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
     Tuple3<
-            Seq<IFormula>, scala.collection.immutable.Map<IFunction, SMTFunctionType>,
+            Seq<IFormula>,
+            scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>>
         triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
 
     List<? extends IExpression> formula = seqAsJavaList(triple._1());
-    Map<IFunction, SMTFunctionType> functionTypes = mapAsJavaMap(triple._2());
-    Map<ConstantTerm, SMTType> constantTypes = mapAsJavaMap(triple._3());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formula) {
@@ -241,12 +252,7 @@ class PrincessEnvironment {
     }
     for (IExpression var : declaredFunctions.build()) {
       if (var instanceof IConstant) {
-        SMTType type = constantTypes.get(((IConstant) var).c());
-        if (type instanceof SMTParser2InputAbsy.SMTArray) {
-          arrayVariablesCache.put(var.toString(), (ITerm) var);
-        } else {
-          intVariablesCache.put(var.toString(), (ITerm) var);
-        }
+        sortedVariablesCache.put(var.toString(), (ITerm) var);
         addSymbol((IConstant) var);
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
@@ -254,20 +260,10 @@ class PrincessEnvironment {
       } else if (var instanceof IFunApp) {
         IFunction fun = ((IFunApp) var).fun();
         functionsCache.put(fun.name(), fun);
-        functionsReturnTypes.put(fun, convertToTermType(functionTypes.get(fun)));
         addFunction(fun);
       }
     }
     return formula;
-  }
-
-  private static PrincessTermType convertToTermType(SMTFunctionType type) {
-    SMTType resultType = type.result();
-    if (resultType.equals(SMTParser2InputAbsy.SMTBool$.MODULE$)) {
-      return PrincessTermType.Boolean;
-    } else {
-      return PrincessTermType.Integer;
-    }
   }
 
   public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
@@ -347,7 +343,7 @@ class PrincessEnvironment {
           String name =
               getName(getOnlyElement(creator.extractVariablesAndUFs(abbrev, true).values()));
 
-          //only add the necessary abbreviations
+          // only add the necessary abbreviations
           if (!todoAbbrevs.contains(name)) {
             continue;
           }
@@ -379,6 +375,8 @@ class PrincessEnvironment {
     } else if (var instanceof IFunApp) {
       String fullStr = ((IFunApp) var).fun().toString();
       return fullStr.substring(0, fullStr.indexOf('/'));
+    } else if (var instanceof IIntFormula) {
+      return getName(((IIntFormula) var).t());
     }
 
     throw new IllegalArgumentException("The given parameter is no variable or function");
@@ -396,68 +394,51 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  public IExpression makeVariable(PrincessTermType type, String varname) {
-    switch (type) {
-      case Boolean:
-        {
-          if (boolVariablesCache.containsKey(varname)) {
-            return boolVariablesCache.get(varname);
-          } else {
-            IFormula var = api.createBooleanVariable(varname);
-            addSymbol(var);
-            boolVariablesCache.put(varname, var);
-            return var;
-          }
-        }
-
-      case Integer:
-        {
-          if (intVariablesCache.containsKey(varname)) {
-            return intVariablesCache.get(varname);
-          } else {
-            ITerm var = api.createConstant(varname);
-            addSymbol(var);
-            intVariablesCache.put(varname, var);
-            return var;
-          }
-        }
-      case Array:
-        {
-          if (arrayVariablesCache.containsKey(varname)) {
-            return arrayVariablesCache.get(varname);
-          } else {
-            ITerm var = api.createConstant(varname);
-            addSymbol(var);
-            arrayVariablesCache.put(varname, var);
-            return var;
-          }
-        }
-
-      default:
-        throw new AssertionError("unsupported type: " + type);
+  public IExpression makeVariable(Sort type, String varname) {
+    if (type == BOOL_SORT) {
+      if (boolVariablesCache.containsKey(varname)) {
+        return boolVariablesCache.get(varname);
+      } else {
+        IFormula var = api.createBooleanVariable(varname);
+        addSymbol(var);
+        boolVariablesCache.put(varname, var);
+        return var;
+      }
+    } else {
+      if (sortedVariablesCache.containsKey(varname)) {
+        return sortedVariablesCache.get(varname);
+      } else {
+        ITerm var = api.createConstant(varname, type);
+        addSymbol(var);
+        sortedVariablesCache.put(varname, var);
+        return var;
+      }
     }
   }
 
-  /**
-   * This function declares a new functionSymbol, that has a given number of params. Princess has no
-   * support for typed params, only their number is important.
-   */
-  public IFunction declareFun(String name, int nofArgs, PrincessTermType returnType) {
+  /** This function declares a new functionSymbol with the given argument types and result. */
+  public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
-      assert returnType == functionsReturnTypes.get(functionsCache.get(name));
-      return functionsCache.get(name);
-
+      final IFunction res = functionsCache.get(name);
+      assert (res instanceof MonoSortedIFunction)
+          ? (((MonoSortedIFunction) res).resSort().equals(returnType)
+              && seqAsJavaList(((MonoSortedIFunction) res).argSorts()).equals(args))
+          : (returnType == INTEGER_SORT
+              && res.arity() == args.size()
+              && args.stream().allMatch(s -> s == INTEGER_SORT));
+      return res;
     } else {
-      IFunction funcDecl = api.createFunction(name, nofArgs);
+      IFunction funcDecl =
+          api.createFunction(
+              name,
+              asScalaBuffer(args),
+              returnType,
+              false,
+              SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
       functionsCache.put(name, funcDecl);
-      functionsReturnTypes.put(funcDecl, returnType);
       return funcDecl;
     }
-  }
-
-  PrincessTermType getReturnTypeForFunction(IFunction fun) {
-    return functionsReturnTypes.get(fun);
   }
 
   public ITerm makeSelect(ITerm array, ITerm index) {
@@ -471,8 +452,12 @@ class PrincessEnvironment {
   }
 
   public boolean hasArrayType(IExpression exp) {
-    return arrayVariablesCache.containsValue(exp)
-        || (exp instanceof IFunApp && ((IFunApp) exp).fun().toString().equals("store/3"));
+    if (exp instanceof ITerm) {
+      final ITerm t = (ITerm) exp;
+      return Sort$.MODULE$.sortOf(t) instanceof SimpleArray.ArraySort;
+    } else {
+      return false;
+    }
   }
 
   public IFormula elimQuantifiers(IFormula formula) {

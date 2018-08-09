@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: Test-Code Configuration
+    Checkstyle-Configuration: SoSy-Lab
     Description: none
 -->
 <module name="Checker">
@@ -23,7 +23,9 @@
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
-    <module name="JavadocStyle"/>
+    <module name="JavadocStyle">
+      <property name="checkFirstSentence" value="false"/>
+    </module>
     <module name="JavadocMethod">
       <property name="allowUndeclaredRTE" value="true"/>
       <property name="allowMissingParamTags" value="true"/>
@@ -32,28 +34,32 @@
       <property name="allowMissingJavadoc" value="true"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
+    <module name="AbstractClassName">
+      <property name="format" value="^(Abstract|Forwarding).*$"/>
+      <property name="ignoreName" value="true"/>
+    </module>
     <module name="ClassTypeParameterName">
-      <property name="format" value="^[A-Z][0-9]?$"/>
+      <property name="format" value="^([A-Z][A-Z0-9]?|T[A-Za-z]*|[A-Z][a-zA-Z0-9]*T(ype)?)$"/>
     </module>
     <module name="ConstantName">
-      <property name="applyToPrivate" value="false"/>
+      <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|[a-z][a-zA-Z0-9]*)$"/>
     </module>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName">
-      <property name="format" value="^[a-zA-Z0-9_]*$"/>
+      <property name="format" value="^([a-z][a-zA-Z0-9]*|_)$"/>
     </module>
     <module name="MemberName"/>
-    <module name="MethodName">
-      <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
-    </module>
+    <module name="MethodName"/>
     <module name="MethodTypeParameterName">
-      <property name="format" value="^[A-Z][0-9]?$"/>
+      <property name="format" value="^([A-Z][A-Z]?[A-Z0-9]?|[A-Z][a-zA-Z0-9]*T(ype)?)$"/>
     </module>
     <module name="PackageName"/>
     <module name="ParameterName"/>
     <module name="StaticVariableName"/>
     <module name="TypeName"/>
-    <module name="IllegalImport"/>
+    <module name="IllegalImport">
+      <property name="illegalPkgs" value="sun,com.google.common.testing,org.junit,junit"/>
+    </module>
     <module name="ImportOrder">
       <property name="option" value="top"/>
       <property name="separated" value="true"/>
@@ -93,6 +99,8 @@
       <property name="tokens" value="BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,LAND,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,TYPE_EXTENSION_AND"/>
       <property name="allowEmptyConstructors" value="true"/>
       <property name="allowEmptyMethods" value="true"/>
+      <property name="allowEmptyTypes" value="true"/>
+      <property name="allowEmptyLambdas" value="true"/>
       <property name="ignoreEnhancedForColon" value="false"/>
     </module>
     <module name="NoWhitespaceBefore">
@@ -103,9 +111,7 @@
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
-    <module name="LeftCurly">
-      <property name="maxLineLength" value="100"/>
-    </module>
+    <module name="LeftCurly"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
     <module name="RedundantModifier"/>
@@ -126,7 +132,7 @@
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>
-    <module name="MissingSwitchDefault"/>
+    <module name="MultipleVariableDeclarations"/>
     <module name="NoClone"/>
     <module name="NoFinalizer"/>
     <module name="PackageDeclaration"/>
@@ -134,8 +140,14 @@
     <module name="StringLiteralEquality"/>
     <module name="OneStatementPerLine"/>
     <module name="ArrayTrailingComma"/>
+    <module name="HideUtilityClassConstructor"/>
     <module name="InterfaceIsType"/>
     <module name="MutableException"/>
+    <module name="VisibilityModifier">
+      <property name="packageAllowed" value="true"/>
+      <property name="protectedAllowed" value="true"/>
+      <property name="publicMemberPattern" value="^$"/>
+    </module>
     <module name="ArrayTypeStyle"/>
     <module name="UpperEll"/>
     <module name="OuterTypeFilename"/>
@@ -143,15 +155,19 @@
       <property name="tokens" value="ARRAY_INIT"/>
     </module>
     <module name="AvoidStarImport"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClasses"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBoolean"/>
+    <module name="com.github.sevntu.checkstyle.checks.annotation.ForbidAnnotationCheck">
+      <property name="annotationNames" value="Test"/>
+      <property name="annotationTargets" value="METHOD_DEF"/>
+    </module>
+    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidDefaultSerializableInInnerClassesCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.AvoidNotShortCircuitOperatorsForBooleanCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.ForbidReturnInFinallyBlockCheck"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnNullInsteadOfBoolean"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnBooleanFromTernary"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnNullInsteadOfBooleanCheck"/>
+    <module name="com.github.sevntu.checkstyle.checks.coding.ReturnBooleanFromTernaryCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.NoNullForCollectionReturnCheck">
       <property name="searchThroughMethodBody" value="true"/>
     </module>
-    <module name="com.github.sevntu.checkstyle.checks.design.NoMainMethodInAbstractClass"/>
+    <module name="com.github.sevntu.checkstyle.checks.design.NoMainMethodInAbstractClassCheck"/>
     <module name="AnnotationLocation">
       <property name="tokens" value="CLASS_DEF,CTOR_DEF,ENUM_DEF,INTERFACE_DEF,METHOD_DEF"/>
     </module>
@@ -163,7 +179,7 @@
     <module name="CommentsIndentation"/>
     <module name="OneTopLevelClass"/>
     <module name="com.github.sevntu.checkstyle.checks.coding.ForbidThrowAnonymousExceptionsCheck"/>
-    <module name="com.github.sevntu.checkstyle.checks.coding.MapIterationInForEachLoop">
+    <module name="com.github.sevntu.checkstyle.checks.coding.MapIterationInForEachLoopCheck">
       <property name="proposeKeySetUsage" value="true"/>
       <property name="proposeEntrySetUsage" value="true"/>
     </module>
@@ -176,11 +192,6 @@
       <property name="scope" value="public"/>
       <property name="severity" value="ignore"/>
     </module>
-  </module>
-  <module name="Header">
-    <property name="header" value="/*\n *  JavaSMT is an API wrapper for a collection of SMT solvers.\n *  This file is part of JavaSMT.\n *\n *  Copyright (C) 2007-2015  Dirk Beyer\n *  All rights reserved.\n *\n *  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);\n *  you may not use this file except in compliance with the License.\n *  You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n *  Unless required by applicable law or agreed to in writing, software\n *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,\n *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n *  See the License for the specific language governing permissions and\n *  limitations under the License.\n */"/>
-    <property name="severity" value="ignore"/>
-    <property name="ignoreLines" value="5"/>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>

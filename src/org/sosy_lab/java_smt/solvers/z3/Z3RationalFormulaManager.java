@@ -27,8 +27,8 @@ import org.sosy_lab.java_smt.api.RationalFormulaManager;
 class Z3RationalFormulaManager extends Z3NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  Z3RationalFormulaManager(Z3FormulaCreator pCreator) {
-    super(pCreator);
+  Z3RationalFormulaManager(Z3FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

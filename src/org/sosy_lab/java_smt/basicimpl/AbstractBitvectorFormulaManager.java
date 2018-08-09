@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BitvectorFormula;

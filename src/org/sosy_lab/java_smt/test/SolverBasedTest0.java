@@ -19,14 +19,11 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.proverEnvironment;
+import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.truth.FailureStrategy;
-import com.google.common.truth.SubjectFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -34,6 +31,7 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -116,11 +114,20 @@ public abstract class SolverBasedTest0 {
   }
 
   @Before
-  public final void initSolver() throws Exception {
+  public final void initSolver() throws InvalidConfigurationException {
     config = createTestConfigBuilder().build();
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
-    context = factory.generateContext();
+    try {
+      context = factory.generateContext();
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
+    }
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();
@@ -154,14 +161,16 @@ public abstract class SolverBasedTest0 {
   }
 
   @After
-  public final void closeSolver() throws Exception {
-    context.close();
+  public final void closeSolver() {
+    if (context != null) {
+      context.close();
+    }
   }
 
   /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of rationals")
+        .withMessage("Solver %s does not support the theory of rationals", solverToUse())
         .that(rmgr)
         .isNotNull();
   }
@@ -169,15 +178,14 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
-        .withFailureMessage(
-            "Solver " + solverToUse() + " does not support the theory of bitvectors")
+        .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
         .that(bvmgr)
         .isNotNull();
   }
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support quantifiers")
+        .withMessage("Solver %s does not support quantifiers", solverToUse())
         .that(qmgr)
         .isNotNull();
   }
@@ -185,14 +193,14 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support arrays. */
   protected final void requireArrays() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of arrays")
+        .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
         .isNotNull();
   }
 
   protected final void requireFloats() {
     assume()
-        .withFailureMessage("Solver " + solverToUse() + " does not support the theory of floats")
+        .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
         .isNotNull();
   }
@@ -207,7 +215,7 @@ public abstract class SolverBasedTest0 {
       context.newOptimizationProverEnvironment().close();
     } catch (UnsupportedOperationException e) {
       assume()
-          .withFailureMessage("Solver " + solverToUse() + " does not support optimization")
+          .withMessage("Solver %s does not support optimization", solverToUse())
           .that(e)
           .isNull();
     }
@@ -218,7 +226,7 @@ public abstract class SolverBasedTest0 {
       context.newProverEnvironmentWithInterpolation().close();
     } catch (UnsupportedOperationException e) {
       assume()
-          .withFailureMessage("Solver " + solverToUse() + " does not support interpolation")
+          .withMessage("Solver %s does not support interpolation", solverToUse())
           .that(e)
           .isNull();
     }
@@ -226,7 +234,7 @@ public abstract class SolverBasedTest0 {
 
   @Deprecated
   protected final void requireFalse(String failureMessage) {
-    assume().withFailureMessage(failureMessage).fail();
+    assume().withMessage(failureMessage).fail();
   }
 
   /**
@@ -234,28 +242,17 @@ public abstract class SolverBasedTest0 {
    * assertThatFormula(formula).is...()</code>.
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
-    return assert_().about(BooleanFormulaSubject.forSolver(context)).that(formula);
+    return assertUsing(context).that(formula);
   }
 
   /**
    * Use this for checking assertions about ProverEnvironments with Truth: <code>
    * assertThatEnvironment(stack).is...()</code>.
+   *
+   * <p>For new code, we suggest using {@link
+   * ProverEnvironmentSubject#assertThat(BasicProverEnvironment)} with a static import.
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
-    return assert_().about(proverEnvironment()).that(prover);
-  }
-
-  @Deprecated
-  protected final JavaOptionalSubject assertThatOptional(Optional<?> pOptional) {
-    return assert_()
-        .about(
-            new SubjectFactory<JavaOptionalSubject, Optional<?>>() {
-              @Override
-              public JavaOptionalSubject getSubject(
-                  FailureStrategy pFailureStrategy, Optional<?> pOptional) {
-                return new JavaOptionalSubject(pFailureStrategy, pOptional);
-              }
-            })
-        .that(pOptional);
+    return assertThat(prover);
   }
 }

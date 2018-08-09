@@ -23,9 +23,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,12 +33,12 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
+import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class OptimizationTest extends SolverBasedTest0 {
@@ -64,20 +62,18 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Before
-  public void skipUnsupportedSolvers() throws Exception {
+  public void skipUnsupportedSolvers() {
     requireOptimization();
   }
 
   @Test
-  public void testUnbounded() throws Exception {
+  public void testUnbounded() throws SolverException, InterruptedException {
     requireRationals();
-    assert rmgr != null;
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");
       RationalFormula obj = rmgr.makeVariable("obj");
-      List<BooleanFormula> constraints =
-          ImmutableList.of(rmgr.greaterOrEquals(x, rmgr.makeNumber("10")), rmgr.equal(x, obj));
-      prover.addConstraint(bmgr.and(constraints));
+      prover.addConstraint(
+          bmgr.and(rmgr.greaterOrEquals(x, rmgr.makeNumber("10")), rmgr.equal(x, obj)));
       int handle = prover.maximize(obj);
       OptStatus response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
@@ -87,14 +83,12 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void testUnfeasible() throws Exception {
+  public void testUnfeasible() throws SolverException, InterruptedException {
     requireRationals();
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");
       RationalFormula y = rmgr.makeVariable("y");
-      List<BooleanFormula> constraints =
-          ImmutableList.of(rmgr.lessThan(x, y), rmgr.greaterThan(x, y));
-      prover.addConstraint(bmgr.and(constraints));
+      prover.addConstraint(bmgr.and(rmgr.lessThan(x, y), rmgr.greaterThan(x, y)));
       prover.maximize(x);
       OptStatus response = prover.check();
       assertThat(response).isEqualTo(OptStatus.UNSAT);
@@ -102,7 +96,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testOptimal() throws Exception {
+  public void testOptimal() throws SolverException, InterruptedException {
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
 
       IntegerFormula x = imgr.makeVariable("x");
@@ -116,14 +110,12 @@ public class OptimizationTest extends SolverBasedTest0 {
        obj = x + y
        x - y >= 1
       */
-      List<BooleanFormula> constraints =
-          ImmutableList.of(
+      prover.addConstraint(
+          bmgr.and(
               imgr.lessOrEquals(x, imgr.makeNumber(10)),
               imgr.lessOrEquals(y, imgr.makeNumber(15)),
               imgr.equal(obj, imgr.add(x, y)),
-              imgr.greaterOrEquals(imgr.subtract(x, y), imgr.makeNumber(1)));
-
-      prover.addConstraint(bmgr.and(constraints));
+              imgr.greaterOrEquals(imgr.subtract(x, y), imgr.makeNumber(1))));
       int handle = prover.maximize(obj);
 
       // Maximize for x.
@@ -146,7 +138,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testSwitchingObjectives() throws Exception {
+  public void testSwitchingObjectives() throws SolverException, InterruptedException {
     requireRationals();
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
@@ -163,13 +155,12 @@ public class OptimizationTest extends SolverBasedTest0 {
        obj = x + y
        x - y >= 1
       */
-      List<BooleanFormula> constraints =
-          ImmutableList.of(
+      prover.addConstraint(
+          bmgr.and(
               rmgr.lessOrEquals(x, rmgr.makeNumber(10)),
               rmgr.lessOrEquals(y, rmgr.makeNumber(15)),
               rmgr.equal(obj, rmgr.add(x, y)),
-              rmgr.greaterOrEquals(rmgr.subtract(x, y), rmgr.makeNumber(1)));
-      prover.addConstraint(bmgr.and(constraints));
+              rmgr.greaterOrEquals(rmgr.subtract(x, y), rmgr.makeNumber(1))));
       OptStatus response;
 
       prover.push();
@@ -200,7 +191,7 @@ public class OptimizationTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testStrictConstraint() throws Exception {
+  public void testStrictConstraint() throws SolverException, InterruptedException {
     requireRationals();
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {

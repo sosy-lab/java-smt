@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
@@ -36,10 +37,11 @@ abstract class Mathsat5NumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
 
-  private final long mathsatEnv;
+  final long mathsatEnv;
 
-  Mathsat5NumeralFormulaManager(Mathsat5FormulaCreator pCreator) {
-    super(pCreator);
+  Mathsat5NumeralFormulaManager(
+      Mathsat5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
     this.mathsatEnv = pCreator.getEnv();
   }
 
@@ -49,8 +51,12 @@ abstract class Mathsat5NumeralFormulaManager<
   }
 
   @Override
-  public Long makeNumberImpl(long pI) {
-    return msat_make_number(mathsatEnv, Long.toString(pI));
+  public Long makeNumberImpl(long pNumber) {
+    int i = (int) pNumber;
+    if (i == pNumber) { // fits in an int
+      return msat_make_int_number(mathsatEnv, i);
+    }
+    return msat_make_number(mathsatEnv, Long.toString(pNumber));
   }
 
   @Override
@@ -87,11 +93,7 @@ abstract class Mathsat5NumeralFormulaManager<
 
   @Override
   public Long multiply(Long pNumber1, Long pNumber2) {
-    if (isNumeral(pNumber1) || isNumeral(pNumber2)) {
-      return msat_make_times(mathsatEnv, pNumber1, pNumber2);
-    } else {
-      return super.multiply(pNumber1, pNumber2);
-    }
+    return msat_make_times(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override

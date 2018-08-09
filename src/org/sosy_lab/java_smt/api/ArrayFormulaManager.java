@@ -48,9 +48,14 @@ public interface ArrayFormulaManager {
       ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue);
 
   /**
-   * Declare a new array.
+   * Declare a new array with exactly the given name.
    *
-   * @param pName The name of the array variable
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   *
    * @param pIndexType The type of the array index
    * @param pElementType The type of the array elements
    * @return Formula that represents the array

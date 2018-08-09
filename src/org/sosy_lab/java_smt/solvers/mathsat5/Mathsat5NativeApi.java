@@ -62,77 +62,78 @@ class Mathsat5NativeApi {
   public static final int MSAT_TAG_ERROR = -1;
 
   public static final int MSAT_TAG_UNKNOWN = 0;
-  public static final int MSAT_TAG_TRUE = 1; //< the Boolean constant True
-  public static final int MSAT_TAG_FALSE = 2; //< the Boolean constant False
-  public static final int MSAT_TAG_AND = 3; //< the AND Boolean connective
-  public static final int MSAT_TAG_OR = 4; //< the OR Boolean connective
-  public static final int MSAT_TAG_NOT = 5; //< the NOT Boolean connective
-  public static final int MSAT_TAG_IFF = 6; //< the IFF Boolean connective
-  public static final int MSAT_TAG_PLUS = 7; //< arithmetic addition
-  public static final int MSAT_TAG_TIMES = 8; //< arithmetic multiplication
-  public static final int MSAT_TAG_FLOOR = 9; //< floor function
-  public static final int MSAT_TAG_LEQ = 10; //< arithmetic <=
-  public static final int MSAT_TAG_EQ = 11; //< equality
-  public static final int MSAT_TAG_ITE = 12; //< term-level if-then-else
-  public static final int MSAT_TAG_INT_MOD_CONGR = 13; //< integer modular congruence
-  public static final int MSAT_TAG_BV_CONCAT = 14; //< BV concatenation
-  public static final int MSAT_TAG_BV_EXTRACT = 15; //< BV selection
-  public static final int MSAT_TAG_BV_NOT = 16; //< BV bitwise not
-  public static final int MSAT_TAG_BV_AND = 17; //< BV bitwise and
-  public static final int MSAT_TAG_BV_OR = 18; //< BV bitwise or
-  public static final int MSAT_TAG_BV_XOR = 19; //< BV bitwise xor
-  public static final int MSAT_TAG_BV_ULT = 20; //< BV unsigned <
-  public static final int MSAT_TAG_BV_SLT = 21; //< BV signed <
-  public static final int MSAT_TAG_BV_ULE = 22; //< BV unsigned <=
-  public static final int MSAT_TAG_BV_SLE = 23; //< BV signed <
-  public static final int MSAT_TAG_BV_COMP = 24; //< BV bit comparison
-  public static final int MSAT_TAG_BV_NEG = 25; //< BV unary minus
-  public static final int MSAT_TAG_BV_ADD = 26; //< BV addition
-  public static final int MSAT_TAG_BV_SUB = 27; //< BV subtraction
-  public static final int MSAT_TAG_BV_MUL = 28; //< BV multiplication
-  public static final int MSAT_TAG_BV_UDIV = 29; //< BV unsigned division
-  public static final int MSAT_TAG_BV_SDIV = 30; //< BV signed division
-  public static final int MSAT_TAG_BV_UREM = 31; //< BV unsigned remainder
-  public static final int MSAT_TAG_BV_SREM = 32; //< BV signed remainder
-  public static final int MSAT_TAG_BV_LSHL = 33; //< BV logical left shift
-  public static final int MSAT_TAG_BV_LSHR = 34; //< BV logical right shift
-  public static final int MSAT_TAG_BV_ASHR = 35; //< BV arithmetic right shift
-  public static final int MSAT_TAG_BV_ROL = 36; //< BV rotate left
-  public static final int MSAT_TAG_BV_ROR = 37; //< BV rotate right
-  public static final int MSAT_TAG_BV_ZEXT = 38; //< BV zero extension
-  public static final int MSAT_TAG_BV_SEXT = 39; //< BV sign extension
-  public static final int MSAT_TAG_ARRAY_READ = 40; //< Array read/select operation
-  public static final int MSAT_TAG_ARRAY_WRITE = 41; //< Array write/store operation
-  public static final int MSAT_TAG_ARRAY_CONST = 42; //< Constant arrays
-  public static final int MSAT_TAG_FP_EQ = 43; //< FP IEEE equality
-  public static final int MSAT_TAG_FP_LT = 44; //< FP <
-  public static final int MSAT_TAG_FP_LE = 45; //< FP <=
-  public static final int MSAT_TAG_FP_NEG = 46; //< FP unary minus
-  public static final int MSAT_TAG_FP_ADD = 47; //< FP addition
-  public static final int MSAT_TAG_FP_SUB = 48; //< FP subtraction
-  public static final int MSAT_TAG_FP_MUL = 49; //< FP multiplication
-  public static final int MSAT_TAG_FP_DIV = 50; //< FP division
-  public static final int MSAT_TAG_FP_SQRT = 51; //< FP square root
-  public static final int MSAT_TAG_FP_ABS = 52; //< FP absolute value
-  public static final int MSAT_TAG_FP_MIN = 53; //< FP min
-  public static final int MSAT_TAG_FP_MAX = 54; //< FP max
-  public static final int MSAT_TAG_FP_CAST = 55; //< FP format conversion
-  public static final int MSAT_TAG_FP_ROUND_TO_INT = 56; //< FP round to integer
-  public static final int MSAT_TAG_FP_FROM_SBV = 57; //< FP conversion from a signed BV
-  public static final int MSAT_TAG_FP_FROM_UBV = 58; //< FP conversion from an unsigned BV
-  public static final int MSAT_TAG_FP_TO_BV = 59; //< FP conversion to BV
-  public static final int MSAT_TAG_FP_AS_IEEEBV = 60; //< FP as IEEE BV (access to the bits)
-  public static final int MSAT_TAG_FP_ISNAN = 61; //< FP check for NaN
-  public static final int MSAT_TAG_FP_ISINF = 62; //< FP check for infinity
-  public static final int MSAT_TAG_FP_ISZERO = 63; //< FP check for zero
-  public static final int MSAT_TAG_FP_ISSUBNORMAL = 64; //< FP check for subnormal
-  public static final int MSAT_TAG_FP_ISNORMAL = 65; //< FP check for normal
-  public static final int MSAT_TAG_FP_ISNEG = 66; //< FP check for negative
-  public static final int MSAT_TAG_FP_ISPOS = 67; //< FP check for positive
-  public static final int MSAT_TAG_FP_FROM_IEEEBV = 68; //< FP conversion from IEEE BV
-  public static final int MSAT_TAG_INT_FROM_UBV = 69; //< Unsigned BV -> INT conversion
-  public static final int MSAT_TAG_INT_FROM_SBV = 70; //< Signed BV -> INT conversion
-  public static final int MSAT_TAG_INT_TO_BV = 71; //< INT -> BV conversion
+  public static final int MSAT_TAG_TRUE = 1; // < the Boolean constant True
+  public static final int MSAT_TAG_FALSE = 2; // < the Boolean constant False
+  public static final int MSAT_TAG_AND = 3; // < the AND Boolean connective
+  public static final int MSAT_TAG_OR = 4; // < the OR Boolean connective
+  public static final int MSAT_TAG_NOT = 5; // < the NOT Boolean connective
+  public static final int MSAT_TAG_IFF = 6; // < the IFF Boolean connective
+  public static final int MSAT_TAG_PLUS = 7; // < arithmetic addition
+  public static final int MSAT_TAG_TIMES = 8; // < arithmetic multiplication
+  public static final int MSAT_TAG_DIVIDE = 9; // < arithmetic multiplication
+  public static final int MSAT_TAG_FLOOR = 10; // < floor function
+  public static final int MSAT_TAG_LEQ = 11; // < arithmetic <=
+  public static final int MSAT_TAG_EQ = 12; // < equality
+  public static final int MSAT_TAG_ITE = 13; // < term-level if-then-else
+  public static final int MSAT_TAG_INT_MOD_CONGR = 14; // < integer modular congruence
+  public static final int MSAT_TAG_BV_CONCAT = 15; // < BV concatenation
+  public static final int MSAT_TAG_BV_EXTRACT = 16; // < BV selection
+  public static final int MSAT_TAG_BV_NOT = 17; // < BV bitwise not
+  public static final int MSAT_TAG_BV_AND = 18; // < BV bitwise and
+  public static final int MSAT_TAG_BV_OR = 19; // < BV bitwise or
+  public static final int MSAT_TAG_BV_XOR = 20; // < BV bitwise xor
+  public static final int MSAT_TAG_BV_ULT = 21; // < BV unsigned <
+  public static final int MSAT_TAG_BV_SLT = 22; // < BV signed <
+  public static final int MSAT_TAG_BV_ULE = 23; // < BV unsigned <=
+  public static final int MSAT_TAG_BV_SLE = 24; // < BV signed <
+  public static final int MSAT_TAG_BV_COMP = 25; // < BV bit comparison
+  public static final int MSAT_TAG_BV_NEG = 26; // < BV unary minus
+  public static final int MSAT_TAG_BV_ADD = 27; // < BV addition
+  public static final int MSAT_TAG_BV_SUB = 28; // < BV subtraction
+  public static final int MSAT_TAG_BV_MUL = 29; // < BV multiplication
+  public static final int MSAT_TAG_BV_UDIV = 30; // < BV unsigned division
+  public static final int MSAT_TAG_BV_SDIV = 31; // < BV signed division
+  public static final int MSAT_TAG_BV_UREM = 32; // < BV unsigned remainder
+  public static final int MSAT_TAG_BV_SREM = 33; // < BV signed remainder
+  public static final int MSAT_TAG_BV_LSHL = 34; // < BV logical left shift
+  public static final int MSAT_TAG_BV_LSHR = 35; // < BV logical right shift
+  public static final int MSAT_TAG_BV_ASHR = 36; // < BV arithmetic right shift
+  public static final int MSAT_TAG_BV_ROL = 37; // < BV rotate left
+  public static final int MSAT_TAG_BV_ROR = 38; // < BV rotate right
+  public static final int MSAT_TAG_BV_ZEXT = 39; // < BV zero extension
+  public static final int MSAT_TAG_BV_SEXT = 40; // < BV sign extension
+  public static final int MSAT_TAG_ARRAY_READ = 41; // < Array read/select operation
+  public static final int MSAT_TAG_ARRAY_WRITE = 42; // < Array write/store operation
+  public static final int MSAT_TAG_ARRAY_CONST = 43; // < Constant arrays
+  public static final int MSAT_TAG_FP_EQ = 44; // < FP IEEE equality
+  public static final int MSAT_TAG_FP_LT = 45; // < FP <
+  public static final int MSAT_TAG_FP_LE = 46; // < FP <=
+  public static final int MSAT_TAG_FP_NEG = 47; // < FP unary minus
+  public static final int MSAT_TAG_FP_ADD = 48; // < FP addition
+  public static final int MSAT_TAG_FP_SUB = 49; // < FP subtraction
+  public static final int MSAT_TAG_FP_MUL = 50; // < FP multiplication
+  public static final int MSAT_TAG_FP_DIV = 51; // < FP division
+  public static final int MSAT_TAG_FP_SQRT = 52; // < FP square root
+  public static final int MSAT_TAG_FP_ABS = 53; // < FP absolute value
+  public static final int MSAT_TAG_FP_MIN = 54; // < FP min
+  public static final int MSAT_TAG_FP_MAX = 55; // < FP max
+  public static final int MSAT_TAG_FP_CAST = 56; // < FP format conversion
+  public static final int MSAT_TAG_FP_ROUND_TO_INT = 57; // < FP round to integer
+  public static final int MSAT_TAG_FP_FROM_SBV = 58; // < FP conversion from a signed BV
+  public static final int MSAT_TAG_FP_FROM_UBV = 59; // < FP conversion from an unsigned BV
+  public static final int MSAT_TAG_FP_TO_BV = 60; // < FP conversion to BV
+  public static final int MSAT_TAG_FP_AS_IEEEBV = 61; // < FP as IEEE BV (access to the bits)
+  public static final int MSAT_TAG_FP_ISNAN = 62; // < FP check for NaN
+  public static final int MSAT_TAG_FP_ISINF = 63; // < FP check for infinity
+  public static final int MSAT_TAG_FP_ISZERO = 64; // < FP check for zero
+  public static final int MSAT_TAG_FP_ISSUBNORMAL = 65; // < FP check for subnormal
+  public static final int MSAT_TAG_FP_ISNORMAL = 66; // < FP check for normal
+  public static final int MSAT_TAG_FP_ISNEG = 67; // < FP check for negative
+  public static final int MSAT_TAG_FP_ISPOS = 68; // < FP check for positive
+  public static final int MSAT_TAG_FP_FROM_IEEEBV = 69; // < FP conversion from IEEE BV
+  public static final int MSAT_TAG_INT_FROM_UBV = 70; // < Unsigned BV -> INT conversion
+  public static final int MSAT_TAG_INT_FROM_SBV = 71; // < Signed BV -> INT conversion
+  public static final int MSAT_TAG_INT_TO_BV = 72; // < INT -> BV conversion
 
   interface AllSatModelCallback {
 
@@ -170,9 +171,11 @@ class Mathsat5NativeApi {
   private static final ImmutableSet<String> ALLOWED_SOLVE_FAILURE_MESSAGES =
       ImmutableSet.of(
           "unsupported",
+          "unimplemented",
           "can't produce proofs",
           "non-integer model value",
           "build_model: too many iterations",
+          "eager fp solver does not support proof generation",
           "FP<->BV combination unsupported by the current configuration");
 
   private static boolean processSolveResult(long e, int resultCode)
@@ -186,7 +189,7 @@ class Mathsat5NativeApi {
         String msg = Strings.emptyToNull(msat_last_error_message(e));
 
         if (ALLOWED_SOLVE_FAILURE_MESSAGES.contains(msg)) {
-          //·This·is·not·a·bug·in·our·code,·but·a·problem·of·MathSAT
+          // This is not a bug in our code, but a problem of MathSAT
           throw new SolverException(msg);
         }
 
@@ -301,15 +304,21 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_equal(long e, long t1, long t2);
 
+  public static native long msat_make_eq(long e, long t1, long t2);
+
   public static native long msat_make_leq(long e, long t1, long t2);
 
   public static native long msat_make_plus(long e, long t1, long t2);
 
   public static native long msat_make_times(long e, long t1, long t2);
 
+  public static native long msat_make_divide(long e, long t1, long t2);
+
   public static native long msat_make_floor(long e, long t);
 
   public static native long msat_make_number(long e, String num_rep);
+
+  public static native long msat_make_int_number(long e, int value);
 
   public static native long msat_make_int_modular_congruence(
       long e, String modulo, long t1, long t2);
@@ -333,6 +342,8 @@ class Mathsat5NativeApi {
   public static native long msat_make_int_from_sbv(long e, long t);
 
   public static native long msat_make_bv_number(long e, String numRep, int width, int base);
+
+  public static native long msat_make_bv_int_number(long e, int value, int width);
 
   public static native long msat_make_bv_concat(long e, long t1, long t2);
 
@@ -529,6 +540,8 @@ class Mathsat5NativeApi {
 
   public static native boolean msat_term_is_times(long e, long t);
 
+  public static native boolean msat_term_is_divide(long e, long t);
+
   public static native boolean msat_term_is_floor(long e, long t);
 
   public static native boolean msat_term_is_array_read(long e, long t);
@@ -594,7 +607,7 @@ class Mathsat5NativeApi {
   public static native boolean msat_term_is_bv_ror(long e, long t);
 
   public static native boolean msat_term_is_bv_comp(long e, long t);
-  //public static native int msat_visit_term(long e, msat_visit_term_callback func)
+  // public static native int msat_visit_term(long e, msat_visit_term_callback func)
   public static native long msat_find_decl(long e, String symbol);
 
   /**
@@ -655,12 +668,12 @@ class Mathsat5NativeApi {
   public static native void msat_push_backtrack_point(long e);
 
   public static native void msat_pop_backtrack_point(long e);
-  //public static native int msat_num_backtrack_points(long e)
+  // public static native int msat_num_backtrack_points(long e)
   public static native void msat_reset_env(long e);
 
   public static native void msat_assert_formula(long e, long formula);
-  //public static native int msat_add_preferred_for_branching(long e, long termBoolvar);
-  //public static native int msat_clear_preferred_for_branching(long e)
+  // public static native int msat_add_preferred_for_branching(long e, long termBoolvar);
+  // public static native int msat_clear_preferred_for_branching(long e)
   private static native int msat_solve(long e) throws InterruptedException;
 
   private static native int msat_solve_with_assumptions(

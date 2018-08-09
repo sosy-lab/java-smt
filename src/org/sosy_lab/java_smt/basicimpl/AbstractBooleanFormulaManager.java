@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -35,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -140,6 +143,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.reducing(makeTrue(), this::and);
+  }
+
+  @Override
   public BooleanFormula or(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
@@ -180,6 +188,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       result = or(result, formula);
     }
     return result;
+  }
+
+  @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.reducing(makeFalse(), this::or);
   }
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -419,12 +432,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     while (!toProcess.isEmpty()) {
       BooleanFormula s = toProcess.pop();
-      Set<BooleanFormula> out = cache.get(s);
-      if (out == null) {
-
-        out = formulaCreator.visit(s, visitor);
-        cache.put(s, out);
-      }
+      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> formulaCreator.visit(ss, visitor));
       if (out.size() == 1 && s.equals(out.iterator().next())) {
         output.add(s);
       }

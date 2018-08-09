@@ -5,37 +5,32 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+      - jq
 env:
   global:
     - GH_REF: github.com/sosy-lab/java-smt.git
-  matrix:
-    - NAME='Build and run tests'
 install:
   - ant resolve-dependencies
-script:
-  - ant unit-tests-coverage
 matrix:
   include:
     - env: NAME='Build with ECJ'
       script:
         - ant build-project-ecj
-      jdk: oraclejdk8
+    - env: NAME='Unit Tests'
+      script:
+        - ant unit-tests-coverage
     - env: NAME='Create Javadoc'
       script:
-        - ant javadoc
-      jdk: oraclejdk8
+        - ant javadoc collect-options
     - env: NAME=Checkstyle
       script:
         - ant run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && [ $(cat Checkstyle*.xml | grep -vic audit) -eq 0 ]
-      jdk: oraclejdk8
-    - env: NAME=FindBugs
+    - env: NAME=SpotBugs
       script:
-        - ant run-findbugs -Dfindbugs.output=text && cat FindBugs.xml && test \! -s FindBugs.xml
-      jdk: oraclejdk8
+        - ant run-spotbugs -Dspotbugs.output=text && cat SpotBugs.xml && test \! -s SpotBugs.xml
     - env: NAME='Check source-code format'
       script:
-        - ant format-source && git diff -s --exit-code
-      jdk: oraclejdk8
+        - ant format-source && git diff --exit-code
 deploy:
   - skip_cleanup: true
     provider: script
@@ -46,7 +41,7 @@ deploy:
     provider: script
     script: build/deploy-coverage.sh
     on:
-      condition: $NAME = "Build and run tests"
+      condition: $NAME = "Unit Tests"
 notifications:
   email:
   - java-smt-dev@googlegroups.com

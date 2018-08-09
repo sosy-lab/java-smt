@@ -32,8 +32,9 @@ class SmtInterpolRationalFormulaManager
     extends SmtInterpolNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  SmtInterpolRationalFormulaManager(SmtInterpolFormulaCreator pCreator) {
-    super(pCreator);
+  SmtInterpolRationalFormulaManager(
+      SmtInterpolFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override
@@ -74,7 +75,7 @@ class SmtInterpolRationalFormulaManager
 
   @Override
   public Term divide(Term pNumber1, Term pNumber2) {
-    if (isNumeral(pNumber2)) {
+    if (consistsOfNumerals(pNumber2)) {
       Sort intSort = pNumber1.getTheory().getNumericSort();
       Sort realSort = pNumber1.getTheory().getRealSort();
       assert intSort.equals(pNumber1.getSort()) || realSort.equals(pNumber1.getSort());

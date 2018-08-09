@@ -4,11 +4,15 @@
 
     <!-- Targets for building documentation. -->
 
-    <!-- Keep this file synchronized between SoSy-Lab Common, CPAchecker, JavaSMT, and VerifierCloud. -->
+    <!-- DO NOT EDIT LOCALLY!
+         Keep this file synchronized with
+         https://gitlab.com/sosy-lab/software/java-project-template
+    -->
 
     <!-- These properties can be overridden from including file. -->
     <property name="documentation.options.file" value="${class.dir}/org/sosy_lab/${package}/ConfigurationOptions.txt"/>
     <property name="documentation.javadoc.dir" value="Javadoc"/>
+    <property name="documentation.javadoc.exclude" value=""/>
 
     <target name="collect-options" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
@@ -27,7 +31,7 @@
         <echo message="Options collected." level="info"/>
     </target>
 
-    <target name="javadoc">
+    <target name="javadoc" depends="build-project">
         <javadoc
             destdir="${documentation.javadoc.dir}"
             classpathref="classpath"
@@ -35,21 +39,29 @@
             encoding="utf-8"
             windowtitle="${ant.project.name}"
             failonerror="true"
+            failonwarning="true"
             overview="doc/javadoc_overview.html"
+            excludepackagenames="${documentation.javadoc.exclude}"
             >
 
             <fileset dir="${source.dir}" defaultexcludes="yes">
                 <exclude name="**/*Test.java"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/mathsat5/*"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/princess/*"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/smtinterpol/*"/>
-                <exclude name="org/sosy_lab/java_smt/solvers/z3/*"/>
             </fileset>
-            <link href="http://docs.oracle.com/javase/8/docs/api/"/>
-            <link href="https://google.github.io/guava/releases/19.0/api/docs/"/>
+            <link href="https://docs.oracle.com/javase/8/docs/api/"/>
+            <link href="https://google.github.io/guava/releases/snapshot/api/docs/"/>
             <link href="https://google.github.io/truth/api/latest/"/>
             <link href="https://sosy-lab.github.io/java-common-lib/api/"/>
             <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
+            <tag name="apiNote" description="API Note:"/>
+            <tag name="implSpec" description="Implementation Requirements:"/>
+            <tag name="implNote" description="Implementation Note:"/>
         </javadoc>
+    </target>
+
+    <target name="javadoc-jar" depends="javadoc,determine-version,build" description="Pack Javadoc into a JAR">
+        <property name="javadoc-jar.file" value="${ivy.module}-${version}-javadoc.jar"/>
+        <jar jarfile="${javadoc-jar.file}">
+            <fileset dir="Javadoc" />
+        </jar>
     </target>
 </project>

@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.basicimpl.tactics;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -114,22 +113,18 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
     @Override
     public BooleanFormula visitAnd(List<BooleanFormula> processedOperands) {
-      List<BooleanFormula> newOperands = new ArrayList<>();
-      for (BooleanFormula f : processedOperands) {
-        newOperands.add(bfmgr.visit(f, this));
-      }
-
-      return bfmgr.or(newOperands);
+      return processedOperands
+          .stream()
+          .map(f -> bfmgr.visit(f, this))
+          .collect(bfmgr.toDisjunction());
     }
 
     @Override
     public BooleanFormula visitOr(List<BooleanFormula> processedOperands) {
-      List<BooleanFormula> newOperands = new ArrayList<>();
-      for (BooleanFormula f : processedOperands) {
-        newOperands.add(bfmgr.visit(f, this));
-      }
-
-      return bfmgr.and(newOperands);
+      return processedOperands
+          .stream()
+          .map(f -> bfmgr.visit(f, this))
+          .collect(bfmgr.toConjunction());
     }
 
     @Override

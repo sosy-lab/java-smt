@@ -52,6 +52,15 @@ public interface FloatingPointFormulaManager {
   FloatingPointFormula makeNumber(
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
+  /**
+   * Creates a variable with exactly the given name.
+   *
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   */
   FloatingPointFormula makeVariable(String pVar, FloatingPointType type);
 
   FloatingPointFormula makePlusInfinity(FloatingPointType type);
@@ -74,6 +83,22 @@ public interface FloatingPointFormulaManager {
       boolean signed,
       FloatingPointType targetType,
       FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  /**
+   * Create a formula that interprets the given bitvector as a floating-point value in the IEEE
+   * format, according to the given type. The sum of the sizes of exponent and mantissa of the
+   * target type plus 1 (for the sign bit) needs to be equal to the size of the bitvector.
+   */
+  FloatingPointFormula fromIeeeBitvector(BitvectorFormula number, FloatingPointType pTargetType);
+
+  /**
+   * Create a formula that produces a representation of the given floating-point value as a
+   * bitvector conforming to the IEEE format. The size of the resulting bitvector is the sum of the
+   * sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   */
+  BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
+
+  FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 
   // ----------------- Arithmetic relations, return type NumeralFormula -----------------
 

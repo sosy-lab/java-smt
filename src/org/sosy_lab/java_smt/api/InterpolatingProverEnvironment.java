@@ -19,10 +19,12 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This class provides an interface to an incremental SMT solver with methods for pushing and
@@ -41,7 +43,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    */
   @Override
   @CanIgnoreReturnValue
-  default T push(BooleanFormula f) {
+  default T push(BooleanFormula f) throws InterruptedException {
     // Java8 does not support overriding of default-interface-methods,
     // thus we forward to the super-interface here.
     return BasicProverEnvironment.super.push(f);
@@ -77,8 +79,13 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed, for example because interpolation
    *     procedure is incomplete
    */
-  List<BooleanFormula> getSeqInterpolants(List<Set<T>> partitionedFormulas)
+  List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException;
+
+  default List<BooleanFormula> getSeqInterpolants0(List<T> formulas)
+      throws SolverException, InterruptedException {
+    return getSeqInterpolants(Lists.transform(formulas, Collections::singleton));
+  }
 
   /**
    * Compute a sequence of interpolants. The nesting array describes the start of the subtree for
@@ -109,15 +116,30 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed, for example because interpolation
    *     procedure is incomplete
    */
-  List<BooleanFormula> getTreeInterpolants(List<Set<T>> partitionedFormulas, int[] startOfSubTree)
+  List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException;
 
-  /**
-   * Check whether the conjunction of all formulas on the stack together with the list of
-   * assumptions is satisfiable.
-   *
-   * @param assumptions A list of literals.
-   */
-  boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
+  default List<BooleanFormula> getTreeInterpolants0(List<T> formulas, int[] startOfSubTree)
+      throws SolverException, InterruptedException {
+    return getTreeInterpolants(Lists.transform(formulas, Collections::singleton), startOfSubTree);
+  }
+
+  /** Checks for a valid subtree-structure. This code is taken from SMTinterpol. */
+  static boolean checkTreeStructure(int numOfPartitions, int[] startOfSubTree) {
+    Preconditions.checkArgument(
+        numOfPartitions == startOfSubTree.length,
+        "partitions and subtree table mus have equal length.");
+    for (int i = 0; i < numOfPartitions; i++) {
+      Preconditions.checkArgument(startOfSubTree[i] >= 0, "tree contains negative node.");
+      int j = i;
+      while (startOfSubTree[i] < j) {
+        j = startOfSubTree[j - 1];
+      }
+      Preconditions.checkArgument(startOfSubTree[i] == j, "invalid leaf of tree.");
+    }
+    Preconditions.checkArgument(startOfSubTree[numOfPartitions - 1] == 0, "invalid root of tree.");
+
+    return true;
+  }
 }

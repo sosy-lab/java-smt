@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collector;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -43,6 +44,15 @@ public interface BooleanFormulaManager {
   /** Shortcut for {@code makeBoolean(false)}. */
   BooleanFormula makeFalse();
 
+  /**
+   * Creates a variable with exactly the given name.
+   *
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   */
   BooleanFormula makeVariable(String pVar);
 
   /**
@@ -106,6 +116,9 @@ public interface BooleanFormulaManager {
   /** @see #and(BooleanFormula, BooleanFormula) */
   BooleanFormula and(BooleanFormula... bits);
 
+  /** Return a stream {@link Collector} that creates a conjunction of all elements in the stream. */
+  Collector<BooleanFormula, ?, BooleanFormula> toConjunction();
+
   /**
    * Creates a formula representing an OR of the two arguments.
    *
@@ -120,6 +133,9 @@ public interface BooleanFormulaManager {
 
   /** @see #or(BooleanFormula, BooleanFormula) */
   BooleanFormula or(BooleanFormula... bits);
+
+  /** Return a stream {@link Collector} that creates a disjunction of all elements in the stream. */
+  Collector<BooleanFormula, ?, BooleanFormula> toDisjunction();
 
   /** Creates a formula representing XOR of the two arguments. */
   BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2);

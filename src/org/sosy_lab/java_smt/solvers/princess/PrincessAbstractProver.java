@@ -23,8 +23,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.SimpleAPI;
+import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
+import ap.parser.IBoolLit;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
+import ap.parser.INot;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -33,12 +38,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 import scala.Enumeration.Value;
+import scala.Option;
 
 abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E> {
 
@@ -47,6 +54,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   protected final ShutdownNotifier shutdownNotifier;
+  protected final boolean computeUnsatCores;
 
   private final PrincessFormulaCreator creator;
   protected boolean closed = false;
@@ -56,11 +64,13 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      boolean pComputeUnsatCores) {
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
+    this.computeUnsatCores = pComputeUnsatCores;
   }
 
   /**
@@ -91,13 +101,26 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
   }
 
+  protected int addAssertedFormula(AF f) {
+    assertedFormulas.peek().add(f);
+    final int id = trackingStack.peek().constraintNum++;
+    return id;
+  }
+
   @Override
   public final void push() {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     assertedFormulas.push(new ArrayList<>());
     api.push();
-    trackingStack.push(new Level());
+
+    final int oldConstraintNum;
+    if (trackingStack.isEmpty()) {
+      oldConstraintNum = 0;
+    } else {
+      oldConstraintNum = trackingStack.peek().constraintNum;
+    }
+    trackingStack.push(new Level(oldConstraintNum));
   }
 
   @Override
@@ -131,10 +154,34 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     }
   }
 
-  @SuppressWarnings("unused")
+  @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Solving with assumptions is not supported.");
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed && computeUnsatCores);
+    final List<BooleanFormula> result = new ArrayList<>();
+    final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
+
+    int cnt = 0;
+    for (IExpression formula : getAssertedFormulas()) {
+      if (core.contains(cnt)) {
+        result.add(mgr.encapsulateBooleanFormula(formula));
+      }
+      ++cnt;
+    }
+    return result;
+  }
+
+  protected abstract Iterable<IExpression> getAssertedFormulas();
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    throw new UnsupportedOperationException("UNSAT cores not supported by Princess");
   }
 
   /**
@@ -159,12 +206,52 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     closed = true;
   }
 
+  @Override
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
+
+    // unpack formulas to terms
+    List<IFormula> importantFormulas = new ArrayList<>(important.size());
+    for (BooleanFormula impF : important) {
+      importantFormulas.add((IFormula) mgr.extractInfo(impF));
+    }
+
+    api.push();
+    while (!isUnsat()) {
+      shutdownNotifier.shutdownIfNecessary();
+
+      IFormula newFormula = new IBoolLit(true); // neutral element for AND
+      List<BooleanFormula> wrappedPartialModel = new ArrayList<>(important.size());
+      for (final IFormula f : importantFormulas) {
+        final Option<Object> value = api.evalPartial(f);
+        if (value.isDefined()) {
+          final boolean isTrueValue = (boolean) value.get();
+          final IFormula newElement = isTrueValue ? f : new INot(f);
+
+          wrappedPartialModel.add(mgr.encapsulateBooleanFormula(newElement));
+          newFormula = new IBinFormula(IBinJunctor.And(), newFormula, newElement);
+        }
+      }
+      callback.apply(wrappedPartialModel);
+
+      // add negation of current formula to get a new model in next iteration
+      addConstraint0(new INot(newFormula));
+    }
+    shutdownNotifier.shutdownIfNecessary();
+    api.pop();
+
+    wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
+
+    return callback.getResult();
+  }
+
   /** add external definition: boolean variable. */
   void addSymbol(IFormula f) {
     Preconditions.checkState(!closed);
     api.addBooleanVariable(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().booleanSymbols.add(f);
+      trackingStack.peek().booleanSymbols.add(f);
     }
   }
 
@@ -173,7 +260,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(!closed);
     api.addConstant(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().intSymbols.add(f);
+      trackingStack.peek().intSymbols.add(f);
     }
   }
 
@@ -182,7 +269,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     Preconditions.checkState(!closed);
     api.addFunction(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.getLast().functionSymbols.add(f);
+      trackingStack.peek().functionSymbols.add(f);
     }
   }
 
@@ -190,12 +277,24 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
     final List<IFormula> booleanSymbols = new ArrayList<>();
     final List<ITerm> intSymbols = new ArrayList<>();
     final List<IFunction> functionSymbols = new ArrayList<>();
+    // the number of constraints asserted up to this point, this is needed
+    // for unsat core computation
+    int constraintNum = 0;
+
+    Level(int constraintNum) {
+      this.constraintNum = constraintNum;
+    }
 
     /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
       this.booleanSymbols.addAll(other.booleanSymbols);
       this.intSymbols.addAll(other.intSymbols);
       this.functionSymbols.addAll(other.functionSymbols);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("{%s, %s, %s}", booleanSymbols, intSymbols, functionSymbols);
     }
   }
 }

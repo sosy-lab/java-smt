@@ -20,11 +20,12 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.truth.Truth.assert_;
 
-import com.google.common.truth.FailureStrategy;
+import com.google.common.truth.FailureMetadata;
+import com.google.common.truth.SimpleSubjectBuilder;
+import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
-import com.google.common.truth.SubjectFactory;
-import com.google.common.truth.TestVerb;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -40,8 +41,8 @@ import org.sosy_lab.java_smt.api.SolverException;
  * <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use either {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or use
- * {@link TestVerb#about(com.google.common.truth.SubjectFactory)} and set a solver via the method
- * {@link #forSolver(SolverContext)}.
+ * {@link StandardSubjectBuilder#about(com.google.common.truth.Subject.Factory)} and set a solver
+ * via the method {@link #booleanFormulasOf(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, BooleanFormula> {
@@ -49,24 +50,27 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   private final SolverContext context;
 
   private BooleanFormulaSubject(
-      FailureStrategy pFailureStrategy, BooleanFormula pFormula, SolverContext pMgr) {
-    super(pFailureStrategy, pFormula);
+      FailureMetadata pMetadata, BooleanFormula pFormula, SolverContext pMgr) {
+    super(pMetadata, pFormula);
     context = checkNotNull(pMgr);
   }
 
   /**
    * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
-   * Truth: <code>assert_().about(BooleanFormulaSubject.forSolver(mgr)).that(formula).is...()</code>
-   * .
+   * Truth: <code>assert_().about(booleanFormulasOf(context)).that(formula).is...()</code>.
    */
-  public static SubjectFactory<BooleanFormulaSubject, BooleanFormula> forSolver(
+  public static Subject.Factory<BooleanFormulaSubject, BooleanFormula> booleanFormulasOf(
       final SolverContext context) {
-    return new SubjectFactory<BooleanFormulaSubject, BooleanFormula>() {
-      @Override
-      public BooleanFormulaSubject getSubject(FailureStrategy pFs, BooleanFormula pFormula) {
-        return new BooleanFormulaSubject(pFs, pFormula, context);
-      }
-    };
+    return (metadata, formula) -> new BooleanFormulaSubject(metadata, formula, context);
+  }
+
+  /**
+   * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
+   * Truth: <code>assertUsing(context)).that(formula).is...()</code>.
+   */
+  public static SimpleSubjectBuilder<BooleanFormulaSubject, BooleanFormula> assertUsing(
+      final SolverContext context) {
+    return assert_().about(booleanFormulasOf(context));
   }
 
   private void checkIsUnsat(final BooleanFormula subject, final String verb, final Object expected)
@@ -98,7 +102,8 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   /** Check that the subject is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    if (context.getFormulaManager().getBooleanFormulaManager().isFalse(actual())) {
+    final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
+    if (bmgr.isFalse(actual())) {
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
@@ -112,6 +117,12 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       // Try to report unsat core for failure message if the solver supports it.
+      for (BooleanFormula part : bmgr.toConjunctionArgs(actual(), true)) {
+        prover.push(part);
+      }
+      if (!prover.isUnsat()) {
+        throw new AssertionError("repated satisfiability check returned different result");
+      }
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
       if (unsatCore.isEmpty() || (unsatCore.size() == 1 && actual().equals(unsatCore.get(0)))) {
         // empty or trivial unsat core

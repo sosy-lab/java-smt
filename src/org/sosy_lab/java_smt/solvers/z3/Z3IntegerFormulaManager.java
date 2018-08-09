@@ -28,8 +28,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  Z3IntegerFormulaManager(Z3FormulaCreator pCreator) {
-    super(pCreator);
+  Z3IntegerFormulaManager(Z3FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

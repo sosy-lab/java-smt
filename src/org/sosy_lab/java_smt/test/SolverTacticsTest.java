@@ -25,7 +25,6 @@ import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,9 +165,9 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula v3EqualsV4 = imgr.equal(variable3, variable4);
 
     FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+        fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula f = bmgr.xor(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
@@ -196,13 +195,13 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula v3EqualsV4 = imgr.equal(variable3, variable4);
 
     FunctionDeclaration<IntegerFormula> uf1Decl =
-        fmgr.declareUF("uf1", IntegerType, Lists.newArrayList(IntegerType, IntegerType));
+        fmgr.declareUF("uf1", IntegerType, IntegerType, IntegerType);
     Formula uf1a = fmgr.callUF(uf1Decl, variable1, variable2);
     Formula uf1b = fmgr.callUF(uf1Decl, variable2, variable1);
     FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf2", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1a, variable3));
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(uf1b, variable4));
+        fmgr.declareUF("uf2", BooleanType, IntegerType, IntegerType);
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, uf1a, variable3);
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, uf1b, variable4);
     BooleanFormula f = bmgr.xor(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4);
 
@@ -230,9 +229,9 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     IntegerFormula variable4 = imgr.makeVariable("variable4");
 
     FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf", BooleanType, Lists.newArrayList(IntegerType, IntegerType));
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable1, variable3));
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, Lists.newArrayList(variable2, variable4));
+        fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
+    BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
+    BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula f =
         qmgr.exists(
             newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));

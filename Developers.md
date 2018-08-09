@@ -17,7 +17,7 @@ for more information.
 
 We rely on [Travis][] continuous
 integration, which picks up code style violations, compile warnings for both
-ECJ and javac, and [FindBugs](http://findbugs.sourceforge.net/) errors.
+ECJ and javac, and [SpotBugs](https://github.com/spotbugs/spotbugs) errors.
 
 ## Releasing JavaSMT
 
@@ -53,12 +53,45 @@ release as follows:
 
 Release to Maven Central is currently not fully automated due to the bug in the
 ANT script provided by Maven Central documentation.
+For publishing to Maven Central, we use the [Nexus Repository Manager](https://oss.sonatype.org/).
+
+#### Requirements
+
+Please make sure that you have a valid user account and configured your local settings accordingly.
+For example, insert the following content into `~/.m2/settings.xml`:
+```xml
+<settings>
+  <servers>
+    <server>
+      <id>ossrh</id>
+      <username>USER</username>
+      <password>PASSWORD</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>gpg</id>
+      <properties>
+        <gpg.executable>gpg2</gpg.executable>
+        <!-- optional <gpg.passphrase>PASSPHRASE</gpg.passphrase> -->
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+```
+
+#### Publishing
 
 The following steps are required:
 
  - Run the `stage` ANT target.
- - Login to [Nexus Repository Manager](https://oss.sonatype.org/)
- - Run `close` and `release` tasks on the pushed bundle.
+   (There is currently no need to change any label from `SNAPSHOT` to `RELEASE` or vice versa,
+   as written somewhere in the documentation, because we only produce `RELEASE` versions.)
+ - Login to [Nexus Repository Manager](https://oss.sonatype.org/) 
+   and open the [list of staging repositories](https://oss.sonatype.org/#stagingRepositories).
+ - Run `close` and `release` tasks on your pushed bundle 
+   (see [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html) for details).
+ - After some delay (a few hours or days) the release is automatically synced to Maven Central.
 
 Additional instructions are available at the official [OSSRH][] page.
 
@@ -66,24 +99,42 @@ Additional instructions are available at the official [OSSRH][] page.
 
 ### Publishing Z3
 
-To publish Z3, [download it](https://github.com/Z3Prover/z3) and build
+We prefer to use the official Z3 binaries,
+please build from source only if necessary (e.g., in case of an important bugfix).
+
+To publish Z3, download the **Ubuntu 14.04** binary for the [latest release](https://github.com/Z3Prover/z3/releases)
+and unzip it.
+Then execute the following command in the JavaSMT directory,
+where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
+and `$Z3_VERSION` is the version number:
+```
+ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
+```
+Finally follow the instructions shown in the message at the end.
+
+As long as [PR #1650](https://github.com/Z3Prover/z3/pull/1650) is not merged,
+you need to run the following command before running ant:
+```
+patchelf --set-soname libz3.so libz3.so
+```
+
+To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
 it with the following command in its directory on a 64bit Ubuntu 14.04 system
 (building on Ubuntu 16.04 introduces unwanted dependencies to new libstdc++ and libgomp versions):
 
 ```
 ./configure --staticlib --java --git-describe && cd build && make -j 2
 ```
-
 Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR
+ant publish-z3 -Dz3.path=$Z3_DIR/build
 ```
 Finally follow the instructions shown in the message at the end.
 
 ### Publishing (Opti)-MathSAT5
 
 For publishing MathSAT5, you need to use a machine with at least GCC 4.9.
-First, [download the binary release](http://mathsat.fbk.eu/download.html), unpack it,
+First, [download the (reentrant!) binary release](http://mathsat.fbk.eu/download.html), unpack it,
 and then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH` is the path to the MathSAT directory,
 and `$MATHSAT_VERSION` is the version number of MathSAT:

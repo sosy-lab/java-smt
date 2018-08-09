@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 @RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
@@ -80,7 +79,7 @@ public class VariableNamesInvalidTest extends SolverBasedTest0 {
   public void testInvalidFloatVariable() {
     requireFloats();
     @SuppressWarnings("unused")
-    Formula var = fpmgr.makeVariable("", FloatingPointType.getSinglePrecisionFloatingPointType());
+    Formula var = fpmgr.makeVariable("", FormulaType.getSinglePrecisionFloatingPointType());
   }
 
   @Test(expected = IllegalArgumentException.class)

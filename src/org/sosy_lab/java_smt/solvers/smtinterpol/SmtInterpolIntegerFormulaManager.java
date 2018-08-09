@@ -30,8 +30,9 @@ class SmtInterpolIntegerFormulaManager
     extends SmtInterpolNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  SmtInterpolIntegerFormulaManager(SmtInterpolFormulaCreator pCreator) {
-    super(pCreator);
+  SmtInterpolIntegerFormulaManager(
+      SmtInterpolFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override
@@ -67,7 +68,7 @@ class SmtInterpolIntegerFormulaManager
 
   @Override
   public Term divide(Term pNumber1, Term pNumber2) {
-    if (isNumeral(pNumber2)) {
+    if (consistsOfNumerals(pNumber2)) {
       Sort intSort = pNumber1.getTheory().getNumericSort();
       assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
       return getFormulaCreator().getEnv().term("div", pNumber1, pNumber2);
@@ -78,7 +79,7 @@ class SmtInterpolIntegerFormulaManager
 
   @Override
   protected Term modulo(Term pNumber1, Term pNumber2) {
-    if (isNumeral(pNumber2)) {
+    if (consistsOfNumerals(pNumber2)) {
       Sort intSort = pNumber1.getTheory().getNumericSort();
       assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
       return getFormulaCreator().getEnv().term("mod", pNumber1, pNumber2);

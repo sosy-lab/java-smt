@@ -64,6 +64,23 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    */
   Optional<Rational> lower(int handle, Rational epsilon);
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Please note that the prover is allowed to use standard numbers for any real variable in the
+   * model after a sat-query returned {@link OptStatus#OPT}. For integer formulas, we expect the
+   * optimal assignment.
+   *
+   * <p>Example 1: For the constraint 'x&lt;10' with a real x, the upper bound of x is '10-epsilon'
+   * (epsilon can even be set to zero). The model can return the assignment x=9. To get an optimal
+   * assignment, query the solver with an additional constraint 'x == 10-epsilon'.
+   *
+   * <p>Example 2: For the constraint 'x&lt;10' with a integer x, the upper bound of x is '9'
+   * (epsilon is irrelevant here and can be zero). The model returns the optimal assignment x=9.
+   */
+  @Override
+  Model getModel() throws SolverException;
+
   /** Status of the optimization problem. */
   enum OptStatus {
 

@@ -73,14 +73,20 @@ public interface SolverContext extends AutoCloseable {
    * and allows to generate and retrieve interpolants for unsatisfiable formulas. If the SMT solver
    * is able to handle satisfiability tests with assumptions please consider implementing the {@link
    * InterpolatingProverEnvironment} interface, and return an Object of this type here.
+   *
+   * @param options Options specified for the prover environment. All of the options specified in
+   *     {@link ProverOptions} are turned off by default.
    */
-  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation();
+  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(ProverOptions... options);
 
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
    * and allows to solve optimization queries.
+   *
+   * @param options Options specified for the prover environment. All of the options specified in
+   *     {@link ProverOptions} are turned off by default.
    */
-  OptimizationProverEnvironment newOptimizationProverEnvironment();
+  OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options);
 
   /** Get version information out of the solver. */
   String getVersion();

@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
-import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -72,9 +71,5 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
       throw new IllegalArgumentException("Not supported interface");
     }
     return t;
-  }
-
-  protected static void checkVariableName(String pVar) {
-    Preconditions.checkArgument(!pVar.isEmpty(), "Identifier for variable should not be empty.");
   }
 }

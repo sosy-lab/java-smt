@@ -30,13 +30,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Streams;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 import javax.annotation.CheckReturnValue;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -150,7 +149,7 @@ public class UfElimination {
 
     int depth = getNestingDepthOfUfs(f);
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = findUFs(f);
-    ufs = merge(ufs, pOtherResult);
+    merge(ufs, pOtherResult);
 
     ImmutableMap.Builder<Formula, Formula> substitutionsBuilder = ImmutableMap.builder();
     List<BooleanFormula> extraConstraints = new ArrayList<>();
@@ -174,15 +173,12 @@ public class UfElimination {
            * Add constraints to enforce functional consistency.
            */
           Verify.verify(args.size() == otherArgs.size());
-          Collection<BooleanFormula> argumentEquality = new ArrayList<>(args.size());
-          for (int i = 0; i < args.size(); i++) {
-            Formula arg1 = args.get(i);
-            Formula arg2 = otherArgs.get(i);
-            argumentEquality.add(makeEqual(arg1, arg2));
-          }
+          BooleanFormula argumentsEquality =
+              Streams.zip(args.stream(), otherArgs.stream(), this::makeEqual)
+                  .collect(bfmgr.toConjunction());
 
           BooleanFormula functionEquality = makeEqual(substitution, application2.getSubstitution());
-          extraConstraints.add(bfmgr.implication(bfmgr.and(argumentEquality), functionEquality));
+          extraConstraints.add(bfmgr.implication(argumentsEquality, functionEquality));
         }
       }
     }
@@ -194,11 +190,7 @@ public class UfElimination {
     // substitute all UFs in the additional constraints,
     // required if UFs are arguments of UFs, e.g. uf(uf(1, 2), 2)
     for (int i = 0; i < depth; i++) {
-      extraConstraints =
-          extraConstraints
-              .stream()
-              .map(c -> fmgr.substitute(c, substitutions))
-              .collect(Collectors.toList());
+      extraConstraints.replaceAll(c -> fmgr.substitute(c, substitutions));
     }
 
     Map<Formula, Formula> otherSubstitution =
@@ -209,7 +201,7 @@ public class UfElimination {
     return new Result(formulaWithoutUFs, constraints, allSubstitutions, copyOf(ufs));
   }
 
-  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> merge(
+  private void merge(
       Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs,
       Result pPreviousResult) {
     for (Entry<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufInOtherFormula :
@@ -218,7 +210,6 @@ public class UfElimination {
         pUfs.put(ufInOtherFormula.getKey(), ufInOtherFormula.getValue());
       }
     }
-    return pUfs;
   }
 
   @SuppressWarnings("unchecked")
@@ -273,9 +264,9 @@ public class UfElimination {
     return result.get();
   }
 
-  private int getNestingDepthOfUfs(Formula f) {
+  private int getNestingDepthOfUfs(Formula pFormula) {
     return fmgr.visit(
-        f,
+        pFormula,
         new DefaultFormulaVisitor<Integer>() {
 
           @Override
@@ -307,11 +298,12 @@ public class UfElimination {
         });
   }
 
-  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> findUFs(Formula f) {
+  private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> findUFs(
+      Formula pFormula) {
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = HashMultimap.create();
 
     fmgr.visitRecursively(
-        f,
+        pFormula,
         new DefaultFormulaVisitor<TraversalProcess>() {
 
           @Override

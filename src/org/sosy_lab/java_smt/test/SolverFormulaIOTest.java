@@ -25,11 +25,9 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import java.util.Iterator;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -90,7 +88,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void varDumpTest2() {
-    //always true
+    // always true
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
@@ -150,12 +148,10 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   public void funcsDumpTest() {
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula var = imgr.makeVariable("var_a");
-    List<IntegerFormula> args1 = ImmutableList.of(int1, var);
-
     FunctionDeclaration<IntegerFormula> funA =
         fmgr.declareUF(
             "fun_a", FormulaType.IntegerType, FormulaType.IntegerType, FormulaType.IntegerType);
-    IntegerFormula res1 = fmgr.callUF(funA, args1);
+    IntegerFormula res1 = fmgr.callUF(funA, int1, var);
     BooleanFormula formula = imgr.equal(res1, var);
 
     String formDump = mgr.dumpFormula(formula).toString();
@@ -254,8 +250,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
         fmgr.declareUF("fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
     FunctionDeclaration<IntegerFormula> funB =
         fmgr.declareUF("fun_b", FormulaType.IntegerType, FormulaType.IntegerType);
-    IntegerFormula res1 = fmgr.callUF(funA, ImmutableList.of(int1));
-    IntegerFormula res2 = fmgr.callUF(funB, ImmutableList.of(int2));
+    IntegerFormula res1 = fmgr.callUF(funA, int1);
+    IntegerFormula res2 = fmgr.callUF(funB, int2);
 
     IntegerFormula calc = imgr.add(res1, res2);
     String formDump = mgr.dumpFormula(imgr.equal(calc, int1)).toString();
@@ -273,8 +269,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
     FunctionDeclaration<IntegerFormula> funA =
         fmgr.declareUF("fun_a", FormulaType.IntegerType, FormulaType.IntegerType);
-    IntegerFormula res1 = fmgr.callUF(funA, ImmutableList.of(int1));
-    IntegerFormula res2 = fmgr.callUF(funA, ImmutableList.of(int2));
+    IntegerFormula res1 = fmgr.callUF(funA, int1);
+    IntegerFormula res2 = fmgr.callUF(funA, int2);
 
     IntegerFormula calc = imgr.add(res1, res2);
     String formDump = mgr.dumpFormula(imgr.equal(calc, int1)).toString();
@@ -357,17 +353,17 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     BooleanFormula b1 = bmgr.makeVariable("q");
     BooleanFormula b2 = bmgr.makeVariable("u");
 
-    //1st execution
+    // 1st execution
     BooleanFormula f1 = imgr.equal(imgr.add(i1, i2), erg);
     BooleanFormula comp1 = imgr.greaterOrEquals(i1, i2);
     BooleanFormula x1 = bmgr.xor(b1, f1);
     BooleanFormula comb1 = bmgr.and(x1, comp1);
 
-    //rest
+    // rest
     BooleanFormula r1a = bmgr.or(comb1, b2);
     BooleanFormula r1b = bmgr.and(r1a, b1);
 
-    //rest
+    // rest
     BooleanFormula r2a = imgr.equal(i1, i2);
     BooleanFormula r2b = bmgr.and(r2a, comb1);
 
@@ -378,7 +374,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     IntegerFormula arg = imgr.makeNumber(1);
     FunctionDeclaration<BooleanFormula> funA =
         fmgr.declareUF("fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
-    BooleanFormula res1 = fmgr.callUF(funA, ImmutableList.of(arg));
+    BooleanFormula res1 = fmgr.callUF(funA, arg);
     return bmgr.and(res1, bmgr.makeBoolean(true));
   }
 }

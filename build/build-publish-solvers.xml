@@ -6,28 +6,32 @@
     <!-- SECTION: Publishing Z3 {{{1
          ===============================================================
     -->
-    <target name="wrap-z3"
-        description="Wrap memcpy version in libz3">
+    <target name="package-z3"
+        description="Copy Z3 binaries to the root folder along with the version postfix.
+            This package provides the JNI for direct usage.">
         <fail unless="z3.path">
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
             The path has to point to the root Z3 folder.
             Note that shell substitutions do not work and a full absolute
             path has to be specified.
         </fail>
-        <exec executable="lib/native/source/libz3j/wrap_memcpy_in_z3.sh">
-            <arg value="${z3.path}" />
+        <exec executable="readelf" dir="${z3.path}" outputproperty="z3.elf_details" logError="true" failonerror="true">
+            <arg value="-d"/>
+            <arg value="libz3.so"/>
         </exec>
-    </target>
-
-    <target name="package-z3" depends="wrap-z3"
-        description="Copy Z3 binaries to the root folder along with the version postfix.
-            This package provides the JNI for direct usage.">
+        <fail>
+            <condition>
+                <not><contains string="${z3.elf_details}" substring="(SONAME)"/></not>
+            </condition>
+            libz3.so has missing SONAME property.
+            Please run 'patchelf --set-soname libz3.so ${z3.path}/libz3.so'.
+        </fail>
         <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
             <arg value="describe" />
         </exec>
-        <copy file="lib/native/source/libz3j/libz3.so" tofile="libz3-${z3.version}.so"/>
-        <copy file="${z3.path}/build/libz3java.so" tofile="libz3java-${z3.version}.so"/>
-        <copy file="${z3.path}/build/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
+        <copy file="${z3.path}/libz3.so" tofile="libz3-${z3.version}.so"/>
+        <copy file="${z3.path}/libz3java.so" tofile="libz3java-${z3.version}.so"/>
+        <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
 
     <target name="publish-z3" depends="package-z3, load-ivy"

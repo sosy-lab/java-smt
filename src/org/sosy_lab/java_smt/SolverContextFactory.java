@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.Classes;
@@ -40,6 +39,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
@@ -83,6 +83,15 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Default rounding mode for floating point operations.")
   private FloatingPointRoundingMode floatingPointRoundingMode =
       FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+
+  @Option(
+      secure = true,
+      description =
+          "Use non-linear arithmetic of the solver if supported and throw exception otherwise, "
+              + "approximate non-linear arithmetic with UFs if unsupported, "
+              + "or always approximate non-linear arithmetic. "
+              + "This affects only the theories of integer and rational arithmetic.")
+  private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -137,11 +146,17 @@ public class SolverContextFactory {
 
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
-            config, logger, shutdownNotifier, logfile, randomSeed);
+            config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);
 
       case MATHSAT5:
         return Mathsat5SolverContext.create(
-            logger, config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
+            logger,
+            config,
+            shutdownNotifier,
+            logfile,
+            randomSeed,
+            floatingPointRoundingMode,
+            nonLinearArithmetic);
 
       case Z3:
 
@@ -149,11 +164,17 @@ public class SolverContextFactory {
         // java.library.path without affecting the main class loader.
         return getFactoryForSolver(z3ClassLoader, Z3_FACTORY_CLASS)
             .generateSolverContext(
-                config, logger, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode);
+                config,
+                logger,
+                shutdownNotifier,
+                logfile,
+                randomSeed,
+                floatingPointRoundingMode,
+                nonLinearArithmetic);
 
       case PRINCESS:
-        // TODO: pass randomSeed to Princess
-        return PrincessSolverContext.create(config, shutdownNotifier, logfile);
+        return PrincessSolverContext.create(
+            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       default:
         throw new AssertionError("no solver selected");
@@ -215,7 +236,8 @@ public class SolverContextFactory {
         ShutdownNotifier pShutdownNotifier,
         @Nullable PathCounterTemplate solverLogfile,
         long randomSeed,
-        FloatingPointRoundingMode pFloatingPointRoundingMode)
+        FloatingPointRoundingMode pFloatingPointRoundingMode,
+        NonLinearArithmetic pNonLinearArithmetic)
         throws InvalidConfigurationException;
   }
 
@@ -229,7 +251,7 @@ public class SolverContextFactory {
       Pattern.compile("^(" + "com\\.microsoft\\.z3|" + Pattern.quote(Z3_PACKAGE) + ")\\..*");
 
   // Libraries for which we have to supply a custom path.
-  private static final Set<String> Z3_LIBRARY_NAMES =
+  private static final ImmutableSet<String> Z3_LIBRARY_NAMES =
       ImmutableSet.of("z3", "libz3", "libz3java", "z3java");
 
   // Both Z3 and Z3Java have to be loaded using same, custom, class loader.
@@ -250,7 +272,7 @@ public class SolverContextFactory {
   private static ClassLoader createZ3ClassLoader() {
     ClassLoader parentClassLoader = SolverContextFactory.class.getClassLoader();
 
-    ClassLoaderBuilder builder =
+    ClassLoaderBuilder<?> builder =
         Classes.makeExtendedURLClassLoader()
             .setParent(parentClassLoader)
             .setDirectLoadClasses(Z3_CLASSES)

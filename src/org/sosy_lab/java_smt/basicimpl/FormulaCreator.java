@@ -22,13 +22,14 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -282,20 +283,37 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   /**
-   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean)} which unwraps both input and
-   * output.
+   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean, BiConsumer)} which unwraps both
+   * input and output.
    */
   public Map<String, TFormulaInfo> extractVariablesAndUFs(
       final TFormulaInfo pFormula, final boolean extractUFs) {
-    return Maps.transformValues(
-        extractVariablesAndUFs(encapsulateWithTypeOf(pFormula), extractUFs), this::extractInfo);
+    Map<String, TFormulaInfo> found = new LinkedHashMap<>();
+    extractVariablesAndUFs(
+        encapsulateWithTypeOf(pFormula), extractUFs, (name, f) -> found.put(name, extractInfo(f)));
+    return found;
+  }
+
+  /**
+   * Wrapper for {@link #extractVariablesAndUFs(Formula, boolean, BiConsumer)} which unwraps both
+   * input and output.
+   */
+  public void extractVariablesAndUFs(
+      final TFormulaInfo pFormula,
+      final boolean extractUFs,
+      final BiConsumer<String, TFormulaInfo> pConsumer) {
+    extractVariablesAndUFs(
+        encapsulateWithTypeOf(pFormula),
+        extractUFs,
+        (name, f) -> pConsumer.accept(name, extractInfo(f)));
   }
 
   /** Extract all free variables from the formula, optionally including UFs. */
-  public Map<String, Formula> extractVariablesAndUFs(
-      final Formula pFormula, final boolean extractUF) {
+  public void extractVariablesAndUFs(
+      final Formula pFormula,
+      final boolean extractUF,
+      final BiConsumer<String, Formula> pConsumer) {
 
-    final Map<String, Formula> found = new HashMap<>();
     visitRecursively(
         new DefaultFormulaVisitor<TraversalProcess>() {
 
@@ -309,19 +327,18 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
               Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
 
             if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
-              found.put(functionDeclaration.getName(), f);
+              pConsumer.accept(functionDeclaration.getName(), f);
             }
             return TraversalProcess.CONTINUE;
           }
 
           @Override
           public TraversalProcess visitFreeVariable(Formula f, String name) {
-            found.put(name, f);
+            pConsumer.accept(name, f);
             return TraversalProcess.CONTINUE;
           }
         },
         pFormula);
-    return found;
   }
 
   @SuppressWarnings("unchecked")
@@ -329,11 +346,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     return encapsulate(
         declaration.getType(),
-        callFunctionImpl((FunctionDeclarationImpl<T, TFuncDecl>) declaration, extractInfo(args)));
+        callFunctionImpl(
+            ((FunctionDeclarationImpl<T, TFuncDecl>) declaration).getSolverDeclaration(),
+            extractInfo(args)));
   }
 
-  public abstract TFormulaInfo callFunctionImpl(
-      FunctionDeclarationImpl<?, TFuncDecl> declaration, List<TFormulaInfo> args);
+  public abstract TFormulaInfo callFunctionImpl(TFuncDecl declaration, List<TFormulaInfo> args);
+
+  public abstract TFuncDecl declareUFImpl(String pName, TType pReturnType, List<TType> pArgTypes);
 
   public TFuncDecl getBooleanVarDeclaration(BooleanFormula var) {
     return getBooleanVarDeclarationImpl(extractInfo(var));

@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.collect.FluentIterable;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
-import org.sosy_lab.common.io.MoreFiles;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -44,6 +45,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 @Options(prefix = "solver.z3")
@@ -51,23 +53,20 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings */
   @Option(
-    secure = true,
-    description = "Engine to use for the optimization",
-    values = {"basic", "farkas", "symba"}
-  )
+      secure = true,
+      description = "Engine to use for the optimization",
+      values = {"basic", "farkas", "symba"})
   String optimizationEngine = "basic";
 
   @Option(
-    secure = true,
-    description = "Ordering for objectives in the optimization context",
-    values = {"lex", "pareto", "box"}
-  )
+      secure = true,
+      description = "Ordering for objectives in the optimization context",
+      values = {"lex", "pareto", "box"})
   String objectivePrioritizationMode = "box";
 
   @Option(
-    secure = true,
-    description = "Dump failed interpolation queries to this file in SMTLIB2 format"
-  )
+      secure = true,
+      description = "Dump failed interpolation queries to this file in SMTLIB2 format")
   @FileOption(Type.OUTPUT_FILE)
   private @Nullable PathCounterTemplate dumpFailedInterpolationQueries =
       PathCounterTemplate.ofFormatString("z3-failed-interpolation-query.%d.smt2");
@@ -87,11 +86,10 @@ final class Z3SolverContext extends AbstractSolverContext {
     boolean requireProofs = true;
 
     @Option(
-      secure = true,
-      description =
-          "Activate replayable logging in Z3."
-              + " The log can be given as an input to the solver and replayed."
-    )
+        secure = true,
+        description =
+            "Activate replayable logging in Z3."
+                + " The log can be given as an input to the solver and replayed.")
     @FileOption(Type.OUTPUT_FILE)
     @Nullable
     Path log = null;
@@ -124,7 +122,8 @@ final class Z3SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
-      FloatingPointRoundingMode pFloatingPointRoundingMode)
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -157,7 +156,7 @@ final class Z3SolverContext extends AbstractSolverContext {
       Path absolutePath = extraOptions.log.toAbsolutePath();
       try {
         // Z3 segfaults if it cannot write to the file, thus we write once first
-        MoreFiles.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
+        IO.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
         Native.openLog(absolutePath.toString());
       } catch (IOException e) {
         logger.logUserException(Level.WARNING, e, "Cannot write Z3 log file");
@@ -198,11 +197,13 @@ final class Z3SolverContext extends AbstractSolverContext {
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);
     Z3BooleanFormulaManager booleanTheory = new Z3BooleanFormulaManager(creator);
-    Z3IntegerFormulaManager integerTheory = new Z3IntegerFormulaManager(creator);
-    Z3RationalFormulaManager rationalTheory = new Z3RationalFormulaManager(creator);
+    Z3IntegerFormulaManager integerTheory =
+        new Z3IntegerFormulaManager(creator, pNonLinearArithmetic);
+    Z3RationalFormulaManager rationalTheory =
+        new Z3RationalFormulaManager(creator, pNonLinearArithmetic);
     Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
     Z3FloatingPointFormulaManager floatingPointTheory =
-        new Z3FloatingPointFormulaManager(creator, functionTheory, pFloatingPointRoundingMode);
+        new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
 
@@ -240,21 +241,36 @@ final class Z3SolverContext extends AbstractSolverContext {
         Native.mkStringSymbol(z3context, ":unsat_core"),
         options.contains(ProverOptions.GENERATE_UNSAT_CORE)
             || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
-    return new Z3TheoremProver(creator, manager, z3params, options);
+    return new Z3TheoremProver(
+        creator, manager, z3params, options.contains(ProverOptions.GENERATE_UNSAT_CORE));
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> options) {
     long z3context = creator.getEnv();
     Native.paramsSetBool(z3context, z3params, Native.mkStringSymbol(z3context, ":model"), true);
     Native.paramsSetBool(
         z3context, z3params, Native.mkStringSymbol(z3context, ":unsat_core"), false);
-    return new Z3InterpolatingProver(creator, z3params, logger, dumpFailedInterpolationQueries);
+    return new Z3InterpolatingProver(
+        creator,
+        z3params,
+        logger,
+        dumpFailedInterpolationQueries,
+        manager,
+        FluentIterable.from(options).contains(ProverOptions.GENERATE_UNSAT_CORE));
   }
 
   @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    Z3OptimizationProver out = new Z3OptimizationProver(creator, logger);
+  public OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> options) {
+    Z3OptimizationProver out =
+        new Z3OptimizationProver(
+            creator,
+            logger,
+            z3params,
+            manager,
+            FluentIterable.from(options).contains(ProverOptions.GENERATE_UNSAT_CORE));
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;

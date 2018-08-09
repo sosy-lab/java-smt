@@ -35,8 +35,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -76,8 +78,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   private BooleanFormula forall_x_a_at_x_eq_0;
 
   @Before
-  public void setUp() throws Exception {
-    assert amgr != null;
+  public void setUp() {
     requireArrays();
     requireQuantifiers();
 
@@ -95,10 +96,12 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // We do not ignore all SolverExceptions in order to not hide bugs,
     // but only for Princess which is known to not be able to solve all tests here.
     if (solverUnderTest == Solvers.PRINCESS) {
-      TruthJUnit.throwAssumptionError().fail(e.getMessage());
+      TruthJUnit.assume().fail(e.getMessage());
     }
     throw e;
   }
+
+  private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
   @Test
   public void testForallArrayConjunctUnsat() throws SolverException, InterruptedException {
@@ -276,7 +279,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testSimple() throws SolverException, InterruptedException {
     // forall x . x+2 = x+1+1  is SAT
-    assert qmgr != null;
     BooleanFormula f =
         qmgr.forall(
             ImmutableList.of(x),
@@ -287,10 +289,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testBlah() throws Exception {
+  public void testBlah() throws SolverException, InterruptedException {
     IntegerFormula z = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
-    assert qmgr != null;
     BooleanFormula f =
         qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), imgr.equal(z, y)));
     assertThatFormula(f).isSatisfiable();
@@ -298,7 +299,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEquals() {
-    assert qmgr != null;
     BooleanFormula f1 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
     BooleanFormula f2 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
 
@@ -308,7 +308,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testQELight() throws InterruptedException {
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
-    assert qmgr != null;
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
         qmgr.exists(
@@ -321,7 +320,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionForall() {
-    assert qmgr != null;
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
 
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -353,8 +351,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionExists() {
-    assert qmgr != null;
-
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
     final AtomicBoolean isForall = new AtomicBoolean(false);
@@ -386,8 +382,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThat(isForall.get()).isFalse();
 
     assume()
-        .withFailureMessage(
-            "Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     assertThat(boundVars).hasSize(1);
@@ -396,12 +391,49 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   public void testEmpty() {
     assume()
-        .withFailureMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
+        .withMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
     // An empty list of quantified variables throws an exception.
     @SuppressWarnings("unused")
     BooleanFormula quantified = qmgr.exists(ImmutableList.of(), bmgr.makeVariable("b"));
+  }
+
+  @Test
+  public void checkQuantifierElimination() throws InterruptedException, SolverException {
+    // build formula: (forall x . ((x < 5) | (7 < x + y)))
+    // quantifier-free equivalent: (2 < y)
+    IntegerFormula xx = imgr.makeVariable("x");
+    IntegerFormula yy = imgr.makeVariable("y");
+    BooleanFormula f =
+        qmgr.forall(
+            xx,
+            bmgr.or(
+                imgr.lessThan(xx, imgr.makeNumber(5)),
+                imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+    assertThatFormula(qFreeF).isEquivalentTo(imgr.lessThan(imgr.makeNumber(2), yy));
+  }
+
+  @Test
+  public void checkBVQuantifierElimination() throws InterruptedException, SolverException {
+    requireBitvectors();
+
+    // build formula: exists y : bv[2]. x * y = 1
+    // quantifier-free equivalent: x = 1 | x = 3
+    //                      or     extract_0_0 x = 1
+
+    int i = index.getFreshId();
+    int width = 2;
+
+    BitvectorFormula xx = bvmgr.makeVariable(width, "x" + i);
+    BitvectorFormula yy = bvmgr.makeVariable(width, "y" + i);
+    BooleanFormula f =
+        qmgr.exists(yy, bvmgr.equal(bvmgr.multiply(xx, yy), bvmgr.makeBitvector(width, 1)));
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+
+    assertThatFormula(qFreeF)
+        .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
   }
 }

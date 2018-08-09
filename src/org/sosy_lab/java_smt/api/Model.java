@@ -83,8 +83,20 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   final class ValueAssignment {
 
-    /** the key should be of simple formula-type (Boolean/Integer/Rational/BitVector). */
-    private final Formula key;
+    /**
+     * the key should be of simple formula-type (Boolean/Integer/Rational/BitVector).
+     *
+     * <p>For UFs we use the application of the UF with arguments.
+     *
+     * <p>For arrays we use the selection-statement with an index.
+     */
+    private final Formula keyFormula;
+
+    /** the value should be of simple formula-type (Boolean/Integer/Rational/BitVector). */
+    private final Formula valueFormula;
+
+    /** the equality of key and value. */
+    private final BooleanFormula formula;
 
     /** the key should be boolean or numeral (Rational/Double/BigInteger/Long/Integer). */
     private final Object value;
@@ -92,16 +104,36 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /**
      * arguments can have any type. We would prefer numerals (like value), but we also allow
      * Formulas.
+     *
+     * <p>For UFs we use the arguments.
+     *
+     * <p>For arrays we use the index of a selection or an empty list for wildcard-selection, if the
+     * whole array is filled with a constant value. In the latter case any additionally given
+     * array-assignment overrides the wildcard-selection for the given index. Example: "arr=0,
+     * arr[2]=3" corresponds to an array {0,0,3,0,...}.
      */
     private final ImmutableList<Object> argumentsInterpretation;
 
-    /** The name should be a 'useful' identifier for the current assignment, without parameters. */
+    /**
+     * The name should be a 'useful' identifier for the current assignment.
+     *
+     * <p>For UFs we use their name without parameters.
+     *
+     * <p>For arrays we use the name without any index.
+     */
     private final String name;
 
     public ValueAssignment(
-        Formula key, String name, Object value, Collection<?> argumentInterpretation) {
+        Formula keyFormula,
+        Formula valueFormula,
+        BooleanFormula formula,
+        String name,
+        Object value,
+        Collection<?> argumentInterpretation) {
 
-      this.key = Preconditions.checkNotNull(key);
+      this.keyFormula = Preconditions.checkNotNull(keyFormula);
+      this.valueFormula = Preconditions.checkNotNull(valueFormula);
+      this.formula = Preconditions.checkNotNull(formula);
       this.name = Preconditions.checkNotNull(name);
       this.value = Preconditions.checkNotNull(value);
       this.argumentsInterpretation = ImmutableList.copyOf(argumentInterpretation);
@@ -109,7 +141,17 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
     /** The formula AST which is assigned a given value. */
     public Formula getKey() {
-      return key;
+      return keyFormula;
+    }
+
+    /** The formula AST which is assigned to a given key. */
+    public Formula getValueAsFormula() {
+      return valueFormula;
+    }
+
+    /** The formula AST representing the equality of key and value. */
+    public BooleanFormula getAssignmentAsFormula() {
+      return formula;
     }
 
     /** Variable name for variables, function name for UFs, and array name for arrays. */
@@ -163,11 +205,9 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
       // "Key" is purposefully not included in the comparison,
       // name and arguments should be sufficient.
-      boolean out =
-          name.equals(other.name)
-              && value.equals(other.value)
-              && argumentsInterpretation.equals(other.argumentsInterpretation);
-      return out;
+      return name.equals(other.name)
+          && value.equals(other.value)
+          && argumentsInterpretation.equals(other.argumentsInterpretation);
     }
 
     @Override

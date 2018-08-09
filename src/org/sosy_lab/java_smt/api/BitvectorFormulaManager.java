@@ -29,8 +29,18 @@ public interface BitvectorFormulaManager {
 
   BitvectorFormula makeBitvector(int length, BigInteger pI);
 
+  /**
+   * Creates a variable with exactly the given name and bitwidth.
+   *
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   */
   BitvectorFormula makeVariable(int length, String pVar);
 
+  /** @see #makeVariable(int, String) */
   BitvectorFormula makeVariable(BitvectorType type, String pVar);
 
   int getLength(BitvectorFormula number);

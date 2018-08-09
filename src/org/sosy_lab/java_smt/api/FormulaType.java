@@ -20,6 +20,8 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
@@ -199,6 +201,11 @@ public abstract class FormulaType<T extends Formula> {
       return mantissaSize;
     }
 
+    /** Return the total size of a value of this type in bits. */
+    public int getTotalSize() {
+      return exponentSize + mantissaSize + 1;
+    }
+
     @Override
     public int hashCode() {
       return (31 + exponentSize) * 31 + mantissaSize;
@@ -313,9 +320,9 @@ public abstract class FormulaType<T extends Formula> {
       return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {
       // FloatingPoint<exp=11,mant=52>
-      String[] exman = t.substring(14, t.length() - 1).split(",");
+      List<String> exman = Splitter.on(',').limit(2).splitToList(t.substring(14, t.length() - 1));
       return FormulaType.getFloatingPointType(
-          Integer.parseInt(exman[0].substring(4)), Integer.parseInt(exman[1].substring(5)));
+          Integer.parseInt(exman.get(0).substring(4)), Integer.parseInt(exman.get(1).substring(5)));
     } else if (t.startsWith("Bitvector<")) {
       // Bitvector<32>
       return FormulaType.getBitvectorTypeWithSize(
