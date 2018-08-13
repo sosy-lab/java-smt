@@ -313,13 +313,19 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
-  public Expr callFunctionImpl(FunctionDeclarationImpl<?, Expr> pDeclaration, List<Expr> pArgs) {
+  protected Expr getBooleanVarDeclarationImpl(Expr pTFormulaInfo) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected Expr getBooleanVarDeclarationImpl(Expr pTFormulaInfo) {
+  public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException();
   }

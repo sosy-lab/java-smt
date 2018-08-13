@@ -30,8 +30,9 @@ public class CVC4RationalFormulaManager
     extends CVC4NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  CVC4RationalFormulaManager(CVC4FormulaCreator pCreator) {
-    super(pCreator);
+  CVC4RationalFormulaManager(
+      CVC4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

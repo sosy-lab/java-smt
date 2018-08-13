@@ -11,6 +11,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class CVC4SolverContext extends AbstractSolverContext {
@@ -23,7 +24,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     this.manager = manager;
   }
 
-  public static SolverContext create(int randomSeed) {
+  public static SolverContext create(int randomSeed, NonLinearArithmetic pNonLinearArithmetic) {
 
     // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
@@ -39,8 +40,10 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     // Create managers
     CVC4UFManager functionTheory = new CVC4UFManager(creator);
     CVC4BooleanFormulaManager booleanTheory = new CVC4BooleanFormulaManager(creator);
-    CVC4IntegerFormulaManager integerTheory = new CVC4IntegerFormulaManager(creator);
-    CVC4RationalFormulaManager rationalTheory = new CVC4RationalFormulaManager(creator);
+    CVC4IntegerFormulaManager integerTheory =
+        new CVC4IntegerFormulaManager(creator, pNonLinearArithmetic);
+    CVC4RationalFormulaManager rationalTheory =
+        new CVC4RationalFormulaManager(creator, pNonLinearArithmetic);
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
@@ -51,16 +54,6 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   public FormulaManager getFormulaManager0() {
     return manager;
-  }
-
-  @Override
-  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0() {
-    throw new UnsupportedOperationException("CVC4 does not support interpolation.");
-  }
-
-  @Override
-  public OptimizationProverEnvironment newOptimizationProverEnvironment() {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -87,5 +80,19 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   protected boolean supportsAssumptionSolving() {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
   }
 }

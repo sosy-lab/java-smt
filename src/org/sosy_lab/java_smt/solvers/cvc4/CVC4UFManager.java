@@ -21,12 +21,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.FunctionType;
-import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
-import edu.nyu.acsys.CVC4.vectorExpr;
-import edu.nyu.acsys.CVC4.vectorType;
-import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
@@ -38,7 +33,7 @@ public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManag
     exprManager = pCreator.getExprManager();
   }
 
-  @Override
+  /*@Override
   protected Expr declareUninterpretedFunctionImpl(
       String pName, Type pReturnType, List<Type> pArgTypes) {
     vectorType argTypes = new vectorType();
@@ -56,5 +51,5 @@ public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManag
       args.add(t);
     }
     return exprManager.mkExpr(Kind.APPLY_UF, pFunc, args);
-  }
+  }*/
 }

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
@@ -113,19 +114,22 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
     for (Expr lKeyTerm : cvc4Creator.variablesCache.values()) {
       Expr lValueTerm = smtEngine.getValue(lKeyTerm);
-      Formula key = creator.encapsulateWithTypeOf(lKeyTerm);
-      Object lValue = getValue(lValueTerm);
-      out.add(new ValueAssignment(key, lValueTerm.toString(), lValue, ImmutableList.of()));
+      out.add(getAssignment(lKeyTerm,lValueTerm));
     }
 
     return out.build();
   }
 
-  /*
-  private Collection<ValueAssignment> getArrayAssignments() {
-    return new HashSet<>();
+
+  private ValueAssignment getAssignment(Expr pKeyTerm, Expr pValueTerm) {
+
+    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
+    Formula valueFormula = creator.encapsulateWithTypeOf(pValueTerm);
+    BooleanFormula equation = null;//getAssignment(key, value);
+    Object value = getValue(pValueTerm);
+    return new ValueAssignment(
+        keyFormula, valueFormula, equation, pValueTerm.toString(), value, ImmutableList.of());
   }
-  */
 
   public static CVC4Model create(CVC4FormulaCreator pCreator) {
     return new CVC4Model(pCreator);

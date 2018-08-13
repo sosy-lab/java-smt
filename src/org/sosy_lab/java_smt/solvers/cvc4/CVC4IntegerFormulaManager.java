@@ -35,8 +35,8 @@ public class CVC4IntegerFormulaManager
     extends CVC4NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  CVC4IntegerFormulaManager(CVC4FormulaCreator pCreator) {
-    super(pCreator);
+  CVC4IntegerFormulaManager(CVC4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic);
   }
 
   @Override

@@ -184,4 +184,22 @@ public class CVC4FloatingPointFormulaManager
   protected Expr isSubnormal(Expr pParam1) {
     return exprManager.mkExpr(Kind.FLOATINGPOINT_ISSN, pParam1);
   }
+
+  @Override
+  protected Expr fromIeeeBitvectorImpl(Expr pNumber, FloatingPointType pTargetType) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected Expr toIeeeBitvectorImpl(Expr pNumber) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
 }
