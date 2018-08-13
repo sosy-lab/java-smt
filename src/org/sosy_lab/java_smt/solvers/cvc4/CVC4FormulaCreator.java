@@ -27,6 +27,8 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
+import edu.nyu.acsys.CVC4.vectorExpr;
+import edu.nyu.acsys.CVC4.vectorType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -314,19 +316,37 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   protected Expr getBooleanVarDeclarationImpl(Expr pTFormulaInfo) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    Kind kind = pTFormulaInfo.getKind();
+    assert (kind == Kind.APPLY_UF || kind == Kind.VARIABLE) : pTFormulaInfo.getKind();
+    if (kind == Kind.APPLY_UF) {
+      return pTFormulaInfo.getOperator();
+    } else {
+      return pTFormulaInfo;
+    }
   }
 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    if (pArgs.size() == 0) {
+      return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration);
+    } else if (pArgs.size() == 1) {
+      return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration, pArgs.get(0));
+    } else {
+      vectorExpr args = new vectorExpr();
+      for (Expr expr : pArgs) {
+        args.add(expr);
+      }
+      return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration, args);
+    }
   }
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    vectorType args = new vectorType();
+    for (Type t : pArgTypes) {
+      args.add(t);
+    }
+    Type requestedFunctionType = exprManager.mkFunctionType(args, pReturnType);
+    return exprManager.mkVar(pName, requestedFunctionType);
   }
 }
