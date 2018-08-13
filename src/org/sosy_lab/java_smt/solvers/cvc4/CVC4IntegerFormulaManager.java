@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
@@ -47,11 +46,8 @@ public class CVC4IntegerFormulaManager
   @Override
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
-    if (pI < 0) {
-      // TODO fix this bug
-      return exprManager.mkConst(new Rational(new Integer((int) pI)));
-    }
-    return exprManager.mkConst(new Rational(new Integer(pI)));
+    Expr result = exprManager.mkConst(new Rational(pI));
+    return result;
   }
 
   @Override
