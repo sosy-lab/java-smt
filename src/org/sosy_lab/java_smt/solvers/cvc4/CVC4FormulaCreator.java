@@ -279,7 +279,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FunctionDeclarationKind.NOT;
     } else if (kind == Kind.AND) {
       return FunctionDeclarationKind.AND;
-    } else if (kind == Kind.IFF) {
+    } else if (kind == Kind.EQUAL) {
       return FunctionDeclarationKind.IFF;
     } else if (kind == Kind.IMPLIES) {
       return FunctionDeclarationKind.IMPLIES;
