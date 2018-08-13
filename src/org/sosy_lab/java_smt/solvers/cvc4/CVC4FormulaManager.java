@@ -19,12 +19,16 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import com.google.common.base.Splitter;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
+import java.io.IOException;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
@@ -58,7 +62,27 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   @Override
-  public Appender dumpFormula(Expr pT) {
-    throw new UnsupportedOperationException();
+  public Appender dumpFormula(Expr f) {
+    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
+
+    // Lazy invocation of msat_to_smtlib2 wrapped in an Appender.
+    return new Appenders.AbstractAppender() {
+      @Override
+      public void appendTo(Appendable out) throws IOException {
+        String cvc4String = f.toString();
+        // Adjust line breaks: assert needs to be on last line, so we remove all following breaks.
+        boolean needsLinebreak = true;
+        for (String part : Splitter.on('\n').split(cvc4String)) {
+          out.append(part);
+          if (needsLinebreak && part.startsWith("(assert")) {
+            needsLinebreak = false;
+          }
+          if (needsLinebreak) {
+            out.append('\n');
+          }
+        }
+      }
+    };
   }
 }
