@@ -155,12 +155,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.getFloatingPointType(
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getSignificandSize());
+    } else if (t.isReal()) {
+      // The theory REAL in CVC4 is the theory of (infinite precision!) real numbers.
+      // As such, the theory RATIONAL is contained in REAL. TODO: find a better solution.
+      return FormulaType.RationalType;
     } else {
-      throw new AssertionError("Unhandled type " + t.getClass());
+      throw new AssertionError("Unhandled type " + t.getBaseType());
     }
-    // else if(t == exprManager.realType()) {
-    //   FormulaType.re
-    // }
   }
 
   @SuppressWarnings("unchecked")
@@ -252,6 +253,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return visitor.visitFreeVariable(formula, f.toString());
 
     } else {
+      // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
+      // These are all treated like operators, so we can get the declaration by f.getOperator()!
       String name = getName(f);
       long arity = f.getNumChildren();
 
@@ -267,7 +270,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return visitor.visitFunction(
           formula,
           args,
-          FunctionDeclarationImpl.of(name, getDeclarationKind(f), argsTypes, getFormulaType(f), f));
+          FunctionDeclarationImpl.of(
+              name, getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
     }
   }
 
