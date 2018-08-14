@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
@@ -125,10 +126,11 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(pValueTerm);
-    BooleanFormula equation = null;//getAssignment(key, value);
+    BooleanFormula equation =
+        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, pValueTerm));
     Object value = getValue(pValueTerm);
     return new ValueAssignment(
-        keyFormula, valueFormula, equation, pValueTerm.toString(), value, ImmutableList.of());
+        keyFormula, valueFormula, equation, pKeyTerm.toString(), value, ImmutableList.of());
   }
 
   public static CVC4Model create(CVC4FormulaCreator pCreator) {
