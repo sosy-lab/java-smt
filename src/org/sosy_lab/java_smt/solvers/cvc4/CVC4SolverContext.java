@@ -44,10 +44,17 @@ public final class CVC4SolverContext extends AbstractSolverContext {
         new CVC4IntegerFormulaManager(creator, pNonLinearArithmetic);
     CVC4RationalFormulaManager rationalTheory =
         new CVC4RationalFormulaManager(creator, pNonLinearArithmetic);
+    CVC4BitvectorFormulaManager bitvectorTheory = new CVC4BitvectorFormulaManager(creator);
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
+            creator,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            bitvectorTheory,
+            arrayTheory);
 
     return new CVC4SolverContext(creator, manager);
   }
