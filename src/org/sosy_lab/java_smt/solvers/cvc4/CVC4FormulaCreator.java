@@ -284,6 +284,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
     Kind kind = f.getKind();
+    // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)
     if (kind == Kind.EQUAL) {
       return FunctionDeclarationKind.EQ;
     } else if (kind == Kind.DISTINCT) {
@@ -320,6 +321,51 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
       return FunctionDeclarationKind.GT;
     } else if (kind == Kind.GEQ) {
       return FunctionDeclarationKind.GTE;
+    } else if (kind == Kind.BITVECTOR_PLUS) {
+      return FunctionDeclarationKind.BV_ADD;
+    } else if (kind == Kind.BITVECTOR_SUB) {
+      return FunctionDeclarationKind.BV_SUB;
+    } else if (kind == Kind.BITVECTOR_MULT) {
+      return FunctionDeclarationKind.BV_MUL;
+    } else if (kind == Kind.BITVECTOR_AND) {
+      return FunctionDeclarationKind.BV_AND;
+    } else if (kind == Kind.BITVECTOR_OR) {
+      return FunctionDeclarationKind.BV_OR;
+    } else if (kind == Kind.BITVECTOR_XOR) {
+      return FunctionDeclarationKind.BV_XOR;
+    } else if (kind == Kind.BITVECTOR_SLT) {
+      return FunctionDeclarationKind.BV_SLT;
+    } else if (kind == Kind.BITVECTOR_ULT) {
+      return FunctionDeclarationKind.BV_ULT;
+    } else if (kind == Kind.BITVECTOR_SLE) {
+      return FunctionDeclarationKind.BV_SLE;
+    } else if (kind == Kind.BITVECTOR_ULE) {
+      return FunctionDeclarationKind.BV_ULE;
+    } else if (kind == Kind.BITVECTOR_SGT) {
+      return FunctionDeclarationKind.BV_SGT;
+    } else if (kind == Kind.BITVECTOR_UGT) {
+      return FunctionDeclarationKind.BV_UGT;
+    } else if (kind == Kind.BITVECTOR_SGE) {
+      return FunctionDeclarationKind.BV_SGE;
+    } else if (kind == Kind.BITVECTOR_UGE) {
+      return FunctionDeclarationKind.BV_UGE;
+    } else if (kind == Kind.BITVECTOR_SDIV) {
+      return FunctionDeclarationKind.BV_SDIV;
+    } else if (kind == Kind.BITVECTOR_UDIV) {
+      return FunctionDeclarationKind.BV_UDIV;
+    } else if (kind == Kind.BITVECTOR_SREM) {
+      // TODO: find out where Kind.BITVECTOR_SMOD fits in here
+      return FunctionDeclarationKind.BV_SREM;
+    } else if (kind == Kind.BITVECTOR_UREM) {
+      return FunctionDeclarationKind.BV_UREM;
+    } else if (kind == Kind.BITVECTOR_NOT) {
+      return FunctionDeclarationKind.BV_NOT;
+    } else if (kind == Kind.BITVECTOR_NEG) {
+      return FunctionDeclarationKind.BV_NEG;
+    } else if (kind == Kind.BITVECTOR_EXTRACT) {
+      return FunctionDeclarationKind.BV_EXTRACT;
+    } else if (kind == Kind.BITVECTOR_CONCAT) {
+      return FunctionDeclarationKind.BV_CONCAT;
     } else {
       return FunctionDeclarationKind.OTHER;
     }

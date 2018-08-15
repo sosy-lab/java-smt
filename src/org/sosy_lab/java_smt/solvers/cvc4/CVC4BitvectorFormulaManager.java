@@ -140,7 +140,7 @@ public class CVC4BitvectorFormulaManager
   @Override
   protected Expr modulo(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
-      return exprManager.mkExpr(Kind.BITVECTOR_SMOD, pParam1, pParam2);
+      return exprManager.mkExpr(Kind.BITVECTOR_SREM, pParam1, pParam2);
     } else {
       return exprManager.mkExpr(Kind.BITVECTOR_UREM, pParam1, pParam2);
     }
