@@ -40,18 +40,18 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr concat(Expr pParam1, Expr pParam2) {
+  protected Expr concat(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_CONCAT, pParam1, pParam2);
   }
 
   @Override
-  public Expr extract(Expr pParam1, int pMsb, int pLsb, boolean signed) {
+  protected Expr extract(Expr pParam1, int pMsb, int pLsb, boolean signed) {
     Expr ext = exprManager.mkConst(new BitVectorExtract(pMsb, pLsb));
     return exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, ext, pParam1);
   }
 
   @Override
-  public Expr extend(Expr pParam1, int pExtensionBits, boolean signed) {
+  protected Expr extend(Expr pParam1, int pExtensionBits, boolean signed) {
     Expr pParam2 = exprManager.mkConst(new Rational(pExtensionBits));
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SIGN_EXTEND, pParam1, pParam2);
@@ -61,7 +61,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr makeBitvectorImpl(int pLength, long pI) {
+  protected Expr makeBitvectorImpl(int pLength, long pI) {
     return exprManager.mkConst(new BitVector(pI, pLength));
   }
 
@@ -71,7 +71,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr makeVariableImpl(int length, String varName) {
+  protected Expr makeVariableImpl(int length, String varName) {
     Type type = exprManager.mkBitVectorType(length);
     return getFormulaCreator().makeVariable(type, varName);
   }
@@ -80,7 +80,7 @@ public class CVC4BitvectorFormulaManager
    * Return a term representing the (arithmetic if signed is true) right shift of number by toShift.
    */
   @Override
-  public Expr shiftRight(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr shiftRight(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_ASHR, pParam1, pParam2);
     } else {
@@ -89,47 +89,47 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr shiftLeft(Expr pParam1, Expr pParam2) {
+  protected Expr shiftLeft(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_SHL, pParam1, pParam2);
   }
 
   @Override
-  public Expr not(Expr pParam1) {
+  protected Expr not(Expr pParam1) {
     return exprManager.mkExpr(Kind.BITVECTOR_NOT, pParam1);
   }
 
   @Override
-  public Expr and(Expr pParam1, Expr pParam2) {
+  protected Expr and(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_AND, pParam1, pParam2);
   }
 
   @Override
-  public Expr or(Expr pParam1, Expr pParam2) {
+  protected Expr or(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_OR, pParam1, pParam2);
   }
 
   @Override
-  public Expr xor(Expr pParam1, Expr pParam2) {
+  protected Expr xor(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_XOR, pParam1, pParam2);
   }
 
   @Override
-  public Expr negate(Expr pParam1) {
+  protected Expr negate(Expr pParam1) {
     return exprManager.mkExpr(Kind.BITVECTOR_NEG, pParam1);
   }
 
   @Override
-  public Expr add(Expr pParam1, Expr pParam2) {
+  protected Expr add(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_PLUS, pParam1, pParam2);
   }
 
   @Override
-  public Expr subtract(Expr pParam1, Expr pParam2) {
+  protected Expr subtract(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_SUB, pParam1, pParam2);
   }
 
   @Override
-  public Expr divide(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr divide(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SDIV, pParam1, pParam2);
     } else {
@@ -138,7 +138,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr modulo(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr modulo(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SMOD, pParam1, pParam2);
     } else {
@@ -147,17 +147,17 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr multiply(Expr pParam1, Expr pParam2) {
+  protected Expr multiply(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_MULT, pParam1, pParam2);
   }
 
   @Override
-  public Expr equal(Expr pParam1, Expr pParam2) {
+  protected Expr equal(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
 
   @Override
-  public Expr lessThan(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr lessThan(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SLT, pParam1, pParam2);
     } else {
@@ -166,7 +166,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr lessOrEquals(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr lessOrEquals(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SLE, pParam1, pParam2);
     } else {
@@ -175,7 +175,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr greaterThan(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr greaterThan(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SGT, pParam1, pParam2);
     } else {
@@ -184,7 +184,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  public Expr greaterOrEquals(Expr pParam1, Expr pParam2, boolean signed) {
+  protected Expr greaterOrEquals(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
       return exprManager.mkExpr(Kind.BITVECTOR_SGE, pParam1, pParam2);
     } else {
