@@ -43,6 +43,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   // added assertions.
   private final SmtEngine smtEngine;
   private final CVC4FormulaCreator cvc4Creator;
+  private final ImmutableList<ValueAssignment> model;
 
   // private final ImmutableList<Expr> assertedFormulas;
 
@@ -50,6 +51,10 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     super(pCreator);
     this.cvc4Creator = pCreator;
     this.smtEngine = pCreator.getSmtEngine();
+    // We need to generate and save this at construction time as CVC4 has no functionality to give a
+    // persistent reference to the model. If the SMT engine is used somewhere else, the values we
+    // get out of it might change!
+    model = generateModel();
     // this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
@@ -109,8 +114,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   }
 
-  @Override
-  public ImmutableList<ValueAssignment> modelToList() {
+  private ImmutableList<ValueAssignment> generateModel() {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
     for (Expr lKeyTerm : cvc4Creator.variablesCache.values()) {
@@ -119,6 +123,11 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     }
 
     return out.build();
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> modelToList() {
+    return model;
   }
 
 
