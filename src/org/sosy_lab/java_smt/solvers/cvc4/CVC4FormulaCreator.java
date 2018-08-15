@@ -225,9 +225,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     Preconditions.checkState(!pT.isNull());
 
     if (pT.isConst() || pT.isVariable()) {
-      return pT.toString();
+      return dequote(pT.toString());
     } else {
-      return pT.getOperator().toString();
+      return dequote(pT.getOperator().toString());
     }
   }
 
@@ -237,6 +237,18 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     throw new UnsupportedOperationException("Not implemented");
   }
   */
+
+  /**
+   * Variable names can be wrapped with "|". This function removes those chars. I copied it from
+   * SMTInterpolFormulaCreator. TODO: remove code duplication
+   */
+  private String dequote(String s) {
+    int l = s.length();
+    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
+      return s.substring(1, l - 1);
+    }
+    return s;
+  }
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
@@ -257,7 +269,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
       }
 
     } else if (f.isVariable()) {
-      return visitor.visitFreeVariable(formula, f.toString());
+      return visitor.visitFreeVariable(formula, getName(f));
 
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
