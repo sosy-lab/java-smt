@@ -30,7 +30,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 public class CVC4BitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Expr, Type, ExprManager, Expr> {
+    extends AbstractBitvectorFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
   private final ExprManager exprManager;
 

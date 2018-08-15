@@ -24,7 +24,7 @@ import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
+public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, CVC4Environment> {
 
   private final ExprManager exprManager;
 

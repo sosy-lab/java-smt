@@ -35,11 +35,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements ProverEnvironment {
 
-  private final CVC4FormulaManager mgr;
-
-  protected CVC4TheoremProver(CVC4FormulaCreator creator, CVC4FormulaManager pMgr) {
+  protected CVC4TheoremProver(CVC4FormulaCreator creator) {
     super(creator);
-    mgr = pMgr;
   }
 
   @Override
@@ -59,9 +56,9 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
     List<BooleanFormula> converted = new ArrayList<>();
-    UnsatCore core = smtEngine.getUnsatCore();
+    UnsatCore core = env.getUnsatCore();
     for (Expr aCore : core) {
-      converted.add(mgr.encapsulateBooleanFormula(aCore));
+      converted.add(creator.encapsulateBoolean(aCore));
     }
     return converted;
   }

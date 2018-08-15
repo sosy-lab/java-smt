@@ -21,20 +21,19 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import edu.nyu.acsys.CVC4.SmtEngine;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final CVC4FormulaCreator creator;
-  protected final SmtEngine smtEngine;
+  protected final CVC4Environment env;
 
   protected boolean closed = false;
 
   protected CVC4AbstractProver(CVC4FormulaCreator pFormulaCreator) {
     this.creator = pFormulaCreator;
-    this.smtEngine = pFormulaCreator.getSmtEngine();
+    this.env = pFormulaCreator.getEnv();
   }
 
   protected abstract CVC4Model getCVC4Model();

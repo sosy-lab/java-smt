@@ -28,7 +28,7 @@ import java.util.Collection;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC4BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Expr, Type, ExprManager, Expr> {
+    extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
   private final Expr cvc4True;
   private final Expr cvc4False;

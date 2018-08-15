@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
 public class CVC4FloatingPointFormulaManager
-    extends AbstractFloatingPointFormulaManager<Expr, Type, ExprManager, Expr> {
+    extends AbstractFloatingPointFormulaManager<Expr, Type, CVC4Environment, Expr> {
   protected final ExprManager exprManager;
 
   protected CVC4FloatingPointFormulaManager(CVC4FormulaCreator pCreator) {

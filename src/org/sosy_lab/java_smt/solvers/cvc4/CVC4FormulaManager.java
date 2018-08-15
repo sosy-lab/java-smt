@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Splitter;
 import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 import java.io.IOException;
 import org.sosy_lab.common.Appender;
@@ -32,10 +31,10 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager, Expr> {
+class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
   CVC4FormulaManager(
-      FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator,
+      FormulaCreator<Expr, Type, CVC4Environment, Expr> pFormulaCreator,
       CVC4UFManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr,
@@ -51,10 +50,6 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
     }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
-  }
-
-  BooleanFormula encapsulateBooleanFormula(Expr t) {
-    return getFormulaCreator().encapsulateBoolean(t);
   }
 
   @Override

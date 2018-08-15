@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class CVC4ArrayFormulaManager
-    extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
+    extends AbstractArrayFormulaManager<Expr, Type, CVC4Environment, Expr> {
   protected final ExprManager exprManager;
 
   public CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {

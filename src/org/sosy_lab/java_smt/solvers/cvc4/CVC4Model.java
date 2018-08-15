@@ -23,10 +23,8 @@ import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
-import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -37,11 +35,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
-public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
+public class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment> {
 
-  // TODO: this will not work properly, as SmtEngine is affected by
-  // added assertions.
-  private final SmtEngine smtEngine;
   private final CVC4FormulaCreator cvc4Creator;
   private final ImmutableList<ValueAssignment> model;
 
@@ -50,7 +45,6 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   CVC4Model(CVC4FormulaCreator pCreator) {
     super(pCreator);
     this.cvc4Creator = pCreator;
-    this.smtEngine = pCreator.getSmtEngine();
     // We need to generate and save this at construction time as CVC4 has no functionality to give a
     // persistent reference to the model. If the SMT engine is used somewhere else, the values we
     // get out of it might change!
@@ -60,7 +54,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public Object evaluateImpl(Expr f) {
-    return getValue(smtEngine.getValue(f));
+    return getValue(cvc4Creator.getEnv().getValue(f));
   }
 
   public Map<String, Object> createAllsatModel(
@@ -72,7 +66,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
       extracted.addAll(creator.extractVariablesAndUFs(expr, true).values());
     }
     for (Expr lKeyTerm : extracted) {
-      Expr lValueTerm = creator.getSmtEngine().getValue(lKeyTerm);
+      Expr lValueTerm = creator.getEnv().getValue(lKeyTerm);
       Object lValue = getValue(lValueTerm);
       // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
       // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
@@ -118,7 +112,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     Builder<ValueAssignment> out = ImmutableList.builder();
 
     for (Expr lKeyTerm : cvc4Creator.variablesCache.values()) {
-      Expr lValueTerm = smtEngine.getValue(lKeyTerm);
+      Expr lValueTerm = cvc4Creator.getEnv().getValue(lKeyTerm);
       out.add(getAssignment(lKeyTerm,lValueTerm));
     }
 
@@ -136,7 +130,8 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(pValueTerm);
     BooleanFormula equation =
-        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, pValueTerm));
+        creator.encapsulateBoolean(
+            creator.getEnv().getExprManager().mkExpr(Kind.EQUAL, pKeyTerm, pValueTerm));
     Object value = getValue(pValueTerm);
     return new ValueAssignment(
         keyFormula, valueFormula, equation, pKeyTerm.toString(), value, ImmutableList.of());

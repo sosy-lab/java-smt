@@ -24,8 +24,6 @@ import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.SExpr;
-import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
 import edu.nyu.acsys.CVC4.vectorType;
@@ -52,25 +50,20 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environment, Expr> {
 
-  protected final ExprManager exprManager;
-  protected final SmtEngine smtEngine;
   protected final Map<String, Expr> variablesCache = new HashMap<>();
   protected final Map<String, Type[]> arrayTypeMapping = new HashMap<>();
+  private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(
-      int randomSeed, ExprManager exprManager, Type boolType, Type intType, Type realType) {
-    super(exprManager, boolType, intType, realType);
-    this.exprManager = exprManager;
-    smtEngine = new SmtEngine(exprManager);
-    smtEngine.setOption("incremental", new SExpr(true));
-    smtEngine.setOption("produce-models", new SExpr(true));
-    smtEngine.setOption("produce-assertions", new SExpr(true));
-    smtEngine.setOption("dump-models", new SExpr(true));
-    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
-    smtEngine.setOption("output-language", new SExpr("smt2"));
-    smtEngine.setOption("random-seed", new SExpr(randomSeed));
+  protected CVC4FormulaCreator(CVC4Environment pEnvironment) {
+    super(
+        pEnvironment,
+        pEnvironment.getExprManager().booleanType(),
+        pEnvironment.getExprManager().integerType(),
+        pEnvironment.getExprManager().realType());
+    exprManager = pEnvironment.getExprManager();
+
   }
 
   public Expr makeVariable(String name, Type type) {
@@ -87,10 +80,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   protected ExprManager getExprManager() {
     return exprManager;
-  }
-
-  protected SmtEngine getSmtEngine() {
-    return smtEngine;
   }
 
   @Override

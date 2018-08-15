@@ -2,11 +2,9 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.CVC4JNI;
 import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.Type;
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -15,13 +13,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class CVC4SolverContext extends AbstractSolverContext {
-  private final CVC4FormulaManager manager;
   private final CVC4FormulaCreator creator;
 
   private CVC4SolverContext(CVC4FormulaCreator creator, CVC4FormulaManager manager) {
     super(manager);
     this.creator = creator;
-    this.manager = manager;
   }
 
   public static SolverContext create(int randomSeed, NonLinearArithmetic pNonLinearArithmetic) {
@@ -29,13 +25,10 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
     ExprManager exprManager = new ExprManager();
-    Type boolType = exprManager.booleanType();
-    Type intType = exprManager.integerType();
-    Type realType = exprManager.realType();
+    CVC4Environment env = new CVC4Environment(exprManager, randomSeed);
 
     // Create CVC4FormulaCreator
-    CVC4FormulaCreator creator =
-        new CVC4FormulaCreator(randomSeed, exprManager, boolType, intType, realType);
+    CVC4FormulaCreator creator = new CVC4FormulaCreator(env);
 
     // Create managers
     CVC4UFManager functionTheory = new CVC4UFManager(creator);
@@ -59,10 +52,6 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     return new CVC4SolverContext(creator, manager);
   }
 
-  public FormulaManager getFormulaManager0() {
-    return manager;
-  }
-
   @Override
   public String getVersion() {
     return "CVC4 " + CVC4JNI.Configuration_getVersionString();
@@ -80,7 +69,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   @Override
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new CVC4TheoremProver(creator, manager);
+    return new CVC4TheoremProver(creator);
   }
 
   @Override

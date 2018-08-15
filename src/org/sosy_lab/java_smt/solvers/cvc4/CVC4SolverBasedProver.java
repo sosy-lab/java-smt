@@ -38,14 +38,14 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    smtEngine.push();
+    env.push();
   }
 
   @Nullable
-  public Expr addConstraint0(BooleanFormula pF) {
+  protected Expr addConstraint0(BooleanFormula pF) {
     Preconditions.checkState(!closed);
     Expr exp = creator.extractInfo(pF);
-    smtEngine.assertFormula(exp);
+    env.assertFormula(exp);
     assertedFormulas.add(exp);
     return exp;
   }
@@ -54,13 +54,13 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   public void pop() {
     Preconditions.checkState(!closed);
     assertedFormulas.remove(assertedFormulas.size() - 1);
-    smtEngine.pop();
+    env.pop();
   }
 
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    Result result = smtEngine.checkSat();
+    Result result = env.checkSat();
 
     if (result.isNull() || result.isUnknown()) {
       throw new SolverException(
@@ -79,7 +79,7 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
   @Override
   public void close() {
     Preconditions.checkState(!closed);
-    smtEngine.delete();
+    env.delete();
     closed = true;
   }
 
