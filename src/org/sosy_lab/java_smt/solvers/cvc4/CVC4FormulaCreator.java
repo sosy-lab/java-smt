@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
+import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
@@ -53,7 +54,6 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environment, Expr> {
 
   protected final Map<String, Expr> variablesCache = new HashMap<>();
-  protected final Map<String, Type[]> arrayTypeMapping = new HashMap<>();
   private final ExprManager exprManager;
 
   protected CVC4FormulaCreator(CVC4Environment pEnvironment) {
@@ -121,14 +121,30 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     return ((CVC4ArrayFormula<TD, TR>) pArray).getIndexType();
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+    CVC4Environment env = getEnv();
+
+    if (pFormula instanceof BitvectorFormula) {
+      return (FormulaType<T>) getFormulaType(((CVC4BitvectorFormula) pFormula).getTerm());
+    }
+    // TODO: handle ArrayFormula (and FloatingPointFormula)
+    // (HINT: look at corresponding method in MathSat5 part)
+    return super.getFormulaType(pFormula);
+  }
+
   @Override
   public FormulaType<?> getFormulaType(Expr pFormula) {
     Type t = pFormula.getType();
 
     if (t.isArray()) {
+      // it can happen that t is instance of Type but not instance of ArrayType! But this workaround
+      // seems to work:
+      ArrayType arrayType = new ArrayType(t);
       return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(arrayTypeMapping.get(pFormula.toString())[0]),
-          getFormulaTypeFromTermType(arrayTypeMapping.get(pFormula.toString())[1]));
+          getFormulaTypeFromTermType(arrayType.getIndexType()),
+          getFormulaTypeFromTermType(arrayType.getConstituentType()));
     }
     return getFormulaTypeFromTermType(t);
   }
@@ -139,7 +155,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
     } else if (t.isInteger()) {
       return FormulaType.IntegerType;
     } else if (t.isBitVector()) {
-      return FormulaType.getBitvectorTypeWithSize((int) ((BitVectorType) t).getSize());
+      // apparently, we can get a t instanceof Type here for that t instanceof BitVectorType does
+      // not hold, hence we use the new BitVectorType(t) here as a workaround:
+      return FormulaType.getBitvectorTypeWithSize((int) (new BitVectorType(t)).getSize());
     } else if (t.isFloatingPoint()) {
       return FormulaType.getFloatingPointType(
           (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),

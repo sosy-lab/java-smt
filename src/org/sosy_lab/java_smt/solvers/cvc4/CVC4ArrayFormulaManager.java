@@ -53,9 +53,6 @@ public class CVC4ArrayFormulaManager
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final Type cvc4ArrayType = toSolverType(arrayFormulaType);
-    ((CVC4FormulaCreator) formulaCreator)
-        .arrayTypeMapping.put(
-            pName, new Type[] {toSolverType(pIndexType), toSolverType(pElementType)});
     return getFormulaCreator().makeVariable(cvc4ArrayType, pName);
   }
 
