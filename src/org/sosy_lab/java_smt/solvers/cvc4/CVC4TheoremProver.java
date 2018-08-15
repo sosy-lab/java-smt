@@ -36,17 +36,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements ProverEnvironment {
 
   private final CVC4FormulaManager mgr;
-  private final List<Expr> assertedFormulas = new ArrayList<>();
 
   protected CVC4TheoremProver(CVC4FormulaCreator creator, CVC4FormulaManager pMgr) {
     super(creator);
     mgr = pMgr;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    smtEngine.push();
   }
 
   @Override
@@ -60,13 +53,6 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
   public Void addConstraint(BooleanFormula pF) {
     super.addConstraint0(pF);
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    assertedFormulas.remove(assertedFormulas.size() - 1);
-    smtEngine.pop();
   }
 
   @Override
