@@ -4,6 +4,7 @@ import edu.nyu.acsys.CVC4.CVC4JNI;
 import edu.nyu.acsys.CVC4.ExprManager;
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -20,12 +21,15 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     this.creator = creator;
   }
 
-  public static SolverContext create(int randomSeed, NonLinearArithmetic pNonLinearArithmetic) {
+  public static SolverContext create(
+      int randomSeed,
+      NonLinearArithmetic pNonLinearArithmetic,
+      ShutdownNotifier pShutdownNotifier) {
 
     // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
     ExprManager exprManager = new ExprManager();
-    CVC4Environment env = new CVC4Environment(exprManager, randomSeed);
+    CVC4Environment env = new CVC4Environment(exprManager, randomSeed, pShutdownNotifier);
 
     // Create CVC4FormulaCreator
     CVC4FormulaCreator creator = new CVC4FormulaCreator(env);

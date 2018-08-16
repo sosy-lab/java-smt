@@ -62,9 +62,13 @@ public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
     Preconditions.checkState(!closed);
     Result result = env.checkSat();
 
-    if (result.isNull() || result.isUnknown()) {
-      throw new SolverException(
-          "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
+    if (result.isUnknown()) {
+      if (result.whyUnknown().equals(Result.UnknownExplanation.INTERRUPTED)) {
+        throw new InterruptedException();
+      } else {
+        throw new SolverException(
+            "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
+      }
     } else {
       if (result.isSat() == Result.Sat.SAT) {
         return false;
