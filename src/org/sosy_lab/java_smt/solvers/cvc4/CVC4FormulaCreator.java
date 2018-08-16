@@ -54,6 +54,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environment, Expr> {
 
   protected final Map<String, Expr> variablesCache = new HashMap<>();
+  private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
   protected CVC4FormulaCreator(CVC4Environment pEnvironment) {
@@ -66,7 +67,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
 
   }
 
-  public Expr makeVariable(String name, Type type) {
+  @Override
+  public Expr makeVariable(Type type, String name) {
     if (variablesCache.containsKey(name)) {
       Expr oldExp = variablesCache.get(name);
       assert type.equals(oldExp.getType());
@@ -95,13 +97,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
   @Override
   public Type getArrayType(Type pIndexType, Type pElementType) {
     return exprManager.mkArrayType(pIndexType, pElementType);
-  }
-
-  @Override
-  public Expr makeVariable(Type pType, String pVarName) {
-    Expr var = exprManager.mkVar(pVarName, pType);
-    variablesCache.put(pVarName, var);
-    return var;
   }
 
   @Override
@@ -411,11 +406,17 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
-    vectorType args = new vectorType();
-    for (Type t : pArgTypes) {
-      args.add(t);
+    if (!functionsCache.containsKey(pName)) {
+      vectorType args = new vectorType();
+      for (Type t : pArgTypes) {
+        args.add(t);
+      }
+      Type requestedFunctionType = exprManager.mkFunctionType(args, pReturnType);
+      Expr result = exprManager.mkVar(pName, requestedFunctionType);
+      functionsCache.put(pName, result);
+      return result;
+    } else {
+      return functionsCache.get(pName);
     }
-    Type requestedFunctionType = exprManager.mkFunctionType(args, pReturnType);
-    return exprManager.mkVar(pName, requestedFunctionType);
   }
 }
