@@ -49,7 +49,7 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
   @Nullable
   public Void addConstraint(BooleanFormula pF) {
     super.addConstraint0(pF);
-    throw new UnsupportedOperationException();
+    return null;
   }
 
   @Override
