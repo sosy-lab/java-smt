@@ -434,6 +434,20 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void modelForUnsatFormula2() throws SolverException, InterruptedException {
+    try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      assertThat(stack).isSatisfiable();
+      stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      assertThat(stack).isUnsatisfiable();
+
+      thrown.expect(Exception.class);
+      stack.getModel();
+    }
+  }
+
+  @Test
   public void modelForSatFormula() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula a = imgr.makeVariable("a");
