@@ -143,7 +143,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   @Override
   public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, "model is only available for SAT environments");
+    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     return new PrincessModel(api.partialModel(), creator);
   }
 

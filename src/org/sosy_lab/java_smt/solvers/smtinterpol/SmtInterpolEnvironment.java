@@ -66,6 +66,7 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -336,7 +337,16 @@ class SmtInterpolEnvironment {
 
   /** This function returns a map, that contains assignments term->term for all terms in terms. */
   public Model getModel() {
-    return script.getModel();
+    try {
+      return script.getModel();
+    } catch (SMTLIBException e) {
+      if (e.getMessage().contains("Context is inconsistent")) {
+        throw new IllegalStateException(BasicProverEnvironment.NO_MODEL_HELP, e);
+      } else {
+        // new stacktrace, but only the library calls are missing.
+        throw e;
+      }
+    }
   }
 
   public Object getInfo(String info) {

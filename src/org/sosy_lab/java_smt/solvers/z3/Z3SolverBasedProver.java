@@ -129,7 +129,16 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected long getZ3Model() {
-    return Native.solverGetModel(z3context, z3solver);
+    try {
+      return Native.solverGetModel(z3context, z3solver);
+    } catch (Z3Exception e) {
+      if (e.getMessage().contains("invalid usage")) {
+        throw new IllegalStateException(NO_MODEL_HELP + " " + NO_MODEL_HELP_GENERATE_MODEL, e);
+      } else {
+        // new stacktrace, but only the native call is missing.
+        throw e;
+      }
+    }
   }
 
   @CanIgnoreReturnValue

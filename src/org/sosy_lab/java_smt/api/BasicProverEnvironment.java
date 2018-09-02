@@ -33,6 +33,11 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
  */
 public interface BasicProverEnvironment<T> extends AutoCloseable {
 
+  static final String NO_MODEL_HELP =
+      "Model computation failed. Are the pushed formulae satisfiable?";
+  static final String NO_MODEL_HELP_GENERATE_MODEL =
+      "Have you set the prover option GENERATE_MODELS?";
+
   /**
    * Push a backtracking point and add a formula to the environment stack, asserting it. The return
    * value may be used to identify this formula later on in a query (this depends on the sub-type of

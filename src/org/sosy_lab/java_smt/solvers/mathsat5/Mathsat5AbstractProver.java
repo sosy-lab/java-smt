@@ -145,7 +145,16 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   /** @throws SolverException if an expected MathSAT failure occurs */
   protected long getMsatModel() throws SolverException {
-    return Mathsat5NativeApi.msat_get_model(curEnv);
+    try {
+      return Mathsat5NativeApi.msat_get_model(curEnv);
+    } catch (IllegalArgumentException e) {
+      if (e.getMessage().contains("no model available")) {
+        throw new IllegalStateException(NO_MODEL_HELP + " " + NO_MODEL_HELP_GENERATE_MODEL, e);
+      } else {
+        // new stacktrace, but only the native call is missing.
+        throw e;
+      }
+    }
   }
 
   @Override
