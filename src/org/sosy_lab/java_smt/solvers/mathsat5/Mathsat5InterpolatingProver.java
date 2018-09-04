@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
@@ -101,7 +100,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     // As this is a bug in MathSAT and not in our code, we throw a SolverException.
     // We do it only in InterpolatingProver because without interpolation this is not expected.
     try {
-      return msat_get_model(curEnv);
+      return super.getMsatModel();
     } catch (IllegalArgumentException e) {
       String msg = Strings.emptyToNull(e.getMessage());
       throw new SolverException(
