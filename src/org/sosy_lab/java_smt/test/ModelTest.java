@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -1057,6 +1058,24 @@ public class ModelTest extends SolverBasedTest0 {
       // ignore
     } finally {
       m.close();
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGenerateModelsOption() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(/* no option */ )) {
+      assertThat(prover).isSatisfiable();
+      prover.getModel();
+      fail();
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGenerateModelsOption2() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(/* no option */ )) {
+      assertThat(prover).isSatisfiable();
+      prover.getModelAssignments();
+      fail();
     }
   }
 }
