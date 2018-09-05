@@ -36,15 +36,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
+abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
 
   private boolean closed = false;
   protected final SmtInterpolEnvironment env;
@@ -57,7 +59,8 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames
 
-  SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr) {
+  SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
+    super(options);
     checkState(
         pMgr.getEnvironment().getStackDepth() == 0,
         "Not allowed to create a new prover environment while solver stack is still non-empty, "
@@ -94,6 +97,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   @Override
   public SmtInterpolModel getModel() {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
     return new SmtInterpolModel(env.getModel(), creator, getAssertedTerms());
   }
 
@@ -113,6 +117,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!isClosed());
+    checkGenerateUnsatCores();
     Term[] terms = env.getUnsatCore();
     return Collections3.transformedImmutableListCopy(
         terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
@@ -121,6 +126,8 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException {
+    Preconditions.checkState(!isClosed());
+    checkGenerateUnsatCores();
     push();
     Preconditions.checkState(
         annotatedTerms.isEmpty(),

@@ -46,17 +46,16 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
-abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> {
+abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   protected final Mathsat5SolverContext context;
   protected final long curEnv;
@@ -68,12 +67,13 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   protected Mathsat5AbstractProver(
       Mathsat5SolverContext pContext,
-      Set<ProverOptions> opts,
-      Mathsat5FormulaCreator creator,
+      Set<ProverOptions> pOptions,
+      Mathsat5FormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier) {
+    super(pOptions);
     context = pContext;
-    this.creator = creator;
-    curConfig = buildConfig(opts);
+    creator = pCreator;
+    curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
     terminationTest = context.addTerminationTest(curEnv);
     shutdownNotifier = pShutdownNotifier;
@@ -133,6 +133,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public Mathsat5Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
     return new Mathsat5Model(getMsatModel(), creator, this);
   }
 
@@ -145,16 +146,8 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   /** @throws SolverException if an expected MathSAT failure occurs */
   protected long getMsatModel() throws SolverException {
-    try {
-      return Mathsat5NativeApi.msat_get_model(curEnv);
-    } catch (IllegalArgumentException e) {
-      if (e.getMessage().contains("no model available")) {
-        throw new IllegalStateException(NO_MODEL_HELP + " " + NO_MODEL_HELP_GENERATE_MODEL, e);
-      } else {
-        // new stacktrace, but only the native call is missing.
-        throw e;
-      }
-    }
+    checkGenerateModels();
+    return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
   @Override
@@ -166,6 +159,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
     long[] terms = msat_get_unsat_core(curEnv);
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {

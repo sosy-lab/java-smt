@@ -56,6 +56,7 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -67,6 +68,7 @@ import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -177,7 +179,8 @@ class SmtInterpolEnvironment {
     return theory;
   }
 
-  SmtInterpolInterpolatingProver getInterpolator(SmtInterpolFormulaManager mgr) {
+  SmtInterpolInterpolatingProver getInterpolator(
+      SmtInterpolFormulaManager mgr, Set<ProverOptions> pOptions) {
     if (smtLogfile != null) {
       Path logfile = smtLogfile.getFreshPath();
 
@@ -187,8 +190,14 @@ class SmtInterpolEnvironment {
         out.println("(set-option :global-declarations true)");
         out.println("(set-option :random-seed " + script.getOption(":random-seed") + ")");
         out.println("(set-option :produce-interpolants true)");
-        out.println("(set-option :produce-models true)");
-        out.println("(set-option :produce-unsat-cores true)");
+        out.println(
+            String.format(
+                "(set-option :produce-models %s)",
+                pOptions.contains(ProverOptions.GENERATE_MODELS)));
+        out.println(
+            String.format(
+                "(set-option :produce-unsat-cores %s)",
+                pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)));
         if (checkResults) {
           out.println("(set-option :interpolant-check-mode true)");
           out.println("(set-option :unsat-core-check-mode true)");
@@ -196,13 +205,13 @@ class SmtInterpolEnvironment {
         }
 
         out.println("(set-logic " + theory.getLogic().name() + ")");
-        return new LoggingSmtInterpolInterpolatingProver(mgr, out);
+        return new LoggingSmtInterpolInterpolatingProver(mgr, pOptions, out);
       } catch (IOException e) {
         logger.logUserException(Level.WARNING, e, "Could not write interpolation query to file");
       }
     }
 
-    return new SmtInterpolInterpolatingProver(mgr);
+    return new SmtInterpolInterpolatingProver(mgr, pOptions);
   }
 
   int getStackDepth() {

@@ -36,15 +36,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
+abstract class Z3SolverBasedProver<T> extends AbstractProver<T> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
@@ -61,14 +63,16 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3SolverBasedProver(
-      Z3FormulaCreator pCreator, long z3params, FormulaManager pMgr, boolean enableUnsatCores) {
+      Z3FormulaCreator pCreator, long z3params, FormulaManager pMgr, Set<ProverOptions> pOptions) {
+    super(pOptions);
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
     mgr = pMgr;
     Native.solverIncRef(z3context, z3solver);
     Native.solverSetParams(z3context, z3solver, z3params);
-    storedConstraints = enableUnsatCores ? new HashMap<>() : null;
+    storedConstraints =
+        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
   }
 
   @Override
@@ -129,16 +133,8 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected long getZ3Model() {
-    try {
-      return Native.solverGetModel(z3context, z3solver);
-    } catch (Z3Exception e) {
-      if (e.getMessage().contains("invalid usage")) {
-        throw new IllegalStateException(NO_MODEL_HELP + " " + NO_MODEL_HELP_GENERATE_MODEL, e);
-      } else {
-        // new stacktrace, but only the native call is missing.
-        throw e;
-      }
-    }
+    checkGenerateModels();
+    return Native.solverGetModel(z3context, z3solver);
   }
 
   @CanIgnoreReturnValue
@@ -187,6 +183,7 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
@@ -209,6 +206,7 @@ abstract class Z3SolverBasedProver<T> implements BasicProverEnvironment<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    checkGenerateUnsatCores();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }

@@ -46,6 +46,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import scala.collection.Seq;
 import scala.collection.mutable.ArrayBuffer;
@@ -60,8 +61,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, creator, pApi, pShutdownNotifier, true);
+      ShutdownNotifier pShutdownNotifier,
+      Set<ProverOptions> pOptions) {
+    super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
   }
 
   @Override

@@ -30,13 +30,14 @@ import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
-  SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr) {
-    super(pMgr);
+  SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
+    super(pMgr, options);
   }
 
   @Override

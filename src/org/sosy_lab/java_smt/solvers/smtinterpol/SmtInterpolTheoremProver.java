@@ -34,11 +34,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     implements ProverEnvironment {
 
-  private final boolean generateUnsatCores;
-
   SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
-    super(pMgr);
-    generateUnsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
+    super(pMgr, options);
   }
 
   @Override

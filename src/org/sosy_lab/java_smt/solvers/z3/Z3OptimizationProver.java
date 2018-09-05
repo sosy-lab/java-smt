@@ -27,6 +27,7 @@ import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.log.LogManager;
@@ -35,6 +36,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class Z3OptimizationProver extends Z3SolverBasedProver<Void>
@@ -48,8 +50,8 @@ class Z3OptimizationProver extends Z3SolverBasedProver<Void>
       LogManager pLogger,
       long z3params,
       FormulaManager pMgr,
-      boolean pEnableUnsatCores) {
-    super(creator, z3params, pMgr, pEnableUnsatCores);
+      Set<ProverOptions> pOptions) {
+    super(creator, z3params, pMgr, pOptions);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;

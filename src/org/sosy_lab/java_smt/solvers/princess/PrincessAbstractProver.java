@@ -39,22 +39,23 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import scala.Enumeration.Value;
 import scala.Option;
 
-abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E> {
+abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
 
   protected final SimpleAPI api;
   protected final PrincessFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   protected final ShutdownNotifier shutdownNotifier;
-  protected final boolean computeUnsatCores;
 
   private final PrincessFormulaCreator creator;
   protected boolean closed = false;
@@ -65,12 +66,12 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier,
-      boolean pComputeUnsatCores) {
+      Set<ProverOptions> pOptions) {
+    super(pOptions);
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
-    this.computeUnsatCores = pComputeUnsatCores;
   }
 
   /**
@@ -144,6 +145,7 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
   public PrincessModel getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    checkGenerateModels();
     return new PrincessModel(api.partialModel(), creator);
   }
 
@@ -162,7 +164,8 @@ abstract class PrincessAbstractProver<E, AF> implements BasicProverEnvironment<E
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed && computeUnsatCores);
+    Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
     final List<BooleanFormula> result = new ArrayList<>();
     final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
 

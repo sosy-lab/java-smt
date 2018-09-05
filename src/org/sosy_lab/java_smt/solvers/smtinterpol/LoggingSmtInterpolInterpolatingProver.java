@@ -25,7 +25,9 @@ import com.google.common.base.Joiner;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 // reason: not maintained, some implementations for methods are missing
@@ -33,8 +35,9 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
 
   private final PrintWriter out;
 
-  LoggingSmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, PrintWriter pOut) {
-    super(pMgr);
+  LoggingSmtInterpolInterpolatingProver(
+      SmtInterpolFormulaManager pMgr, Set<ProverOptions> pOptions, PrintWriter pOut) {
+    super(pMgr, pOptions);
     out = checkNotNull(pOut);
   }
 
