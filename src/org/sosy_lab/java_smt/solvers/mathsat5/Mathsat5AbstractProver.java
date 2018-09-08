@@ -172,7 +172,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       @SuppressWarnings("unused") Collection<BooleanFormula> assumptions) {
     throw new UnsupportedOperationException(
-        "Mathsat5 does not support finding UNSAT core over " + "assumptions");
+        "UNSAT cores over assumptions not supported by Mathsat5");
   }
 
   @Override

@@ -131,7 +131,8 @@ abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
     push();
     Preconditions.checkState(
         annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core" + " over assumptions.");
+        "Empty environment required for UNSAT core over assumptions: %s",
+        annotatedTerms);
     for (BooleanFormula assumption : assumptions) {
       String termName = generateTermName();
       Term t = mgr.extractInfo(assumption);
