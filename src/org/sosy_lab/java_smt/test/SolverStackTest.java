@@ -76,7 +76,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   private BasicProverEnvironment<?> newEnvironmentForTest(ProverOptions... options) {
     if (useInterpolatingEnvironment) {
       requireInterpolation();
-      return context.newProverEnvironmentWithInterpolation();
+      return context.newProverEnvironmentWithInterpolation(options);
     } else {
       return context.newProverEnvironment(options);
     }
