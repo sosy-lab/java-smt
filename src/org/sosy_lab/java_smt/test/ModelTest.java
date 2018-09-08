@@ -1060,6 +1060,7 @@ public class ModelTest extends SolverBasedTest0 {
       m.close();
     }
   }
+
   @Test(expected = IllegalStateException.class)
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
