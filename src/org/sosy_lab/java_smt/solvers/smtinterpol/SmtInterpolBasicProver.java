@@ -166,6 +166,8 @@ abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
+    checkGenerateModels();
+
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

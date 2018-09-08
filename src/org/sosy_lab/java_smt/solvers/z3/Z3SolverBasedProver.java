@@ -249,6 +249,7 @@ abstract class Z3SolverBasedProver<T> extends AbstractProver<T> {
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
 
     // Unpack formulas to terms.
     long[] importantFormulas = new long[important.size()];
