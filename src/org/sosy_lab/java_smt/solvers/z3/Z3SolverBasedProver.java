@@ -206,7 +206,7 @@ abstract class Z3SolverBasedProver<T> extends AbstractProver<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCores();
+    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }

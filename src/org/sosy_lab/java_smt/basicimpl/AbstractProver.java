@@ -28,20 +28,29 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final boolean generateModels;
   protected final boolean generateUnsatCores;
+  private final boolean generateUnsatCoresOverAssumptions;
 
   protected AbstractProver(Set<ProverOptions> pOptions) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
+    generateUnsatCoresOverAssumptions =
+        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 
-  protected void checkGenerateModels() {
+  protected final void checkGenerateModels() {
     Preconditions.checkState(
         generateModels, "Please set the prover option " + ProverOptions.GENERATE_MODELS + ".");
   }
 
-  protected void checkGenerateUnsatCores() {
+  protected final void checkGenerateUnsatCores() {
     Preconditions.checkState(
         generateUnsatCores,
         "Please set the prover option " + ProverOptions.GENERATE_UNSAT_CORE + ".");
+  }
+
+  protected final void checkGenerateUnsatCoresOverAssumptions() {
+    Preconditions.checkState(
+        generateUnsatCoresOverAssumptions,
+        "Please set the prover option " + ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS + ".");
   }
 }

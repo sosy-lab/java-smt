@@ -42,7 +42,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -139,7 +138,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
-        .withMessage("Princess and Mathsat5 do not support unsat core generation")
+        .withMessage("Princess and Mathsat5 do not support unsat core generation over assumptions")
         .that(solverToUse())
         .isNoneOf(PRINCESS, MATHSAT5);
     try (ProverEnvironment pe =

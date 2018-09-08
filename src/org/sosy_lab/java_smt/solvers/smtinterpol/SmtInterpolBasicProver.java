@@ -118,16 +118,25 @@ abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!isClosed());
     checkGenerateUnsatCores();
-    Term[] terms = env.getUnsatCore();
+    return getUnsatCore0();
+  }
+
+  /**
+   * small helper method, because we guarantee that {@link
+   * ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} is independent of {@link
+   * ProverOptions#GENERATE_UNSAT_CORE}.
+   */
+  private List<BooleanFormula> getUnsatCore0() {
     return Collections3.transformedImmutableListCopy(
-        terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
+        env.getUnsatCore(),
+        input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException {
     Preconditions.checkState(!isClosed());
-    checkGenerateUnsatCores();
+    checkGenerateUnsatCoresOverAssumptions();
     push();
     Preconditions.checkState(
         annotatedTerms.isEmpty(),
@@ -143,7 +152,7 @@ abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
     if (!isUnsat()) {
       return Optional.empty();
     }
-    List<BooleanFormula> out = getUnsatCore();
+    List<BooleanFormula> out = getUnsatCore0();
     pop();
     return Optional.of(out);
   }
