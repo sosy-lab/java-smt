@@ -50,7 +50,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-class Z3InterpolatingProver extends Z3SolverBasedProver<Long>
+class Z3InterpolatingProver extends Z3AbstractProver<Long>
     implements InterpolatingProverEnvironment<Long> {
 
   private final LogManager logger;

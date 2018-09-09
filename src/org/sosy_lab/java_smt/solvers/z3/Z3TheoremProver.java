@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class Z3TheoremProver extends Z3SolverBasedProver<Void> implements ProverEnvironment {
+class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
 
   Z3TheoremProver(
       Z3FormulaCreator creator, Z3FormulaManager pMgr, long z3params, Set<ProverOptions> pOptions) {

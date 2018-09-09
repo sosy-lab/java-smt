@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class SmtInterpolInterpolatingProver extends SmtInterpolBasicProver<String, String>
+class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
   SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {

@@ -46,7 +46,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
+abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   private boolean closed = false;
   protected final SmtInterpolEnvironment env;
@@ -59,7 +59,7 @@ abstract class SmtInterpolBasicProver<T, AF> extends AbstractProver<T> {
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames
 
-  SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
+  SmtInterpolAbstractProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
     super(options);
     checkState(
         pMgr.getEnvironment().getStackDepth() == 0,

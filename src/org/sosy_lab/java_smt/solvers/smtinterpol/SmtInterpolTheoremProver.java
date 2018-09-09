@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
+class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void, Term>
     implements ProverEnvironment {
 
   SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {

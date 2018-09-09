@@ -46,7 +46,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-abstract class Z3SolverBasedProver<T> extends AbstractProver<T> {
+abstract class Z3AbstractProver<T> extends AbstractProver<T> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
@@ -62,7 +62,7 @@ abstract class Z3SolverBasedProver<T> extends AbstractProver<T> {
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
-  Z3SolverBasedProver(
+  Z3AbstractProver(
       Z3FormulaCreator pCreator, long z3params, FormulaManager pMgr, Set<ProverOptions> pOptions) {
     super(pOptions);
     creator = pCreator;
