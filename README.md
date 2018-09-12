@@ -1,6 +1,6 @@
 # JavaSMT
 
-[![Build Status](https://api.travis-ci.org/sosy-lab/java-smt.svg?branch=master "Build Status")](https://travis-ci.org/sosy-lab/java-smt)
+[![Build Status](https://gitlab.com/sosy-lab/software/java-smt/badges/master/pipeline.svg)](https://gitlab.com/sosy-lab/software/java-smt/pipelines)
 [![Build Status on Windows](https://ci.appveyor.com/api/projects/status/uehe0fwa8bil8sha/branch/master?svg=true)](https://ci.appveyor.com/project/PhilippWendler/java-smt/branch/master)
 [![Code Quality](https://api.codacy.com/project/badge/Grade/94b27e1928034a4f9d91faad82a0b870)](https://www.codacy.com/app/PhilippWendler/java-smt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-smt&amp;utm_campaign=Badge_Grade)
 [![Test Coverage](https://api.codacy.com/project/badge/Coverage/94b27e1928034a4f9d91faad82a0b870)](https://www.codacy.com/app/PhilippWendler/java-smt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-smt&amp;utm_campaign=Badge_Coverage)
