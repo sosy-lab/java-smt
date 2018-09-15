@@ -991,7 +991,6 @@ public class ModelTest extends SolverBasedTest0 {
           + "(declare-fun A () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
           + "(assert (= a (select A #x00000000)))";
 
-
   @Test
   public void arrayTest1() throws SolverException, InterruptedException {
     requireArrays();
