@@ -648,6 +648,9 @@ public class ModelTest extends SolverBasedTest0 {
       }
     }
 
+    assertThat(assignments.size())
+        .isEqualTo(assignments.stream().map(ValueAssignment::getKey).distinct().count());
+
     List<BooleanFormula> assignmentFormulas = new ArrayList<>();
     for (ValueAssignment va : assignments) {
       assignmentFormulas.add(va.getAssignmentAsFormula());
@@ -988,6 +991,7 @@ public class ModelTest extends SolverBasedTest0 {
           + "(declare-fun A () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
           + "(assert (= a (select A #x00000000)))";
 
+
   @Test
   public void arrayTest1() throws SolverException, InterruptedException {
     requireArrays();
@@ -1012,6 +1016,53 @@ public class ModelTest extends SolverBasedTest0 {
         Lists.newArrayList(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, true);
+      checkModelIteration(formula, false);
+    }
+  }
+
+  static final String ARRAY_QUERY_INT =
+      "(declare-fun i () Int)"
+          + "(declare-fun X () (Array Int Int))"
+          + "(declare-fun Y () (Array Int Int))"
+          + "(declare-fun Z () (Array Int Int))"
+          + "(assert (and "
+          + "  (= Y (store X i 0))"
+          + "  (= (select Y 5) 1)"
+          + "  (= Z (store Y 5 2))"
+          + "))";
+
+  static final String ARRAY_QUERY_BV =
+      "(declare-fun v () (_ BitVec 64))"
+          + "(declare-fun A () (Array (_ BitVec 64) (_ BitVec 32)))"
+          + "(declare-fun B () (Array (_ BitVec 64) (_ BitVec 32)))"
+          + "(declare-fun C () (Array (_ BitVec 64) (_ BitVec 32)))"
+          + "(assert (and "
+          + "  (= B (store A v (_ bv0 32)))"
+          + "  (= (select B (_ bv5 64)) (_ bv1 32))"
+          + "  (= C (store B (_ bv5 64) (_ bv2 32)))"
+          + "))";
+
+  @Test
+  public void arrayTest3() throws SolverException, InterruptedException {
+    requireArrays();
+
+    for (String query : Lists.newArrayList(ARRAY_QUERY_INT)) {
+      BooleanFormula formula = context.getFormulaManager().parse(query);
+      checkModelIteration(formula, false);
+    }
+  }
+
+  @Test
+  public void arrayTest4() throws SolverException, InterruptedException {
+    requireArrays();
+    requireBitvectors();
+    assume()
+        .withMessage("solver does not fully support arrays over bitvectors")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    for (String query : Lists.newArrayList(ARRAY_QUERY_BV)) {
+      BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, false);
     }
   }

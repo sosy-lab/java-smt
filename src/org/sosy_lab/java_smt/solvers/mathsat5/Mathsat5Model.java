@@ -40,8 +40,10 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
@@ -112,11 +114,23 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   private Collection<ValueAssignment> getArrayAssignments(
       long symbol, long key, long array, List<Object> upperIndices) {
     Collection<ValueAssignment> assignments = new ArrayList<>();
+    Set<Long> indices = new HashSet<>();
     while (msat_term_is_array_write(creator.getEnv(), array)) {
       long index = msat_term_get_arg(array, 1);
+      long content = msat_term_get_arg(array, 2);
+      array = msat_term_get_arg(array, 0);
+
+      if (!indices.add(index)) {
+        // sometimes MathSat5 provides a model-assignment like
+        // "ARR := (write (write (write (const 0) 5 1) 0 0) 5 2)",
+        // where the index "5" is assigned twice, even with different values.
+        // In this case we skip the second (deeper nested) assignment.
+        // In this example we ignore the assignment "ARR[5] := 1".
+        continue;
+      }
+
       List<Object> innerIndices = Lists.newArrayList(upperIndices);
       innerIndices.add(evaluateImpl(index));
-      long content = msat_term_get_arg(array, 2);
       long select = msat_make_array_read(creator.getEnv(), key, index);
       if (msat_is_array_type(creator.getEnv(), msat_term_get_type(content))) {
         assignments.addAll(getArrayAssignments(symbol, select, content, innerIndices));
@@ -130,7 +144,6 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
                 evaluateImpl(content),
                 innerIndices));
       }
-      array = msat_term_get_arg(array, 0);
     }
     return assignments;
   }
