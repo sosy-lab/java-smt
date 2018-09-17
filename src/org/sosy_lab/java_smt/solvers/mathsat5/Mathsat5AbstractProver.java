@@ -189,7 +189,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    checkGenerateModels();
+    checkGenerateAllSat();
     long[] imp = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

@@ -634,7 +634,7 @@ public class ModelTest extends SolverBasedTest0 {
     ImmutableList<ValueAssignment> assignments;
     try (BasicProverEnvironment<?> prover =
         useOptProver
-            ? context.newOptimizationProverEnvironment()
+            ? context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)
             : context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
       assertThat(prover.isUnsat()).isFalse();

@@ -121,6 +121,7 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   @Override
   public Z3Model getModel() {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
     return Z3Model.create(z3context, getZ3Model(), creator);
   }
 
@@ -133,7 +134,6 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   }
 
   protected long getZ3Model() {
-    checkGenerateModels();
     return Native.solverGetModel(z3context, z3solver);
   }
 
@@ -249,7 +249,7 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    checkGenerateModels();
+    checkGenerateAllSat();
 
     // Unpack formulas to terms.
     long[] importantFormulas = new long[important.size()];

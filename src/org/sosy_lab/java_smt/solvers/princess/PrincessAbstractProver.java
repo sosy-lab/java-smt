@@ -214,7 +214,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    checkGenerateModels();
+    checkGenerateAllSat();
 
     // unpack formulas to terms
     List<IFormula> importantFormulas = new ArrayList<>(important.size());

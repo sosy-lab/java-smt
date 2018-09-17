@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -97,7 +98,8 @@ public class OptimizationTest extends SolverBasedTest0 {
 
   @Test
   public void testOptimal() throws SolverException, InterruptedException {
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");

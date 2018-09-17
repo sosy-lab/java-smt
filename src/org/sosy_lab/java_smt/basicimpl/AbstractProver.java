@@ -27,30 +27,36 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final boolean generateModels;
+  private final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
 
+  private static String TEMPLATE = "Please set the prover option %s.";
+
   protected AbstractProver(Set<ProverOptions> pOptions) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
+    generateAllSat = pOptions.contains(ProverOptions.GENERATE_ALL_SAT);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 
   protected final void checkGenerateModels() {
-    Preconditions.checkState(
-        generateModels, "Please set the prover option " + ProverOptions.GENERATE_MODELS + ".");
+    Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
+  }
+
+  protected final void checkGenerateAllSat() {
+    Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
   protected final void checkGenerateUnsatCores() {
-    Preconditions.checkState(
-        generateUnsatCores,
-        "Please set the prover option " + ProverOptions.GENERATE_UNSAT_CORE + ".");
+    Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
   }
 
   protected final void checkGenerateUnsatCoresOverAssumptions() {
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
-        "Please set the prover option " + ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS + ".");
+        TEMPLATE,
+        ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 }

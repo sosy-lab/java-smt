@@ -41,11 +41,13 @@ public interface SolverContext extends AutoCloseable {
     /**
      * Whether the solver should generate models (i.e., satisfying assignments) for satisfiable
      * formulas.
-     *
-     * <p>This option is required when computing all satisfying assignments via {@link
-     * ProverEnvironment#allSat}, because some solvers depend on model computation for this task.
      */
     GENERATE_MODELS,
+
+    /**
+     * Whether the solver should allow to query all satisfying assignments for satisfiable formulas.
+     */
+    GENERATE_ALL_SAT,
 
     /**
      * Whether the solver should generate an unsat core for unsatisfiable formulas. Unsat core is

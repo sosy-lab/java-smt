@@ -233,7 +233,8 @@ final class Z3SolverContext extends AbstractSolverContext {
         z3context,
         z3params,
         Native.mkStringSymbol(z3context, ":model"),
-        options.contains(ProverOptions.GENERATE_MODELS));
+        options.contains(ProverOptions.GENERATE_MODELS)
+            || options.contains(ProverOptions.GENERATE_ALL_SAT));
     Native.paramsSetBool(
         z3context,
         z3params,
