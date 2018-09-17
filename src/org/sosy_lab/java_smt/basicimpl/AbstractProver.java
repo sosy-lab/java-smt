@@ -31,7 +31,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
 
-  private static String TEMPLATE = "Please set the prover option %s.";
+  private static final String TEMPLATE = "Please set the prover option %s.";
 
   protected AbstractProver(Set<ProverOptions> pOptions) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
