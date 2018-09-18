@@ -507,7 +507,13 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public Long declareUFImpl(String pName, Long returnType, List<Long> pArgTypes) {
     long[] types = Longs.toArray(pArgTypes);
-    long msatFuncType = msat_get_function_type(environment, types, types.length, returnType);
+    final long msatFuncType;
+    if (pArgTypes.isEmpty()) {
+      // a nullary function is a plain symbol (variable)
+      msatFuncType = returnType;
+    } else {
+      msatFuncType = msat_get_function_type(environment, types, types.length, returnType);
+    }
     long decl = msat_declare_function(environment, pName, msatFuncType);
     return decl;
   }
