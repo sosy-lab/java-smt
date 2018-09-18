@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -417,5 +418,24 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 .stream()
                 .allMatch(pS -> pS.equals(pS.toUpperCase())))
         .isTrue();
+  }
+
+  @Test
+  public void extractionTest1() {
+    IntegerFormula v = imgr.makeVariable("v");
+    BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
+    Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
+    assertThat(mapping).containsEntry("v", v);
+    assertThat(mapping).containsEntry("q", q);
+  }
+
+  @Test
+  public void extractionTest2() {
+    // the same than above, but with nullary UF.
+    IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
+    BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
+    Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
+    assertThat(mapping).containsEntry("v", v);
+    assertThat(mapping).containsEntry("q", q);
   }
 }
