@@ -78,8 +78,6 @@ public interface NumeralFormulaManager<
 
   ResultFormulaType divide(ParamFormulaType number1, ParamFormulaType number2);
 
-  ResultFormulaType modulo(ParamFormulaType number1, ParamFormulaType number2);
-
   ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------

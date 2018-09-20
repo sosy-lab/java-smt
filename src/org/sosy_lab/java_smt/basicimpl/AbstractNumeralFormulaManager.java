@@ -264,7 +264,6 @@ public abstract class AbstractNumeralFormulaManager<
     throw new UnsupportedOperationException();
   }
 
-  @Override
   public ResultFormulaType modulo(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);

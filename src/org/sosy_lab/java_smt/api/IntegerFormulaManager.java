@@ -37,6 +37,8 @@ public interface IntegerFormulaManager
   /** Create a term representing the constraint {@code number1 == number2 (mod n)}. */
   BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n);
 
+  IntegerFormula modulo(IntegerFormula number1, IntegerFormula number2);
+
   @Override
   default FormulaType<IntegerFormula> getFormulaType() {
     return FormulaType.IntegerType;

@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -48,7 +47,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   // SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
   // (though both support some parts)
-  private static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
+  static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
 
   @Parameters(name = "{0} {1} {2}")
@@ -254,88 +253,5 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
-  }
-
-  @Test
-  public void testModuloConstant() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("modulo is only defined for ints")
-        .that(formulaType)
-        .isEqualTo(FormulaType.IntegerType);
-
-    T a = nmgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.makeNumber(3)),
-            nmgr.equal(
-                nmgr.makeNumber(1),
-                handleExpectedException(() -> nmgr.modulo(a, nmgr.makeNumber(2)))));
-
-    assertThatFormula(f).isSatisfiable();
-  }
-
-  @Test
-  public void testModuloConstantUnsatisfiable() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("modulo is only defined for ints")
-        .that(formulaType)
-        .isEqualTo(FormulaType.IntegerType);
-
-    T a = nmgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.makeNumber(5)),
-            nmgr.equal(
-                nmgr.makeNumber(1),
-                handleExpectedException(() -> nmgr.modulo(a, nmgr.makeNumber(3)))));
-
-    if (solver == Solvers.SMTINTERPOL
-        && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
-      // SMTInterpol supports modulo with constants
-      assertThatFormula(f).isUnsatisfiable();
-
-    } else {
-      assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
-    }
-  }
-
-  @Test
-  public void testModulo() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("modulo is only defined for ints")
-        .that(formulaType)
-        .isEqualTo(FormulaType.IntegerType);
-
-    T a = nmgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.makeNumber(2)),
-            nmgr.equal(
-                nmgr.makeNumber(1),
-                handleExpectedException(() -> nmgr.modulo(nmgr.makeNumber(3), a))));
-
-    assertThatFormula(f).isSatisfiable();
-  }
-
-  @Test
-  public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("modulo is only defined for ints")
-        .that(formulaType)
-        .isEqualTo(FormulaType.IntegerType);
-
-    T a = nmgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.makeNumber(3)),
-            nmgr.equal(
-                nmgr.makeNumber(1),
-                handleExpectedException(() -> nmgr.modulo(nmgr.makeNumber(5), a))));
-
-    assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
   }
 }
