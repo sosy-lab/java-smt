@@ -58,10 +58,9 @@ public class Interpolation {
   }
 
   /**
-   * Example taken from SMTInterpol, {@link
-   * "http://ultimate.informatik.uni-freiburg.de/smtinterpol/interpolation.smt2"}.
-   *
-   * <p>Example as SMT-LIB:
+   * Example taken from SMTInterpol, <a
+   * href="http://ultimate.informatik.uni-freiburg.de/smtinterpol/interpolation.smt2">example as
+   * SMT-LIB</a>:
    *
    * <pre>
    * (set-option :print-success false)
@@ -128,9 +127,9 @@ public class Interpolation {
   }
 
   /**
-   * Example for encoding a program path and computing interpolants along the path. Taken from
-   * Philipp Rümmer, {@link "http://satsmt2014.forsyte.at/files/2014/01/interpolation_philipp.pdf"}
-   * .
+   * Example for encoding a program path and computing interpolants along the path. Taken from <a
+   * href="http://satsmt2014.forsyte.at/files/2014/01/interpolation_philipp.pdf">slides</a> from
+   * Philipp Rümmer.
    *
    * <p>Example trace of a program:
    *
