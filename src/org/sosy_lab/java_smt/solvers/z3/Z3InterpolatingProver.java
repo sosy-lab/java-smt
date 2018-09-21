@@ -115,16 +115,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Long>> partitionedFormulas)
-      throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-
-    // a 'tree' with all subtrees starting at 0 is called a 'sequence'
-    return getTreeInterpolants(partitionedFormulas, new int[partitionedFormulas.size()]);
-  }
-
-  @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {

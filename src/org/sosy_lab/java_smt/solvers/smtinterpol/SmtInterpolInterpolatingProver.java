@@ -90,13 +90,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<String>> partitionedTermNames)
-      throws SolverException, InterruptedException {
-    return getTreeInterpolants(partitionedTermNames, new int[partitionedTermNames.size()]);
-  }
-
-  @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {

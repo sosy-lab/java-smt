@@ -67,8 +67,11 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed, for example because interpolation
    *     procedure is incomplete
    */
-  List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
-      throws SolverException, InterruptedException;
+  default List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
+      throws SolverException, InterruptedException {
+    // a 'tree' with all subtrees starting at 0 is called a 'sequence'
+    return getTreeInterpolants(partitionedFormulas, new int[partitionedFormulas.size()]);
+  }
 
   default List<BooleanFormula> getSeqInterpolants0(List<T> formulas)
       throws SolverException, InterruptedException {
