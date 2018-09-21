@@ -139,7 +139,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
       List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
     // the fallback to a loop is sound and returns an inductive sequence of interpolants
     final List<BooleanFormula> itps = new ArrayList<>();
-    for (int i = 0; i < partitionedFormulas.size(); i++) {
+    for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
           getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }
