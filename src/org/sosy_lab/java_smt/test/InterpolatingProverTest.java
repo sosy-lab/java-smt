@@ -291,23 +291,26 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     BooleanFormula C = imgr.equal(b, c);
     BooleanFormula D = imgr.equal(c, zero);
 
-    Set<T> TA = Sets.newHashSet(stack.push(A));
-    Set<T> TB = Sets.newHashSet(stack.push(B));
-    Set<T> TC = Sets.newHashSet(stack.push(C));
-    Set<T> TD = Sets.newHashSet(stack.push(D));
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+    T TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(TA, TB, TC, TD));
-    List<BooleanFormula> itps2 = stack.getSeqInterpolants(ImmutableList.of(TD, TC, TB, TA));
-    List<BooleanFormula> itps3 = stack.getSeqInterpolants(ImmutableList.of(TA, TC, TB, TD));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
 
     List<BooleanFormula> itps4 =
-        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), Sets::newHashSet));
     List<BooleanFormula> itps5 =
-        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), Sets::newHashSet));
     List<BooleanFormula> itps6 =
-        stack.getSeqInterpolants(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), Sets::newHashSet));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -849,7 +852,10 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       List<BooleanFormula> itps)
       throws SolverException, InterruptedException {
 
-    assert formulas.size() - 1 == itps.size() : "there should be N-1 interpolants for N formulas";
+    assert formulas.size() - 1 == itps.size()
+        : String.format(
+            "there should be N-1 interpolants for N formulas, but we got %s for %s",
+            itps, formulas);
 
     checkImplies(stack, formulas.get(0), itps.get(0));
     for (int i = 1; i < formulas.size() - 1; i++) {
