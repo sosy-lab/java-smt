@@ -263,14 +263,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(stack, ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
 
-  private void requireSequentialItp() {
-    requireInterpolation();
-    assume()
-        .withMessage("Solver does not support sequential interpolation.")
-        .that(solver)
-        .isNotEqualTo(Solvers.MATHSAT5);
-  }
-
   private void requireTreeItp() {
     requireInterpolation();
     assume()
@@ -282,9 +274,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
-
-    requireSequentialItp();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -336,8 +325,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
-
-    requireSequentialItp();
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
