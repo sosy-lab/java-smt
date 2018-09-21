@@ -327,6 +327,41 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   @SuppressWarnings({"unchecked", "varargs"})
+  public <T> void sequentialInterpolationWithFewPartitions()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula:  1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThat(stack).isUnsatisfiable();
+
+    List<BooleanFormula> itps1 =
+        stack.getSeqInterpolants(ImmutableList.of(Sets.newHashSet(TA, TB)));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
+
+    stack.pop(); // clear stack, such that we can re-use the solver
+    stack.pop();
+
+    checkItpSequence(stack, ImmutableList.of(bmgr.and(A, B)), itps1);
+    checkItpSequence(stack, ImmutableList.of(A, B), itps2);
+    checkItpSequence(stack, ImmutableList.of(B, A), itps3);
+  }
+
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
 
@@ -857,11 +892,13 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
             "there should be N-1 interpolants for N formulas, but we got %s for %s",
             itps, formulas);
 
-    checkImplies(stack, formulas.get(0), itps.get(0));
-    for (int i = 1; i < formulas.size() - 1; i++) {
-      checkImplies(stack, bmgr.and(itps.get(i - 1), formulas.get(i)), itps.get(i));
+    if (!itps.isEmpty()) {
+      checkImplies(stack, formulas.get(0), itps.get(0));
+      for (int i = 1; i < formulas.size() - 1; i++) {
+        checkImplies(stack, bmgr.and(itps.get(i - 1), formulas.get(i)), itps.get(i));
+      }
+      checkImplies(stack, bmgr.and(getLast(itps), getLast(formulas)), bmgr.makeBoolean(false));
     }
-    checkImplies(stack, bmgr.and(getLast(itps), getLast(formulas)), bmgr.makeBoolean(false));
   }
 
   private void checkImplies(BasicProverEnvironment<?> stack, BooleanFormula a, BooleanFormula b)

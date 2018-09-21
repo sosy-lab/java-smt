@@ -119,8 +119,6 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       List<? extends Collection<Long>> partitionedFormulas)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    Preconditions.checkArgument(
-        partitionedFormulas.size() >= 2, "at least 2 partitions needed for interpolation");
 
     // a 'tree' with all subtrees starting at 0 is called a 'sequence'
     return getTreeInterpolants(partitionedFormulas, new int[partitionedFormulas.size()]);
