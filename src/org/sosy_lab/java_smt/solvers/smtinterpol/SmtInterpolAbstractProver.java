@@ -24,12 +24,12 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -132,27 +133,17 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws InterruptedException {
-    Preconditions.checkState(!isClosed());
-    checkGenerateUnsatCoresOverAssumptions();
-    push();
-    Preconditions.checkState(
-        annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core over assumptions: %s",
-        annotatedTerms);
-    for (BooleanFormula assumption : assumptions) {
-      String termName = generateTermName();
-      Term t = mgr.extractInfo(assumption);
-      Term annotated = env.annotate(t, new Annotation(":named", termName));
-      annotatedTerms.put(termName, t);
-      env.assertTerm(annotated);
-    }
-    if (!isUnsat()) {
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+
+    if (isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }
-    List<BooleanFormula> out = getUnsatCore0();
-    pop();
-    return Optional.of(out);
+
+    List<BooleanFormula> l =
+        Arrays.stream(env.getUnsatCoreOverAssumptions())
+            .map(creator::encapsulateBoolean)
+            .collect(Collectors.toList());
+    return Optional.of(l);
   }
 
   @Override
@@ -167,7 +158,8 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Assumption-solving is not supported.");
+    return env.checkSatWithAssumptions(
+        pAssumptions.stream().map(mgr::extractInfo).toArray(Term[]::new));
   }
 
   @Override
