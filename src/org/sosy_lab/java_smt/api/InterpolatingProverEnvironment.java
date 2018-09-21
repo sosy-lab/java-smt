@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,18 +35,6 @@ import java.util.List;
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */
 public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironment<T> {
-
-  /**
-   * Add a formula to the environment stack, asserting it. The returned value can be used when
-   * selecting the formulas for interpolant generation.
-   */
-  @Override
-  @CanIgnoreReturnValue
-  default T push(BooleanFormula f) throws InterruptedException {
-    // Java8 does not support overriding of default-interface-methods,
-    // thus we forward to the super-interface here.
-    return BasicProverEnvironment.super.push(f);
-  }
 
   /**
    * Get an interpolant for two groups of formulas. This should be called only immediately after an
