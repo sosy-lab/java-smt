@@ -327,7 +327,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"CheckReturnValue", "unchecked", "varargs"})
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -341,6 +341,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -924,7 +925,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"CheckReturnValue", "unchecked", "varargs"})
+  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
   public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
     requireTreeItp();
 
@@ -939,6 +940,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
     requireTreeItp();
 
