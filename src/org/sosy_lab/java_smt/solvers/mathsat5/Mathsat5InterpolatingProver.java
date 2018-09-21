@@ -30,6 +30,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -115,12 +116,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
     Preconditions.checkState(!closed);
 
-    int[] groupsOfA = new int[formulasOfA.size()];
-    int i = 0;
-    for (Integer f : formulasOfA) {
-      groupsOfA[i++] = f;
-    }
-
+    int[] groupsOfA = Ints.toArray(formulasOfA);
     long itp;
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
