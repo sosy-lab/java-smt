@@ -434,29 +434,6 @@ class SmtInterpolEnvironment {
   }
 
   /**
-   * This function returns a list of interpolants for the partitions. Each partition must be a named
-   * term or a conjunction of named terms. There should be (n-1) interpolants for n partitions.
-   */
-  public Term[] getInterpolants(Term[] partition) throws SolverException, InterruptedException {
-    checkState(stackDepth > 0, "interpolants should be on higher levels");
-    try {
-      return script.getInterpolants(partition);
-    } catch (UnsupportedOperationException e) {
-      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
-        // Not a bug, interpolation procedure is incomplete
-        throw new SolverException(e.getMessage(), e);
-      } else {
-        throw e;
-      }
-    } catch (SMTLIBException e) {
-      if ("Timeout exceeded".equals(e.getMessage())) {
-        shutdownNotifier.shutdownIfNecessary();
-      }
-      throw new AssertionError(e);
-    }
-  }
-
-  /**
    * Compute a sequence of interpolants. The nesting array describes the start of the subtree for
    * tree interpolants. For inductive sequences of interpolants use a nesting array completely
    * filled with 0.
