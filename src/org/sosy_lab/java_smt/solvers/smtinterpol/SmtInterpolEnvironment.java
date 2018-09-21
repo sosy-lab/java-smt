@@ -296,9 +296,7 @@ class SmtInterpolEnvironment {
     script.assertTerm(term);
   }
 
-  /**
-   * Check satisfiability assuming {@code assumptions}.
-   */
+  /** Check satisfiability assuming {@code assumptions}. */
   public boolean checkSatWithAssumptions(Term[] assumptions) throws InterruptedException {
     shutdownNotifier.shutdownIfNecessary();
     return toSATResult(script.checkSatAssuming(assumptions));
@@ -516,9 +514,7 @@ class SmtInterpolEnvironment {
     }
   }
 
-  /**
-   * @return UNSAT core over previously taken assumptions.
-   */
+  /** @return UNSAT core over previously taken assumptions. */
   public Term[] getUnsatCoreOverAssumptions() {
     return script.getUnsatAssumptions();
   }
