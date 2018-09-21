@@ -44,13 +44,14 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * sequence', however this seems to work for most (all?) solvers as long as the same proof is
    * used, i.e. all interpolants are computed after the same SAT-check.
    *
-   * @param formulasOfA A list of values returned by {@link #push(BooleanFormula)}. All the
+   * @param formulasOfA A collection of values returned by {@link #push(BooleanFormula)}. All the
    *     corresponding formulas from group A, the remaining formulas form group B.
    * @return An interpolant for A and B
    * @throws SolverException if interpolant cannot be computed, for example because interpolation
    *     procedure is incomplete
    */
-  BooleanFormula getInterpolant(List<T> formulasOfA) throws SolverException, InterruptedException;
+  BooleanFormula getInterpolant(Collection<T> formulasOfA)
+      throws SolverException, InterruptedException;
 
   /**
    * This method returns interpolants of an 'inductive sequence'. This property must be supported by

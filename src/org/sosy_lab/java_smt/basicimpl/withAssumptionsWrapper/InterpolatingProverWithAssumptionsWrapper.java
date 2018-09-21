@@ -51,7 +51,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<T> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
       throws SolverException, InterruptedException {
     List<T> completeListOfA = Lists.newArrayList(pFormulasOfA);
     completeListOfA.addAll(solverAssumptionsFromPush);

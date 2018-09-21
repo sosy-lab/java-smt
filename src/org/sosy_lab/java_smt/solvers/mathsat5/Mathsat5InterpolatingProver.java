@@ -112,7 +112,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<Integer> formulasOfA) throws SolverException {
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
     Preconditions.checkState(!closed);
 
     int[] groupsOfA = new int[formulasOfA.size()];

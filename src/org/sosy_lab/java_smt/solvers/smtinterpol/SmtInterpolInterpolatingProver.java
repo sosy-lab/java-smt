@@ -61,7 +61,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<String> pTermNamesOfA)
+  public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
 

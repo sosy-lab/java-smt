@@ -98,7 +98,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<Integer> pTermNamesOfA) throws SolverException {
+  public BooleanFormula getInterpolant(Collection<Integer> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
     Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 

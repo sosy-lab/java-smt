@@ -96,7 +96,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
-  public BooleanFormula getInterpolant(final List<Long> pFormulasOfA)
+  public BooleanFormula getInterpolant(final Collection<Long> pFormulasOfA)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
