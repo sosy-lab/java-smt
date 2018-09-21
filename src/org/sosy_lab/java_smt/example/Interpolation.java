@@ -40,9 +40,8 @@ public class Interpolation {
     // setup context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        @SuppressWarnings("cast") // ugly cast, we really should think about this method.
-            InterpolatingProverEnvironment<?> prover =
-                context.newProverEnvironmentWithInterpolation()) {
+        InterpolatingProverEnvironment<?> prover =
+            context.newProverEnvironmentWithInterpolation()) {
 
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
 
