@@ -28,6 +28,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -362,9 +363,9 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     assertThat(stack).isUnsatisfiable();
 
-    // empty list of partition
-    List<BooleanFormula> itps =
-        stack.getSeqInterpolants(ImmutableList.of(Lists.newArrayList(TA, TB)));
+    // list of one partition
+    ArrayList<T> partition = Lists.newArrayList(TA, TB);
+    List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
     assertThat(itps).isEmpty();
   }
 
@@ -390,8 +391,8 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     assertThat(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps1 =
-        stack.getSeqInterpolants(ImmutableList.of(Sets.newHashSet(TA, TB)));
+    Set<T> partition = Sets.newHashSet(TA, TB);
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(partition));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
 
@@ -962,9 +963,10 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     assertThat(stack).isUnsatisfiable();
 
-    // empty list of partition
+    // list of one partition
+    ArrayList<T> partition = Lists.newArrayList(TA, TB);
     List<BooleanFormula> itps =
-        stack.getTreeInterpolants(ImmutableList.of(Lists.newArrayList(TA, TB)), new int[] {0});
+        stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0});
     assertThat(itps).isEmpty();
   }
 
