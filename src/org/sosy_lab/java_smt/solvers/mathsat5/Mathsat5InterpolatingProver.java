@@ -137,6 +137,9 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+
     // the fallback to a loop is sound and returns an inductive sequence of interpolants
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 1; i < partitionedFormulas.size(); i++) {

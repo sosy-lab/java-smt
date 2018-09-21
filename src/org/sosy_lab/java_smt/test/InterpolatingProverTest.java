@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -323,6 +324,47 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(stack, ImmutableList.of(A, A, A, C, B, D, D), itps4);
     checkItpSequence(stack, ImmutableList.of(A, A, B, C, D, A, D), itps5);
     checkItpSequence(stack, ImmutableList.of(B, C, D, A, A, A, D), itps6);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"CheckReturnValue"})
+  public <T> void sequentialInterpolationWithoutPartition()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
+    assertThat(stack).isUnsatisfiable();
+
+    // empty list of partition
+    stack.getSeqInterpolants(ImmutableList.of());
+    fail();
+  }
+
+  @Test
+  public <T> void sequentialInterpolationWithOnePartition()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula:  1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThat(stack).isUnsatisfiable();
+
+    // empty list of partition
+    List<BooleanFormula> itps =
+        stack.getSeqInterpolants(ImmutableList.of(Lists.newArrayList(TA, TB)));
+    assertThat(itps).isEmpty();
   }
 
   @Test

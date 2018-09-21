@@ -121,6 +121,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   public List<BooleanFormula> getSeqInterpolants(
       final List<? extends Collection<Integer>> partitions) throws SolverException {
     Preconditions.checkState(!closed);
+    Preconditions.checkArgument(
+        !partitions.isEmpty(), "at least one partition should be available.");
 
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();

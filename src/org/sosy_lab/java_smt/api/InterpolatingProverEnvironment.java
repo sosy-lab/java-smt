@@ -58,8 +58,9 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * the interpolation-strategy of the underlying SMT-solver! Depending on the underlying SMT-solver
    * this method might be faster than N direct calls to getInterpolant().
    *
-   * <p>The stack must contain exactly the partitioned formulas, but any order is allowed. For an
-   * input of N partitions we return N-1 interpolants.
+   * <p>The stack should contain exactly the partitioned formulas, but any order is allowed. For an
+   * input of N partitions we return N-1 interpolants. Any asserted formula that is not part of the
+   * partitioned list, will be used for background theory.
    *
    * @return a 'inductive sequence' of interpolants, such that the implication {@code AND(I_i, P_i)
    *     => I_(i+1)} is satisfied for all i, where P_i is the conjunction of all formulas in
@@ -118,9 +119,10 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
 
   /** Checks for a valid subtree-structure. This code is taken from SMTinterpol. */
   static boolean checkTreeStructure(int numOfPartitions, int[] startOfSubTree) {
+    Preconditions.checkArgument(numOfPartitions > 0, "at least one partition should be available.");
     Preconditions.checkArgument(
         numOfPartitions == startOfSubTree.length,
-        "partitions and subtree table mus have equal length.");
+        "partitions and subtree table must have equal length.");
     for (int i = 0; i < numOfPartitions; i++) {
       Preconditions.checkArgument(startOfSubTree[i] >= 0, "tree contains negative node.");
       int j = i;
