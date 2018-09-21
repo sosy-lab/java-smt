@@ -923,6 +923,49 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings({"CheckReturnValue"})
+  public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
+    assertThat(stack).isUnsatisfiable();
+
+    // empty list of partition
+    stack.getTreeInterpolants(ImmutableList.of(), new int[] {});
+    fail();
+  }
+
+  @Test
+  public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula:  1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThat(stack).isUnsatisfiable();
+
+    // empty list of partition
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(ImmutableList.of(Lists.newArrayList(TA, TB)), new int[] {0});
+    assertThat(itps).isEmpty();
+  }
+
   private void checkItpSequence(
       InterpolatingProverEnvironment<?> stack,
       List<BooleanFormula> formulas,
