@@ -44,7 +44,7 @@ class Mathsat5NativeApi {
   public static final int MSAT_FALSE = 0;
   public static final int MSAT_TRUE = 1;
 
-  /** OptiMathSAT codes for queries on objective items */
+  /** OptiMathSAT codes for queries on objective items. */
   public static final int MSAT_OPTIMUM = 0;
 
   public static final int MSAT_INITIAL_LOWER = 1;
@@ -53,7 +53,7 @@ class Mathsat5NativeApi {
   public static final int MSAT_FINAL_UPPER = 4;
   public static final int MSAT_FINAL_ERROR = 5;
 
-  /** OptiMathSAT objective type, either minimize or maximize */
+  /** OptiMathSAT objective type, either minimize or maximize. */
   public static final int MSAT_OBJECTIVE_MINIMIZE = -1;
 
   public static final int MSAT_OBJECTIVE_MAXIMIZE = 1;
@@ -482,7 +482,7 @@ class Mathsat5NativeApi {
       long e, String bitRep, long exp_w, long mant_w);
 
   /**
-   * Creates a term from a declaration and a list of arguments
+   * Creates a term from a declaration and a list of arguments.
    *
    * <p>Precondition: The length of {@code args} should be equal to the arity of {@code d}
    *
@@ -611,7 +611,7 @@ class Mathsat5NativeApi {
   public static native long msat_find_decl(long e, String symbol);
 
   /**
-   * Returns the declaration associated to {@code t} (if any)
+   * Returns the declaration associated to {@code t} (if any).
    *
    * <p>If {@code t} is not a constant or a function application, the returned value \a ret will be
    * s.t. MSAT_ERROR_DECL(ret) is true
@@ -750,7 +750,7 @@ class Mathsat5NativeApi {
 
   /**
    * Push on the stack the new objective 'min(term)' with optional optimization local interval
-   * [lower, upper[
+   * [lower, upper[.
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be minimized.
@@ -763,7 +763,7 @@ class Mathsat5NativeApi {
 
   /**
    * Push on the stack the new objective 'max(term)' with optional optimization local interval
-   * ]local, upper]
+   * ]local, upper].
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be maximized.
@@ -776,7 +776,7 @@ class Mathsat5NativeApi {
 
   /**
    * Push on the stack the new objective 'min(max(term0), ..., max(termN))' with optional
-   * optimization local interval ]lower, upper]
+   * optimization local interval ]lower, upper].
    *
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
@@ -790,7 +790,7 @@ class Mathsat5NativeApi {
 
   /**
    * Push on the stack the new objective 'max(min(term0), ..., min(termN))' with optional
-   * optimization local interval [lower, upper[
+   * optimization local interval [lower, upper[.
    *
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
@@ -805,7 +805,7 @@ class Mathsat5NativeApi {
   /**
    * \brief Associate a weight to a term declaration with respect to a MaxSMT group identified by a
    * common id label. Assert-soft constraints are ineffective unless the id label is used by an
-   * objective that is pushed on the stack
+   * objective that is pushed on the stack.
    *
    * <p>\param e msat_env The environment in which to operate. \param term msat_term The term to
    * which a weight is attached. \param weight msat_term The weight of not satisfying this
@@ -828,7 +828,7 @@ class Mathsat5NativeApi {
   public static native long msat_create_objective_iterator(long e);
 
   /**
-   * Checks whether {@code i} can be incremented
+   * Checks whether {@code i} can be incremented.
    *
    * @param i msat_objective_iterator An objective iterator
    * @return nonzero if \a i can be incremented, zero otherwise
@@ -836,7 +836,7 @@ class Mathsat5NativeApi {
   public static native int msat_objective_iterator_has_next(long i);
 
   /**
-   * Returns the next objective, and increments the given iterator
+   * Returns the next objective, and increments the given iterator.
    *
    * @param i msat_objective_iterator The objective iterator to increment.
    * @param o msat_objective* Output value for the next objective in the stack.
@@ -856,7 +856,7 @@ class Mathsat5NativeApi {
    */
 
   /**
-   * Returns the optimization search state of the given objective
+   * Returns the optimization search state of the given objective.
    *
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective.
@@ -867,7 +867,7 @@ class Mathsat5NativeApi {
   public static native int msat_objective_result(long e, long o);
 
   /**
-   * Returns the term which is optimized by the objective
+   * Returns the term which is optimized by the objective.
    *
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective.
@@ -876,7 +876,7 @@ class Mathsat5NativeApi {
   public static native long msat_objective_get_term(long e, long o);
 
   /**
-   * Returns the objective optimization type (min or max)
+   * Returns the objective optimization type (min or max).
    *
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective.
@@ -933,7 +933,7 @@ class Mathsat5NativeApi {
 
   /**
    * Determines if the given objective value is strict, (e.g. if term(i) = k and strict(i) = TRUE,
-   * then actual value of 'i' is k+epsilon, with epsilon being any small positive value)
+   * then actual value of 'i' is k+epsilon, with epsilon being any small positive value).
    *
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective providing the value.
@@ -965,7 +965,7 @@ class Mathsat5NativeApi {
   public static native String msat_objective_value_repr(long e, long o, int i);
 
   /**
-   * Performs garbage collection on the given environment
+   * Performs garbage collection on the given environment.
    *
    * <p>This function will perform garbage collection on the given environment. All the internal
    * caches of the environment will be cleared (including those in the active solvers and

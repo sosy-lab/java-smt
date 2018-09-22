@@ -50,7 +50,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 @Options(prefix = "solver.z3")
 final class Z3SolverContext extends AbstractSolverContext {
 
-  /** Optimization settings */
+  /** Optimization settings. */
   @Option(
       secure = true,
       description = "Engine to use for the optimization",

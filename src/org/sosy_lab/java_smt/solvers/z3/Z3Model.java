@@ -301,7 +301,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   /**
-   * get all ValueAssignments for a function declaration in the model
+   * get all ValueAssignments for a function declaration in the model.
    *
    * @param evalDecl function declaration where the evaluation comes from
    * @param funcDecl function declaration where the function name comes from

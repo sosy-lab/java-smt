@@ -23,9 +23,7 @@
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
-    <module name="JavadocStyle">
-      <property name="checkFirstSentence" value="false"/>
-    </module>
+    <module name="JavadocStyle"/>
     <module name="JavadocMethod">
       <property name="allowUndeclaredRTE" value="true"/>
       <property name="allowMissingParamTags" value="true"/>

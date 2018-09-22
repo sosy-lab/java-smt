@@ -22,11 +22,11 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-/** Collection of utilities for working with SmtInterpol */
+/** Collection of utilities for working with SmtInterpol. */
 class SmtInterpolUtil {
   private SmtInterpolUtil() {}
 
-  /** this function can be used to print a bigger term */
+  /** this function can be used to print a bigger term. */
   public static String prettyPrint(Term t) {
     StringBuilder str = new StringBuilder();
     prettyPrint(t, str, 0);

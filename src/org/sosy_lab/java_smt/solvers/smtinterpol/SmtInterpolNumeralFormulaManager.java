@@ -50,7 +50,7 @@ abstract class SmtInterpolNumeralFormulaManager<
     env = pCreator.getEnv();
   }
 
-  /** check for ConstantTerm with Number or ApplicationTerm with negative Number */
+  /** check for ConstantTerm with Number or ApplicationTerm with negative Number. */
   @Override
   protected final boolean isNumeral(Term t) {
     boolean is = false;

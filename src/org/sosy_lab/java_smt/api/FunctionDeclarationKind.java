@@ -41,7 +41,7 @@ public enum FunctionDeclarationKind {
   IMPLIES,
   DISTINCT,
 
-  /** Store and select on arrays */
+  /** Store and select on arrays. */
   STORE,
   SELECT,
 

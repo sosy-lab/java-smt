@@ -102,7 +102,7 @@ class SmtInterpolEnvironment {
   private final LogProxy smtInterpolLogProxy;
   private final ShutdownNotifier shutdownNotifier;
 
-  /** the wrapped Script */
+  /** the wrapped Script. */
   private final Script script;
 
   private final Theory theory;
@@ -405,22 +405,22 @@ class SmtInterpolEnvironment {
     return script.annotate(t, annotations);
   }
 
-  /** returns a number of type INT or REAL */
+  /** returns a number of type INT or REAL. */
   public Term numeral(BigInteger num) {
     return script.numeral(num);
   }
 
-  /** returns a number of type INT or REAL */
+  /** returns a number of type INT or REAL. */
   public Term numeral(String num) {
     return script.numeral(num);
   }
 
-  /** returns a number of type REAL */
+  /** returns a number of type REAL. */
   public Term decimal(String num) {
     return script.decimal(num);
   }
 
-  /** returns a number of type REAL */
+  /** returns a number of type REAL. */
   public Term decimal(BigDecimal num) {
     return script.decimal(num);
   }

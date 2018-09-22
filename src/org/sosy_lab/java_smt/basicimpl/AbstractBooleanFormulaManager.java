@@ -239,7 +239,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected abstract boolean isFalse(TFormulaInfo bits);
 
   /**
-   * Creates a formula representing "IF cond THEN f1 ELSE f2"
+   * Creates a formula representing "IF cond THEN f1 ELSE f2".
    *
    * @param pBits a Formula
    * @param f1 a Formula

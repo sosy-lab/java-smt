@@ -115,7 +115,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
-  /** Builds a solver from the given theory implementations */
+  /** Builds a solver from the given theory implementations. */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,

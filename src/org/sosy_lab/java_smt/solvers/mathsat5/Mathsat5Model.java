@@ -110,7 +110,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
         argumentInterpretation);
   }
 
-  /** split an array-assignment into several assignments for all positions */
+  /** split an array-assignment into several assignments for all positions. */
   private Collection<ValueAssignment> getArrayAssignments(
       long symbol, long key, long array, List<Object> upperIndices) {
     Collection<ValueAssignment> assignments = new ArrayList<>();
