@@ -73,8 +73,8 @@
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.6" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.6" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.6.2" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.6.2" conf="build->default"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -101,7 +101,7 @@
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
-        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.7" conf="build->default"/>
+        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.8" conf="build->default"/>
 
         <!-- google-java-format
              A source-code formatter for Java -->

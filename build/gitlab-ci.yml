@@ -62,9 +62,20 @@ build:jdk-10:
     - build-dependencies
 
 
-build-project-ecj:
+.build-project-ecj: &build-project-ecj
   <<: *source_check
   script: "ant $ANT_PROPS_BUILD build-project-ecj"
+
+build-project-ecj:jdk-8:
+  <<: *build-project-ecj
+
+build-project-ecj:jdk-9:
+  <<: *build-project-ecj
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-9
+
+build-project-ecj:jdk-10:
+  <<: *build-project-ecj
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-10
 
 check-format:
   <<: *source_check
@@ -112,6 +123,8 @@ spotbugs:
       - "JUnit-coverage/"
       - "junit/coverage.xml"
     when: always
+    reports:
+      junit: "junit/TESTS-TestSuites.xml"
 
 unit-tests:jdk-8:
   <<: *unit-tests
