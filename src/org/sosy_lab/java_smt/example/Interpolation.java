@@ -100,33 +100,41 @@ public class Interpolation {
 
     List<BooleanFormula> itps;
 
-    // example 1a :
-    // get a sequence of interpolants for three formulas: (get-interpolants IP_0 IP_1 IP_2).
-    itps = prover.getSeqInterpolants0(Lists.newArrayList(ip0, ip1, ip2));
-    logger.log(Level.INFO, "1a :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
+    {
+      // example 1a :
+      // get a sequence of interpolants for three formulas: (get-interpolants IP_0 IP_1 IP_2).
+      itps = prover.getSeqInterpolants0(Lists.newArrayList(ip0, ip1, ip2));
+      logger.log(Level.INFO, "1a :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
+    }
 
-    // example 1b :
-    // alternative solution ... with more code and partitioned formulas.
-    Set<T> partition0 = Collections.singleton(ip0);
-    Set<T> partition1 = Collections.singleton(ip1);
-    Set<T> partition2 = Collections.singleton(ip2);
-    itps = prover.getSeqInterpolants(Lists.newArrayList(partition0, partition1, partition2));
-    logger.log(Level.INFO, "1b :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
+    {
+      // example 1b :
+      // alternative solution ... with more code and partitioned formulas.
+      Set<T> partition0 = Collections.singleton(ip0);
+      Set<T> partition1 = Collections.singleton(ip1);
+      Set<T> partition2 = Collections.singleton(ip2);
+      itps = prover.getSeqInterpolants(Lists.newArrayList(partition0, partition1, partition2));
+      logger.log(Level.INFO, "1b :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
+    }
 
-    // example 2a :
-    // get a sequence of interpolants for two formulas: (get-interpolants IP_1 (and IP_0 IP_2)).
-    Set<T> partition3 = Collections.singleton(ip0);
-    Set<T> partition4 = new HashSet<>();
-    partition4.add(ip1);
-    partition4.add(ip2);
-    itps = prover.getSeqInterpolants(Lists.newArrayList(partition3, partition4));
-    logger.log(Level.INFO, "2a :: Interpolants for [{ip0},{ip1,ip2}] are:", itps);
+    {
+      // example 2a :
+      // get a sequence of interpolants for two formulas: (get-interpolants IP_1 (and IP_0 IP_2)).
+      Set<T> partition3 = Collections.singleton(ip0);
+      Set<T> partition4 = new HashSet<>();
+      partition4.add(ip1);
+      partition4.add(ip2);
+      itps = prover.getSeqInterpolants(Lists.newArrayList(partition3, partition4));
+      logger.log(Level.INFO, "2a :: Interpolants for [{ip0},{ip1,ip2}] are:", itps);
+    }
 
-    // example 2b :
-    // alternative solution, works when there are exactly two (!) groups of formulas.
-    // only one part is given as parameter, the rest is taken from the already asserted formulas.
-    BooleanFormula itp = prover.getInterpolant(Lists.newArrayList(ip0));
-    logger.log(Level.INFO, "2b :: Interpolants for [{ip0},{ip1,ip2}] are:", itp);
+    {
+      // example 2b :
+      // alternative solution, works when there are exactly two (!) groups of formulas.
+      // only one part is given as parameter, the rest is taken from the already asserted formulas.
+      BooleanFormula itp = prover.getInterpolant(Lists.newArrayList(ip0));
+      logger.log(Level.INFO, "2b :: Interpolants for [{ip0},{ip1,ip2}] are:", itp);
+    }
   }
 
   /**
