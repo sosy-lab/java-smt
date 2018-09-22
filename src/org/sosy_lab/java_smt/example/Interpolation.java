@@ -2,8 +2,10 @@ package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -77,7 +79,6 @@ public class Interpolation {
    * (exit)
    * </pre>
    */
-  @SuppressWarnings("unchecked")
   private static <T> void interpolateExample(
       InterpolatingProverEnvironment<T> prover, IntegerFormulaManager imgr, LogManager logger)
       throws InterruptedException, SolverException {
@@ -106,17 +107,19 @@ public class Interpolation {
 
     // example 1b :
     // alternative solution ... with more code and partitioned formulas.
-    itps =
-        prover.getSeqInterpolants(
-            Lists.newArrayList(Sets.newHashSet(ip0), Sets.newHashSet(ip1), Sets.newHashSet(ip2)));
+    Set<T> partition0 = Collections.singleton(ip0);
+    Set<T> partition1 = Collections.singleton(ip1);
+    Set<T> partition2 = Collections.singleton(ip2);
+    itps = prover.getSeqInterpolants(Lists.newArrayList(partition0, partition1, partition2));
     logger.log(Level.INFO, "1b :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
 
     // example 2a :
-    // get a sequence of interpolants for two (!) formulas: (get-interpolants IP_1 (and IP_0
-    // IP_2)).
-    itps =
-        prover.getSeqInterpolants(
-            Lists.newArrayList(Sets.newHashSet(ip0), Sets.newHashSet(ip1, ip2)));
+    // get a sequence of interpolants for two formulas: (get-interpolants IP_1 (and IP_0 IP_2)).
+    Set<T> partition3 = Collections.singleton(ip0);
+    Set<T> partition4 = new HashSet<>();
+    partition4.add(ip1);
+    partition4.add(ip2);
+    itps = prover.getSeqInterpolants(Lists.newArrayList(partition3, partition4));
     logger.log(Level.INFO, "2a :: Interpolants for [{ip0},{ip1,ip2}] are:", itps);
 
     // example 2b :
