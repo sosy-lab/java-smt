@@ -23,7 +23,9 @@
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
-    <module name="JavadocStyle"/>
+    <module name="JavadocStyle">
+      <property name="checkFirstSentence" value="false"/>
+    </module>
     <module name="JavadocMethod">
       <property name="allowUndeclaredRTE" value="true"/>
       <property name="allowMissingParamTags" value="true"/>
@@ -37,7 +39,7 @@
       <property name="ignoreName" value="true"/>
     </module>
     <module name="ClassTypeParameterName">
-      <property name="format" value="^[A-Z][0-9]?$"/>
+      <property name="format" value="^([A-Z][A-Z0-9]?|T[A-Za-z]*|[A-Z][a-zA-Z0-9]*T(ype)?)$"/>
     </module>
     <module name="ConstantName">
       <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|[a-z][a-zA-Z0-9]*)$"/>
@@ -49,7 +51,7 @@
     <module name="MemberName"/>
     <module name="MethodName"/>
     <module name="MethodTypeParameterName">
-      <property name="format" value="^[A-Z][0-9]?$"/>
+      <property name="format" value="^([A-Z][A-Z]?[A-Z0-9]?|[A-Z][a-zA-Z0-9]*T(ype)?)$"/>
     </module>
     <module name="PackageName"/>
     <module name="ParameterName"/>
