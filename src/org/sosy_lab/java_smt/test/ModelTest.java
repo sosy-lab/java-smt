@@ -472,6 +472,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireArrays();
 
@@ -490,9 +491,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        @SuppressWarnings("unused")
-        Object evaluation =
-            m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
+        m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
       }
     }
   }
