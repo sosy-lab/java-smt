@@ -15,12 +15,12 @@ wrapping layer) and type-safety (it shouldn't be possible to add boolean terms
 to integer ones at _compile_ time) sometimes at the cost of verbosity.
 
 #### Quick links
-[Getting Started](getting-started.md) |
+[Getting Started](Getting-started.md) |
 [Documentation][JavaDoc] |
 [Known Issues](KnownIssues.md) |
 [Documentation for Developers](Developers.md) |
 [Changelog](CHANGELOG.md) |
-[Configuration Options](ConfigurationOptions)
+[Configuration Options][ConfigurationOptions]
 
 ### Feature overview
 JavaSMT can express formulas in the following theories:
