@@ -1137,4 +1137,73 @@ public class ModelTest extends SolverBasedTest0 {
       fail();
     }
   }
+
+  @Test
+  public void testGetSmallIntegers1() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeVariable("x")),
+        BigInteger.valueOf(20));
+  }
+
+  @Test
+  public void testGetSmallIntegers2() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
+        BigInteger.valueOf(11));
+  }
+
+  @Test
+  public void testGetNegativeIntegers1() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
+        BigInteger.valueOf(-9));
+  }
+
+  @Test
+  public void testGetSmallIntegralRationals1() throws SolverException, InterruptedException {
+    requireRationals();
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
+        rmgr.add(rmgr.makeVariable("x"), rmgr.makeVariable("x")),
+        Rational.of(2));
+  }
+
+  @Test
+  public void testGetRationals1() throws SolverException, InterruptedException {
+    requireRationals();
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.divide(rmgr.makeVariable("x"), rmgr.makeNumber(2)),
+        Rational.ofString("1/6"));
+  }
+
+  @Test
+  public void testGetBooleans1() throws SolverException, InterruptedException {
+    evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true);
+    evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(false), false);
+    evaluateInModel(
+        bmgr.makeVariable("x"),
+        bmgr.or(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
+        true);
+    evaluateInModel(
+        bmgr.makeVariable("x"),
+        bmgr.and(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
+        false);
+  }
+
+  private void evaluateInModel(BooleanFormula constraint, Formula variable, Object expectedValue)
+      throws SolverException, InterruptedException {
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(constraint);
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
+      }
+    }
+  }
 }
