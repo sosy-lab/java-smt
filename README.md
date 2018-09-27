@@ -20,7 +20,7 @@ to integer ones at _compile_ time) sometimes at the cost of verbosity.
 [Known Issues](KnownIssues.md) |
 [Documentation for Developers](Developers.md) |
 [Changelog](CHANGELOG.md) |
-[Configuration Options](ConfigurationOptions.txt)
+[Configuration Options](ConfigurationOptions)
 
 ### Feature overview
 JavaSMT can express formulas in the following theories:
@@ -105,7 +105,8 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Initial codebase, many design decisions: [Philipp Wendler][]
  - Contributions: [Thomas Stieglmaier][] and others.
  
-[Manual Installation]: getting-started.md
+[ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
+[Manual Installation]: Getting-started.md
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
 [George Karpenkov]: http://metaworld.me
 [Philipp Wendler]: https://www.philippwendler.de/
