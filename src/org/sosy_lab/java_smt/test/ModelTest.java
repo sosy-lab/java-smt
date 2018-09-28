@@ -328,6 +328,20 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testPartialModels2() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      IntegerFormula x = imgr.makeVariable("x");
+      prover.push(imgr.greaterThan(x, imgr.makeNumber(0)));
+      assertThat(prover).isSatisfiable();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+        // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
+        // solvers.
+      }
+    }
+  }
+
+  @Test
   public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
         .withMessage("As of now, only Z3 and Princess support partial model evaluation")
