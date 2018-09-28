@@ -39,6 +39,8 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * Evaluate a given formula substituting the values from the model. Can be absent if the value is
    * not relevant to the satisfiability result.
    *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
    * @param f Input formula
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
    * @throws IllegalArgumentException if a formula has unexpected type, e.g Array.
@@ -46,19 +48,35 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   @Nullable
   Object evaluate(Formula f);
 
-  /** Type-safe evaluation for integer formulas. */
+  /**
+   * Type-safe evaluation for integer formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   BigInteger evaluate(IntegerFormula f);
 
-  /** Type-safe evaluation for rational formulas. */
+  /**
+   * Type-safe evaluation for rational formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   Rational evaluate(RationalFormula f);
 
-  /** Type-safe evaluation for boolean formulas. */
+  /**
+   * Type-safe evaluation for boolean formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   Boolean evaluate(BooleanFormula f);
 
-  /** Type-safe evaluation for bitvector formulas. */
+  /**
+   * Type-safe evaluation for bitvector formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   BigInteger evaluate(BitvectorFormula f);
 
