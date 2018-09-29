@@ -158,6 +158,6 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long formula) {
-    return msat_model_eval(creator.getEnv(), formula);
+    return msat_model_eval(model, formula);
   }
 }

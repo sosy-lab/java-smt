@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.Collections2;
@@ -70,12 +69,6 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-
-        // TODO bug in Mathsat5?
-        assume()
-            .withMessage("Mathsat5 crashes on evaluation of some formulas")
-            .that(solver)
-            .isNotEqualTo(Solvers.MATHSAT5);
 
         // lets try to check evaluations. Actually the whole method is based on some default values
         // in the solvers, because we do not use constraints for the evaluated formulas.
