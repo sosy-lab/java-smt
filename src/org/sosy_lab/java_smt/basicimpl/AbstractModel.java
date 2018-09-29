@@ -42,6 +42,14 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     this.creator = creator;
   }
 
+  @SuppressWarnings("unchecked")
+  @Nullable
+  @Override
+  public <T extends Formula> T eval(T f) {
+    TFormulaInfo evaluation = evalImpl(creator.extractInfo(f));
+    return evaluation == null ? null : (T) creator.encapsulateWithTypeOf(evaluation);
+  }
+
   @Nullable
   @Override
   public BigInteger evaluate(IntegerFormula f) {
@@ -74,6 +82,9 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
         "cannot compute a simple constant evaluation for an array-formula");
     return evaluateImpl(creator.extractInfo(f));
   }
+
+  @Nullable
+  protected abstract TFormulaInfo evalImpl(TFormulaInfo formula);
 
   protected abstract Object evaluateImpl(TFormulaInfo f);
 

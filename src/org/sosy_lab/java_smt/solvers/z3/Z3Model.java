@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Native.LongPtr;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
@@ -402,6 +403,20 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     if (!closed) {
       Native.modelDecRef(z3context, model);
       closed = true;
+    }
+  }
+
+  @Override
+  protected Long evalImpl(Long formula) {
+    LongPtr resultPtr = new LongPtr();
+    boolean satisfiableModel = Native.modelEval(z3context, model, formula, true, resultPtr);
+    Preconditions.checkState(satisfiableModel);
+    if (resultPtr.value == 0) {
+      // unknown evaluation
+      return null;
+    } else {
+      Native.incRef(z3context, resultPtr.value);
+      return resultPtr.value;
     }
   }
 }

@@ -208,4 +208,9 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
 
   @Override
   public void close() {}
+
+  @Override
+  protected Term evalImpl(Term formula) {
+    return model.evaluate(formula);
+  }
 }
