@@ -14,6 +14,7 @@
    be used in `InterpolatingProverEnvironment`
  - New methods to convert IEEE bitvectors to floats and vice versa.
  - Improved handling of exceptions
+ - New method for evaluating formulas with an existing model
 
 ### Improvements and Fixes
  - Improve instantiation procedure of Z3 and Princess
