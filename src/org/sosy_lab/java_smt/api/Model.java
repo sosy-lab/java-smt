@@ -36,8 +36,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   /**
-   * Evaluate a given formula substituting the values from the model. Can be absent if the value is
-   * not relevant to the satisfiability result.
+   * Evaluate a given formula substituting the values from the model.
+   *
+   * <p>If a value is not relevant to the satisfiability result, the model can choose either an
+   * arbitrary value (e.g., the value <code>0</code> for the matching type) or just return <code>
+   * null</code>.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    *

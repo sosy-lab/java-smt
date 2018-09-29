@@ -139,7 +139,9 @@ class PrincessFormulaCreator
         }
       }
     }
-    throw new IllegalArgumentException("Unknown formula type");
+    throw new IllegalArgumentException(
+        String.format(
+            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
   }
 
   @Override
