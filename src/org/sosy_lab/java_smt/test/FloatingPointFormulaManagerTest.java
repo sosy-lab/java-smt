@@ -449,6 +449,27 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void checkIeeeFpConversion() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    // the following two lines define values and should match each other.
+    int[] bitvectors = new int[] {0}; // TODO more numbers
+    double[] floats = new double[] {0}; // TODO more numbers
+
+    for (int i = 0; i < bitvectors.length; i++) {
+      BitvectorFormula bv = bvmgr.makeBitvector(32, bitvectors[i]);
+      FloatingPointFormula flt = fpmgr.makeNumber(floats[i], singlePrecType);
+      assertThatFormula(bvmgr.equal(bv, fpmgr.toIeeeBitvector(flt))).isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(flt, fpmgr.fromIeeeBitvector(bv, singlePrecType)))
+          .isTautological();
+    }
+  }
+
+  @Test
   public void fpModelValue() throws SolverException, InterruptedException {
     FloatingPointFormula zeroVar = fpmgr.makeVariable("zero", singlePrecType);
     BooleanFormula zeroEq = fpmgr.assignment(zeroVar, zero);
