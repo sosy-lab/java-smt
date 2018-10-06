@@ -73,7 +73,7 @@ Currently we do not support performing garbage collection for MathSAT5.
 
 
 ## Getting started
-Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](getting-started.md)
+Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](Getting-started.md)
 
 #### Usage
 ``` java
@@ -106,7 +106,9 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Contributions: [Thomas Stieglmaier][] and others.
  
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
-[Manual Installation]: Getting-started.md
+[Manual Installation]: Getting-started.md#manual-installation
+[ShutdownManager]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownManager.html
+[ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
 [George Karpenkov]: http://metaworld.me
 [Philipp Wendler]: https://www.philippwendler.de/
