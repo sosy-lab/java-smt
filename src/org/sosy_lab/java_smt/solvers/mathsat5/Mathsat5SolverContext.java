@@ -242,10 +242,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    if (options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
-      throw new UnsupportedOperationException(
-          "Mathsat5 does not support generating UNSAT core over assumptions");
-    }
     return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
   }
 

@@ -27,6 +27,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
@@ -161,18 +162,22 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     long[] terms = msat_get_unsat_core(curEnv);
+    return encapsulate(terms);
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    long[] unsatAssumptions = msat_get_unsat_assumptions(curEnv);
+    return Optional.of(encapsulate(unsatAssumptions));
+  }
+
+  private List<BooleanFormula> encapsulate(long[] terms) {
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {
       result.add(creator.encapsulateBoolean(t));
     }
     return result;
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      @SuppressWarnings("unused") Collection<BooleanFormula> assumptions) {
-    throw new UnsupportedOperationException(
-        "UNSAT cores over assumptions not supported by Mathsat5");
   }
 
   @Override

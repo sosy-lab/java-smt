@@ -196,9 +196,6 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
     (check-sat-assumptions (A))
     */
 
-    // TODO: disabled for MathSat5. Is this a bug in MathSat5?
-    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
-
     BooleanFormula a = bmgr.makeVariable("a");
     try (ProverEnvironment pe = context.newProverEnvironment()) {
       pe.push();
