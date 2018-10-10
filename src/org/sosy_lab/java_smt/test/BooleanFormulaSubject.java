@@ -130,7 +130,8 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
               // ignore, we just check iteration
             }
           }
-          prover.getModelAssignments();
+          @SuppressWarnings("unused")
+          List<ValueAssignment> lst = prover.getModelAssignments();
         }
         return; // success
       }
