@@ -258,6 +258,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
       assertThatFormula(bmgr.not(eq.apply(var, var2))).isSatisfiable();
     } else {
       assertThatFormula(bmgr.not(eq.apply(var, var2))).isUnsatisfiable();
+      assertThatFormula(eq.apply(var, var2)).isSatisfiable(true);
     }
 
     // check whether SMTLIB2-dump is possible

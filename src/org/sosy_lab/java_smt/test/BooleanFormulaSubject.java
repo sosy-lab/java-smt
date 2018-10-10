@@ -31,6 +31,7 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -102,14 +103,35 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
   /** Check that the subject is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
+    isSatisfiable(false);
+  }
+
+  /**
+   * Check that the subject is satisfiable. Will show an unsat core on failure.
+   *
+   * @param generateModel whether we check model iteration.
+   */
+  @SuppressWarnings("unused")
+  public void isSatisfiable(boolean generateModel) throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(actual())) {
       failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
-    try (ProverEnvironment prover = context.newProverEnvironment()) {
+    try (ProverEnvironment prover =
+        generateModel
+            ? context.newProverEnvironment(ProverOptions.GENERATE_MODELS)
+            : context.newProverEnvironment()) {
       prover.push(actual());
       if (!prover.isUnsat()) {
+        if (generateModel) {
+          try (Model m = prover.getModel()) {
+            for (ValueAssignment v : m) {
+              // ignore, we just check iteration
+            }
+          }
+          prover.getModelAssignments();
+        }
         return; // success
       }
     }
