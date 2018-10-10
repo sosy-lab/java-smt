@@ -65,7 +65,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (FunctionSymbol symbol : model.getDefinedFunctions()) {
-      final String name = symbol.getApplicationString();
+      final String name = unescape(symbol.getApplicationString());
       if (symbol.getParameterSorts().length == 0) { // simple variable or array
         Term variable = creator.getEnv().term(name);
         if (symbol.getReturnSort().isArraySort()) {
@@ -79,6 +79,10 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     }
 
     return assignments.build().asList();
+  }
+
+  private static String unescape(String s) {
+    return s.startsWith("|") ? s.substring(1, s.length() - 1) : s;
   }
 
   /**
