@@ -138,6 +138,6 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.2.0"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.1"/>
     </dependencies>
 </ivy-module>
