@@ -138,7 +138,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   /** Get all modeled assignments for the UF. */
   private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol) {
     final Collection<ValueAssignment> assignments = new ArrayList<>();
-    final String name = symbol.getApplicationString();
+    final String name = unescape(symbol.getApplicationString());
 
     // direct interaction with internal classes and internal behaviour of SMTInterpol.
     // they made some classes 'public' especially for us,
