@@ -183,3 +183,4 @@ For further information, look at our full example [HoudiniApp][], or at the [Jav
 [HoudiniApp]: https://github.com/sosy-lab/java-smt/blob/master/src/org/sosy_lab/java_smt/example/HoudiniApp.java
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
 [example code]: /src/org/sosy_lab/java_smt/example
+[Ivy repository]: https://www.sosy-lab.org/ivy
