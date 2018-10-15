@@ -38,14 +38,17 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   /**
    * Evaluate a given formula substituting the values from the model and return it as formula.
    *
-   * <p>If a value is not relevant to the satisfiability result, the model can choose either an
-   * arbitrary value (e.g., the value <code>0</code> for the matching type) or just return <code>
-   * null</code>.
+   * <p>If a value is not relevant to the satisfiability result, the solver can choose either to
+   * insert an arbitrary value (e.g., the value <code>0</code> for the matching type) or just return
+   * <code>null</code>.
    *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
+   * <p>The formula does not need to be a variable, we also allow complex expression. The solver
+   * will replace all symbols from the formula with their model values and then simplify the formula
+   * into a simple formula, e.g., consisting only of a numeral expression.
    *
-   * @param formula Input formula to be evaluated
-   * @return evaluation of the given formula or <code>null</code> if the formula has no evaluation
+   * @param formula Input formula to be evaluated.
+   * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
+   *     better evaluation.
    */
   @Nullable
   <T extends Formula> T eval(T formula);
