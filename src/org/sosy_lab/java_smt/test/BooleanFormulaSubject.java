@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.truth.Fact.simpleFact;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.truth.FailureMetadata;
@@ -86,11 +85,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
 
       // get model for failure message
       try (Model model = prover.getModel()) {
-        failWithoutActual(
-            simpleFact(
-                String.format(
-                    "Not true that %s %s <%s>. It has counterexample <%s>",
-                    actualAsString(), verb, expected, model)));
+        failWithBadResults(verb, expected, "has counterexample", model);
       }
     }
   }
@@ -100,11 +95,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
     if (context.getFormulaManager().getBooleanFormulaManager().isTrue(actual())) {
-      failWithoutActual(
-          simpleFact(
-              String.format(
-                  "Not true that %s is <unsatisfiable>. It is <trivially satisfiable>.",
-                  actualAsString())));
+      failWithBadResults("is", "unsatisfiable", "is", "trivially satisfiable");
     }
 
     checkIsUnsat(actual(), "is", "unsatisfiable");
@@ -124,11 +115,7 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
   public void isSatisfiable(boolean generateModel) throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(actual())) {
-      failWithoutActual(
-          simpleFact(
-              String.format(
-                  "Not true that %s is <satisfiable>. It <trivially unsatisfiable>.",
-                  actualAsString())));
+      failWithBadResults("is", "satisfiable", "is", "trivially unsatisfiable");
     }
 
     try (ProverEnvironment prover =
@@ -162,20 +149,14 @@ public class BooleanFormulaSubject extends Subject<BooleanFormulaSubject, Boolea
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
       if (unsatCore.isEmpty() || (unsatCore.size() == 1 && actual().equals(unsatCore.get(0)))) {
         // empty or trivial unsat core
-        failWithoutActual(
-            simpleFact(String.format("Not true that %s is <satisfiable>", actualAsString())));
+        fail("is", "satisfiable");
       } else {
-        failWithoutActual(
-            simpleFact(
-                String.format(
-                    "Not true that %s is <satisfiable>. It has unsat core <%s>",
-                    actualAsString(), unsatCore)));
+        failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
       }
     } catch (UnsupportedOperationException ex) {
 
       // Otherwise just fail.
-      failWithoutActual(
-          simpleFact(String.format("Not true that %s is <satisfiable>", actualAsString())));
+      fail("is", "satisfiable");
     }
   }
 
