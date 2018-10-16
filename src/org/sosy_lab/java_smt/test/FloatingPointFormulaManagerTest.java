@@ -458,8 +458,10 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     // the following two lines define values and should match each other.
     int[] bitvectors = new int[] {1065353216, 1123477881, 0, -1082130432, 2139095040, -8388608};
     // , 2143289344
-    double[] floats = new double[] {1, 123.456001, -0, -1, Float.POSITIVE_INFINITY, Float
-        .NEGATIVE_INFINITY}; // , Float.NaN
+    double[] floats =
+        new double[] {
+          1, 123.456001, -0, -1, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY
+        }; // , Float.NaN
 
     for (int i = 0; i < bitvectors.length; i++) {
       BitvectorFormula bv = bvmgr.makeBitvector(32, bitvectors[i]);
