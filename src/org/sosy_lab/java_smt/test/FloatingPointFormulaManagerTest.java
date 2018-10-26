@@ -65,6 +65,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   private FloatingPointType singlePrecType;
+  private FloatingPointType doublePrecType;
   private FloatingPointFormula nan;
   private FloatingPointFormula posInf;
   private FloatingPointFormula negInf;
@@ -76,6 +77,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     requireFloats();
 
     singlePrecType = FormulaType.getSinglePrecisionFloatingPointType();
+    doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
     nan = fpmgr.makeNaN(singlePrecType);
     posInf = fpmgr.makePlusInfinity(singlePrecType);
     negInf = fpmgr.makeMinusInfinity(singlePrecType);
@@ -167,7 +169,6 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void numberConstants() throws SolverException, InterruptedException {
-    FloatingPointType doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, doublePrecType);
@@ -177,7 +178,6 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void cast() throws SolverException, InterruptedException {
-    FloatingPointType doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
     FloatingPointFormula doublePrecNumber = fpmgr.makeNumber(1.5, doublePrecType);
     FloatingPointFormula singlePrecNumber = fpmgr.makeNumber(1.5, singlePrecType);
 
