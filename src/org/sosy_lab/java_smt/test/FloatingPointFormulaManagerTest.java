@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,11 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +54,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
+
+  private static final int NUM_RANDOM_TESTS = 100;
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -449,28 +455,97 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void checkIeeeFpConversion() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
-
-    // the following two lines define values and should match each other.
-    int[] bitvectors = new int[] {1065353216, 1123477881, 0, -1082130432, 2139095040, -8388608};
-    // , 2143289344
-    double[] floats =
-        new double[] {
-          1, 123.456001, -0, -1, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY
-        }; // , Float.NaN
-
-    for (int i = 0; i < bitvectors.length; i++) {
-      BitvectorFormula bv = bvmgr.makeBitvector(32, bitvectors[i]);
-      FloatingPointFormula flt = fpmgr.makeNumber(floats[i], singlePrecType);
-      assertThatFormula(bvmgr.equal(bv, fpmgr.toIeeeBitvector(flt))).isTautological();
-      assertThatFormula(
-              fpmgr.equalWithFPSemantics(flt, fpmgr.fromIeeeBitvector(bv, singlePrecType)))
-          .isTautological();
+  public void checkIeeeFpConversion32() throws SolverException, InterruptedException {
+    for (float f : getListOfFloats()) {
+      checkFP(
+          singlePrecType,
+          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
+          fpmgr.makeNumber(f, singlePrecType));
     }
+  }
+
+  @Test
+  public void checkIeeeFpConversion64() throws SolverException, InterruptedException {
+    for (double d : getListOfDoubles()) {
+      checkFP(
+          doublePrecType,
+          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
+          fpmgr.makeNumber(d, doublePrecType));
+    }
+  }
+
+  private List<Float> getListOfFloats() {
+    List<Float> flts =
+        Lists.newArrayList(
+            // Float.NaN, // NaN is no unique bitvector
+            Float.MIN_NORMAL,
+            Float.MIN_VALUE,
+            Float.MAX_VALUE,
+            Float.POSITIVE_INFINITY,
+            Float.NEGATIVE_INFINITY,
+            0.0f,
+            -0.0f);
+
+    for (int i = 1; i < 20; i++) {
+      for (int j = 1; j < 20; j++) {
+        flts.add((float) (i * Math.pow(10, j)));
+      }
+    }
+
+    Random rand = new Random(0);
+    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+      float flt = Float.intBitsToFloat(rand.nextInt());
+      if (!Float.isNaN(flt)) {
+        flts.add(flt);
+      }
+    }
+
+    return flts;
+  }
+
+  private List<Double> getListOfDoubles() {
+    List<Double> dbls =
+        Lists.newArrayList(
+            // Double.NaN, // NaN is no unique bitvector
+            Double.MIN_NORMAL,
+            Double.MIN_VALUE,
+            Double.MAX_VALUE,
+            Double.POSITIVE_INFINITY,
+            Double.NEGATIVE_INFINITY,
+            0.0,
+            -0.0);
+
+    for (int i = 1; i < 20; i++) {
+      for (int j = 1; j < 20; j++) {
+        dbls.add(i * Math.pow(10, j));
+      }
+    }
+
+    Random rand = new Random(0);
+    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+      double d = Double.longBitsToDouble(rand.nextLong());
+      if (!Double.isNaN(d)) {
+        dbls.add(d);
+      }
+    }
+
+    return dbls;
+  }
+
+  private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
+      throws SolverException, InterruptedException {
+    BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
+
+    Truth.assertThat(mgr.getFormulaType(var))
+        .isEqualTo(mgr.getFormulaType(fpmgr.toIeeeBitvector(flt)));
+    Truth.assertThat(mgr.getFormulaType(flt))
+        .isEqualTo(mgr.getFormulaType(fpmgr.fromIeeeBitvector(bv, type)));
+
+    assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, fpmgr.toIeeeBitvector(flt))))
+        .isSatisfiable();
+    assertThatFormula(bvmgr.equal(bv, fpmgr.toIeeeBitvector(flt))).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(flt, fpmgr.fromIeeeBitvector(bv, type)))
+        .isTautological();
   }
 
   @Test
