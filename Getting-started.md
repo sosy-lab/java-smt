@@ -60,7 +60,7 @@ See [NativeLibraries][] documentation for more details on which path is searched
 
 For systems other than 64-bit Linux (e.g., Windows, or 32-bit systems)
 we do not provide binaries so you need to download or compile them for yourself.
-For [Z3][], download either the [official binaries](https://github.com/Z3Prover/z3/releases)
+For [Z3](https://github.com/Z3Prover/z3), download either the [official binaries](https://github.com/Z3Prover/z3/releases)
 or build it with the flags `--java --git-describe` according to its documentation.
 Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
 In order to compile MathSAT binaries,
