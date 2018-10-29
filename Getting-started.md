@@ -53,7 +53,7 @@ JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository
 
 When using Ivy for installation on a 64-bit Linux platform, solver binaries for native solvers are downloaded automatically. Everything should work as is after installation.
 
-Without Ivy you need to download and install the binaries manually as described above under [Manual Installation](manual-installation).
+Without Ivy you need to download and install the binaries manually as described above under [Manual Installation](#manual-installation).
 You can either copy them into the directory of the JavaSMT JAR file,
 or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
