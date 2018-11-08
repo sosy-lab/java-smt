@@ -134,6 +134,10 @@ class Mathsat5NativeApi {
   public static final int MSAT_TAG_INT_FROM_UBV = 70; // < Unsigned BV -> INT conversion
   public static final int MSAT_TAG_INT_FROM_SBV = 71; // < Signed BV -> INT conversion
   public static final int MSAT_TAG_INT_TO_BV = 72; // < INT -> BV conversion
+  public static final int MSAT_TAG_PI = 73; // Pi constant
+  public static final int MSAT_TAG_EXP = 73; // Exponential function
+  public static final int MSAT_TAG_SIN = 73; // Sine function
+  public static final int MSAT_TAG_LOG = 73; // Natural logarithm function
 
   interface AllSatModelCallback {
 
@@ -315,6 +319,14 @@ class Mathsat5NativeApi {
   public static native long msat_make_divide(long e, long t1, long t2);
 
   public static native long msat_make_floor(long e, long t);
+
+  public static native long msat_make_pi(long e);
+
+  public static native long msat_make_exp(long e, long t);
+
+  public static native long msat_make_sin(long e, long t);
+
+  public static native long msat_make_log(long e, long t);
 
   public static native long msat_make_number(long e, String num_rep);
 
@@ -543,6 +555,14 @@ class Mathsat5NativeApi {
   public static native boolean msat_term_is_divide(long e, long t);
 
   public static native boolean msat_term_is_floor(long e, long t);
+
+  public static native boolean msat_term_is_pi(long e, long t);
+
+  public static native boolean msat_term_is_exp(long e, long t);
+
+  public static native boolean msat_term_is_sin(long e, long t);
+
+  public static native boolean msat_term_is_log(long e, long t);
 
   public static native boolean msat_term_is_array_read(long e, long t);
 
