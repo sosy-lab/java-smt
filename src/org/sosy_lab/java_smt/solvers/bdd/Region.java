@@ -1,4 +1,4 @@
-package org.sosy_lab.cpachecker.util.predicates.regions;
+package org.sosy_lab.java-smt.src.org.sosy_lab.java_smt_solver_bdd;
 
 public interface Region {
 
