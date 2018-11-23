@@ -129,7 +129,7 @@
         <dependency org="edu.tum.cs" name="java-cup" rev="11a" conf="runtime->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.3-rc20181102-0" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.3" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.7.1" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
 
