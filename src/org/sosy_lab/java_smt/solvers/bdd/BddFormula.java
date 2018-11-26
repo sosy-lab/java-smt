@@ -1,26 +1,24 @@
 
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
+/*import org.sosy_lab.java_smt.api.FormulaType;*/
 
 abstract class BddFormula implements Formula {
 
   private final Region region;
- 
 
-  BddFormula(Region region {
+  public static native long region_make_true(long e);
+
+  BddFormula(Region region) {
     this.region = region;
   }
 
   @Override
   public final String toString(){
-  return Mathsat5NativeApi.msat_term_repr(region);
+    return this.region.toString();
   }
-  
+
   @Override
   public final boolean equals(Object o){
     if(o == this){
@@ -31,16 +29,19 @@ abstract class BddFormula implements Formula {
     }
     return region == ((BddFormula) o).region;
     }
-    
+
   @Override
-  public final int hashCode() {
-    return (int) region;
+  public int hashCode() {
+    return this.region.hashCode();
   }
 
 
-  final long getRegion() {
+  public static Region getRegion(Region region) {
     return region;
   }
+
+}
+
 
   /*static final class Mathsat5ArrayFormula<TI extends Formula, TE extends Formula>
       extends Mathsat5Formula implements ArrayFormula<TI, TE> {
@@ -76,4 +77,4 @@ abstract class BddFormula implements Formula {
   }
 }
 */
-  
+
