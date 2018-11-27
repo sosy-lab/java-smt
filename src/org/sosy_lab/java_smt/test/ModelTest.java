@@ -77,6 +77,33 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testEmpty() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m).isEmpty();
+      }
+
+      assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
+  public void testOnlyTrue() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeTrue());
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m).isEmpty();
+      }
+
+      assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
   public void testGetSmallIntegers() throws SolverException, InterruptedException {
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
