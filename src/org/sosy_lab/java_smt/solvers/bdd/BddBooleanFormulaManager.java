@@ -1,5 +1,4 @@
 package org.sosy_lab.java_smt.solvers.bdd;
-
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class BddBooleanFormulaManager
@@ -18,10 +17,7 @@ class BddBooleanFormulaManager
   // TODO
   @Override
   public Region makeVariableImpl(String pVar) {
-    // long boolType = getFormulaCreator().getBoolType();
-    // return getFormulaCreator().makeVariable(boolType, pVar);
-    // long boolType = getFormulaCreator().getBoolType();
-    return formulaCreator.makeVariable(formulaCreator.getBoolType(), pVar);
+    return null;
   }
 
   @Override
@@ -36,8 +32,8 @@ class BddBooleanFormulaManager
   }
 
   @Override
-  public Region equivalence(Region f1, Region f2) {
-      f1.equals(f2);
+  public boolean equivalence(Region f1, Region f2) {
+    return f1.equals(f2);
   }
 
   @Override
@@ -51,33 +47,43 @@ class BddBooleanFormulaManager
   }
 
   @Override
-  public Region not(Region pBits) {
-    Region param1 = extractInfo(pBits);
+  public boolean not(Region pBits) {
+    return pBits.isFalse();
 
-    return (not(pBits));
   }
 
   @Override
-  public Region and(Region pBits1, Region pBits2) {
-    Region param1 = extractInfo(pBits1);
-    Region param2 = extractInfo(pBits2);
+  public boolean and(Region pBits1, Region pBits2) {
+    Region t;
+    if (pBits1.isTrue() && pBits2.isTrue()) {
+      return t.isTrue();
+    } else {
+      return t.isFalse();
+    }
 
-    return (and(param1, param2));
   }
 
   @Override
-  public Region or(Region pBits1, Region pBits2) {
-    Region param1 = extractInfo(pBits1);
-    Region param2 = extractInfo(pBits2);
-
-    return (or(param1, param2));
+  public boolean or(Region pBits1, Region pBits2) {
+    Region t;
+    if (pBits1.isFalse() && pBits2.isFalse()) {
+      return t.isFalse();
+    } else {
+      return t.isTrue();
+    }
   }
 
   @Override
-  public Region xor(Region pBits1, Region pBits2) {
-    Region param1 = extractInfo(pBits1);
-    Region param2 = extractInfo(pBits2);
-
-    return (xor(param1, param2));
+  public boolean xor(Region pBits1, Region pBits2) {
+    Region t;
+    if(pBits1.isTrue() && pBits2.isTrue() ) {
+      return t.isFalse() ;
+    } else if (pBits1.isFalse() && pBits2.isFalse()) {
+      return t.isFalse();
+    }
+    else {
+      t.isTrue();
+    }
   }
+
 }
