@@ -42,7 +42,6 @@ import ap.parser.IFunApp;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.types.Sort;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -245,10 +244,11 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     if (formula instanceof ITerm) {
       Option<ITerm> out = model.evalToTerm((ITerm) formula);
       return out.isEmpty() ? null : out.get();
-    } else {
-      Preconditions.checkArgument(formula instanceof IFormula);
+    } else if (formula instanceof IFormula) {
       Option<ModelValue> out = model.evalExpression(formula);
       return out.isEmpty() ? null : new IBoolLit(((SimpleAPI.BoolValue) out.get()).v());
+    } else {
+      throw new AssertionError("unexpected formula: " + formula);
     }
   }
 }
