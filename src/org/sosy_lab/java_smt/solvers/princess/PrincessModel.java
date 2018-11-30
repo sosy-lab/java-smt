@@ -70,12 +70,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   @Nullable
   @Override
   public Object evaluateImpl(IExpression f) {
-    Option<ModelValue> out = model.evalExpression(f);
-    if (out.isEmpty()) {
-      return null;
-    }
-    ModelValue value = out.get();
-    return getValue(value);
+    IExpression out = evalImpl(f);
+    return out == null ? null : getValue(out);
   }
 
   @Override
@@ -208,6 +204,24 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   @Override
   public String toString() {
     return model.toString();
+  }
+
+  private Object getValue(IExpression value) {
+    if (value instanceof IBoolLit) {
+      return ((IBoolLit) value).value();
+    } else if (value instanceof IIntLit) {
+      return ((IIntLit) value).value().bigIntValue();
+    }
+    if (value instanceof IFunApp) {
+      IFunApp fun = (IFunApp) value;
+      if ("mod_cast".equals(fun.fun().name())) {
+        // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
+        return ((IIntLit) fun.apply(2)).value().bigIntValue();
+      }
+    }
+
+    throw new IllegalArgumentException(
+        "unhandled model value " + value + " of type " + value.getClass());
   }
 
   private Object getValue(SimpleAPI.ModelValue value) {
