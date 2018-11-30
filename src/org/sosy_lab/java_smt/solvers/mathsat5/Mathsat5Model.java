@@ -64,10 +64,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public Object evaluateImpl(Long f) {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
-    long term = msat_model_eval(model, f);
-    return formulaCreator.convertValue(f, term);
+    return formulaCreator.convertValue(f, evalImpl(f));
   }
 
   @Override
@@ -158,6 +155,8 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long formula) {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     return msat_model_eval(model, formula);
   }
 }
