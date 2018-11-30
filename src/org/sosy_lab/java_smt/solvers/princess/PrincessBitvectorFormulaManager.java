@@ -127,11 +127,6 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression makeBitvectorImpl(int pLength, long pI) {
-    return makeBitvectorImpl(pLength, BigInteger.valueOf(pI));
-  }
-
-  @Override
   protected IExpression makeBitvectorImpl(int pLength, BigInteger pI) {
     BigInteger n = BigInteger.valueOf(2).pow(pLength);
     if (pI.signum() < 0) {
