@@ -128,7 +128,7 @@ public abstract class FormulaType<T extends Formula> {
     private final int size;
 
     private BitvectorType(int size) {
-      this.size = (size);
+      this.size = size;
     }
 
     @Override
