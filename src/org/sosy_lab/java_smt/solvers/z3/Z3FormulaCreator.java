@@ -605,7 +605,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
    *     FloatingPointRoundingMode}.
    */
-  public Object convertValue(long value) {
+  Object convertValue(long value) {
     assert isConstant(value) : "value is not constant: " + Native.astToString(environment, value);
     Native.incRef(environment, value);
 
