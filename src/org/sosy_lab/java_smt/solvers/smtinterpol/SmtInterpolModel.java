@@ -24,10 +24,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
-import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
@@ -37,7 +35,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
@@ -55,8 +52,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   @Nullable
   @Override
   public Object evaluateImpl(Term f) {
-    Term out = model.evaluate(f);
-    return getValue(out);
+    return formulaCreator.convertValue(evalImpl(f));
   }
 
   @Override
@@ -180,34 +176,6 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   @Override
   public String toString() {
     return model.toString();
-  }
-
-  private Object getValue(Term value) {
-    FormulaType<?> type = creator.getFormulaType(value);
-    if (type.isBooleanType()) {
-      return value.getTheory().mTrue == value;
-    } else if (value instanceof ConstantTerm
-        && ((ConstantTerm) value).getValue() instanceof Rational) {
-
-      /*
-       * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
-       * the output is SmtInterpol's Rational unless it is a bitvector,
-       * and currently we do not support bitvectors for SmtInterpol.
-       */
-      Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
-      org.sosy_lab.common.rationals.Rational out =
-          org.sosy_lab.common.rationals.Rational.of(
-              rationalValue.numerator(), rationalValue.denominator());
-      if (formulaCreator.getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
-        assert out.isIntegral();
-        return out.getNum();
-      } else {
-        return out;
-      }
-    } else {
-
-      throw new IllegalArgumentException("Unexpected value: " + value);
-    }
   }
 
   @Override
