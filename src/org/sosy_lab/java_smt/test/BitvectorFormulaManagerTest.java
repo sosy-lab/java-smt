@@ -121,7 +121,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     values.put(1L, 1L);
     values.put(2L, 2L);
     values.put(123L, 123L);
-    values.put((long)Integer.MAX_VALUE, (long) Integer.MAX_VALUE);
+    values.put((long) Integer.MAX_VALUE, (long) Integer.MAX_VALUE);
 
     // positive unsigned values stay equal
     values.put(Integer.MAX_VALUE + 1L, Integer.MAX_VALUE + 1l);
@@ -135,7 +135,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     values.put(-1L, int32 - 1);
     values.put(-2L, int32 - 2);
     values.put(-123L, int32 - 123);
-    values.put((long)Integer.MIN_VALUE, 1L + Integer.MAX_VALUE);
+    values.put((long) Integer.MIN_VALUE, 1L + Integer.MAX_VALUE);
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       for (Entry<Long, Long> entry : values.entrySet()) {
