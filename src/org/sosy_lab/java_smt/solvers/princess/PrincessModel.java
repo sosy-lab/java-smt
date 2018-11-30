@@ -44,7 +44,6 @@ import ap.parser.ITerm;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -82,7 +81,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     Map<IdealInt, ITerm> arrays = getArrayAddresses(interpretation);
 
     // then iterate over the model and generate the assignments
-    Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
     for (Tuple2<ModelLocation, ModelValue> entry : asJavaIterable(interpretation)) {
       ValueAssignment assignment = getAssignment(entry._1, entry._2, arrays);
       if (assignment != null) {

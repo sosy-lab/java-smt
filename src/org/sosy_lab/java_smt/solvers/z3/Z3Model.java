@@ -23,7 +23,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
@@ -82,7 +81,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
-    Builder<ValueAssignment> out = ImmutableList.builder();
+    ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
     for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {

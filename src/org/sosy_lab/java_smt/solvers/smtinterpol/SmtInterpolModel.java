@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -58,7 +57,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   @Override
   protected ImmutableList<ValueAssignment> toList() {
 
-    Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (FunctionSymbol symbol : model.getDefinedFunctions()) {
       final String name = unescape(symbol.getApplicationString());

@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.collect.FluentIterable.from;
 import static scala.collection.JavaConversions.asJavaIterable;
 import static scala.collection.JavaConversions.collectionAsScalaIterable;
 
@@ -205,8 +204,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   /** returns a post-order iteration of the tree. */
   private List<BooleanFormula> tree2List(Tree<IFormula> tree) {
     List<BooleanFormula> lst =
-        from(Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
-                .depthFirstPostOrder(tree))
+        FluentIterable.from(
+                Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
+                    .depthFirstPostOrder(tree))
             .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
             .toList();
     // root of interpolation tree is false, and we have to remove it.

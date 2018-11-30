@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
@@ -184,16 +183,16 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "| \" can occur too |",
           "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|");
 
-  @SuppressWarnings("unchecked")
   @Parameters(name = "{0} with varname {1}")
   public static List<Object[]> getAllCombinations() {
-    List<String> allNames =
-        from(NAMES)
-            .append(AbstractFormulaManager.BASIC_OPERATORS)
-            .append(AbstractFormulaManager.SMTLIB2_KEYWORDS)
-            .append(FURTHER_SMTLIB2_KEYWORDS)
-            .append(UNSUPPORTED_NAMES)
-            .toList();
+    List<Object> allNames =
+        ImmutableList.builder()
+            .addAll(NAMES)
+            .addAll(AbstractFormulaManager.BASIC_OPERATORS)
+            .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
+            .addAll(FURTHER_SMTLIB2_KEYWORDS)
+            .addAll(UNSUPPORTED_NAMES)
+            .build();
     return Lists.transform(
         Lists.cartesianProduct(Arrays.asList(Solvers.values()), allNames), List::toArray);
   }
