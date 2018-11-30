@@ -124,7 +124,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     values.put((long) Integer.MAX_VALUE, (long) Integer.MAX_VALUE);
 
     // positive unsigned values stay equal
-    values.put(Integer.MAX_VALUE + 1L, Integer.MAX_VALUE + 1l);
+    values.put(Integer.MAX_VALUE + 1L, Integer.MAX_VALUE + 1L);
     values.put(Integer.MAX_VALUE + 2L, Integer.MAX_VALUE + 2L);
     values.put(Integer.MAX_VALUE + 123L, Integer.MAX_VALUE + 123L);
     values.put(int32 - 1L, int32 - 1);
