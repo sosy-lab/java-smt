@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;

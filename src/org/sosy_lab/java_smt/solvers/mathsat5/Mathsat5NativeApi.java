@@ -26,8 +26,8 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nullable;
+import com.google.errorprone.annotations.CheckReturnValue;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})

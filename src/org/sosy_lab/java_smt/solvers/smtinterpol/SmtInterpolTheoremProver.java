@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;

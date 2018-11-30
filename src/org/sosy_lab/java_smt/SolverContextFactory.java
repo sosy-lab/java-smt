@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Classes;
 import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 import org.sosy_lab.common.ShutdownNotifier;

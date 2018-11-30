@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.Iterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;

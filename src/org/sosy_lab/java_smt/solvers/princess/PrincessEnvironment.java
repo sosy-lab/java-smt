@@ -65,7 +65,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;

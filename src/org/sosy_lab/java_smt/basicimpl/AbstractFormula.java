@@ -21,7 +21,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;

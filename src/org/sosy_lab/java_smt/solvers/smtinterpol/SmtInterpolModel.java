@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 

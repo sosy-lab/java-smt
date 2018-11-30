@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;

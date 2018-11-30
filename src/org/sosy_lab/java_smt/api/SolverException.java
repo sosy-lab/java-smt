@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Exception thrown if there is an error during SMT solving. */
 public class SolverException extends Exception {
