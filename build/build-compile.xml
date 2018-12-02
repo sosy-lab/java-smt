@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
-<project name="compile" basedir="." xmlns:if="ant:if">
+<project name="compile" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
     <!-- Targets for compilation. -->
 
@@ -11,17 +11,18 @@
 
     <!-- These properties can be overridden from including file. -->
     <property name="source.format" value="1.8"/>
+    <property name="source.release" value="8"/>
     <property name="source.dir" value="src"/>
     <property name="source.generated.dir" value=".apt-generated"/>
     <property name="class.format" value="1.8"/>
     <property name="class.dir" value="bin"/>
+    <!-- <property name="errorprone.disable" value=""/> --> <!-- Disable error-prone completely. -->
     <property name="errorprone.options" value=""/>
 
     <path id="processorpath">
         <fileset dir="${ivy.lib.dir}" includes="build/*.jar"/>
     </path>
 
-    <property name="errorprone" value="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
     <condition property="java8">
         <equals arg1="${ant.java.version}" arg2="1.8"/>
     </condition>
@@ -44,12 +45,13 @@
         <javac debug="true"
                debuglevel="source,lines,vars"
                destdir="${class.dir}"
-               source="${source.format}"
-               target="${class.format}"
                fork="true"
                includeAntRuntime="false"
                encoding="UTF-8">
             <compilerarg value="-J-Xbootclasspath/p:${ivy.lib.dir}/build/javac.jar" if:set="java8"/>
+            <compilerarg line="-source ${source.format}" if:set="java8"/>
+            <compilerarg line="-target ${class.format}" if:set="java8"/>
+            <compilerarg line="--release ${source.release}" unless:set="java8"/>
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
             <compilerarg value="-Xlint"/>
@@ -58,7 +60,7 @@
             <compilerarg value="-Xlint:-options"/> <!-- suppress warning about bootclasspath on newer JDK -->
             <compilerarg value="-Werror"/>
             <compilerarg value="-XDcompilePolicy=simple"/> <!-- necessary for error-prone -->
-            <compilerarg value="-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode ${errorprone.options}"/>
+            <compilerarg value="-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode ${errorprone.options}" unless:set="errorprone.disable"/>
             <compilerarg value="-s"/><compilerarg value="${source.generated.dir}"/>
             <compilerarg value="-processorpath"/><compilerarg pathref="processorpath"/>
         </javac>
