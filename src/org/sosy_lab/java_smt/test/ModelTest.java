@@ -393,8 +393,43 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeNumber(0))).isEqualTo(BigInteger.ZERO);
         assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(imgr.makeNumber(100))).isEqualTo(BigInteger.valueOf(100));
         assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        if (bvmgr != null) {
+          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+            assertThat(m.evaluate(bvmgr.makeBitvector(i, 0))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.makeBitvector(i, 1))).isEqualTo(BigInteger.ONE);
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testEvaluatingConstantsWithOperation() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeVariable("b"));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.add(imgr.makeNumber(45), imgr.makeNumber(55))))
+            .isEqualTo(BigInteger.valueOf(100));
+        assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
+            .isEqualTo(BigInteger.valueOf(100));
+        assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
+            .isEqualTo(true);
+        if (bvmgr != null) {
+          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+            BitvectorFormula zero = bvmgr.makeBitvector(i, 0);
+            BitvectorFormula one = bvmgr.makeBitvector(i, 1);
+            assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
+            assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
+          }
+        }
       }
     }
   }
