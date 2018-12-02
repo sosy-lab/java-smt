@@ -19,9 +19,11 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
 /** An arbitrary SMT formula. */
+@Immutable
 public interface Formula {
 
   /**

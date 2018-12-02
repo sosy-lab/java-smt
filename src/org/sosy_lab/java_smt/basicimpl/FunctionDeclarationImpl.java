@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.Immutable;
 import java.util.List;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 
 /** Declaration of a function. */
+@Immutable(containerOf = "T")
 public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDeclaration<F> {
   private final String name;
   private final FunctionDeclarationKind kind;

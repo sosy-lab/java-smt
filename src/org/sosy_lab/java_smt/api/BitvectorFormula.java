@@ -19,5 +19,8 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
+
 /** A formula of the bitvector sort. */
+@Immutable
 public interface BitvectorFormula extends Formula {}
