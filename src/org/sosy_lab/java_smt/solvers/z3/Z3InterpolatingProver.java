@@ -122,9 +122,43 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
 
-    final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
+    final long[] conjunctionFormulas = buildConjunctions(partitionedFormulas);
+    final long[] interpolationFormulas =
+        buildFormulaTree(partitionedFormulas, startOfSubTree, conjunctionFormulas);
+    final long root = interpolationFormulas[interpolationFormulas.length - 1];
 
-    // build conjunction of each partition
+    final long proof = Native.solverGetProof(z3context, z3solver);
+    Native.incRef(z3context, proof);
+
+    final long interpolationResult = computeInterpolants(root, proof);
+
+    // n partitions -> n-1 interpolants
+    // the given tree interpolants are sorted in post-order,
+    // so we only need to copy them
+    final List<BooleanFormula> result = new ArrayList<>();
+    for (int i = 0; i < partitionedFormulas.size() - 1; i++) {
+      result.add(
+          creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult, i)));
+    }
+    assert result.size() == startOfSubTree.length - 1;
+
+    // cleanup
+    Native.decRef(z3context, proof);
+    for (long partition : conjunctionFormulas) {
+      Native.decRef(z3context, partition);
+    }
+    for (long partition : interpolationFormulas) {
+      Native.decRef(z3context, partition);
+    }
+
+    checkInterpolantsForUnboundVariables(result); // Do this last after cleanup.
+
+    return result;
+  }
+
+  /** build a conjunction of each partition. */
+  private long[] buildConjunctions(List<? extends Collection<Long>> partitionedFormulas) {
+    final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
     for (int i = 0; i < partitionedFormulas.size(); i++) {
       long conjunction =
           Native.mkAnd(
@@ -134,8 +168,14 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       Native.incRef(z3context, conjunction);
       conjunctionFormulas[i] = conjunction;
     }
+    return conjunctionFormulas;
+  }
 
-    // build tree of interpolation-points
+  /** build tree of interpolation-points. */
+  private long[] buildFormulaTree(
+      List<? extends Collection<Long>> partitionedFormulas,
+      int[] startOfSubTree,
+      final long[] conjunctionFormulas) {
     final long[] interpolationFormulas = new long[partitionedFormulas.size()];
     final Deque<Z3TreeInterpolant> stack = new ArrayDeque<>();
 
@@ -178,11 +218,17 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
         stack.peek().getRootOfTree() == 0, "subtree of root should start at 0.");
     long root = stack.pop().getInterpolationPoint();
     Preconditions.checkState(
+        root == interpolationFormulas[interpolationFormulas.length - 1],
+        "subtree of root should start at 0.");
+    Preconditions.checkState(
         stack.isEmpty(), "root should have been the last element in the stack.");
 
-    final long proof = Native.solverGetProof(z3context, z3solver);
-    Native.incRef(z3context, proof);
+    return interpolationFormulas;
+  }
 
+  /** compute interpolants for the given tree of formulas and dump the interpolation problem. */
+  private long computeInterpolants(final long root, final long proof)
+      throws SolverException, InterruptedException {
     long interpolationResult;
     try {
       interpolationResult =
@@ -210,29 +256,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       }
       throw creator.handleZ3Exception(e);
     }
-
-    // n partitions -> n-1 interpolants
-    // the given tree interpolants are sorted in post-order,
-    // so we only need to copy them
-    final List<BooleanFormula> result = new ArrayList<>();
-    for (int i = 0; i < partitionedFormulas.size() - 1; i++) {
-      result.add(
-          creator.encapsulateBoolean(Native.astVectorGet(z3context, interpolationResult, i)));
-    }
-    assert result.size() == startOfSubTree.length - 1;
-
-    // cleanup
-    Native.decRef(z3context, proof);
-    for (long partition : conjunctionFormulas) {
-      Native.decRef(z3context, partition);
-    }
-    for (long partition : interpolationFormulas) {
-      Native.decRef(z3context, partition);
-    }
-
-    checkInterpolantsForUnboundVariables(result); // Do this last after cleanup.
-
-    return result;
+    return interpolationResult;
   }
 
   /**
