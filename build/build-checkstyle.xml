@@ -16,15 +16,16 @@
         <path id="checkstyle.lib.path">
             <fileset dir="${ivy.lib.dir}/checkstyle" includes="*.jar"/>
         </path>
+        <property name="config_loc" value="build"/>
         <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" uri="antlib:com.puppycrawl.tools.checkstyle.ant" classpathref="checkstyle.lib.path"/>
 
         <cs:checkstyle config="build/checkstyle.xml" classpathref="checkstyle.lib.path">
-            <fileset dir="${source.dir}" includes="**/*.java" excludes="**/*Test.java **/*Test0.java **/*TestSuite.java"/>
+            <fileset dir="${source.dir}" includes="**/*.java" excludes="**/test/*.java **/*Test.java **/*Test0.java **/*TestSuite.java"/>
             <formatter type="${checkstyle.output}" toFile="Checkstyle.xml"/>
         </cs:checkstyle>
 
         <cs:checkstyle config="build/checkstyle.test.xml" classpathref="checkstyle.lib.path">
-            <fileset dir="${source.dir}" includes="**/*Test.java **/*Test0.java **/*TestSuite.java"/>
+            <fileset dir="${source.dir}" includes="**/test/*.java **/*Test.java **/*Test0.java **/*TestSuite.java"/>
             <formatter type="${checkstyle.output}" toFile="Checkstyle.Test.xml"/>
         </cs:checkstyle>
     </target>
@@ -35,13 +36,4 @@
     </target>
 
     <target name="checkstyle" depends="run-checkstyle, checkstyle-report" description="Run CheckStyle on source code" />
-
-    <target name="checkstyle-commandline" description="Run CheckStyle on source code and output warnings in the commandline">
-        <exec executable="ant">
-            <arg value="run-checkstyle" />
-            <arg value="-Dcheckstyle.output=plain" />
-        </exec>
-        <loadfile property="message" srcFile="Checkstyle.xml" />
-        <echo message="${message}" />
-    </target>
 </project>
