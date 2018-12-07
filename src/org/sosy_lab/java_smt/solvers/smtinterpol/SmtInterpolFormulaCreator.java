@@ -112,7 +112,8 @@ class SmtInterpolFormulaCreator
   }
 
   /** convert a boolean or numeral term into an object of type Boolean, BigInteger, or Rational. */
-  Object convertValue(Term value) {
+  @Override
+  public Object convertValue(Term value) {
     FormulaType<?> type = getFormulaType(value);
     if (type.isBooleanType()) {
       return value.getTheory().mTrue == value;

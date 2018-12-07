@@ -33,25 +33,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
   private final Model model;
-  private final SmtInterpolFormulaCreator formulaCreator;
 
   SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator) {
     super(pCreator);
-    formulaCreator = (SmtInterpolFormulaCreator) pCreator;
     model = pModel;
-  }
-
-  @Nullable
-  @Override
-  public Object evaluateImpl(Term f) {
-    return formulaCreator.convertValue(evalImpl(f));
   }
 
   @Override

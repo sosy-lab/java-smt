@@ -96,7 +96,10 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
    * formula into a Java object as far as possible, i.e., try to match a primitive or simple type.
    */
   @Nullable
-  protected abstract Object evaluateImpl(TFormulaInfo f);
+  protected Object evaluateImpl(TFormulaInfo f) {
+    TFormulaInfo evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
+  }
 
   @Override
   public String toString() {

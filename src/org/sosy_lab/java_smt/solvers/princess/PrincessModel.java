@@ -26,7 +26,6 @@ import ap.SimpleAPI.PartialModel;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
-import ap.parser.IBoolLit;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
@@ -55,13 +54,6 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
       FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator) {
     super(creator);
     this.model = partialModel;
-  }
-
-  @Nullable
-  @Override
-  public Object evaluateImpl(IExpression f) {
-    IExpression out = evalImpl(f);
-    return out == null ? null : getValue(out);
   }
 
   @Override
@@ -106,7 +98,6 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
   private @Nullable ValueAssignment getAssignment(
       IExpression key, IExpression value, Map<IIntLit, ITerm> pArrays) {
-    Object directValue = getValue(value);
     IExpression fValue = value;
     final IExpression fKey;
     final String name;
@@ -145,7 +136,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
             }
             fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
             name = arrayF.toString();
-            argumentInterpretations = Collections.singleton(getValue(arrayIndex));
+            argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
             break;
           }
         case "store":
@@ -164,8 +155,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
             fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
             fValue = arrayContent;
             name = arrayF.toString();
-            directValue = getValue(arrayContent);
-            argumentInterpretations = Collections.singleton(getValue(arrayIndex));
+            argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
             break;
           }
         default:
@@ -173,7 +163,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
             // normal variable or UF
             argumentInterpretations = new ArrayList<>();
             for (ITerm arg : seqAsJavaList(cKey.args())) {
-              argumentInterpretations.add(getValue(arg));
+              argumentInterpretations.add(creator.convertValue(arg));
             }
             fKey = cKey;
             name = cKey.fun().name();
@@ -192,36 +182,13 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
         creator.encapsulateWithTypeOf(fValue),
         creator.encapsulateBoolean(fAssignment),
         name,
-        directValue,
+        creator.convertValue(fValue),
         argumentInterpretations);
   }
 
   @Override
   public String toString() {
     return model.toString();
-  }
-
-  private Object getValue(IExpression value) {
-    if (value instanceof IBoolLit) {
-      return ((IBoolLit) value).value();
-    } else if (value instanceof IIntLit) {
-      return ((IIntLit) value).value().bigIntValue();
-    }
-    if (value instanceof IFunApp) {
-      IFunApp fun = (IFunApp) value;
-      switch (fun.fun().name()) {
-        case "false":
-          assert fun.fun().arity() == 0;
-          return false;
-        case "mod_cast":
-          // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
-          return ((IIntLit) fun.apply(2)).value().bigIntValue();
-        default:
-      }
-    }
-
-    throw new IllegalArgumentException(
-        "unhandled model value " + value + " of type " + value.getClass());
   }
 
   @Override

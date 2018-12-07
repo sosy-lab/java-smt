@@ -62,11 +62,6 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public Object evaluateImpl(Long f) {
-    return formulaCreator.convertValue(f, evalImpl(f));
-  }
-
-  @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
