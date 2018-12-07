@@ -132,7 +132,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
       IFunApp cKey = (IFunApp) key;
 
       switch (cKey.fun().name()) {
-        case "select/2":
+        case "select":
           {
             // array-access, for explanation see #getArrayAddresses
             ITerm arrayId = cKey.args().apply(0);
@@ -145,10 +145,10 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
             }
             fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
             name = arrayF.toString();
-            argumentInterpretations = Collections.singleton(arrayIndex);
+            argumentInterpretations = Collections.singleton(getValue(arrayIndex));
             break;
           }
-        case "store/3":
+        case "store":
           {
             // array-access, for explanation see #getArrayAddresses
             // IdealInt sourceArray = cKey.args().apply(0);
@@ -164,14 +164,17 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
             fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
             fValue = arrayContent;
             name = arrayF.toString();
-            directValue = arrayContent;
-            argumentInterpretations = Collections.singleton(arrayIndex);
+            directValue = getValue(arrayContent);
+            argumentInterpretations = Collections.singleton(getValue(arrayIndex));
             break;
           }
         default:
           {
             // normal variable or UF
-            argumentInterpretations = new ArrayList<>(seqAsJavaList(cKey.args()));
+            argumentInterpretations = new ArrayList<>();
+            for (ITerm arg : seqAsJavaList(cKey.args())) {
+              argumentInterpretations.add(getValue(arg));
+            }
             fKey = cKey;
             name = cKey.fun().name();
           }
@@ -211,8 +214,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
           assert fun.fun().arity() == 0;
           return false;
         case "mod_cast":
-        // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
-        return ((IIntLit) fun.apply(2)).value().bigIntValue();
+          // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
+          return ((IIntLit) fun.apply(2)).value().bigIntValue();
         default:
       }
     }
