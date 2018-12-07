@@ -124,50 +124,44 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
       switch (cKey.fun().name()) {
         case "select":
-          {
-            // array-access, for explanation see #getArrayAddresses
-            ITerm arrayId = cKey.args().apply(0);
-            ITerm arrayIndex = cKey.args().apply(1);
-            ITerm arrayF = pArrays.get(arrayId);
-            if (arrayF == null) {
-              // intermediate array store, like a tmp-variable, happens for repeated
-              // store-operations
-              return null;
-            }
-            fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
-            name = arrayF.toString();
-            argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
-            break;
+          // array-access, for explanation see #getArrayAddresses
+          ITerm arrayId = cKey.args().apply(0);
+          ITerm arrayIndex = cKey.args().apply(1);
+          ITerm arrayF = pArrays.get(arrayId);
+          if (arrayF == null) {
+            // intermediate array store, like a tmp-variable, happens for repeated
+            // store-operations
+            return null;
           }
+          fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
+          name = arrayF.toString();
+          argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
+          break;
         case "store":
-          {
-            // array-access, for explanation see #getArrayAddresses
-            // IdealInt sourceArray = cKey.args().apply(0);
-            ITerm arrayId = (ITerm) value;
-            ITerm arrayIndex = cKey.args().apply(1);
-            ITerm arrayContent = cKey.args().apply(2);
-            ITerm arrayF = pArrays.get(arrayId);
-            if (arrayF == null) {
-              // intermediate array store, like a tmp-variable, happens for repeated
-              // store-operations
-              return null;
-            }
-            fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
-            fValue = arrayContent;
-            name = arrayF.toString();
-            argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
-            break;
+          // array-access, for explanation see #getArrayAddresses
+          // IdealInt sourceArray = cKey.args().apply(0);
+          ITerm arrayId2 = (ITerm) value;
+          ITerm arrayIndex2 = cKey.args().apply(1);
+          ITerm arrayContent = cKey.args().apply(2);
+          ITerm arrayF2 = pArrays.get(arrayId2);
+          if (arrayF2 == null) {
+            // intermediate array store, like a tmp-variable, happens for repeated
+            // store-operations
+            return null;
           }
+          fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
+          fValue = arrayContent;
+          name = arrayF2.toString();
+          argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex2));
+          break;
         default:
-          {
-            // normal variable or UF
-            argumentInterpretations = new ArrayList<>();
-            for (ITerm arg : seqAsJavaList(cKey.args())) {
-              argumentInterpretations.add(creator.convertValue(arg));
-            }
-            fKey = cKey;
-            name = cKey.fun().name();
+          // normal variable or UF
+          argumentInterpretations = new ArrayList<>();
+          for (ITerm arg : seqAsJavaList(cKey.args())) {
+            argumentInterpretations.add(creator.convertValue(arg));
           }
+          fKey = cKey;
+          name = cKey.fun().name();
       }
 
       fAssignment = ((ITerm) fKey).$eq$eq$eq((ITerm) fValue);
