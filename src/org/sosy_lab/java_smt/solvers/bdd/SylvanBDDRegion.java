@@ -23,56 +23,55 @@
  */
 package org.sosy_lab.cpachecker.util.predicates.bdd;
 
-import org.sosy_lab.cpachecker.util.predicates.regions.Region;
-
-import net.sf.javabdd.BDD;
+import com.google.common.primitives.Longs;
+import jsylvan.JSylvan;
 
 /**
- * Regions represented using BDDs from JavaBDD.
+ * Regions represented using Sylvan BDDs.
  */
-class JavaBDDRegion implements Region {
+public class SylvanBDDRegion implements Region {
 
-  private final BDD bddRepr;
+  private final long bddRepr;
 
-  JavaBDDRegion(BDD pBDD) {
+  SylvanBDDRegion(long pBDD) {
     bddRepr = pBDD;
   }
 
   @Override
   public boolean isTrue() {
-    return bddRepr.isOne();
+    return bddRepr == JSylvan.getTrue();
   }
 
   @Override
   public boolean isFalse() {
-    return bddRepr.isZero();
+    return bddRepr == JSylvan.getFalse();
   }
 
-  BDD getBDD() {
+  long getBDD() {
     return bddRepr;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (o instanceof JavaBDDRegion) {
-      return bddRepr.equals(((JavaBDDRegion)o).bddRepr);
+    if (o instanceof SylvanBDDRegion) {
+      return bddRepr == ((SylvanBDDRegion) o).bddRepr;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return bddRepr.hashCode();
+    return Longs.hashCode(bddRepr);
   }
 
   @Override
   public String toString() {
-    if (bddRepr.isOne()) {
+    if (isTrue()) {
       return "true";
-    } else if (bddRepr.isZero()) {
+    } else if (isFalse()) {
       return "false";
     } else {
-      return bddRepr.toString();
+      return bddRepr + "";
     }
   }
 }

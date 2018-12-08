@@ -1,8 +1,8 @@
 /*
- *  CPAchecker is a tool for configurable software verification.
- *  This file is part of CPAchecker.
+ *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2014  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,9 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- *
- *  CPAchecker web page:
- *    http://cpachecker.sosy-lab.org
  */
-/**
- * Interface to the BDD library JavaBDD,
- * implementing the {@link org.sosy_lab.cpachecker.util.predicates.regions.Region}
- * and {@link org.sosy_lab.cpachecker.util.predicates.regions.RegionManager}
- * interfaces.
- */
-package org.sosy_lab.cpachecker.util.predicates.bdd;
+package org.sosy_lab.java_smt.solvers.bdd;
+
+public class BddTheoremProver {
+
+}

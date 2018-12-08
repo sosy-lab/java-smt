@@ -7,52 +7,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 class BddBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Region, Sort, Context, funcDecl> {
 
-  public static native Region sleq(Region e, Region t1, Region t2);
 
-  public static native Region next(Region e, Region t1, Region t2);
-
-  public static native Region sext(Region e, Region t1, Region t2);
-
-  public static native Region extract(Region e, Region t1, Region t2);
-
-  public static native Region concat(Region e, Region t1, Region t2);
-
-  public static native Region times(Region e, Region t1, Region t2);
-
-  public static native Region smod(Region e, Region t1, Region t2);
-
-  public static native Region umod(Region e, Region t1, Region t2);
-
-  public static native Region neg(Region e, Region t1);
-
-  public static native Region minus(Region e, Region t1, Region t2);
-
-  public static native Region uleq(Region e, Region t1, Region t2);
-
-  public static native Region slt(Region e, Region t1, Region t2);
-
-  public static native Region ult(Region e, Region t1, Region t2);
-
-  public static native Region equal(Region e, Region t1, Region t2);
-
-  public static native Region plus(Region e, Region t1, Region t2);
-
-  public static native Region sdiv(Region e, Region t1, Region t2);
-
-  public static native Region udiv(Region e, Region t1, Region t2);
-
-  public static native Region xor(Region e, Region t1, Region t2);
-
-  public static native Region or(Region e, Region t1, Region t2);
-
-
-  public static native Region sl(Region e, Region t1, Region t2);
-
-  public static native Region signedsr(Region e, Region t1, Region t2);
-
-  public static native Region usignedsr(Region e, Region t1, Region t2);
-
-  public static native Region not(Region e, Region t1);
 
   private final Region region;
 
@@ -67,7 +22,7 @@ class BddBitvectorFormulaManager
 
   @Override
   public Region concat(Region pFirst, Region pSecond) {
-    return concat(region, pFirst, pSecond);
+
   }
 
   @Override

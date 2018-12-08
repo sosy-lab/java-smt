@@ -21,7 +21,7 @@
  *  CPAchecker web page:
  *    http://cpachecker.sosy-lab.org
  */
-package org.sosy_lab.cpachecker.util.predicates.bdd;
+package org.sosy_lab.java_smt.solvers.bdd;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,8 +33,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.cpachecker.util.predicates.regions.NamedRegionManager;
-import org.sosy_lab.cpachecker.util.predicates.regions.Region;
 
 @RunWith(Parameterized.class)
 public class BDDExistsTest {
@@ -54,12 +52,11 @@ public class BDDExistsTest {
   @Test
   public void existsTest() throws InvalidConfigurationException {
     config = Configuration.builder().setOption("bdd.package", bddPackage).build();
-    nrm =
-        new NamedRegionManager(new BDDManagerFactory(config, logger).createRegionManager());
+    nrm = new NamedRegionManager(new BDDManagerFactory(config, logger).createRegionManager());
 
-    Region r0  = nrm.createPredicate("r0");
-    Region r1  = nrm.createPredicate("r1");
-    Region r2  = nrm.createPredicate("r2");
+    Region r0 = nrm.createPredicate("r0");
+    Region r1 = nrm.createPredicate("r1");
+    Region r2 = nrm.createPredicate("r2");
 
     Region complete = r2;
     complete = nrm.makeAnd(complete, r1);

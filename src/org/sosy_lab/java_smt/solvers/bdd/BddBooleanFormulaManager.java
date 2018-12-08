@@ -1,17 +1,23 @@
 package org.sosy_lab.java_smt.solvers.bdd;
+
+import com.microsoft.z3.FuncDecl;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class BddBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Region, Sort, Context, funcDecl>
+    extends AbstractBooleanFormulaManager<Region, BddSort, RegionManager, FuncDecl>
 {
 
-  private final Region region;
+  private final RegionManager rmgr;
 
   // TODO
   protected BddBooleanFormulaManager(BddFormulaManager pCreator) {
     super(pCreator);
-    this.region = pCreator.getEnv();
+    rmgr = pCreator.getEnv();
+  }
 
+  @Override
+  protected Region ifThenElse(Region pCond, Region pF1, Region pF2) {
+    return rmgr.makeIte(pCond, pF1, pF2);
   }
 
   // TODO
@@ -21,19 +27,17 @@ class BddBooleanFormulaManager
   }
 
   @Override
-  public Region makeBooleanImpl(Boolean pValue) {
-    Region t;
+  public Region makeBooleanImpl(boolean pValue) {
     if (pValue) {
-      t.isTrue();
+      return rmgr.makeTrue();
     } else {
-      t.isFalse();
+      return rmgr.makeFalse();
     }
-    return t;
   }
 
   @Override
-  public boolean equivalence(Region f1, Region f2) {
-    return f1.equals(f2);
+  public Region equivalence(Region f1, Region f2) {
+    return rmgr.makeEqual(f1, f2);
   }
 
   @Override
@@ -47,43 +51,24 @@ class BddBooleanFormulaManager
   }
 
   @Override
-  public boolean not(Region pBits) {
-    return pBits.isFalse();
-
+  public Region not(Region f) {
+    return rmgr.makeNot(f);
   }
 
   @Override
-  public boolean and(Region pBits1, Region pBits2) {
-    Region t;
-    if (pBits1.isTrue() && pBits2.isTrue()) {
-      return t.isTrue();
-    } else {
-      return t.isFalse();
-    }
-
+  public Region and(Region pBits1, Region pBits2) {
+    return rmgr.makeAnd(pBits1, pBits2);
   }
 
   @Override
-  public boolean or(Region pBits1, Region pBits2) {
-    Region t;
-    if (pBits1.isFalse() && pBits2.isFalse()) {
-      return t.isFalse();
-    } else {
-      return t.isTrue();
-    }
+  public Region or(Region pBits1, Region pBits2) {
+    return rmgr.makeOr(pBits1, pBits2);
   }
 
   @Override
-  public boolean xor(Region pBits1, Region pBits2) {
-    Region t;
-    if(pBits1.isTrue() && pBits2.isTrue() ) {
-      return t.isFalse() ;
-    } else if (pBits1.isFalse() && pBits2.isFalse()) {
-      return t.isFalse();
-    }
-    else {
-      t.isTrue();
-    }
+  public Region xor(Region pBits1, Region pBits2) {
+    // return rmgr.makeNot(rmgr.makeEqual(pBits1, pBits2));
+    return rmgr.makeUnequal(pBits1, pBits2);
   }
 
 }

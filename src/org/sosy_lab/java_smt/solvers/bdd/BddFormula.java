@@ -1,14 +1,13 @@
 
 package org.sosy_lab.java_smt.solvers.bdd;
 
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-/*import org.sosy_lab.java_smt.api.FormulaType;*/
 
 abstract class BddFormula implements Formula {
 
   private final Region region;
-
-  public static native long region_make_true(long e);
 
   BddFormula(Region region) {
     this.region = region;
@@ -16,7 +15,7 @@ abstract class BddFormula implements Formula {
 
   @Override
   public final String toString(){
-    return this.region.toString();
+    return region.toString();
   }
 
   @Override
@@ -35,13 +34,23 @@ abstract class BddFormula implements Formula {
     return this.region.hashCode();
   }
 
+  final class BddBooleanFormula extends BddFormula implements BooleanFormula {
+    BddBooleanFormula(Region pTerm) {
+      super(pTerm);
+    }
 
-  public static Region getRegion(Region region) {
-    return region;
+    @Override
+    public Region getFormulaInfo() {
+      return region;
+    }
   }
 
+    static final class BddBitvectorFormula extends BddFormula implements BitvectorFormula {
+      BddBitvectorFormula(Region pTerm) {
+        super(pTerm);
+      }
+    }
 }
-
 
   /*static final class Mathsat5ArrayFormula<TI extends Formula, TE extends Formula>
       extends Mathsat5Formula implements ArrayFormula<TI, TE> {
@@ -69,12 +78,6 @@ abstract class BddFormula implements Formula {
       super(pTerm);
     }
   }
-
-  static final class Bdd5BooleanFormula extends BddFormula implements BooleanFormula {
-    BddBooleanFormula(Region pTerm) {
-      super(pTerm);
-    }
-  }
-}
 */
+
 
