@@ -107,9 +107,12 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Contributions: [Thomas Stieglmaier][] and others.
  
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
+[Manual Installation]: Getting-started.md#manual-installation
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
 [George Karpenkov]: http://metaworld.me
 [Philipp Wendler]: https://www.philippwendler.de/
 [Thomas Stieglmaier]: https://stieglmaier.me/
 [Karlheinz Friedberger]: https://www.sosy-lab.org/people/friedberger
+[Ivy repository]: https://www.sosy-lab.org/ivy
+[Maven repository]: https://mvnrepository.com/artifact/org.sosy-lab/java-smt
