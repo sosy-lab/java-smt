@@ -15,9 +15,9 @@ for more information.
 
 ## Continuous Integration
 
-We rely on [Travis][] continuous
-integration, which picks up code style violations, compile warnings for both
-ECJ and javac, and [SpotBugs](https://github.com/spotbugs/spotbugs) errors.
+We rely on [GitLab-CI][] for continuous integration, which picks up code style violations,
+compile warnings for both ECJ and javac (for several versions of Java), 
+[SpotBugs](https://github.com/spotbugs/spotbugs) errors,...
 
 ## Releasing JavaSMT
 
@@ -170,7 +170,7 @@ The new solver can be added from outside of JavaSMT as well: in that case,
 the user might wish to have their own factory which can create
 a suitable `SolverContext`.
 
-[Travis]: https://travis-ci.org/sosy-lab/java-smt
+[GitLab-CI]: https://gitlab.com/sosy-lab/software/java-smt/pipelines
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
 [OSSRH]: http://central.sonatype.org/pages/ossrh-guide.html
 [Semantic Versioning]: http://semver.org/
