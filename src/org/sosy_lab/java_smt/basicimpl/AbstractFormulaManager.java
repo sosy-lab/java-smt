@@ -91,7 +91,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
-  static final CharMatcher DISALLOWED_CHARACTERS = CharMatcher.anyOf("|\\");
+  private static final CharMatcher DISALLOWED_CHARACTERS = CharMatcher.anyOf("|\\");
 
   private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       arrayManager;
@@ -426,7 +426,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>This method must be kept in sync with {@link #checkVariableName}.
    */
   @Override
-  public boolean isValidName(String pVar) {
+  public final boolean isValidName(String pVar) {
     if (pVar.isEmpty()) {
       return false;
     }
