@@ -15,10 +15,10 @@ wrapping layer) and type-safety (it shouldn't be possible to add boolean terms
 to integer ones at _compile_ time) sometimes at the cost of verbosity.
 
 #### Quick links
-[Getting Started](Getting-started.md) |
+[Getting Started](doc/Getting-started.md) |
 [Documentation][JavaDoc] |
-[Known Issues](KnownIssues.md) |
-[Documentation for Developers](Developers.md) |
+[Known Issues](doc/KnownIssues.md) |
+[Documentation for Developers](doc/Developers.md) |
 [Changelog](CHANGELOG.md) |
 [Configuration Options][ConfigurationOptions]
 
@@ -107,7 +107,7 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Contributions: [Thomas Stieglmaier][] and others.
  
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
-[Manual Installation]: Getting-started.md#manual-installation
+[Manual Installation]: doc/Getting-started.md#manual-installation
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
 [George Karpenkov]: http://metaworld.me
