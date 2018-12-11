@@ -58,9 +58,10 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * the interpolation-strategy of the underlying SMT-solver! Depending on the underlying SMT-solver
    * this method might be faster than N direct calls to getInterpolant().
    *
-   * <p>The stack should contain exactly the partitioned formulas, but any order is allowed. For an
-   * input of N partitions we return N-1 interpolants. Any asserted formula that is not part of the
-   * partitioned list, will be used for background theory.
+   * <p>The prover stack should contain the partitioned formulas, but any order is allowed. For an
+   * input of N partitions we return N-1 interpolants. Any asserted formula that is on the prover
+   * stack and not part of the partitioned list, will be used for background theory and its symbols
+   * can appear in any interpolant.
    *
    * @return a 'inductive sequence' of interpolants, such that the implication {@code AND(I_i, P_i)
    *     => I_(i+1)} is satisfied for all i, where P_i is the conjunction of all formulas in
@@ -101,6 +102,11 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * partition      = [A,B,D,E,C,F,H,G]  // post-order of tree
    * startOfSubTree = [0,0,2,2,0,0,6,0]  // index of left-most leaf of the current element
    * </pre>
+   *
+   * <p>The prover stack should contain the partitioned formulas. For an input of N partitions
+   * (nodes in the tree) we return N-1 interpolants (one interpolant for/below each node except the
+   * root). Any asserted formula that is on the prover stack and not part of the partitioned list,
+   * will be used for background theory and its symbols can appear in any interpolant.
    *
    * @param partitionedFormulas of formulas
    * @param startOfSubTree The start of the subtree containing the formula at this index as root.
