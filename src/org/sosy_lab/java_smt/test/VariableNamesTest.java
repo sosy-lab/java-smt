@@ -60,7 +60,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
-          "javasmt",
+          "java-smt",
+          "JavaSMT",
           "sosylab",
           "test",
           "foo",
