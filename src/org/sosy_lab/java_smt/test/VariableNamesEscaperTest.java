@@ -40,11 +40,13 @@ public class VariableNamesEscaperTest extends VariableNamesTest {
   public void testEscapeUnescape() {
     String var = super.getVarname();
     Assert.assertEquals(var, mgr.unescape(mgr.escape(var)));
+    Assert.assertEquals(var, mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var)))));
   }
 
   @Test
   public void testDoubleEscapeUnescape() {
     String var = getVarname();
     Assert.assertEquals(var, mgr.unescape(mgr.escape(var)));
+    Assert.assertEquals(var, mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var)))));
   }
 }
