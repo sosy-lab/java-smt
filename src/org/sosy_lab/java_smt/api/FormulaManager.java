@@ -252,6 +252,8 @@ public interface FormulaManager {
   /**
    * Unescape the symbol/name for variables or undefined functions, if necessary.
    *
+   * <p>The result is undefined for Strings that are not properly escaped.
+   *
    * <p>See {@link #isValidName(String)} for further details.
    */
   String unescape(String variableName);

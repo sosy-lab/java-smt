@@ -517,11 +517,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
       // unescape DISALLOWED_CHARACTERS
       StringBuilder str = new StringBuilder();
-      for (int i = 0; i < pVar.length(); i++) {
+      int i = 0;
+      while (i < pVar.length()) {
         if (pVar.charAt(i) == ESCAPE) {
           if (pVar.charAt(i + 1) == ESCAPE) {
             str.append(ESCAPE);
-            i += 1;
+            i++;
           } else {
             String rest = pVar.substring(i + 1);
             for (Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
@@ -534,6 +535,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           }
         } else {
           str.append(pVar.charAt(i));
+          i++;
         }
       }
       return str.toString();
