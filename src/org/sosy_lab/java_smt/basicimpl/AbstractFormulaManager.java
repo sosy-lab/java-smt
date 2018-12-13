@@ -535,8 +535,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           }
         } else {
           str.append(pVar.charAt(i));
-          i++;
         }
+        i++;
       }
       return str.toString();
     }
