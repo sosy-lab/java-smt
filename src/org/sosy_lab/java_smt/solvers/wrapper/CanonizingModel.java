@@ -47,40 +47,40 @@ public class CanonizingModel implements Model {
   @Override
   @Nullable
   public BigInteger evaluate(IntegerFormula pF) {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.evaluate(pF);
   }
 
   @Override
   @Nullable
   public Rational evaluate(RationalFormula pF) {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.evaluate(pF);
   }
 
   @Override
   @Nullable
   public Boolean evaluate(BooleanFormula pF) {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.evaluate(pF);
   }
 
   @Override
   @Nullable
   public BigInteger evaluate(BitvectorFormula pF) {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.evaluate(pF);
   }
 
   @Override
   public Iterator<ValueAssignment> iterator() {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.iterator();
   }
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
+    delegate.close();
+  }
 
+  @Override
+  @Nullable
+  public <T extends Formula> T eval(T pFormula) {
+    return delegate.eval(pFormula);
   }
 }
