@@ -47,6 +47,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGES =
       ImmutableSet.of(
+          "Unexpected proof rule to split: PN4msat5proof5ProofE",
           "impossible to build a suitable congruence graph!",
           "can't build ie-local interpolant",
           "set_raised on an already-raised proof",

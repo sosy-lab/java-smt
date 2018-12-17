@@ -21,6 +21,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
 
+import com.google.common.base.Joiner;
+import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
@@ -76,7 +78,11 @@ public class ProverEnvironmentSubject
 
     // get model for failure message
     try (Model model = actual().getModel()) {
-      failWithBadResults("is", "unsatisfiable", "has counterexample", model);
+      failWithoutActual(
+          Fact.fact("expected to be", "unsatisfiable"),
+          Fact.fact("but was", actual()),
+          Fact.fact("which is", "satisfiable"),
+          Fact.fact("which has model", model));
     }
   }
 
@@ -91,13 +97,17 @@ public class ProverEnvironmentSubject
       try {
         final List<BooleanFormula> unsatCore = actual().getUnsatCore();
         if (!unsatCore.isEmpty()) {
-          failWithBadResults("is", "satisfiable", "has unsat core", unsatCore);
+          failWithoutActual(
+              Fact.fact("expected to be", "satisfiable"),
+              Fact.fact("but was", actual()),
+              Fact.fact("which is", "unsatisfiable"),
+              Fact.fact("with unsat core", Joiner.on('\n').join(unsatCore)));
           return;
         }
       } catch (IllegalArgumentException ignored) {
         // Skip if unsat core generation is disabled.
       }
     }
-    fail("is", "satisfiable");
+    failWithActual(Fact.fact("expected to be", "satisfiable"));
   }
 }

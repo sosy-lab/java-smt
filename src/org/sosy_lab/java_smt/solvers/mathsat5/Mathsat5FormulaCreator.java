@@ -448,7 +448,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  Object convertValue(long key, long term) {
+  @Override
+  public Object convertValue(Long key) {
+    throw new UnsupportedOperationException(
+        "Mathsat needs a second term to determine a correct type. Please use the other method.");
+  }
+
+  @Override
+  public Object convertValue(Long key, Long term) {
 
     // To get the correct type, we generate it from the key, not the value.
     FormulaType<?> type = getFormulaType(key);

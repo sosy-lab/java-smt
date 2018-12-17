@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
@@ -61,7 +60,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
-          "javasmt",
+          "java-smt",
+          "JavaSMT",
           "sosylab",
           "test",
           "foo",
@@ -184,16 +184,17 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "| \" can occur too |",
           "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|");
 
-  @SuppressWarnings("unchecked")
   @Parameters(name = "{0} with varname {1}")
   public static List<Object[]> getAllCombinations() {
-    List<String> allNames =
-        from(NAMES)
-            .append(AbstractFormulaManager.BASIC_OPERATORS)
-            .append(AbstractFormulaManager.SMTLIB2_KEYWORDS)
-            .append(FURTHER_SMTLIB2_KEYWORDS)
-            .append(UNSUPPORTED_NAMES)
-            .toList();
+    List<Object> allNames =
+        ImmutableList.builder()
+            .addAll(NAMES)
+            .addAll(AbstractFormulaManager.BASIC_OPERATORS)
+            .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
+            .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
+            .addAll(FURTHER_SMTLIB2_KEYWORDS)
+            .addAll(UNSUPPORTED_NAMES)
+            .build();
     return Lists.transform(
         Lists.cartesianProduct(Arrays.asList(Solvers.values()), allNames), List::toArray);
   }
@@ -209,25 +210,33 @@ public class VariableNamesTest extends SolverBasedTest0 {
     return solver;
   }
 
+  boolean allowInvalidNames() {
+    return true;
+  }
+
+  String getVarname() {
+    return varname;
+  }
+
   @CanIgnoreReturnValue
-  private <T extends Formula> T createVariableWith(Function<String, T> creator) {
+  private <T extends Formula> T createVariableWith(Function<String, T> creator, String name) {
     final T result;
-    if (!mgr.isValidName(varname)) {
+    if (allowInvalidNames() && !mgr.isValidName(name)) {
       try {
-        result = creator.apply(varname);
+        result = creator.apply(name);
         fail();
       } catch (IllegalArgumentException e) {
         throw new AssumptionViolatedException("unsupported variable name", e);
       }
     } else {
-      result = creator.apply(varname);
+      result = creator.apply(name);
     }
     return result;
   }
 
   @Test
   public void testBoolVariable() {
-    createVariableWith(bmgr::makeVariable);
+    createVariableWith(bmgr::makeVariable, getVarname());
   }
 
   private <T extends Formula> void testName0(
@@ -235,7 +244,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
       throws SolverException, InterruptedException {
 
     // create a variable
-    T var = createVariableWith(creator);
+    T var = createVariableWith(creator, getVarname());
 
     // check whether it exists with the given name
     Map<String, Formula> map = mgr.extractVariables(var);
@@ -244,10 +253,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
       map = mgr.extractVariablesAndUFs(var);
     }
     assertThat(map).hasSize(1);
-    assertThat(map).containsEntry(varname, var);
+    assertThat(map).containsEntry(getVarname(), var);
 
     // check whether we can create the same variable again
-    T var2 = createVariableWith(creator);
+    T var2 = createVariableWith(creator, getVarname());
     // for simple formulas, we can expect a direct equality
     // (for complex formulas this is not satisfied)
     assertThat(var2).isEqualTo(var);
@@ -265,11 +274,12 @@ public class VariableNamesTest extends SolverBasedTest0 {
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
 
-    // try to create a new (!) variable with a different name, the escaped previous name.
-    varname = "|" + varname + "|";
-    @SuppressWarnings("unused")
-    T var3 = createVariableWith(creator);
-    fail();
+    if (allowInvalidNames()) {
+      // try to create a new (!) variable with a different name, the escaped previous name.
+      @SuppressWarnings("unused")
+      T var3 = createVariableWith(creator, "|" + getVarname() + "|");
+      fail();
+    }
   }
 
   @Test
@@ -336,7 +346,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public void testNameExists() {
     requireQuantifiers();
 
-    IntegerFormula var = createVariableWith(imgr::makeVariable);
+    IntegerFormula var = createVariableWith(imgr::makeVariable, getVarname());
     IntegerFormula zero = imgr.makeNumber(0);
     BooleanFormula exists = qmgr.exists(var, imgr.equal(var, zero));
 
@@ -356,7 +366,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
             for (Formula f : pBoundVariables) {
               Map<String, Formula> map = mgr.extractVariables(f);
               assertThat(map).hasSize(1);
-              assertThat(map).containsEntry(varname, f);
+              assertThat(map).containsEntry(getVarname(), f);
             }
             return null;
           }
@@ -370,7 +380,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableNameInVisitor() {
-    BooleanFormula var = createVariableWith(bmgr::makeVariable);
+    BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
 
     bmgr.visit(
         var,
@@ -382,7 +392,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
           @Override
           public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> pDecl) {
-            assertThat(pDecl.getName()).isEqualTo(varname);
+            assertThat(pDecl.getName()).isEqualTo(getVarname());
             return null;
           }
         });
@@ -390,57 +400,58 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableDump() {
-    BooleanFormula var = createVariableWith(bmgr::makeVariable);
+    BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(var).toString();
   }
 
   @Test
   public void testEqBoolVariableDump() {
-    BooleanFormula var = createVariableWith(bmgr::makeVariable);
+    BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
   }
 
   @Test
   public void testIntVariable() {
-    createVariableWith(imgr::makeVariable);
+    createVariableWith(imgr::makeVariable, getVarname());
   }
 
   @Test
   public void testInvalidRatVariable() {
     requireRationals();
-    createVariableWith(rmgr::makeVariable);
+    createVariableWith(rmgr::makeVariable, getVarname());
   }
 
   @Test
   public void testBVVariable() {
     requireBitvectors();
-    createVariableWith(v -> bvmgr.makeVariable(4, v));
+    createVariableWith(v -> bvmgr.makeVariable(4, v), getVarname());
   }
 
   @Test
   public void testInvalidFloatVariable() {
     requireFloats();
     createVariableWith(
-        v -> fpmgr.makeVariable(v, FormulaType.getSinglePrecisionFloatingPointType()));
+        v -> fpmgr.makeVariable(v, FormulaType.getSinglePrecisionFloatingPointType()),
+        getVarname());
   }
 
   @Test
   public void testArrayVariable() {
     requireArrays();
-    createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType));
+    createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType), getVarname());
   }
 
   @Test
   public void sameBehaviorTest() {
-    if (mgr.isValidName(varname)) {
+    if (mgr.isValidName(getVarname())) {
       // should pass without exception
-      AbstractFormulaManager.checkVariableName(varname);
+      AbstractFormulaManager.checkVariableName(getVarname());
     } else {
       try {
         // should throw exception
-        AbstractFormulaManager.checkVariableName(varname);
+        AbstractFormulaManager.checkVariableName(getVarname());
         fail();
       } catch (IllegalArgumentException e) {
       }

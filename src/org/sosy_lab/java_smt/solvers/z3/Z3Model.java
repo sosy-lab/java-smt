@@ -20,10 +20,8 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
@@ -36,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Z3Model extends CachingAbstractModel<Long, Long, Long> {
@@ -60,29 +57,10 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     return new Z3Model(z3context, z3model, pCreator);
   }
 
-  @Nullable
-  @Override
-  public Object evaluateImpl(Long f) {
-    Preconditions.checkState(!closed);
-    Native.LongPtr out = new Native.LongPtr();
-    boolean status = Native.modelEval(z3context, model, f, false, out);
-    Verify.verify(status, "Error during model evaluation");
-    long outValue = out.value;
-
-    if (z3creator.isConstant(outValue)) {
-      return z3creator.convertValue(outValue);
-    }
-
-    // Z3 does not give us a direct API to query for "irrelevant" ASTs during evaluation.
-    // The only hint we get is that the input AST is not simplified down to a constant:
-    // thus, it is assumed to be irrelevant.
-    return null;
-  }
-
   @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
-    Builder<ValueAssignment> out = ImmutableList.builder();
+    ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
     for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
@@ -409,7 +387,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   @Override
   protected Long evalImpl(Long formula) {
     LongPtr resultPtr = new LongPtr();
-    boolean satisfiableModel = Native.modelEval(z3context, model, formula, true, resultPtr);
+    boolean satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {
       // unknown evaluation

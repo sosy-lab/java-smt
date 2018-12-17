@@ -105,10 +105,7 @@
       <property name="allowLineBreaks" value="true"/>
       <property name="tokens" value="DOT"/>
     </module>
-    <module name="ModifierOrder">
-      <property name="severity" value="ignore"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
+    <module name="ModifierOrder"/>
     <module name="LeftCurly"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
@@ -120,13 +117,15 @@
     <module name="DefaultComesLast"/>
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
-    <module name="FallThrough"/>
+    <module name="FallThrough">
+      <property name="reliefPattern" value="\$FALL-THROUGH\$"/>
+    </module>
     <module name="IllegalInstantiation">
       <property name="classes" value="Boolean,Character,Integer,Long,Double,Float,String"/>
     </module>
     <module name="IllegalType">
       <property name="tokens" value="METHOD_DEF,PARAMETER_DEF,VARIABLE_DEF"/>
-      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector"/>
+      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector, javax.annotation.Nullable, javax.annotation.CheckReturnValue, javax.annotation.concurrent.GuardedBy, javax.annotation.concurrent.Immutable"/>
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>
@@ -186,14 +185,14 @@
     <module name="com.github.sevntu.checkstyle.checks.design.AvoidConditionInversionCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
     <module name="JavadocParagraph"/>
-    <module name="JavadocType">
-      <property name="scope" value="public"/>
-      <property name="severity" value="ignore"/>
-    </module>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
   </module>
-  <module name="SuppressWarningsFilter"/>
   <module name="JavadocPackage"/>
+  <module name="SuppressWarningsFilter"/>
+  <module name="SuppressionFilter">
+    <property name="file" value="${config_loc}/Checkstyle.exclude.xml"/>
+    <property name="optional" value="true"/>
+  </module>
 </module>

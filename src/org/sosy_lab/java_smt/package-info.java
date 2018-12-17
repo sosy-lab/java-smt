@@ -28,7 +28,7 @@
  * <p>All interfaces which form the public API are located in the <a
  * href="api/package-summary.html">API package</a>.
  */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

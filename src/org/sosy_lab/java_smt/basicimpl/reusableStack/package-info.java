@@ -24,7 +24,7 @@
  * internal stack of formulas must be able to be cleared completely. This is not possible, if the
  * stack is shared, because we cannot use "pop()" to remove constraints from an empty stack.
  */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

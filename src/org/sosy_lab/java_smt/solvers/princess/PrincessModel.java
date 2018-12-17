@@ -20,39 +20,27 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static scala.collection.JavaConversions.asJavaIterable;
-import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.seqAsJavaList;
 
-import ap.SimpleAPI;
-import ap.SimpleAPI.ConstantLoc;
-import ap.SimpleAPI.IntFunctionLoc;
-import ap.SimpleAPI.IntValue;
-import ap.SimpleAPI.ModelLocation;
-import ap.SimpleAPI.ModelValue;
 import ap.SimpleAPI.PartialModel;
-import ap.SimpleAPI.PredicateLoc;
-import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
-import ap.parser.IBoolLit;
+import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.types.Sort;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
@@ -68,27 +56,16 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     this.model = partialModel;
   }
 
-  @Nullable
-  @Override
-  public Object evaluateImpl(IExpression f) {
-    Option<ModelValue> out = model.evalExpression(f);
-    if (out.isEmpty()) {
-      return null;
-    }
-    ModelValue value = out.get();
-    return getValue(value);
-  }
-
   @Override
   protected ImmutableList<ValueAssignment> toList() {
-    scala.collection.Map<ModelLocation, ModelValue> interpretation = model.interpretation();
+    scala.collection.Map<IExpression, IExpression> interpretation = model.interpretation();
 
     // first get the addresses of arrays
-    Map<IdealInt, ITerm> arrays = getArrayAddresses(interpretation);
+    Map<IIntLit, ITerm> arrays = getArrayAddresses(interpretation);
 
     // then iterate over the model and generate the assignments
-    Builder<ValueAssignment> assignments = ImmutableSet.builder();
-    for (Tuple2<ModelLocation, ModelValue> entry : asJavaIterable(interpretation)) {
+    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    for (Tuple2<IExpression, IExpression> entry : asJavaIterable(interpretation)) {
       ValueAssignment assignment = getAssignment(entry._1, entry._2, arrays);
       if (assignment != null) {
         assignments.add(assignment);
@@ -105,14 +82,14 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
    * store(0,5,123)=0}", where "0" is the memory-address. The returned mapping contains the mapping
    * of "0" (=address) to "arr" (=identifier).
    */
-  private Map<IdealInt, ITerm> getArrayAddresses(
-      scala.collection.Map<ModelLocation, ModelValue> interpretation) {
-    Map<IdealInt, ITerm> arrays = new HashMap<>();
-    for (Tuple2<ModelLocation, ModelValue> entry : asJavaIterable(interpretation)) {
-      if (entry._1 instanceof ConstantLoc) {
-        ITerm maybeArray = IExpression.i(((ConstantLoc) entry._1).c());
-        if (creator.getEnv().hasArrayType(maybeArray) && entry._2 instanceof IntValue) {
-          arrays.put(((IntValue) entry._2).v(), maybeArray);
+  private Map<IIntLit, ITerm> getArrayAddresses(
+      scala.collection.Map<IExpression, IExpression> interpretation) {
+    Map<IIntLit, ITerm> arrays = new HashMap<>();
+    for (Tuple2<IExpression, IExpression> entry : asJavaIterable(interpretation)) {
+      if (entry._1 instanceof IConstant) {
+        ITerm maybeArray = (IConstant) entry._1;
+        if (creator.getEnv().hasArrayType(maybeArray) && entry._2 instanceof IIntLit) {
+          arrays.put((IIntLit) entry._2, maybeArray);
         }
       }
     }
@@ -120,74 +97,71 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   }
 
   private @Nullable ValueAssignment getAssignment(
-      ModelLocation key, ModelValue value, Map<IdealInt, ITerm> arrays) {
-    Object directValue = getValue(value);
-    IExpression fValue = getValueFormula(value);
+      IExpression key, IExpression value, Map<IIntLit, ITerm> pArrays) {
+    IExpression fValue = value;
     final IExpression fKey;
     final String name;
     final IFormula fAssignment;
     Collection<Object> argumentInterpretations = Collections.emptyList();
 
-    if (key instanceof PredicateLoc) {
-      IAtom predicate = new IAtom(((PredicateLoc) key).p(), asScalaBuffer(Collections.emptyList()));
-      fKey = predicate;
+    if (key instanceof IAtom) {
+      fKey = key;
       name = key.toString();
-      fAssignment = new IBinFormula(IBinJunctor.Eqv(), predicate, (IFormula) fValue);
+      fAssignment = new IBinFormula(IBinJunctor.Eqv(), (IAtom) key, (IFormula) fValue);
 
-    } else if (key instanceof ConstantLoc) {
-      ITerm term = IExpression.i(((ConstantLoc) key).c());
-      if (creator.getEnv().hasArrayType(term)) {
+    } else if (key instanceof IConstant) {
+      if (creator.getEnv().hasArrayType(key)) {
         // array-access, for explanation see #getArrayAddresses
         return null;
       } else {
-        fKey = term;
+        fKey = key;
         name = key.toString();
-        fAssignment = term.$eq$eq$eq((ITerm) fValue);
+        fAssignment = ((IConstant) key).$eq$eq$eq((ITerm) fValue);
       }
 
-    } else if (key instanceof IntFunctionLoc) {
-      IntFunctionLoc cKey = (IntFunctionLoc) key;
+    } else if (key instanceof IFunApp) {
+      IFunApp cKey = (IFunApp) key;
 
-      if ("select/2".equals(cKey.f().toString())) {
-        // array-access, for explanation see #getArrayAddresses
-        IdealInt arrayId = cKey.args().apply(0);
-        IdealInt arrayIndex = cKey.args().apply(1);
-        ITerm arrayF = arrays.get(arrayId);
-        if (arrayF == null) {
-          // intermediate array store, like a tmp-variable, happens for repeated store-operations
-          return null;
-        }
-        fKey = creator.getEnv().makeSelect(arrayF, IExpression.i(arrayIndex));
-        name = arrayF.toString();
-        argumentInterpretations = Collections.singleton(arrayIndex.bigIntValue());
-
-      } else if ("store/3".equals(cKey.f().toString())) {
-        // array-access, for explanation see #getArrayAddresses
-        // IdealInt sourceArray = cKey.args().apply(0);
-        IdealInt arrayId = ((SimpleAPI.IntValue) value).v();
-        IdealInt arrayIndex = cKey.args().apply(1);
-        IdealInt arrayContent = cKey.args().apply(2);
-        ITerm arrayF = arrays.get(arrayId);
-        if (arrayF == null) {
-          // intermediate array store, like a tmp-variable, happens for repeated store-operations
-          return null;
-        }
-        fKey = creator.getEnv().makeSelect(arrayF, IExpression.i(arrayIndex));
-        fValue = new IIntLit(arrayContent);
-        name = arrayF.toString();
-        directValue = arrayContent.bigIntValue();
-        argumentInterpretations = Collections.singleton(arrayIndex.bigIntValue());
-
-      } else {
-        // normal variable or UF
-        argumentInterpretations = new ArrayList<>();
-        List<ITerm> argTerms = new ArrayList<>();
-        for (IdealInt arg : seqAsJavaList(cKey.args())) {
-          argumentInterpretations.add(arg.bigIntValue());
-          argTerms.add(IExpression.i(arg));
-        }
-        fKey = new IFunApp(cKey.f(), asScalaBuffer(argTerms));
-        name = cKey.f().name();
+      switch (cKey.fun().name()) {
+        case "select":
+          // array-access, for explanation see #getArrayAddresses
+          ITerm arrayId = cKey.args().apply(0);
+          ITerm arrayIndex = cKey.args().apply(1);
+          ITerm arrayF = pArrays.get(arrayId);
+          if (arrayF == null) {
+            // intermediate array store, like a tmp-variable, happens for repeated
+            // store-operations
+            return null;
+          }
+          fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
+          name = arrayF.toString();
+          argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
+          break;
+        case "store":
+          // array-access, for explanation see #getArrayAddresses
+          // IdealInt sourceArray = cKey.args().apply(0);
+          ITerm arrayId2 = (ITerm) value;
+          ITerm arrayIndex2 = cKey.args().apply(1);
+          ITerm arrayContent = cKey.args().apply(2);
+          ITerm arrayF2 = pArrays.get(arrayId2);
+          if (arrayF2 == null) {
+            // intermediate array store, like a tmp-variable, happens for repeated
+            // store-operations
+            return null;
+          }
+          fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
+          fValue = arrayContent;
+          name = arrayF2.toString();
+          argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex2));
+          break;
+        default:
+          // normal variable or UF
+          argumentInterpretations = new ArrayList<>();
+          for (ITerm arg : seqAsJavaList(cKey.args())) {
+            argumentInterpretations.add(creator.convertValue(arg));
+          }
+          fKey = cKey;
+          name = cKey.fun().name();
       }
 
       fAssignment = ((ITerm) fKey).$eq$eq$eq((ITerm) fValue);
@@ -202,39 +176,13 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
         creator.encapsulateWithTypeOf(fValue),
         creator.encapsulateBoolean(fAssignment),
         name,
-        directValue,
+        creator.convertValue(fValue),
         argumentInterpretations);
   }
 
   @Override
   public String toString() {
     return model.toString();
-  }
-
-  private Object getValue(SimpleAPI.ModelValue value) {
-    if (value instanceof SimpleAPI.BoolValue) {
-      return ((SimpleAPI.BoolValue) value).v();
-
-    } else if (value instanceof SimpleAPI.IntValue) {
-      return ((SimpleAPI.IntValue) value).v().bigIntValue();
-
-    } else {
-      throw new IllegalArgumentException(
-          "unhandled model value " + value + " of type " + value.getClass());
-    }
-  }
-
-  private IExpression getValueFormula(SimpleAPI.ModelValue value) {
-    if (value instanceof SimpleAPI.BoolValue) {
-      return new IBoolLit(((SimpleAPI.BoolValue) value).v());
-
-    } else if (value instanceof SimpleAPI.IntValue) {
-      return new IIntLit(((SimpleAPI.IntValue) value).v());
-
-    } else {
-      throw new IllegalArgumentException(
-          "unhandled model value " + value + " of type " + value.getClass());
-    }
   }
 
   @Override
@@ -245,10 +193,11 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     if (formula instanceof ITerm) {
       Option<ITerm> out = model.evalToTerm((ITerm) formula);
       return out.isEmpty() ? null : out.get();
+    } else if (formula instanceof IFormula) {
+      Option<IExpression> out = model.evalExpression(formula);
+      return out.isEmpty() ? null : out.get();
     } else {
-      Preconditions.checkArgument(formula instanceof IFormula);
-      Option<ModelValue> out = model.evalExpression(formula);
-      return out.isEmpty() ? null : new IBoolLit(((SimpleAPI.BoolValue) out.get()).v());
+      throw new AssertionError("unexpected formula: " + formula);
     }
   }
 }

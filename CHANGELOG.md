@@ -4,11 +4,11 @@
 
 ### Changes in the API
  - New solver versions:
-    - MathSAT: 5.5.0
+    - MathSAT: 5.5.3 (Nov 20 2018)
     - OptiMathSAT: 1.4.0.10
-    - Princess: 2017-12-06-assertionless
-    - SMTInterpol: 2.1-335-g4c543a5
-    - Z3: z3-4.6.0-9-g36204fa
+    - Princess: 2018-12-06-assertionless
+    - SMTInterpol: 2.5-47-gc0546aa
+    - Z3: 4.7.1.0
  - Methods for computing a model, unsat core and allsat are moved from
    `ProverEnvironment` upwards into `BasicProverEnvironment` and can now also
    be used in `InterpolatingProverEnvironment`

@@ -35,7 +35,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,18 +62,10 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public Object evaluateImpl(Long f) {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
-    long term = msat_model_eval(model, f);
-    return formulaCreator.convertValue(f, term);
-  }
-
-  @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
-    Builder<ValueAssignment> assignments = ImmutableList.builder();
+    ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
     while (msat_model_iterator_has_next(modelIterator)) {
@@ -158,6 +149,8 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long formula) {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     return msat_model_eval(model, formula);
   }
 }

@@ -52,15 +52,26 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   }
 
   @Override
-  public Long makeBitvectorImpl(int pLength, long pI) {
-    long sort = Native.mkBvSort(z3context, pLength);
-    return Native.mkInt64(z3context, pI, sort);
-  }
-
-  @Override
   protected Long makeBitvectorImpl(int pLength, BigInteger pI) {
+    checkRange(pLength, pI);
     long sort = Native.mkBvSort(z3context, pLength);
     return Native.mkNumeral(z3context, pI.toString(), sort);
+  }
+
+  private void checkRange(int pLength, BigInteger pI) {
+    if (pI.signum() > 0) {
+      BigInteger max = BigInteger.ONE.shiftLeft(pLength);
+      if (pI.compareTo(max) >= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to big for a bitvector with length " + pLength);
+      }
+    } else if (pI.signum() < 0) {
+      BigInteger min = BigInteger.ONE.shiftLeft(pLength).negate();
+      if (pI.compareTo(min) <= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to small for a bitvector with length " + pLength);
+      }
+    }
   }
 
   @Override

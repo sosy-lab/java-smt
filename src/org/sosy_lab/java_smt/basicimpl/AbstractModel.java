@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.Iterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -83,10 +83,23 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     return evaluateImpl(creator.extractInfo(f));
   }
 
+  /**
+   * Simplify the given formula and replace all symbols with their model values. If a symbol is not
+   * set in the model and evaluation aborts, return <code>null</code>.
+   */
   @Nullable
   protected abstract TFormulaInfo evalImpl(TFormulaInfo formula);
 
-  protected abstract Object evaluateImpl(TFormulaInfo f);
+  /**
+   * Simplify the given formula and replace all symbols with their model values. If a symbol is not
+   * set in the model and evaluation aborts, return <code>null</code>. Afterwards convert the
+   * formula into a Java object as far as possible, i.e., try to match a primitive or simple type.
+   */
+  @Nullable
+  protected Object evaluateImpl(TFormulaInfo f) {
+    TFormulaInfo evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
+  }
 
   @Override
   public String toString() {

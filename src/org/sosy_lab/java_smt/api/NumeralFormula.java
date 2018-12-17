@@ -19,10 +19,15 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
+
 /** Formulas of any numeral sort. */
+@Immutable
 public interface NumeralFormula extends Formula {
 
+  @Immutable
   interface IntegerFormula extends NumeralFormula {}
 
+  @Immutable
   interface RationalFormula extends NumeralFormula {}
 }

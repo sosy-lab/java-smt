@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -54,7 +55,8 @@ public class OptimizationIntReal {
     // create solver context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+        OptimizationProverEnvironment prover =
+            context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager nmgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -77,7 +79,8 @@ public class OptimizationIntReal {
     // create solver context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+        OptimizationProverEnvironment prover =
+            context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       RationalFormulaManager nmgr = context.getFormulaManager().getRationalFormulaManager();

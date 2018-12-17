@@ -19,5 +19,8 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
+
 /** A formula of the boolean sort. */
+@Immutable
 public interface BooleanFormula extends Formula {}
