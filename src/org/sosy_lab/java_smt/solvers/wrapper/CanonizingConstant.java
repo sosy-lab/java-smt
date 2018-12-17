@@ -19,7 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
+import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 
@@ -68,15 +69,30 @@ public class CanonizingConstant implements CanonizingFormula {
   }
 
   @Override
-  public BooleanFormula toFormula(FormulaManager pMgr) {
-    // TODO Auto-generated method stub
-    return null;
+  public Formula toFormula(FormulaManager pMgr) {
+    Formula formula = null;
+
+    if (type.isIntegerType()) {
+      formula = pMgr.getIntegerFormulaManager().makeNumber(value.toString());
+    } else if (type.isBitvectorType()) {
+      formula =
+          pMgr.getBitvectorFormulaManager()
+              .makeBitvector(
+                  ((FormulaType.BitvectorType) type).getSize(), new BigInteger(value.toString()));
+    } else if (type.isFloatingPointType()) {
+      formula =
+          pMgr.getFloatingPointFormulaManager()
+              .makeNumber(value.toString(), (FormulaType.FloatingPointType) type);
+    } else if (type.isBooleanType()) {
+      formula = pMgr.getBooleanFormulaManager().makeBoolean(Boolean.getBoolean(value.toString()));
+    }
+
+    return formula;
   }
 
   @Override
   public CanonizingFormula canonize() {
-    // TODO Auto-generated method stub
-    return null;
+    return copy();
   }
 
   @Override

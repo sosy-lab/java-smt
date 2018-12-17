@@ -128,8 +128,8 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
   @Override
   public CanonizingFormula canonize() {
-    // TODO Auto-generated method stub
-    return null;
+    return CanonizingStrategy.canonizePrefixOperator(
+        mgr, operator, operands, operandSize, returnType);
   }
 
   public FormulaType<?> getType() {

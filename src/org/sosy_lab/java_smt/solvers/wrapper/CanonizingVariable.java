@@ -74,8 +74,7 @@ public class CanonizingVariable implements CanonizingFormula {
 
   @Override
   public CanonizingFormula canonize() {
-    // TODO Auto-generated method stub
-    return null;
+    return CanonizingStrategy.canonizeVariable(mgr, name, type);
   }
 
   @Override
