@@ -19,42 +19,31 @@
  */
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
+public class BddPredicateOrderingStrategy {
+  public enum PredicateOrderingStrategy {
+    SIMILARITY(false),
+    FREQUENCY(false),
+    IMPLICATION(false),
+    REV_IMPLICATION(false),
+    RANDOMLY(false),
+    FRAMEWORK_RANDOM(true),
+    FRAMEWORK_SIFT(true),
+    FRAMEWORK_SIFTITE(true),
+    FRAMEWORK_WIN2(true),
+    FRAMEWORK_WIN2ITE(true),
+    FRAMEWORK_WIN3(true),
+    FRAMEWORK_WIN3ITE(true),
+    CHRONOLOGICAL(true);
 
-public class BddBooleanFormula extends BddFormula {
+    private final boolean isFrameworkStrategy;
 
-
-
-
-  BddBooleanFormula(Region pRegion) {
-    super(pRegion);
-  }
-
-  private BooleanFormula bf;
-
-  BooleanFormula x = bf.makeTrue();
-
-
-
-  @Override
-  public String toString() {
-    return bf.toString();
-  }
-
-  @Override
-  public final boolean equals(Object o) {
-    if (o == this) {
-      return true;
+    PredicateOrderingStrategy(boolean pIsFrameworkStrategy) {
+      isFrameworkStrategy = pIsFrameworkStrategy;
     }
-    if (!(o instanceof BddFormula)) {
-      return false;
-    }
-    return bf == BddFormula.bf;
-  }
 
-  @Override
-  public int hashCode() {
-    return this.bf.hashCode();
+    public boolean getIsFrameworkStrategy() {
+      return this.isFrameworkStrategy;
+    }
   }
 
 }
