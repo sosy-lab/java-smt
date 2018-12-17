@@ -2,6 +2,7 @@ package org.sosy_lab.java_smt.solvers.bdd;
 
 import com.microsoft.z3.FuncDecl;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class BddBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Region, BddSort, RegionManager, FuncDecl>
@@ -9,10 +10,11 @@ class BddBooleanFormulaManager
 
   private final RegionManager rmgr;
 
-  // TODO
-  protected BddBooleanFormulaManager(BddFormulaManager pCreator) {
+  protected BddBooleanFormulaManager(
+      FormulaCreator<Region, BddSort, RegionManager, FuncDecl> pCreator) {
     super(pCreator);
-    rmgr = pCreator.getEnv();
+    this.rmgr = pCreator.getEnv();
+
   }
 
   @Override
@@ -20,10 +22,11 @@ class BddBooleanFormulaManager
     return rmgr.makeIte(pCond, pF1, pF2);
   }
 
-  // TODO
+
   @Override
   public Region makeVariableImpl(String pVar) {
-    return null;
+    BddSort booltype = getFormulaCreator().getBoolType();
+    return getFormulaCreator().makeVariable(booltype, pVar);
   }
 
   @Override

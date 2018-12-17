@@ -1,20 +1,24 @@
 
 package org.sosy_lab.java_smt.solvers.bdd;
 
+import com.microsoft.z3.FuncDecl;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class BddBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Region, Sort, Context, funcDecl> {
+    extends AbstractBitvectorFormulaManager<Region, Sort, Context, FuncDecl> {
 
 
 
   private final Region region;
 
-  protected BddBitvectorFormulaManager(BddFormulaCreator pCreator) {
+  protected BddBitvectorFormulaManager(
+      FormulaCreator<Region, BddSort, RegionManager, FuncDecl> pCreator) {
     super(pCreator);
     this.region = pCreator.getEnv();
   }
+
 
   public static BddBitvectorFormulaManager create(BddFormulaCreator creator) {
     return new BddBitvectorFormulaManager(creator);
