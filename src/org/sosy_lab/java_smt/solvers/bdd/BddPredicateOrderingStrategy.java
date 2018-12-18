@@ -19,9 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.bdd;
 
-public class BddPredicateOrderingStrategy {
-  public enum PredicateOrderingStrategy {
-    SIMILARITY(false),
+public enum BddPredicateOrderingStrategy {
+  SIMILARITY(false),
     FREQUENCY(false),
     IMPLICATION(false),
     REV_IMPLICATION(false),
@@ -37,7 +36,7 @@ public class BddPredicateOrderingStrategy {
 
     private final boolean isFrameworkStrategy;
 
-    PredicateOrderingStrategy(boolean pIsFrameworkStrategy) {
+  BddPredicateOrderingStrategy(boolean pIsFrameworkStrategy) {
       isFrameworkStrategy = pIsFrameworkStrategy;
     }
 
@@ -45,5 +44,3 @@ public class BddPredicateOrderingStrategy {
       return this.isFrameworkStrategy;
     }
   }
-
-}

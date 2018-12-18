@@ -1,11 +1,11 @@
 
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.function.Function;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -107,7 +107,7 @@ public class SynchronizedRegionManager implements RegionManager {
   @Override
   public Region fromFormula(
       BooleanFormula pF,
-      FormulaManagerView pFmgr,
+      FormulaManager pFmgr,
       Function<BooleanFormula, Region> pAtomToRegion) {
     synchronized (delegate) {
       return delegate.fromFormula(pF, pFmgr, pAtomToRegion);
@@ -118,13 +118,6 @@ public class SynchronizedRegionManager implements RegionManager {
   public Triple<Region, Region, Region> getIfThenElse(Region pF) {
     synchronized (delegate) {
       return delegate.getIfThenElse(pF);
-    }
-  }
-
-  @Override
-  public void printStatistics(PrintStream pOut) {
-    synchronized (delegate) {
-      delegate.printStatistics(pOut);
     }
   }
 
@@ -143,7 +136,7 @@ public class SynchronizedRegionManager implements RegionManager {
   }
 
   @Override
-  public void reorder(PredicateOrderingStrategy pStrategy) {
+  public void reorder(BddPredicateOrderingStrategy pStrategy) {
     synchronized (delegate) {
       delegate.reorder(pStrategy);
     }

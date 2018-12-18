@@ -19,12 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.FormulaType;
-
-
 public class BddSort {
-  public static class BddBooleanSort {
+  public static class BddBooleanSort extends BddSort {
     private static final BddBooleanSort instance = new BddBooleanSort();
 
     private BddBooleanSort() {}
@@ -34,25 +30,25 @@ public class BddSort {
     }
 
   }
-
-    public static final class BddvectorSort extends FormulaType<BitvectorFormula> {
-      private final int size;
-
-
-      @Override
-      public boolean isBitvectorType() {
-        return true;
-      }
-
-    public int getLength() {
-        return size;
-      }
-
-      @Override
-      public String toString() {
-        return "Bitvector<" + getSize() + ">";
-      }
-  }
+  //
+  // public static final class BddvectorSort extends FormulaType<BitvectorFormula> {
+  // private final FormulaType<?> size;
+  //
+  //
+  // @Override
+  // public boolean isBitvectorType() {
+  // return true;
+  // }
+  //
+  // public FormulaType<?> getLength() {
+  // return size;
+  // }
+  //
+  // @Override
+  // public String toString() {
+  // return "Bitvector<" + getSize() + ">";
+  // }
+  // }
 }
 
 

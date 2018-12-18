@@ -2,66 +2,70 @@ package org.sosy_lab.java_smt.solvers.bdd;
 
 
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.microsoft.z3.FuncDecl;
 import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.bdd.BddFormula.BddBooleanFormula;
+import org.sosy_lab.java_smt.solvers.bdd.BddSort.BddBooleanSort;
 
 
-abstract class BddFormulaCreator extends FormulaCreator<Region, BddSort, RegionManager, FuncDecl> {
 
-  private final BddBooleanSort booltype;
-  private final RegionManager environment;
-  private final BiMap<String, Region> names = HashBiMap.create();
+abstract class BddFormulaCreator
+    extends FormulaCreator<Region, BddSort, NamedRegionManager, FuncDecl> {
 
-  // TODO contructor parameter?
+  // private final BiMap<String, Region> cache = HashBiMap.create();
+
   protected BddFormulaCreator(
-      BddBooleanSort pBool,
-      RegionManager pEnv) {
-    super(pEnv, pBool, null, null);
+      NamedRegionManager pEnv,
+      BddSort pBoolType) {
+    super(pEnv, pBoolType, null, null);
   }
 
-  // TODO: hashbimap
   @Override
-  public Region makeVariable(BddSort type, String name) {
-    return null;
+  public Region makeVariable(BddSort sort, String varName) {
+    if (sort == BddBooleanSort.getInstance()) {
+      /*
+       * Region result = cache.get(varName); if (result == null) { result =
+       * getEnv().createPredicate(); cache.put(varName, result); } return result;
+       */
+      return getEnv().createPredicate(varName);
+
+    } else {
+      throw new AssertionError("implement later");
+    }
   }
 
-
+  // @Override
   @Override
   public Region extractInfo(Formula pT) {
-      if(pT instanceof BooleanFormula) {
-      return ((BooleanFormula) pT).getFormulaInfo();
+    if (pT instanceof BddBooleanFormula) {
+      return ((BddBooleanFormula) pT).getRegion();
       }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + "in Bdd");
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
-      FormulaType<?> t;
+    final FormulaType<?> t;
       if (formula instanceof BooleanFormula) {
         t=FormulaType.BooleanType;
-    } else if (formula instanceof BitvectorFormula) {
-      // TODO how to get the size of a formula?
-      t = FormulaType.getBitvectorTypeWithSize(0);
     } else {
       throw new IllegalArgumentException("Formula with unexpected type" + formula.getClass());
     }
     return (FormulaType<T>) t;
     }
 
-    @Override
+  @Override
   public FormulaType<?> getFormulaType(Region pFormula) {
         return FormulaType.BooleanType;
   }
+
 
     @Override
     protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(

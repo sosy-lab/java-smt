@@ -1,9 +1,9 @@
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -21,7 +21,6 @@ public interface RegionManager extends RegionCreator {
    */
   boolean entails(Region f1, Region f2) throws SolverException, InterruptedException;
 
-  RegionManager
   /**
    * Creates a new variable and returns the predicate representing it.
    *
@@ -39,7 +38,7 @@ public interface RegionManager extends RegionCreator {
    */
   Region fromFormula(
       BooleanFormula pF,
-      FormulaManagerView fmgr,
+      FormulaManager fmgr,
       Function<BooleanFormula, Region> atomToRegion);
 
   /**
@@ -52,10 +51,10 @@ public interface RegionManager extends RegionCreator {
    */
   Triple<Region, Region, Region> getIfThenElse(Region f);
 
-  /**
-   * Prints some information about the RegionManager.
-   */
-  void printStatistics(PrintStream out);
+  // /**
+  // * Prints some information about the RegionManager.
+  // */
+  // void printStatistics(PrintStream out);
 
   /**
    * Returns a short string with package name and version number.
@@ -74,5 +73,5 @@ public interface RegionManager extends RegionCreator {
    *
    * @param strategy the reorder strategy that should be applied.
    */
-  void reorder(PredicateOrderingStrategy strategy);
+  void reorder(BddPredicateOrderingStrategy strategy);
 }

@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import com.google.common.base.Objects;
 import java.io.Serializable;
+import java.util.Objects;
 
 
 public class Triple<T1, T2, T3> implements Serializable {
@@ -61,9 +61,9 @@ public class Triple<T1, T2, T3> implements Serializable {
   @Override
   public boolean equals(Object other) {
     return(other instanceof Triple<?,?,?>)
-        && Objects.equal(t1, ((Triple<?, ?, ?>) other).t1)
-        && Objects.equal(t2, ((Triple<?, ?, ?>) other).t2)
-        && Objects.equal(t3, ((Triple<?, ?, ?>) other).t3);
+        && Objects.equals(t1, ((Triple<?, ?, ?>) other).t1)
+        && Objects.equals(t2, ((Triple<?, ?, ?>) other).t2)
+        && Objects.equals(t3, ((Triple<?, ?, ?>) other).t3);
   }
 
   @Override

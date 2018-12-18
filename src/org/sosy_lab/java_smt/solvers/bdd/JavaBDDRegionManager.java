@@ -2,12 +2,9 @@ package org.sosy_lab.java_smt.solvers.bdd;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.sosy_lab.cpachecker.util.statistics.StatisticsWriter.writingStatisticsTo;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import java.io.PrintStream;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -29,14 +26,10 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.time.TimeSpan;
-import org.sosy_lab.cpachecker.util.Triple;
-import org.sosy_lab.cpachecker.util.predicates.PredicateOrderingStrategy;
-import org.sosy_lab.cpachecker.util.predicates.smt.BooleanFormulaManagerView;
-import org.sosy_lab.cpachecker.util.predicates.smt.FormulaManagerView;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
@@ -196,29 +189,29 @@ class JavaBDDRegionManager implements RegionManager {
       }
     }
   }
-
-  @Override
-  public void printStatistics(PrintStream out) {
-    try {
-      BDDFactory.GCStats stats = factory.getGCStats();
-      int currentCacheSize = readCacheSize();
-
-      writingStatisticsTo(out).put("Number of BDD nodes", factory.getNodeNum())
-          .put("Size of BDD node table", factory.getNodeTableSize())
-          .putIf(currentCacheSize >= 0, "Size of BDD cache", currentCacheSize)
-          .put(cleanupQueueSize)
-          .put(cleanupTimer)
-          .put(
-              "Time for BDD garbage collection",
-              TimeSpan.ofMillis(stats.sumtime).formatAs(SECONDS) + " (in " + stats.num + " runs)");
-
-      // Cache stats are disabled in JFactory (CACHESTATS = false)
-      // out.println(factory.getCacheStats());
-    } catch (UnsupportedOperationException e) {
-      // Not all factories might have all statistics supported.
-      // As statistics are not that important, just ignore it.
-    }
-  }
+  //
+  // @Override
+  // public void printStatistics(PrintStream out) {
+  // try {
+  // BDDFactory.GCStats stats = factory.getGCStats();
+  // int currentCacheSize = readCacheSize();
+  //
+  // writingStatisticsTo(out).put("Number of BDD nodes", factory.getNodeNum())
+  // .put("Size of BDD node table", factory.getNodeTableSize())
+  // .putIf(currentCacheSize >= 0, "Size of BDD cache", currentCacheSize)
+  // .put(cleanupQueueSize)
+  // .put(cleanupTimer)
+  // .put(
+  // "Time for BDD garbage collection",
+  // TimeSpan.ofMillis(stats.sumtime).formatAs(SECONDS) + " (in " + stats.num + " runs)");
+  //
+  // // Cache stats are disabled in JFactory (CACHESTATS = false)
+  // // out.println(factory.getCacheStats());
+  // } catch (UnsupportedOperationException e) {
+  // // Not all factories might have all statistics supported.
+  // // As statistics are not that important, just ignore it.
+  // }
+  // }
 
   /**
    * Return the current size of the cache of the BDD library. Returns -1 if value cannot be read.
@@ -279,8 +272,8 @@ class JavaBDDRegionManager implements RegionManager {
    * thread in the background, but the BDD library is not multi-threaded.
    */
   private void cleanupReferences() {
-    cleanupTimer.start();
-    try {
+    // cleanupTimer.start();
+    // try {
       int count = 0;
       Reference<? extends JavaBDDRegion> ref;
       while ((ref = referenceQueue.poll()) != null) {
@@ -290,11 +283,11 @@ class JavaBDDRegionManager implements RegionManager {
         assert bdd != null;
         bdd.free();
       }
-      cleanupQueueSize.setNextValue(count);
-    } finally {
-      cleanupTimer.stop();
+    // cleanupQueueSize.setNextValue(count);
+    // } finally {
+    // cleanupTimer.stop();
     }
-  }
+
 
   /**
    * Wrap a BDD object in a JavaBDDRegion and register it so that we can free the BDD after the
@@ -422,11 +415,11 @@ class JavaBDDRegionManager implements RegionManager {
   @Override
   public Region fromFormula(
       BooleanFormula pF,
-      FormulaManagerView fmgr,
+      FormulaManager fmgr,
       Function<BooleanFormula, Region> atomToRegion) {
     cleanupReferences();
 
-    BooleanFormulaManagerView bfmgr = fmgr.getBooleanFormulaManager();
+    BooleanFormulaManager bfmgr = fmgr.getBooleanFormulaManager();
     if (bfmgr.isFalse(pF)) {
       return makeFalse();
     }
@@ -459,7 +452,7 @@ class JavaBDDRegionManager implements RegionManager {
   }
 
   @Override
-  public void reorder(PredicateOrderingStrategy strategy) {
+  public void reorder(BddPredicateOrderingStrategy strategy) {
     switch (strategy) {
       case FRAMEWORK_RANDOM:
         factory.reorder(BDDFactory.REORDER_RANDOM);
@@ -606,7 +599,7 @@ class JavaBDDRegionManager implements RegionManager {
     private final BooleanFormulaManager bfmgr;
 
     FormulaToRegionConverter(
-        FormulaManagerView pFmgr,
+        FormulaManager pFmgr,
         Function<BooleanFormula, Region> pAtomToRegion) {
       atomToRegion = pAtomToRegion;
       bfmgr = pFmgr.getBooleanFormulaManager();

@@ -67,16 +67,18 @@ public class BDDManagerFactory {
     logger = pLogger;
   }
 
+
   public RegionManager createRegionManager() throws InvalidConfigurationException {
-    RegionManager rmgr;
-    if (bddPackage.equals("SYLVAN")) {
-      rmgr = new SylvanBDDRegionManager(config, logger);
-    } else {
-      rmgr = new JavaBDDRegionManager(bddPackage, config, logger);
-    }
+    RegionManager rmgr = null;
+
+
     if (synchronizeLibraryAccess) {
       rmgr = new SynchronizedRegionManager(rmgr);
+    }  else {
+      rmgr = new JavaBDDRegionManager(bddPackage, config, logger);
+    return rmgr;
     }
     return rmgr;
   }
-}
+  }
+

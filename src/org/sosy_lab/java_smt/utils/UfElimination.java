@@ -332,11 +332,11 @@ public class UfElimination {
   @AutoValue
   abstract static class UninterpretedFunctionApplication {
 
-    static UninterpretedFunctionApplication create(
-        Formula pF, List<Formula> pArguments, Formula pSubstitution) {
-      return new AutoValue_UfElimination_UninterpretedFunctionApplication(
-          pF, pArguments, pSubstitution);
-    }
+	  static UninterpretedFunctionApplication create(
+		        Formula pF, List<Formula> pArguments, Formula pSubstitution) {
+		      return new AutoValue_UfElimination_UninterpretedFunctionApplication(
+		          pF, pArguments, pSubstitution);
+		    }
 
     abstract Formula getFormula();
 

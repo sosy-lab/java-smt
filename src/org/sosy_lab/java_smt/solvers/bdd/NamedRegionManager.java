@@ -8,7 +8,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +18,7 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders.AbstractAppender;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -219,12 +219,12 @@ public class NamedRegionManager implements RegionManager {
   public void setVarOrder(ArrayList<Integer> pOrder) {}
 
   @Override
-  public void reorder(PredicateOrderingStrategy strategy) {}
+  public void reorder(BddPredicateOrderingStrategy strategy) {}
 
   @Override
   public Region fromFormula(
       BooleanFormula pF,
-      FormulaManagerView pFmgr,
+      FormulaManager pFmgr,
       Function<BooleanFormula, Region> pAtomToRegion) {
     return delegate.fromFormula(pF, pFmgr, pAtomToRegion);
   }
@@ -232,14 +232,6 @@ public class NamedRegionManager implements RegionManager {
   @Override
   public Triple<Region, Region, Region> getIfThenElse(Region pF) {
     return delegate.getIfThenElse(pF);
-  }
-
-  @Override
-  public void printStatistics(PrintStream out) {
-    out.println(
-        "Number of named predicates:          "
-            + (regionMap.size() - anonymousPredicateCounter.get()));
-    delegate.printStatistics(out);
   }
 
   @Override
