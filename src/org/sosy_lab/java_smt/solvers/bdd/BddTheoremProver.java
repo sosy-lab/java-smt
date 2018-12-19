@@ -19,6 +19,99 @@
  */
 package org.sosy_lab.java_smt.solvers.bdd;
 
-public class BddTheoremProver {
+import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import javax.annotation.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
+
+public class BddTheoremProver implements ProverEnvironment {
+
+  public BddTheoremProver(
+      BddSolverContext pBddSolverContext,
+      ShutdownNotifier pShutdownNotifier,
+      BddFormulaCreator pCreator,
+      Set<ProverOptions> pOptions) {
+    // TODO Auto-generated constructor stub
+  }
+
+  @Override
+  public void pop() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  @Nullable
+  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void push() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public boolean isUnsat() throws SolverException, InterruptedException {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>>
+      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
+          throws SolverException, InterruptedException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void close() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
+      throws InterruptedException, SolverException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }
