@@ -26,5 +26,6 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/java/runtime/javabdd.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
