@@ -174,8 +174,7 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case BDD:
-        return BddSolverContext
-            .create(config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);
+        return BddSolverContext.create(logger, config, shutdownNotifier);
 
       default:
         throw new AssertionError("no solver selected");

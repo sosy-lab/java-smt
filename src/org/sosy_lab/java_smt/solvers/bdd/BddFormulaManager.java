@@ -1,20 +1,30 @@
 
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
+import com.microsoft.z3.FuncDecl;
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-public class BddFormulaManager {
+public class BddFormulaManager
+    extends AbstractFormulaManager<Region, BddSort, NamedRegionManager, FuncDecl> {
 
-  private final RegionManager rmgr;
+  public BddFormulaManager(
+      BddFormulaCreator creator,
+      BddBooleanFormulaManager booleanMgr) {
+    super(creator, null, booleanMgr, null, null, null, null, null, null);
+  }
 
-  public BddFormulaManager(Configuration config, LogManager logger)
-      throws InvalidConfigurationException {
-    BDDManagerFactory factory = new BDDManagerFactory(config, logger);
-    rmgr = factory.createRegionManager();
+  @Override
+  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-
+  @Override
+  public Appender dumpFormula(Region pT) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 

@@ -3,17 +3,20 @@ package org.sosy_lab.java_smt.solvers.bdd;
 
 
 import com.microsoft.z3.FuncDecl;
+import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.bdd.BddFormula.BddBooleanFormula;
 import org.sosy_lab.java_smt.solvers.bdd.BddSort.BddBooleanSort;
 
 
 
-abstract class BddFormulaCreator
+class BddFormulaCreator
     extends FormulaCreator<Region, BddSort, NamedRegionManager, FuncDecl> {
 
   // private final BiMap<String, Region> cache = HashBiMap.create();
@@ -90,6 +93,47 @@ abstract class BddFormulaCreator
 
     }
 
+  @Override
+  public BddSort getBitvectorType(int pBitwidth) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public BddSort getFloatingPointType(FloatingPointType pType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public BddSort getArrayType(BddSort pIndexType, BddSort pElementType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Region pF) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Region callFunctionImpl(FuncDecl pDeclaration, List<Region> pArgs) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public FuncDecl declareUFImpl(String pName, BddSort pReturnType, List<BddSort> pArgTypes) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  protected FuncDecl getBooleanVarDeclarationImpl(Region pTFormulaInfo) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 
 }

@@ -2,16 +2,15 @@ package org.sosy_lab.java_smt.solvers.bdd;
 
 import com.microsoft.z3.FuncDecl;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class BddBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Region, BddSort, RegionManager, FuncDecl>
+    extends AbstractBooleanFormulaManager<Region, BddSort, NamedRegionManager, FuncDecl>
 {
 
   private final RegionManager rmgr;
 
   protected BddBooleanFormulaManager(
-      FormulaCreator<Region, BddSort, RegionManager, FuncDecl> pCreator) {
+      BddFormulaCreator pCreator) {
     super(pCreator);
     this.rmgr = pCreator.getEnv();
 
