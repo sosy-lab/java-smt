@@ -64,7 +64,8 @@ public final class BddSolverContext extends AbstractSolverContext {
     NamedRegionManager rmgr = new NamedRegionManager(nestedRmgr);
     BddFormulaCreator creator = new BddFormulaCreator(rmgr, BddBooleanSort.getInstance());
     BddBooleanFormulaManager bfmgr = new BddBooleanFormulaManager(creator);
-    FormulaManager fmgr = new BddFormulaManager(creator, bfmgr);
+    BddUFManager ufmgr = new BddUFManager(creator);
+    FormulaManager fmgr = new BddFormulaManager(creator, bfmgr, ufmgr);
     return new BddSolverContext(logger, fmgr, creator, pShutdownNotifier);
 }
 

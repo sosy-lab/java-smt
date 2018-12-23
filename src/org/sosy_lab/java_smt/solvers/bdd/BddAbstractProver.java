@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.bdd;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
@@ -30,24 +29,33 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-public class BddTheoremProver implements ProverEnvironment {
+public class BddAbstractProver<T, E> extends AbstractProver<E> {
+
+  protected final BddSolverContext context;
+  protected final BddFormulaCreator creator;
+  protected final BddFormulaManager manager;
+  protected final ShutdownNotifier shutdownNotifier;
+
 
   protected boolean closed = false;
 
-
-
-
-  public BddTheoremProver(
-      BddSolverContext pBddSolverContext,
-      ShutdownNotifier pShutdownNotifier,
+  protected BddAbstractProver(
+      BddSolverContext pContext,
+      Set<ProverOptions> pOptions,
       BddFormulaCreator pCreator,
-      Set<ProverOptions> pPOptions) {
-    // TODO Auto-generated constructor stub
+      ShutdownNotifier pShutdownNotifier,
+      BddFormulaManager pManager) {
+    super(pOptions);
+    context = pContext;
+    creator = pCreator;
+    manager = pManager;
+    shutdownNotifier = pShutdownNotifier;
   }
+
 
   @Override
   public void pop() {
@@ -57,9 +65,8 @@ public class BddTheoremProver implements ProverEnvironment {
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
-
+  public E addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+    // TODO Auto-generated method stub
     return null;
   }
 

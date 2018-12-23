@@ -11,8 +11,9 @@ public class BddFormulaManager
 
   public BddFormulaManager(
       BddFormulaCreator creator,
-      BddBooleanFormulaManager booleanMgr) {
-    super(creator, null, booleanMgr, null, null, null, null, null, null);
+      BddBooleanFormulaManager booleanMgr,
+      BddUFManager fMgr) {
+    super(creator, fMgr, booleanMgr, null, null, null, null, null, null);
   }
 
   @Override
