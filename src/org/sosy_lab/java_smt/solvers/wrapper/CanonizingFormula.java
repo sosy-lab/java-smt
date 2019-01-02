@@ -24,12 +24,6 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 
 public interface CanonizingFormula {
 
-  public void add(CanonizingFormula pFormula);
-
-  public void setParent(CanonizingFormula pFormula);
-
-  public CanonizingFormula getParent();
-
   default CanonizingFormula getOperand1() {
     return null;
   }

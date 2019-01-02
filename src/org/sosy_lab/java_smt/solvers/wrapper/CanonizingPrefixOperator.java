@@ -19,69 +19,36 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 public class CanonizingPrefixOperator implements CanonizingFormula {
 
   private FormulaManager mgr;
   private FormulaType<?> returnType;
   private FunctionDeclarationKind operator;
-  private List<CanonizingFormula> operands;
-  private int operand = 0;
-  private int operandSize = 0;
-
-  private CanonizingFormula parent;
+  private ImmutableList<CanonizingFormula> operands;
 
   public CanonizingPrefixOperator(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
-      int pOperands,
-      FormulaType<?> pReturnType) {
-    mgr = pMgr;
-    operator = pKind;
-    operandSize = pOperands;
-    operands = new ArrayList<>(pOperands);
-    returnType = pReturnType;
-  }
-
-  private CanonizingPrefixOperator(
-      FormulaManager pMgr,
-      FunctionDeclarationKind pKind,
-      int pOperand,
       List<CanonizingFormula> pOperands,
-      int pOperandSize,
       FormulaType<?> pReturnType) {
     mgr = pMgr;
     operator = pKind;
-    operands = pOperands;
-    operand = pOperand;
-    operandSize = pOperandSize;
+    operands = ImmutableList.copyOf(pOperands);
     returnType = pReturnType;
-  }
-
-  @Override
-  public void add(CanonizingFormula pFormula) {
-    if (operand < operandSize) {
-      operands.add(operand++, pFormula);
-      pFormula.setParent(this);
-    } else {
-      assert false;
-    }
-  }
-
-  @Override
-  public void setParent(CanonizingFormula pFormula) {
-    parent = pFormula;
-  }
-
-  @Override
-  public CanonizingFormula getParent() {
-    return parent;
   }
 
   @Override
@@ -110,26 +77,61 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
   @Override
   public CanonizingFormula copy() {
     List<CanonizingFormula> operandsCopy = new ArrayList<>();
-    for (int i = 0; i < operand; i++) {
+    for (int i = 0; i < operands.size(); i++) {
       operandsCopy.set(i, operands.get(i).copy());
     }
 
     CanonizingFormula copy =
-        new CanonizingPrefixOperator(mgr, operator, operand, operandsCopy, operandSize, returnType);
+        new CanonizingPrefixOperator(mgr, operator, operandsCopy, returnType);
 
     return copy;
   }
 
   @Override
-  public BooleanFormula toFormula(FormulaManager pMgr) {
-    // TODO Auto-generated method stub
-    return null;
+  public Formula toFormula(FormulaManager pMgr) {
+    Formula formula = null;
+
+    if (returnType.isBitvectorType()) {
+      BitvectorFormulaManager bmgr = pMgr.getBitvectorFormulaManager();
+      BitvectorFormula[] bvOperands = new BitvectorFormula[operands.size()];
+      for (int i = 0; i < bvOperands.length; i++) {
+        bvOperands[i] = (BitvectorFormula) operands.get(i).toFormula(pMgr);
+      }
+
+      switch (operator) {
+        case BV_EXTRACT:
+          // FIXME: how to determine sign?
+          // handle operands 1 and 2 meaningfully
+          //          formula = bmgr.extract(bvOperands[0], operands.get(1), bvOperands[2], signed);
+          break;
+        default:
+          throw new IllegalStateException(
+              "Handling for PrefixOperator " + operator + " not yet implemented.");
+      }
+    } else if (returnType.isIntegerType()) {
+      IntegerFormulaManager bmgr = pMgr.getIntegerFormulaManager();
+      IntegerFormula[] bvOperands = new IntegerFormula[operands.size()];
+      for (int i = 0; i < bvOperands.length; i++) {
+        bvOperands[i] = (IntegerFormula) operands.get(i).toFormula(pMgr);
+      }
+    } else if (returnType.isFloatingPointType()) {
+      FloatingPointFormulaManager bmgr = pMgr.getFloatingPointFormulaManager();
+      FloatingPointFormula[] bvOperands = new FloatingPointFormula[operands.size()];
+      for (int i = 0; i < bvOperands.length; i++) {
+        bvOperands[i] = (FloatingPointFormula) operands.get(i).toFormula(pMgr);
+      }
+    }
+
+    return formula;
   }
 
   @Override
   public CanonizingFormula canonize() {
     return CanonizingStrategy.canonizePrefixOperator(
-        mgr, operator, operands, operandSize, returnType);
+        mgr,
+        operator,
+        operands,
+        returnType);
   }
 
   public FormulaType<?> getType() {

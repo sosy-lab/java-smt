@@ -34,48 +34,21 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
   private FormulaManager mgr;
   private FormulaType<?> returnType;
-  private CanonizingFormula parent;
   private FunctionDeclarationKind operator;
   private CanonizingFormula left;
   private CanonizingFormula right;
 
   public CanonizingInfixOperator(
-      FormulaManager pMgr, FunctionDeclarationKind pKind, FormulaType<?> pReturnType) {
-    this(pMgr, null, pKind, pReturnType);
-  }
-
-  public CanonizingInfixOperator(
       FormulaManager pMgr,
-      CanonizingFormula pParent,
       FunctionDeclarationKind pKind,
+      CanonizingFormula pLeft,
+      CanonizingFormula pRight,
       FormulaType<?> pReturnType) {
     mgr = pMgr;
-    parent = pParent;
     operator = pKind;
+    left = pLeft;
+    right = pRight;
     returnType = pReturnType;
-  }
-
-  @Override
-  public void add(CanonizingFormula pFormula) {
-    if (left == null) {
-      left = pFormula;
-      left.setParent(this);
-    } else if (right == null) {
-      right = pFormula;
-      right.setParent(this);
-    } else {
-      assert false;
-    }
-  }
-
-  @Override
-  public void setParent(CanonizingFormula pFormula) {
-    parent = pFormula;
-  }
-
-  @Override
-  public CanonizingFormula getParent() {
-    return parent;
   }
 
   @Override
@@ -94,15 +67,8 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
   @Override
   public CanonizingFormula copy() {
-    CanonizingFormula copy = new CanonizingInfixOperator(mgr, operator, returnType);
-
-    if (left != null) {
-      copy.add(left.copy());
-    }
-
-    if (right != null) {
-      copy.add(right.copy());
-    }
+    CanonizingFormula copy =
+        new CanonizingInfixOperator(mgr, operator, left.copy(), right.copy(), returnType);
 
     return copy;
   }
@@ -129,9 +95,11 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_CONCAT:
           formula = bmgr.concat(lFormula, rFormula);
           break;
+          // FIXME: returnType.isBoolean() ?
         case BV_EQ:
           formula = bmgr.equal(lFormula, rFormula);
           break;
+          // FIXME - end
         case BV_LSHR:
           formula = bmgr.shiftRight(lFormula, rFormula, false);
           break;
@@ -144,6 +112,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_SDIV:
           formula = bmgr.divide(lFormula, rFormula, true);
           break;
+          // FIXME: returnType.isBoolean() ?
         case BV_SGE:
           formula = bmgr.greaterOrEquals(lFormula, rFormula, true);
           break;
@@ -156,9 +125,11 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_SLT:
           formula = bmgr.lessThan(lFormula, rFormula, true);
           break;
+          // FIXME - end
         case BV_UDIV:
           formula = bmgr.divide(lFormula, rFormula, false);
           break;
+          // FIXME: returnType.isBoolean() ?
         case BV_UGE:
           formula = bmgr.greaterOrEquals(lFormula, rFormula, false);
           break;
@@ -171,6 +142,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_ULT:
           formula = bmgr.lessThan(lFormula, rFormula, false);
           break;
+          // FIXME - end
         case BV_SHL:
           formula = bmgr.shiftLeft(lFormula, rFormula);
           break;

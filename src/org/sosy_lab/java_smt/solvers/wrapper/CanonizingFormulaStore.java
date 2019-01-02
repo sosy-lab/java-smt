@@ -24,7 +24,6 @@ import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 
 public class CanonizingFormulaStore {
 
@@ -105,46 +104,21 @@ public class CanonizingFormulaStore {
     // TODO implement
   }
 
-  public void storeInfixOperator(FunctionDeclarationKind pKind) {
-    CanonizingFormula op = new CanonizingInfixOperator(mgr, pKind, nextLiteralsType);
-    if (currentConstraint != null) {
-      currentConstraint.add(op);
+  public void storeOperator(CanonizingFormula pOp) {
+    if (currentConstraint == null) {
+      currentConstraint = pOp;
     }
-    currentConstraint = op;
-  }
-
-  public void storePrefixOperator(FunctionDeclarationKind pKind, int pOperands) {
-    CanonizingFormula op = new CanonizingPrefixOperator(mgr, pKind, pOperands, nextLiteralsType);
-    if (currentConstraint != null) {
-      currentConstraint.add(op);
-    }
-    currentConstraint = op;
   }
 
   public void storeType(FormulaType<?> pFormulaType) {
     nextLiteralsType = pFormulaType;
   }
 
-  public void storeVariable(String pName) {
-    assert currentConstraint != null;
-
-    currentConstraint.add(new CanonizingVariable(mgr, pName, nextLiteralsType));
-    nextLiteralsType = null;
-  }
-
-  public void storeConstant(Object pValue) {
-    assert currentConstraint != null;
-
-    currentConstraint.add(new CanonizingConstant(mgr, pValue, nextLiteralsType));
-    nextLiteralsType = null;
-  }
-
-  public void closeOperand() {
+  public void closeOperand(CanonizingFormula pFormula) {
     if (currentConstraint != null) {
-      if (currentConstraint.getParent() == null) {
+      if (currentConstraint.equals(pFormula)) {
         addConstraint(currentConstraint);
       }
-      currentConstraint = currentConstraint.getParent();
     } else {
       assert false;
     }
@@ -156,5 +130,11 @@ public class CanonizingFormulaStore {
     }
 
     constraints.add(pConstraint);
+  }
+
+  public FormulaType<?> popType() {
+    FormulaType<?> pop = nextLiteralsType;
+    nextLiteralsType = null;
+    return pop;
   }
 }

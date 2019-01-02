@@ -29,27 +29,10 @@ public class CanonizingVariable implements CanonizingFormula {
   private String name;
   private FormulaType<?> type;
 
-  private CanonizingFormula parent;
-
   public CanonizingVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
     mgr = pMgr;
     name = pName;
     type = pType;
-  }
-
-  @Override
-  public void add(CanonizingFormula pFormula) {
-    assert false;
-  }
-
-  @Override
-  public void setParent(CanonizingFormula pFormula) {
-    parent = pFormula;
-  }
-
-  @Override
-  public CanonizingFormula getParent() {
-    return parent;
   }
 
   public String getName() {

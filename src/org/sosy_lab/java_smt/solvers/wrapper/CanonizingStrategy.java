@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -54,9 +55,8 @@ public class CanonizingStrategy {
       right = add(pMgr, right, epsilon, pReturnType);
     }
 
-    CanonizingInfixOperator result = new CanonizingInfixOperator(pMgr, operator, pReturnType);
-    result.add(left);
-    result.add(right);
+    CanonizingInfixOperator result =
+        new CanonizingInfixOperator(pMgr, operator, left, right, pReturnType);
 
     return result;
   }
@@ -81,9 +81,7 @@ public class CanonizingStrategy {
 
     if (pFormula instanceof CanonizingVariable) {
       CanonizingInfixOperator operator =
-          new CanonizingInfixOperator(pMgr, pFormula.getParent(), kind, pReturnType);
-      operator.add(pFormula);
-      operator.add(pEpsilon);
+          new CanonizingInfixOperator(pMgr, kind, pFormula, pEpsilon, pReturnType);
 
       result = operator;
     } else if (pFormula instanceof CanonizingConstant) {
@@ -185,13 +183,14 @@ public class CanonizingStrategy {
       FormulaManager pMgr,
       FunctionDeclarationKind pOperator,
       List<CanonizingFormula> pOperands,
-      int pOperandSize,
       FormulaType<?> pReturnType) {
-    CanonizingPrefixOperator canonizedFormula =
-        new CanonizingPrefixOperator(pMgr, pOperator, pOperandSize, pReturnType);
+    List<CanonizingFormula> args = new ArrayList<>();
     for (CanonizingFormula operandToCanonize : pOperands) {
-      canonizedFormula.add(operandToCanonize.canonize());
+      args.add(operandToCanonize.canonize());
     }
+
+    CanonizingPrefixOperator canonizedFormula =
+        new CanonizingPrefixOperator(pMgr, pOperator, args, pReturnType);
     return canonizedFormula;
   }
 }

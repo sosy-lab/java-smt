@@ -30,27 +30,10 @@ public class CanonizingConstant implements CanonizingFormula {
   private Object value;
   private FormulaType<?> type;
 
-  private CanonizingFormula parent;
-
   public CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
     mgr = pMgr;
     value = pValue;
     type = pType;
-  }
-
-  @Override
-  public void add(CanonizingFormula pFormula) {
-    assert false;
-  }
-
-  @Override
-  public void setParent(CanonizingFormula pFormula) {
-    parent = pFormula;
-  }
-
-  @Override
-  public CanonizingFormula getParent() {
-    return parent;
   }
 
   public Object getValue() {

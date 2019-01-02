@@ -19,15 +19,17 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
-public class CanonizingFormulaVisitor implements FormulaVisitor<Void> {
+public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormula> {
 
   private final CanonizingFormulaStore store;
   private final FormulaManager mgr;
@@ -42,58 +44,66 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitFreeVariable(Formula pF, String pName) {
-    store.storeVariable(pName);
-
-    return null;
+  public CanonizingFormula visitFreeVariable(Formula pF, String pName) {
+    return new CanonizingVariable(mgr, pName, store.popType());
   }
 
   @Override
-  public Void visitBoundVariable(Formula pF, int pDeBruijnIdx) {
+  public CanonizingFormula visitBoundVariable(Formula pF, int pDeBruijnIdx) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Void visitConstant(Formula pF, Object pValue) {
-    store.storeConstant(pValue);
-
-    return null;
+  public CanonizingFormula visitConstant(Formula pF, Object pValue) {
+    return new CanonizingConstant(mgr, pValue, store.popType());
   }
 
   @Override
-  public Void visitFunction(
+  public CanonizingFormula visitFunction(
       Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+    CanonizingFormula function = null;
+    FormulaType<?> returnType = pFunctionDeclaration.getType();
+
     switch (pArgs.size()) {
       case 1:
       case 3:
-        store.storePrefixOperator(pFunctionDeclaration.getKind(), pArgs.size());
+        List<CanonizingFormula> args = new ArrayList<>();
 
         for (int i = 0; i < pArgs.size(); i++) {
           store.storeType(pFunctionDeclaration.getArgumentTypes().get(i));
-          mgr.visit(pArgs.get(i), this);
+          args.add(mgr.visit(pArgs.get(i), this));
         }
+
+        function =
+            new CanonizingPrefixOperator(mgr, pFunctionDeclaration.getKind(), args, returnType);
         break;
       case 2:
-        store.storeInfixOperator(pFunctionDeclaration.getKind());
-
         store.storeType(pFunctionDeclaration.getArgumentTypes().get(0));
-        mgr.visit(pArgs.get(0), this);
-
+        CanonizingFormula left = mgr.visit(pArgs.get(0), this);
         store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
-        mgr.visit(pArgs.get(1), this);
+        CanonizingFormula right = mgr.visit(pArgs.get(1), this);
+
+        function =
+            new CanonizingInfixOperator(
+                mgr,
+                pFunctionDeclaration.getKind(),
+                left,
+                right,
+                returnType);
         break;
       default:
         // TODO: Exception/Error/Not implemented/...
     }
 
-    store.closeOperand();
+    store.storeOperator(function);
+    store.closeOperand(function);
 
-    return null;
+    return function;
   }
 
   @Override
-  public Void visitQuantifier(
+  public CanonizingFormula visitQuantifier(
       BooleanFormula pF,
       Quantifier pQuantifier,
       List<Formula> pBoundVariables,
