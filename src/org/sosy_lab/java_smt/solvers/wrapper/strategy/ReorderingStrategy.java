@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2018  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,25 +17,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper;
+package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.solvers.wrapper.CanonizingConstant;
+import org.sosy_lab.java_smt.solvers.wrapper.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.CanonizingInfixOperator;
+import org.sosy_lab.java_smt.solvers.wrapper.CanonizingVariable;
 
-public class CanonizingStrategy {
+public class ReorderingStrategy implements CanonizingStrategy {
 
-  public static CanonizingFormula canonizeInfixOperator(
+  @Override
+  public CanonizingFormula canonizeInfixOperator(
       FormulaManager pMgr,
       FunctionDeclarationKind pOperator,
       CanonizingFormula pLeft,
       CanonizingFormula pRight,
       FormulaType<?> pReturnType) {
     FunctionDeclarationKind operator = pOperator;
-    CanonizingFormula left = pLeft.canonize();
-    CanonizingFormula right = pRight.canonize();
+    CanonizingFormula left = pLeft.canonize(this);
+    CanonizingFormula right = pRight.canonize(this);
 
     if (isGreaterOp(pOperator)) {
       // TODO: find meaningful handling of arrays
@@ -110,8 +113,8 @@ public class CanonizingStrategy {
     return result;
   }
 
-  private static CanonizingConstant getMinimumSummand(
-      FormulaManager pMgr, FormulaType<?> pReturnType) {
+  private static CanonizingConstant
+      getMinimumSummand(FormulaManager pMgr, FormulaType<?> pReturnType) {
     if (pReturnType.isIntegerType() || pReturnType.isBitvectorType()) {
       return new CanonizingConstant(pMgr, Integer.valueOf(1), pReturnType);
     }
@@ -165,32 +168,5 @@ public class CanonizingStrategy {
       answer = true;
     }
     return answer;
-  }
-
-  public static CanonizingFormula canonizeVariable(
-      FormulaManager pMgr, String pName, FormulaType<?> pType) {
-    String canonizedName = canonizeVariableName(pName);
-
-    return new CanonizingVariable(pMgr, canonizedName, pType);
-  }
-
-  private static String canonizeVariableName(String pName) {
-    // TODO: Implement some (hopefully) useful renaming strategy
-    return pName;
-  }
-
-  public static CanonizingFormula canonizePrefixOperator(
-      FormulaManager pMgr,
-      FunctionDeclarationKind pOperator,
-      List<CanonizingFormula> pOperands,
-      FormulaType<?> pReturnType) {
-    List<CanonizingFormula> args = new ArrayList<>();
-    for (CanonizingFormula operandToCanonize : pOperands) {
-      args.add(operandToCanonize.canonize());
-    }
-
-    CanonizingPrefixOperator canonizedFormula =
-        new CanonizingPrefixOperator(pMgr, pOperator, args, pReturnType);
-    return canonizedFormula;
   }
 }

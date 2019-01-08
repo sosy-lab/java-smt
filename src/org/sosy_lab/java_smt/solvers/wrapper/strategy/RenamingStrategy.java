@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2018  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,33 +17,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper;
+package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.solvers.wrapper.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.CanonizingVariable;
 
-public interface CanonizingFormula {
+public class RenamingStrategy implements CanonizingStrategy {
 
-  default CanonizingFormula getOperand1() {
-    return null;
+  @Override
+  public CanonizingFormula
+      canonizeVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
+    String canonizedName = canonizeVariableName(pName);
+
+    return new CanonizingVariable(pMgr, canonizedName, pType);
   }
 
-  default CanonizingFormula getOperand2() {
-    return null;
+  private static String canonizeVariableName(String pName) {
+    // TODO: Implement some (hopefully) useful renaming strategy
+    return pName;
   }
-
-  default CanonizingFormula getOperand3() {
-    return null;
-  }
-
-  public CanonizingFormula copy();
-
-  public Formula toFormula(FormulaManager pMgr);
-
-  public CanonizingFormula canonize(CanonizingStrategy pStrategy);
-
-  public FormulaManager getFormulaManager();
-
-  public void toString(StringBuilder pBuilder);
 }

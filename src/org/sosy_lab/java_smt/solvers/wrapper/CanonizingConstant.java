@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingConstant implements CanonizingFormula {
 
@@ -74,7 +75,7 @@ public class CanonizingConstant implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize() {
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
     return copy();
   }
 

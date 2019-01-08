@@ -19,11 +19,15 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.IdentityStrategy;
 
 public class CanonizingFormulaStore {
 
@@ -35,8 +39,15 @@ public class CanonizingFormulaStore {
 
   private FormulaManager mgr;
 
+  private List<CanonizingStrategy> strategies;
+
   public CanonizingFormulaStore(FormulaManager pMgr) {
-    this(pMgr, null, null, null, null);
+    this(pMgr, null, null, null, null, new ArrayList<CanonizingStrategy>() {
+      private static final long serialVersionUID = 1L;
+      {
+        add(new IdentityStrategy());
+      }
+    });
   }
 
   public CanonizingFormulaStore(
@@ -44,18 +55,25 @@ public class CanonizingFormulaStore {
       CanonizingFormula pFormula,
       FormulaType<?> pType,
       Set<CanonizingFormula> pConstraints,
-      Set<CanonizingFormula> pCanonizedConstraints) {
+      Set<CanonizingFormula> pCanonizedConstraints,
+      List<CanonizingStrategy> pStrategies) {
     mgr = pMgr;
     currentConstraint = pFormula;
     nextLiteralsType = pType;
     constraints = pConstraints;
     canonizedConstraints = pCanonizedConstraints;
+    strategies = pStrategies;
   }
 
   public CanonizingFormulaStore copy() {
     CanonizingFormula constraint = currentConstraint != null ? currentConstraint.copy() : null;
     return new CanonizingFormulaStore(
-        mgr, constraint, nextLiteralsType, constraints, canonizedConstraints);
+        mgr,
+        constraint,
+        nextLiteralsType,
+        constraints,
+        canonizedConstraints,
+        strategies);
   }
 
   public BooleanFormula getFormula() {
@@ -66,8 +84,13 @@ public class CanonizingFormulaStore {
 
   private void canonize() {
     canonizedConstraints = new HashSet<>();
+
     for (CanonizingFormula cF : constraints) {
-      canonizedConstraints.add(cF.canonize());
+      CanonizingFormula canonizedF = cF;
+      for (CanonizingStrategy strategy : strategies) {
+        canonizedF = canonizedF.canonize(strategy);
+      }
+      canonizedConstraints.add(canonizedF);
     }
   }
 

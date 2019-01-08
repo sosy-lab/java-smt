@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.wrapper;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingVariable implements CanonizingFormula {
 
@@ -56,8 +57,8 @@ public class CanonizingVariable implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize() {
-    return CanonizingStrategy.canonizeVariable(mgr, name, type);
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
+    return pStrategy.canonizeVariable(mgr, name, type);
   }
 
   @Override

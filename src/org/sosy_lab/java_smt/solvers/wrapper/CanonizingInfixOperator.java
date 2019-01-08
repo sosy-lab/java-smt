@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingInfixOperator implements CanonizingFormula {
 
@@ -245,8 +246,8 @@ public class CanonizingInfixOperator implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize() {
-    return CanonizingStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType);
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
+    return pStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType);
   }
 
   public FormulaType<?> getType() {
