@@ -13,7 +13,7 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>1.0.1</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -28,7 +28,7 @@ If your build tool supports fetching packages from [Apache Ivy](https://ant.apac
 After the repository URL is configured, you only need to add the following dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt" rev="0.60" />
+<dependency org="org.sosy_lab" name="javasmt" rev="2.0.0" />
 ```
 
 ### Manual Installation
@@ -36,16 +36,16 @@ After the repository URL is configured, you only need to add the following depen
 JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository][] manually. In order to perform the manual installation, the following steps should be followed:
 
  - The desired version has to be chosen.
-   Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/).
- - Suppose the version `1.0.1` was chosen.
-   Ivy description file [`ivy-1.0.1.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt/ivy-1.0.1.xml) can
+   Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
+ - Suppose the version `2.0.0` was chosen.
+   Ivy description file [`ivy-2.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-2.0.0.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `javasmt-1.0.1.jar` and (optionally)
-   `javasmt-1.0.1-sources.jar`, located in the same directory.
+   In the example case, those are `javasmt-2.0.0.jar` and (optionally)
+   `javasmt-2.0.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
-   E.g. in the example, Z3 version `z3-4.4.1-1394-gd12efb6` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.4.1-1558-gf96cfea.xml)
+   E.g. in the example, Z3 version `z3-4.7.1` is specified,
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.7.1.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
