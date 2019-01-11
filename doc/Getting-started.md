@@ -28,7 +28,7 @@ If your build tool supports fetching packages from [Apache Ivy](https://ant.apac
 After the repository URL is configured, you only need to add the following dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt" rev="2.0.0" />
+<dependency org="org.sosy_lab" name="java-smt" rev="2.0.0" />
 ```
 
 ### Manual Installation
