@@ -45,7 +45,7 @@ JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository
    `java-smt-2.0.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
    E.g. in the example, Z3 version `z3-4.7.1` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-z3-4.7.1.xml)
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.7.1.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
