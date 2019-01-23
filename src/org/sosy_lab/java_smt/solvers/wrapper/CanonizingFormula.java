@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.wrapper;
 
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public interface CanonizingFormula {
@@ -46,4 +47,6 @@ public interface CanonizingFormula {
   public FormulaManager getFormulaManager();
 
   public void toString(StringBuilder pBuilder);
+
+  FormulaType<?> getType();
 }

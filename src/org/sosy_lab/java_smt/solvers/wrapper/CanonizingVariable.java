@@ -30,6 +30,8 @@ public class CanonizingVariable implements CanonizingFormula {
   private String name;
   private FormulaType<?> type;
 
+  private Integer hashCode = null;
+
   public CanonizingVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
     mgr = pMgr;
     name = pName;
@@ -40,6 +42,7 @@ public class CanonizingVariable implements CanonizingFormula {
     return name;
   }
 
+  @Override
   public FormulaType<?> getType() {
     return type;
   }
@@ -74,5 +77,29 @@ public class CanonizingVariable implements CanonizingFormula {
   @Override
   public void toString(StringBuilder pBuilder) {
     pBuilder.append(name);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof CanonizingVariable)) {
+      return false;
+    }
+    CanonizingVariable other = (CanonizingVariable) o;
+    return type.equals(other.type) && name.equals(other.name);
+  }
+
+  @Override
+  public int hashCode() {
+    int prime = 43;
+    int result = 1;
+    if (hashCode == null) {
+      result = prime * result + type.hashCode();
+      result = prime * result + name.hashCode();
+      hashCode = result;
+    }
+    return hashCode;
   }
 }

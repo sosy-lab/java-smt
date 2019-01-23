@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingOptimizationEnvironmentWrapper implements OptimizationProverEnvironment {
 
@@ -40,10 +41,12 @@ public class CanonizingOptimizationEnvironmentWrapper implements OptimizationPro
   private CanonizingFormulaVisitor visitor;
 
   public CanonizingOptimizationEnvironmentWrapper(
-      OptimizationProverEnvironment pEnv, FormulaManager pFormulaManager) {
+      OptimizationProverEnvironment pEnv,
+      FormulaManager pFormulaManager,
+      List<CanonizingStrategy> pStrategies) {
     delegate = pEnv;
     fmgr = pFormulaManager;
-    visitor = new CanonizingFormulaVisitor(fmgr);
+    visitor = new CanonizingFormulaVisitor(fmgr, pStrategies);
   }
 
   @Override

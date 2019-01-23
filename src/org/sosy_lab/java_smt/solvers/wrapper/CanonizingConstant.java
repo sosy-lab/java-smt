@@ -31,6 +31,8 @@ public class CanonizingConstant implements CanonizingFormula {
   private Object value;
   private FormulaType<?> type;
 
+  private Integer hashCode = null;
+
   public CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
     mgr = pMgr;
     value = pValue;
@@ -41,6 +43,7 @@ public class CanonizingConstant implements CanonizingFormula {
     return value;
   }
 
+  @Override
   public FormulaType<?> getType() {
     return type;
   }
@@ -92,5 +95,29 @@ public class CanonizingConstant implements CanonizingFormula {
   @Override
   public String toString() {
     return value.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CanonizingConstant)) {
+      return false;
+    }
+    CanonizingConstant other = (CanonizingConstant) o;
+    return type.equals(other.type) && value.equals(other.value);
+  }
+
+  @Override
+  public int hashCode() {
+    int prime = 37;
+    int result = 1;
+    if (hashCode == null) {
+      result = prime * result + type.hashCode();
+      result = prime * result + value.hashCode();
+      hashCode = result;
+    }
+    return hashCode;
   }
 }

@@ -21,6 +21,8 @@ package org.sosy_lab.java_smt.solvers.wrapper;
 
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -38,6 +40,8 @@ public class CanonizingInfixOperator implements CanonizingFormula {
   private FunctionDeclarationKind operator;
   private CanonizingFormula left;
   private CanonizingFormula right;
+
+  private Integer hashCode = null;
 
   public CanonizingInfixOperator(
       FormulaManager pMgr,
@@ -77,8 +81,9 @@ public class CanonizingInfixOperator implements CanonizingFormula {
   @Override
   public Formula toFormula(FormulaManager pMgr) {
     Formula formula = null;
+    FormulaType<?> innerType = left.getType();
 
-    if (returnType.isBitvectorType()) {
+    if (returnType.isBitvectorType() || innerType.isBitvectorType()) {
       BitvectorFormulaManager bmgr = pMgr.getBitvectorFormulaManager();
       BitvectorFormula lFormula = (BitvectorFormula) left.toFormula(pMgr);
       BitvectorFormula rFormula = (BitvectorFormula) right.toFormula(pMgr);
@@ -96,11 +101,9 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_CONCAT:
           formula = bmgr.concat(lFormula, rFormula);
           break;
-          // FIXME: returnType.isBoolean() ?
         case BV_EQ:
           formula = bmgr.equal(lFormula, rFormula);
           break;
-          // FIXME - end
         case BV_LSHR:
           formula = bmgr.shiftRight(lFormula, rFormula, false);
           break;
@@ -113,7 +116,6 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_SDIV:
           formula = bmgr.divide(lFormula, rFormula, true);
           break;
-          // FIXME: returnType.isBoolean() ?
         case BV_SGE:
           formula = bmgr.greaterOrEquals(lFormula, rFormula, true);
           break;
@@ -126,11 +128,9 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_SLT:
           formula = bmgr.lessThan(lFormula, rFormula, true);
           break;
-          // FIXME - end
         case BV_UDIV:
           formula = bmgr.divide(lFormula, rFormula, false);
           break;
-          // FIXME: returnType.isBoolean() ?
         case BV_UGE:
           formula = bmgr.greaterOrEquals(lFormula, rFormula, false);
           break;
@@ -143,7 +143,6 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case BV_ULT:
           formula = bmgr.lessThan(lFormula, rFormula, false);
           break;
-          // FIXME - end
         case BV_SHL:
           formula = bmgr.shiftLeft(lFormula, rFormula);
           break;
@@ -163,7 +162,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
           throw new IllegalStateException(
               "Handling for InfixOperator " + operator + " not yet implemented.");
       }
-    } else if (returnType.isIntegerType()) {
+    } else if (returnType.isIntegerType() || innerType.isIntegerType()) {
       IntegerFormulaManager imgr = pMgr.getIntegerFormulaManager();
       IntegerFormula lFormula = (IntegerFormula) left.toFormula(pMgr);
       IntegerFormula rFormula = (IntegerFormula) right.toFormula(pMgr);
@@ -203,7 +202,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
           throw new IllegalStateException(
               "Handling for InfixOperator " + operator + " not yet implemented.");
       }
-    } else if (returnType.isFloatingPointType()) {
+    } else if (returnType.isFloatingPointType() || innerType.isFloatingPointType()) {
       FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
       FloatingPointFormula lFormula = (FloatingPointFormula) left.toFormula(pMgr);
       FloatingPointFormula rFormula = (FloatingPointFormula) right.toFormula(pMgr);
@@ -240,6 +239,31 @@ public class CanonizingInfixOperator implements CanonizingFormula {
           throw new IllegalStateException(
               "Handling for InfixOperator " + operator + " not yet implemented.");
       }
+    } else if (returnType.isBooleanType() && innerType.isBooleanType()) {
+      BooleanFormulaManager bmgr = pMgr.getBooleanFormulaManager();
+      BooleanFormula lFormula = (BooleanFormula) left.toFormula(pMgr);
+      BooleanFormula rFormula = (BooleanFormula) right.toFormula(pMgr);
+
+      switch (operator) {
+        case AND:
+          formula = bmgr.and(lFormula, rFormula);
+          break;
+        case OR:
+          formula = bmgr.or(lFormula, rFormula);
+          break;
+        case IMPLIES:
+          formula = bmgr.implication(lFormula, rFormula);
+          break;
+        case XOR:
+          formula = bmgr.xor(lFormula, rFormula);
+          break;
+        case IFF:
+          formula = bmgr.equivalence(lFormula, rFormula);
+          break;
+        default:
+          throw new IllegalStateException(
+              "Handling for InfixOperator " + operator + " not yet implemented.");
+      }
     }
 
     return formula;
@@ -250,6 +274,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
     return pStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType);
   }
 
+  @Override
   public FormulaType<?> getType() {
     return returnType;
   }
@@ -284,5 +309,58 @@ public class CanonizingInfixOperator implements CanonizingFormula {
       right.toString(pBuilder);
     }
     pBuilder.append(" )");
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 47;
+    int result = 1;
+    if (hashCode == null) {
+      result = prime * result + ((left == null) ? 0 : left.hashCode());
+      result = prime * result + ((operator == null) ? 0 : operator.hashCode());
+      result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
+      result = prime * result + ((right == null) ? 0 : right.hashCode());
+      hashCode = result;
+    }
+    return hashCode;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    CanonizingInfixOperator other = (CanonizingInfixOperator) obj;
+    if (left == null) {
+      if (other.left != null) {
+        return false;
+      }
+    } else if (!left.equals(other.left)) {
+      return false;
+    }
+    if (operator != other.operator) {
+      return false;
+    }
+    if (returnType == null) {
+      if (other.returnType != null) {
+        return false;
+      }
+    } else if (!returnType.equals(other.returnType)) {
+      return false;
+    }
+    if (right == null) {
+      if (other.right != null) {
+        return false;
+      }
+    } else if (!right.equals(other.right)) {
+      return false;
+    }
+    return true;
   }
 }

@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,12 +27,13 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
-import org.sosy_lab.java_smt.solvers.wrapper.strategy.IdentityStrategy;
 
 public class CanonizingFormulaStore {
 
   private Set<CanonizingFormula> constraints;
   private Set<CanonizingFormula> canonizedConstraints;
+
+  private final HashMap<CanonizingFormula, CanonizingFormula> MEMOIZED_FORMULAS = new HashMap<>();
 
   private CanonizingFormula currentConstraint;
   private FormulaType<?> nextLiteralsType;
@@ -41,13 +42,8 @@ public class CanonizingFormulaStore {
 
   private List<CanonizingStrategy> strategies;
 
-  public CanonizingFormulaStore(FormulaManager pMgr) {
-    this(pMgr, null, null, null, null, new ArrayList<CanonizingStrategy>() {
-      private static final long serialVersionUID = 1L;
-      {
-        add(new IdentityStrategy());
-      }
-    });
+  public CanonizingFormulaStore(FormulaManager pMgr, List<CanonizingStrategy> pStrategies) {
+    this(pMgr, null, null, null, null, pStrategies);
   }
 
   public CanonizingFormulaStore(
@@ -92,6 +88,14 @@ public class CanonizingFormulaStore {
       }
       canonizedConstraints.add(canonizedF);
     }
+  }
+
+  public CanonizingFormula getSomeCanonizedFormula() {
+    canonize();
+    for (CanonizingFormula cf : canonizedConstraints) {
+      return cf;
+    }
+    return null;
   }
 
   public BooleanFormula getCanonizedFormula() {
@@ -159,5 +163,12 @@ public class CanonizingFormulaStore {
     FormulaType<?> pop = nextLiteralsType;
     nextLiteralsType = null;
     return pop;
+  }
+
+  public CanonizingFormula remember(CanonizingFormula pCanonizingFormula) {
+    if (MEMOIZED_FORMULAS.get(pCanonizingFormula) == null) {
+      MEMOIZED_FORMULAS.put(pCanonizingFormula, pCanonizingFormula);
+    }
+    return MEMOIZED_FORMULAS.get(pCanonizingFormula);
   }
 }

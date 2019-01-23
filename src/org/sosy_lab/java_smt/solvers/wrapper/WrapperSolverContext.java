@@ -19,7 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
@@ -32,6 +35,8 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategies;
+import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class WrapperSolverContext extends AbstractSolverContext {
 
@@ -45,6 +50,9 @@ public class WrapperSolverContext extends AbstractSolverContext {
       description = "If formulas should be canonized before queried to the solver."
     )
     public boolean canonize = false;
+
+    @Option(secure = true, description = "Which strategies to use for canonization")
+    public Set<CanonizingStrategies> strategies = null;
 
     @Option(secure = true, description = "If answers of solvers should be cached.")
     public boolean cache = false;
@@ -90,7 +98,8 @@ public class WrapperSolverContext extends AbstractSolverContext {
     ProverEnvironment env = delegate.newProverEnvironment(pOptions.toArray(new ProverOptions[] {}));
 
     if (options.canonize) {
-      // TODO: env = new CanonizingEnvironmentWrapper(env);
+      List<CanonizingStrategy> strategies = organizeStrategies();
+      env = new CanonizingEnvironmentWrapper(env, delegate.getFormulaManager(), strategies);
     }
 
     if (options.cache) {
@@ -107,7 +116,12 @@ public class WrapperSolverContext extends AbstractSolverContext {
         delegate.newProverEnvironmentWithInterpolation(pSet.toArray(new ProverOptions[] {}));
 
     if (options.canonize) {
-      // TODO: env = new CanonizingEnvironmentWrapper(env);
+      List<CanonizingStrategy> strategies = organizeStrategies();
+      env =
+          new CanonizingInterpolatingEnvironmentWrapper<>(
+              env,
+              delegate.getFormulaManager(),
+              strategies);
     }
 
     if (options.cache) {
@@ -124,7 +138,12 @@ public class WrapperSolverContext extends AbstractSolverContext {
         delegate.newOptimizationProverEnvironment(pSet.toArray(new ProverOptions[] {}));
 
     if (options.canonize) {
-      env = new CanonizingOptimizationEnvironmentWrapper(env, delegate.getFormulaManager());
+      List<CanonizingStrategy> strategies = organizeStrategies();
+      env =
+          new CanonizingOptimizationEnvironmentWrapper(
+              env,
+              delegate.getFormulaManager(),
+              strategies);
     }
 
     if (options.cache) {
@@ -132,6 +151,22 @@ public class WrapperSolverContext extends AbstractSolverContext {
     }
 
     return env;
+  }
+
+  private List<CanonizingStrategy> organizeStrategies() {
+    List<CanonizingStrategy> strategies = new ArrayList<>();
+    if (options.strategies != null) {
+      strategies =
+          options.strategies.stream()
+              .sorted((s0, s1) -> s0.getPriority() - s1.getPriority())
+              .map(CanonizingStrategies::getStrategy)
+              .collect(Collectors.toList());
+
+    }
+    if (strategies.isEmpty()) {
+      strategies.add(CanonizingStrategies.IDENTITY.getStrategy());
+    }
+    return strategies;
   }
 
   @Override
