@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
+package org.sosy_lab.java_smt.solvers.wrapper.canonizing.prover;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
@@ -26,20 +26,22 @@ import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
-public class CanonizingEnvironmentWrapper implements ProverEnvironment {
+public class CanonizingInterpolatingEnvironmentWrapper<T>
+    implements InterpolatingProverEnvironment<T> {
 
-  private ProverEnvironment delegate;
+  private InterpolatingProverEnvironment<T> delegate;
   private FormulaManager fmgr;
   private CanonizingFormulaVisitor visitor;
 
-  public CanonizingEnvironmentWrapper(
-      ProverEnvironment pEnv,
+  public CanonizingInterpolatingEnvironmentWrapper(
+      InterpolatingProverEnvironment<T> pEnv,
       FormulaManager pMgr,
       List<CanonizingStrategy> pStrategies) {
     delegate = pEnv;
@@ -54,10 +56,9 @@ public class CanonizingEnvironmentWrapper implements ProverEnvironment {
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     fmgr.visit(pConstraint, visitor);
-    delegate.addConstraint(visitor.getStorage().getFormula());
-    return null;
+    return delegate.addConstraint(visitor.getStorage().getFormula());
   }
 
   @Override
@@ -110,4 +111,16 @@ public class CanonizingEnvironmentWrapper implements ProverEnvironment {
     return delegate.allSat(pCallback, pImportant);
   }
 
+  @Override
+  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
+      throws SolverException, InterruptedException {
+    return delegate.getInterpolant(pFormulasOfA);
+  }
+
+  @Override
+  public List<BooleanFormula>
+      getTreeInterpolants(List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+          throws SolverException, InterruptedException {
+    return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
+  }
 }

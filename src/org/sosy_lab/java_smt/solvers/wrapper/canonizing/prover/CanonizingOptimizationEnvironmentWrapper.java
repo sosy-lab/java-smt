@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2019  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,34 +17,37 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
+package org.sosy_lab.java_smt.solvers.wrapper.canonizing.prover;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingModel;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
-public class CanonizingInterpolatingEnvironmentWrapper<T>
-    implements InterpolatingProverEnvironment<T> {
+public class CanonizingOptimizationEnvironmentWrapper implements OptimizationProverEnvironment {
 
-  private InterpolatingProverEnvironment<T> delegate;
+  private OptimizationProverEnvironment delegate;
   private FormulaManager fmgr;
   private CanonizingFormulaVisitor visitor;
 
-  public CanonizingInterpolatingEnvironmentWrapper(
-      InterpolatingProverEnvironment<T> pEnv,
-      FormulaManager pMgr,
+  public CanonizingOptimizationEnvironmentWrapper(
+      OptimizationProverEnvironment pEnv,
+      FormulaManager pFormulaManager,
       List<CanonizingStrategy> pStrategies) {
     delegate = pEnv;
-    fmgr = pMgr;
+    fmgr = pFormulaManager;
     visitor = new CanonizingFormulaVisitor(fmgr, pStrategies);
   }
 
@@ -55,9 +58,11 @@ public class CanonizingInterpolatingEnvironmentWrapper<T>
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  @Nullable
+  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     fmgr.visit(pConstraint, visitor);
-    return delegate.addConstraint(visitor.getStorage().getFormula());
+    delegate.addConstraint(visitor.getStorage().getFormula());
+    return null;
   }
 
   @Override
@@ -78,25 +83,27 @@ public class CanonizingInterpolatingEnvironmentWrapper<T>
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    return delegate.getModel();
-  }
-
-  @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    return delegate.getModelAssignments();
+    ImmutableList<ValueAssignment> assignments = delegate.getModelAssignments();
+    // TODO translate back
+    return assignments;
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    return delegate.getUnsatCore();
+    List<BooleanFormula> unsatCore = delegate.getUnsatCore();
+    // TODO translate back
+    return unsatCore;
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
-    return delegate.unsatCoreOverAssumptions(pAssumptions);
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+    Optional<List<BooleanFormula>> unsatCore = delegate.unsatCoreOverAssumptions(pAssumptions);
+    if (unsatCore.isPresent()) {
+      // TODO translate back
+    }
+    return unsatCore;
   }
 
   @Override
@@ -111,15 +118,32 @@ public class CanonizingInterpolatingEnvironmentWrapper<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
-      throws SolverException, InterruptedException {
-    return delegate.getInterpolant(pFormulasOfA);
+  public int maximize(Formula pObjective) {
+    return delegate.maximize(pObjective);
   }
 
   @Override
-  public List<BooleanFormula>
-      getTreeInterpolants(List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
-          throws SolverException, InterruptedException {
-    return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
+  public int minimize(Formula pObjective) {
+    return delegate.minimize(pObjective);
+  }
+
+  @Override
+  public OptStatus check() throws InterruptedException, SolverException {
+    return delegate.check();
+  }
+
+  @Override
+  public Optional<Rational> upper(int pHandle, Rational pEpsilon) {
+    return delegate.upper(pHandle, pEpsilon);
+  }
+
+  @Override
+  public Optional<Rational> lower(int pHandle, Rational pEpsilon) {
+    return delegate.lower(pHandle, pEpsilon);
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    return new CanonizingModel(delegate.getModel());
   }
 }

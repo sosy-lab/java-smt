@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper.caching;
+package org.sosy_lab.java_smt.solvers.wrapper.caching.prover;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache;
 import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
 import org.sosy_lab.java_smt.api.SolverException;
 
