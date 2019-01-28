@@ -17,25 +17,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper.strategy;
+package org.sosy_lab.java_smt.solvers.wrapper.caching;
 
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
-import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
 
-public class RenamingStrategy implements CanonizingStrategy {
+public class CachingEnvironmentWrapper extends AbstractCachingEnvironment<Void>
+    implements ProverEnvironment {
 
-  @Override
-  public CanonizingFormula
-      canonizeVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
-    String canonizedName = canonizeVariableName(pName);
-
-    return new CanonizingVariable(pMgr, canonizedName, pType);
-  }
-
-  private static String canonizeVariableName(String pName) {
-    // TODO: Implement some (hopefully) useful renaming strategy
-    return pName;
+  public CachingEnvironmentWrapper(
+      BasicProverEnvironment<Void> pEnv,
+      FormulaManager pMgr,
+      CachingMode pMode) {
+    super(pEnv, pMgr, pMode);
   }
 }

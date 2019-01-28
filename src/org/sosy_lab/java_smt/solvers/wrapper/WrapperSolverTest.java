@@ -35,6 +35,8 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategies;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;

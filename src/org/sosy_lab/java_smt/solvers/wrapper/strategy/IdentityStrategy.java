@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
-import org.sosy_lab.java_smt.solvers.wrapper.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
 
 /**
  * For proof-of-concept and testing matters this implementation of the {@link CanonizingStrategy}

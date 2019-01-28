@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper;
+package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
@@ -112,8 +112,7 @@ public class CanonizingOptimizationEnvironmentWrapper implements OptimizationPro
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.allSat(pCallback, pImportant);
   }
 
   @Override

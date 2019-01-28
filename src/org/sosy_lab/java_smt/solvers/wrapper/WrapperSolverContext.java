@@ -35,6 +35,13 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.solvers.wrapper.caching.CachingEnvironmentWrapper;
+import org.sosy_lab.java_smt.solvers.wrapper.caching.CachingInterpolatingEnvironmentWrapper;
+import org.sosy_lab.java_smt.solvers.wrapper.caching.CachingOptimizationEnvironmentWrapper;
+import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingEnvironmentWrapper;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingInterpolatingEnvironmentWrapper;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingOptimizationEnvironmentWrapper;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategies;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
@@ -97,13 +104,14 @@ public class WrapperSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     ProverEnvironment env = delegate.newProverEnvironment(pOptions.toArray(new ProverOptions[] {}));
 
+    if (options.cache) {
+      // FIXME: Parameterize CachingMode
+      env = new CachingEnvironmentWrapper(env, delegate.getFormulaManager(), CachingMode.IN_MEMORY);
+    }
+
     if (options.canonize) {
       List<CanonizingStrategy> strategies = organizeStrategies();
       env = new CanonizingEnvironmentWrapper(env, delegate.getFormulaManager(), strategies);
-    }
-
-    if (options.cache) {
-      // TODO: env = new CachingEnvironmentWrapper(env);
     }
 
     return env;
@@ -115,6 +123,15 @@ public class WrapperSolverContext extends AbstractSolverContext {
     InterpolatingProverEnvironment<?> env =
         delegate.newProverEnvironmentWithInterpolation(pSet.toArray(new ProverOptions[] {}));
 
+    if (options.cache) {
+      // FIXME: Parameterize CachingMode
+      env =
+          new CachingInterpolatingEnvironmentWrapper<>(
+              env,
+              delegate.getFormulaManager(),
+              CachingMode.IN_MEMORY);
+    }
+
     if (options.canonize) {
       List<CanonizingStrategy> strategies = organizeStrategies();
       env =
@@ -122,10 +139,6 @@ public class WrapperSolverContext extends AbstractSolverContext {
               env,
               delegate.getFormulaManager(),
               strategies);
-    }
-
-    if (options.cache) {
-      // TODO: env = new CachingEnvironmentWrapper(env);
     }
 
     return env;
@@ -137,6 +150,15 @@ public class WrapperSolverContext extends AbstractSolverContext {
     OptimizationProverEnvironment env =
         delegate.newOptimizationProverEnvironment(pSet.toArray(new ProverOptions[] {}));
 
+    if (options.cache) {
+      // FIXME: Parameterize CachingMode
+      env =
+          new CachingOptimizationEnvironmentWrapper(
+              env,
+              delegate.getFormulaManager(),
+              CachingMode.IN_MEMORY);
+    }
+
     if (options.canonize) {
       List<CanonizingStrategy> strategies = organizeStrategies();
       env =
@@ -144,10 +166,6 @@ public class WrapperSolverContext extends AbstractSolverContext {
               env,
               delegate.getFormulaManager(),
               strategies);
-    }
-
-    if (options.cache) {
-      // TODO: env = new CachingEnvironmentWrapper(env);
     }
 
     return env;

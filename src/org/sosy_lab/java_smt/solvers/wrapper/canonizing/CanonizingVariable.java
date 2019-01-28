@@ -17,30 +17,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper;
+package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 
-import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
-public class CanonizingConstant implements CanonizingFormula {
+public class CanonizingVariable implements CanonizingFormula {
 
   private FormulaManager mgr;
-  private Object value;
+  private String name;
   private FormulaType<?> type;
 
   private Integer hashCode = null;
 
-  public CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
+  public CanonizingVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
     mgr = pMgr;
-    value = pValue;
+    name = pName;
     type = pType;
   }
 
-  public Object getValue() {
-    return value;
+  public String getName() {
+    return name;
   }
 
   @Override
@@ -50,36 +49,19 @@ public class CanonizingConstant implements CanonizingFormula {
 
   @Override
   public CanonizingFormula copy() {
-    CanonizingFormula copy = new CanonizingConstant(mgr, value, type);
+    CanonizingFormula copy = new CanonizingVariable(mgr, name, type);
 
     return copy;
   }
 
   @Override
   public Formula toFormula(FormulaManager pMgr) {
-    Formula formula = null;
-
-    if (type.isIntegerType()) {
-      formula = pMgr.getIntegerFormulaManager().makeNumber(value.toString());
-    } else if (type.isBitvectorType()) {
-      formula =
-          pMgr.getBitvectorFormulaManager()
-              .makeBitvector(
-                  ((FormulaType.BitvectorType) type).getSize(), new BigInteger(value.toString()));
-    } else if (type.isFloatingPointType()) {
-      formula =
-          pMgr.getFloatingPointFormulaManager()
-              .makeNumber(value.toString(), (FormulaType.FloatingPointType) type);
-    } else if (type.isBooleanType()) {
-      formula = pMgr.getBooleanFormulaManager().makeBoolean(Boolean.getBoolean(value.toString()));
-    }
-
-    return formula;
+    return pMgr.makeVariable(type, name);
   }
 
   @Override
   public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
-    return copy();
+    return pStrategy.canonizeVariable(mgr, name, type);
   }
 
   @Override
@@ -88,34 +70,34 @@ public class CanonizingConstant implements CanonizingFormula {
   }
 
   @Override
-  public void toString(StringBuilder pBuilder) {
-    pBuilder.append(value);
+  public String toString() {
+    return name;
   }
 
   @Override
-  public String toString() {
-    return value.toString();
+  public void toString(StringBuilder pBuilder) {
+    pBuilder.append(name);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
+    if (o == this) {
       return true;
     }
-    if (!(o instanceof CanonizingConstant)) {
+    if (!(o instanceof CanonizingVariable)) {
       return false;
     }
-    CanonizingConstant other = (CanonizingConstant) o;
-    return type.equals(other.type) && value.equals(other.value);
+    CanonizingVariable other = (CanonizingVariable) o;
+    return type.equals(other.type) && name.equals(other.name);
   }
 
   @Override
   public int hashCode() {
-    int prime = 37;
+    int prime = 43;
     int result = 1;
     if (hashCode == null) {
       result = prime * result + type.hashCode();
-      result = prime * result + value.hashCode();
+      result = prime * result + name.hashCode();
       hashCode = result;
     }
     return hashCode;

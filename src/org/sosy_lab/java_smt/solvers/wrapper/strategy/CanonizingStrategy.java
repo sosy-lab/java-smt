@@ -24,10 +24,10 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
-import org.sosy_lab.java_smt.solvers.wrapper.CanonizingFormula;
-import org.sosy_lab.java_smt.solvers.wrapper.CanonizingInfixOperator;
-import org.sosy_lab.java_smt.solvers.wrapper.CanonizingPrefixOperator;
-import org.sosy_lab.java_smt.solvers.wrapper.CanonizingVariable;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingInfixOperator;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingPrefixOperator;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 
 /**
  * CanonizingStrategies shall be used to canonize {@link CanonizingFormula}s.

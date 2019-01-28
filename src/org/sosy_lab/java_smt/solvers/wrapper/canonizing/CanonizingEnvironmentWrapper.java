@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.wrapper;
+package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
@@ -34,81 +34,80 @@ import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingEnvironmentWrapper implements ProverEnvironment {
 
+  private ProverEnvironment delegate;
+  private FormulaManager fmgr;
+  private CanonizingFormulaVisitor visitor;
+
   public CanonizingEnvironmentWrapper(
       ProverEnvironment pEnv,
       FormulaManager pMgr,
       List<CanonizingStrategy> pStrategies) {
-    // TODO Auto-generated constructor stub
+    delegate = pEnv;
+    fmgr = pMgr;
+    visitor = new CanonizingFormulaVisitor(fmgr, pStrategies);
   }
 
   @Override
   public void pop() {
-    // TODO Auto-generated method stub
-
+    visitor.pop();
+    delegate.pop();
   }
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    // TODO Auto-generated method stub
+    fmgr.visit(pConstraint, visitor);
+    delegate.addConstraint(visitor.getStorage().getFormula());
     return null;
   }
 
   @Override
   public void push() {
-    // TODO Auto-generated method stub
-
+    visitor.push();
+    delegate.push();
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
+    return delegate.isUnsat();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
+    return delegate.isUnsatWithAssumptions(pAssumptions);
   }
 
   @Override
   public Model getModel() throws SolverException {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.getModel();
   }
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.getModelAssignments();
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.getUnsatCore();
   }
 
   @Override
   public Optional<List<BooleanFormula>>
       unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
           throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.unsatCoreOverAssumptions(pAssumptions);
   }
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
-
+    delegate.close();
   }
 
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
-    return null;
+    return delegate.allSat(pCallback, pImportant);
   }
 
 }
