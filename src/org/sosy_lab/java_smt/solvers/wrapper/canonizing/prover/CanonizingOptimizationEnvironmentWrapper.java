@@ -19,102 +19,31 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.canonizing.prover;
 
-import com.google.common.collect.ImmutableList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
-import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingModel;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
-public class CanonizingOptimizationEnvironmentWrapper implements OptimizationProverEnvironment {
+public class CanonizingOptimizationEnvironmentWrapper extends AbstractCanonizingEnvironment<Void>
+    implements OptimizationProverEnvironment {
 
   private OptimizationProverEnvironment delegate;
-  private FormulaManager fmgr;
-  private CanonizingFormulaVisitor visitor;
 
   public CanonizingOptimizationEnvironmentWrapper(
       OptimizationProverEnvironment pEnv,
       FormulaManager pFormulaManager,
       List<CanonizingStrategy> pStrategies) {
+    super(pFormulaManager, pStrategies);
     delegate = pEnv;
-    fmgr = pFormulaManager;
-    visitor = new CanonizingFormulaVisitor(fmgr, pStrategies);
   }
 
   @Override
-  public void pop() {
-    visitor.pop();
-    delegate.pop();
-  }
-
-  @Override
-  @Nullable
-  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    fmgr.visit(pConstraint, visitor);
-    delegate.addConstraint(visitor.getStorage().getFormula());
-    return null;
-  }
-
-  @Override
-  public void push() {
-    visitor.push();
-    delegate.push();
-  }
-
-  @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    return delegate.isUnsat();
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    return delegate.isUnsatWithAssumptions(pAssumptions);
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    ImmutableList<ValueAssignment> assignments = delegate.getModelAssignments();
-    // TODO translate back
-    return assignments;
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    List<BooleanFormula> unsatCore = delegate.getUnsatCore();
-    // TODO translate back
-    return unsatCore;
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    Optional<List<BooleanFormula>> unsatCore = delegate.unsatCoreOverAssumptions(pAssumptions);
-    if (unsatCore.isPresent()) {
-      // TODO translate back
-    }
-    return unsatCore;
-  }
-
-  @Override
-  public void close() {
-    delegate.close();
-  }
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    return delegate.allSat(pCallback, pImportant);
+  protected OptimizationProverEnvironment getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -140,10 +69,5 @@ public class CanonizingOptimizationEnvironmentWrapper implements OptimizationPro
   @Override
   public Optional<Rational> lower(int pHandle, Rational pEpsilon) {
     return delegate.lower(pHandle, pEpsilon);
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    return new CanonizingModel(delegate.getModel());
   }
 }

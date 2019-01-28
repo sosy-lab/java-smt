@@ -30,11 +30,19 @@ import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
 public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEnvironment<T>
     implements InterpolatingProverEnvironment<T> {
 
+  private InterpolatingProverEnvironment<T> delegate;
+
   public CachingInterpolatingEnvironmentWrapper(
       InterpolatingProverEnvironment<T> pEnv,
       FormulaManager pMgr,
       CachingMode pMode) {
-    super(pEnv, pMgr, pMode);
+    super(pMgr, pMode);
+    delegate = pEnv;
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<T> getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -42,7 +50,7 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
       throws SolverException, InterruptedException {
     BooleanFormula cached = cache.getFormulaInterpolant(formula, pFormulasOfA);
     if (cached == null) {
-      cached = ((InterpolatingProverEnvironment<T>) delegate).getInterpolant(pFormulasOfA);
+      cached = delegate.getInterpolant(pFormulasOfA);
       cache.storeFormulaInterpolant(formula, cached, pFormulasOfA);
     }
     return cached;
@@ -56,7 +64,7 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
         cache.getFormulaTreeInterpolants(formula, pPartitionedFormulas, pStartOfSubTree);
     if (cached == null) {
       cached =
-          ((InterpolatingProverEnvironment<T>) delegate)
+          delegate
               .getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
       cache.storeFormulaTreeInterpolants(formula, cached, pPartitionedFormulas, pStartOfSubTree);
     }

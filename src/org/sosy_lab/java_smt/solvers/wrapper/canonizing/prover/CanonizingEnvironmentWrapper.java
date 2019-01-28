@@ -19,96 +19,26 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.canonizing.prover;
 
-import com.google.common.collect.ImmutableList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
-public class CanonizingEnvironmentWrapper implements ProverEnvironment {
+public class CanonizingEnvironmentWrapper extends AbstractCanonizingEnvironment<Void>
+    implements ProverEnvironment {
 
-  private ProverEnvironment delegate;
-  private FormulaManager fmgr;
-  private CanonizingFormulaVisitor visitor;
+  ProverEnvironment delegate;
 
   public CanonizingEnvironmentWrapper(
       ProverEnvironment pEnv,
       FormulaManager pMgr,
       List<CanonizingStrategy> pStrategies) {
+    super(pMgr, pStrategies);
     delegate = pEnv;
-    fmgr = pMgr;
-    visitor = new CanonizingFormulaVisitor(fmgr, pStrategies);
   }
 
   @Override
-  public void pop() {
-    visitor.pop();
-    delegate.pop();
+  protected ProverEnvironment getDelegate() {
+    return delegate;
   }
-
-  @Override
-  public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    fmgr.visit(pConstraint, visitor);
-    delegate.addConstraint(visitor.getStorage().getFormula());
-    return null;
-  }
-
-  @Override
-  public void push() {
-    visitor.push();
-    delegate.push();
-  }
-
-  @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    return delegate.isUnsat();
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    return delegate.isUnsatWithAssumptions(pAssumptions);
-  }
-
-  @Override
-  public Model getModel() throws SolverException {
-    return delegate.getModel();
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    return delegate.getModelAssignments();
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    return delegate.getUnsatCore();
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
-    return delegate.unsatCoreOverAssumptions(pAssumptions);
-  }
-
-  @Override
-  public void close() {
-    delegate.close();
-  }
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    return delegate.allSat(pCallback, pImportant);
-  }
-
 }

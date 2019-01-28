@@ -30,18 +30,26 @@ import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
 public class CachingOptimizationEnvironmentWrapper extends AbstractCachingEnvironment<Void>
     implements OptimizationProverEnvironment {
 
+  private OptimizationProverEnvironment delegate;
+
   public CachingOptimizationEnvironmentWrapper(
       OptimizationProverEnvironment pEnv,
       FormulaManager pMgr,
       CachingMode pMode) {
-    super(pEnv, pMgr, pMode);
+    super(pMgr, pMode);
+    delegate = pEnv;
+  }
+
+  @Override
+  protected OptimizationProverEnvironment getDelegate() {
+    return delegate;
   }
 
   @Override
   public int maximize(Formula pObjective) {
     Integer max = cache.getFormulaMaximize(formula, pObjective);
     if (max == null) {
-      max = ((OptimizationProverEnvironment) delegate).maximize(pObjective);
+      max = delegate.maximize(pObjective);
       cache.storeFormulaMaximize(formula, max, pObjective);
     }
     return max;
@@ -51,7 +59,7 @@ public class CachingOptimizationEnvironmentWrapper extends AbstractCachingEnviro
   public int minimize(Formula pObjective) {
     Integer min = cache.getFormulaMinimize(formula, pObjective);
     if (min == null) {
-      min = ((OptimizationProverEnvironment) delegate).minimize(pObjective);
+      min = delegate.minimize(pObjective);
       cache.storeFormulaMinimize(formula, min, pObjective);
     }
     return min;
@@ -60,14 +68,14 @@ public class CachingOptimizationEnvironmentWrapper extends AbstractCachingEnviro
   // FIXME: how to handle this?
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    return ((OptimizationProverEnvironment) delegate).check();
+    return delegate.check();
   }
 
   @Override
   public Optional<Rational> upper(int pHandle, Rational pEpsilon) {
     Optional<Rational> upper = cache.getFormulaUpper(formula, pHandle, pEpsilon);
     if (upper == null) {
-      upper = ((OptimizationProverEnvironment) delegate).upper(pHandle, pEpsilon);
+      upper = delegate.upper(pHandle, pEpsilon);
       cache.storeFormulaUpper(formula, upper, pHandle, pEpsilon);
     }
     return upper;
@@ -77,7 +85,7 @@ public class CachingOptimizationEnvironmentWrapper extends AbstractCachingEnviro
   public Optional<Rational> lower(int pHandle, Rational pEpsilon) {
     Optional<Rational> lower = cache.getFormulaLower(formula, pHandle, pEpsilon);
     if (lower == null) {
-      lower = ((OptimizationProverEnvironment) delegate).lower(pHandle, pEpsilon);
+      lower = delegate.lower(pHandle, pEpsilon);
       cache.storeFormulaLower(formula, lower, pHandle, pEpsilon);
     }
     return lower;

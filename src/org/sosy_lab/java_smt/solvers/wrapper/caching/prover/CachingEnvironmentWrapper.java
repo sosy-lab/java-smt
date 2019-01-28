@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.caching.prover;
 
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
@@ -27,10 +26,18 @@ import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
 public class CachingEnvironmentWrapper extends AbstractCachingEnvironment<Void>
     implements ProverEnvironment {
 
+  private ProverEnvironment delegate;
+
   public CachingEnvironmentWrapper(
-      BasicProverEnvironment<Void> pEnv,
+      ProverEnvironment pEnv,
       FormulaManager pMgr,
       CachingMode pMode) {
-    super(pEnv, pMgr, pMode);
+    super(pMgr, pMode);
+    delegate = pEnv;
+  }
+
+  @Override
+  protected ProverEnvironment getDelegate() {
+    return delegate;
   }
 }
