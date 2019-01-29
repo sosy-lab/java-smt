@@ -389,6 +389,11 @@ TERM_ARG(2)
 CALL2(msat_term, make_floor)
 TERM_RETURN
 
+make_term_constant(pi, 1pi)
+make_term_unary(exp)
+make_term_unary(sin)
+make_term_unary(log)
+
 DEFINE_FUNC(jterm, 1make_1number) WITH_TWO_ARGS(jenv, string)
 ENV_ARG(1)
 STRING_ARG(2)
@@ -752,6 +757,10 @@ func2_term_is(times, 1times)
 func2_term_is(divide, 1divide)
 
 func2_term_is(floor, 1floor)
+func2_term_is(floor, 1pi)
+func2_term_is(floor, 1exp)
+func2_term_is(floor, 1sin)
+func2_term_is(floor, 1log)
 func2_term_is(array_read, 1array_1read)
 func2_term_is(array_write, 1array_1write)
 func2_term_is(array_const, 1array_1const)

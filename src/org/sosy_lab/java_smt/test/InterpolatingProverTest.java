@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -47,7 +48,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @RunWith(Parameterized.class)
 @SuppressWarnings("resource")
-public class SolverInterpolationTest extends SolverBasedTest0 {
+public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Solvers[] getAllCombinations() {
@@ -114,7 +115,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
     requireInterpolation();
 
@@ -167,7 +167,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
     requireInterpolation();
 
@@ -204,7 +203,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireInterpolation();
     requireBitvectors();
@@ -263,14 +261,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkItpSequence(stack, ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
 
-  private void requireSequentialItp() {
-    requireInterpolation();
-    assume()
-        .withMessage("Solver does not support sequential interpolation.")
-        .that(solver)
-        .isNotEqualTo(Solvers.MATHSAT5);
-  }
-
   private void requireTreeItp() {
     requireInterpolation();
     assume()
@@ -280,11 +270,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
-
-    requireSequentialItp();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -302,23 +288,26 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     BooleanFormula C = imgr.equal(b, c);
     BooleanFormula D = imgr.equal(c, zero);
 
-    Set<T> TA = Sets.newHashSet(stack.push(A));
-    Set<T> TB = Sets.newHashSet(stack.push(B));
-    Set<T> TC = Sets.newHashSet(stack.push(C));
-    Set<T> TD = Sets.newHashSet(stack.push(D));
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+    T TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(TA, TB, TC, TD));
-    List<BooleanFormula> itps2 = stack.getSeqInterpolants(ImmutableList.of(TD, TC, TB, TA));
-    List<BooleanFormula> itps3 = stack.getSeqInterpolants(ImmutableList.of(TA, TC, TB, TD));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
 
     List<BooleanFormula> itps4 =
-        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), Collections::singleton));
     List<BooleanFormula> itps5 =
-        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), Collections::singleton));
     List<BooleanFormula> itps6 =
-        stack.getSeqInterpolants(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), Collections::singleton));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -333,11 +322,84 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkItpSequence(stack, ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
 
-  @Test
-  @SuppressWarnings({"unchecked", "varargs"})
-  public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void sequentialInterpolationWithoutPartition()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    requireSequentialItp();
+    stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
+    assertThat(stack).isUnsatisfiable();
+
+    // empty list of partition
+    stack.getSeqInterpolants(ImmutableList.of());
+    fail();
+  }
+
+  @Test
+  public <T> void sequentialInterpolationWithOnePartition()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula:  1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThat(stack).isUnsatisfiable();
+
+    // list of one partition
+    List<T> partition = Lists.newArrayList(TA, TB);
+    List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
+    assertThat(itps).isEmpty();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public <T> void sequentialInterpolationWithFewPartitions()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula:  1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThat(stack).isUnsatisfiable();
+
+    Set<T> partition = Sets.newHashSet(TA, TB);
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(partition));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
+
+    stack.pop(); // clear stack, such that we can re-use the solver
+    stack.pop();
+
+    checkItpSequence(stack, ImmutableList.of(bmgr.and(A, B)), itps1);
+    checkItpSequence(stack, ImmutableList.of(A, B), itps2);
+    checkItpSequence(stack, ImmutableList.of(B, A), itps3);
+  }
+
+  @Test
+  public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -358,23 +420,23 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     BooleanFormula C = bvmgr.equal(b, c);
     BooleanFormula D = bvmgr.equal(c, zero);
 
-    Set<T> TA = Sets.newHashSet(stack.push(A));
-    Set<T> TB = Sets.newHashSet(stack.push(B));
-    Set<T> TC = Sets.newHashSet(stack.push(C));
-    Set<T> TD = Sets.newHashSet(stack.push(D));
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+    T TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(TA, TB, TC, TD));
-    List<BooleanFormula> itps2 = stack.getSeqInterpolants(ImmutableList.of(TD, TC, TB, TA));
-    List<BooleanFormula> itps3 = stack.getSeqInterpolants(ImmutableList.of(TA, TC, TB, TD));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
 
     List<BooleanFormula> itps4 =
-        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
+        stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
     List<BooleanFormula> itps5 =
-        stack.getSeqInterpolants(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
+        stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
     List<BooleanFormula> itps6 =
-        stack.getSeqInterpolants(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
+        stack.getSeqInterpolants0(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -456,7 +518,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     testTreeInterpolants2(stack, bmgr.not(A), A, B, B, B);
   }
 
-  @SuppressWarnings({"unchecked", "varargs"})
   private <T> void testTreeInterpolants0(
       InterpolatingProverEnvironment<T> stack,
       BooleanFormula pA,
@@ -465,11 +526,11 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
       BooleanFormula pD,
       BooleanFormula pE)
       throws SolverException, InterruptedException {
-    Set<T> TA = Sets.newHashSet(stack.push(pA));
-    Set<T> TB = Sets.newHashSet(stack.push(pB));
-    Set<T> TC = Sets.newHashSet(stack.push(pC));
-    Set<T> TD = Sets.newHashSet(stack.push(pD));
-    Set<T> TE = Sets.newHashSet(stack.push(pE));
+    T TA = stack.push(pA);
+    T TB = stack.push(pB);
+    T TC = stack.push(pC);
+    T TD = stack.push(pD);
+    T TE = stack.push(pE);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -480,7 +541,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // | /
     // C
     List<BooleanFormula> itps =
-        stack.getTreeInterpolants(
+        stack.getTreeInterpolants0(
             ImmutableList.of(TA, TB, TD, TE, TC), // post-order
             new int[] {0, 0, 2, 2, 0}); // left-most node in current subtree
 
@@ -497,7 +558,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkImplies(stack, bmgr.and(itps.get(1), itps.get(3), pC), bmgr.makeBoolean(false));
   }
 
-  @SuppressWarnings({"unchecked", "varargs"})
   private <T> void testTreeInterpolants1(
       InterpolatingProverEnvironment<T> stack,
       BooleanFormula pA,
@@ -506,11 +566,11 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
       BooleanFormula pD,
       BooleanFormula pE)
       throws SolverException, InterruptedException {
-    Set<T> TA = Sets.newHashSet(stack.push(pA));
-    Set<T> TB = Sets.newHashSet(stack.push(pB));
-    Set<T> TC = Sets.newHashSet(stack.push(pC));
-    Set<T> TD = Sets.newHashSet(stack.push(pD));
-    Set<T> TE = Sets.newHashSet(stack.push(pE));
+    T TA = stack.push(pA);
+    T TB = stack.push(pB);
+    T TC = stack.push(pC);
+    T TD = stack.push(pD);
+    T TE = stack.push(pE);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -519,7 +579,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // \|//
     //  E
     List<BooleanFormula> itps =
-        stack.getTreeInterpolants(
+        stack.getTreeInterpolants0(
             ImmutableList.of(TA, TB, TC, TD, TE), // post-order
             new int[] {0, 1, 2, 3, 0}); // left-most node in current subtree
 
@@ -539,7 +599,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
         bmgr.makeBoolean(false));
   }
 
-  @SuppressWarnings({"unchecked", "varargs"})
   private <T> void testTreeInterpolants2(
       InterpolatingProverEnvironment<T> stack,
       BooleanFormula pA,
@@ -548,11 +607,11 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
       BooleanFormula pD,
       BooleanFormula pE)
       throws SolverException, InterruptedException {
-    Set<T> TA = Sets.newHashSet(stack.push(pA));
-    Set<T> TB = Sets.newHashSet(stack.push(pB));
-    Set<T> TC = Sets.newHashSet(stack.push(pC));
-    Set<T> TD = Sets.newHashSet(stack.push(pD));
-    Set<T> TE = Sets.newHashSet(stack.push(pE));
+    T TA = stack.push(pA);
+    T TB = stack.push(pB);
+    T TC = stack.push(pC);
+    T TD = stack.push(pD);
+    T TE = stack.push(pE);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -567,7 +626,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // |
     // E
     List<BooleanFormula> itps =
-        stack.getTreeInterpolants(
+        stack.getTreeInterpolants0(
             ImmutableList.of(TA, TB, TC, TD, TE), // post-order
             new int[] {0, 0, 0, 0, 0}); // left-most node in current subtree
 
@@ -585,7 +644,6 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolation2() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -611,12 +669,12 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     BooleanFormula R2 = imgr.equal(d, e);
     BooleanFormula D = imgr.equal(e, five);
 
-    Set<T> TA = Sets.newHashSet(stack.push(A));
-    Set<T> TB = Sets.newHashSet(stack.push(B));
-    Set<T> TR1 = Sets.newHashSet(stack.push(R1));
-    Set<T> TC = Sets.newHashSet(stack.push(C));
-    Set<T> TR2 = Sets.newHashSet(stack.push(R2));
-    Set<T> TD = Sets.newHashSet(stack.push(D));
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+    T TD = stack.push(D);
+    T TR1 = stack.push(R1);
+    T TR2 = stack.push(R2);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -629,7 +687,7 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     // | /
     // R2
     List<BooleanFormula> itps =
-        stack.getTreeInterpolants(
+        stack.getTreeInterpolants0(
             ImmutableList.of(TA, TB, TC, TR1, TD, TR2), // post-order
             new int[] {0, 0, 2, 0, 4, 0}); // left-most node in current subtree
 
@@ -648,8 +706,8 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
     checkImplies(stack, bmgr.and(itps.get(3), itps.get(4), R2), bmgr.makeBoolean(false));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
-  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolation3() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -815,45 +873,89 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @SuppressWarnings("CheckReturnValue")
   public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
 
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = Sets.newHashSet(stack.push(A));
+    T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
+    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @SuppressWarnings("CheckReturnValue")
   public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
 
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = Sets.newHashSet(stack.push(A));
+    T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2});
+    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2});
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @SuppressWarnings("CheckReturnValue")
   public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
 
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = Sets.newHashSet(stack.push(A));
+    T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
+    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
+    assertThat(stack).isUnsatisfiable();
+
+    // empty list of partition
+    stack.getTreeInterpolants(ImmutableList.of(), new int[] {});
+    fail();
+  }
+
+  @Test
+  public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+
+    // build formula:  1 = A = 0
+    BooleanFormula A = imgr.equal(one, a);
+    BooleanFormula B = imgr.equal(a, zero);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+
+    assertThat(stack).isUnsatisfiable();
+
+    // list of one partition
+    List<T> partition = Lists.newArrayList(TA, TB);
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0});
+    assertThat(itps).isEmpty();
   }
 
   private void checkItpSequence(
@@ -862,13 +964,18 @@ public class SolverInterpolationTest extends SolverBasedTest0 {
       List<BooleanFormula> itps)
       throws SolverException, InterruptedException {
 
-    assert formulas.size() - 1 == itps.size() : "there should be N-1 interpolants for N formulas";
+    assert formulas.size() - 1 == itps.size()
+        : String.format(
+            "there should be N-1 interpolants for N formulas, but we got %s for %s",
+            itps, formulas);
 
-    checkImplies(stack, formulas.get(0), itps.get(0));
-    for (int i = 1; i < formulas.size() - 1; i++) {
-      checkImplies(stack, bmgr.and(itps.get(i - 1), formulas.get(i)), itps.get(i));
+    if (!itps.isEmpty()) {
+      checkImplies(stack, formulas.get(0), itps.get(0));
+      for (int i = 1; i < formulas.size() - 1; i++) {
+        checkImplies(stack, bmgr.and(itps.get(i - 1), formulas.get(i)), itps.get(i));
+      }
+      checkImplies(stack, bmgr.and(getLast(itps), getLast(formulas)), bmgr.makeBoolean(false));
     }
-    checkImplies(stack, bmgr.and(getLast(itps), getLast(formulas)), bmgr.makeBoolean(false));
   }
 
   private void checkImplies(BasicProverEnvironment<?> stack, BooleanFormula a, BooleanFormula b)

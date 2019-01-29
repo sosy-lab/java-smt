@@ -121,6 +121,30 @@ class PrincessFormulaCreator
   }
 
   @Override
+  public Object convertValue(IExpression value) {
+    if (value instanceof IBoolLit) {
+      return ((IBoolLit) value).value();
+    } else if (value instanceof IIntLit) {
+      return ((IIntLit) value).value().bigIntValue();
+    }
+    if (value instanceof IFunApp) {
+      IFunApp fun = (IFunApp) value;
+      switch (fun.fun().name()) {
+        case "false":
+          assert fun.fun().arity() == 0;
+          return false;
+        case "mod_cast":
+          // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
+          return ((IIntLit) fun.apply(2)).value().bigIntValue();
+        default:
+      }
+    }
+
+    throw new IllegalArgumentException(
+        "unhandled model value " + value + " of type " + value.getClass());
+  }
+
+  @Override
   public FormulaType<?> getFormulaType(IExpression pFormula) {
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
@@ -139,7 +163,9 @@ class PrincessFormulaCreator
         }
       }
     }
-    throw new IllegalArgumentException("Unknown formula type");
+    throw new IllegalArgumentException(
+        String.format(
+            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
   }
 
   @Override

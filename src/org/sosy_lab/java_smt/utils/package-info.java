@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 /** Utility classes implementing algorithms based on the API of JavaSMT. */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

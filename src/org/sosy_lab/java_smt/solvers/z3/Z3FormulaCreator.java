@@ -178,7 +178,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
         return FormulaType.getFloatingPointType(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_DATATYPE_SORT:
@@ -309,7 +309,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
-    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize());
+    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize() + 1);
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -591,7 +591,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * @param value Z3_ast
-   * @return Whether the value is a constant and can be passed to {@link #convertValue(long)}.
+   * @return Whether the value is a constant and can be passed to {@link #convertValue(Long)}.
    */
   public boolean isConstant(long value) {
     return Native.isNumeralAst(environment, value)
@@ -605,8 +605,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
    *     FloatingPointRoundingMode}.
    */
-  public Object convertValue(long value) {
-    assert isConstant(value) : "value is not constant: " + Native.astToString(environment, value);
+  @Override
+  public Object convertValue(Long value) {
+    if (!isConstant(value)) {
+      return null;
+    }
+
     Native.incRef(environment, value);
 
     Object constantValue =

@@ -44,7 +44,9 @@ public class AllSatExample {
       System.out.println("\nUsing solver " + solver);
       try (SolverContext context =
               SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-          ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+          ProverEnvironment prover =
+              context.newProverEnvironment(
+                  ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
 
         AllSatExample ase = new AllSatExample(context, prover);
 
@@ -178,10 +180,12 @@ public class AllSatExample {
       throws InterruptedException, SolverException {
 
     IntegerFormula a = ifmgr.makeVariable("a");
+    IntegerFormula b = ifmgr.makeVariable("b");
     BooleanFormula p = bfmgr.makeVariable("p");
     BooleanFormula q = bfmgr.makeVariable("q");
 
     prover.addConstraint(ifmgr.lessOrEquals(num(1), a));
+    prover.addConstraint(ifmgr.equal(num(0), b));
     prover.addConstraint(ifmgr.lessOrEquals(a, num(3)));
     prover.addConstraint(bfmgr.equivalence(p, q));
 

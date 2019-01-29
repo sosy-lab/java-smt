@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<String> pTermNamesOfA)
+  public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
 
@@ -84,31 +85,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
             .collect(ImmutableSet.toImmutableSet());
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
-    Term termA = buildConjunctionOfNamedTerms(termNamesOfA);
-    Term termB = buildConjunctionOfNamedTerms(termNamesOfB);
-
-    return getInterpolant(termA, termB);
-  }
-
-  @Override
-  public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<String>> partitionedTermNames)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
-
-    final Term[] formulas = new Term[partitionedTermNames.size()];
-    for (int i = 0; i < formulas.length; i++) {
-      formulas[i] = buildConjunctionOfNamedTerms(partitionedTermNames.get(i));
-    }
-
-    // get interpolants of groups
-    final Term[] itps = env.getInterpolants(formulas);
-
-    final List<BooleanFormula> result = new ArrayList<>();
-    for (Term itp : itps) {
-      result.add(mgr.encapsulateBooleanFormula(itp));
-    }
-    return result;
+    return Iterables.getOnlyElement(
+        getSeqInterpolants(Lists.newArrayList(termNamesOfA, termNamesOfB)));
   }
 
   @Override
@@ -133,16 +111,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
     }
     assert result.size() == startOfSubTree.length - 1;
     return result;
-  }
-
-  protected BooleanFormula getInterpolant(Term termA, Term termB)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
-    // get interpolant of groups
-    Term[] itp = env.getInterpolants(new Term[] {termA, termB});
-    assert itp.length == 1; // 2 groups -> 1 interpolant
-
-    return mgr.encapsulateBooleanFormula(itp[0]);
   }
 
   private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {

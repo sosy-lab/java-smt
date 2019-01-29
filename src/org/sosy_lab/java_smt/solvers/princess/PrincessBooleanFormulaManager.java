@@ -127,7 +127,7 @@ class PrincessBooleanFormulaManager
     return simplify(new IBinFormula(IBinJunctor.Or(), (IFormula) t1, (IFormula) t2));
   }
 
-  /** simplification to avoid identical subgraphs: (a&b)&(a&c) --> a&(b&c), etc */
+  /** simplification to avoid identical subgraphs: (a&b)&(a&c) --> a&(b&c), etc. */
   private IFormula simplify(IFormula f) {
     if (f instanceof IBinFormula) {
       final IBinFormula bin = (IBinFormula) f;

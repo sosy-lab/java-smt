@@ -58,7 +58,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -102,7 +102,7 @@ class SmtInterpolEnvironment {
   private final LogProxy smtInterpolLogProxy;
   private final ShutdownNotifier shutdownNotifier;
 
-  /** the wrapped Script */
+  /** the wrapped Script. */
   private final Script script;
 
   private final Theory theory;
@@ -415,22 +415,22 @@ class SmtInterpolEnvironment {
     return script.annotate(t, annotations);
   }
 
-  /** returns a number of type INT or REAL */
+  /** returns a number of type INT or REAL. */
   public Term numeral(BigInteger num) {
     return script.numeral(num);
   }
 
-  /** returns a number of type INT or REAL */
+  /** returns a number of type INT or REAL. */
   public Term numeral(String num) {
     return script.numeral(num);
   }
 
-  /** returns a number of type REAL */
+  /** returns a number of type REAL. */
   public Term decimal(String num) {
     return script.decimal(num);
   }
 
-  /** returns a number of type REAL */
+  /** returns a number of type REAL. */
   public Term decimal(BigDecimal num) {
     return script.decimal(num);
   }
@@ -441,29 +441,6 @@ class SmtInterpolEnvironment {
 
   public Term binary(String bin) {
     return script.binary(bin);
-  }
-
-  /**
-   * This function returns a list of interpolants for the partitions. Each partition must be a named
-   * term or a conjunction of named terms. There should be (n-1) interpolants for n partitions.
-   */
-  public Term[] getInterpolants(Term[] partition) throws SolverException, InterruptedException {
-    checkState(stackDepth > 0, "interpolants should be on higher levels");
-    try {
-      return script.getInterpolants(partition);
-    } catch (UnsupportedOperationException e) {
-      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
-        // Not a bug, interpolation procedure is incomplete
-        throw new SolverException(e.getMessage(), e);
-      } else {
-        throw e;
-      }
-    } catch (SMTLIBException e) {
-      if ("Timeout exceeded".equals(e.getMessage())) {
-        shutdownNotifier.shutdownIfNecessary();
-      }
-      throw new AssertionError(e);
-    }
   }
 
   /**

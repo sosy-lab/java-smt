@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 /** Solver-independent tests and test utilities for the solver API. */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 package org.sosy_lab.java_smt.test;

@@ -152,7 +152,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     try (PrincessModel model = getModel()) {
-      return model.modelToList();
+      return model.toList();
     }
   }
 

@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -50,7 +50,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 @Options(prefix = "solver.z3")
 final class Z3SolverContext extends AbstractSolverContext {
 
-  /** Optimization settings */
+  /** Optimization settings. */
   @Option(
       secure = true,
       description = "Engine to use for the optimization",

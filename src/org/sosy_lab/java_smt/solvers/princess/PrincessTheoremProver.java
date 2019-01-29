@@ -25,7 +25,7 @@ import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;

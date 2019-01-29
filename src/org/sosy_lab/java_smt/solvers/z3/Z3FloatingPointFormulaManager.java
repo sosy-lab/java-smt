@@ -187,16 +187,12 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long fromIeeeBitvectorImpl(Long pNumber, FloatingPointType pTargetType) {
-    // TODO: The following code misses the sign bit
-    // return Native.mkFpaToFpBv(z3context, pNumber, mkFpaSort(pTargetType));
-    throw new UnsupportedOperationException();
+    return Native.mkFpaToFpBv(z3context, pNumber, mkFpaSort(pTargetType));
   }
 
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    // TODO: The following code misses the sign bit
-    // return Native.mkFpaToIeeeBv(z3context, pNumber);
-    throw new UnsupportedOperationException();
+    return Native.mkFpaToIeeeBv(z3context, pNumber);
   }
 
   @Override

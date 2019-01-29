@@ -30,6 +30,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,6 +47,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGES =
       ImmutableSet.of(
+          "Unexpected proof rule to split: PN4msat5proof5ProofE",
           "impossible to build a suitable congruence graph!",
           "can't build ie-local interpolant",
           "set_raised on an already-raised proof",
@@ -112,15 +114,10 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<Integer> formulasOfA) throws SolverException {
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
     Preconditions.checkState(!closed);
 
-    int[] groupsOfA = new int[formulasOfA.size()];
-    int i = 0;
-    for (Integer f : formulasOfA) {
-      groupsOfA[i++] = f;
-    }
-
+    int[] groupsOfA = Ints.toArray(formulasOfA);
     long itp;
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
@@ -141,9 +138,12 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+
     // the fallback to a loop is sound and returns an inductive sequence of interpolants
     final List<BooleanFormula> itps = new ArrayList<>();
-    for (int i = 0; i < partitionedFormulas.size(); i++) {
+    for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
           getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }

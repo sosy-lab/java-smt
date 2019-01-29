@@ -19,10 +19,13 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
+
 /**
  * A formula of the array sort.
  *
  * @param <TI> Index type.
  * @param <TE> Element type.
  */
+@Immutable
 public interface ArrayFormula<TI extends Formula, TE extends Formula> extends Formula {}

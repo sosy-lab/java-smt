@@ -84,7 +84,7 @@ public interface BooleanFormulaManager {
   boolean isFalse(BooleanFormula formula);
 
   /**
-   * Creates a formula representing {@code IF cond THEN f1 ELSE f2}
+   * Creates a formula representing {@code IF cond THEN f1 ELSE f2}.
    *
    * @param cond a Formula
    * @param f1 a Formula

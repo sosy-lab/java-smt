@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
 import java.util.List;
 
 /**
@@ -27,6 +28,7 @@ import java.util.List;
  *
  * <p>Can be instantiated using {@link FormulaManager#makeApplication}
  */
+@Immutable
 public interface FunctionDeclaration<E extends Formula> {
 
   /** @return Type of the function (LT / GT / UF / etc...). */

@@ -21,13 +21,10 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
-import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
@@ -36,36 +33,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
   private final Model model;
-  private final SmtInterpolFormulaCreator formulaCreator;
 
   SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator) {
     super(pCreator);
-    formulaCreator = (SmtInterpolFormulaCreator) pCreator;
     model = pModel;
   }
 
-  @Nullable
   @Override
-  public Object evaluateImpl(Term f) {
-    Term out = model.evaluate(f);
-    return getValue(out);
-  }
+  protected ImmutableList<ValueAssignment> toList() {
 
-  @Override
-  protected ImmutableList<ValueAssignment> modelToList() {
-
-    Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (FunctionSymbol symbol : model.getDefinedFunctions()) {
-      final String name = symbol.getApplicationString();
+      final String name = unescape(symbol.getApplicationString());
       if (symbol.getParameterSorts().length == 0) { // simple variable or array
         Term variable = creator.getEnv().term(name);
         if (symbol.getReturnSort().isArraySort()) {
@@ -79,6 +65,10 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     }
 
     return assignments.build().asList();
+  }
+
+  private static String unescape(String s) {
+    return s.startsWith("|") ? s.substring(1, s.length() - 1) : s;
   }
 
   /**
@@ -134,7 +124,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
   /** Get all modeled assignments for the UF. */
   private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol) {
     final Collection<ValueAssignment> assignments = new ArrayList<>();
-    final String name = symbol.getApplicationString();
+    final String name = unescape(symbol.getApplicationString());
 
     // direct interaction with internal classes and internal behaviour of SMTInterpol.
     // they made some classes 'public' especially for us,
@@ -178,34 +168,11 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     return model.toString();
   }
 
-  private Object getValue(Term value) {
-    FormulaType<?> type = creator.getFormulaType(value);
-    if (type.isBooleanType()) {
-      return value.getTheory().mTrue == value;
-    } else if (value instanceof ConstantTerm
-        && ((ConstantTerm) value).getValue() instanceof Rational) {
-
-      /*
-       * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
-       * the output is SmtInterpol's Rational unless it is a bitvector,
-       * and currently we do not support bitvectors for SmtInterpol.
-       */
-      Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
-      org.sosy_lab.common.rationals.Rational out =
-          org.sosy_lab.common.rationals.Rational.of(
-              rationalValue.numerator(), rationalValue.denominator());
-      if (formulaCreator.getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
-        assert out.isIntegral();
-        return out.getNum();
-      } else {
-        return out;
-      }
-    } else {
-
-      throw new IllegalArgumentException("Unexpected value: " + value);
-    }
-  }
-
   @Override
   public void close() {}
+
+  @Override
+  protected Term evalImpl(Term formula) {
+    return model.evaluate(formula);
+  }
 }

@@ -77,6 +77,33 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testEmpty() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m).isEmpty();
+      }
+
+      assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
+  public void testOnlyTrue() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeTrue());
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m).isEmpty();
+      }
+
+      assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
   public void testGetSmallIntegers() throws SolverException, InterruptedException {
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
@@ -328,6 +355,20 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testPartialModels2() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      IntegerFormula x = imgr.makeVariable("x");
+      prover.push(imgr.greaterThan(x, imgr.makeNumber(0)));
+      assertThat(prover).isSatisfiable();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+        // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
+        // solvers.
+      }
+    }
+  }
+
+  @Test
   public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
         .withMessage("As of now, only Z3 and Princess support partial model evaluation")
@@ -352,8 +393,43 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeNumber(0))).isEqualTo(BigInteger.ZERO);
         assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(imgr.makeNumber(100))).isEqualTo(BigInteger.valueOf(100));
         assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        if (bvmgr != null) {
+          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+            assertThat(m.evaluate(bvmgr.makeBitvector(i, 0))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.makeBitvector(i, 1))).isEqualTo(BigInteger.ONE);
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testEvaluatingConstantsWithOperation() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeVariable("b"));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.add(imgr.makeNumber(45), imgr.makeNumber(55))))
+            .isEqualTo(BigInteger.valueOf(100));
+        assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
+            .isEqualTo(BigInteger.valueOf(100));
+        assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
+            .isEqualTo(true);
+        if (bvmgr != null) {
+          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+            BitvectorFormula zero = bvmgr.makeBitvector(i, 0);
+            BitvectorFormula one = bvmgr.makeBitvector(i, 1);
+            assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
+            assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
+          }
+        }
       }
     }
   }
@@ -472,6 +548,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireArrays();
 
@@ -490,9 +567,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        @SuppressWarnings("unused")
-        Object evaluation =
-            m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
+        m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
       }
     }
   }
@@ -1136,6 +1211,75 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
       prover.getModelAssignments();
       fail();
+    }
+  }
+
+  @Test
+  public void testGetSmallIntegers1() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeVariable("x")),
+        BigInteger.valueOf(20));
+  }
+
+  @Test
+  public void testGetSmallIntegers2() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
+        BigInteger.valueOf(11));
+  }
+
+  @Test
+  public void testGetNegativeIntegers1() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
+        BigInteger.valueOf(-9));
+  }
+
+  @Test
+  public void testGetSmallIntegralRationals1() throws SolverException, InterruptedException {
+    requireRationals();
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
+        rmgr.add(rmgr.makeVariable("x"), rmgr.makeVariable("x")),
+        Rational.of(2));
+  }
+
+  @Test
+  public void testGetRationals1() throws SolverException, InterruptedException {
+    requireRationals();
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.divide(rmgr.makeVariable("x"), rmgr.makeNumber(2)),
+        Rational.ofString("1/6"));
+  }
+
+  @Test
+  public void testGetBooleans1() throws SolverException, InterruptedException {
+    evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true);
+    evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(false), false);
+    evaluateInModel(
+        bmgr.makeVariable("x"),
+        bmgr.or(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
+        true);
+    evaluateInModel(
+        bmgr.makeVariable("x"),
+        bmgr.and(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
+        false);
+  }
+
+  private void evaluateInModel(BooleanFormula constraint, Formula variable, Object expectedValue)
+      throws SolverException, InterruptedException {
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(constraint);
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
+      }
     }
   }
 }
