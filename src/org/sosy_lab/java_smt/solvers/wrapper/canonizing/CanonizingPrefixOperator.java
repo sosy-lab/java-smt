@@ -239,7 +239,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     if (obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if (!(obj instanceof CanonizingPrefixOperator)) {
       return false;
     }
     CanonizingPrefixOperator other = (CanonizingPrefixOperator) obj;

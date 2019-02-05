@@ -333,7 +333,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
     if (obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if (!(obj instanceof CanonizingInfixOperator)) {
       return false;
     }
     CanonizingInfixOperator other = (CanonizingInfixOperator) obj;
