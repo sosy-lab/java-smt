@@ -19,12 +19,13 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
-import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import com.google.errorprone.annotations.Immutable;
 
 /**
  * For proof-of-concept and testing matters this implementation of the {@link CanonizingStrategy}
  * interface returns an unaltered copy of any {@link CanonizingFormula}.
  */
+@Immutable
 public class IdentityStrategy implements CanonizingStrategy {
 
 }

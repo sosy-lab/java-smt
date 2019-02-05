@@ -152,19 +152,19 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
           formula = bmgr.negate(fpOperands[0]);
           break;
         case FP_ROUND_AWAY:
-          bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_AWAY);
+          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_AWAY);
           break;
         case FP_ROUND_EVEN:
-          bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
           break;
         case FP_ROUND_NEGATIVE:
-          bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_NEGATIVE);
+          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_NEGATIVE);
           break;
         case FP_ROUND_POSITIVE:
-          bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_POSITIVE);
+          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_POSITIVE);
           break;
         case FP_ROUND_ZERO:
-          bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
+          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
           break;
         default:
           throw new IllegalStateException(

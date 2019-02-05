@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
+import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
@@ -27,6 +28,7 @@ import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingInfixOperator;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 
+@Immutable
 public class ReorderingStrategy implements CanonizingStrategy {
 
   @Override
