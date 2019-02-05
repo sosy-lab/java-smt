@@ -32,14 +32,14 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 public interface SMTCache {
 
   /**
-   * FIXME: For Allsat some strategy has yet to be thought of, to handle the generic callback
+   * FIXME: For Allsat some strategy has yet to be thought of, to handle the generic callback.
    */
 
-  public enum CachingMode {
+  enum CachingMode {
     IN_MEMORY;
   }
 
-  public static SMTCache newSMTCache(CachingMode pMode) {
+  static SMTCache newSMTCache(CachingMode pMode) {
     SMTCache cache = null;
 
     switch (pMode) {
@@ -53,84 +53,84 @@ public interface SMTCache {
     return cache;
   }
 
-  public Boolean storeFormulaUnsat(BooleanFormula pFormula, boolean pUnsat);
+  Boolean storeFormulaUnsat(BooleanFormula pFormula, boolean pUnsat);
 
-  public Boolean isFormulaUnsat(BooleanFormula pFormula);
+  Boolean isFormulaUnsat(BooleanFormula pFormula);
 
-  public Boolean storeFormulaUnsatWithAssumptions(
+  Boolean storeFormulaUnsatWithAssumptions(
       BooleanFormula pFormula,
       boolean pUnsat,
       Collection<BooleanFormula> pAssumptions);
 
-  public Boolean isFormulaUnsatWithAssumptions(
+  Boolean isFormulaUnsatWithAssumptions(
       BooleanFormula pFormula,
       Collection<BooleanFormula> pAssumptions);
 
-  public Model storeFormulaModel(BooleanFormula pFormula, Model pModel);
+  Model storeFormulaModel(BooleanFormula pFormula, Model pModel);
 
-  public Model getFormulaModel(BooleanFormula pFormula);
+  Model getFormulaModel(BooleanFormula pFormula);
 
-  public ImmutableList<ValueAssignment> storeFormulaModelAssignments(
+  ImmutableList<ValueAssignment> storeFormulaModelAssignments(
       BooleanFormula pFormula,
       ImmutableList<ValueAssignment> pAssignments);
 
-  public ImmutableList<ValueAssignment> getFormulaModelAssignments(BooleanFormula pFormula);
+  ImmutableList<ValueAssignment> getFormulaModelAssignments(BooleanFormula pFormula);
 
-  public List<BooleanFormula>
+  List<BooleanFormula>
       storeFormulaUnsatCore(BooleanFormula pFormula, List<BooleanFormula> pUnsatCore);
 
-  public List<BooleanFormula> getFormulaUnsatCore(BooleanFormula pFormula);
+  List<BooleanFormula> getFormulaUnsatCore(BooleanFormula pFormula);
 
-  public Optional<List<BooleanFormula>> storeFormulaUnsatCoreOverAssumptions(
+  Optional<List<BooleanFormula>> storeFormulaUnsatCoreOverAssumptions(
       BooleanFormula pFormula,
       Optional<List<BooleanFormula>> pUnsatCore,
       Collection<BooleanFormula> pAssumptions);
 
-  public Optional<List<BooleanFormula>> getFormulaUnsatCoreOverAssumptions(
+  Optional<List<BooleanFormula>> getFormulaUnsatCoreOverAssumptions(
       BooleanFormula pFormula,
       Collection<BooleanFormula> pAssumptions);
 
-  public BooleanFormula storeFormulaInterpolant(
+  BooleanFormula storeFormulaInterpolant(
       BooleanFormula pFormula,
       BooleanFormula pInterpolant,
       Collection<?> pFormulasOfA);
 
-  public BooleanFormula getFormulaInterpolant(BooleanFormula pFormula, Collection<?> pFormulasOfA);
+  BooleanFormula getFormulaInterpolant(BooleanFormula pFormula, Collection<?> pFormulasOfA);
 
-  public List<BooleanFormula> storeFormulaTreeInterpolants(
+  List<BooleanFormula> storeFormulaTreeInterpolants(
       BooleanFormula pFormula,
       List<BooleanFormula> pTreeInterpolants,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree);
 
-  public List<BooleanFormula> getFormulaTreeInterpolants(
+  List<BooleanFormula> getFormulaTreeInterpolants(
       BooleanFormula pFormula,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree);
 
-  public Integer storeFormulaMaximize(BooleanFormula pFormula, Integer max, Formula pObjective);
+  Integer storeFormulaMaximize(BooleanFormula pFormula, Integer max, Formula pObjective);
 
-  public Integer getFormulaMaximize(BooleanFormula pFormula, Formula pObjective);
+  Integer getFormulaMaximize(BooleanFormula pFormula, Formula pObjective);
 
-  public Integer storeFormulaMinimize(BooleanFormula pFormula, Integer min, Formula pObjective);
+  Integer storeFormulaMinimize(BooleanFormula pFormula, Integer min, Formula pObjective);
 
-  public Integer getFormulaMinimize(BooleanFormula pFormula, Formula pObjective);
+  Integer getFormulaMinimize(BooleanFormula pFormula, Formula pObjective);
 
-  public Optional<Rational> storeFormulaUpper(
+  Optional<Rational> storeFormulaUpper(
       BooleanFormula pFormula,
       Optional<Rational> pUpper,
       int pHandle,
       Rational pEpsilon);
 
-  public Optional<Rational>
+  Optional<Rational>
       getFormulaUpper(BooleanFormula pFormula, int pHandle, Rational pEpsilon);
 
-  public Optional<Rational> storeFormulaLower(
+  Optional<Rational> storeFormulaLower(
       BooleanFormula pFormula,
       Optional<Rational> pLower,
       int pHandle,
       Rational pEpsilon);
 
-  public Optional<Rational>
+  Optional<Rational>
       getFormulaLower(BooleanFormula pFormula, int pHandle, Rational pEpsilon);
 }

@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -33,7 +34,7 @@ public class CanonizingFormulaStore {
   private Set<CanonizingFormula> constraints;
   private Set<CanonizingFormula> canonizedConstraints;
 
-  private final HashMap<CanonizingFormula, CanonizingFormula> MEMOIZED_FORMULAS = new HashMap<>();
+  private final Map<CanonizingFormula, CanonizingFormula> memoizedFormulas = new HashMap<>();
 
   private CanonizingFormula currentConstraint;
   private FormulaType<?> nextLiteralsType;
@@ -166,9 +167,9 @@ public class CanonizingFormulaStore {
   }
 
   public CanonizingFormula remember(CanonizingFormula pCanonizingFormula) {
-    if (MEMOIZED_FORMULAS.get(pCanonizingFormula) == null) {
-      MEMOIZED_FORMULAS.put(pCanonizingFormula, pCanonizingFormula);
+    if (memoizedFormulas.get(pCanonizingFormula) == null) {
+      memoizedFormulas.put(pCanonizingFormula, pCanonizingFormula);
     }
-    return MEMOIZED_FORMULAS.get(pCanonizingFormula);
+    return memoizedFormulas.get(pCanonizingFormula);
   }
 }

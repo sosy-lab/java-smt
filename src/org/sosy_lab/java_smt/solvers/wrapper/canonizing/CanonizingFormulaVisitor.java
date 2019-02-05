@@ -163,7 +163,12 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
                 returnType);
         break;
       default:
-        // TODO: Exception/Error/Not implemented/...
+        throw new IllegalStateException(
+            "No handling for function "
+                + pFunctionDeclaration.getName()
+                + " with "
+                + pArgs.size()
+                + " Parameters known.");
     }
 
     function = store.remember(function);

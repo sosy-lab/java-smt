@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.wrapper.caching;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,36 +35,36 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 
 public class InMemorySMTCache implements SMTCache {
 
-  private final Map<Integer, Boolean> UNSAT_MAP = new HashMap<>();
+  private final Map<Integer, Boolean> unsatMap = new HashMap<>();
 
-  private final Map<Integer, Model> MODEL_MAP = new HashMap<>();
+  private final Map<Integer, Model> modelMap = new HashMap<>();
 
-  private final Map<Integer, ImmutableList<ValueAssignment>> ASSIGNMENT_MAP = new HashMap<>();
+  private final Map<Integer, ImmutableList<ValueAssignment>> assignmentMap = new HashMap<>();
 
-  private final Map<Integer, List<BooleanFormula>> USAT_CORE_MAP = new HashMap<>();
+  private final Map<Integer, List<BooleanFormula>> usatCoreMap = new HashMap<>();
 
-  private final Map<Integer, BooleanFormula> INTERPOLANT_MAP = new HashMap<>();
+  private final Map<Integer, BooleanFormula> interpolantMap = new HashMap<>();
 
-  private final Map<Integer, List<BooleanFormula>> TREE_INTERPOLANT_MAP = new HashMap<>();
+  private final Map<Integer, List<BooleanFormula>> treeInterpolantMap = new HashMap<>();
 
-  private final Map<Integer, Rational> UPPER_MAP = new HashMap<>();
+  private final Map<Integer, Rational> upperMap = new HashMap<>();
 
-  private final Map<Integer, Rational> LOWER_MAP = new HashMap<>();
+  private final Map<Integer, Rational> lowerMap = new HashMap<>();
 
-  private final int prime = 7;
+  private final static int prime = 7;
 
-  private Map<Integer, Integer> MAX_MAP = new HashMap<>();
+  private Map<Integer, Integer> maxMap = new HashMap<>();
 
-  private Map<Integer, Integer> MIN_MAP = new HashMap<>();
+  private Map<Integer, Integer> minMap = new HashMap<>();
 
   @Override
   public Boolean storeFormulaUnsat(BooleanFormula pFormula, boolean pUnsat) {
-    return UNSAT_MAP.put(pFormula.hashCode(), pUnsat);
+    return unsatMap.put(pFormula.hashCode(), pUnsat);
   }
 
   @Override
   public Boolean isFormulaUnsat(BooleanFormula pFormula) {
-    return UNSAT_MAP.get(pFormula.hashCode());
+    return unsatMap.get(pFormula.hashCode());
   }
 
   @Override
@@ -71,47 +72,47 @@ public class InMemorySMTCache implements SMTCache {
       BooleanFormula pFormula,
       boolean pUnsat,
       Collection<BooleanFormula> pAssumptions) {
-    return UNSAT_MAP.put(pFormula.hashCode() + prime * pAssumptions.hashCode(), pUnsat);
+    return unsatMap.put(pFormula.hashCode() + prime * pAssumptions.hashCode(), pUnsat);
   }
 
   @Override
   public Boolean isFormulaUnsatWithAssumptions(
       BooleanFormula pFormula,
       Collection<BooleanFormula> pAssumptions) {
-    return UNSAT_MAP.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
+    return unsatMap.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
   }
 
   @Override
   public Model storeFormulaModel(BooleanFormula pFormula, Model pModel) {
-    return MODEL_MAP.put(pFormula.hashCode(), pModel);
+    return modelMap.put(pFormula.hashCode(), pModel);
   }
 
   @Override
   public Model getFormulaModel(BooleanFormula pFormula) {
-    return MODEL_MAP.get(pFormula.hashCode());
+    return modelMap.get(pFormula.hashCode());
   }
 
   @Override
   public ImmutableList<ValueAssignment> storeFormulaModelAssignments(
       BooleanFormula pFormula,
       ImmutableList<ValueAssignment> pAssignments) {
-    return ASSIGNMENT_MAP.put(pFormula.hashCode(), pAssignments);
+    return assignmentMap.put(pFormula.hashCode(), pAssignments);
   }
 
   @Override
   public ImmutableList<ValueAssignment> getFormulaModelAssignments(BooleanFormula pFormula) {
-    return ASSIGNMENT_MAP.get(pFormula.hashCode());
+    return assignmentMap.get(pFormula.hashCode());
   }
 
   @Override
   public List<BooleanFormula>
       storeFormulaUnsatCore(BooleanFormula pFormula, List<BooleanFormula> pUnsatCore) {
-    return USAT_CORE_MAP.put(pFormula.hashCode(), pUnsatCore);
+    return usatCoreMap.put(pFormula.hashCode(), pUnsatCore);
   }
 
   @Override
   public List<BooleanFormula> getFormulaUnsatCore(BooleanFormula pFormula) {
-    return USAT_CORE_MAP.get(pFormula.hashCode());
+    return usatCoreMap.get(pFormula.hashCode());
   }
 
   @Override
@@ -124,7 +125,7 @@ public class InMemorySMTCache implements SMTCache {
       unsatCore = pUnsatCore.get();
     }
     unsatCore =
-        USAT_CORE_MAP
+        usatCoreMap
             .put(pFormula.hashCode() + prime * pAssumptions.hashCode(), new ArrayList<>(unsatCore));
     return optionalList(unsatCore);
   }
@@ -134,7 +135,7 @@ public class InMemorySMTCache implements SMTCache {
       BooleanFormula pFormula,
       Collection<BooleanFormula> pAssumptions) {
     Collection<BooleanFormula> unsatCore =
-        USAT_CORE_MAP.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
+        usatCoreMap.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
     return optionalList(unsatCore);
   }
 
@@ -151,12 +152,12 @@ public class InMemorySMTCache implements SMTCache {
       BooleanFormula pFormula,
       BooleanFormula pInterpolant,
       Collection<?> pFormulasOfA) {
-    return INTERPOLANT_MAP.put(pFormula.hashCode() + prime * pFormulasOfA.hashCode(), pInterpolant);
+    return interpolantMap.put(pFormula.hashCode() + prime * pFormulasOfA.hashCode(), pInterpolant);
   }
 
   @Override
   public BooleanFormula getFormulaInterpolant(BooleanFormula pFormula, Collection<?> pFormulasOfA) {
-    return INTERPOLANT_MAP.get(pFormula.hashCode() + prime * pFormulasOfA.hashCode());
+    return interpolantMap.get(pFormula.hashCode() + prime * pFormulasOfA.hashCode());
   }
 
   @Override
@@ -167,8 +168,8 @@ public class InMemorySMTCache implements SMTCache {
       int[] pStartOfSubTree) {
     int key = pFormula.hashCode();
     key += prime * pPartitionedFormulas.hashCode();
-    key += prime * pStartOfSubTree.hashCode();
-    return TREE_INTERPOLANT_MAP.put(key, pTreeInterpolants);
+    key += prime * Arrays.hashCode(pStartOfSubTree);
+    return treeInterpolantMap.put(key, pTreeInterpolants);
   }
 
   @Override
@@ -178,28 +179,28 @@ public class InMemorySMTCache implements SMTCache {
       int[] pStartOfSubTree) {
     int key = pFormula.hashCode();
     key += prime * pPartitionedFormulas.hashCode();
-    key += prime * pStartOfSubTree.hashCode();
-    return TREE_INTERPOLANT_MAP.get(key);
+    key += prime * Arrays.hashCode(pStartOfSubTree);
+    return treeInterpolantMap.get(key);
   }
 
   @Override
   public Integer storeFormulaMaximize(BooleanFormula pFormula, Integer pMax, Formula pObjective) {
-    return MAX_MAP.put(pFormula.hashCode(), pMax);
+    return maxMap.put(pFormula.hashCode(), pMax);
   }
 
   @Override
   public Integer getFormulaMaximize(BooleanFormula pFormula, Formula pObjective) {
-    return MAX_MAP.get(pFormula.hashCode());
+    return maxMap.get(pFormula.hashCode());
   }
 
   @Override
   public Integer storeFormulaMinimize(BooleanFormula pFormula, Integer pMin, Formula pObjective) {
-    return MIN_MAP.put(pFormula.hashCode(), pMin);
+    return minMap.put(pFormula.hashCode(), pMin);
   }
 
   @Override
   public Integer getFormulaMinimize(BooleanFormula pFormula, Formula pObjective) {
-    return MIN_MAP.get(pFormula.hashCode());
+    return minMap.get(pFormula.hashCode());
   }
 
   @Override
@@ -213,7 +214,7 @@ public class InMemorySMTCache implements SMTCache {
     key += prime * pHandle;
     Rational last = null;
     if (pUpper.isPresent()) {
-      last = UPPER_MAP.put(key, pUpper.get());
+      last = upperMap.put(key, pUpper.get());
     }
     return Optional.ofNullable(last);
   }
@@ -224,7 +225,7 @@ public class InMemorySMTCache implements SMTCache {
     int key = pFormula.hashCode();
     key += prime * pEpsilon.hashCode();
     key += prime * pHandle;
-    Rational value = UPPER_MAP.get(key);
+    Rational value = upperMap.get(key);
     return Optional.ofNullable(value);
   }
 
@@ -239,7 +240,7 @@ public class InMemorySMTCache implements SMTCache {
     key += prime * pHandle;
     Rational last = null;
     if (pLower.isPresent()) {
-      last = LOWER_MAP.put(key, pLower.get());
+      last = lowerMap.put(key, pLower.get());
     }
     return Optional.ofNullable(last);
   }
@@ -250,7 +251,7 @@ public class InMemorySMTCache implements SMTCache {
     int key = pFormula.hashCode();
     key += prime * pEpsilon.hashCode();
     key += prime * pHandle;
-    Rational value = LOWER_MAP.get(key);
+    Rational value = lowerMap.get(key);
     return Optional.ofNullable(value);
   }
 }

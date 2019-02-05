@@ -50,19 +50,19 @@ public class WrapperSolverContext extends AbstractSolverContext {
   @Options(prefix = "solver.wrapper")
   private static class WrapperOptions {
     @Option(secure = true, description = "Which SMT solver to use as delegate.")
-    public Solvers solver = Solvers.SMTINTERPOL;
+    private Solvers solver = Solvers.SMTINTERPOL;
 
     @Option(
       secure = true,
       description = "If formulas should be canonized before queried to the solver."
     )
-    public boolean canonize = false;
+    private boolean canonize = false;
 
     @Option(secure = true, description = "Which strategies to use for canonization")
-    public Set<CanonizingStrategies> strategies = null;
+    private Set<CanonizingStrategies> strategies = null;
 
     @Option(secure = true, description = "If answers of solvers should be cached.")
-    public boolean cache = false;
+    private boolean cache = false;
   }
 
   private SolverContext delegate;

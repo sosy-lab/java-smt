@@ -40,7 +40,7 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   protected BooleanFormulaManager fmgr;
   protected SMTCache cache;
   protected BooleanFormula formula;
-  protected Stack<BooleanFormula> stack;
+  protected final Stack<BooleanFormula> stack;
 
   public AbstractCachingEnvironment(
       FormulaManager pMgr,
@@ -85,7 +85,8 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
     Boolean cached = cache.isFormulaUnsatWithAssumptions(formula, pAssumptions);
     if (cached == null) {
       cached = getDelegate().isUnsatWithAssumptions(pAssumptions);
@@ -126,7 +127,8 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
+  public Optional<List<BooleanFormula>>
+      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
         Optional<List<BooleanFormula>> cached =
             cache.getFormulaUnsatCoreOverAssumptions(formula, pAssumptions);

@@ -38,15 +38,15 @@ public interface CanonizingFormula {
     return null;
   }
 
-  public CanonizingFormula copy();
+  CanonizingFormula copy();
 
-  public Formula toFormula(FormulaManager pMgr);
+  Formula toFormula(FormulaManager pMgr);
 
-  public CanonizingFormula canonize(CanonizingStrategy pStrategy);
+  CanonizingFormula canonize(CanonizingStrategy pStrategy);
 
-  public FormulaManager getFormulaManager();
+  FormulaManager getFormulaManager();
 
-  public void toString(StringBuilder pBuilder);
+  void toString(StringBuilder pBuilder);
 
   FormulaType<?> getType();
 }
