@@ -24,8 +24,8 @@ public enum CanonizingStrategies {
   REORDERING(4),
   RENAMING(10);
 
-  private int priority;
-  private CanonizingStrategy strategy;
+  private final int priority;
+  private final CanonizingStrategy strategy;
 
   CanonizingStrategies(int pPriority) {
     this.priority = pPriority;
