@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
+import com.google.errorprone.annotations.Immutable;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -36,6 +37,7 @@ import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
  * specialized as possible. E.g., do not mix alteration of variable-names, reordering of operands,
  * and constant-propagation into a single strategy.
  */
+@Immutable
 public interface CanonizingStrategy {
 
   default CanonizingFormula canonizeInfixOperator(
