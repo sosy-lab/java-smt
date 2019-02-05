@@ -20,10 +20,11 @@
 package org.sosy_lab.java_smt.solvers.wrapper.caching.prover;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -40,7 +41,7 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   protected BooleanFormulaManager fmgr;
   protected SMTCache cache;
   protected BooleanFormula formula;
-  protected final Stack<BooleanFormula> stack;
+  protected final Deque<BooleanFormula> stack;
 
   public AbstractCachingEnvironment(
       FormulaManager pMgr,
@@ -49,7 +50,7 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
     cache = SMTCache.newSMTCache(pMode);
 
     formula = fmgr.makeTrue();
-    stack = new Stack<>();
+    stack = new ArrayDeque<>();
     stack.push(formula);
   }
 
