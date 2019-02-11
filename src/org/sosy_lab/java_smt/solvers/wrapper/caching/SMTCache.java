@@ -133,4 +133,6 @@ public interface SMTCache {
 
   Optional<Rational>
       getFormulaLower(BooleanFormula pFormula, int pHandle, Rational pEpsilon);
+
+  void close();
 }

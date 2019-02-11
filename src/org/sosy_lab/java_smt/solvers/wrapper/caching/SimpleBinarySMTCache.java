@@ -20,13 +20,15 @@
 package org.sosy_lab.java_smt.solvers.wrapper.caching;
 
 import com.google.common.collect.ImmutableList;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -34,40 +36,47 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 
-public class InMemorySMTCache implements SMTCache, Serializable {
+public class SimpleBinarySMTCache implements SMTCache {
 
-  private static final long serialVersionUID = 1L;
+  private final static String CACHE_FILE = "java-smt.cache";
 
-  private final Map<Integer, Boolean> unsatMap = new HashMap<>();
+  private InMemorySMTCache cache;
 
-  private final Map<Integer, Model> modelMap = new HashMap<>();
+  public SimpleBinarySMTCache() {
+    cache = loadCacheFileIfExists();
+  }
 
-  private final Map<Integer, ImmutableList<ValueAssignment>> assignmentMap = new HashMap<>();
+  private InMemorySMTCache loadCacheFileIfExists() {
+    InMemorySMTCache newCache = new InMemorySMTCache();
 
-  private final Map<Integer, List<BooleanFormula>> usatCoreMap = new HashMap<>();
+    Path path = getCacheFilePath();
+    File cacheFile = path.toFile();
 
-  private final Map<Integer, BooleanFormula> interpolantMap = new HashMap<>();
+    if (cacheFile.exists()) {
+      try (ObjectInputStream os = new ObjectInputStream(new FileInputStream(cacheFile))) {
+        newCache = (InMemorySMTCache) os.readObject();
+      } catch (Exception e) {
+        // TODO: handle exception
+      }
+    }
 
-  private final Map<Integer, List<BooleanFormula>> treeInterpolantMap = new HashMap<>();
+    return newCache;
+  }
 
-  private final Map<Integer, Rational> upperMap = new HashMap<>();
-
-  private final Map<Integer, Rational> lowerMap = new HashMap<>();
-
-  private final static int prime = 7;
-
-  private Map<Integer, Integer> maxMap = new HashMap<>();
-
-  private Map<Integer, Integer> minMap = new HashMap<>();
+  private Path getCacheFilePath() {
+    Path path = Paths.get("");
+    path = Paths.get(path.toAbsolutePath().toString(), CACHE_FILE);
+    return path;
+  }
 
   @Override
   public Boolean storeFormulaUnsat(BooleanFormula pFormula, boolean pUnsat) {
-    return unsatMap.put(pFormula.hashCode(), pUnsat);
+    return cache.storeFormulaUnsat(pFormula, pUnsat);
   }
 
   @Override
   public Boolean isFormulaUnsat(BooleanFormula pFormula) {
-    return unsatMap.get(pFormula.hashCode());
+    return cache.isFormulaUnsat(pFormula);
   }
 
   @Override
@@ -75,47 +84,47 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       BooleanFormula pFormula,
       boolean pUnsat,
       Collection<BooleanFormula> pAssumptions) {
-    return unsatMap.put(pFormula.hashCode() + prime * pAssumptions.hashCode(), pUnsat);
+    return cache.storeFormulaUnsatWithAssumptions(pFormula, pUnsat, pAssumptions);
   }
 
   @Override
   public Boolean isFormulaUnsatWithAssumptions(
       BooleanFormula pFormula,
       Collection<BooleanFormula> pAssumptions) {
-    return unsatMap.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
+    return cache.isFormulaUnsatWithAssumptions(pFormula, pAssumptions);
   }
 
   @Override
   public Model storeFormulaModel(BooleanFormula pFormula, Model pModel) {
-    return modelMap.put(pFormula.hashCode(), pModel);
+    return cache.storeFormulaModel(pFormula, pModel);
   }
 
   @Override
   public Model getFormulaModel(BooleanFormula pFormula) {
-    return modelMap.get(pFormula.hashCode());
+    return cache.getFormulaModel(pFormula);
   }
 
   @Override
   public ImmutableList<ValueAssignment> storeFormulaModelAssignments(
       BooleanFormula pFormula,
       ImmutableList<ValueAssignment> pAssignments) {
-    return assignmentMap.put(pFormula.hashCode(), pAssignments);
+    return cache.storeFormulaModelAssignments(pFormula, pAssignments);
   }
 
   @Override
   public ImmutableList<ValueAssignment> getFormulaModelAssignments(BooleanFormula pFormula) {
-    return assignmentMap.get(pFormula.hashCode());
+    return cache.getFormulaModelAssignments(pFormula);
   }
 
   @Override
   public List<BooleanFormula>
       storeFormulaUnsatCore(BooleanFormula pFormula, List<BooleanFormula> pUnsatCore) {
-    return usatCoreMap.put(pFormula.hashCode(), pUnsatCore);
+    return cache.storeFormulaUnsatCore(pFormula, pUnsatCore);
   }
 
   @Override
   public List<BooleanFormula> getFormulaUnsatCore(BooleanFormula pFormula) {
-    return usatCoreMap.get(pFormula.hashCode());
+    return cache.getFormulaUnsatCore(pFormula);
   }
 
   @Override
@@ -123,31 +132,14 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       BooleanFormula pFormula,
       Optional<List<BooleanFormula>> pUnsatCore,
       Collection<BooleanFormula> pAssumptions) {
-    Collection<BooleanFormula> unsatCore = null;
-    if (pUnsatCore.isPresent()) {
-      unsatCore = pUnsatCore.get();
-    }
-    unsatCore =
-        usatCoreMap
-            .put(pFormula.hashCode() + prime * pAssumptions.hashCode(), new ArrayList<>(unsatCore));
-    return optionalList(unsatCore);
+    return cache.storeFormulaUnsatCoreOverAssumptions(pFormula, pUnsatCore, pAssumptions);
   }
 
   @Override
   public Optional<List<BooleanFormula>> getFormulaUnsatCoreOverAssumptions(
       BooleanFormula pFormula,
       Collection<BooleanFormula> pAssumptions) {
-    Collection<BooleanFormula> unsatCore =
-        usatCoreMap.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
-    return optionalList(unsatCore);
-  }
-
-  private Optional<List<BooleanFormula>> optionalList(Collection<BooleanFormula> unsatCore) {
-    if (unsatCore != null) {
-      return Optional.of(new ArrayList<>(unsatCore));
-    } else {
-      return Optional.empty();
-    }
+    return cache.getFormulaUnsatCoreOverAssumptions(pFormula, pAssumptions);
   }
 
   @Override
@@ -155,12 +147,12 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       BooleanFormula pFormula,
       BooleanFormula pInterpolant,
       Collection<?> pFormulasOfA) {
-    return interpolantMap.put(pFormula.hashCode() + prime * pFormulasOfA.hashCode(), pInterpolant);
+    return cache.storeFormulaInterpolant(pFormula, pInterpolant, pFormulasOfA);
   }
 
   @Override
   public BooleanFormula getFormulaInterpolant(BooleanFormula pFormula, Collection<?> pFormulasOfA) {
-    return interpolantMap.get(pFormula.hashCode() + prime * pFormulasOfA.hashCode());
+    return cache.getFormulaInterpolant(pFormula, pFormulasOfA);
   }
 
   @Override
@@ -169,10 +161,11 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       List<BooleanFormula> pTreeInterpolants,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
-    int key = pFormula.hashCode();
-    key += prime * pPartitionedFormulas.hashCode();
-    key += prime * Arrays.hashCode(pStartOfSubTree);
-    return treeInterpolantMap.put(key, pTreeInterpolants);
+    return cache.storeFormulaTreeInterpolants(
+        pFormula,
+        pTreeInterpolants,
+        pPartitionedFormulas,
+        pStartOfSubTree);
   }
 
   @Override
@@ -180,30 +173,27 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       BooleanFormula pFormula,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
-    int key = pFormula.hashCode();
-    key += prime * pPartitionedFormulas.hashCode();
-    key += prime * Arrays.hashCode(pStartOfSubTree);
-    return treeInterpolantMap.get(key);
+    return cache.getFormulaTreeInterpolants(pFormula, pPartitionedFormulas, pStartOfSubTree);
   }
 
   @Override
   public Integer storeFormulaMaximize(BooleanFormula pFormula, Integer pMax, Formula pObjective) {
-    return maxMap.put(pFormula.hashCode(), pMax);
+    return cache.storeFormulaMaximize(pFormula, pMax, pObjective);
   }
 
   @Override
   public Integer getFormulaMaximize(BooleanFormula pFormula, Formula pObjective) {
-    return maxMap.get(pFormula.hashCode());
+    return cache.getFormulaMaximize(pFormula, pObjective);
   }
 
   @Override
   public Integer storeFormulaMinimize(BooleanFormula pFormula, Integer pMin, Formula pObjective) {
-    return minMap.put(pFormula.hashCode(), pMin);
+    return cache.storeFormulaMinimize(pFormula, pMin, pObjective);
   }
 
   @Override
   public Integer getFormulaMinimize(BooleanFormula pFormula, Formula pObjective) {
-    return minMap.get(pFormula.hashCode());
+    return cache.getFormulaMinimize(pFormula, pObjective);
   }
 
   @Override
@@ -212,24 +202,13 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       Optional<Rational> pUpper,
       int pHandle,
       Rational pEpsilon) {
-    int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
-    Rational last = null;
-    if (pUpper.isPresent()) {
-      last = upperMap.put(key, pUpper.get());
-    }
-    return Optional.ofNullable(last);
+    return cache.storeFormulaUpper(pFormula, pUpper, pHandle, pEpsilon);
   }
 
   @Override
   public Optional<Rational>
       getFormulaUpper(BooleanFormula pFormula, int pHandle, Rational pEpsilon) {
-    int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
-    Rational value = upperMap.get(key);
-    return Optional.ofNullable(value);
+    return cache.getFormulaUpper(pFormula, pHandle, pEpsilon);
   }
 
   @Override
@@ -238,28 +217,35 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       Optional<Rational> pLower,
       int pHandle,
       Rational pEpsilon) {
-    int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
-    Rational last = null;
-    if (pLower.isPresent()) {
-      last = lowerMap.put(key, pLower.get());
-    }
-    return Optional.ofNullable(last);
+    return cache.storeFormulaLower(pFormula, pLower, pHandle, pEpsilon);
   }
 
   @Override
   public Optional<Rational>
       getFormulaLower(BooleanFormula pFormula, int pHandle, Rational pEpsilon) {
-    int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
-    Rational value = lowerMap.get(key);
-    return Optional.ofNullable(value);
+    return cache.getFormulaLower(pFormula, pHandle, pEpsilon);
   }
 
   @Override
   public void close() {
-    // Nothing to do
+    if (cache != null) {
+      writeCacheFile(cache);
+      cache = null;
+    }
+  }
+
+  private void writeCacheFile(InMemorySMTCache pCache) {
+    Path path = getCacheFilePath();
+    File check = path.toFile();
+
+    if (check.exists()) {
+      check.delete();
+    }
+
+    try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(check))) {
+      os.writeObject(pCache);
+    } catch (Exception e) {
+      // TODO: handle Exception
+    }
   }
 }

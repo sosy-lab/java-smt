@@ -143,6 +143,7 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   @Override
   public void close() {
     getDelegate().close();
+    cache.close();
   }
 
   @Override
