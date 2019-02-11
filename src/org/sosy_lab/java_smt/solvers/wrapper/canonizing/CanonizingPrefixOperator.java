@@ -22,6 +22,8 @@ package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -34,7 +36,9 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingPrefixOperator implements CanonizingFormula {
@@ -43,6 +47,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
   private FormulaType<?> returnType;
   private FunctionDeclarationKind operator;
   private ImmutableList<CanonizingFormula> operands;
+  private String name;
 
   private Integer hashCode = null;
 
@@ -51,10 +56,20 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       FunctionDeclarationKind pKind,
       List<CanonizingFormula> pOperands,
       FormulaType<?> pReturnType) {
+    this(pMgr, pKind, pOperands, pReturnType, pKind.name());
+  }
+
+  public CanonizingPrefixOperator(
+      FormulaManager pMgr,
+      FunctionDeclarationKind pKind,
+      List<CanonizingFormula> pOperands,
+      FormulaType<?> pReturnType,
+      String pName) {
     mgr = pMgr;
     operator = pKind;
     operands = ImmutableList.copyOf(pOperands);
     returnType = pReturnType;
+    name = pName;
   }
 
   @Override
@@ -97,6 +112,17 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
   public Formula toFormula(FormulaManager pMgr) {
     Formula formula = null;
 
+    if (operator == FunctionDeclarationKind.UF) {
+      UFManager umgr = pMgr.getUFManager();
+      List<Formula> args = new ArrayList<>();
+      for (CanonizingFormula cf : operands) {
+        args.add(cf.toFormula(pMgr));
+      }
+
+      // FIXME: how to determine the use of declare, call, declareAndCall for UFs?
+      return umgr.declareAndCallUF(name, returnType, args);
+    }
+
     if (operator == FunctionDeclarationKind.ITE) {
       BooleanFormulaManager bmgr = pMgr.getBooleanFormulaManager();
       BooleanFormula formula0 = (BooleanFormula) operands.get(0).toFormula(pMgr);
@@ -104,6 +130,29 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       Formula formula2 = operands.get(2).toFormula(pMgr);
 
       return bmgr.ifThenElse(formula0, formula1, formula2);
+    }
+
+    if (isArrayOperator(operator)) {
+      ArrayFormulaManager amgr = pMgr.getArrayFormulaManager();
+
+      if (operator == FunctionDeclarationKind.SELECT) {
+        @SuppressWarnings("unchecked")
+        ArrayFormula<NumeralFormula, ?> array =
+            (ArrayFormula<NumeralFormula, ?>) operands.get(0).toFormula(pMgr);
+        NumeralFormula index = (NumeralFormula) operands.get(1).toFormula(pMgr);
+
+        formula = amgr.select(array, index);
+      } else if (operator == FunctionDeclarationKind.STORE) {
+        @SuppressWarnings("unchecked")
+        ArrayFormula<NumeralFormula, Formula> array =
+            (ArrayFormula<NumeralFormula, Formula>) operands.get(0).toFormula(pMgr);
+        NumeralFormula index = (NumeralFormula) operands.get(1).toFormula(pMgr);
+        Formula value = operands.get(2).toFormula(pMgr);
+
+        formula = amgr.store(array, index, value);
+      }
+
+      return formula;
     }
 
     if (returnType.isBitvectorType()) {
@@ -115,8 +164,6 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
       switch (operator) {
         case BV_EXTRACT:
-          // XXX: sign seems to be irrelevant and superfluous, since not a single API-method
-          // actually uses it
           formula =
               bmgr.extract(
                   bvOperands[0],
@@ -129,6 +176,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
               "Handling for PrefixOperator " + operator + " not yet implemented.");
       }
     } else if (returnType.isIntegerType()) {
+      @SuppressWarnings("unused")
       IntegerFormulaManager bmgr = pMgr.getIntegerFormulaManager();
       IntegerFormula[] iOperands = new IntegerFormula[operands.size()];
       for (int i = 0; i < iOperands.length; i++) {
@@ -175,6 +223,11 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     return formula;
   }
 
+  private boolean isArrayOperator(FunctionDeclarationKind pOperator) {
+    return pOperator == FunctionDeclarationKind.SELECT
+        || pOperator == FunctionDeclarationKind.STORE;
+  }
+
   @Override
   public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
     return pStrategy.canonizePrefixOperator(
@@ -209,7 +262,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
   @Override
   public void toString(StringBuilder pBuilder) {
-    pBuilder.append("( ").append(operator).append(" ");
+    pBuilder.append("( ").append(name).append(" ");
     for (CanonizingFormula cF : operands) {
       pBuilder.append("_ ( ");
       cF.toString(pBuilder);
@@ -226,6 +279,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       result = prime * result + ((operands == null) ? 0 : operands.hashCode());
       result = prime * result + ((operator == null) ? 0 : operator.hashCode());
       result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
+      result = prime * result + ((name == null) ? 0 : name.hashCode());
       hashCode = result;
     }
     return hashCode;
@@ -258,6 +312,8 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
         return false;
       }
     } else if (!returnType.equals(other.returnType)) {
+      return false;
+    } else if (!name.equals(other.name)) {
       return false;
     }
     return true;

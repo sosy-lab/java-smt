@@ -76,99 +76,127 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
     CanonizingFormula function = null;
     FormulaType<?> returnType = pFunctionDeclaration.getType();
 
-    switch (pArgs.size()) {
-      case 1:
-      case 3:
-      case 4: // PRINCESS: extract
-        List<CanonizingFormula> args = new ArrayList<>();
+    if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
+      List<CanonizingFormula> args = new ArrayList<>();
+      for (int i = 0; i < pArgs.size(); i++) {
+        store.storeType(pFunctionDeclaration.getArgumentTypes().get(i));
+        args.add(mgr.visit(pArgs.get(i), this));
+      }
 
-        for (int i = 0; i < pArgs.size(); i++) {
-          store.storeType(pFunctionDeclaration.getArgumentTypes().get(i));
-          args.add(mgr.visit(pArgs.get(i), this));
-        }
+      function =
+          new CanonizingPrefixOperator(
+              mgr,
+              pFunctionDeclaration.getKind(),
+              args,
+              pFunctionDeclaration.getType(),
+              pFunctionDeclaration.getName());
+    } else {
+      switch (pArgs.size()) {
+        case 1:
+        case 3:
+        case 4: // PRINCESS: extract
+          List<CanonizingFormula> args = new ArrayList<>();
 
-        // FIXME: MathSAT and Z3 simplify bvextract with 3 parameters to a function with only 1
-        // parameter, so at the moment we have to use this ugly and error-prone hack to determine
-        // the ranges of the extract
-        //
-        // Princess also needs a special handling, since it creates some 4-argument function with
-        // reordering in the arguments
-        if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.BV_EXTRACT) {
-          if (mgr.getClass().getName().contains("Mathsat")
-              || mgr.getClass().getName().contains("Z3")) {
-            String rawFunction = pF.toString();
-            Matcher matcher =
-                Pattern.compile(".*?([0-9]{1,4}).*?([0-9]{1,4}).*").matcher(rawFunction);
-            if (matcher.matches()) {
-              String argument1 = matcher.group(1);
-              String argument2 = matcher.group(2);
-              args.add(
+          for (int i = 0; i < pArgs.size(); i++) {
+            store.storeType(pFunctionDeclaration.getArgumentTypes().get(i));
+            args.add(mgr.visit(pArgs.get(i), this));
+          }
+
+          // FIXME: MathSAT and Z3 simplify bvextract with 3 parameters to a function with only 1
+          // parameter, so at the moment we have to use this ugly and error-prone hack to determine
+          // the ranges of the extract
+          //
+          // Princess also needs a special handling, since it creates some 4-argument function with
+          // reordering in the arguments
+          if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.BV_EXTRACT) {
+            if (mgr.getClass().getName().contains("Mathsat")
+                || mgr.getClass().getName().contains("Z3")) {
+              String rawFunction = pF.toString();
+              Matcher matcher =
+                  Pattern.compile(".*?([0-9]{1,4}).*?([0-9]{1,4}).*").matcher(rawFunction);
+              if (matcher.matches()) {
+                String argument1 = matcher.group(1);
+                String argument2 = matcher.group(2);
+                args.add(
+                    store.remember(
+                        new CanonizingConstant(
+                            mgr,
+                            Integer.parseInt(argument1),
+                            FormulaType.IntegerType)));
+                args.add(
+                    store.remember(
+                        new CanonizingConstant(
+                            mgr,
+                            Integer.parseInt(argument2),
+                            FormulaType.IntegerType)));
+              }
+            }
+            if (mgr.getClass().getName().contains("Princess")) {
+              args.clear();
+              store.storeType(pFunctionDeclaration.getArgumentTypes().get(3));
+              args.add(mgr.visit(pArgs.get(3), this));
+
+              store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
+              CanonizingConstant arg1inter = (CanonizingConstant) mgr.visit(pArgs.get(1), this);
+              store.storeType(pFunctionDeclaration.getArgumentTypes().get(2));
+              CanonizingConstant arg2 = (CanonizingConstant) mgr.visit(pArgs.get(2), this);
+
+              Integer arg1Calculated =
+                  ((BigInteger) arg1inter.getValue()).add(((BigInteger) arg2.getValue())).intValue()
+                      - 1;
+
+              CanonizingFormula arg1 =
                   store.remember(
+                      new CanonizingConstant(mgr, arg1Calculated, FormulaType.IntegerType));
+              arg2 =
+                  (CanonizingConstant) store.remember(
                       new CanonizingConstant(
                           mgr,
-                          Integer.parseInt(argument1),
-                          FormulaType.IntegerType)));
-              args.add(
-                  store.remember(
-                      new CanonizingConstant(
-                          mgr,
-                          Integer.parseInt(argument2),
-                          FormulaType.IntegerType)));
+                          ((BigInteger) arg2.getValue()).intValue(),
+                          FormulaType.IntegerType));
+
+              args.add(arg1);
+              args.add(arg2);
             }
           }
-          if (mgr.getClass().getName().contains("Princess")) {
-            args.clear();
-            store.storeType(pFunctionDeclaration.getArgumentTypes().get(3));
-            args.add(mgr.visit(pArgs.get(3), this));
 
-            store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
-            CanonizingConstant arg1inter = (CanonizingConstant) mgr.visit(pArgs.get(1), this);
-            store.storeType(pFunctionDeclaration.getArgumentTypes().get(2));
-            CanonizingConstant arg2 = (CanonizingConstant) mgr.visit(pArgs.get(2), this);
+          function =
+              new CanonizingPrefixOperator(mgr, pFunctionDeclaration.getKind(), args, returnType);
+          break;
+        case 2:
+          store.storeType(pFunctionDeclaration.getArgumentTypes().get(0));
+          CanonizingFormula left = mgr.visit(pArgs.get(0), this);
+          store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
+          CanonizingFormula right = mgr.visit(pArgs.get(1), this);
 
-            Integer arg1Calculated =
-                ((BigInteger) arg1inter.getValue()).add(((BigInteger) arg2.getValue())).intValue()
-                    - 1;
-
-            CanonizingFormula arg1 =
-                store
-                    .remember(new CanonizingConstant(mgr, arg1Calculated, FormulaType.IntegerType));
-            arg2 =
-                (CanonizingConstant) store.remember(
-                    new CanonizingConstant(
-                        mgr,
-                        ((BigInteger) arg2.getValue()).intValue(),
-                        FormulaType.IntegerType));
-
-            args.add(arg1);
-            args.add(arg2);
+          if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.SELECT) {
+            List<CanonizingFormula> operands = new ArrayList<>();
+            operands.add(left);
+            operands.add(right);
+            function =
+                new CanonizingPrefixOperator(
+                    mgr,
+                    pFunctionDeclaration.getKind(),
+                    operands,
+                    returnType);
+          } else {
+            function =
+                new CanonizingInfixOperator(
+                    mgr,
+                    pFunctionDeclaration.getKind(),
+                    left,
+                    right,
+                    returnType);
           }
-        }
-
-        function =
-            new CanonizingPrefixOperator(mgr, pFunctionDeclaration.getKind(), args, returnType);
-        break;
-      case 2:
-        store.storeType(pFunctionDeclaration.getArgumentTypes().get(0));
-        CanonizingFormula left = mgr.visit(pArgs.get(0), this);
-        store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
-        CanonizingFormula right = mgr.visit(pArgs.get(1), this);
-
-        function =
-            new CanonizingInfixOperator(
-                mgr,
-                pFunctionDeclaration.getKind(),
-                left,
-                right,
-                returnType);
-        break;
-      default:
-        throw new IllegalStateException(
-            "No handling for function "
-                + pFunctionDeclaration.getName()
-                + " with "
-                + pArgs.size()
-                + " Parameters known.");
+          break;
+        default:
+          throw new IllegalStateException(
+              "No handling for function "
+                  + pFunctionDeclaration.getName()
+                  + " with "
+                  + pArgs.size()
+                  + " Parameters known.");
+      }
     }
 
     function = store.remember(function);
