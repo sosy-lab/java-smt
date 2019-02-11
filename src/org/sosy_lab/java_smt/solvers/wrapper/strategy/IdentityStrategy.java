@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
 import com.google.errorprone.annotations.Immutable;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
 
 /**
  * For proof-of-concept and testing matters this implementation of the {@link CanonizingStrategy}
