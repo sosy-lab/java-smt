@@ -31,10 +31,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategies;
@@ -104,5 +106,30 @@ public class WrapperSolverTest extends SolverBasedTest0 {
 
     assertTrue(cf0.hashCode() == cf1.hashCode());
     assertTrue(cf0 == cf1);
+  }
+
+  @Test
+  public void arrayTest() {
+    requireArrays();
+    ArrayFormula<IntegerFormula, IntegerFormula> array =
+        amgr.makeArray(
+            "arr",
+            FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+    IntegerFormula int0 = imgr.makeNumber("42");
+    IntegerFormula int1 = imgr.makeNumber("0");
+    IntegerFormula int2 = imgr.makeNumber("2");
+
+    array = amgr.store(array, int1, int0);
+    array = amgr.store(array, int2, imgr.add(amgr.select(array, int1), int2));
+
+    List<CanonizingStrategy> strategies = new ArrayList<>();
+    strategies.add(CanonizingStrategies.IDENTITY.getStrategy());
+
+    CanonizingFormulaVisitor visitor = new CanonizingFormulaVisitor(mgr, strategies);
+
+    CanonizingFormula cf = mgr.visit(array, visitor);
+    Formula f = cf.toFormula(mgr);
+
+    assertEquals(array, f);
   }
 }
