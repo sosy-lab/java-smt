@@ -37,6 +37,8 @@ JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository
 
  - The desired version has to be chosen.
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
+   **JavaSMT might not yet support the latest version on the solver's webpage,
+   but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).**
  - Suppose the version `2.0.0` was chosen.
    Ivy description file [`ivy-2.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-2.0.0.xml) can
    be consulted in order to determine all the files which should be fetched.
