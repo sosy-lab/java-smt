@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaStore;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingInfixOperator;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingPrefixOperator;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
@@ -45,12 +46,13 @@ public interface CanonizingStrategy {
       FunctionDeclarationKind pOperator,
       CanonizingFormula pLeft,
       CanonizingFormula pRight,
-      FormulaType<?> pReturnType) {
+      FormulaType<?> pReturnType,
+      CanonizingFormulaStore pCaller) {
     return new CanonizingInfixOperator(
         pMgr,
         pOperator,
-        pLeft.canonize(this),
-        pRight.canonize(this),
+        pLeft.canonize(this, pCaller),
+        pRight.canonize(this, pCaller),
         pReturnType);
   }
 
@@ -58,10 +60,11 @@ public interface CanonizingStrategy {
       FormulaManager pMgr,
       FunctionDeclarationKind pOperator,
       List<CanonizingFormula> pOperands,
-      FormulaType<?> pReturnType) {
+      FormulaType<?> pReturnType,
+      CanonizingFormulaStore pCaller) {
     List<CanonizingFormula> args = new ArrayList<>();
     for (CanonizingFormula operandToCanonize : pOperands) {
-      args.add(operandToCanonize.canonize(this));
+      args.add(operandToCanonize.canonize(this, pCaller));
     }
 
     CanonizingPrefixOperator canonizedFormula =
@@ -69,8 +72,13 @@ public interface CanonizingStrategy {
     return canonizedFormula;
   }
 
+  @SuppressWarnings("unused")
   default CanonizingFormula
-      canonizeVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
+      canonizeVariable(
+          FormulaManager pMgr,
+          String pName,
+          FormulaType<?> pType,
+          CanonizingFormulaStore pCaller) {
     return new CanonizingVariable(pMgr, pName, pType);
   }
 }

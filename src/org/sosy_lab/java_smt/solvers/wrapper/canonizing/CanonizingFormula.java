@@ -42,7 +42,7 @@ public interface CanonizingFormula {
 
   Formula toFormula(FormulaManager pMgr);
 
-  CanonizingFormula canonize(CanonizingStrategy pStrategy);
+  CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller);
 
   FormulaManager getFormulaManager();
 

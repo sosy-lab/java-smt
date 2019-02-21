@@ -78,7 +78,7 @@ public class CanonizingConstant implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
     return copy();
   }
 

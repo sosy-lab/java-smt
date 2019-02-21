@@ -270,8 +270,8 @@ public class CanonizingInfixOperator implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
-    return pStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType);
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
+    return pStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType, pCaller);
   }
 
   @Override

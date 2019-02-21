@@ -23,6 +23,7 @@ import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaStore;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 
 @Immutable
@@ -30,13 +31,17 @@ public class RenamingStrategy implements CanonizingStrategy {
 
   @Override
   public CanonizingFormula
-      canonizeVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
-    String canonizedName = canonizeVariableName(pName);
+      canonizeVariable(
+          FormulaManager pMgr,
+          String pName,
+          FormulaType<?> pType,
+          CanonizingFormulaStore pCaller) {
+    String canonizedName = canonizeVariableName(pName, pCaller);
 
     return new CanonizingVariable(pMgr, canonizedName, pType);
   }
 
-  private static String canonizeVariableName(String pName) {
+  private static String canonizeVariableName(String pName, CanonizingFormulaStore pCaller) {
     // TODO: Implement some (hopefully) useful renaming strategy
     return pName;
   }

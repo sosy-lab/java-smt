@@ -35,6 +35,7 @@ public class CanonizingFormulaStore {
   private Set<CanonizingFormula> canonizedConstraints;
 
   private final Map<CanonizingFormula, CanonizingFormula> memoizedFormulas = new HashMap<>();
+  private final Map<String, String> nameMap = new HashMap<>();
 
   private CanonizingFormula currentConstraint;
   private FormulaType<?> nextLiteralsType;
@@ -85,7 +86,7 @@ public class CanonizingFormulaStore {
     for (CanonizingFormula cF : constraints) {
       CanonizingFormula canonizedF = cF;
       for (CanonizingStrategy strategy : strategies) {
-        canonizedF = canonizedF.canonize(strategy);
+        canonizedF = canonizedF.canonize(strategy, this);
       }
       canonizedConstraints.add(canonizedF);
     }
@@ -171,5 +172,16 @@ public class CanonizingFormulaStore {
       memoizedFormulas.put(pCanonizingFormula, pCanonizingFormula);
     }
     return memoizedFormulas.get(pCanonizingFormula);
+  }
+
+  public String mapName(String pOrigialName, String pMappedName) {
+    return nameMap.put(pOrigialName, pMappedName);
+  }
+
+  public String checkName(String pName) {
+    if (nameMap.containsKey(pName)) {
+      return nameMap.get(pName);
+    }
+    return pName;
   }
 }

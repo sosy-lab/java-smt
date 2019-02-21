@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingConstant;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaStore;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingInfixOperator;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 
@@ -37,13 +38,13 @@ public class ReorderingStrategy implements CanonizingStrategy {
       FunctionDeclarationKind pOperator,
       CanonizingFormula pLeft,
       CanonizingFormula pRight,
-      FormulaType<?> pReturnType) {
+      FormulaType<?> pReturnType,
+      CanonizingFormulaStore pCaller) {
     FunctionDeclarationKind operator = pOperator;
-    CanonizingFormula left = pLeft.canonize(this);
-    CanonizingFormula right = pRight.canonize(this);
+    CanonizingFormula left = pLeft.canonize(this, pCaller);
+    CanonizingFormula right = pRight.canonize(this, pCaller);
 
     if (isGreaterOp(pOperator)) {
-      // TODO: find meaningful handling of arrays
       if (!pReturnType.isRationalType()) {
         operator = FunctionDeclarationKind.LT;
       } else {
@@ -54,11 +55,13 @@ public class ReorderingStrategy implements CanonizingStrategy {
       right = tmp;
     }
 
-    // TODO: find meaningful handling of arrays
     if (isOrEqualOp(pOperator) && !pReturnType.isRationalType()) {
       CanonizingConstant epsilon = getMinimumSummand(pMgr, pReturnType);
       right = add(pMgr, right, epsilon, pReturnType);
     }
+
+    // TODO: collect constants from right, compute them and shift them to left
+    // TODO: collect variables from right and subtract them from left
 
     CanonizingInfixOperator result =
         new CanonizingInfixOperator(pMgr, operator, left, right, pReturnType);
@@ -74,13 +77,13 @@ public class ReorderingStrategy implements CanonizingStrategy {
     FunctionDeclarationKind kind = null;
     CanonizingFormula result = null;
 
-    if (pReturnType.isIntegerType()) {
+    if (pEpsilon.getType().isIntegerType()) {
       kind = FunctionDeclarationKind.ADD;
     }
-    if (pReturnType.isBitvectorType()) {
+    if (pEpsilon.getType().isBitvectorType()) {
       kind = FunctionDeclarationKind.BV_ADD;
     }
-    if (pReturnType.isFloatingPointType()) {
+    if (pEpsilon.getType().isFloatingPointType()) {
       kind = FunctionDeclarationKind.FP_ADD;
     }
 
@@ -137,11 +140,9 @@ public class ReorderingStrategy implements CanonizingStrategy {
       return new CanonizingConstant(pMgr, value, pReturnType);
     }
     if (pReturnType.isArrayType()) {
-      // TODO: for arrays we have to traverse the correct operand to determine the type
-    }
-    if (pReturnType.isRationalType()) {
-      // FIXME: for this one, there is no meaningful solution, so 'lessThanOrEquals' should be kept
-      // as such
+      return getMinimumSummand(
+          pMgr,
+          ((FormulaType.ArrayFormulaType<?, ?>) pReturnType).getElementType());
     }
     return null;
   }

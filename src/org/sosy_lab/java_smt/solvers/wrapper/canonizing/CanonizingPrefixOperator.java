@@ -229,12 +229,13 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
     return pStrategy.canonizePrefixOperator(
         mgr,
         operator,
         operands,
-        returnType);
+        returnType,
+        pCaller);
   }
 
   @Override

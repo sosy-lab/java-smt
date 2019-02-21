@@ -60,8 +60,8 @@ public class CanonizingVariable implements CanonizingFormula {
   }
 
   @Override
-  public CanonizingFormula canonize(CanonizingStrategy pStrategy) {
-    return pStrategy.canonizeVariable(mgr, name, type);
+  public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
+    return pStrategy.canonizeVariable(mgr, name, type, pCaller);
   }
 
   @Override
