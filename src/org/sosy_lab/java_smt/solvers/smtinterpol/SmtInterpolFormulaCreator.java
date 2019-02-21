@@ -269,6 +269,16 @@ class SmtInterpolFormulaCreator
         return FunctionDeclarationKind.SELECT;
       case "store":
         return FunctionDeclarationKind.STORE;
+      case "*":
+        return FunctionDeclarationKind.MUL;
+      case "+":
+        return FunctionDeclarationKind.ADD;
+      case "-":
+        return FunctionDeclarationKind.SUB;
+      case "/":
+        return FunctionDeclarationKind.DIV;
+      case "%":
+        return FunctionDeclarationKind.MODULO;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;
