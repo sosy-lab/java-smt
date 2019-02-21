@@ -73,7 +73,7 @@ Currently we do not support performing garbage collection for MathSAT5.
 
 
 ## Getting started
-Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](Getting-started.md)
+Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](doc/Getting-started.md)
 
 #### Usage
 ``` java
