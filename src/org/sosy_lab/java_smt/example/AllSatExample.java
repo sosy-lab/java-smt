@@ -41,12 +41,12 @@ public class AllSatExample {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
     for (Solvers solver : Solvers.values()) {
-      System.out.println("\nUsing solver " + solver);
       try (SolverContext context =
               SolverContextFactory.createSolverContext(config, logger, notifier, solver);
           ProverEnvironment prover =
               context.newProverEnvironment(
                   ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
+        System.out.println("\nUsing solver " + solver + " in version " + context.getVersion());
 
         AllSatExample ase = new AllSatExample(context, prover);
 
