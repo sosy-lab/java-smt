@@ -261,7 +261,6 @@ public class FormulaClassifier {
             }
             return 0;
           } else {
-            pFunctionDeclaration.getKind();
             if (pFunctionDeclaration.getKind() != FunctionDeclarationKind.UF) {
               linearArithmetic = true;
             }
