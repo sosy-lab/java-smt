@@ -246,7 +246,6 @@ public class FormulaClassifier {
           // $FALL-THROUGH$
         default:
           if (pFunctionDeclaration.getType().isBooleanType()) {
-            pFunctionDeclaration.getKind();
             if (Sets.newHashSet(
                     FunctionDeclarationKind.LT,
                     FunctionDeclarationKind.LTE,
