@@ -161,6 +161,10 @@ public class FormulaClassifier {
         logic += "RA";
       }
     }
+    if (v.hasFloats) {
+      // TODO forthcoming, see http://smtlib.cs.uiowa.edu/logics.shtml
+      logic += " with FP";
+    }
     return logic;
   }
 
