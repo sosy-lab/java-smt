@@ -1,0 +1,284 @@
+/*
+ *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  This file is part of JavaSMT.
+ *
+ *  Copyright (C) 2007-2019  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package org.sosy_lab.java_smt.example;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.BasicLogManager;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.SolverContextFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+
+/**
+ * This program parses user-given formulas and prints out the (minimal) matching theory for them.
+ *
+ * <p>Warning: This is a prototype and not intended for larger usage.
+ */
+@SuppressWarnings("unused")
+public class FormulaClassifier {
+
+  private final FormulaManager mgr;
+  private final SolverContext context;
+  private final Classifier v = new Classifier();
+  private int levelLinearArithmetic = 0;
+
+  public static void main(String... args)
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
+
+    if (args.length == 0) {
+      help();
+    }
+
+    Solvers solver = Solvers.MATHSAT5;
+    Path path = null;
+    for (String arg : args) {
+      if (arg.startsWith("-solver=")) {
+        solver = Solvers.valueOf(arg.substring(8));
+      } else if (path == null) {
+        path = Paths.get(arg);
+      } else {
+        help();
+      }
+    }
+
+    Configuration config = Configuration.defaultConfiguration();
+    LogManager logger = BasicLogManager.create(config);
+    ShutdownNotifier notifier = ShutdownNotifier.createDummy();
+    // we need a solver that supports all theories, at least for parsing.
+    try (SolverContext context =
+        SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
+      FormulaClassifier fc = new FormulaClassifier(context);
+
+      List<String> definitions = new ArrayList<>();
+      for (String line : Files.readAllLines(path)) {
+        // we assume a line-based content
+        if (line.startsWith(";;") || line.startsWith("(push ") || line.startsWith("(pop ")) {
+          continue;
+        } else if (line.startsWith("(assert ")) {
+          BooleanFormula bf = fc.parse(Joiner.on("").join(definitions) + line);
+          fc.visit(bf);
+        } else {
+          // it is a definition
+          definitions.add(line);
+        }
+      }
+      System.out.println(fc);
+    }
+  }
+
+  private static void help() {
+    throw new AssertionError("run $> TOOL [-solver=SOLVER] PATH");
+  }
+
+  public FormulaClassifier(SolverContext pContext) {
+    context = pContext;
+    mgr = context.getFormulaManager();
+  }
+
+  private BooleanFormula parse(String s) {
+    return mgr.parse(s);
+  }
+
+  public void visit(BooleanFormula f) {
+    int levelLA = mgr.visit(f, v);
+    levelLinearArithmetic = Math.max(levelLA, levelLinearArithmetic);
+  }
+
+  @Override
+  public String toString() {
+    // build logic string
+    String logic = "";
+    if (!v.hasQuantifiers) {
+      logic += "QF_";
+    }
+    if (v.hasArrays) {
+      logic += "A";
+    }
+    if (v.hasUFs) {
+      logic += "UF";
+    }
+    if (v.hasBVs) {
+      logic += "BV";
+    }
+    if (v.nonLinearArithmetic || v.linearArithmetic) {
+      if (v.hasInts && v.hasReals) {
+        if (v.nonLinearArithmetic) {
+          logic += "N";
+        } else if (v.linearArithmetic) {
+          logic += "L";
+        }
+        logic += "IRA";
+      } else if (v.hasInts) {
+        if (v.nonLinearArithmetic) {
+          logic += "N";
+        } else if (v.linearArithmetic) {
+          logic += "L";
+        }
+        logic += "IA";
+      } else if (v.hasReals) {
+        if (v.nonLinearArithmetic) {
+          logic += "N";
+        } else if (v.linearArithmetic) {
+          logic += "L";
+        }
+        logic += "RA";
+      }
+    }
+    return logic;
+  }
+
+  private class Classifier implements FormulaVisitor<Integer> {
+
+    boolean hasUFs = false;
+    boolean hasQuantifiers = false;
+
+    boolean hasFloats = false;
+    boolean hasInts = false;
+    boolean hasReals = false;
+    boolean hasBVs = false;
+    boolean hasArrays = false;
+    boolean linearArithmetic = false;
+    boolean nonLinearArithmetic = false;
+
+    void checkType(Formula f) {
+      FormulaType<Formula> type = mgr.getFormulaType(f);
+      if (type.isIntegerType()) {
+        hasInts = true;
+      }
+      if (type.isRationalType()) {
+        hasReals = true;
+      }
+      if (type.isFloatingPointType()) {
+        hasFloats = true;
+      }
+      if (type.isBitvectorType()) {
+        hasBVs = true;
+      }
+      if (type.isArrayType()) {
+        hasArrays = true;
+      }
+    }
+
+    @Override
+    public Integer visitFreeVariable(Formula pF, String pName) {
+      checkType(pF);
+      return 1;
+    }
+
+    @Override
+    public Integer visitBoundVariable(Formula pF, int pDeBruijnIdx) {
+      checkType(pF);
+      return 1;
+    }
+
+    @Override
+    public Integer visitConstant(Formula pF, Object pValue) {
+      checkType(pF);
+      return 0;
+    }
+
+    @Override
+    public Integer visitFunction(
+        Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+      if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
+        hasUFs = true;
+      }
+      checkType(pF);
+      int numNonConstantArgs = 0;
+      int allArgLevel = 0;
+      for (Formula arg : args) {
+        int argLevel = mgr.visit(arg, this);
+        if (argLevel >= 1) {
+          numNonConstantArgs++;
+        }
+        allArgLevel = Math.max(allArgLevel, argLevel);
+      }
+      switch (pFunctionDeclaration.getKind()) {
+        case MUL:
+        case BV_MUL:
+        case DIV:
+        case BV_UDIV:
+        case BV_SDIV:
+        case MODULO:
+        case BV_UREM:
+        case BV_SREM:
+          if (numNonConstantArgs >= 2) {
+            nonLinearArithmetic = true;
+            return allArgLevel + 1;
+          }
+          // $FALL-THROUGH$
+        default:
+          if (pFunctionDeclaration.getType().isBooleanType()) {
+            pFunctionDeclaration.getKind();
+            if (Sets.newHashSet(
+                    FunctionDeclarationKind.LT,
+                    FunctionDeclarationKind.LTE,
+                    FunctionDeclarationKind.GT,
+                    FunctionDeclarationKind.GTE)
+                .contains(pFunctionDeclaration.getKind())) {
+              for (Formula arg : args) {
+                FormulaType<Formula> type = mgr.getFormulaType(arg);
+                if (type.isIntegerType() || type.isRationalType()) {
+                  linearArithmetic = true;
+                }
+              }
+            }
+            return 0;
+          } else {
+            pFunctionDeclaration.getKind();
+            if (pFunctionDeclaration.getKind() != FunctionDeclarationKind.UF) {
+              linearArithmetic = true;
+            }
+            return allArgLevel;
+          }
+      }
+    }
+
+    @Override
+    public Integer visitQuantifier(
+        BooleanFormula pF,
+        Quantifier pQuantifier,
+        List<Formula> pBoundVariables,
+        BooleanFormula pBody) {
+      hasQuantifiers = true;
+      checkType(pF);
+      return mgr.visit(pBody, this);
+    }
+  }
+}
