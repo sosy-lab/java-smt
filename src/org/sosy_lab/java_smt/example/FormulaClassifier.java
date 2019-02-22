@@ -84,7 +84,7 @@ public class FormulaClassifier {
     try (SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
       FormulaClassifier fc = new FormulaClassifier(context);
-
+      List<BooleanFormula> formulas = new ArrayList<>();
       List<String> definitions = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         // we assume a line-based content
@@ -93,12 +93,13 @@ public class FormulaClassifier {
         } else if (line.startsWith("(assert ")) {
           BooleanFormula bf = fc.parse(Joiner.on("").join(definitions) + line);
           fc.visit(bf);
+          formulas.add(bf);
         } else {
           // it is a definition
           definitions.add(line);
         }
       }
-      System.out.println(fc);
+      System.out.println(fc + ", checked formulas: " + formulas.size());
     }
   }
 
