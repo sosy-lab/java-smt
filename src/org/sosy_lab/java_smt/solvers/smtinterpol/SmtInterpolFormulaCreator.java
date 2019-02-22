@@ -279,6 +279,14 @@ class SmtInterpolFormulaCreator
         return FunctionDeclarationKind.DIV;
       case "%":
         return FunctionDeclarationKind.MODULO;
+      case "<":
+        return FunctionDeclarationKind.LT;
+      case "<=":
+        return FunctionDeclarationKind.LTE;
+      case ">=":
+        return FunctionDeclarationKind.GT;
+      case ">":
+        return FunctionDeclarationKind.GTE;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;
