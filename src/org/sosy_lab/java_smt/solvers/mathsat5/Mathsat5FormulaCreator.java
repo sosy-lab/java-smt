@@ -60,6 +60,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -355,6 +356,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case MSAT_TAG_ITE:
         return FunctionDeclarationKind.ITE;
 
+      case MSAT_TAG_TIMES:
+        return FunctionDeclarationKind.MUL;
       case MSAT_TAG_PLUS:
         return FunctionDeclarationKind.ADD;
       case MSAT_TAG_LEQ:
