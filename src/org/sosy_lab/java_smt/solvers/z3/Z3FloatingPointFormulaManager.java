@@ -278,6 +278,11 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
+  protected Long isNormal(Long pParam) {
+    return Native.mkFpaIsNormal(z3context, pParam);
+  }
+
+  @Override
   protected Long isNegative(Long pParam) {
     return Native.mkFpaIsNegative(z3context, pParam);
   }

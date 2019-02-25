@@ -184,15 +184,29 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void specialValueFunctions() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.isInfinity(posInf)).isTautological();
+    assertThatFormula(fpmgr.isNormal(posInf)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(posInf)).isUnsatisfiable();
+
     assertThatFormula(fpmgr.isInfinity(negInf)).isTautological();
+    assertThatFormula(fpmgr.isNormal(negInf)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(negInf)).isUnsatisfiable();
 
     assertThatFormula(fpmgr.isNaN(nan)).isTautological();
+    assertThatFormula(fpmgr.isNormal(nan)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(nan)).isUnsatisfiable();
 
     assertThatFormula(fpmgr.isZero(zero)).isTautological();
-    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(-0.0, singlePrecType))).isTautological();
+    assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
+
+    FloatingPointFormula negZero = fpmgr.makeNumber(-0.0, singlePrecType);
+    assertThatFormula(fpmgr.isZero(negZero)).isTautological();
+    assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
 
     FloatingPointFormula minPosNormalValue = fpmgr.makeNumber(Float.MIN_NORMAL, singlePrecType);
     assertThatFormula(fpmgr.isSubnormal(minPosNormalValue)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isNormal(minPosNormalValue)).isSatisfiable();
     assertThatFormula(fpmgr.isZero(minPosNormalValue)).isUnsatisfiable();
   }
 

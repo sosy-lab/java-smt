@@ -28,6 +28,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isinf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isnan;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isneg;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isnormal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_issubnormal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_iszero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_leq;
@@ -303,6 +304,11 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long isSubnormal(Long pParam) {
     return msat_make_fp_issubnormal(mathsatEnv, pParam);
+  }
+
+  @Override
+  protected Long isNormal(Long pParam) {
+    return msat_make_fp_isnormal(mathsatEnv, pParam);
   }
 
   @Override
