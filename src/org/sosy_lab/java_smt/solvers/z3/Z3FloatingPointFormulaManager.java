@@ -82,8 +82,7 @@ class Z3FloatingPointFormulaManager
     if (Double.isNaN(pN) || Double.isInfinite(pN)) {
       return Native.mkFpaNumeralDouble(z3context, pN, mkFpaSort(pType));
     }
-    // Z3 has problems with rounding when giving a double value, so we go via Strings
-    return makeNumberAndRound(Double.toString(pN), pType, pRoundingMode);
+    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
@@ -96,11 +95,7 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
-    try {
-      return makeNumberImpl(Double.valueOf(pN), pType, pRoundingMode);
-    } catch (NumberFormatException e) {
-      return makeNumberAndRound(pN, pType, pRoundingMode);
-    }
+    return makeNumberAndRound(pN, pType, pRoundingMode);
   }
 
   private Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
