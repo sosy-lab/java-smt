@@ -79,9 +79,6 @@ class Z3FloatingPointFormulaManager
 
   @Override
   public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
-    if (Double.isNaN(pN) || Double.isInfinite(pN)) {
-      return Native.mkFpaNumeralDouble(z3context, pN, mkFpaSort(pType));
-    }
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
@@ -95,7 +92,20 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
-    return makeNumberAndRound(pN, pType, pRoundingMode);
+    if (pN.startsWith("+")) {
+      pN = pN.substring(1);
+    }
+    switch (pN) {
+      case "NaN":
+      case "-NaN":
+        return makeNaNImpl(pType);
+      case "Infinity":
+        return makePlusInfinityImpl(pType);
+      case "-Infinity":
+        return makeMinusInfinityImpl(pType);
+      default:
+        return makeNumberAndRound(pN, pType, pRoundingMode);
+    }
   }
 
   private Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {

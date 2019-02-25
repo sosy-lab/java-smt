@@ -108,8 +108,12 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
+    if (pN.startsWith("+")) {
+      pN = pN.substring(1);
+    }
     switch (pN) {
       case "NaN":
+      case "-NaN":
         return makeNaNImpl(pType);
       case "Infinity":
         return makePlusInfinityImpl(pType);
