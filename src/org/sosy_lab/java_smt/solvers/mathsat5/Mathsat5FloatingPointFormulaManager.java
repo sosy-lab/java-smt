@@ -27,6 +27,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_from_ubv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isinf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isnan;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isneg;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_isnormal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_issubnormal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_iszero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_leq;
@@ -98,14 +100,26 @@ class Mathsat5FloatingPointFormulaManager
   public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     if (Double.isNaN(pN)) {
       return makeNaNImpl(pType);
-    } else if (Double.isInfinite(pN)) {
-      if (pN > 0.0) {
-        return makePlusInfinityImpl(pType);
-      } else {
-        return makeMinusInfinityImpl(pType);
-      }
+    } else if (Double.POSITIVE_INFINITY == pN) {
+      return makePlusInfinityImpl(pType);
+    } else if (Double.NEGATIVE_INFINITY == pN) {
+      return makeMinusInfinityImpl(pType);
     }
-    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
+    long numeral =
+        msat_make_fp_rat_number(
+            mathsatEnv,
+            Double.toString(pN),
+            pType.getExponentSize(),
+            pType.getMantissaSize(),
+            pRoundingMode);
+    if (isNegativeZero(pN)) {
+      numeral = msat_make_fp_neg(mathsatEnv, numeral);
+    }
+    return numeral;
+  }
+
+  private static boolean isNegativeZero(double pN) {
+    return pN == 0.0 && Double.valueOf(-0.0).equals(Double.valueOf(pN));
   }
 
   @Override
@@ -115,8 +129,13 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
-    return msat_make_fp_rat_number(
-        mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode);
+    try {
+      return makeNumberImpl(Double.valueOf(pN), pType, pRoundingMode);
+    } catch (NumberFormatException e) {
+      // fallback to direct String-based method
+      return msat_make_fp_rat_number(
+          mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode);
+    }
   }
 
   @Override
@@ -285,6 +304,16 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long isSubnormal(Long pParam) {
     return msat_make_fp_issubnormal(mathsatEnv, pParam);
+  }
+
+  @Override
+  protected Long isNormal(Long pParam) {
+    return msat_make_fp_isnormal(mathsatEnv, pParam);
+  }
+
+  @Override
+  protected Long isNegative(Long pParam) {
+    return msat_make_fp_isneg(mathsatEnv, pParam);
   }
 
   @Override

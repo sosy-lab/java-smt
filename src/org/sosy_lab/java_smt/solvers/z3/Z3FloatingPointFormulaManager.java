@@ -83,7 +83,7 @@ class Z3FloatingPointFormulaManager
       return Native.mkFpaNumeralDouble(z3context, pN, mkFpaSort(pType));
     }
     // Z3 has problems with rounding when giving a double value, so we go via Strings
-    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
+    return makeNumberAndRound(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
@@ -96,11 +96,18 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
+    try {
+      return makeNumberImpl(Double.valueOf(pN), pType, pRoundingMode);
+    } catch (NumberFormatException e) {
+      return makeNumberAndRound(pN, pType, pRoundingMode);
+    }
+  }
+
+  private Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
         || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
-
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
       long smallPrecNumber = castToImpl(highPrecNumber, pType, pRoundingMode);
@@ -268,6 +275,16 @@ class Z3FloatingPointFormulaManager
   @Override
   protected Long isSubnormal(Long pParam) {
     return Native.mkFpaIsSubnormal(z3context, pParam);
+  }
+
+  @Override
+  protected Long isNormal(Long pParam) {
+    return Native.mkFpaIsNormal(z3context, pParam);
+  }
+
+  @Override
+  protected Long isNegative(Long pParam) {
+    return Native.mkFpaIsNegative(z3context, pParam);
   }
 
   @Override

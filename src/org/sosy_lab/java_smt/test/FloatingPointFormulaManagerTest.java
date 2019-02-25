@@ -102,6 +102,56 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void negative() throws SolverException, InterruptedException {
+    for (double d : new double[] {-1, -2, -0.0, Double.NEGATIVE_INFINITY}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isTautological();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+    for (double d : new double[] {1, 2, 0.0, Double.POSITIVE_INFINITY}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+  }
+
+  @Test
+  public void parser() throws SolverException, InterruptedException {
+    for (String s : new String[] {"-1", "-Infinity", "-0", "-0.0", "-0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isTautological();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+    for (String s : new String[] {"1", "Infinity", "0", "0.0", "0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+    for (String s : new String[] {"+1", "+Infinity", "+0", "+0.0", "+0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+    // NaN is not positive and not negative.
+    for (String s : new String[] {"NaN", "-NaN", "+NaN"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void negativeZeroDivision() throws SolverException, InterruptedException {
+    BooleanFormula formula =
+        fpmgr.equalWithFPSemantics(
+            fpmgr.divide(
+                one, fpmgr.makeNumber(-0.0, singlePrecType), FloatingPointRoundingMode.TOWARD_ZERO),
+            fpmgr.makeMinusInfinity(singlePrecType));
+    assertThatFormula(formula).isSatisfiable();
+    assertThatFormula(bmgr.not(formula)).isUnsatisfiable();
+  }
+
+  @Test
   public void nanEqualNanIsUnsat() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.equalWithFPSemantics(nan, nan)).isUnsatisfiable();
   }
@@ -134,15 +184,29 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void specialValueFunctions() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.isInfinity(posInf)).isTautological();
+    assertThatFormula(fpmgr.isNormal(posInf)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(posInf)).isUnsatisfiable();
+
     assertThatFormula(fpmgr.isInfinity(negInf)).isTautological();
+    assertThatFormula(fpmgr.isNormal(negInf)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(negInf)).isUnsatisfiable();
 
     assertThatFormula(fpmgr.isNaN(nan)).isTautological();
+    assertThatFormula(fpmgr.isNormal(nan)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(nan)).isUnsatisfiable();
 
     assertThatFormula(fpmgr.isZero(zero)).isTautological();
-    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(-0.0, singlePrecType))).isTautological();
+    assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
+
+    FloatingPointFormula negZero = fpmgr.makeNumber(-0.0, singlePrecType);
+    assertThatFormula(fpmgr.isZero(negZero)).isTautological();
+    assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
 
     FloatingPointFormula minPosNormalValue = fpmgr.makeNumber(Float.MIN_NORMAL, singlePrecType);
     assertThatFormula(fpmgr.isSubnormal(minPosNormalValue)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isNormal(minPosNormalValue)).isSatisfiable();
     assertThatFormula(fpmgr.isZero(minPosNormalValue)).isUnsatisfiable();
   }
 
