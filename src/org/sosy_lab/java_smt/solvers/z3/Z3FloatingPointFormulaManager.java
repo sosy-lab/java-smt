@@ -271,6 +271,11 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
+  protected Long isNegative(Long pParam) {
+    return Native.mkFpaIsNegative(z3context, pParam);
+  }
+
+  @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
     return Native.mkFpaRoundToIntegral(z3context, getRoundingModeImpl(pRoundingMode), pFormula);
   }

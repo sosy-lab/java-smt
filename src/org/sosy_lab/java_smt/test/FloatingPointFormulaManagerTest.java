@@ -102,6 +102,20 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void negative() throws SolverException, InterruptedException {
+    for (double d : new double[] {-1, -2, -0.0, Double.NEGATIVE_INFINITY}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isTautological();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+    for (double d : new double[] {1, 2, 0.0, Double.POSITIVE_INFINITY}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+  }
+
+  @Test
   public void nanEqualNanIsUnsat() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.equalWithFPSemantics(nan, nan)).isUnsatisfiable();
   }

@@ -288,6 +288,11 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
+  protected Long isNegative(Long pParam) {
+    return msat_make_fp_isneg(mathsatEnv, pParam);
+  }
+
+  @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
     return msat_make_fp_round_to_int(mathsatEnv, getRoundingModeImpl(pRoundingMode), pFormula);
   }

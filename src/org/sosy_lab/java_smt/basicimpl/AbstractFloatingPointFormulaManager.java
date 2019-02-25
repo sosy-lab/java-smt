@@ -404,6 +404,13 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected abstract TFormulaInfo isSubnormal(TFormulaInfo pParam);
 
   @Override
+  public BooleanFormula isNegative(FloatingPointFormula pNumber) {
+    return wrapBool(isNegative(extractInfo(pNumber)));
+  }
+
+  protected abstract TFormulaInfo isNegative(TFormulaInfo pParam);
+
+  @Override
   public FloatingPointFormula round(
       FloatingPointFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
     return wrap(round(extractInfo(pFormula), pRoundingMode));

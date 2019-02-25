@@ -163,4 +163,7 @@ public interface FloatingPointFormulaManager {
   BooleanFormula isZero(FloatingPointFormula number);
 
   BooleanFormula isSubnormal(FloatingPointFormula number);
+
+  /** checks whether a formula is negative, including -0.0. */
+  BooleanFormula isNegative(FloatingPointFormula number);
 }
