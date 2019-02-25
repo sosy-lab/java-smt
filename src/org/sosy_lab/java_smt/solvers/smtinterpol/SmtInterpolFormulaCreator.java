@@ -283,9 +283,9 @@ class SmtInterpolFormulaCreator
         return FunctionDeclarationKind.LT;
       case "<=":
         return FunctionDeclarationKind.LTE;
-      case ">=":
-        return FunctionDeclarationKind.GT;
       case ">":
+        return FunctionDeclarationKind.GT;
+      case ">=":
         return FunctionDeclarationKind.GTE;
       default:
         // TODO: other declaration kinds!
