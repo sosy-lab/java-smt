@@ -116,6 +116,42 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void parser() throws SolverException, InterruptedException {
+    for (String s : new String[] {"-1", "-Infinity", "-0", "-0.0", "-0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isTautological();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+    for (String s : new String[] {"1", "Infinity", "0", "0.0", "0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+    for (String s : new String[] {"+1", "+Infinity", "+0", "+0.0", "+0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+    // NaN is not positive and not negative.
+    for (String s : new String[] {"NaN", "-NaN", "+NaN"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void negativeZeroDivision() throws SolverException, InterruptedException {
+    BooleanFormula formula =
+        fpmgr.equalWithFPSemantics(
+            fpmgr.divide(
+                one, fpmgr.makeNumber(-0.0, singlePrecType), FloatingPointRoundingMode.TOWARD_ZERO),
+            fpmgr.makeMinusInfinity(singlePrecType));
+    assertThatFormula(formula).isSatisfiable();
+    assertThatFormula(bmgr.not(formula)).isUnsatisfiable();
+  }
+
+  @Test
   public void nanEqualNanIsUnsat() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.equalWithFPSemantics(nan, nan)).isUnsatisfiable();
   }
