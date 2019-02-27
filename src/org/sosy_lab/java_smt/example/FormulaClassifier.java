@@ -124,6 +124,9 @@ public class FormulaClassifier {
     // first split formula into atoms to avoid repeated analysis of common subtrees.
     AtomCollector atomCollector = new AtomCollector();
     mgr.getBooleanFormulaManager().visitRecursively(f, atomCollector);
+    if (atomCollector.hasQuantifiers) {
+      v.hasQuantifiers = true;
+    }
     // then analyze each part
     for (BooleanFormula part : atomCollector.atoms) {
       int levelLA = mgr.visit(part, v);
@@ -181,6 +184,7 @@ public class FormulaClassifier {
   private static class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {
 
     private final Collection<BooleanFormula> atoms = new LinkedHashSet<>();
+    boolean hasQuantifiers = false;
 
     @Override
     protected TraversalProcess visitDefault() {
@@ -192,6 +196,16 @@ public class FormulaClassifier {
         BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
       atoms.add(atom);
       return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitQuantifier(
+        Quantifier quantifier,
+        BooleanFormula quantifiedAST,
+        List<Formula> boundVars,
+        BooleanFormula body) {
+      hasQuantifiers = true;
+      return visitDefault();
     }
   }
 
