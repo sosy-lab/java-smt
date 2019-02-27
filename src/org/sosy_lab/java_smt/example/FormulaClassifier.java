@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -43,7 +45,9 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 /**
  * This program parses user-given formulas and prints out the (minimal) matching theory for them.
@@ -117,8 +121,14 @@ public class FormulaClassifier {
   }
 
   public void visit(BooleanFormula f) {
-    int levelLA = mgr.visit(f, v);
-    levelLinearArithmetic = Math.max(levelLA, levelLinearArithmetic);
+    // first split formula into atoms to avoid repeated analysis of common subtrees.
+    AtomCollector atomCollector = new AtomCollector();
+    mgr.getBooleanFormulaManager().visitRecursively(f, atomCollector);
+    // then analyze each part
+    for (BooleanFormula part : atomCollector.atoms) {
+      int levelLA = mgr.visit(part, v);
+      levelLinearArithmetic = Math.max(levelLA, levelLinearArithmetic);
+    }
   }
 
   @Override
@@ -166,6 +176,23 @@ public class FormulaClassifier {
       logic += " with FP";
     }
     return logic;
+  }
+
+  private class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {
+
+    private final Collection<BooleanFormula> atoms = new LinkedHashSet<>();
+
+    @Override
+    protected TraversalProcess visitDefault() {
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitAtom(
+        BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
+      atoms.add(atom);
+      return TraversalProcess.CONTINUE;
+    }
   }
 
   private class Classifier implements FormulaVisitor<Integer> {
