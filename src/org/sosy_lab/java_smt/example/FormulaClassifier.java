@@ -178,7 +178,7 @@ public class FormulaClassifier {
     return logic;
   }
 
-  private class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {
+  private static class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {
 
     private final Collection<BooleanFormula> atoms = new LinkedHashSet<>();
 
