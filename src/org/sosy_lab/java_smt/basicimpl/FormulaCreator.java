@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -198,6 +199,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       t = FormulaType.IntegerType;
     } else if (formula instanceof RationalFormula) {
       t = FormulaType.RationalType;
+    } else if (formula instanceof FloatingPointRoundingModeFormula) {
+      t = FormulaType.FloatingPointRoundingModeType;
     } else if (formula instanceof ArrayFormula) {
       throw new UnsupportedOperationException(
           "SMT solvers with support for arrays need to overwrite FormulaCreator.getFormulaType()");
