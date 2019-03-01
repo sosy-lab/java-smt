@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Classes;
@@ -69,6 +71,13 @@ public class SolverContextFactory {
   private @Nullable PathCounterTemplate logfile =
       PathCounterTemplate.ofFormatString("smtquery.%03d.smt2");
 
+  @Option(
+      secure = true,
+      description = "If logging from the same application, avoid conflicting logfile names.")
+  private boolean renameLogfileToAvoidConflicts = true;
+
+  private static final Set<String> logfiles = new LinkedHashSet<>();
+
   @Option(secure = true, description = "Random seed for SMT solver.")
   private long randomSeed = 42;
 
@@ -106,6 +115,33 @@ public class SolverContextFactory {
     if (!logAllQueries) {
       logfile = null;
     }
+
+    if (logfile != null && renameLogfileToAvoidConflicts) {
+      logfile = makeUniqueLogfile(logfile);
+    }
+  }
+
+  /**
+   * compute a new unused template. This method is helpful, if several instances of a solver are
+   * used interleaved via JavaSMT and only one configuration is used.
+   */
+  private static synchronized PathCounterTemplate makeUniqueLogfile(PathCounterTemplate pLogfile) {
+    final String original = pLogfile.getTemplate();
+    final String extension = getFileExtension(original);
+    final String basename = original.substring(0, original.length() - extension.length());
+    String template = original;
+    int counter = 0;
+    while (logfiles.contains(template)) {
+      counter++;
+      template = basename + "." + counter + extension;
+    }
+    logfiles.add(template);
+    return PathCounterTemplate.ofFormatString(template);
+  }
+
+  private static String getFileExtension(String path) {
+    int lastIndexOf = path.lastIndexOf(".");
+    return (lastIndexOf == -1) ? "" : path.substring(lastIndexOf);
   }
 
   /** Create new context with solver chosen according to the supplied configuration. */
