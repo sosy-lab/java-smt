@@ -244,6 +244,41 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, doublePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, singlePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, doublePrecType);
+
+    // check unequality for large types
+    FloatingPointType nearDouble = FormulaType.getFloatingPointType(12, 52);
+    FloatingPointFormula h1 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(309).multiply(BigDecimal.valueOf(1.0001)), nearDouble);
+    FloatingPointFormula h2 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(309).multiply(BigDecimal.valueOf(1.0002)), nearDouble);
+    assertThatFormula(fpmgr.equalWithFPSemantics(h1, h2)).isUnsatisfiable();
+
+    // check equality for short types
+    FloatingPointType smallType = FormulaType.getFloatingPointType(4, 4);
+    FloatingPointFormula i1 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.001)), smallType);
+    FloatingPointFormula i2 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.002)), smallType);
+    assertThatFormula(fpmgr.equalWithFPSemantics(i1, i2)).isTautological();
+
+    // check equality for short types
+    FloatingPointType smallType2 = FormulaType.getFloatingPointType(4, 4);
+    FloatingPointFormula j1 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.001)), smallType2);
+    FloatingPointFormula j2 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.002)), smallType2);
+    assertThatFormula(fpmgr.equalWithFPSemantics(j1, j2)).isTautological();
+
+    // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
+    if (!solver.equals(Solvers.Z3)) {
+      // check unequality for very large types
+      FloatingPointType largeType = FormulaType.getFloatingPointType(100, 100);
+      FloatingPointFormula k1 =
+          fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.001)), largeType);
+      FloatingPointFormula k2 =
+          fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.002)), largeType);
+      assertThatFormula(fpmgr.equalWithFPSemantics(k1, k2)).isUnsatisfiable();
+    }
   }
 
   @Test
