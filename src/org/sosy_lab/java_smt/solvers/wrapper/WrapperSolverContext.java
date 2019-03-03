@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.wrapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,10 +60,19 @@ public class WrapperSolverContext extends AbstractSolverContext {
     private boolean canonize = false;
 
     @Option(secure = true, description = "Which strategies to use for canonization")
-    private Set<CanonizingStrategies> strategies = null;
+    private Set<CanonizingStrategies> strategies = new HashSet<CanonizingStrategies>() {
+      private static final long serialVersionUID = 1L;
+
+      {
+        add(CanonizingStrategies.IDENTITY);
+      }
+    };
 
     @Option(secure = true, description = "If answers of solvers should be cached.")
     private boolean cache = false;
+
+    @Option(secure = true, description = "Which caching-mode should be used.")
+    private CachingMode cachingmode = CachingMode.IN_MEMORY;
   }
 
   private SolverContext delegate;
@@ -105,8 +115,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
     ProverEnvironment env = delegate.newProverEnvironment(pOptions.toArray(new ProverOptions[] {}));
 
     if (options.cache) {
-      // FIXME: Parameterize CachingMode
-      env = new CachingEnvironmentWrapper(env, delegate.getFormulaManager(), CachingMode.IN_MEMORY);
+      env = new CachingEnvironmentWrapper(env, delegate.getFormulaManager(), options.cachingmode);
     }
 
     if (options.canonize) {
@@ -124,12 +133,11 @@ public class WrapperSolverContext extends AbstractSolverContext {
         delegate.newProverEnvironmentWithInterpolation(pSet.toArray(new ProverOptions[] {}));
 
     if (options.cache) {
-      // FIXME: Parameterize CachingMode
       env =
           new CachingInterpolatingEnvironmentWrapper<>(
               env,
               delegate.getFormulaManager(),
-              CachingMode.IN_MEMORY);
+              options.cachingmode);
     }
 
     if (options.canonize) {
@@ -151,12 +159,11 @@ public class WrapperSolverContext extends AbstractSolverContext {
         delegate.newOptimizationProverEnvironment(pSet.toArray(new ProverOptions[] {}));
 
     if (options.cache) {
-      // FIXME: Parameterize CachingMode
       env =
           new CachingOptimizationEnvironmentWrapper(
               env,
               delegate.getFormulaManager(),
-              CachingMode.IN_MEMORY);
+              options.cachingmode);
     }
 
     if (options.canonize) {

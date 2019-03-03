@@ -42,6 +42,9 @@ public class CanonizingInfixOperator implements CanonizingFormula {
   private CanonizingFormula right;
 
   private Integer hashCode = null;
+  private Formula translated = null;
+
+  private CanonizingFormula canonized = null;
 
   public CanonizingInfixOperator(
       FormulaManager pMgr,
@@ -80,7 +83,9 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
   @Override
   public Formula toFormula(FormulaManager pMgr) {
-    Formula formula = null;
+    if (translated != null) {
+      return translated;
+    }
     FormulaType<?> innerType = left.getType();
 
     if (returnType.isBitvectorType() || innerType.isBitvectorType()) {
@@ -90,73 +95,74 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
       switch (operator) {
         case BV_ADD:
-          formula = bmgr.add(lFormula, rFormula);
+          translated = bmgr.add(lFormula, rFormula);
           break;
         case BV_AND:
-          formula = bmgr.and(lFormula, rFormula);
+          translated = bmgr.and(lFormula, rFormula);
           break;
         case BV_ASHR:
-          formula = bmgr.shiftRight(lFormula, rFormula, true);
+          translated = bmgr.shiftRight(lFormula, rFormula, true);
           break;
         case BV_CONCAT:
-          formula = bmgr.concat(lFormula, rFormula);
+          translated = bmgr.concat(lFormula, rFormula);
           break;
+        case EQ:
         case BV_EQ:
-          formula = bmgr.equal(lFormula, rFormula);
+          translated = bmgr.equal(lFormula, rFormula);
           break;
         case BV_LSHR:
-          formula = bmgr.shiftRight(lFormula, rFormula, false);
+          translated = bmgr.shiftRight(lFormula, rFormula, false);
           break;
         case BV_MUL:
-          formula = bmgr.multiply(lFormula, rFormula);
+          translated = bmgr.multiply(lFormula, rFormula);
           break;
         case BV_OR:
-          formula = bmgr.or(lFormula, rFormula);
+          translated = bmgr.or(lFormula, rFormula);
           break;
         case BV_SDIV:
-          formula = bmgr.divide(lFormula, rFormula, true);
+          translated = bmgr.divide(lFormula, rFormula, true);
           break;
         case BV_SGE:
-          formula = bmgr.greaterOrEquals(lFormula, rFormula, true);
+          translated = bmgr.greaterOrEquals(lFormula, rFormula, true);
           break;
         case BV_SGT:
-          formula = bmgr.greaterThan(lFormula, rFormula, true);
+          translated = bmgr.greaterThan(lFormula, rFormula, true);
           break;
         case BV_SLE:
-          formula = bmgr.lessOrEquals(lFormula, rFormula, true);
+          translated = bmgr.lessOrEquals(lFormula, rFormula, true);
           break;
         case BV_SLT:
-          formula = bmgr.lessThan(lFormula, rFormula, true);
+          translated = bmgr.lessThan(lFormula, rFormula, true);
           break;
         case BV_UDIV:
-          formula = bmgr.divide(lFormula, rFormula, false);
+          translated = bmgr.divide(lFormula, rFormula, false);
           break;
         case BV_UGE:
-          formula = bmgr.greaterOrEquals(lFormula, rFormula, false);
+          translated = bmgr.greaterOrEquals(lFormula, rFormula, false);
           break;
         case BV_UGT:
-          formula = bmgr.greaterThan(lFormula, rFormula, false);
+          translated = bmgr.greaterThan(lFormula, rFormula, false);
           break;
         case BV_ULE:
-          formula = bmgr.lessOrEquals(lFormula, rFormula, false);
+          translated = bmgr.lessOrEquals(lFormula, rFormula, false);
           break;
         case BV_ULT:
-          formula = bmgr.lessThan(lFormula, rFormula, false);
+          translated = bmgr.lessThan(lFormula, rFormula, false);
           break;
         case BV_SHL:
-          formula = bmgr.shiftLeft(lFormula, rFormula);
+          translated = bmgr.shiftLeft(lFormula, rFormula);
           break;
         case BV_SUB:
-          formula = bmgr.subtract(lFormula, rFormula);
+          translated = bmgr.subtract(lFormula, rFormula);
           break;
         case BV_XOR:
-          formula = bmgr.xor(lFormula, rFormula);
+          translated = bmgr.xor(lFormula, rFormula);
           break;
         case BV_SREM:
-          formula = bmgr.modulo(lFormula, rFormula, true);
+          translated = bmgr.modulo(lFormula, rFormula, true);
           break;
         case BV_UREM:
-          formula = bmgr.modulo(lFormula, rFormula, false);
+          translated = bmgr.modulo(lFormula, rFormula, false);
           break;
         default:
           throw new IllegalStateException(
@@ -169,34 +175,34 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
       switch (operator) {
         case ADD:
-          formula = imgr.add(lFormula, rFormula);
+          translated = imgr.add(lFormula, rFormula);
           break;
         case DIV:
-          formula = imgr.divide(lFormula, rFormula);
+          translated = imgr.divide(lFormula, rFormula);
           break;
         case EQ:
-          formula = imgr.equal(lFormula, rFormula);
+          translated = imgr.equal(lFormula, rFormula);
           break;
         case GT:
-          formula = imgr.greaterThan(lFormula, rFormula);
+          translated = imgr.greaterThan(lFormula, rFormula);
           break;
         case GTE:
-          formula = imgr.greaterOrEquals(lFormula, rFormula);
+          translated = imgr.greaterOrEquals(lFormula, rFormula);
           break;
         case LT:
-          formula = imgr.lessThan(lFormula, rFormula);
+          translated = imgr.lessThan(lFormula, rFormula);
           break;
         case LTE:
-          formula = imgr.lessOrEquals(lFormula, rFormula);
+          translated = imgr.lessOrEquals(lFormula, rFormula);
           break;
         case MODULO:
-          formula = imgr.modulo(lFormula, rFormula);
+          translated = imgr.modulo(lFormula, rFormula);
           break;
         case MUL:
-          formula = imgr.multiply(lFormula, rFormula);
+          translated = imgr.multiply(lFormula, rFormula);
           break;
         case SUB:
-          formula = imgr.subtract(lFormula, rFormula);
+          translated = imgr.subtract(lFormula, rFormula);
           break;
         default:
           throw new IllegalStateException(
@@ -209,31 +215,31 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
       switch (operator) {
         case FP_ADD:
-          formula = fmgr.add(lFormula, rFormula);
+          translated = fmgr.add(lFormula, rFormula);
           break;
         case FP_DIV:
-          formula = fmgr.divide(lFormula, rFormula);
+          translated = fmgr.divide(lFormula, rFormula);
           break;
         case FP_EQ:
-          formula = fmgr.equalWithFPSemantics(lFormula, rFormula);
+          translated = fmgr.equalWithFPSemantics(lFormula, rFormula);
           break;
         case FP_GE:
-          formula = fmgr.greaterOrEquals(lFormula, rFormula);
+          translated = fmgr.greaterOrEquals(lFormula, rFormula);
           break;
         case FP_GT:
-          formula = fmgr.greaterThan(lFormula, rFormula);
+          translated = fmgr.greaterThan(lFormula, rFormula);
           break;
         case FP_LE:
-          formula = fmgr.lessOrEquals(lFormula, rFormula);
+          translated = fmgr.lessOrEquals(lFormula, rFormula);
           break;
         case FP_LT:
-          formula = fmgr.lessThan(lFormula, rFormula);
+          translated = fmgr.lessThan(lFormula, rFormula);
           break;
         case FP_MUL:
-          formula = fmgr.multiply(lFormula, rFormula);
+          translated = fmgr.multiply(lFormula, rFormula);
           break;
         case FP_SUB:
-          formula = fmgr.subtract(lFormula, rFormula);
+          translated = fmgr.subtract(lFormula, rFormula);
           break;
         default:
           throw new IllegalStateException(
@@ -246,19 +252,19 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
       switch (operator) {
         case AND:
-          formula = bmgr.and(lFormula, rFormula);
+          translated = bmgr.and(lFormula, rFormula);
           break;
         case OR:
-          formula = bmgr.or(lFormula, rFormula);
+          translated = bmgr.or(lFormula, rFormula);
           break;
         case IMPLIES:
-          formula = bmgr.implication(lFormula, rFormula);
+          translated = bmgr.implication(lFormula, rFormula);
           break;
         case XOR:
-          formula = bmgr.xor(lFormula, rFormula);
+          translated = bmgr.xor(lFormula, rFormula);
           break;
         case IFF:
-          formula = bmgr.equivalence(lFormula, rFormula);
+          translated = bmgr.equivalence(lFormula, rFormula);
           break;
         default:
           throw new IllegalStateException(
@@ -266,12 +272,15 @@ public class CanonizingInfixOperator implements CanonizingFormula {
       }
     }
 
-    return formula;
+    return translated;
   }
 
   @Override
   public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
-    return pStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType, pCaller);
+    if (canonized == null) {
+      canonized = pStrategy.canonizeInfixOperator(mgr, operator, left, right, returnType, pCaller);
+    }
+    return canonized;
   }
 
   @Override

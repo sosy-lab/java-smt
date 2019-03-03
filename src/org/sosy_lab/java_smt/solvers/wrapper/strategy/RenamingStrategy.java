@@ -42,7 +42,6 @@ public class RenamingStrategy implements CanonizingStrategy {
   }
 
   private static String canonizeVariableName(String pName, CanonizingFormulaStore pCaller) {
-    // TODO: Implement some (hopefully) useful renaming strategy
-    return pName;
+    return pCaller.mapName(pName);
   }
 }

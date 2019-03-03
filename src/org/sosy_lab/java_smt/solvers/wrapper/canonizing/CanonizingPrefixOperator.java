@@ -50,6 +50,9 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
   private String name;
 
   private Integer hashCode = null;
+  private Formula translated = null;
+
+  private CanonizingFormula canonized = null;
 
   public CanonizingPrefixOperator(
       FormulaManager pMgr,
@@ -110,7 +113,9 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
   @Override
   public Formula toFormula(FormulaManager pMgr) {
-    Formula formula = null;
+    if (translated != null) {
+      return translated;
+    }
 
     if (operator == FunctionDeclarationKind.UF) {
       UFManager umgr = pMgr.getUFManager();
@@ -119,8 +124,8 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
         args.add(cf.toFormula(pMgr));
       }
 
-      // FIXME: how to determine the use of declare, call, declareAndCall for UFs?
-      return umgr.declareAndCallUF(name, returnType, args);
+      translated = umgr.declareAndCallUF(name, returnType, args);
+      return translated;
     }
 
     if (operator == FunctionDeclarationKind.ITE) {
@@ -129,7 +134,8 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       Formula formula1 = operands.get(1).toFormula(pMgr);
       Formula formula2 = operands.get(2).toFormula(pMgr);
 
-      return bmgr.ifThenElse(formula0, formula1, formula2);
+      translated = bmgr.ifThenElse(formula0, formula1, formula2);
+      return translated;
     }
 
     if (isArrayOperator(operator)) {
@@ -141,7 +147,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
             (ArrayFormula<NumeralFormula, ?>) operands.get(0).toFormula(pMgr);
         NumeralFormula index = (NumeralFormula) operands.get(1).toFormula(pMgr);
 
-        formula = amgr.select(array, index);
+        translated = amgr.select(array, index);
       } else if (operator == FunctionDeclarationKind.STORE) {
         @SuppressWarnings("unchecked")
         ArrayFormula<NumeralFormula, Formula> array =
@@ -149,10 +155,10 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
         NumeralFormula index = (NumeralFormula) operands.get(1).toFormula(pMgr);
         Formula value = operands.get(2).toFormula(pMgr);
 
-        formula = amgr.store(array, index, value);
+        translated = amgr.store(array, index, value);
       }
 
-      return formula;
+      return translated;
     }
 
     if (returnType.isBitvectorType()) {
@@ -164,7 +170,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
       switch (operator) {
         case BV_EXTRACT:
-          formula =
+          translated =
               bmgr.extract(
                   bvOperands[0],
                   ((Integer) ((CanonizingConstant) operands.get(1)).getValue()),
@@ -197,22 +203,22 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
       switch (operator) {
         case FP_NEG:
-          formula = bmgr.negate(fpOperands[0]);
+          translated = bmgr.negate(fpOperands[0]);
           break;
         case FP_ROUND_AWAY:
-          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_AWAY);
+          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_AWAY);
           break;
         case FP_ROUND_EVEN:
-          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
           break;
         case FP_ROUND_NEGATIVE:
-          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_NEGATIVE);
+          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_NEGATIVE);
           break;
         case FP_ROUND_POSITIVE:
-          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_POSITIVE);
+          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_POSITIVE);
           break;
         case FP_ROUND_ZERO:
-          formula = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
+          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
           break;
         default:
           throw new IllegalStateException(
@@ -220,7 +226,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       }
     }
 
-    return formula;
+    return translated;
   }
 
   private boolean isArrayOperator(FunctionDeclarationKind pOperator) {
@@ -230,12 +236,10 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
   @Override
   public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
-    return pStrategy.canonizePrefixOperator(
-        mgr,
-        operator,
-        operands,
-        returnType,
-        pCaller);
+    if (canonized == null) {
+      canonized = pStrategy.canonizePrefixOperator(mgr, operator, operands, returnType, pCaller);
+    }
+    return canonized;
   }
 
   @Override

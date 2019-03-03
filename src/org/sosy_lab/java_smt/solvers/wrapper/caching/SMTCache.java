@@ -36,7 +36,8 @@ public interface SMTCache {
    */
 
   enum CachingMode {
-    IN_MEMORY;
+    IN_MEMORY,
+    SIMPLE_BINARY;
   }
 
   static SMTCache newSMTCache(CachingMode pMode) {
@@ -45,6 +46,9 @@ public interface SMTCache {
     switch (pMode) {
       case IN_MEMORY:
         cache = new InMemorySMTCache();
+        break;
+      case SIMPLE_BINARY:
+        cache = new SimpleBinarySMTCache();
         break;
       default:
         // no-op. just return null

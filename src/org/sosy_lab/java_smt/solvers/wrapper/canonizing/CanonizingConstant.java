@@ -32,6 +32,9 @@ public class CanonizingConstant implements CanonizingFormula {
   private FormulaType<?> type;
 
   private Integer hashCode = null;
+  private Formula translated = null;
+
+  private CanonizingFormula canonized = null;
 
   public CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
     mgr = pMgr;
@@ -57,29 +60,35 @@ public class CanonizingConstant implements CanonizingFormula {
 
   @Override
   public Formula toFormula(FormulaManager pMgr) {
-    Formula formula = null;
+    if (translated != null) {
+      return translated;
+    }
 
     if (type.isIntegerType()) {
-      formula = pMgr.getIntegerFormulaManager().makeNumber(value.toString());
+      translated = pMgr.getIntegerFormulaManager().makeNumber(value.toString());
     } else if (type.isBitvectorType()) {
-      formula =
+      translated =
           pMgr.getBitvectorFormulaManager()
               .makeBitvector(
                   ((FormulaType.BitvectorType) type).getSize(), new BigInteger(value.toString()));
     } else if (type.isFloatingPointType()) {
-      formula =
+      translated =
           pMgr.getFloatingPointFormulaManager()
               .makeNumber(value.toString(), (FormulaType.FloatingPointType) type);
     } else if (type.isBooleanType()) {
-      formula = pMgr.getBooleanFormulaManager().makeBoolean(Boolean.getBoolean(value.toString()));
+      translated =
+          pMgr.getBooleanFormulaManager().makeBoolean(Boolean.getBoolean(value.toString()));
     }
 
-    return formula;
+    return translated;
   }
 
   @Override
   public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
-    return copy();
+    if (canonized == null) {
+      canonized = copy();
+    }
+    return canonized;
   }
 
   @Override

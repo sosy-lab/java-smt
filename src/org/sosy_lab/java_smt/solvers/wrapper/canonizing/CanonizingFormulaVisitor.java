@@ -92,6 +92,14 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
               pFunctionDeclaration.getName());
     } else {
       switch (pArgs.size()) {
+        case 0:
+          function =
+              new CanonizingPrefixOperator(
+                  mgr,
+                  pFunctionDeclaration.getKind(),
+                  new ArrayList<>(),
+                  returnType);
+          break;
         case 1:
         case 3:
         case 4: // PRINCESS: extract

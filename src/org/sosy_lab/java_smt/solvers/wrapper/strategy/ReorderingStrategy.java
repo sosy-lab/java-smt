@@ -118,6 +118,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
     return result;
   }
 
+  // FIXME: Bitvector-Overflow and FloatingPoint-Special-Values (Infinitiy)
   private static CanonizingConstant
       getMinimumSummand(FormulaManager pMgr, FormulaType<?> pReturnType) {
     if (pReturnType.isIntegerType() || pReturnType.isBitvectorType()) {

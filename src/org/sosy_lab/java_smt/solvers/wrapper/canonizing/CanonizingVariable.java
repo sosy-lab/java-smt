@@ -31,6 +31,9 @@ public class CanonizingVariable implements CanonizingFormula {
   private FormulaType<?> type;
 
   private Integer hashCode = null;
+  private Formula translated = null;
+
+  private CanonizingFormula canonized = null;
 
   public CanonizingVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
     mgr = pMgr;
@@ -56,12 +59,18 @@ public class CanonizingVariable implements CanonizingFormula {
 
   @Override
   public Formula toFormula(FormulaManager pMgr) {
-    return pMgr.makeVariable(type, name);
+    if (translated == null) {
+      translated = pMgr.makeVariable(type, name);
+    }
+    return translated;
   }
 
   @Override
   public CanonizingFormula canonize(CanonizingStrategy pStrategy, CanonizingFormulaStore pCaller) {
-    return pStrategy.canonizeVariable(mgr, name, type, pCaller);
+    if (canonized == null) {
+      canonized = pStrategy.canonizeVariable(mgr, name, type, pCaller);
+    }
+    return canonized;
   }
 
   @Override

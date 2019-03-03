@@ -43,6 +43,9 @@ public class CanonizingFormulaStore {
   private FormulaManager mgr;
 
   private List<CanonizingStrategy> strategies;
+  private String nameSchema = "v_";
+  // FIXME: probably AtomicInteger/IntegerCounterProvider/IntegerIdGenerator (?)
+  private int nameCounter = 0;
 
   public CanonizingFormulaStore(FormulaManager pMgr, List<CanonizingStrategy> pStrategies) {
     this(pMgr, null, null, null, null, pStrategies);
@@ -168,17 +171,19 @@ public class CanonizingFormulaStore {
   }
 
   public CanonizingFormula remember(CanonizingFormula pCanonizingFormula) {
-    if (memoizedFormulas.get(pCanonizingFormula) == null) {
-      memoizedFormulas.put(pCanonizingFormula, pCanonizingFormula);
+    return memoizedFormulas.putIfAbsent(pCanonizingFormula, pCanonizingFormula);
+  }
+
+  public String mapName(String pOriginalName) {
+    String mappedName = checkName(pOriginalName);
+    if (mappedName.equals(pOriginalName)) {
+      mappedName = nameSchema + nameCounter++;
+      nameMap.put(pOriginalName, mappedName);
     }
-    return memoizedFormulas.get(pCanonizingFormula);
+    return mappedName;
   }
 
-  public String mapName(String pOrigialName, String pMappedName) {
-    return nameMap.put(pOrigialName, pMappedName);
-  }
-
-  public String checkName(String pName) {
+  private String checkName(String pName) {
     if (nameMap.containsKey(pName)) {
       return nameMap.get(pName);
     }
