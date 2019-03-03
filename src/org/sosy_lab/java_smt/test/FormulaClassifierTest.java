@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.example;
+package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertEquals;
@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.test.SolverBasedTest0;
+import org.sosy_lab.java_smt.example.FormulaClassifier;
 
 @RunWith(Parameterized.class)
 public class FormulaClassifierTest extends SolverBasedTest0 {
@@ -231,5 +231,22 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
     assertEquals("UFNRA", classifier.toString());
+  }
+
+  @Test
+  public void test_QF_FP() {
+    requireFloats();
+    String query = VARS + "(declare-fun a () Float32) (assert (fp.eq a (fp.add RNE a a)))";
+    classifier.visit(mgr.parse(query));
+    assertEquals("QF_FP", classifier.toString());
+  }
+
+  @Test
+  public void test_FP() {
+    requireFloats();
+    requireQuantifiers();
+    String query = VARS + "(declare-fun a () Float32) (assert (exists ((zz Real)) (fp.eq a a)))";
+    classifier.visit(mgr.parse(query));
+    assertEquals("FP", classifier.toString());
   }
 }

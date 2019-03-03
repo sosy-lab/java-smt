@@ -176,7 +176,7 @@ public class FormulaClassifier {
     }
     if (v.hasFloats) {
       // TODO forthcoming, see http://smtlib.cs.uiowa.edu/logics.shtml
-      logic += " with FP";
+      logic += "FP";
     }
     return logic;
   }
