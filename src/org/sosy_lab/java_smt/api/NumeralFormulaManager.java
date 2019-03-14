@@ -84,6 +84,9 @@ public interface NumeralFormulaManager<
 
   BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2);
 
+  /** all given numbers are pairwise unequal. */
+  BooleanFormula distinct(List<ParamFormulaType> pNumbers);
+
   BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2);
 
   BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2);

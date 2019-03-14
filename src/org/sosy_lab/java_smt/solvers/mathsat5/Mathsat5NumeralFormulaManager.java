@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
@@ -26,9 +27,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_plus;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
@@ -99,6 +102,18 @@ abstract class Mathsat5NumeralFormulaManager<
   @Override
   public Long equal(Long pNumber1, Long pNumber2) {
     return msat_make_equal(mathsatEnv, pNumber1, pNumber2);
+  }
+
+  @Override
+  public Long distinctImpl(List<Long> pNumbers) {
+    // MathSat does not directly support this method, we need to build the whole term.
+    long r = msat_make_true(mathsatEnv);
+    for (int i = 0; i < pNumbers.size(); i++) {
+      for (int j = 0; j < i; j++) {
+        r = msat_make_and(mathsatEnv, r, makeNot(equal(pNumbers.get(i), pNumbers.get(j))));
+      }
+    }
+    return r;
   }
 
   @Override
