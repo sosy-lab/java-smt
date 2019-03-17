@@ -36,23 +36,23 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingPrefixOperator implements CanonizingFormula {
 
-  private FormulaManager mgr;
+  private static final long serialVersionUID = 1L;
+  private transient FormulaManager mgr;
   private FormulaType<?> returnType;
   private FunctionDeclarationKind operator;
   private ImmutableList<CanonizingFormula> operands;
   private String name;
 
   private Integer hashCode = null;
-  private Formula translated = null;
+  private transient Formula translated = null;
 
-  private CanonizingFormula canonized = null;
+  private transient CanonizingFormula canonized = null;
 
   public CanonizingPrefixOperator(
       FormulaManager pMgr,
@@ -101,8 +101,8 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
   @Override
   public CanonizingFormula copy() {
     List<CanonizingFormula> operandsCopy = new ArrayList<>();
-    for (int i = 0; i < operands.size(); i++) {
-      operandsCopy.set(i, operands.get(i).copy());
+    for (CanonizingFormula cf : operands) {
+      operandsCopy.add(cf);
     }
 
     CanonizingFormula copy =
@@ -138,21 +138,28 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       return translated;
     }
 
+    if (operator == FunctionDeclarationKind.NOT) {
+      BooleanFormulaManager bmgr = pMgr.getBooleanFormulaManager();
+      BooleanFormula formula0 = (BooleanFormula) operands.get(0).toFormula(pMgr);
+
+      translated = bmgr.not(formula0);
+      return translated;
+    }
+
     if (isArrayOperator(operator)) {
       ArrayFormulaManager amgr = pMgr.getArrayFormulaManager();
 
       if (operator == FunctionDeclarationKind.SELECT) {
         @SuppressWarnings("unchecked")
-        ArrayFormula<NumeralFormula, ?> array =
-            (ArrayFormula<NumeralFormula, ?>) operands.get(0).toFormula(pMgr);
-        NumeralFormula index = (NumeralFormula) operands.get(1).toFormula(pMgr);
+        ArrayFormula<Formula, ?> array = (ArrayFormula<Formula, ?>) operands.get(0).toFormula(pMgr);
+        Formula index = operands.get(1).toFormula(pMgr);
 
         translated = amgr.select(array, index);
       } else if (operator == FunctionDeclarationKind.STORE) {
         @SuppressWarnings("unchecked")
-        ArrayFormula<NumeralFormula, Formula> array =
-            (ArrayFormula<NumeralFormula, Formula>) operands.get(0).toFormula(pMgr);
-        NumeralFormula index = (NumeralFormula) operands.get(1).toFormula(pMgr);
+        ArrayFormula<Formula, Formula> array =
+            (ArrayFormula<Formula, Formula>) operands.get(0).toFormula(pMgr);
+        Formula index = operands.get(1).toFormula(pMgr);
         Formula value = operands.get(2).toFormula(pMgr);
 
         translated = amgr.store(array, index, value);
@@ -163,19 +170,36 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
     if (returnType.isBitvectorType()) {
       BitvectorFormulaManager bmgr = pMgr.getBitvectorFormulaManager();
-      BitvectorFormula[] bvOperands = new BitvectorFormula[operands.size()];
+      Formula[] bvOperands = new Formula[operands.size()];
       for (int i = 0; i < bvOperands.length; i++) {
-        bvOperands[i] = (BitvectorFormula) operands.get(i).toFormula(pMgr);
+        bvOperands[i] = operands.get(i).toFormula(pMgr);
       }
 
       switch (operator) {
         case BV_EXTRACT:
           translated =
               bmgr.extract(
-                  bvOperands[0],
+                  ((BitvectorFormula) bvOperands[0]),
                   ((Integer) ((CanonizingConstant) operands.get(1)).getValue()),
                   ((Integer) ((CanonizingConstant) operands.get(2)).getValue()),
                   true);
+          break;
+        case BV_SIGN_EXTENSION:
+          translated =
+              bmgr.extend(
+                  ((BitvectorFormula) bvOperands[0]),
+                  ((Integer) ((CanonizingConstant) operands.get(1)).getValue()),
+                  true);
+          break;
+        case BV_ZERO_EXTENSION:
+          translated =
+              bmgr.extend(
+              ((BitvectorFormula) bvOperands[0]),
+              ((Integer) ((CanonizingConstant) operands.get(1)).getValue()),
+              false);
+          break;
+        case BV_NEG:
+          translated = bmgr.negate((BitvectorFormula) bvOperands[0]);
           break;
         default:
           throw new IllegalStateException(
@@ -195,34 +219,49 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
               "Handling for PrefixOperator " + operator + " not yet implemented.");
       }
     } else if (returnType.isFloatingPointType()) {
-      FloatingPointFormulaManager bmgr = pMgr.getFloatingPointFormulaManager();
-      FloatingPointFormula[] fpOperands = new FloatingPointFormula[operands.size()];
-      for (int i = 0; i < fpOperands.length; i++) {
-        fpOperands[i] = (FloatingPointFormula) operands.get(i).toFormula(pMgr);
-      }
+      FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
+      if (operator == FunctionDeclarationKind.BV_UCASTTO_FP) {
+        Formula[] fOperands = new Formula[operands.size()];
+        for (int i = 0; i < fOperands.length; i++) {
+          fOperands[i] = operands.get(i).toFormula(pMgr);
+        }
 
-      switch (operator) {
-        case FP_NEG:
-          translated = bmgr.negate(fpOperands[0]);
-          break;
-        case FP_ROUND_AWAY:
-          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_AWAY);
-          break;
-        case FP_ROUND_EVEN:
-          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
-          break;
-        case FP_ROUND_NEGATIVE:
-          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_NEGATIVE);
-          break;
-        case FP_ROUND_POSITIVE:
-          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_POSITIVE);
-          break;
-        case FP_ROUND_ZERO:
-          translated = bmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
-          break;
-        default:
-          throw new IllegalStateException(
-              "Handling for PrefixOperator " + operator + " not yet implemented.");
+        translated = fmgr.castFrom(fOperands[1], false, (FormulaType.FloatingPointType) returnType);
+      } else {
+        FloatingPointFormula[] fpOperands = new FloatingPointFormula[operands.size()];
+        for (int i = 0; i < fpOperands.length; i++) {
+          fpOperands[i] = (FloatingPointFormula) operands.get(i).toFormula(pMgr);
+        }
+
+        switch (operator) {
+          case FP_NEG:
+            translated = fmgr.negate(fpOperands[0]);
+            break;
+          case FP_ROUND_AWAY:
+            translated = fmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_AWAY);
+            break;
+          case FP_ROUND_EVEN:
+            translated = fmgr.round(fpOperands[0], FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+            break;
+          case FP_ROUND_NEGATIVE:
+            translated = fmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_NEGATIVE);
+            break;
+          case FP_ROUND_POSITIVE:
+            translated = fmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_POSITIVE);
+            break;
+          case FP_ROUND_ZERO:
+            translated = fmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
+            break;
+          case FP_IS_NAN:
+            translated = fmgr.isNaN(fpOperands[0]);
+            break;
+          case FP_MUL:
+            translated = fmgr.multiply(fpOperands[1], fpOperands[2]);
+            break;
+          default:
+            throw new IllegalStateException(
+                "Handling for PrefixOperator " + operator + " not yet implemented.");
+        }
       }
     }
 

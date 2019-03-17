@@ -95,7 +95,7 @@ public abstract class AbstractCanonizingEnvironment<T> implements BasicProverEnv
       unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     return getDelegate().unsatCoreOverAssumptions(pAssumptions);
-      }
+  }
 
   @Override
   public void close() {
@@ -106,6 +106,5 @@ public abstract class AbstractCanonizingEnvironment<T> implements BasicProverEnv
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
     return getDelegate().allSat(pCallback, pImportant);
-      }
-
+  }
 }

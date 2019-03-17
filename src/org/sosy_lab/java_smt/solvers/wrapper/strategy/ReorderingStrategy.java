@@ -20,6 +20,8 @@
 package org.sosy_lab.java_smt.solvers.wrapper.strategy;
 
 import com.google.errorprone.annotations.Immutable;
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
@@ -27,6 +29,7 @@ import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingConstant;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaStore;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingInfixOperator;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingPrefixOperator;
 import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 
 @Immutable
@@ -43,30 +46,189 @@ public class ReorderingStrategy implements CanonizingStrategy {
     FunctionDeclarationKind operator = pOperator;
     CanonizingFormula left = pLeft.canonize(this, pCaller);
     CanonizingFormula right = pRight.canonize(this, pCaller);
+    boolean transformationPossible =
+        isTransformationPossible(left.getType(), right.getType());
+    FormulaType<?> type = determineType(left.getType(), right.getType());
+    CanonizingInfixOperator result = null;
 
-    if (isGreaterOp(pOperator)) {
-      if (!pReturnType.isRationalType()) {
-        operator = FunctionDeclarationKind.LT;
-      } else {
-        operator = FunctionDeclarationKind.LTE;
+    if (isInequalityOrEquality(pOperator)) {
+      if (isLesserOp(pOperator)) {
+        if (transformationPossible || isOrEqualOp(pOperator)) {
+          operator = getGreaterEqualsOp(type, signedOperator(operator));
+        } else {
+          operator = getGreaterOp(type, signedOperator(operator));
+        }
+        CanonizingFormula tmp = left;
+        left = right;
+        right = tmp;
       }
-      CanonizingFormula tmp = left;
-      left = right;
-      right = tmp;
+
+      left =
+          new CanonizingInfixOperator(
+              pMgr,
+              getSubtractionOperator(left.getType()),
+              left,
+              right,
+              type);
+      right = new CanonizingConstant(pMgr, 0, type);
+
+      if (transformationPossible && !isOrEqualOp(pOperator)) {
+        CanonizingConstant epsilon = getMinimumSummand(pMgr, type);
+        left = add(pMgr, left, negateConstant(epsilon), type);
+      }
+
+      result =
+          new CanonizingInfixOperator(pMgr, operator, left, right, pReturnType);
+
+      if (pReturnType.isBooleanType() && type.isFloatingPointType()) {
+        // for cases that result in a transformation like: inf - inf == 0, which translates to nan
+        // ==
+        // 0 -> false, while the original inf == inf results in true
+        List<CanonizingFormula> operand = new ArrayList<>();
+        operand.add(result);
+        CanonizingPrefixOperator compareToNan =
+            new CanonizingPrefixOperator(
+                pMgr,
+                FunctionDeclarationKind.FP_IS_NAN,
+                operand,
+                pReturnType);
+        result =
+            new CanonizingInfixOperator(
+                pMgr,
+                FunctionDeclarationKind.OR,
+                result,
+                compareToNan,
+                pReturnType);
+      }
+    } else {
+      // arithmetical or logical operators where one can possibly reorder variables.
+      // TODO: implement variable-reordering according to their count
     }
 
-    if (isOrEqualOp(pOperator) && !pReturnType.isRationalType()) {
-      CanonizingConstant epsilon = getMinimumSummand(pMgr, pReturnType);
-      right = add(pMgr, right, epsilon, pReturnType);
+    if (result == null) {
+      result = new CanonizingInfixOperator(pMgr, pOperator, pLeft, pRight, pReturnType);
     }
-
-    // TODO: collect constants from right, compute them and shift them to left
-    // TODO: collect variables from right and subtract them from left
-
-    CanonizingInfixOperator result =
-        new CanonizingInfixOperator(pMgr, operator, left, right, pReturnType);
 
     return result;
+  }
+
+  private boolean isInequalityOrEquality(FunctionDeclarationKind pOperator) {
+    return isLesserOp(pOperator)
+        || isOrEqualOp(pOperator)
+        || isGreaterOp(pOperator)
+        || isEqualOp(pOperator);
+  }
+
+  private FunctionDeclarationKind getSubtractionOperator(FormulaType<?> pType) {
+    if (pType.isIntegerType() || pType.isRationalType()) {
+      return FunctionDeclarationKind.SUB;
+    }
+    if (pType.isBitvectorType()) {
+      return FunctionDeclarationKind.BV_SUB;
+    }
+    if (pType.isFloatingPointType()) {
+      return FunctionDeclarationKind.FP_SUB;
+    }
+    // TODO: Exception or something like this
+    return null;
+  }
+
+  private FormulaType<?> determineType(FormulaType<?> pType0, FormulaType<?> pType1) {
+    FormulaType<?> type0 = CanonizingFormula.recursivelyLookUpArray(pType0);
+    FormulaType<?> type1 = CanonizingFormula.recursivelyLookUpArray(pType1);
+
+    if (type0.equals(type1)
+        || (type0.isBitvectorType() && type1.isBitvectorType())
+        || (type0.isFloatingPointType() && type1.isFloatingPointType())) {
+      return getGreaterType(type0, type1);
+    }
+    // TODO: what to do in case of differing types?
+    return null;
+  }
+
+  private FormulaType<?> getGreaterType(FormulaType<?> pType0, FormulaType<?> pType1) {
+    if (pType0.isBitvectorType() && pType1.isBitvectorType()) {
+      int size0 = ((FormulaType.BitvectorType) pType0).getSize();
+      int size1 = ((FormulaType.BitvectorType) pType1).getSize();
+
+      return (size0 > size1) ? pType0 : pType1;
+    }
+    if (pType0.isFloatingPointType() && pType1.isFloatingPointType()) {
+      int expSize0 = ((FormulaType.FloatingPointType) pType0).getExponentSize();
+      int expSize1 = ((FormulaType.FloatingPointType) pType1).getExponentSize();
+      if (expSize0 > expSize1) {
+        return pType0;
+      } else if (expSize1 > expSize0) {
+        return pType1;
+      } else {
+        int manSize0 = ((FormulaType.FloatingPointType) pType0).getMantissaSize();
+        int manSize1 = ((FormulaType.FloatingPointType) pType1).getMantissaSize();
+
+        return (manSize0 > manSize1) ? pType0 : pType1;
+      }
+    }
+    return pType0;
+  }
+
+  private boolean isTransformationPossible(FormulaType<?> pType0, FormulaType<?> pType1) {
+    boolean result = true;
+
+    pType0 = CanonizingFormula.recursivelyLookUpArray(pType0);
+    pType1 = CanonizingFormula.recursivelyLookUpArray(pType1);
+
+    result &= !pType0.isRationalType();
+    result &= !pType1.isRationalType();
+    result &= !pType0.isBitvectorType();
+    result &= !pType1.isBitvectorType();
+
+    return result;
+  }
+
+  private boolean signedOperator(FunctionDeclarationKind pOperator) {
+    return pOperator == FunctionDeclarationKind.BV_SLE
+        || pOperator == FunctionDeclarationKind.BV_SLT;
+  }
+
+  private FunctionDeclarationKind
+      getGreaterEqualsOp(FormulaType<?> pType, boolean isSigned) {
+    pType = CanonizingFormula.recursivelyLookUpArray(pType);
+    if (pType.isFloatingPointType()) {
+      return FunctionDeclarationKind.FP_GE;
+    }
+    if (pType.isBitvectorType()) {
+      return isSigned ? FunctionDeclarationKind.BV_SGE : FunctionDeclarationKind.BV_UGE;
+    }
+    return FunctionDeclarationKind.GTE;
+  }
+
+  private FunctionDeclarationKind
+      getGreaterOp(FormulaType<?> pType, boolean isSigned) {
+    pType = CanonizingFormula.recursivelyLookUpArray(pType);
+    if (pType.isFloatingPointType()) {
+      return FunctionDeclarationKind.FP_GT;
+    }
+    if (pType.isBitvectorType()) {
+      return isSigned ? FunctionDeclarationKind.BV_SGT : FunctionDeclarationKind.BV_UGT;
+    }
+    return FunctionDeclarationKind.GT;
+  }
+
+  private CanonizingConstant negateConstant(CanonizingConstant pConstant) {
+    Object value = null;
+    FormulaType<?> type = pConstant.getType();
+
+    if (type.isIntegerType()) {
+      value = ((long) pConstant.getValue()) * -1;
+    } else if (type.isFloatingPointType()) {
+      if (type.equals(FormulaType.getSinglePrecisionFloatingPointType())) {
+        value = ((float) pConstant.getValue()) * -1;
+      } else if (type.equals(FormulaType.getDoublePrecisionFloatingPointType())) {
+        value = ((double) pConstant.getValue()) * -1;
+      } else {
+        throw new IllegalArgumentException("Type " + type + " is not fully implemented, yet.");
+      }
+    }
+    return new CanonizingConstant(pConstant.getFormulaManager(), value, type);
   }
 
   private static CanonizingFormula add(
@@ -121,7 +283,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
   // FIXME: Bitvector-Overflow and FloatingPoint-Special-Values (Infinitiy)
   private static CanonizingConstant
       getMinimumSummand(FormulaManager pMgr, FormulaType<?> pReturnType) {
-    if (pReturnType.isIntegerType() || pReturnType.isBitvectorType()) {
+    if (pReturnType.isIntegerType()) {
       return new CanonizingConstant(pMgr, Integer.valueOf(1), pReturnType);
     }
     if (pReturnType.isFloatingPointType()) {
@@ -148,12 +310,37 @@ public class ReorderingStrategy implements CanonizingStrategy {
     return null;
   }
 
+  private static boolean isEqualOp(FunctionDeclarationKind pO) {
+    boolean answer = false;
+    if (pO == FunctionDeclarationKind.EQ
+        || pO == FunctionDeclarationKind.BV_EQ
+        || pO == FunctionDeclarationKind.FP_EQ) {
+      answer = true;
+    }
+    return answer;
+  }
+
   private static boolean isOrEqualOp(FunctionDeclarationKind pO) {
     boolean answer = false;
-    if (pO == FunctionDeclarationKind.GTE
-        || pO == FunctionDeclarationKind.FP_GE
-        || pO == FunctionDeclarationKind.BV_SGE
-        || pO == FunctionDeclarationKind.BV_UGE) {
+    if (pO == FunctionDeclarationKind.LTE
+        || pO == FunctionDeclarationKind.FP_LE
+        || pO == FunctionDeclarationKind.BV_SLE
+        || pO == FunctionDeclarationKind.BV_ULE) {
+      answer = true;
+    }
+    return answer;
+  }
+
+  private static boolean isLesserOp(FunctionDeclarationKind pO) {
+    boolean answer = false;
+    if (pO == FunctionDeclarationKind.LT
+        || pO == FunctionDeclarationKind.LTE
+        || pO == FunctionDeclarationKind.FP_LT
+        || pO == FunctionDeclarationKind.FP_LE
+        || pO == FunctionDeclarationKind.BV_SLT
+        || pO == FunctionDeclarationKind.BV_SLE
+        || pO == FunctionDeclarationKind.BV_ULT
+        || pO == FunctionDeclarationKind.BV_ULE) {
       answer = true;
     }
     return answer;

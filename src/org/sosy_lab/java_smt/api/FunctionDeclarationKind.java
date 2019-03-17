@@ -101,6 +101,12 @@ public enum FunctionDeclarationKind {
   /** Concatenation over bitvectors. */
   BV_CONCAT,
 
+  /** Extend bitvectors according to their sign. */
+  BV_SIGN_EXTENSION,
+
+  /** Extend bitvectors with zeros. */
+  BV_ZERO_EXTENSION,
+
   /** Bitwise negation of a bitvector. */
   BV_NOT,
 
@@ -173,6 +179,9 @@ public enum FunctionDeclarationKind {
   /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
   BV_ASHR,
 
+  /** Cast an unsigned bitvector to a floating-point number */
+  BV_UCASTTO_FP,
+
   // Simple floating point operations
 
   /** Negation of a floating point. */
@@ -222,6 +231,9 @@ public enum FunctionDeclarationKind {
 
   /** Rounding over floating points. */
   FP_ROUND_TO_INTEGRAL,
+
+  /** For internal use, representing an 'isNaN' query. */
+  FP_IS_NAN,
 
   // default case
 

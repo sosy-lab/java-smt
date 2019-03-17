@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 @Immutable
 abstract class Mathsat5Formula implements Formula {
 
+  private static final long serialVersionUID = 1L;
   private final long msatTerm;
 
   Mathsat5Formula(long term) {
@@ -68,6 +69,7 @@ abstract class Mathsat5Formula implements Formula {
   static final class Mathsat5ArrayFormula<TI extends Formula, TE extends Formula>
       extends Mathsat5Formula implements ArrayFormula<TI, TE> {
 
+    private static final long serialVersionUID = 1L;
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
@@ -88,6 +90,8 @@ abstract class Mathsat5Formula implements Formula {
 
   @Immutable
   static final class Mathsat5BitvectorFormula extends Mathsat5Formula implements BitvectorFormula {
+    private static final long serialVersionUID = 1L;
+
     Mathsat5BitvectorFormula(long pTerm) {
       super(pTerm);
     }
@@ -96,6 +100,8 @@ abstract class Mathsat5Formula implements Formula {
   @Immutable
   static final class Mathsat5FloatingPointFormula extends Mathsat5Formula
       implements FloatingPointFormula {
+    private static final long serialVersionUID = 1L;
+
     Mathsat5FloatingPointFormula(long pTerm) {
       super(pTerm);
     }
@@ -104,6 +110,8 @@ abstract class Mathsat5Formula implements Formula {
   @Immutable
   static final class Mathsat5FloatingPointRoundingModeFormula extends Mathsat5Formula
       implements FloatingPointRoundingModeFormula {
+    private static final long serialVersionUID = 1L;
+
     Mathsat5FloatingPointRoundingModeFormula(long pTerm) {
       super(pTerm);
     }
@@ -111,6 +119,8 @@ abstract class Mathsat5Formula implements Formula {
 
   @Immutable
   static final class Mathsat5IntegerFormula extends Mathsat5Formula implements IntegerFormula {
+    private static final long serialVersionUID = 1L;
+
     Mathsat5IntegerFormula(long pTerm) {
       super(pTerm);
     }
@@ -118,6 +128,8 @@ abstract class Mathsat5Formula implements Formula {
 
   @Immutable
   static final class Mathsat5RationalFormula extends Mathsat5Formula implements RationalFormula {
+    private static final long serialVersionUID = 1L;
+
     Mathsat5RationalFormula(long pTerm) {
       super(pTerm);
     }
@@ -125,6 +137,8 @@ abstract class Mathsat5Formula implements Formula {
 
   @Immutable
   static final class Mathsat5BooleanFormula extends Mathsat5Formula implements BooleanFormula {
+    private static final long serialVersionUID = 1L;
+
     Mathsat5BooleanFormula(long pTerm) {
       super(pTerm);
     }

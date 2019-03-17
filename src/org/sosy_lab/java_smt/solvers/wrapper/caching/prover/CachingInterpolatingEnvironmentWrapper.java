@@ -19,9 +19,14 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.caching.prover;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -35,8 +40,11 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
   public CachingInterpolatingEnvironmentWrapper(
       InterpolatingProverEnvironment<T> pEnv,
       FormulaManager pMgr,
-      CachingMode pMode) {
-    super(pMgr, pMode);
+      CachingMode pMode,
+      Configuration config,
+      boolean solversFormulasCacheable)
+      throws InvalidConfigurationException {
+    super(pMgr, pMode, config, solversFormulasCacheable);
     delegate = pEnv;
   }
 
@@ -48,26 +56,38 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
   @Override
   public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
       throws SolverException, InterruptedException {
-    BooleanFormula cached = cache.getFormulaInterpolant(formula, pFormulasOfA);
+    Formula translated = fromFormula(formula);
+    Formula cached = cache.getFormulaInterpolant(translated, pFormulasOfA);
+    BooleanFormula computed;
     if (cached == null) {
-      cached = delegate.getInterpolant(pFormulasOfA);
-      cache.storeFormulaInterpolant(formula, cached, pFormulasOfA);
+      assert delegate.isUnsat();
+      computed = delegate.getInterpolant(pFormulasOfA);
+      cached = fromFormula(computed);
+      cache.storeFormulaInterpolant(translated, cached, pFormulasOfA);
+    } else {
+      computed = toFormula(cached);
     }
-    return cached;
+    return computed;
   }
 
   @Override
   public List<BooleanFormula>
       getTreeInterpolants(List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
           throws SolverException, InterruptedException {
-    List<BooleanFormula> cached =
-        cache.getFormulaTreeInterpolants(formula, pPartitionedFormulas, pStartOfSubTree);
+    Formula translated = fromFormula(formula);
+    List<BooleanFormula> computed = new ArrayList<>();
+    List<Formula> cached =
+        cache.getFormulaTreeInterpolants(translated, pPartitionedFormulas, pStartOfSubTree);
     if (cached == null) {
-      cached =
+      assert delegate.isUnsat();
+      computed =
           delegate
               .getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
-      cache.storeFormulaTreeInterpolants(formula, cached, pPartitionedFormulas, pStartOfSubTree);
+      cached = computed.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
+      cache.storeFormulaTreeInterpolants(translated, cached, pPartitionedFormulas, pStartOfSubTree);
+    } else {
+      computed = cached.stream().map(f -> toFormula(f)).collect(Collectors.toList());
     }
-    return cached;
+    return computed;
   }
 }

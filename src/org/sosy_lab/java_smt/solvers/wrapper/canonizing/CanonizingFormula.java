@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
-public interface CanonizingFormula {
+public interface CanonizingFormula extends Formula {
 
   default CanonizingFormula getOperand1() {
     return null;
@@ -49,4 +49,12 @@ public interface CanonizingFormula {
   void toString(StringBuilder pBuilder);
 
   FormulaType<?> getType();
+
+  public static FormulaType<?> recursivelyLookUpArray(FormulaType<?> pType) {
+    if (pType.isArrayType()) {
+      return recursivelyLookUpArray(((FormulaType.ArrayFormulaType<?, ?>) pType).getElementType());
+    } else {
+      return pType;
+    }
+  }
 }

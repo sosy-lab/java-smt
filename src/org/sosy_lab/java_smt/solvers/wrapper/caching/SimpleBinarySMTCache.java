@@ -30,135 +30,134 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.FileOption;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 
+@Options
 public class SimpleBinarySMTCache implements SMTCache {
 
-  private final static String CACHE_FILE = "java-smt.cache";
+  @Option(secure = true, description = "Cache SMT-Solver results to this file on disc.")
+  @FileOption(FileOption.Type.OUTPUT_FILE)
+  private Path cacheFileLocation = Paths.get("java-smt.cache");
 
   private InMemorySMTCache cache;
 
-  public SimpleBinarySMTCache() {
+  public SimpleBinarySMTCache(Configuration config) throws InvalidConfigurationException {
+    config.inject(this);
     cache = loadCacheFileIfExists();
   }
 
   private InMemorySMTCache loadCacheFileIfExists() {
     InMemorySMTCache newCache = new InMemorySMTCache();
 
-    Path path = getCacheFilePath();
-    File cacheFile = path.toFile();
+    File cacheFile = cacheFileLocation.toFile();
 
     if (cacheFile.exists()) {
       try (ObjectInputStream os = new ObjectInputStream(new FileInputStream(cacheFile))) {
         newCache = (InMemorySMTCache) os.readObject();
       } catch (Exception e) {
-        // TODO: handle exception
+        throw new RuntimeException("Could not load SMT-cachefile from disc.", e);
       }
     }
 
     return newCache;
   }
 
-  private Path getCacheFilePath() {
-    Path path = Paths.get("");
-    path = Paths.get(path.toAbsolutePath().toString(), CACHE_FILE);
-    return path;
-  }
-
   @Override
-  public Boolean storeFormulaUnsat(BooleanFormula pFormula, boolean pUnsat) {
+  public Boolean storeFormulaUnsat(Formula pFormula, boolean pUnsat) {
     return cache.storeFormulaUnsat(pFormula, pUnsat);
   }
 
   @Override
-  public Boolean isFormulaUnsat(BooleanFormula pFormula) {
+  public Boolean isFormulaUnsat(Formula pFormula) {
     return cache.isFormulaUnsat(pFormula);
   }
 
   @Override
   public Boolean storeFormulaUnsatWithAssumptions(
-      BooleanFormula pFormula,
+      Formula pFormula,
       boolean pUnsat,
-      Collection<BooleanFormula> pAssumptions) {
+      Collection<Formula> pAssumptions) {
     return cache.storeFormulaUnsatWithAssumptions(pFormula, pUnsat, pAssumptions);
   }
 
   @Override
   public Boolean isFormulaUnsatWithAssumptions(
-      BooleanFormula pFormula,
-      Collection<BooleanFormula> pAssumptions) {
+      Formula pFormula,
+      Collection<Formula> pAssumptions) {
     return cache.isFormulaUnsatWithAssumptions(pFormula, pAssumptions);
   }
 
   @Override
-  public Model storeFormulaModel(BooleanFormula pFormula, Model pModel) {
+  public Model storeFormulaModel(Formula pFormula, Model pModel) {
     return cache.storeFormulaModel(pFormula, pModel);
   }
 
   @Override
-  public Model getFormulaModel(BooleanFormula pFormula) {
+  public Model getFormulaModel(Formula pFormula) {
     return cache.getFormulaModel(pFormula);
   }
 
   @Override
   public ImmutableList<ValueAssignment> storeFormulaModelAssignments(
-      BooleanFormula pFormula,
+      Formula pFormula,
       ImmutableList<ValueAssignment> pAssignments) {
     return cache.storeFormulaModelAssignments(pFormula, pAssignments);
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getFormulaModelAssignments(BooleanFormula pFormula) {
+  public ImmutableList<ValueAssignment> getFormulaModelAssignments(Formula pFormula) {
     return cache.getFormulaModelAssignments(pFormula);
   }
 
   @Override
-  public List<BooleanFormula>
-      storeFormulaUnsatCore(BooleanFormula pFormula, List<BooleanFormula> pUnsatCore) {
+  public List<Formula> storeFormulaUnsatCore(Formula pFormula, List<Formula> pUnsatCore) {
     return cache.storeFormulaUnsatCore(pFormula, pUnsatCore);
   }
 
   @Override
-  public List<BooleanFormula> getFormulaUnsatCore(BooleanFormula pFormula) {
+  public List<Formula> getFormulaUnsatCore(Formula pFormula) {
     return cache.getFormulaUnsatCore(pFormula);
   }
 
   @Override
-  public Optional<List<BooleanFormula>> storeFormulaUnsatCoreOverAssumptions(
-      BooleanFormula pFormula,
-      Optional<List<BooleanFormula>> pUnsatCore,
-      Collection<BooleanFormula> pAssumptions) {
+  public Optional<List<Formula>> storeFormulaUnsatCoreOverAssumptions(
+      Formula pFormula,
+      Optional<List<Formula>> pUnsatCore,
+      Collection<Formula> pAssumptions) {
     return cache.storeFormulaUnsatCoreOverAssumptions(pFormula, pUnsatCore, pAssumptions);
   }
 
   @Override
-  public Optional<List<BooleanFormula>> getFormulaUnsatCoreOverAssumptions(
-      BooleanFormula pFormula,
-      Collection<BooleanFormula> pAssumptions) {
+  public Optional<List<Formula>>
+      getFormulaUnsatCoreOverAssumptions(Formula pFormula, Collection<Formula> pAssumptions) {
     return cache.getFormulaUnsatCoreOverAssumptions(pFormula, pAssumptions);
   }
 
   @Override
-  public BooleanFormula storeFormulaInterpolant(
-      BooleanFormula pFormula,
-      BooleanFormula pInterpolant,
+  public Formula storeFormulaInterpolant(
+      Formula pFormula,
+      Formula pInterpolant,
       Collection<?> pFormulasOfA) {
     return cache.storeFormulaInterpolant(pFormula, pInterpolant, pFormulasOfA);
   }
 
   @Override
-  public BooleanFormula getFormulaInterpolant(BooleanFormula pFormula, Collection<?> pFormulasOfA) {
+  public Formula getFormulaInterpolant(Formula pFormula, Collection<?> pFormulasOfA) {
     return cache.getFormulaInterpolant(pFormula, pFormulasOfA);
   }
 
   @Override
-  public List<BooleanFormula> storeFormulaTreeInterpolants(
-      BooleanFormula pFormula,
-      List<BooleanFormula> pTreeInterpolants,
+  public List<Formula> storeFormulaTreeInterpolants(
+      Formula pFormula,
+      List<Formula> pTreeInterpolants,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
     return cache.storeFormulaTreeInterpolants(
@@ -169,36 +168,36 @@ public class SimpleBinarySMTCache implements SMTCache {
   }
 
   @Override
-  public List<BooleanFormula> getFormulaTreeInterpolants(
-      BooleanFormula pFormula,
+  public List<Formula> getFormulaTreeInterpolants(
+      Formula pFormula,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
     return cache.getFormulaTreeInterpolants(pFormula, pPartitionedFormulas, pStartOfSubTree);
   }
 
   @Override
-  public Integer storeFormulaMaximize(BooleanFormula pFormula, Integer pMax, Formula pObjective) {
+  public Integer storeFormulaMaximize(Formula pFormula, Integer pMax, Formula pObjective) {
     return cache.storeFormulaMaximize(pFormula, pMax, pObjective);
   }
 
   @Override
-  public Integer getFormulaMaximize(BooleanFormula pFormula, Formula pObjective) {
+  public Integer getFormulaMaximize(Formula pFormula, Formula pObjective) {
     return cache.getFormulaMaximize(pFormula, pObjective);
   }
 
   @Override
-  public Integer storeFormulaMinimize(BooleanFormula pFormula, Integer pMin, Formula pObjective) {
+  public Integer storeFormulaMinimize(Formula pFormula, Integer pMin, Formula pObjective) {
     return cache.storeFormulaMinimize(pFormula, pMin, pObjective);
   }
 
   @Override
-  public Integer getFormulaMinimize(BooleanFormula pFormula, Formula pObjective) {
+  public Integer getFormulaMinimize(Formula pFormula, Formula pObjective) {
     return cache.getFormulaMinimize(pFormula, pObjective);
   }
 
   @Override
   public Optional<Rational> storeFormulaUpper(
-      BooleanFormula pFormula,
+      Formula pFormula,
       Optional<Rational> pUpper,
       int pHandle,
       Rational pEpsilon) {
@@ -207,13 +206,13 @@ public class SimpleBinarySMTCache implements SMTCache {
 
   @Override
   public Optional<Rational>
-      getFormulaUpper(BooleanFormula pFormula, int pHandle, Rational pEpsilon) {
+      getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon) {
     return cache.getFormulaUpper(pFormula, pHandle, pEpsilon);
   }
 
   @Override
   public Optional<Rational> storeFormulaLower(
-      BooleanFormula pFormula,
+      Formula pFormula,
       Optional<Rational> pLower,
       int pHandle,
       Rational pEpsilon) {
@@ -222,7 +221,7 @@ public class SimpleBinarySMTCache implements SMTCache {
 
   @Override
   public Optional<Rational>
-      getFormulaLower(BooleanFormula pFormula, int pHandle, Rational pEpsilon) {
+      getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon) {
     return cache.getFormulaLower(pFormula, pHandle, pEpsilon);
   }
 
@@ -235,8 +234,7 @@ public class SimpleBinarySMTCache implements SMTCache {
   }
 
   private void writeCacheFile(InMemorySMTCache pCache) {
-    Path path = getCacheFilePath();
-    File check = path.toFile();
+    File check = cacheFileLocation.toFile();
 
     if (check.exists()) {
       check.delete();
@@ -245,7 +243,7 @@ public class SimpleBinarySMTCache implements SMTCache {
     try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(check))) {
       os.writeObject(pCache);
     } catch (Exception e) {
-      // TODO: handle Exception
+      throw new RuntimeException("Could not write SMT-cachefile to disc.", e);
     }
   }
 }

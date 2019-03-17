@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 public class CanonizingModel implements Model {
 
+  private static final long serialVersionUID = 1L;
   private final Model delegate;
 
   public CanonizingModel(Model pDelegate) {

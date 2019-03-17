@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 @Immutable(containerOf = "TFormulaInfo")
 abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
+  private static final long serialVersionUID = 1L;
   private final TFormulaInfo formulaInfo;
 
   private AbstractFormula(TFormulaInfo formulaInfo) {
@@ -76,6 +77,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   static final class ArrayFormulaImpl<TI extends Formula, TE extends Formula, TFormulaInfo>
       extends AbstractFormula<TFormulaInfo> implements ArrayFormula<TI, TE> {
 
+    private static final long serialVersionUID = 1L;
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
@@ -97,6 +99,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple BooleanFormula implementation. Just tracing the size and the sign-treatment */
   static final class BitvectorFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BitvectorFormula {
+    private static final long serialVersionUID = 1L;
+
     BitvectorFormulaImpl(TFormulaInfo info) {
       super(info);
     }
@@ -105,6 +109,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple FloatingPointFormula implementation. */
   static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements FloatingPointFormula {
+    private static final long serialVersionUID = 1L;
+
     FloatingPointFormulaImpl(TFormulaInfo info) {
       super(info);
     }
@@ -113,6 +119,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple FloatingPointRoundingModeFormula implementation. */
   static final class FloatingPointRoundingModeFormulaImpl<TFormulaInfo>
       extends AbstractFormula<TFormulaInfo> implements FloatingPointRoundingModeFormula {
+    private static final long serialVersionUID = 1L;
+
     FloatingPointRoundingModeFormulaImpl(TFormulaInfo info) {
       super(info);
     }
@@ -121,6 +129,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple BooleanFormula implementation. */
   static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BooleanFormula {
+    private static final long serialVersionUID = 1L;
+
     BooleanFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }
@@ -129,6 +139,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple IntegerFormula implementation. */
   static final class IntegerFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements IntegerFormula {
+    private static final long serialVersionUID = 1L;
+
     IntegerFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
     }
@@ -137,6 +149,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple RationalFormula implementation. */
   static final class RationalFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements RationalFormula {
+    private static final long serialVersionUID = 1L;
+
     RationalFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
     }

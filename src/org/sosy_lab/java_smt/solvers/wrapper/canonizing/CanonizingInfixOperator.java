@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -35,16 +37,17 @@ import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingInfixOperator implements CanonizingFormula {
 
-  private FormulaManager mgr;
+  private static final long serialVersionUID = 1L;
+  private transient FormulaManager mgr;
   private FormulaType<?> returnType;
   private FunctionDeclarationKind operator;
   private CanonizingFormula left;
   private CanonizingFormula right;
 
   private Integer hashCode = null;
-  private Formula translated = null;
+  private transient Formula translated = null;
 
-  private CanonizingFormula canonized = null;
+  private transient CanonizingFormula canonized = null;
 
   public CanonizingInfixOperator(
       FormulaManager pMgr,
@@ -81,6 +84,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
     return copy;
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public Formula toFormula(FormulaManager pMgr) {
     if (translated != null) {
@@ -220,6 +224,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case FP_DIV:
           translated = fmgr.divide(lFormula, rFormula);
           break;
+        case EQ:
         case FP_EQ:
           translated = fmgr.equalWithFPSemantics(lFormula, rFormula);
           break;
@@ -265,6 +270,19 @@ public class CanonizingInfixOperator implements CanonizingFormula {
           break;
         case IFF:
           translated = bmgr.equivalence(lFormula, rFormula);
+          break;
+        default:
+          throw new IllegalStateException(
+              "Handling for InfixOperator " + operator + " not yet implemented.");
+      }
+    } else if (returnType.isBooleanType() && innerType.isArrayType()) {
+      ArrayFormulaManager amgr = pMgr.getArrayFormulaManager();
+      ArrayFormula lFormula = (ArrayFormula) left.toFormula(pMgr);
+      ArrayFormula rFormula = (ArrayFormula) right.toFormula(pMgr);
+
+      switch (operator) {
+        case EQ:
+          translated = amgr.equivalence(lFormula, rFormula);
           break;
         default:
           throw new IllegalStateException(

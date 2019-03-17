@@ -27,14 +27,15 @@ import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingConstant implements CanonizingFormula {
 
-  private FormulaManager mgr;
+  private static final long serialVersionUID = 1L;
+  private transient FormulaManager mgr;
   private Object value;
   private FormulaType<?> type;
 
   private Integer hashCode = null;
-  private Formula translated = null;
+  private transient Formula translated = null;
 
-  private CanonizingFormula canonized = null;
+  private transient CanonizingFormula canonized = null;
 
   public CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
     mgr = pMgr;
@@ -72,9 +73,14 @@ public class CanonizingConstant implements CanonizingFormula {
               .makeBitvector(
                   ((FormulaType.BitvectorType) type).getSize(), new BigInteger(value.toString()));
     } else if (type.isFloatingPointType()) {
-      translated =
+      if (value != null) {
+        translated =
           pMgr.getFloatingPointFormulaManager()
               .makeNumber(value.toString(), (FormulaType.FloatingPointType) type);
+      } else {
+        translated =
+            pMgr.getFloatingPointFormulaManager().makeNaN((FormulaType.FloatingPointType) type);
+      }
     } else if (type.isBooleanType()) {
       translated =
           pMgr.getBooleanFormulaManager().makeBoolean(Boolean.getBoolean(value.toString()));

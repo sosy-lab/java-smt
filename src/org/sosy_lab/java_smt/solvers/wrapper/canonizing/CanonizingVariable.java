@@ -26,14 +26,17 @@ import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
 
 public class CanonizingVariable implements CanonizingFormula {
 
-  private FormulaManager mgr;
+  private static final long serialVersionUID = 1L;
+  private transient FormulaManager mgr;
   private String name;
   private FormulaType<?> type;
 
-  private Integer hashCode = null;
-  private Formula translated = null;
+  private long counter = 0;
 
-  private CanonizingFormula canonized = null;
+  private Integer hashCode = null;
+  private transient Formula translated = null;
+
+  private transient CanonizingFormula canonized = null;
 
   public CanonizingVariable(FormulaManager pMgr, String pName, FormulaType<?> pType) {
     mgr = pMgr;
@@ -48,6 +51,14 @@ public class CanonizingVariable implements CanonizingFormula {
   @Override
   public FormulaType<?> getType() {
     return type;
+  }
+
+  public long getCount() {
+    return counter;
+  }
+
+  public void incrementCount() {
+    counter++;
   }
 
   @Override

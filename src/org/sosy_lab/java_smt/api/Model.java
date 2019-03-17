@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,7 +34,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 /** A model returned from the satisfiable solver environment. */
-public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
+public interface Model extends Iterable<ValueAssignment>, AutoCloseable, Serializable {
 
   /**
    * Evaluate a given formula substituting the values from the model and return it as formula.
@@ -120,7 +121,9 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   @Override
   void close();
 
-  final class ValueAssignment {
+  static final class ValueAssignment implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * the key should be of simple formula-type (Boolean/Integer/Rational/BitVector).

@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 @Immutable
 abstract class Z3Formula implements Formula {
 
+  private static final long serialVersionUID = 1L;
   private final long z3expr;
   private final long z3context;
 
@@ -81,6 +82,7 @@ abstract class Z3Formula implements Formula {
   static final class Z3ArrayFormula<TI extends Formula, TE extends Formula> extends Z3Formula
       implements ArrayFormula<TI, TE> {
 
+    private static final long serialVersionUID = 1L;
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
@@ -103,6 +105,8 @@ abstract class Z3Formula implements Formula {
   @Immutable
   static final class Z3BitvectorFormula extends Z3Formula implements BitvectorFormula {
 
+    private static final long serialVersionUID = 1L;
+
     Z3BitvectorFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
@@ -110,6 +114,8 @@ abstract class Z3Formula implements Formula {
 
   @Immutable
   static final class Z3FloatingPointFormula extends Z3Formula implements FloatingPointFormula {
+
+    private static final long serialVersionUID = 1L;
 
     Z3FloatingPointFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
@@ -120,6 +126,8 @@ abstract class Z3Formula implements Formula {
   static final class Z3FloatingPointRoundingModeFormula extends Z3Formula
       implements FloatingPointRoundingModeFormula {
 
+    private static final long serialVersionUID = 1L;
+
     Z3FloatingPointRoundingModeFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
@@ -127,6 +135,8 @@ abstract class Z3Formula implements Formula {
 
   @Immutable
   static final class Z3IntegerFormula extends Z3Formula implements IntegerFormula {
+
+    private static final long serialVersionUID = 1L;
 
     Z3IntegerFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
@@ -136,6 +146,8 @@ abstract class Z3Formula implements Formula {
   @Immutable
   static final class Z3RationalFormula extends Z3Formula implements RationalFormula {
 
+    private static final long serialVersionUID = 1L;
+
     Z3RationalFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
@@ -143,6 +155,8 @@ abstract class Z3Formula implements Formula {
 
   @Immutable
   static final class Z3BooleanFormula extends Z3Formula implements BooleanFormula {
+    private static final long serialVersionUID = 1L;
+
     Z3BooleanFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }

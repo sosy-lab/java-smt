@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
+  private static final long serialVersionUID = 1L;
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
   private boolean closed = false;

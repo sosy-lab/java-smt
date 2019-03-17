@@ -20,11 +20,12 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.Immutable;
+import java.io.Serializable;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
 /** An arbitrary SMT formula. */
 @Immutable
-public interface Formula {
+public interface Formula extends Serializable {
 
   /**
    * returns an arbitrary representation of the formula, might be human- or machine-readable.

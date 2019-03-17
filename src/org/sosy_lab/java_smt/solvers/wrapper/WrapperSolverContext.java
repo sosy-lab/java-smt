@@ -77,12 +77,17 @@ public class WrapperSolverContext extends AbstractSolverContext {
 
   private SolverContext delegate;
   private WrapperOptions options;
+  private Configuration config;
 
   public WrapperSolverContext(
-      FormulaManager pFmgr, SolverContext pDelegate, WrapperOptions pOptions) {
+      FormulaManager pFmgr,
+      SolverContext pDelegate,
+      WrapperOptions pOptions,
+      Configuration config) {
     super(pFmgr);
     delegate = pDelegate;
     options = pOptions;
+    this.config = config;
   }
 
   @SuppressWarnings("resource")
@@ -92,7 +97,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
     WrapperOptions options = new WrapperOptions();
     pConfig.inject(options);
     SolverContext delegate = pSolverContextFactory.generateContext(options.solver);
-    return new WrapperSolverContext(delegate.getFormulaManager(), delegate, options);
+    return new WrapperSolverContext(delegate.getFormulaManager(), delegate, options, pConfig);
   }
 
   @Override
@@ -115,7 +120,17 @@ public class WrapperSolverContext extends AbstractSolverContext {
     ProverEnvironment env = delegate.newProverEnvironment(pOptions.toArray(new ProverOptions[] {}));
 
     if (options.cache) {
-      env = new CachingEnvironmentWrapper(env, delegate.getFormulaManager(), options.cachingmode);
+      try {
+        env =
+            new CachingEnvironmentWrapper(
+                env,
+                delegate.getFormulaManager(),
+                options.cachingmode,
+                config,
+                areSolversFormulasCacheable());
+      } catch (InvalidConfigurationException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     if (options.canonize) {
@@ -133,11 +148,17 @@ public class WrapperSolverContext extends AbstractSolverContext {
         delegate.newProverEnvironmentWithInterpolation(pSet.toArray(new ProverOptions[] {}));
 
     if (options.cache) {
-      env =
-          new CachingInterpolatingEnvironmentWrapper<>(
-              env,
-              delegate.getFormulaManager(),
-              options.cachingmode);
+      try {
+        env =
+            new CachingInterpolatingEnvironmentWrapper<>(
+                env,
+                delegate.getFormulaManager(),
+                options.cachingmode,
+                config,
+                areSolversFormulasCacheable());
+      } catch (InvalidConfigurationException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     if (options.canonize) {
@@ -159,11 +180,17 @@ public class WrapperSolverContext extends AbstractSolverContext {
         delegate.newOptimizationProverEnvironment(pSet.toArray(new ProverOptions[] {}));
 
     if (options.cache) {
-      env =
-          new CachingOptimizationEnvironmentWrapper(
-              env,
-              delegate.getFormulaManager(),
-              options.cachingmode);
+      try {
+        env =
+            new CachingOptimizationEnvironmentWrapper(
+                env,
+                delegate.getFormulaManager(),
+                options.cachingmode,
+                config,
+                areSolversFormulasCacheable());
+      } catch (InvalidConfigurationException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     if (options.canonize) {
@@ -176,6 +203,11 @@ public class WrapperSolverContext extends AbstractSolverContext {
     }
 
     return env;
+  }
+
+  private boolean areSolversFormulasCacheable() {
+    // Assess if that's correct
+    return options.solver == Solvers.PRINCESS || options.solver == Solvers.SMTINTERPOL;
   }
 
   private List<CanonizingStrategy> organizeStrategies() {

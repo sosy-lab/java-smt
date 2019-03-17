@@ -21,20 +21,27 @@ package org.sosy_lab.java_smt.solvers.wrapper.caching.prover;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache;
 import org.sosy_lab.java_smt.solvers.wrapper.caching.SMTCache.CachingMode;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
+import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormulaVisitor;
 
 public abstract class AbstractCachingEnvironment<T> implements BasicProverEnvironment<T> {
 
@@ -42,16 +49,26 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   protected SMTCache cache;
   protected BooleanFormula formula;
   protected final Deque<BooleanFormula> stack;
+  protected @Nullable CanonizingFormulaVisitor visitor;
+  private FormulaManager mgr;
 
   public AbstractCachingEnvironment(
       FormulaManager pMgr,
-      CachingMode pMode) {
+      CachingMode pMode,
+      Configuration config,
+      boolean solversFormulasCacheable)
+      throws InvalidConfigurationException {
+    mgr = pMgr;
     fmgr = pMgr.getBooleanFormulaManager();
-    cache = SMTCache.newSMTCache(pMode);
+    cache = SMTCache.newSMTCache(pMode, config);
 
     formula = fmgr.makeTrue();
     stack = new ArrayDeque<>();
     stack.push(formula);
+
+    if (!solversFormulasCacheable) {
+      visitor = new CanonizingFormulaVisitor(pMgr, new ArrayList<>());
+    }
   }
 
   protected abstract BasicProverEnvironment<T> getDelegate();
@@ -75,12 +92,27 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
     getDelegate().push();
   }
 
+  protected Formula fromFormula(BooleanFormula pFormula) {
+    if (visitor != null) {
+      return visitor.translate(pFormula);
+    }
+    return pFormula;
+  }
+
+  protected BooleanFormula toFormula(Formula pFormula) {
+    if (visitor != null) {
+      return (BooleanFormula) ((CanonizingFormula) pFormula).toFormula(mgr);
+    }
+    return (BooleanFormula) pFormula;
+  }
+
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    Boolean cached = cache.isFormulaUnsat(formula);
+    Formula translated = fromFormula(formula);
+    Boolean cached = cache.isFormulaUnsat(translated);
     if (cached == null) {
       cached = getDelegate().isUnsat();
-      cache.storeFormulaUnsat(formula, cached);
+      cache.storeFormulaUnsat(translated, cached);
     }
     return cached;
   }
@@ -88,10 +120,13 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Boolean cached = cache.isFormulaUnsatWithAssumptions(formula, pAssumptions);
+    Formula translated = fromFormula(formula);
+    List<Formula> tAssumptions =
+        pAssumptions.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
+    Boolean cached = cache.isFormulaUnsatWithAssumptions(translated, tAssumptions);
     if (cached == null) {
       cached = getDelegate().isUnsatWithAssumptions(pAssumptions);
-      cache.storeFormulaUnsatWithAssumptions(formula, cached, pAssumptions);
+      cache.storeFormulaUnsatWithAssumptions(translated, cached, tAssumptions);
     }
     return cached;
   }
@@ -99,46 +134,92 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Model cached = cache.getFormulaModel(formula);
+    Formula translated = fromFormula(formula);
+    Model cached = cache.getFormulaModel(translated);
     if (cached == null) {
-      cached = getDelegate().getModel();
-      cache.storeFormulaModel(formula, cached);
+      boolean unsat = true;
+      try {
+        unsat = getDelegate().isUnsat();
+      } catch (InterruptedException e) {
+        throw new SolverException("Exception when trying to evaluate satisfiability.", e);
+      }
+      if (!unsat) {
+        cached = getDelegate().getModel();
+        cache.storeFormulaModel(translated, cached);
+      }
     }
     return cached;
   }
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    ImmutableList<ValueAssignment> cached = cache.getFormulaModelAssignments(formula);
+    Formula translated = fromFormula(formula);
+    ImmutableList<ValueAssignment> cached = cache.getFormulaModelAssignments(translated);
     if (cached == null) {
-      cached = getDelegate().getModelAssignments();
-      cache.storeFormulaModelAssignments(formula, cached);
+      boolean unsat = true;
+      try {
+        unsat = getDelegate().isUnsat();
+      } catch (InterruptedException e) {
+        throw new SolverException("Exception when trying to evaluate satisfiability.", e);
+      }
+      if (!unsat) {
+        cached = getDelegate().getModelAssignments();
+        cache.storeFormulaModelAssignments(translated, cached);
+      }
     }
     return cached;
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    List<BooleanFormula> cached = cache.getFormulaUnsatCore(formula);
+    Formula translated = fromFormula(formula);
+    List<Formula> cached = cache.getFormulaUnsatCore(translated);
+    List<BooleanFormula> computed;
     if (cached == null) {
-      cached = getDelegate().getUnsatCore();
-      cache.storeFormulaUnsatCore(formula, cached);
+      boolean unsat = true;
+      try {
+        unsat = getDelegate().isUnsat();
+      } catch (InterruptedException | SolverException e) {
+        throw new RuntimeException("Exception when trying to evaluate satisfiability.", e);
+      }
+      if (!unsat) {
+        computed = getDelegate().getUnsatCore();
+        cached = computed.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
+        cache.storeFormulaUnsatCore(translated, new ArrayList<>(cached));
+      } else {
+        computed = new ArrayList<>();
+      }
+    } else {
+      computed = cached.stream().map(f -> toFormula(f)).collect(Collectors.toList());
     }
-    return cached;
+    return computed;
   }
 
   @Override
   public Optional<List<BooleanFormula>>
       unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-        Optional<List<BooleanFormula>> cached =
-            cache.getFormulaUnsatCoreOverAssumptions(formula, pAssumptions);
-        if (cached == null || !cached.isPresent()) {
-      cached = getDelegate().unsatCoreOverAssumptions(pAssumptions);
-          cache.storeFormulaUnsatCoreOverAssumptions(formula, cached, pAssumptions);
-        }
-        return cached;
+          throws SolverException, InterruptedException {
+    Formula translated = fromFormula(formula);
+    List<Formula> tAssumptions =
+        pAssumptions.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
+    Optional<List<BooleanFormula>> computed = Optional.empty();
+    Optional<List<Formula>> cached =
+        cache.getFormulaUnsatCoreOverAssumptions(translated, tAssumptions);
+    if (cached == null || !cached.isPresent()) {
+      boolean unsat = getDelegate().isUnsat();
+      if (unsat) {
+        computed = getDelegate().unsatCoreOverAssumptions(pAssumptions);
+        cached =
+            Optional
+                .of(computed.get().stream().map(f -> fromFormula(f)).collect(Collectors.toList()));
+        cache.storeFormulaUnsatCoreOverAssumptions(translated, cached, tAssumptions);
       }
+    } else {
+      computed =
+          Optional.of(cached.get().stream().map(f -> toFormula(f)).collect(Collectors.toList()));
+    }
+    return computed;
+  }
 
   @Override
   public void close() {
@@ -149,6 +230,26 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
-    return getDelegate().allSat(pCallback, pImportant);
-      }
+    // FIXME: Cache this
+    List<List<BooleanFormula>> result = getDelegate().allSat(new MyAllSatCallback(), pImportant);
+    for (List<BooleanFormula> model : result) {
+      pCallback.apply(model);
+    }
+    return pCallback.getResult();
+  }
+
+  private class MyAllSatCallback implements AllSatCallback<List<List<BooleanFormula>>> {
+
+    private List<List<BooleanFormula>> formulas = new ArrayList<>();
+
+    @Override
+    public void apply(List<BooleanFormula> pModel) {
+      formulas.add(pModel);
+    }
+
+    @Override
+    public List<List<BooleanFormula>> getResult() throws InterruptedException {
+      return formulas;
+    }
+  }
 }

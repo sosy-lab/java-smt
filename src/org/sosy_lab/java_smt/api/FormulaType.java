@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.errorprone.annotations.Immutable;
+import java.io.Serializable;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -33,7 +34,9 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
  */
 @SuppressWarnings("checkstyle:constantname")
 @Immutable
-public abstract class FormulaType<T extends Formula> {
+public abstract class FormulaType<T extends Formula> implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private FormulaType() {}
 
@@ -75,6 +78,8 @@ public abstract class FormulaType<T extends Formula> {
   @Immutable
   public abstract static class NumeralType<T extends NumeralFormula> extends FormulaType<T> {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public final boolean isNumeralType() {
       return true;
@@ -83,6 +88,8 @@ public abstract class FormulaType<T extends Formula> {
 
   public static final FormulaType<RationalFormula> RationalType =
       new NumeralType<RationalFormula>() {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public boolean isRationalType() {
@@ -98,6 +105,8 @@ public abstract class FormulaType<T extends Formula> {
   public static final FormulaType<IntegerFormula> IntegerType =
       new NumeralType<IntegerFormula>() {
 
+        private static final long serialVersionUID = 1L;
+
         @Override
         public boolean isIntegerType() {
           return true;
@@ -111,6 +120,8 @@ public abstract class FormulaType<T extends Formula> {
 
   public static final FormulaType<BooleanFormula> BooleanType =
       new FormulaType<BooleanFormula>() {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public boolean isBooleanType() {
@@ -129,6 +140,7 @@ public abstract class FormulaType<T extends Formula> {
 
   @Immutable
   public static final class BitvectorType extends FormulaType<BitvectorFormula> {
+    private static final long serialVersionUID = 1L;
     private final int size;
 
     private BitvectorType(int size) {
@@ -182,6 +194,7 @@ public abstract class FormulaType<T extends Formula> {
   @Immutable
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
 
+    private static final long serialVersionUID = 1L;
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE = new FloatingPointType(8, 23);
     private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE = new FloatingPointType(11, 52);
 
@@ -240,6 +253,8 @@ public abstract class FormulaType<T extends Formula> {
   private static class FloatingPointRoundingModeType
       extends FormulaType<FloatingPointRoundingModeFormula> {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean isFloatingPointRoundingModeType() {
       return true;
@@ -259,6 +274,7 @@ public abstract class FormulaType<T extends Formula> {
   public static final class ArrayFormulaType<TI extends Formula, TE extends Formula>
       extends FormulaType<ArrayFormula<TI, TE>> {
 
+    private static final long serialVersionUID = 1L;
     private final FormulaType<TE> elementType;
     private final FormulaType<TI> indexType;
 

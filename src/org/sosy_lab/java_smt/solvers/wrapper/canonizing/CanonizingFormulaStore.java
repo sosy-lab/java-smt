@@ -137,9 +137,7 @@ public class CanonizingFormulaStore {
   }
 
   public void storeOperator(CanonizingFormula pOp) {
-    if (currentConstraint == null) {
-      currentConstraint = pOp;
-    }
+    currentConstraint = pOp;
   }
 
   public void storeType(FormulaType<?> pFormulaType) {
@@ -171,7 +169,12 @@ public class CanonizingFormulaStore {
   }
 
   public CanonizingFormula remember(CanonizingFormula pCanonizingFormula) {
-    return memoizedFormulas.putIfAbsent(pCanonizingFormula, pCanonizingFormula);
+    memoizedFormulas.putIfAbsent(pCanonizingFormula, pCanonizingFormula);
+    CanonizingFormula result = memoizedFormulas.get(pCanonizingFormula);
+    if (result instanceof CanonizingVariable) {
+      ((CanonizingVariable) result).incrementCount();
+    }
+    return result;
   }
 
   public String mapName(String pOriginalName) {

@@ -23,8 +23,9 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
@@ -40,7 +41,8 @@ public interface SMTCache {
     SIMPLE_BINARY;
   }
 
-  static SMTCache newSMTCache(CachingMode pMode) {
+  static SMTCache newSMTCache(CachingMode pMode, Configuration config)
+      throws InvalidConfigurationException {
     SMTCache cache = null;
 
     switch (pMode) {
@@ -48,7 +50,7 @@ public interface SMTCache {
         cache = new InMemorySMTCache();
         break;
       case SIMPLE_BINARY:
-        cache = new SimpleBinarySMTCache();
+        cache = new SimpleBinarySMTCache(config);
         break;
       default:
         // no-op. just return null
@@ -57,86 +59,84 @@ public interface SMTCache {
     return cache;
   }
 
-  Boolean storeFormulaUnsat(BooleanFormula pFormula, boolean pUnsat);
+  Boolean storeFormulaUnsat(Formula pFormula, boolean pUnsat);
 
-  Boolean isFormulaUnsat(BooleanFormula pFormula);
+  Boolean isFormulaUnsat(Formula pFormula);
 
   Boolean storeFormulaUnsatWithAssumptions(
-      BooleanFormula pFormula,
+      Formula pFormula,
       boolean pUnsat,
-      Collection<BooleanFormula> pAssumptions);
+      Collection<Formula> pAssumptions);
 
   Boolean isFormulaUnsatWithAssumptions(
-      BooleanFormula pFormula,
-      Collection<BooleanFormula> pAssumptions);
+      Formula pFormula,
+      Collection<Formula> pAssumptions);
 
-  Model storeFormulaModel(BooleanFormula pFormula, Model pModel);
+  Model storeFormulaModel(Formula pFormula, Model pModel);
 
-  Model getFormulaModel(BooleanFormula pFormula);
+  Model getFormulaModel(Formula pFormula);
 
   ImmutableList<ValueAssignment> storeFormulaModelAssignments(
-      BooleanFormula pFormula,
+      Formula pFormula,
       ImmutableList<ValueAssignment> pAssignments);
 
-  ImmutableList<ValueAssignment> getFormulaModelAssignments(BooleanFormula pFormula);
+  ImmutableList<ValueAssignment> getFormulaModelAssignments(Formula pFormula);
 
-  List<BooleanFormula>
-      storeFormulaUnsatCore(BooleanFormula pFormula, List<BooleanFormula> pUnsatCore);
+  List<Formula> storeFormulaUnsatCore(Formula pFormula, List<Formula> pUnsatCore);
 
-  List<BooleanFormula> getFormulaUnsatCore(BooleanFormula pFormula);
+  List<Formula> getFormulaUnsatCore(Formula pFormula);
 
-  Optional<List<BooleanFormula>> storeFormulaUnsatCoreOverAssumptions(
-      BooleanFormula pFormula,
-      Optional<List<BooleanFormula>> pUnsatCore,
-      Collection<BooleanFormula> pAssumptions);
+  Optional<List<Formula>> storeFormulaUnsatCoreOverAssumptions(
+      Formula pFormula,
+      Optional<List<Formula>> pUnsatCore,
+      Collection<Formula> pAssumptions);
 
-  Optional<List<BooleanFormula>> getFormulaUnsatCoreOverAssumptions(
-      BooleanFormula pFormula,
-      Collection<BooleanFormula> pAssumptions);
+  Optional<List<Formula>>
+      getFormulaUnsatCoreOverAssumptions(Formula pFormula, Collection<Formula> pAssumptions);
 
-  BooleanFormula storeFormulaInterpolant(
-      BooleanFormula pFormula,
-      BooleanFormula pInterpolant,
+  Formula storeFormulaInterpolant(
+      Formula pFormula,
+      Formula pInterpolant,
       Collection<?> pFormulasOfA);
 
-  BooleanFormula getFormulaInterpolant(BooleanFormula pFormula, Collection<?> pFormulasOfA);
+  Formula getFormulaInterpolant(Formula pFormula, Collection<?> pFormulasOfA);
 
-  List<BooleanFormula> storeFormulaTreeInterpolants(
-      BooleanFormula pFormula,
-      List<BooleanFormula> pTreeInterpolants,
+  List<Formula> storeFormulaTreeInterpolants(
+      Formula pFormula,
+      List<Formula> pTreeInterpolants,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree);
 
-  List<BooleanFormula> getFormulaTreeInterpolants(
-      BooleanFormula pFormula,
+  List<Formula> getFormulaTreeInterpolants(
+      Formula pFormula,
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree);
 
-  Integer storeFormulaMaximize(BooleanFormula pFormula, Integer max, Formula pObjective);
+  Integer storeFormulaMaximize(Formula pFormula, Integer max, Formula pObjective);
 
-  Integer getFormulaMaximize(BooleanFormula pFormula, Formula pObjective);
+  Integer getFormulaMaximize(Formula pFormula, Formula pObjective);
 
-  Integer storeFormulaMinimize(BooleanFormula pFormula, Integer min, Formula pObjective);
+  Integer storeFormulaMinimize(Formula pFormula, Integer min, Formula pObjective);
 
-  Integer getFormulaMinimize(BooleanFormula pFormula, Formula pObjective);
+  Integer getFormulaMinimize(Formula pFormula, Formula pObjective);
 
   Optional<Rational> storeFormulaUpper(
-      BooleanFormula pFormula,
+      Formula pFormula,
       Optional<Rational> pUpper,
       int pHandle,
       Rational pEpsilon);
 
   Optional<Rational>
-      getFormulaUpper(BooleanFormula pFormula, int pHandle, Rational pEpsilon);
+      getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon);
 
   Optional<Rational> storeFormulaLower(
-      BooleanFormula pFormula,
+      Formula pFormula,
       Optional<Rational> pLower,
       int pHandle,
       Rational pEpsilon);
 
   Optional<Rational>
-      getFormulaLower(BooleanFormula pFormula, int pHandle, Rational pEpsilon);
+      getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon);
 
   void close();
 }

@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
 
+  private static final long serialVersionUID = 1L;
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
 
   protected AbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
@@ -109,6 +110,7 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   public abstract static class CachingAbstractModel<TFormulaInfo, TType, TEnv>
       extends AbstractModel<TFormulaInfo, TType, TEnv> {
 
+    private static final long serialVersionUID = 1L;
     private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
 
     protected CachingAbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> pCreator) {

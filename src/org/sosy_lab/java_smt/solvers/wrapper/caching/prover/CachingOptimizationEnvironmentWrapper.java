@@ -20,6 +20,8 @@
 package org.sosy_lab.java_smt.solvers.wrapper.caching.prover;
 
 import java.util.Optional;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -35,8 +37,11 @@ public class CachingOptimizationEnvironmentWrapper extends AbstractCachingEnviro
   public CachingOptimizationEnvironmentWrapper(
       OptimizationProverEnvironment pEnv,
       FormulaManager pMgr,
-      CachingMode pMode) {
-    super(pMgr, pMode);
+      CachingMode pMode,
+      Configuration config,
+      boolean solversFormulasCacheable)
+      throws InvalidConfigurationException {
+    super(pMgr, pMode, config, solversFormulasCacheable);
     delegate = pEnv;
   }
 

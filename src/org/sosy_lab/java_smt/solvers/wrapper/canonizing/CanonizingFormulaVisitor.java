@@ -44,6 +44,10 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
     store = new CanonizingFormulaStore(mgr, pStrategies);
   }
 
+  public CanonizingFormula translate(Formula pFormula) {
+    return mgr.visit(pFormula, this);
+  }
+
   public CanonizingFormulaStore getStorage() {
     return store.copy();
   }
@@ -75,9 +79,21 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
       Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
     CanonizingFormula function = null;
     FormulaType<?> returnType = pFunctionDeclaration.getType();
+    FunctionDeclarationKind kind = pFunctionDeclaration.getKind();
 
-    if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
-      List<CanonizingFormula> args = new ArrayList<>();
+    if (kind == FunctionDeclarationKind.OTHER) {
+      // FIXME: That's really bad...
+      if (pFunctionDeclaration.toString().contains("bvsext")) {
+        kind = FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      } else if (pFunctionDeclaration.toString().contains("bvzext")) {
+        kind = FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      } else if (pFunctionDeclaration.toString().contains("fpfromubv")) {
+        kind = FunctionDeclarationKind.BV_UCASTTO_FP;
+      }
+    }
+
+    List<CanonizingFormula> args = new ArrayList<>();
+    if (kind == FunctionDeclarationKind.UF) {
       for (int i = 0; i < pArgs.size(); i++) {
         store.storeType(pFunctionDeclaration.getArgumentTypes().get(i));
         args.add(mgr.visit(pArgs.get(i), this));
@@ -86,7 +102,7 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
       function =
           new CanonizingPrefixOperator(
               mgr,
-              pFunctionDeclaration.getKind(),
+              kind,
               args,
               pFunctionDeclaration.getType(),
               pFunctionDeclaration.getName());
@@ -96,15 +112,13 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
           function =
               new CanonizingPrefixOperator(
                   mgr,
-                  pFunctionDeclaration.getKind(),
+                  kind,
                   new ArrayList<>(),
                   returnType);
           break;
         case 1:
         case 3:
         case 4: // PRINCESS: extract
-          List<CanonizingFormula> args = new ArrayList<>();
-
           for (int i = 0; i < pArgs.size(); i++) {
             store.storeType(pFunctionDeclaration.getArgumentTypes().get(i));
             args.add(mgr.visit(pArgs.get(i), this));
@@ -116,7 +130,9 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
           //
           // Princess also needs a special handling, since it creates some 4-argument function with
           // reordering in the arguments
-          if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.BV_EXTRACT) {
+          if (kind == FunctionDeclarationKind.BV_EXTRACT
+              || kind == FunctionDeclarationKind.BV_SIGN_EXTENSION
+              || kind == FunctionDeclarationKind.BV_ZERO_EXTENSION) {
             if (mgr.getClass().getName().contains("Mathsat")
                 || mgr.getClass().getName().contains("Z3")) {
               String rawFunction = pF.toString();
@@ -169,7 +185,7 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
           }
 
           function =
-              new CanonizingPrefixOperator(mgr, pFunctionDeclaration.getKind(), args, returnType);
+              new CanonizingPrefixOperator(mgr, kind, args, returnType);
           break;
         case 2:
           store.storeType(pFunctionDeclaration.getArgumentTypes().get(0));
@@ -177,24 +193,14 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
           store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
           CanonizingFormula right = mgr.visit(pArgs.get(1), this);
 
-          if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.SELECT) {
+          if (kind == FunctionDeclarationKind.SELECT
+              || kind == FunctionDeclarationKind.BV_UCASTTO_FP) {
             List<CanonizingFormula> operands = new ArrayList<>();
             operands.add(left);
             operands.add(right);
-            function =
-                new CanonizingPrefixOperator(
-                    mgr,
-                    pFunctionDeclaration.getKind(),
-                    operands,
-                    returnType);
+            function = new CanonizingPrefixOperator(mgr, kind, operands, returnType);
           } else {
-            function =
-                new CanonizingInfixOperator(
-                    mgr,
-                    pFunctionDeclaration.getKind(),
-                    left,
-                    right,
-                    returnType);
+            function = new CanonizingInfixOperator(mgr, kind, left, right, returnType);
           }
           break;
         default:

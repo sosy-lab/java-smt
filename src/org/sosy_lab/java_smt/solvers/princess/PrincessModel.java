@@ -47,6 +47,7 @@ import scala.Option;
 import scala.Tuple2;
 
 class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
+  private static final long serialVersionUID = 1L;
   private final PartialModel model;
 
   PrincessModel(
