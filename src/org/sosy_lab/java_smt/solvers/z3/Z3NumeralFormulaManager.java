@@ -106,6 +106,11 @@ abstract class Z3NumeralFormulaManager<
   }
 
   @Override
+  public Long distinctImpl(List<Long> pNumbers) {
+    return Native.mkDistinct(z3context, pNumbers.size(), Longs.toArray(pNumbers));
+  }
+
+  @Override
   public Long greaterThan(Long pNumber1, Long pNumber2) {
     return Native.mkGt(z3context, pNumber1, pNumber2);
   }

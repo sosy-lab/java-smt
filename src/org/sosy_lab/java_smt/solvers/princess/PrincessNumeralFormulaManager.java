@@ -19,10 +19,14 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static scala.collection.JavaConversions.iterableAsScalaIterable;
+
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.ITerm;
 import ap.types.Sort;
+import com.google.common.collect.Iterables;
+import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
@@ -59,6 +63,11 @@ abstract class PrincessNumeralFormulaManager<
   @Override
   public IFormula equal(IExpression pNumber1, IExpression pNumber2) {
     return ((ITerm) pNumber1).$eq$eq$eq((ITerm) pNumber2);
+  }
+
+  @Override
+  protected IExpression distinctImpl(List<IExpression> pNumbers) {
+    return IExpression.distinct(iterableAsScalaIterable(Iterables.filter(pNumbers, ITerm.class)));
   }
 
   @Override

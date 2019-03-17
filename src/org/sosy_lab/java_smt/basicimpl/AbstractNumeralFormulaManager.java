@@ -381,6 +381,13 @@ public abstract class AbstractNumeralFormulaManager<
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
+  public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
+    return wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+  }
+
+  protected abstract TFormulaInfo distinctImpl(List<TFormulaInfo> pNumbers);
+
+  @Override
   public BooleanFormula greaterThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
