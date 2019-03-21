@@ -23,7 +23,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.Iterator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -116,13 +115,14 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
     }
 
     @Override
-    public final Iterator<ValueAssignment> iterator() {
+    public ImmutableList<ValueAssignment> asList() {
       if (modelAssignments == null) {
         modelAssignments = toList();
       }
-      return modelAssignments.iterator();
+      return modelAssignments;
     }
 
+    /** build list of assignments from model */
     protected abstract ImmutableList<ValueAssignment> toList();
   }
 }
