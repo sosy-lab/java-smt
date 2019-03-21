@@ -122,7 +122,7 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
       return modelAssignments;
     }
 
-    /** build list of assignments from model */
+    /** Build a list of all available assignments from the model. */
     protected abstract ImmutableList<ValueAssignment> toList();
   }
 }
