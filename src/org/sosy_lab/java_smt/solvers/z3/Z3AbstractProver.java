@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -41,7 +40,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -123,14 +121,6 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return Z3Model.create(z3context, getZ3Model(), creator);
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    try (Z3Model model = getModel()) {
-      return model.toList();
-    }
   }
 
   protected long getZ3Model() {

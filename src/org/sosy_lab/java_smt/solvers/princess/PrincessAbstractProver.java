@@ -32,7 +32,6 @@ import ap.parser.IFunction;
 import ap.parser.INot;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +41,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -147,13 +145,6 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
     return new PrincessModel(api.partialModel(), creator);
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (PrincessModel model = getModel()) {
-      return model.toList();
-    }
   }
 
   @Override
