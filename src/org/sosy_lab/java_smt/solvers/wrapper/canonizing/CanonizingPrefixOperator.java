@@ -34,8 +34,12 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.wrapper.strategy.CanonizingStrategy;
@@ -54,7 +58,28 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public CanonizingPrefixOperator(
+  public final static CanonizingPrefixOperator getInstance(
+      FormulaManager pMgr,
+      FunctionDeclarationKind pKind,
+      List<CanonizingFormula> pOperands,
+      FormulaType<?> pReturnType) {
+    return getInstance(pMgr, pKind, pOperands, pReturnType, pKind.name());
+  }
+
+  public final static CanonizingPrefixOperator getInstance(
+      FormulaManager pMgr,
+      FunctionDeclarationKind pKind,
+      List<CanonizingFormula> pOperands,
+      FormulaType<?> pReturnType,
+      String pName) {
+    if (pReturnType.isBooleanType()) {
+      return new CanonizingBooleanPrefixOperator(pMgr, pKind, pOperands, pReturnType, pName);
+    } else {
+      return new CanonizingPrefixOperator(pMgr, pKind, pOperands, pReturnType, pName);
+    }
+  }
+
+  private CanonizingPrefixOperator(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
       List<CanonizingFormula> pOperands,
@@ -62,7 +87,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     this(pMgr, pKind, pOperands, pReturnType, pKind.name());
   }
 
-  public CanonizingPrefixOperator(
+  private CanonizingPrefixOperator(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
       List<CanonizingFormula> pOperands,
@@ -138,11 +163,79 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       return translated;
     }
 
+    if (operator == FunctionDeclarationKind.FP_AS_BV) {
+      FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
+      FloatingPointFormula formula = (FloatingPointFormula) operands.get(0).toFormula(pMgr);
+
+      translated = fmgr.toIeeeBitvector(formula);
+      return translated;
+    }
+
+    if (operator == FunctionDeclarationKind.FP_FROM_BV) {
+      FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
+      BitvectorFormula formula = (BitvectorFormula) operands.get(0).toFormula(pMgr);
+
+      translated = fmgr.fromIeeeBitvector(formula, (FloatingPointType) returnType);
+      return translated;
+    }
+
+    if (returnType.isBooleanType() && operands.get(0).getType().isFloatingPointType()) {
+      FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
+      FloatingPointFormula[] fpOperands = new FloatingPointFormula[operands.size()];
+      for (int i = 0; i < fpOperands.length; i++) {
+        fpOperands[i] = (FloatingPointFormula) operands.get(i).toFormula(pMgr);
+      }
+
+      switch (operator) {
+        case FP_IS_NAN:
+          translated = fmgr.isNaN(fpOperands[0]);
+          break;
+        case FP_IS_INF:
+          translated = fmgr.isInfinity(fpOperands[0]);
+          break;
+        case FP_IS_ZERO:
+          translated = fmgr.isZero(fpOperands[0]);
+          break;
+        case FP_IS_SUBNORMAL:
+          translated = fmgr.isSubnormal(fpOperands[0]);
+          break;
+        default:
+          throw new IllegalStateException(
+              "Handling for PrefixOperator " + operator + " not yet implemented.");
+      }
+    }
+
     if (operator == FunctionDeclarationKind.NOT) {
       BooleanFormulaManager bmgr = pMgr.getBooleanFormulaManager();
       BooleanFormula formula0 = (BooleanFormula) operands.get(0).toFormula(pMgr);
 
       translated = bmgr.not(formula0);
+      return translated;
+    }
+
+    // FIXME: function adaptation from PRINCESS
+    if (operator == FunctionDeclarationKind.BV_SLT) {
+      BitvectorFormulaManager bmgr = pMgr.getBitvectorFormulaManager();
+      BitvectorFormula formula0 = (BitvectorFormula) operands.get(1).toFormula(pMgr);
+      BitvectorFormula formula1 = (BitvectorFormula) operands.get(2).toFormula(pMgr);
+
+      translated = bmgr.lessThan(formula0, formula1, true);
+      return translated;
+    }
+
+    if (operator == FunctionDeclarationKind.EQ_ZERO) {
+      Formula formula = operands.get(0).toFormula(pMgr);
+      FormulaType<?> type = operands.get(0).getType();
+
+      translated = makeEqualZero(pMgr, formula, type);
+      return translated;
+    }
+
+    if (operator == FunctionDeclarationKind.GTE_ZERO) {
+      Formula formula = operands.get(0).toFormula(pMgr);
+      FormulaType<?> type = operands.get(0).getType();
+
+      translated = makeGreaterEqualZero(pMgr, formula, type);
       return translated;
     }
 
@@ -201,6 +294,9 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
         case BV_NEG:
           translated = bmgr.negate((BitvectorFormula) bvOperands[0]);
           break;
+        case BV_ADD: // FIXME: PRINCESS
+          translated = bmgr.add((BitvectorFormula) bvOperands[1], (BitvectorFormula) bvOperands[2]);
+          break;
         default:
           throw new IllegalStateException(
               "Handling for PrefixOperator " + operator + " not yet implemented.");
@@ -252,11 +348,17 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
           case FP_ROUND_ZERO:
             translated = fmgr.round(fpOperands[0], FloatingPointRoundingMode.TOWARD_ZERO);
             break;
-          case FP_IS_NAN:
-            translated = fmgr.isNaN(fpOperands[0]);
-            break;
           case FP_MUL:
             translated = fmgr.multiply(fpOperands[1], fpOperands[2]);
+            break;
+          case FP_SUB:
+            translated = fmgr.subtract(fpOperands[1], fpOperands[2]);
+            break;
+          case FP_ADD:
+            translated = fmgr.add(fpOperands[1], fpOperands[2]);
+            break;
+          case FP_DIV:
+            translated = fmgr.divide(fpOperands[1], fpOperands[2]);
             break;
           default:
             throw new IllegalStateException(
@@ -266,6 +368,77 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     }
 
     return translated;
+  }
+
+  private Formula
+      makeGreaterEqualZero(FormulaManager pMgr, Formula pFormula, FormulaType<?> pType) {
+    Formula result = null;
+
+    if (pType.isArrayType()) {
+      // TODO: this handling might be erroneous
+      result = makeEqualZero(pMgr, pFormula, ((ArrayFormulaType<?, ?>) pType).getElementType());
+    }
+    // TODO: Is there an extra one in PRINCESS that holds the signedness?
+    if (pType.isBitvectorType()) {
+      result =
+          pMgr.getBitvectorFormulaManager().greaterOrEquals(
+              (BitvectorFormula) pFormula,
+              pMgr.getBitvectorFormulaManager().makeBitvector(((BitvectorType) pType).getSize(), 0),
+              false);
+    }
+    if (pType.isFloatingPointType()) {
+      result =
+          pMgr.getFloatingPointFormulaManager().greaterOrEquals(
+              (FloatingPointFormula) pFormula,
+              pMgr.getFloatingPointFormulaManager().makeNumber(0.0, ((FloatingPointType) pType)));
+    }
+    if (pType.isIntegerType()) {
+      result =
+          pMgr.getIntegerFormulaManager().greaterOrEquals(
+              (IntegerFormula) pFormula,
+              pMgr.getIntegerFormulaManager().makeNumber(0L));
+    }
+    if (pType.isRationalType()) {
+      result =
+          pMgr.getRationalFormulaManager().greaterOrEquals(
+              (NumeralFormula) pFormula,
+              pMgr.getRationalFormulaManager().makeNumber(0L));
+    }
+
+    return result;
+  }
+
+  private Formula makeEqualZero(FormulaManager pMgr, Formula formula, FormulaType<?> type) {
+    Formula result = null;
+
+    if (type.isArrayType()) {
+      // TODO: this handling might be erroneous
+      result = makeEqualZero(pMgr, formula, ((ArrayFormulaType<?, ?>) type).getElementType());
+    }
+    if (type.isBitvectorType()) {
+      result =
+          pMgr.getBitvectorFormulaManager().equal(
+              (BitvectorFormula) formula,
+              pMgr.getBitvectorFormulaManager()
+                  .makeBitvector(((BitvectorType) type).getSize(), 0));
+    }
+    if (type.isFloatingPointType()) {
+      result =
+          pMgr.getFloatingPointFormulaManager().equalWithFPSemantics(
+              (FloatingPointFormula) formula,
+              pMgr.getFloatingPointFormulaManager().makeNumber(0.0, ((FloatingPointType) type)));
+    }
+    if (type.isIntegerType()) {
+      result =
+          pMgr.getIntegerFormulaManager()
+              .equal((IntegerFormula) formula, pMgr.getIntegerFormulaManager().makeNumber(0L));
+    }
+    if (type.isRationalType()) {
+      result =
+          pMgr.getRationalFormulaManager()
+              .equal((NumeralFormula) formula, pMgr.getRationalFormulaManager().makeNumber(0L));
+    }
+    return result;
   }
 
   private boolean isArrayOperator(FunctionDeclarationKind pOperator) {
@@ -361,5 +534,20 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       return false;
     }
     return true;
+  }
+
+  static final class CanonizingBooleanPrefixOperator extends CanonizingPrefixOperator
+      implements BooleanFormula {
+
+    private static final long serialVersionUID = 1L;
+
+    private CanonizingBooleanPrefixOperator(
+        FormulaManager pMgr,
+        FunctionDeclarationKind pKind,
+        List<CanonizingFormula> pOperands,
+        FormulaType<?> pReturnType,
+        String pName) {
+      super(pMgr, pKind, pOperands, pReturnType, pName);
+    }
   }
 }

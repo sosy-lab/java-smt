@@ -64,13 +64,13 @@ public class ReorderingStrategy implements CanonizingStrategy {
       }
 
       left =
-          new CanonizingInfixOperator(
+          CanonizingInfixOperator.getInstance(
               pMgr,
               getSubtractionOperator(left.getType()),
               left,
               right,
               type);
-      right = new CanonizingConstant(pMgr, 0, type);
+      right = CanonizingConstant.getInstance(pMgr, 0, type);
 
       if (transformationPossible && !isOrEqualOp(pOperator)) {
         CanonizingConstant epsilon = getMinimumSummand(pMgr, type);
@@ -78,7 +78,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
       }
 
       result =
-          new CanonizingInfixOperator(pMgr, operator, left, right, pReturnType);
+          CanonizingInfixOperator.getInstance(pMgr, operator, left, right, pReturnType);
 
       if (pReturnType.isBooleanType() && type.isFloatingPointType()) {
         // for cases that result in a transformation like: inf - inf == 0, which translates to nan
@@ -87,13 +87,14 @@ public class ReorderingStrategy implements CanonizingStrategy {
         List<CanonizingFormula> operand = new ArrayList<>();
         operand.add(result);
         CanonizingPrefixOperator compareToNan =
-            new CanonizingPrefixOperator(
+            CanonizingPrefixOperator
+                .getInstance(
                 pMgr,
                 FunctionDeclarationKind.FP_IS_NAN,
                 operand,
                 pReturnType);
         result =
-            new CanonizingInfixOperator(
+            CanonizingInfixOperator.getInstance(
                 pMgr,
                 FunctionDeclarationKind.OR,
                 result,
@@ -106,7 +107,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
     }
 
     if (result == null) {
-      result = new CanonizingInfixOperator(pMgr, pOperator, pLeft, pRight, pReturnType);
+      result = CanonizingInfixOperator.getInstance(pMgr, pOperator, pLeft, pRight, pReturnType);
     }
 
     return result;
@@ -228,7 +229,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
         throw new IllegalArgumentException("Type " + type + " is not fully implemented, yet.");
       }
     }
-    return new CanonizingConstant(pConstant.getFormulaManager(), value, type);
+    return CanonizingConstant.getInstance(pConstant.getFormulaManager(), value, type);
   }
 
   private static CanonizingFormula add(
@@ -251,7 +252,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
 
     if (pFormula instanceof CanonizingVariable) {
       CanonizingInfixOperator operator =
-          new CanonizingInfixOperator(pMgr, kind, pFormula, pEpsilon, pReturnType);
+          CanonizingInfixOperator.getInstance(pMgr, kind, pFormula, pEpsilon, pReturnType);
 
       result = operator;
     } else if (pFormula instanceof CanonizingConstant) {
@@ -272,7 +273,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
               "Type " + pReturnType + " is not fully implemented, yet.");
         }
       }
-      result = new CanonizingConstant(pMgr, value, pReturnType);
+      result = CanonizingConstant.getInstance(pMgr, value, pReturnType);
     } else {
       result = add(pMgr, pFormula.getOperand1(), pEpsilon, pReturnType);
     }
@@ -284,7 +285,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
   private static CanonizingConstant
       getMinimumSummand(FormulaManager pMgr, FormulaType<?> pReturnType) {
     if (pReturnType.isIntegerType()) {
-      return new CanonizingConstant(pMgr, Integer.valueOf(1), pReturnType);
+      return CanonizingConstant.getInstance(pMgr, Integer.valueOf(1), pReturnType);
     }
     if (pReturnType.isFloatingPointType()) {
       double value;
@@ -300,7 +301,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
         throw new IllegalArgumentException(
             "Type " + pReturnType + " is not fully implemented, yet.");
       }
-      return new CanonizingConstant(pMgr, value, pReturnType);
+      return CanonizingConstant.getInstance(pMgr, value, pReturnType);
     }
     if (pReturnType.isArrayType()) {
       return getMinimumSummand(

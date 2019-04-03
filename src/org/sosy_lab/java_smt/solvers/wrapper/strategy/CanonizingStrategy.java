@@ -48,7 +48,7 @@ public interface CanonizingStrategy {
       CanonizingFormula pRight,
       FormulaType<?> pReturnType,
       CanonizingFormulaStore pCaller) {
-    return new CanonizingInfixOperator(
+    return CanonizingInfixOperator.getInstance(
         pMgr,
         pOperator,
         pLeft.canonize(this, pCaller),
@@ -68,7 +68,7 @@ public interface CanonizingStrategy {
     }
 
     CanonizingPrefixOperator canonizedFormula =
-        new CanonizingPrefixOperator(pMgr, pOperator, args, pReturnType);
+        CanonizingPrefixOperator.getInstance(pMgr, pOperator, args, pReturnType);
     return canonizedFormula;
   }
 
@@ -79,6 +79,6 @@ public interface CanonizingStrategy {
           String pName,
           FormulaType<?> pType,
           CanonizingFormulaStore pCaller) {
-    return new CanonizingVariable(pMgr, pName, pType);
+    return CanonizingVariable.getInstance(pMgr, pName, pType);
   }
 }

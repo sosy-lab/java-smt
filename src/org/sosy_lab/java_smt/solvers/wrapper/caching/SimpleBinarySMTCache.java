@@ -20,13 +20,14 @@
 package org.sosy_lab.java_smt.solvers.wrapper.caching;
 
 import com.google.common.collect.ImmutableList;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import com.google.common.io.MoreFiles;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -40,27 +41,48 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 
-@Options
+@Options(prefix = "solver.caching")
 public class SimpleBinarySMTCache implements SMTCache {
 
-  @Option(secure = true, description = "Cache SMT-Solver results to this file on disc.")
+  @Option(
+    secure = true,
+    description = "Cache SMT-Solver results to this file on disc.",
+    name = "file")
   @FileOption(FileOption.Type.OUTPUT_FILE)
-  private Path cacheFileLocation = Paths.get("java-smt.cache");
+  private Path fileName = Paths.get("java-smt.cache");
+
+  @Option(
+    secure = true,
+    description = "Read cached SMT-Solver results from this file on disc",
+    name = "input")
+  @FileOption(FileOption.Type.OPTIONAL_INPUT_FILE)
+  private Path inputFileName = Paths.get("output/java-smt.cache");
+
+  private Path tempFileLocation;
 
   private InMemorySMTCache cache;
 
   public SimpleBinarySMTCache(Configuration config) throws InvalidConfigurationException {
     config.inject(this);
+    tempFileLocation = fileName != null ? Paths.get(fileName.toString() + ".tmp") : null;
     cache = loadCacheFileIfExists();
+    deleteTempFileIfExists();
+  }
+
+  private void deleteTempFileIfExists() {
+    try {
+      Files.deleteIfExists(tempFileLocation);
+    } catch (IOException e) {
+      throw new RuntimeException("Old temporary cache-file could not be deleted.", e);
+    }
   }
 
   private InMemorySMTCache loadCacheFileIfExists() {
     InMemorySMTCache newCache = new InMemorySMTCache();
 
-    File cacheFile = cacheFileLocation.toFile();
-
-    if (cacheFile.exists()) {
-      try (ObjectInputStream os = new ObjectInputStream(new FileInputStream(cacheFile))) {
+    if (inputFileName != null && Files.exists(inputFileName) && Files.isReadable(inputFileName)) {
+      createParentDirectoryIfNecessary(inputFileName);
+      try (ObjectInputStream os = new ObjectInputStream(Files.newInputStream(inputFileName))) {
         newCache = (InMemorySMTCache) os.readObject();
       } catch (Exception e) {
         throw new RuntimeException("Could not load SMT-cachefile from disc.", e);
@@ -233,17 +255,52 @@ public class SimpleBinarySMTCache implements SMTCache {
     }
   }
 
+  @Override
+  public List<List<Formula>>
+      storeAllSat(Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached) {
+    return cache.storeAllSat(pFormula, pImportant, pCached);
+  }
+
+  @Override
+  public List<List<Formula>> getAllSat(Formula pFormula, List<Formula> pImportant) {
+    return cache.getAllSat(pFormula, pImportant);
+  }
+
   private void writeCacheFile(InMemorySMTCache pCache) {
-    File check = cacheFileLocation.toFile();
-
-    if (check.exists()) {
-      check.delete();
+    if (fileName != null && Files.exists(fileName) && Files.isWritable(fileName)) {
+      writeToFile(pCache, tempFileLocation);
+      try {
+        Files.move(tempFileLocation, fileName, StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException e) {
+        throw new RuntimeException("Could not overwrite SMT-cachefile on disc.", e);
+      }
+    } else {
+      writeToFile(pCache, fileName);
     }
+  }
 
-    try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(check))) {
+  private void writeToFile(InMemorySMTCache pCache, Path check) {
+    createParentDirectoryIfNecessary(check);
+
+    try (ObjectOutputStream os = new ObjectOutputStream(Files.newOutputStream(check))) {
       os.writeObject(pCache);
     } catch (Exception e) {
       throw new RuntimeException("Could not write SMT-cachefile to disc.", e);
+    }
+  }
+
+  private void createParentDirectoryIfNecessary(Path check) {
+    if (!Files.exists(check.getParent())) {
+      try {
+        MoreFiles.createParentDirectories(check);
+      } catch (IOException e) {
+        throw new RuntimeException(
+            "Could not create directory "
+                + check.getParent().getFileName()
+                + " for write into "
+                + check.toAbsolutePath(),
+            e);
+      }
     }
   }
 }

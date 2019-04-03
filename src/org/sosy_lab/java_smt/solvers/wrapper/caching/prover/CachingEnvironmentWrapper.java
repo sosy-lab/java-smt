@@ -34,10 +34,9 @@ public class CachingEnvironmentWrapper extends AbstractCachingEnvironment<Void>
       ProverEnvironment pEnv,
       FormulaManager pMgr,
       CachingMode pMode,
-      Configuration config,
-      boolean solversFormulasCacheable)
+      Configuration config)
       throws InvalidConfigurationException {
-    super(pMgr, pMode, config, solversFormulasCacheable);
+    super(pMgr, pMode, config);
     delegate = pEnv;
   }
 

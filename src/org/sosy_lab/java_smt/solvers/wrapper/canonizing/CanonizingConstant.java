@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.wrapper.canonizing;
 
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -37,7 +38,16 @@ public class CanonizingConstant implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
+  public final static CanonizingConstant
+      getInstance(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
+    if (pType.isBooleanType()) {
+      return new CanonizingBooleanConstant(pMgr, pValue, pType);
+    } else {
+      return new CanonizingConstant(pMgr, pValue, pType);
+    }
+  }
+
+  private CanonizingConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
     mgr = pMgr;
     value = pValue;
     type = pType;
@@ -134,5 +144,15 @@ public class CanonizingConstant implements CanonizingFormula {
       hashCode = result;
     }
     return hashCode;
+  }
+
+  static final class CanonizingBooleanConstant extends CanonizingConstant
+      implements BooleanFormula {
+
+    private static final long serialVersionUID = 1L;
+
+    private CanonizingBooleanConstant(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
+      super(pMgr, pValue, pType);
+    }
   }
 }

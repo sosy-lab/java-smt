@@ -53,11 +53,13 @@ public class InMemorySMTCache implements SMTCache, Serializable {
 
   private final Map<Integer, Rational> lowerMap = new HashMap<>();
 
-  private final static int prime = 7;
+  private final static int PRIME = 7;
 
   private Map<Integer, Integer> maxMap = new HashMap<>();
 
   private Map<Integer, Integer> minMap = new HashMap<>();
+
+  private Map<Integer, List<List<Formula>>> allSatMap = new HashMap<>();
 
   @Override
   public Boolean storeFormulaUnsat(Formula pFormula, boolean pUnsat) {
@@ -74,14 +76,14 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       Formula pFormula,
       boolean pUnsat,
       Collection<Formula> pAssumptions) {
-    return unsatMap.put(pFormula.hashCode() + prime * pAssumptions.hashCode(), pUnsat);
+    return unsatMap.put(pFormula.hashCode() + PRIME * pAssumptions.hashCode(), pUnsat);
   }
 
   @Override
   public Boolean isFormulaUnsatWithAssumptions(
       Formula pFormula,
       Collection<Formula> pAssumptions) {
-    return unsatMap.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
+    return unsatMap.get(pFormula.hashCode() + PRIME * pAssumptions.hashCode());
   }
 
   @Override
@@ -127,7 +129,7 @@ public class InMemorySMTCache implements SMTCache, Serializable {
     }
     unsatCore =
         usatCoreMap
-            .put(pFormula.hashCode() + prime * pAssumptions.hashCode(), new ArrayList<>(unsatCore));
+            .put(pFormula.hashCode() + PRIME * pAssumptions.hashCode(), new ArrayList<>(unsatCore));
     return optionalList(unsatCore);
   }
 
@@ -135,7 +137,7 @@ public class InMemorySMTCache implements SMTCache, Serializable {
   public Optional<List<Formula>>
       getFormulaUnsatCoreOverAssumptions(Formula pFormula, Collection<Formula> pAssumptions) {
     Collection<Formula> unsatCore =
-        usatCoreMap.get(pFormula.hashCode() + prime * pAssumptions.hashCode());
+        usatCoreMap.get(pFormula.hashCode() + PRIME * pAssumptions.hashCode());
     return optionalList(unsatCore);
   }
 
@@ -152,12 +154,12 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       Formula pFormula,
       Formula pInterpolant,
       Collection<?> pFormulasOfA) {
-    return interpolantMap.put(pFormula.hashCode() + prime * pFormulasOfA.hashCode(), pInterpolant);
+    return interpolantMap.put(pFormula.hashCode() + PRIME * pFormulasOfA.hashCode(), pInterpolant);
   }
 
   @Override
   public Formula getFormulaInterpolant(Formula pFormula, Collection<?> pFormulasOfA) {
-    return interpolantMap.get(pFormula.hashCode() + prime * pFormulasOfA.hashCode());
+    return interpolantMap.get(pFormula.hashCode() + PRIME * pFormulasOfA.hashCode());
   }
 
   @Override
@@ -167,8 +169,8 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
     int key = pFormula.hashCode();
-    key += prime * pPartitionedFormulas.hashCode();
-    key += prime * Arrays.hashCode(pStartOfSubTree);
+    key += PRIME * pPartitionedFormulas.hashCode();
+    key += PRIME * Arrays.hashCode(pStartOfSubTree);
     return treeInterpolantMap.put(key, pTreeInterpolants);
   }
 
@@ -178,8 +180,8 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
     int key = pFormula.hashCode();
-    key += prime * pPartitionedFormulas.hashCode();
-    key += prime * Arrays.hashCode(pStartOfSubTree);
+    key += PRIME * pPartitionedFormulas.hashCode();
+    key += PRIME * Arrays.hashCode(pStartOfSubTree);
     return treeInterpolantMap.get(key);
   }
 
@@ -210,8 +212,8 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       int pHandle,
       Rational pEpsilon) {
     int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
+    key += PRIME * pEpsilon.hashCode();
+    key += PRIME * pHandle;
     Rational last = null;
     if (pUpper.isPresent()) {
       last = upperMap.put(key, pUpper.get());
@@ -223,8 +225,8 @@ public class InMemorySMTCache implements SMTCache, Serializable {
   public Optional<Rational>
       getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon) {
     int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
+    key += PRIME * pEpsilon.hashCode();
+    key += PRIME * pHandle;
     Rational value = upperMap.get(key);
     return Optional.ofNullable(value);
   }
@@ -236,8 +238,8 @@ public class InMemorySMTCache implements SMTCache, Serializable {
       int pHandle,
       Rational pEpsilon) {
     int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
+    key += PRIME * pEpsilon.hashCode();
+    key += PRIME * pHandle;
     Rational last = null;
     if (pLower.isPresent()) {
       last = lowerMap.put(key, pLower.get());
@@ -249,8 +251,8 @@ public class InMemorySMTCache implements SMTCache, Serializable {
   public Optional<Rational>
       getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon) {
     int key = pFormula.hashCode();
-    key += prime * pEpsilon.hashCode();
-    key += prime * pHandle;
+    key += PRIME * pEpsilon.hashCode();
+    key += PRIME * pHandle;
     Rational value = lowerMap.get(key);
     return Optional.ofNullable(value);
   }
@@ -258,5 +260,22 @@ public class InMemorySMTCache implements SMTCache, Serializable {
   @Override
   public void close() {
     // Nothing to do
+  }
+
+  @Override
+  public List<List<Formula>>
+      storeAllSat(Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached) {
+    int key = pFormula.hashCode();
+    key += PRIME * pImportant.hashCode();
+
+    List<List<Formula>> last = allSatMap.put(key, pCached);
+    return last;
+  }
+
+  @Override
+  public List<List<Formula>> getAllSat(Formula pFormula, List<Formula> pImportant) {
+    int key = pFormula.hashCode();
+    key += PRIME * pImportant.hashCode();
+    return allSatMap.get(key);
   }
 }

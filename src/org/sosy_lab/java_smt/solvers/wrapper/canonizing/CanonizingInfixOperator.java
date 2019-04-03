@@ -27,9 +27,11 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -49,7 +51,20 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public CanonizingInfixOperator(
+  public final static CanonizingInfixOperator getInstance(
+      FormulaManager pMgr,
+      FunctionDeclarationKind pKind,
+      CanonizingFormula pLeft,
+      CanonizingFormula pRight,
+      FormulaType<?> pReturnType) {
+    if (pReturnType.isBooleanType()) {
+      return new CanonizingBooleanInfixOperator(pMgr, pKind, pLeft, pRight, pReturnType);
+    } else {
+      return new CanonizingInfixOperator(pMgr, pKind, pLeft, pRight, pReturnType);
+    }
+  }
+
+  private CanonizingInfixOperator(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
       CanonizingFormula pLeft,
@@ -91,6 +106,24 @@ public class CanonizingInfixOperator implements CanonizingFormula {
       return translated;
     }
     FormulaType<?> innerType = left.getType();
+
+    if (operator == FunctionDeclarationKind.BV_SCASTTO_FP) {
+      FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
+      BitvectorFormula rFormula = (BitvectorFormula) right.toFormula(pMgr);
+      translated = fmgr.castFrom(rFormula, true, (FloatingPointType) returnType);
+
+      return translated;
+    }
+
+    if (operator == FunctionDeclarationKind.FP_CASTTO_BV) {
+      FloatingPointFormulaManager fmgr = pMgr.getFloatingPointFormulaManager();
+      FloatingPointFormula rFormula = (FloatingPointFormula) right.toFormula(pMgr);
+      FloatingPointRoundingMode mode = determineRoundingMode();
+
+      translated = fmgr.castTo(rFormula, returnType, mode);
+
+      return translated;
+    }
 
     if (returnType.isBitvectorType() || innerType.isBitvectorType()) {
       BitvectorFormulaManager bmgr = pMgr.getBitvectorFormulaManager();
@@ -246,6 +279,16 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case FP_SUB:
           translated = fmgr.subtract(lFormula, rFormula);
           break;
+        case FP_CASTTO_FP:
+          translated = // lFormula is the rounding-mode in this case and will resolve to null
+              fmgr.castFrom(rFormula, true, (FloatingPointType) returnType);
+          break;
+        case FP_ROUND_TO_INTEGRAL:
+          FloatingPointRoundingMode mode = determineRoundingMode();
+          translated = fmgr.round(rFormula, mode); // FIXME: this is still incorrect, but currently
+                                                   // FloatingPointManager does not provide a
+                                                   // roundToIntegral?
+          break;
         default:
           throw new IllegalStateException(
               "Handling for InfixOperator " + operator + " not yet implemented.");
@@ -291,6 +334,33 @@ public class CanonizingInfixOperator implements CanonizingFormula {
     }
 
     return translated;
+  }
+
+  private FloatingPointRoundingMode determineRoundingMode() {
+    FunctionDeclarationKind rawMode = ((CanonizingPrefixOperator) left).getOperator();
+
+    FloatingPointRoundingMode mode;
+    switch (rawMode) {
+      case FP_ROUND_AWAY:
+        mode = FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        break;
+      case FP_ROUND_EVEN:
+        mode = FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        break;
+      case FP_ROUND_NEGATIVE:
+        mode = FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        break;
+      case FP_ROUND_POSITIVE:
+        mode = FloatingPointRoundingMode.TOWARD_POSITIVE;
+        break;
+      case FP_ROUND_ZERO:
+        mode = FloatingPointRoundingMode.TOWARD_ZERO;
+        break;
+      default:
+        throw new IllegalStateException(
+            "Handling for Roundingmode " + rawMode + " not yet implemented.");
+    }
+    return mode;
   }
 
   @Override
@@ -389,5 +459,20 @@ public class CanonizingInfixOperator implements CanonizingFormula {
       return false;
     }
     return true;
+  }
+
+  static final class CanonizingBooleanInfixOperator extends CanonizingInfixOperator
+      implements BooleanFormula {
+
+    private static final long serialVersionUID = 1L;
+
+    private CanonizingBooleanInfixOperator(
+        FormulaManager pMgr,
+        FunctionDeclarationKind pKind,
+        CanonizingFormula pLeft,
+        CanonizingFormula pRight,
+        FormulaType<?> pReturnType) {
+      super(pMgr, pKind, pLeft, pRight, pReturnType);
+    }
   }
 }

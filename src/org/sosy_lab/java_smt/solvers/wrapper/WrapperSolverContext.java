@@ -126,8 +126,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
                 env,
                 delegate.getFormulaManager(),
                 options.cachingmode,
-                config,
-                areSolversFormulasCacheable());
+                config);
       } catch (InvalidConfigurationException e) {
         throw new RuntimeException(e);
       }
@@ -154,8 +153,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
                 env,
                 delegate.getFormulaManager(),
                 options.cachingmode,
-                config,
-                areSolversFormulasCacheable());
+                config);
       } catch (InvalidConfigurationException e) {
         throw new RuntimeException(e);
       }
@@ -186,8 +184,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
                 env,
                 delegate.getFormulaManager(),
                 options.cachingmode,
-                config,
-                areSolversFormulasCacheable());
+                config);
       } catch (InvalidConfigurationException e) {
         throw new RuntimeException(e);
       }
@@ -203,11 +200,6 @@ public class WrapperSolverContext extends AbstractSolverContext {
     }
 
     return env;
-  }
-
-  private boolean areSolversFormulasCacheable() {
-    // Assess if that's correct
-    return options.solver == Solvers.PRINCESS || options.solver == Solvers.SMTINTERPOL;
   }
 
   private List<CanonizingStrategy> organizeStrategies() {

@@ -54,7 +54,11 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
 
   @Override
   public CanonizingFormula visitFreeVariable(Formula pF, String pName) {
-    return store.remember(new CanonizingVariable(mgr, pName, store.popType()));
+    FormulaType<?> type = store.popType();
+    if (type == null) {
+      type = mgr.getFormulaType(pF);
+    }
+    return store.remember(CanonizingVariable.getInstance(mgr, pName, type));
   }
 
   @Override
@@ -71,9 +75,10 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
       // to either 'true' or 'false' before we get a hold of it
       type = FormulaType.BooleanType;
     }
-    return store.remember(new CanonizingConstant(mgr, pValue, type));
+    return store.remember(CanonizingConstant.getInstance(mgr, pValue, type));
   }
 
+  // TODO: PRINCESS -> BV_SLT and probably others
   @Override
   public CanonizingFormula visitFunction(
       Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
@@ -89,6 +94,24 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
         kind = FunctionDeclarationKind.BV_ZERO_EXTENSION;
       } else if (pFunctionDeclaration.toString().contains("fpfromubv")) {
         kind = FunctionDeclarationKind.BV_UCASTTO_FP;
+      } else if (pFunctionDeclaration.toString().contains("fpcast")) {
+        kind = FunctionDeclarationKind.FP_CASTTO_FP;
+      } else if (pFunctionDeclaration.toString().contains("fpisnan")) {
+        kind = FunctionDeclarationKind.FP_IS_NAN;
+      } else if (pFunctionDeclaration.toString().contains("fpisinf")) {
+        kind = FunctionDeclarationKind.FP_IS_INF;
+      } else if (pFunctionDeclaration.toString().contains("fpiszero")) {
+        kind = FunctionDeclarationKind.FP_IS_ZERO;
+      } else if (pFunctionDeclaration.toString().contains("fpissubnormal")) {
+        kind = FunctionDeclarationKind.FP_IS_SUBNORMAL;
+      } else if (pFunctionDeclaration.toString().contains("fpfromsbv")) {
+        kind = FunctionDeclarationKind.BV_SCASTTO_FP;
+      } else if (pFunctionDeclaration.toString().contains("fptobv")) {
+        kind = FunctionDeclarationKind.FP_CASTTO_BV;
+      } else if (pFunctionDeclaration.toString().contains("fpasbv")) {
+        kind = FunctionDeclarationKind.FP_AS_BV;
+      } else if (pFunctionDeclaration.toString().contains("fpfromieeebv")) {
+        kind = FunctionDeclarationKind.FP_FROM_BV;
       }
     }
 
@@ -100,7 +123,7 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
       }
 
       function =
-          new CanonizingPrefixOperator(
+          CanonizingPrefixOperator.getInstance(
               mgr,
               kind,
               args,
@@ -110,7 +133,7 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
       switch (pArgs.size()) {
         case 0:
           function =
-              new CanonizingPrefixOperator(
+              CanonizingPrefixOperator.getInstance(
                   mgr,
                   kind,
                   new ArrayList<>(),
@@ -143,13 +166,13 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
                 String argument2 = matcher.group(2);
                 args.add(
                     store.remember(
-                        new CanonizingConstant(
+                        CanonizingConstant.getInstance(
                             mgr,
                             Integer.parseInt(argument1),
                             FormulaType.IntegerType)));
                 args.add(
                     store.remember(
-                        new CanonizingConstant(
+                        CanonizingConstant.getInstance(
                             mgr,
                             Integer.parseInt(argument2),
                             FormulaType.IntegerType)));
@@ -171,10 +194,10 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
 
               CanonizingFormula arg1 =
                   store.remember(
-                      new CanonizingConstant(mgr, arg1Calculated, FormulaType.IntegerType));
+                      CanonizingConstant.getInstance(mgr, arg1Calculated, FormulaType.IntegerType));
               arg2 =
                   (CanonizingConstant) store.remember(
-                      new CanonizingConstant(
+                      CanonizingConstant.getInstance(
                           mgr,
                           ((BigInteger) arg2.getValue()).intValue(),
                           FormulaType.IntegerType));
@@ -185,9 +208,11 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
           }
 
           function =
-              new CanonizingPrefixOperator(mgr, kind, args, returnType);
+              CanonizingPrefixOperator.getInstance(mgr, kind, args, returnType);
           break;
         case 2:
+          // FIXME: PRRINCESS-Multiply can have one argument of type Integer and one argument of
+          // type bitvector at this point - how to handle something like that?
           store.storeType(pFunctionDeclaration.getArgumentTypes().get(0));
           CanonizingFormula left = mgr.visit(pArgs.get(0), this);
           store.storeType(pFunctionDeclaration.getArgumentTypes().get(1));
@@ -198,12 +223,14 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
             List<CanonizingFormula> operands = new ArrayList<>();
             operands.add(left);
             operands.add(right);
-            function = new CanonizingPrefixOperator(mgr, kind, operands, returnType);
+            function = CanonizingPrefixOperator.getInstance(mgr, kind, operands, returnType);
           } else {
-            function = new CanonizingInfixOperator(mgr, kind, left, right, returnType);
+            function = CanonizingInfixOperator.getInstance(mgr, kind, left, right, returnType);
           }
           break;
         default:
+          // FIXME: SMTINTERPOL seems to construct AND and maybe OR and other operators as well with
+          // arbitrary argument-lists
           throw new IllegalStateException(
               "No handling for function "
                   + pFunctionDeclaration.getName()

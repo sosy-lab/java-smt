@@ -186,6 +186,9 @@ public enum FunctionDeclarationKind {
   /** Cast an unsigned bitvector to a floating-point number */
   BV_UCASTTO_FP,
 
+  /** Cast a signed bitvector to a floating-point number */
+  BV_SCASTTO_FP,
+
   // Simple floating point operations
 
   /** Negation of a floating point. */
@@ -238,6 +241,20 @@ public enum FunctionDeclarationKind {
 
   /** For internal use, representing an 'isNaN' query. */
   FP_IS_NAN,
+
+  FP_IS_INF,
+
+  FP_IS_ZERO,
+
+  FP_IS_SUBNORMAL,
+
+  FP_CASTTO_FP,
+
+  FP_CASTTO_BV,
+
+  FP_AS_BV,
+
+  FP_FROM_BV,
 
   // default case
 

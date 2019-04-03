@@ -38,7 +38,7 @@ public class RenamingStrategy implements CanonizingStrategy {
           CanonizingFormulaStore pCaller) {
     String canonizedName = canonizeVariableName(pName, pCaller);
 
-    return new CanonizingVariable(pMgr, canonizedName, pType);
+    return CanonizingVariable.getInstance(pMgr, canonizedName, pType);
   }
 
   private static String canonizeVariableName(String pName, CanonizingFormulaStore pCaller) {

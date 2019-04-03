@@ -85,6 +85,7 @@ public class CanonizingFormulaStore {
 
   private void canonize() {
     canonizedConstraints = new HashSet<>();
+    safetyCheckForConstantConstraints();
 
     for (CanonizingFormula cF : constraints) {
       CanonizingFormula canonizedF = cF;
@@ -92,6 +93,18 @@ public class CanonizingFormulaStore {
         canonizedF = canonizedF.canonize(strategy, this);
       }
       canonizedConstraints.add(canonizedF);
+    }
+  }
+
+  private void safetyCheckForConstantConstraints() {
+    // XXX: in case of single boolean-constant-constraints that situation can happen
+    if (currentConstraint != null) {
+      if (constraints == null) {
+        constraints = new HashSet<>();
+      }
+      if (!constraints.contains(currentConstraint)) {
+        constraints.add(currentConstraint);
+      }
     }
   }
 
@@ -122,6 +135,7 @@ public class CanonizingFormulaStore {
   }
 
   public CanonizingFormula getSomeConstraint() {
+    safetyCheckForConstantConstraints();
     for (CanonizingFormula cF : constraints) {
       return cF;
     }
@@ -171,6 +185,7 @@ public class CanonizingFormulaStore {
   public CanonizingFormula remember(CanonizingFormula pCanonizingFormula) {
     memoizedFormulas.putIfAbsent(pCanonizingFormula, pCanonizingFormula);
     CanonizingFormula result = memoizedFormulas.get(pCanonizingFormula);
+    currentConstraint = result;
     if (result instanceof CanonizingVariable) {
       ((CanonizingVariable) result).incrementCount();
     }

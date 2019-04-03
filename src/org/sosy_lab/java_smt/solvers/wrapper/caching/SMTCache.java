@@ -139,4 +139,9 @@ public interface SMTCache {
       getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon);
 
   void close();
+
+  List<List<Formula>>
+      storeAllSat(Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached);
+
+  List<List<Formula>> getAllSat(Formula pFormula, List<Formula> pImportant);
 }

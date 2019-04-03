@@ -41,10 +41,9 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
       InterpolatingProverEnvironment<T> pEnv,
       FormulaManager pMgr,
       CachingMode pMode,
-      Configuration config,
-      boolean solversFormulasCacheable)
+      Configuration config)
       throws InvalidConfigurationException {
-    super(pMgr, pMode, config, solversFormulasCacheable);
+    super(pMgr, pMode, config);
     delegate = pEnv;
   }
 
@@ -56,16 +55,21 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
   @Override
   public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
       throws SolverException, InterruptedException {
-    Formula translated = fromFormula(formula);
+    if (translated == null) {
+      translated = fromFormula(formula);
+    }
     Formula cached = cache.getFormulaInterpolant(translated, pFormulasOfA);
     BooleanFormula computed;
     if (cached == null) {
-      assert delegate.isUnsat();
-      computed = delegate.getInterpolant(pFormulasOfA);
-      cached = fromFormula(computed);
-      cache.storeFormulaInterpolant(translated, cached, pFormulasOfA);
+      if (delegate.isUnsat()) {
+        computed = delegate.getInterpolant(pFormulasOfA);
+        cached = fromFormula(computed);
+        cache.storeFormulaInterpolant(translated, cached, pFormulasOfA);
+      } else {
+        computed = null;
+      }
     } else {
-      computed = toFormula(cached);
+      computed = (BooleanFormula) toFormula(cached);
     }
     return computed;
   }
@@ -74,19 +78,26 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
   public List<BooleanFormula>
       getTreeInterpolants(List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
           throws SolverException, InterruptedException {
-    Formula translated = fromFormula(formula);
+    if (translated == null) {
+      translated = fromFormula(formula);
+    }
     List<BooleanFormula> computed = new ArrayList<>();
     List<Formula> cached =
         cache.getFormulaTreeInterpolants(translated, pPartitionedFormulas, pStartOfSubTree);
     if (cached == null) {
-      assert delegate.isUnsat();
-      computed =
-          delegate
-              .getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
-      cached = computed.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
-      cache.storeFormulaTreeInterpolants(translated, cached, pPartitionedFormulas, pStartOfSubTree);
+      if (delegate.isUnsat()) {
+        computed = delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
+        cached = computed.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
+        cache.storeFormulaTreeInterpolants(
+            translated,
+            cached,
+            pPartitionedFormulas,
+            pStartOfSubTree);
+      } else {
+        computed = null;
+      }
     } else {
-      computed = cached.stream().map(f -> toFormula(f)).collect(Collectors.toList());
+      computed = translateCollectionToFormula(cached, BooleanFormula.class);
     }
     return computed;
   }
