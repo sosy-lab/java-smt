@@ -33,8 +33,8 @@ import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 
 /**
  * CanonizingStrategies shall be used to canonize {@link CanonizingFormula}s.
- * <p>
- * For better configurability and clearness, it is recommended to implement such strategies as
+ *
+ * <p>For better configurability and clearness, it is recommended to implement such strategies as
  * specialized as possible. E.g., do not mix alteration of variable-names, reordering of operands,
  * and constant-propagation into a single strategy.
  */
@@ -73,12 +73,8 @@ public interface CanonizingStrategy {
   }
 
   @SuppressWarnings("unused")
-  default CanonizingFormula
-      canonizeVariable(
-          FormulaManager pMgr,
-          String pName,
-          FormulaType<?> pType,
-          CanonizingFormulaStore pCaller) {
+  default CanonizingFormula canonizeVariable(
+      FormulaManager pMgr, String pName, FormulaType<?> pType, CanonizingFormulaStore pCaller) {
     return CanonizingVariable.getInstance(pMgr, pName, pType);
   }
 }

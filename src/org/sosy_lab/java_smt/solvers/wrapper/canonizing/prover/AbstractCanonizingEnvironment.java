@@ -91,9 +91,8 @@ public abstract class AbstractCanonizingEnvironment<T> implements BasicProverEnv
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     return getDelegate().unsatCoreOverAssumptions(pAssumptions);
   }
 

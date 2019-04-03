@@ -94,5 +94,4 @@ public class CachingOptimizationEnvironmentWrapper extends AbstractCachingEnviro
     }
     return lower;
   }
-
 }

@@ -75,9 +75,9 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
   }
 
   @Override
-  public List<BooleanFormula>
-      getTreeInterpolants(List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
-          throws SolverException, InterruptedException {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      throws SolverException, InterruptedException {
     if (translated == null) {
       translated = fromFormula(formula);
     }
@@ -89,10 +89,7 @@ public class CachingInterpolatingEnvironmentWrapper<T> extends AbstractCachingEn
         computed = delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
         cached = computed.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
         cache.storeFormulaTreeInterpolants(
-            translated,
-            cached,
-            pPartitionedFormulas,
-            pStartOfSubTree);
+            translated, cached, pPartitionedFormulas, pStartOfSubTree);
       } else {
         computed = null;
       }

@@ -38,8 +38,8 @@ public class CanonizingConstant implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public final static CanonizingConstant
-      getInstance(FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
+  public static final CanonizingConstant getInstance(
+      FormulaManager pMgr, Object pValue, FormulaType<?> pType) {
     if (pType.isBooleanType()) {
       return new CanonizingBooleanConstant(pMgr, pValue, pType);
     } else {
@@ -85,8 +85,8 @@ public class CanonizingConstant implements CanonizingFormula {
     } else if (type.isFloatingPointType()) {
       if (value != null) {
         translated =
-          pMgr.getFloatingPointFormulaManager()
-              .makeNumber(value.toString(), (FormulaType.FloatingPointType) type);
+            pMgr.getFloatingPointFormulaManager()
+                .makeNumber(value.toString(), (FormulaType.FloatingPointType) type);
       } else {
         translated =
             pMgr.getFloatingPointFormulaManager().makeNaN((FormulaType.FloatingPointType) type);

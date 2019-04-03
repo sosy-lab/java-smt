@@ -58,7 +58,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public final static CanonizingPrefixOperator getInstance(
+  public static final CanonizingPrefixOperator getInstance(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
       List<CanonizingFormula> pOperands,
@@ -66,7 +66,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     return getInstance(pMgr, pKind, pOperands, pReturnType, pKind.name());
   }
 
-  public final static CanonizingPrefixOperator getInstance(
+  public static final CanonizingPrefixOperator getInstance(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
       List<CanonizingFormula> pOperands,
@@ -130,8 +130,7 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
       operandsCopy.add(cf);
     }
 
-    CanonizingFormula copy =
-        new CanonizingPrefixOperator(mgr, operator, operandsCopy, returnType);
+    CanonizingFormula copy = new CanonizingPrefixOperator(mgr, operator, operandsCopy, returnType);
 
     return copy;
   }
@@ -287,9 +286,9 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
         case BV_ZERO_EXTENSION:
           translated =
               bmgr.extend(
-              ((BitvectorFormula) bvOperands[0]),
-              ((Integer) ((CanonizingConstant) operands.get(1)).getValue()),
-              false);
+                  ((BitvectorFormula) bvOperands[0]),
+                  ((Integer) ((CanonizingConstant) operands.get(1)).getValue()),
+                  false);
           break;
         case BV_NEG:
           translated = bmgr.negate((BitvectorFormula) bvOperands[0]);
@@ -370,8 +369,8 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     return translated;
   }
 
-  private Formula
-      makeGreaterEqualZero(FormulaManager pMgr, Formula pFormula, FormulaType<?> pType) {
+  private Formula makeGreaterEqualZero(
+      FormulaManager pMgr, Formula pFormula, FormulaType<?> pType) {
     Formula result = null;
 
     if (pType.isArrayType()) {
@@ -381,28 +380,32 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     // TODO: Is there an extra one in PRINCESS that holds the signedness?
     if (pType.isBitvectorType()) {
       result =
-          pMgr.getBitvectorFormulaManager().greaterOrEquals(
-              (BitvectorFormula) pFormula,
-              pMgr.getBitvectorFormulaManager().makeBitvector(((BitvectorType) pType).getSize(), 0),
-              false);
+          pMgr.getBitvectorFormulaManager()
+              .greaterOrEquals(
+                  (BitvectorFormula) pFormula,
+                  pMgr.getBitvectorFormulaManager()
+                      .makeBitvector(((BitvectorType) pType).getSize(), 0),
+                  false);
     }
     if (pType.isFloatingPointType()) {
       result =
-          pMgr.getFloatingPointFormulaManager().greaterOrEquals(
-              (FloatingPointFormula) pFormula,
-              pMgr.getFloatingPointFormulaManager().makeNumber(0.0, ((FloatingPointType) pType)));
+          pMgr.getFloatingPointFormulaManager()
+              .greaterOrEquals(
+                  (FloatingPointFormula) pFormula,
+                  pMgr.getFloatingPointFormulaManager()
+                      .makeNumber(0.0, ((FloatingPointType) pType)));
     }
     if (pType.isIntegerType()) {
       result =
-          pMgr.getIntegerFormulaManager().greaterOrEquals(
-              (IntegerFormula) pFormula,
-              pMgr.getIntegerFormulaManager().makeNumber(0L));
+          pMgr.getIntegerFormulaManager()
+              .greaterOrEquals(
+                  (IntegerFormula) pFormula, pMgr.getIntegerFormulaManager().makeNumber(0L));
     }
     if (pType.isRationalType()) {
       result =
-          pMgr.getRationalFormulaManager().greaterOrEquals(
-              (NumeralFormula) pFormula,
-              pMgr.getRationalFormulaManager().makeNumber(0L));
+          pMgr.getRationalFormulaManager()
+              .greaterOrEquals(
+                  (NumeralFormula) pFormula, pMgr.getRationalFormulaManager().makeNumber(0L));
     }
 
     return result;
@@ -417,16 +420,19 @@ public class CanonizingPrefixOperator implements CanonizingFormula {
     }
     if (type.isBitvectorType()) {
       result =
-          pMgr.getBitvectorFormulaManager().equal(
-              (BitvectorFormula) formula,
-              pMgr.getBitvectorFormulaManager()
-                  .makeBitvector(((BitvectorType) type).getSize(), 0));
+          pMgr.getBitvectorFormulaManager()
+              .equal(
+                  (BitvectorFormula) formula,
+                  pMgr.getBitvectorFormulaManager()
+                      .makeBitvector(((BitvectorType) type).getSize(), 0));
     }
     if (type.isFloatingPointType()) {
       result =
-          pMgr.getFloatingPointFormulaManager().equalWithFPSemantics(
-              (FloatingPointFormula) formula,
-              pMgr.getFloatingPointFormulaManager().makeNumber(0.0, ((FloatingPointType) type)));
+          pMgr.getFloatingPointFormulaManager()
+              .equalWithFPSemantics(
+                  (FloatingPointFormula) formula,
+                  pMgr.getFloatingPointFormulaManager()
+                      .makeNumber(0.0, ((FloatingPointType) type)));
     }
     if (type.isIntegerType()) {
       result =

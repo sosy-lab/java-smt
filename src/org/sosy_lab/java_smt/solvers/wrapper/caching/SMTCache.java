@@ -32,10 +32,7 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 
 public interface SMTCache {
 
-  /**
-   * FIXME: For Allsat some strategy has yet to be thought of, to handle the generic callback.
-   */
-
+  /** FIXME: For Allsat some strategy has yet to be thought of, to handle the generic callback. */
   enum CachingMode {
     IN_MEMORY,
     SIMPLE_BINARY;
@@ -64,21 +61,16 @@ public interface SMTCache {
   Boolean isFormulaUnsat(Formula pFormula);
 
   Boolean storeFormulaUnsatWithAssumptions(
-      Formula pFormula,
-      boolean pUnsat,
-      Collection<Formula> pAssumptions);
+      Formula pFormula, boolean pUnsat, Collection<Formula> pAssumptions);
 
-  Boolean isFormulaUnsatWithAssumptions(
-      Formula pFormula,
-      Collection<Formula> pAssumptions);
+  Boolean isFormulaUnsatWithAssumptions(Formula pFormula, Collection<Formula> pAssumptions);
 
   Model storeFormulaModel(Formula pFormula, Model pModel);
 
   Model getFormulaModel(Formula pFormula);
 
   ImmutableList<ValueAssignment> storeFormulaModelAssignments(
-      Formula pFormula,
-      ImmutableList<ValueAssignment> pAssignments);
+      Formula pFormula, ImmutableList<ValueAssignment> pAssignments);
 
   ImmutableList<ValueAssignment> getFormulaModelAssignments(Formula pFormula);
 
@@ -87,17 +79,13 @@ public interface SMTCache {
   List<Formula> getFormulaUnsatCore(Formula pFormula);
 
   Optional<List<Formula>> storeFormulaUnsatCoreOverAssumptions(
-      Formula pFormula,
-      Optional<List<Formula>> pUnsatCore,
-      Collection<Formula> pAssumptions);
+      Formula pFormula, Optional<List<Formula>> pUnsatCore, Collection<Formula> pAssumptions);
 
-  Optional<List<Formula>>
-      getFormulaUnsatCoreOverAssumptions(Formula pFormula, Collection<Formula> pAssumptions);
+  Optional<List<Formula>> getFormulaUnsatCoreOverAssumptions(
+      Formula pFormula, Collection<Formula> pAssumptions);
 
   Formula storeFormulaInterpolant(
-      Formula pFormula,
-      Formula pInterpolant,
-      Collection<?> pFormulasOfA);
+      Formula pFormula, Formula pInterpolant, Collection<?> pFormulasOfA);
 
   Formula getFormulaInterpolant(Formula pFormula, Collection<?> pFormulasOfA);
 
@@ -108,9 +96,7 @@ public interface SMTCache {
       int[] pStartOfSubTree);
 
   List<Formula> getFormulaTreeInterpolants(
-      Formula pFormula,
-      List<? extends Collection<?>> pPartitionedFormulas,
-      int[] pStartOfSubTree);
+      Formula pFormula, List<? extends Collection<?>> pPartitionedFormulas, int[] pStartOfSubTree);
 
   Integer storeFormulaMaximize(Formula pFormula, Integer max, Formula pObjective);
 
@@ -121,27 +107,19 @@ public interface SMTCache {
   Integer getFormulaMinimize(Formula pFormula, Formula pObjective);
 
   Optional<Rational> storeFormulaUpper(
-      Formula pFormula,
-      Optional<Rational> pUpper,
-      int pHandle,
-      Rational pEpsilon);
+      Formula pFormula, Optional<Rational> pUpper, int pHandle, Rational pEpsilon);
 
-  Optional<Rational>
-      getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon);
+  Optional<Rational> getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon);
 
   Optional<Rational> storeFormulaLower(
-      Formula pFormula,
-      Optional<Rational> pLower,
-      int pHandle,
-      Rational pEpsilon);
+      Formula pFormula, Optional<Rational> pLower, int pHandle, Rational pEpsilon);
 
-  Optional<Rational>
-      getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon);
+  Optional<Rational> getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon);
 
   void close();
 
-  List<List<Formula>>
-      storeAllSat(Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached);
+  List<List<Formula>> storeAllSat(
+      Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached);
 
   List<List<Formula>> getAllSat(Formula pFormula, List<Formula> pImportant);
 }

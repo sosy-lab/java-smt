@@ -69,12 +69,7 @@ public class CanonizingFormulaStore {
   public CanonizingFormulaStore copy() {
     CanonizingFormula constraint = currentConstraint != null ? currentConstraint.copy() : null;
     return new CanonizingFormulaStore(
-        mgr,
-        constraint,
-        nextLiteralsType,
-        constraints,
-        canonizedConstraints,
-        strategies);
+        mgr, constraint, nextLiteralsType, constraints, canonizedConstraints, strategies);
   }
 
   public BooleanFormula getFormula() {

@@ -46,8 +46,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
     FunctionDeclarationKind operator = pOperator;
     CanonizingFormula left = pLeft.canonize(this, pCaller);
     CanonizingFormula right = pRight.canonize(this, pCaller);
-    boolean transformationPossible =
-        isTransformationPossible(left.getType(), right.getType());
+    boolean transformationPossible = isTransformationPossible(left.getType(), right.getType());
     FormulaType<?> type = determineType(left.getType(), right.getType());
     CanonizingInfixOperator result = null;
 
@@ -65,11 +64,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
 
       left =
           CanonizingInfixOperator.getInstance(
-              pMgr,
-              getSubtractionOperator(left.getType()),
-              left,
-              right,
-              type);
+              pMgr, getSubtractionOperator(left.getType()), left, right, type);
       right = CanonizingConstant.getInstance(pMgr, 0, type);
 
       if (transformationPossible && !isOrEqualOp(pOperator)) {
@@ -77,8 +72,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
         left = add(pMgr, left, negateConstant(epsilon), type);
       }
 
-      result =
-          CanonizingInfixOperator.getInstance(pMgr, operator, left, right, pReturnType);
+      result = CanonizingInfixOperator.getInstance(pMgr, operator, left, right, pReturnType);
 
       if (pReturnType.isBooleanType() && type.isFloatingPointType()) {
         // for cases that result in a transformation like: inf - inf == 0, which translates to nan
@@ -87,19 +81,11 @@ public class ReorderingStrategy implements CanonizingStrategy {
         List<CanonizingFormula> operand = new ArrayList<>();
         operand.add(result);
         CanonizingPrefixOperator compareToNan =
-            CanonizingPrefixOperator
-                .getInstance(
-                pMgr,
-                FunctionDeclarationKind.FP_IS_NAN,
-                operand,
-                pReturnType);
+            CanonizingPrefixOperator.getInstance(
+                pMgr, FunctionDeclarationKind.FP_IS_NAN, operand, pReturnType);
         result =
             CanonizingInfixOperator.getInstance(
-                pMgr,
-                FunctionDeclarationKind.OR,
-                result,
-                compareToNan,
-                pReturnType);
+                pMgr, FunctionDeclarationKind.OR, result, compareToNan, pReturnType);
       }
     } else {
       // arithmetical or logical operators where one can possibly reorder variables.
@@ -190,8 +176,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
         || pOperator == FunctionDeclarationKind.BV_SLT;
   }
 
-  private FunctionDeclarationKind
-      getGreaterEqualsOp(FormulaType<?> pType, boolean isSigned) {
+  private FunctionDeclarationKind getGreaterEqualsOp(FormulaType<?> pType, boolean isSigned) {
     pType = CanonizingFormula.recursivelyLookUpArray(pType);
     if (pType.isFloatingPointType()) {
       return FunctionDeclarationKind.FP_GE;
@@ -202,8 +187,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
     return FunctionDeclarationKind.GTE;
   }
 
-  private FunctionDeclarationKind
-      getGreaterOp(FormulaType<?> pType, boolean isSigned) {
+  private FunctionDeclarationKind getGreaterOp(FormulaType<?> pType, boolean isSigned) {
     pType = CanonizingFormula.recursivelyLookUpArray(pType);
     if (pType.isFloatingPointType()) {
       return FunctionDeclarationKind.FP_GT;
@@ -282,8 +266,8 @@ public class ReorderingStrategy implements CanonizingStrategy {
   }
 
   // FIXME: Bitvector-Overflow and FloatingPoint-Special-Values (Infinitiy)
-  private static CanonizingConstant
-      getMinimumSummand(FormulaManager pMgr, FormulaType<?> pReturnType) {
+  private static CanonizingConstant getMinimumSummand(
+      FormulaManager pMgr, FormulaType<?> pReturnType) {
     if (pReturnType.isIntegerType()) {
       return CanonizingConstant.getInstance(pMgr, Integer.valueOf(1), pReturnType);
     }
@@ -305,8 +289,7 @@ public class ReorderingStrategy implements CanonizingStrategy {
     }
     if (pReturnType.isArrayType()) {
       return getMinimumSummand(
-          pMgr,
-          ((FormulaType.ArrayFormulaType<?, ?>) pReturnType).getElementType());
+          pMgr, ((FormulaType.ArrayFormulaType<?, ?>) pReturnType).getElementType());
     }
     return null;
   }

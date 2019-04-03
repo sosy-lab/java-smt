@@ -51,7 +51,7 @@ public class CanonizingInfixOperator implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public final static CanonizingInfixOperator getInstance(
+  public static final CanonizingInfixOperator getInstance(
       FormulaManager pMgr,
       FunctionDeclarationKind pKind,
       CanonizingFormula pLeft,
@@ -286,8 +286,8 @@ public class CanonizingInfixOperator implements CanonizingFormula {
         case FP_ROUND_TO_INTEGRAL:
           FloatingPointRoundingMode mode = determineRoundingMode();
           translated = fmgr.round(rFormula, mode); // FIXME: this is still incorrect, but currently
-                                                   // FloatingPointManager does not provide a
-                                                   // roundToIntegral?
+          // FloatingPointManager does not provide a
+          // roundToIntegral?
           break;
         default:
           throw new IllegalStateException(

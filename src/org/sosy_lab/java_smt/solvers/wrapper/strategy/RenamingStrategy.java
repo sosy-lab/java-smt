@@ -30,12 +30,8 @@ import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingVariable;
 public class RenamingStrategy implements CanonizingStrategy {
 
   @Override
-  public CanonizingFormula
-      canonizeVariable(
-          FormulaManager pMgr,
-          String pName,
-          FormulaType<?> pType,
-          CanonizingFormulaStore pCaller) {
+  public CanonizingFormula canonizeVariable(
+      FormulaManager pMgr, String pName, FormulaType<?> pType, CanonizingFormulaStore pCaller) {
     String canonizedName = canonizeVariableName(pName, pCaller);
 
     return CanonizingVariable.getInstance(pMgr, canonizedName, pType);

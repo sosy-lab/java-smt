@@ -54,19 +54,19 @@ public class WrapperSolverContext extends AbstractSolverContext {
     private Solvers solver = Solvers.SMTINTERPOL;
 
     @Option(
-      secure = true,
-      description = "If formulas should be canonized before queried to the solver."
-    )
+        secure = true,
+        description = "If formulas should be canonized before queried to the solver.")
     private boolean canonize = false;
 
     @Option(secure = true, description = "Which strategies to use for canonization")
-    private Set<CanonizingStrategies> strategies = new HashSet<CanonizingStrategies>() {
-      private static final long serialVersionUID = 1L;
+    private Set<CanonizingStrategies> strategies =
+        new HashSet<CanonizingStrategies>() {
+          private static final long serialVersionUID = 1L;
 
-      {
-        add(CanonizingStrategies.IDENTITY);
-      }
-    };
+          {
+            add(CanonizingStrategies.IDENTITY);
+          }
+        };
 
     @Option(secure = true, description = "If answers of solvers should be cached.")
     private boolean cache = false;
@@ -123,10 +123,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
       try {
         env =
             new CachingEnvironmentWrapper(
-                env,
-                delegate.getFormulaManager(),
-                options.cachingmode,
-                config);
+                env, delegate.getFormulaManager(), options.cachingmode, config);
       } catch (InvalidConfigurationException e) {
         throw new RuntimeException(e);
       }
@@ -150,10 +147,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
       try {
         env =
             new CachingInterpolatingEnvironmentWrapper<>(
-                env,
-                delegate.getFormulaManager(),
-                options.cachingmode,
-                config);
+                env, delegate.getFormulaManager(), options.cachingmode, config);
       } catch (InvalidConfigurationException e) {
         throw new RuntimeException(e);
       }
@@ -163,9 +157,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
       List<CanonizingStrategy> strategies = organizeStrategies();
       env =
           new CanonizingInterpolatingEnvironmentWrapper<>(
-              env,
-              delegate.getFormulaManager(),
-              strategies);
+              env, delegate.getFormulaManager(), strategies);
     }
 
     return env;
@@ -181,10 +173,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
       try {
         env =
             new CachingOptimizationEnvironmentWrapper(
-                env,
-                delegate.getFormulaManager(),
-                options.cachingmode,
-                config);
+                env, delegate.getFormulaManager(), options.cachingmode, config);
       } catch (InvalidConfigurationException e) {
         throw new RuntimeException(e);
       }
@@ -194,9 +183,7 @@ public class WrapperSolverContext extends AbstractSolverContext {
       List<CanonizingStrategy> strategies = organizeStrategies();
       env =
           new CanonizingOptimizationEnvironmentWrapper(
-              env,
-              delegate.getFormulaManager(),
-              strategies);
+              env, delegate.getFormulaManager(), strategies);
     }
 
     return env;
@@ -206,11 +193,12 @@ public class WrapperSolverContext extends AbstractSolverContext {
     List<CanonizingStrategy> strategies = new ArrayList<>();
     if (options.strategies != null) {
       strategies =
-          options.strategies.stream()
+          options
+              .strategies
+              .stream()
               .sorted((s0, s1) -> s0.getPriority() - s1.getPriority())
               .map(CanonizingStrategies::getStrategy)
               .collect(Collectors.toList());
-
     }
     if (strategies.isEmpty()) {
       strategies.add(CanonizingStrategies.IDENTITY.getStrategy());

@@ -52,8 +52,7 @@ import org.sosy_lab.java_smt.solvers.wrapper.WrapperSolverContext;
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
  * corresponding to the chosen solver.
  *
- * <p>
- * Main entry point for JavaSMT.
+ * <p>Main entry point for JavaSMT.
  */
 @Options(prefix = "solver")
 public class SolverContextFactory {
@@ -108,9 +107,7 @@ public class SolverContextFactory {
   private final Configuration config;
 
   public SolverContextFactory(
-      Configuration pConfig,
-      LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier)
+      Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
     pConfig.inject(this);
     logger = pLogger.withComponentName("JavaSMT");
@@ -167,8 +164,7 @@ public class SolverContextFactory {
               "The SMT solver %s is not available on this machine because of missing libraries "
                   + "(%s). "
                   + "You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
-              solverToCreate,
-              e.getMessage()),
+              solverToCreate, e.getMessage()),
           e);
     }
 
@@ -225,14 +221,11 @@ public class SolverContextFactory {
    * Shortcut for getting a {@link SolverContext}, the solver is selected using the configuration
    * {@code config}
    *
-   * <p>
-   * See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
    * documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
-      Configuration config,
-      LogManager logger,
-      ShutdownNotifier shutdownNotifier)
+      Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
       throws InvalidConfigurationException {
     return new SolverContextFactory(config, logger, shutdownNotifier).generateContext();
   }
@@ -240,15 +233,11 @@ public class SolverContextFactory {
   /**
    * Shortcut for getting a {@link SolverContext}, the solver is selected using an argument.
    *
-   * <p>
-   * See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
    * documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
-      Configuration config,
-      LogManager logger,
-      ShutdownNotifier shutdownNotifier,
-      Solvers solver)
+      Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier, Solvers solver)
       throws InvalidConfigurationException {
     return new SolverContextFactory(config, logger, shutdownNotifier).generateContext(solver);
   }
@@ -262,17 +251,17 @@ public class SolverContextFactory {
   public static SolverContext createSolverContext(Solvers solver)
       throws InvalidConfigurationException {
     return new SolverContextFactory(
-        Configuration.defaultConfiguration(),
-        LogManager.createNullLogManager(),
-        ShutdownNotifier.createDummy()).generateContext(solver);
+            Configuration.defaultConfiguration(),
+            LogManager.createNullLogManager(),
+            ShutdownNotifier.createDummy())
+        .generateContext(solver);
   }
 
   /**
    * Interface for completely encapsulating all accesses to a solver's package to decouple the
    * solver's package from the rest of the code.
    *
-   * <p>
-   * This interface is only meant to be implemented by SMT solvers and used by this class, not by
+   * <p>This interface is only meant to be implemented by SMT solvers and used by this class, not by
    * other classes.
    */
   public abstract static class InnerUtilFactory {
@@ -330,8 +319,8 @@ public class SolverContextFactory {
       URLClassLoader uParentClassLoader = (URLClassLoader) parentClassLoader;
       builder.setUrls(uParentClassLoader.getURLs());
     } else {
-      builder
-          .setUrls(SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation());
+      builder.setUrls(
+          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation());
     }
 
     return builder.build();

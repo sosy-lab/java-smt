@@ -52,9 +52,9 @@ public class CanonizingInterpolatingEnvironmentWrapper<T> extends AbstractCanoni
   }
 
   @Override
-  public List<BooleanFormula>
-      getTreeInterpolants(List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
-          throws SolverException, InterruptedException {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      throws SolverException, InterruptedException {
     return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
   }
 }

@@ -124,20 +124,11 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
 
       function =
           CanonizingPrefixOperator.getInstance(
-              mgr,
-              kind,
-              args,
-              pFunctionDeclaration.getType(),
-              pFunctionDeclaration.getName());
+              mgr, kind, args, pFunctionDeclaration.getType(), pFunctionDeclaration.getName());
     } else {
       switch (pArgs.size()) {
         case 0:
-          function =
-              CanonizingPrefixOperator.getInstance(
-                  mgr,
-                  kind,
-                  new ArrayList<>(),
-                  returnType);
+          function = CanonizingPrefixOperator.getInstance(mgr, kind, new ArrayList<>(), returnType);
           break;
         case 1:
         case 3:
@@ -167,15 +158,11 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
                 args.add(
                     store.remember(
                         CanonizingConstant.getInstance(
-                            mgr,
-                            Integer.parseInt(argument1),
-                            FormulaType.IntegerType)));
+                            mgr, Integer.parseInt(argument1), FormulaType.IntegerType)));
                 args.add(
                     store.remember(
                         CanonizingConstant.getInstance(
-                            mgr,
-                            Integer.parseInt(argument2),
-                            FormulaType.IntegerType)));
+                            mgr, Integer.parseInt(argument2), FormulaType.IntegerType)));
               }
             }
             if (mgr.getClass().getName().contains("Princess")) {
@@ -196,19 +183,19 @@ public class CanonizingFormulaVisitor implements FormulaVisitor<CanonizingFormul
                   store.remember(
                       CanonizingConstant.getInstance(mgr, arg1Calculated, FormulaType.IntegerType));
               arg2 =
-                  (CanonizingConstant) store.remember(
-                      CanonizingConstant.getInstance(
-                          mgr,
-                          ((BigInteger) arg2.getValue()).intValue(),
-                          FormulaType.IntegerType));
+                  (CanonizingConstant)
+                      store.remember(
+                          CanonizingConstant.getInstance(
+                              mgr,
+                              ((BigInteger) arg2.getValue()).intValue(),
+                              FormulaType.IntegerType));
 
               args.add(arg1);
               args.add(arg2);
             }
           }
 
-          function =
-              CanonizingPrefixOperator.getInstance(mgr, kind, args, returnType);
+          function = CanonizingPrefixOperator.getInstance(mgr, kind, args, returnType);
           break;
         case 2:
           // FIXME: PRRINCESS-Multiply can have one argument of type Integer and one argument of

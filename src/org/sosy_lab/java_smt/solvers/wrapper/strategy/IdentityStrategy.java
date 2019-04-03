@@ -27,6 +27,4 @@ import org.sosy_lab.java_smt.solvers.wrapper.canonizing.CanonizingFormula;
  * interface returns an unaltered copy of any {@link CanonizingFormula}.
  */
 @Immutable
-public class IdentityStrategy implements CanonizingStrategy {
-
-}
+public class IdentityStrategy implements CanonizingStrategy {}

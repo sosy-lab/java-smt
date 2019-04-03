@@ -45,16 +45,16 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 public class SimpleBinarySMTCache implements SMTCache {
 
   @Option(
-    secure = true,
-    description = "Cache SMT-Solver results to this file on disc.",
-    name = "file")
+      secure = true,
+      description = "Cache SMT-Solver results to this file on disc.",
+      name = "file")
   @FileOption(FileOption.Type.OUTPUT_FILE)
   private Path fileName = Paths.get("java-smt.cache");
 
   @Option(
-    secure = true,
-    description = "Read cached SMT-Solver results from this file on disc",
-    name = "input")
+      secure = true,
+      description = "Read cached SMT-Solver results from this file on disc",
+      name = "input")
   @FileOption(FileOption.Type.OPTIONAL_INPUT_FILE)
   private Path inputFileName = Paths.get("output/java-smt.cache");
 
@@ -104,16 +104,12 @@ public class SimpleBinarySMTCache implements SMTCache {
 
   @Override
   public Boolean storeFormulaUnsatWithAssumptions(
-      Formula pFormula,
-      boolean pUnsat,
-      Collection<Formula> pAssumptions) {
+      Formula pFormula, boolean pUnsat, Collection<Formula> pAssumptions) {
     return cache.storeFormulaUnsatWithAssumptions(pFormula, pUnsat, pAssumptions);
   }
 
   @Override
-  public Boolean isFormulaUnsatWithAssumptions(
-      Formula pFormula,
-      Collection<Formula> pAssumptions) {
+  public Boolean isFormulaUnsatWithAssumptions(Formula pFormula, Collection<Formula> pAssumptions) {
     return cache.isFormulaUnsatWithAssumptions(pFormula, pAssumptions);
   }
 
@@ -129,8 +125,7 @@ public class SimpleBinarySMTCache implements SMTCache {
 
   @Override
   public ImmutableList<ValueAssignment> storeFormulaModelAssignments(
-      Formula pFormula,
-      ImmutableList<ValueAssignment> pAssignments) {
+      Formula pFormula, ImmutableList<ValueAssignment> pAssignments) {
     return cache.storeFormulaModelAssignments(pFormula, pAssignments);
   }
 
@@ -151,23 +146,19 @@ public class SimpleBinarySMTCache implements SMTCache {
 
   @Override
   public Optional<List<Formula>> storeFormulaUnsatCoreOverAssumptions(
-      Formula pFormula,
-      Optional<List<Formula>> pUnsatCore,
-      Collection<Formula> pAssumptions) {
+      Formula pFormula, Optional<List<Formula>> pUnsatCore, Collection<Formula> pAssumptions) {
     return cache.storeFormulaUnsatCoreOverAssumptions(pFormula, pUnsatCore, pAssumptions);
   }
 
   @Override
-  public Optional<List<Formula>>
-      getFormulaUnsatCoreOverAssumptions(Formula pFormula, Collection<Formula> pAssumptions) {
+  public Optional<List<Formula>> getFormulaUnsatCoreOverAssumptions(
+      Formula pFormula, Collection<Formula> pAssumptions) {
     return cache.getFormulaUnsatCoreOverAssumptions(pFormula, pAssumptions);
   }
 
   @Override
   public Formula storeFormulaInterpolant(
-      Formula pFormula,
-      Formula pInterpolant,
-      Collection<?> pFormulasOfA) {
+      Formula pFormula, Formula pInterpolant, Collection<?> pFormulasOfA) {
     return cache.storeFormulaInterpolant(pFormula, pInterpolant, pFormulasOfA);
   }
 
@@ -183,17 +174,12 @@ public class SimpleBinarySMTCache implements SMTCache {
       List<? extends Collection<?>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
     return cache.storeFormulaTreeInterpolants(
-        pFormula,
-        pTreeInterpolants,
-        pPartitionedFormulas,
-        pStartOfSubTree);
+        pFormula, pTreeInterpolants, pPartitionedFormulas, pStartOfSubTree);
   }
 
   @Override
   public List<Formula> getFormulaTreeInterpolants(
-      Formula pFormula,
-      List<? extends Collection<?>> pPartitionedFormulas,
-      int[] pStartOfSubTree) {
+      Formula pFormula, List<? extends Collection<?>> pPartitionedFormulas, int[] pStartOfSubTree) {
     return cache.getFormulaTreeInterpolants(pFormula, pPartitionedFormulas, pStartOfSubTree);
   }
 
@@ -219,31 +205,23 @@ public class SimpleBinarySMTCache implements SMTCache {
 
   @Override
   public Optional<Rational> storeFormulaUpper(
-      Formula pFormula,
-      Optional<Rational> pUpper,
-      int pHandle,
-      Rational pEpsilon) {
+      Formula pFormula, Optional<Rational> pUpper, int pHandle, Rational pEpsilon) {
     return cache.storeFormulaUpper(pFormula, pUpper, pHandle, pEpsilon);
   }
 
   @Override
-  public Optional<Rational>
-      getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon) {
+  public Optional<Rational> getFormulaUpper(Formula pFormula, int pHandle, Rational pEpsilon) {
     return cache.getFormulaUpper(pFormula, pHandle, pEpsilon);
   }
 
   @Override
   public Optional<Rational> storeFormulaLower(
-      Formula pFormula,
-      Optional<Rational> pLower,
-      int pHandle,
-      Rational pEpsilon) {
+      Formula pFormula, Optional<Rational> pLower, int pHandle, Rational pEpsilon) {
     return cache.storeFormulaLower(pFormula, pLower, pHandle, pEpsilon);
   }
 
   @Override
-  public Optional<Rational>
-      getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon) {
+  public Optional<Rational> getFormulaLower(Formula pFormula, int pHandle, Rational pEpsilon) {
     return cache.getFormulaLower(pFormula, pHandle, pEpsilon);
   }
 
@@ -256,8 +234,8 @@ public class SimpleBinarySMTCache implements SMTCache {
   }
 
   @Override
-  public List<List<Formula>>
-      storeAllSat(Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached) {
+  public List<List<Formula>> storeAllSat(
+      Formula pFormula, List<Formula> pImportant, List<List<Formula>> pCached) {
     return cache.storeAllSat(pFormula, pImportant, pCached);
   }
 

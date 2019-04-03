@@ -75,9 +75,7 @@ public class WrapperSolverTest extends SolverBasedTest0 {
             bvmgr.multiply(bvmgr.add(x, y), y));
 
     CanonizingFormulaVisitor visitor = new CanonizingFormulaVisitor(mgr, strategies);
-    mgr.visit(
-        oformula,
-        visitor);
+    mgr.visit(oformula, visitor);
 
     CanonizingFormula formula = visitor.getStorage().getSomeConstraint();
     System.out.println("\n\n\t" + formula + "\n\n");
@@ -113,8 +111,7 @@ public class WrapperSolverTest extends SolverBasedTest0 {
     requireArrays();
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray(
-            "arr",
-            FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+            "arr", FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
     IntegerFormula int0 = imgr.makeNumber("42");
     IntegerFormula int1 = imgr.makeNumber("0");
     IntegerFormula int2 = imgr.makeNumber("2");

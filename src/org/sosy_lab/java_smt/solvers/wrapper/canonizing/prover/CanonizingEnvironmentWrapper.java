@@ -30,9 +30,7 @@ public class CanonizingEnvironmentWrapper extends AbstractCanonizingEnvironment<
   ProverEnvironment delegate;
 
   public CanonizingEnvironmentWrapper(
-      ProverEnvironment pEnv,
-      FormulaManager pMgr,
-      List<CanonizingStrategy> pStrategies) {
+      ProverEnvironment pEnv, FormulaManager pMgr, List<CanonizingStrategy> pStrategies) {
     super(pMgr, pStrategies);
     delegate = pEnv;
   }

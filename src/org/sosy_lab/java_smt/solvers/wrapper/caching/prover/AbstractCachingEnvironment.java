@@ -55,10 +55,7 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
 
   protected @Nullable Formula translated;
 
-  public AbstractCachingEnvironment(
-      FormulaManager pMgr,
-      CachingMode pMode,
-      Configuration config)
+  public AbstractCachingEnvironment(FormulaManager pMgr, CachingMode pMode, Configuration config)
       throws InvalidConfigurationException {
     mgr = pMgr;
     fmgr = pMgr.getBooleanFormulaManager();
@@ -127,8 +124,7 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
     if (translated == null) {
       translated = fromFormula(formula);
     }
-    List<Formula> tAssumptions =
-        translateCollectionFromFormula(pAssumptions);
+    List<Formula> tAssumptions = translateCollectionFromFormula(pAssumptions);
     Boolean cached = cache.isFormulaUnsatWithAssumptions(translated, tAssumptions);
     if (cached == null) {
       cached = getDelegate().isUnsatWithAssumptions(pAssumptions);
@@ -184,11 +180,14 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
     return cached;
   }
 
-  private ImmutableList<ValueAssignment>
-      toCachedValueAssignments(ImmutableList<ValueAssignment> pCached) {
+  private ImmutableList<ValueAssignment> toCachedValueAssignments(
+      ImmutableList<ValueAssignment> pCached) {
     List<ValueAssignment> transformed =
-        pCached.asList().stream().map(va -> mapFromValueAssignment(va)).collect(
-            Collectors.toList());
+        pCached
+            .asList()
+            .stream()
+            .map(va -> mapFromValueAssignment(va))
+            .collect(Collectors.toList());
     return ImmutableList.copyOf(transformed);
   }
 
@@ -211,13 +210,15 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
       return ImmutableList.copyOf(pArgumentsInterpretation);
     }
     List<Formula> transformed =
-        pArgumentsInterpretation.stream().map(ai -> fromFormula((Formula) ai)).collect(
-            Collectors.toList());
+        pArgumentsInterpretation
+            .stream()
+            .map(ai -> fromFormula((Formula) ai))
+            .collect(Collectors.toList());
     return ImmutableList.copyOf(transformed);
   }
 
-  private ImmutableList<ValueAssignment>
-      fromCachedValueAssignments(ImmutableList<ValueAssignment> pCached) {
+  private ImmutableList<ValueAssignment> fromCachedValueAssignments(
+      ImmutableList<ValueAssignment> pCached) {
     List<ValueAssignment> transformed =
         pCached.asList().stream().map(va -> mapToValueAssignment(va)).collect(Collectors.toList());
     return ImmutableList.copyOf(transformed);
@@ -242,8 +243,10 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
       return ImmutableList.copyOf(pArgumentsInterpretation);
     }
     List<Formula> transformed =
-        pArgumentsInterpretation.stream().map(ai -> toFormula((Formula) ai)).collect(
-            Collectors.toList());
+        pArgumentsInterpretation
+            .stream()
+            .map(ai -> toFormula((Formula) ai))
+            .collect(Collectors.toList());
     return ImmutableList.copyOf(transformed);
   }
 
@@ -275,9 +278,8 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     if (translated == null) {
       translated = fromFormula(formula);
     }
@@ -290,14 +292,11 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
       boolean unsat = getDelegate().isUnsat();
       if (unsat) {
         computed = getDelegate().unsatCoreOverAssumptions(pAssumptions);
-        cached =
-            Optional
-                .of(translateCollectionFromFormula(computed.get()));
+        cached = Optional.of(translateCollectionFromFormula(computed.get()));
         cache.storeFormulaUnsatCoreOverAssumptions(translated, cached, tAssumptions);
       }
     } else {
-      computed =
-          Optional.of(translateCollectionToFormula(cached.get(), BooleanFormula.class));
+      computed = Optional.of(translateCollectionToFormula(cached.get(), BooleanFormula.class));
     }
     return computed;
   }
@@ -326,8 +325,10 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
       cache.storeAllSat(translated, cImportant, cached);
     } else {
       result =
-          cached.stream().map(l -> translateCollectionToFormula(l, BooleanFormula.class)).collect(
-              Collectors.toList());
+          cached
+              .stream()
+              .map(l -> translateCollectionToFormula(l, BooleanFormula.class))
+              .collect(Collectors.toList());
     }
 
     for (List<BooleanFormula> model : result) {
@@ -338,14 +339,14 @@ public abstract class AbstractCachingEnvironment<T> implements BasicProverEnviro
     return pCallback.getResult();
   }
 
-  protected <F extends Formula> List<Formula>
-      translateCollectionFromFormula(Collection<F> pCollection) {
+  protected <F extends Formula> List<Formula> translateCollectionFromFormula(
+      Collection<F> pCollection) {
     return pCollection.stream().map(f -> fromFormula(f)).collect(Collectors.toList());
   }
 
   @SuppressWarnings({"unchecked", "unused"})
-  protected <F extends Formula> List<F>
-      translateCollectionToFormula(Collection<Formula> pCollection, Class<F> pClazz) {
+  protected <F extends Formula> List<F> translateCollectionToFormula(
+      Collection<Formula> pCollection, Class<F> pClazz) {
     return pCollection.stream().map(f -> (F) toFormula(f)).collect(Collectors.toList());
   }
 

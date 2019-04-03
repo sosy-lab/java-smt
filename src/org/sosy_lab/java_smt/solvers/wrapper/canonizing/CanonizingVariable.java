@@ -39,8 +39,8 @@ public class CanonizingVariable implements CanonizingFormula {
 
   private transient CanonizingFormula canonized = null;
 
-  public final static CanonizingVariable
-      getInstance(FormulaManager pMgr, String pName, FormulaType<?> pType) {
+  public static final CanonizingVariable getInstance(
+      FormulaManager pMgr, String pName, FormulaType<?> pType) {
     if (pType.isBooleanType()) {
       return new CanonizingBooleanVariable(pMgr, pName, pType);
     } else {

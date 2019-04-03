@@ -88,21 +88,22 @@ public class CacheableModel implements Model {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends Formula> @Nullable T
-      eval(T pFormula) {
+  public <T extends Formula> @Nullable T eval(T pFormula) {
     Formula key = fromFormula(pFormula);
     if (delegate != null) {
       evalMap.computeIfAbsent(key, o -> fromFormula(delegate.eval(pFormula)));
     } else if (fallback != null) {
-      evalMap.computeIfAbsent(key, o -> {
-        // XXX: possibly unsafe
-        try {
-          fallback.isUnsat();
-          return fromFormula(fallback.getModel().eval(pFormula));
-        } catch (SolverException | InterruptedException e) {
-          throw new RuntimeException("Error during uncached Model-Computation.", e);
-        }
-      });
+      evalMap.computeIfAbsent(
+          key,
+          o -> {
+            // XXX: possibly unsafe
+            try {
+              fallback.isUnsat();
+              return fromFormula(fallback.getModel().eval(pFormula));
+            } catch (SolverException | InterruptedException e) {
+              throw new RuntimeException("Error during uncached Model-Computation.", e);
+            }
+          });
     }
     return (T) toFormula(evalMap.get(key));
   }
@@ -121,15 +122,17 @@ public class CacheableModel implements Model {
     if (delegate != null) {
       evaluateMap.computeIfAbsent(key, o -> delegate.evaluate(pF));
     } else if (fallback != null) {
-      evaluateMap.computeIfAbsent(key, o -> {
-        // XXX: possibly unsafe
-        try {
-          fallback.isUnsat();
-          return fallback.getModel().evaluate(pF);
-        } catch (SolverException | InterruptedException e) {
-          throw new RuntimeException("Error during uncached Model-Computation.", e);
-        }
-      });
+      evaluateMap.computeIfAbsent(
+          key,
+          o -> {
+            // XXX: possibly unsafe
+            try {
+              fallback.isUnsat();
+              return fallback.getModel().evaluate(pF);
+            } catch (SolverException | InterruptedException e) {
+              throw new RuntimeException("Error during uncached Model-Computation.", e);
+            }
+          });
     }
     return evaluateMap.get(key);
   }
@@ -141,14 +144,12 @@ public class CacheableModel implements Model {
   }
 
   @Override
-  public @Nullable BigInteger
-      evaluate(IntegerFormula pF) {
+  public @Nullable BigInteger evaluate(IntegerFormula pF) {
     return (BigInteger) evaluate((Formula) pF);
   }
 
   @Override
-  public @Nullable Rational
-      evaluate(RationalFormula pF) {
+  public @Nullable Rational evaluate(RationalFormula pF) {
     return (Rational) evaluate((Formula) pF);
   }
 
@@ -158,8 +159,7 @@ public class CacheableModel implements Model {
   }
 
   @Override
-  public @Nullable BigInteger
-      evaluate(BitvectorFormula pF) {
+  public @Nullable BigInteger evaluate(BitvectorFormula pF) {
     return (BigInteger) evaluate((Formula) pF);
   }
 
