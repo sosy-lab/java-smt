@@ -66,7 +66,7 @@ For [Z3](https://github.com/Z3Prover/z3), download either the [official binaries
 or build it with the flags `--java --git-describe` according to its documentation.
 Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
 In order to compile MathSAT binaries,
-see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](lib/native/source/libmathsat5j/compile.sh)
+see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](../lib/native/source/libmathsat5j/compile.sh)
 script.
 
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
