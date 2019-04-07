@@ -25,8 +25,18 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 /** Manager for dealing with formulas of the bitvector sort. */
 public interface BitvectorFormulaManager {
 
+  /**
+   * Convert a number into a bitvector with given size.
+   *
+   * @throws IllegalArgumentException if the number is out of range for the given length.
+   */
   BitvectorFormula makeBitvector(int length, long pI);
 
+  /**
+   * Convert a number into a bitvector with given size.
+   *
+   * @throws IllegalArgumentException if the number is out of range for the given length.
+   */
   BitvectorFormula makeBitvector(int length, BigInteger pI);
 
   /**
