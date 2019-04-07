@@ -85,6 +85,7 @@ public class Sudoku {
 
   private static final int SIZE = 9;
   private static final int BLOCKSIZE = 3;
+  private static final Integer[][] UNSOLVABLE_SUDOKU = new Integer[0][0];
 
   private final SolverContext context;
   private final BooleanFormulaManager bmgr;
@@ -105,7 +106,7 @@ public class Sudoku {
 
         Sudoku sudoku = new Sudoku(context);
         Integer[][] solution = sudoku.solve(grid);
-        if (solution == null) {
+        if (solution == UNSOLVABLE_SUDOKU) {
           System.out.println("Sudoku has no solution.");
         } else {
           System.out.println("Sudoku has a solution:");
@@ -162,7 +163,7 @@ public class Sudoku {
 
       boolean isUnsolvable = prover.isUnsat(); // the hard part
       if (isUnsolvable) {
-        return null;
+        return UNSOLVABLE_SUDOKU;
       }
 
       // get model and convert it
