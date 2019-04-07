@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -65,7 +66,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * 4....9...
  * </pre>
  *
- * The solution will then be printed on StdOut, just like the following solution:
+ * <p>The solution will then be printed on StdOut, just like the following solution:
  *
  * <pre>
  * 248976531
@@ -144,6 +145,11 @@ public class Sudoku {
     imgr = context.getFormulaManager().getIntegerFormulaManager();
   }
 
+  /**
+   * Solves a sudoku using the given grid values and returns a possible solution. Return <code>Null
+   * </code> if Sudoku cannot be solved.
+   */
+  @Nullable
   private Integer[][] solve(Integer[][] grid) throws InterruptedException, SolverException {
     IntegerFormula[][] symbols = getSymbols();
     List<BooleanFormula> rules = getRules(symbols);
