@@ -76,6 +76,15 @@ public interface FormulaManager {
   UFManager getUFManager();
 
   /**
+   * Returns the Seperation-Logic-Theory.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
+   */
+  default SLFormulaManager getSLFormulaManager() {
+    return null;
+  };
+
+  /**
    * Returns the interface for handling quantifiers.
    *
    * @throws UnsupportedOperationException If the theory is not supported by the solver.

@@ -44,6 +44,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -113,6 +114,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   private final @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       quantifiedManager;
 
+  private final @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager;
+
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
   /** Builds a solver from the given theory implementations */
@@ -130,7 +133,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
               floatingPointManager,
       @Nullable
           AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> quantifiedManager,
-      @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager) {
+      @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager,
+      @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager) {
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -140,6 +144,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     this.rationalManager = pRationalManager;
     this.bitvectorManager = bitvectorManager;
     this.floatingPointManager = floatingPointManager;
+    this.slManager = slManager;
     this.formulaCreator = pFormulaCreator;
 
     if (booleanManager.getFormulaCreator() != formulaCreator
@@ -197,6 +202,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public AbstractUFManager<TFormulaInfo, ?, TType, TEnv> getUFManager() {
     return functionManager;
+  }
+
+  @Override
+  public SLFormulaManager getSLFormulaManager() {
+    if (slManager == null) {
+      throw new UnsupportedOperationException("Solver does not support Seperation Logic theory");
+    }
+    return slManager;
   }
 
   @Override

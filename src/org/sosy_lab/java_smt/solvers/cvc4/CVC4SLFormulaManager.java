@@ -21,35 +21,42 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
+import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 
-public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, CVC4Environment> {
+public class CVC4SLFormulaManager
+    extends AbstractSLFormulaManager<Expr, Type, CVC4Environment, Expr> {
 
   private final ExprManager exprManager;
 
-  protected CVC4UFManager(CVC4FormulaCreator pCreator) {
+  protected CVC4SLFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getExprManager();
   }
 
-  /*@Override
-  protected Expr declareUninterpretedFunctionImpl(
-      String pName, Type pReturnType, List<Type> pArgTypes) {
-    vectorType argTypes = new vectorType();
-    for (Type t : pArgTypes) {
-      argTypes.add(t);
-    }
-    FunctionType functionType = exprManager.mkFunctionType(argTypes, pReturnType);
-    return formulaCreator.makeVariable(functionType, pName);
+  @Override
+  protected Expr makeStar(Expr e1, Expr e2) {
+    return exprManager.mkExpr(Kind.SEP_STAR, e1, e2);
   }
 
   @Override
-  protected Expr createUninterpretedFunctionCallImpl(Expr pFunc, List<Expr> pArgs) {
-    vectorExpr args = new vectorExpr();
-    for (Expr t : pArgs) {
-      args.add(t);
-    }
-    return exprManager.mkExpr(Kind.APPLY_UF, pFunc, args);
-  }*/
+  protected Expr makePointsTo(Expr pPtr, Expr pTo) {
+    return exprManager.mkExpr(Kind.SEP_PTO, pPtr, pTo);
+  }
+
+  @Override
+  protected Expr makeMagicWand(Expr pE1, Expr pE2) {
+    return exprManager.mkExpr(Kind.SEP_WAND, pE1, pE2);
+  }
+
+  @Override
+  protected Expr makeEmptyHeap(Expr pE1, Expr pE2) {
+    return exprManager.mkExpr(Kind.SEP_EMP, pE1, pE2);
+  }
+
+  @Override
+  protected Expr makeNilElement(Expr pType) {
+    return exprManager.mkExpr(Kind.SEP_NIL, pType);
+  }
 }

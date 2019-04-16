@@ -67,6 +67,10 @@ public abstract class FormulaType<T extends Formula> {
     return false;
   }
 
+  public boolean isSLType() {
+    return false;
+  }
+
   @Override
   public abstract String toString();
 

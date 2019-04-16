@@ -62,7 +62,8 @@ class SmtInterpolFormulaManager
         null,
         null,
         null,
-        pArrayFormulaManager);
+        pArrayFormulaManager,
+        null);
   }
 
   BooleanFormula encapsulateBooleanFormula(Term t) {

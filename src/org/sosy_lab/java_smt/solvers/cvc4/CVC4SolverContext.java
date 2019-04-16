@@ -27,7 +27,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier) {
 
     // Init CVC4
-    NativeLibraries.loadLibrary("cvc4jni");
+    // NativeLibraries.loadLibrary("cvc4jni");
+    NativeLibraries.loadLibrary("cvc4jni-experimental1.7-prerelease");
     ExprManager exprManager = new ExprManager();
     CVC4Environment env = new CVC4Environment(exprManager, randomSeed, pShutdownNotifier);
 
@@ -43,6 +44,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
         new CVC4RationalFormulaManager(creator, pNonLinearArithmetic);
     CVC4BitvectorFormulaManager bitvectorTheory = new CVC4BitvectorFormulaManager(creator);
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
+    CVC4SLFormulaManager slTheory = new CVC4SLFormulaManager(creator);
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
             creator,
@@ -51,7 +53,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             integerTheory,
             rationalTheory,
             bitvectorTheory,
-            arrayTheory);
+            arrayTheory,
+            slTheory);
 
     return new CVC4SolverContext(creator, manager);
   }

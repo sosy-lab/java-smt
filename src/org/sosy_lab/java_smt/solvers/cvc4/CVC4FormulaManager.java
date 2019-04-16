@@ -40,8 +40,9 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environm
       CVC4IntegerFormulaManager pIfmgr,
       CVC4RationalFormulaManager pRfmgr,
       CVC4BitvectorFormulaManager pBvfmgr,
-      CVC4ArrayFormulaManager pAfmgr) {
-    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, pBvfmgr, null, null, pAfmgr);
+      CVC4ArrayFormulaManager pAfmgr,
+      CVC4SLFormulaManager pSLfmgr) {
+    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, pBvfmgr, null, null, pAfmgr, pSLfmgr);
   }
 
   static Expr getCVC4Expr(Formula pT) {
