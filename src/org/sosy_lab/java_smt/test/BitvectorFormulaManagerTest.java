@@ -137,7 +137,9 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     values.put(-123L, int32 - 123);
     values.put((long) Integer.MIN_VALUE, 1L + Integer.MAX_VALUE);
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(
+            ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
       for (Entry<Long, Long> entry : values.entrySet()) {
         prover.push(bvmgr.equal(var, bvmgr.makeBitvector(32, entry.getKey())));
         assertThat(prover).isSatisfiable();
