@@ -27,8 +27,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier) {
 
     // Init CVC4
-    // NativeLibraries.loadLibrary("cvc4jni");
-    NativeLibraries.loadLibrary("cvc4jni-experimental1.7-prerelease");
+    NativeLibraries.loadLibrary("cvc4jni");
+    // System.loadLibrary("CVC4-sl-prerelease1.6");
     ExprManager exprManager = new ExprManager();
     CVC4Environment env = new CVC4Environment(exprManager, randomSeed, pShutdownNotifier);
 

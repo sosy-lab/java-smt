@@ -57,11 +57,13 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
+import org.sosy_lab.common.NativeLibraries;
 
 public class SimpleVC {
   public static void main(String[] args) {
     // System.loadLibrary("cvc4jni");
-    System.loadLibrary("cvc4jni-experimental1.7-prerelease");
+    NativeLibraries.loadLibrary("cvc4jni");
+    // System.loadLibrary("cvc4jni-sl-prerelease");
     ExprManager em = new ExprManager();
     SmtEngine smt = new SmtEngine(em);
 
