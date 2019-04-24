@@ -44,6 +44,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_xor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_zext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_from_sbv;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_from_ubv;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_to_bv;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
@@ -103,6 +106,20 @@ class Mathsat5BitvectorFormulaManager
       pI = pI.add(n);
     }
     return msat_make_bv_number(mathsatEnv, pI.toString(), pLength, 10);
+  }
+
+  @Override
+  protected Long makeBitvectorImpl(int pLength, Long pIntegerFormula) {
+    return msat_make_int_to_bv(mathsatEnv, pLength, pIntegerFormula);
+  }
+
+  @Override
+  protected Long toIntegerFormulaImpl(Long pBVFormula, boolean pSigned) {
+    if (pSigned) {
+      return msat_make_int_from_sbv(mathsatEnv, pBVFormula);
+    } else {
+      return msat_make_int_from_ubv(mathsatEnv, pBVFormula);
+    }
   }
 
   @Override

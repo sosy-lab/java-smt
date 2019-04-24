@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -149,6 +150,121 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
         }
         prover.pop();
       }
+    }
+  }
+
+  @Test
+  public void bvToInt() throws SolverException, InterruptedException {
+    for (int size : Lists.newArrayList(1, 2, 4, 8)) {
+      int max = 1 << size;
+      // number is in range of bitsize
+      for (int i = -max / 2; i < max; i++) {
+        BitvectorFormula bv = bvmgr.makeBitvector(size, i);
+        IntegerFormula num = imgr.makeNumber(i);
+        assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, num))).isTautological();
+        IntegerFormula nSigned = bvmgr.toIntegerFormula(bv, true);
+        IntegerFormula nUnsigned = bvmgr.toIntegerFormula(bv, false);
+        if (i < max / 2) {
+          assertThatFormula(imgr.equal(num, nSigned)).isTautological();
+          assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, nSigned))).isTautological();
+        }
+        if (i >= 0) {
+          assertThatFormula(imgr.equal(num, nUnsigned)).isTautological();
+          assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, nUnsigned))).isTautological();
+        }
+      }
+    }
+  }
+
+  @Test
+  public void bvToIntEquality() throws SolverException, InterruptedException {
+    for (int size : Lists.newArrayList(10, 16, 20, 32, 64)) {
+      for (int i : Lists.newArrayList(1, 2, 4, 32, 64, 100)) {
+        // number is in range of bitsize
+        BitvectorFormula bv = bvmgr.makeBitvector(size, i);
+        IntegerFormula num = imgr.makeNumber(i);
+        assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, num))).isTautological();
+        IntegerFormula nSigned = bvmgr.toIntegerFormula(bv, true);
+        IntegerFormula nUnsigned = bvmgr.toIntegerFormula(bv, false);
+        assertThatFormula(imgr.equal(num, nSigned)).isTautological();
+        assertThatFormula(imgr.equal(num, nUnsigned)).isTautological();
+        assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, nSigned))).isTautological();
+        assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, nUnsigned))).isTautological();
+      }
+    }
+  }
+
+  private static final int[] SOME_SIZES = new int[] {1, 2, 4, 10, 16, 20, 32, 60};
+  private static final int[] SOME_NUMBERS =
+      new int[] {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 32, 64, 100, 150, 512, 1024, 100000, 1000000, Integer.MAX_VALUE
+      };
+
+  @Test
+  public void bvToIntEqualityWithOverflow() throws SolverException, InterruptedException {
+    for (int size : SOME_SIZES) {
+      for (int i : SOME_NUMBERS) {
+        // number might be larger than range of bitsize
+        long upperBound = 1L << size;
+        long iMod = i % upperBound;
+        IntegerFormula num = imgr.makeNumber(i);
+        IntegerFormula nUnsigned = imgr.makeNumber(iMod);
+        IntegerFormula nSigned = imgr.makeNumber(iMod < upperBound / 2 ? iMod : iMod - upperBound);
+        BitvectorFormula bv = bvmgr.makeBitvector(size, iMod);
+        assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, num))).isTautological();
+        assertThat(mgr.getFormulaType(bvmgr.toIntegerFormula(bv, true)))
+            .isEqualTo(FormulaType.IntegerType);
+        assertThatFormula(imgr.equal(nSigned, bvmgr.toIntegerFormula(bv, true))).isTautological();
+        assertThatFormula(imgr.equal(nUnsigned, bvmgr.toIntegerFormula(bv, false)))
+            .isTautological();
+      }
+    }
+  }
+
+  @Test
+  public void bvToIntEqualityWithOverflowNegative() throws SolverException, InterruptedException {
+    for (int size : SOME_SIZES) {
+      for (int i : SOME_NUMBERS) {
+        // make number negative
+        i = -i;
+        // number might be larger than range of bitsize
+        long upperBound = 1L << size;
+        long iMod = i % upperBound;
+        IntegerFormula num = imgr.makeNumber(i);
+        IntegerFormula nUnsigned = imgr.makeNumber(iMod >= 0 ? iMod : iMod + upperBound);
+        IntegerFormula nSigned = imgr.makeNumber(iMod < -upperBound / 2 ? iMod + upperBound : iMod);
+        BitvectorFormula bv =
+            bvmgr.makeBitvector(size, iMod >= -upperBound / 2 ? iMod : iMod + upperBound);
+        assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, num))).isTautological();
+        assertThatFormula(imgr.equal(nSigned, bvmgr.toIntegerFormula(bv, true))).isTautological();
+        assertThatFormula(imgr.equal(nUnsigned, bvmgr.toIntegerFormula(bv, false)))
+            .isTautological();
+      }
+    }
+  }
+
+  @Test
+  public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException {
+    for (int size : new int[] {1, 2, 4, 10}) {
+      IntegerFormula var = imgr.makeVariable("x_" + size);
+
+      // x == int(bv(x)) is sat for small values
+      assertThatFormula(
+              imgr.equal(var, bvmgr.toIntegerFormula(bvmgr.makeBitvector(size, var), true)))
+          .isSatisfiable();
+
+      // x == int(bv(x)) is unsat for large values
+      assertThatFormula(
+              bmgr.not(
+                  imgr.equal(var, bvmgr.toIntegerFormula(bvmgr.makeBitvector(size, var), true))))
+          .isSatisfiable();
+
+      BitvectorFormula bvar = bvmgr.makeVariable(size, "y_" + size);
+
+      // y == bv(int(y)) is sat for all values
+      assertThatFormula(
+              bvmgr.equal(bvar, bvmgr.makeBitvector(size, bvmgr.toIntegerFormula(bvar, true))))
+          .isTautological();
     }
   }
 }

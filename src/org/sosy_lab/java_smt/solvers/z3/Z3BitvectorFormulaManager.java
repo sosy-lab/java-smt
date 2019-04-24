@@ -58,7 +58,17 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
     return Native.mkNumeral(z3context, pI.toString(), sort);
   }
 
-  private void checkRange(int pLength, BigInteger pI) {
+  @Override
+  protected Long makeBitvectorImpl(int pLength, Long pNumeralFormula) {
+    return Native.mkInt2bv(z3context, pLength, pNumeralFormula);
+  }
+
+  @Override
+  protected Long toIntegerFormulaImpl(Long pBVFormula, boolean pSigned) {
+    return Native.mkBv2int(z3context, pBVFormula, pSigned);
+  }
+
+  private static void checkRange(int pLength, BigInteger pI) {
     if (pI.signum() > 0) {
       BigInteger max = BigInteger.ONE.shiftLeft(pLength);
       if (pI.compareTo(max) >= 0) {

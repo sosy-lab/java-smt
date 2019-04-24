@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -53,6 +54,23 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
         len1,
         len2);
   }
+
+  @Override
+  public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
+    TFormulaInfo param1 = extractInfo(pI);
+    return wrap(makeBitvectorImpl(length, param1));
+  }
+
+  protected abstract TFormulaInfo makeBitvectorImpl(int length, TFormulaInfo pParam1);
+
+  @Override
+  public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed) {
+    TFormulaInfo param1 = extractInfo(pI);
+    return getFormulaCreator()
+        .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
+  }
+
+  protected abstract TFormulaInfo toIntegerFormulaImpl(TFormulaInfo pI, boolean signed);
 
   @Override
   public BitvectorFormula negate(BitvectorFormula pNumber) {
