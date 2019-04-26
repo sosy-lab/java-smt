@@ -197,7 +197,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   private static final int[] SOME_SIZES = new int[] {1, 2, 4, 10, 16, 20, 32, 60};
   private static final int[] SOME_NUMBERS =
       new int[] {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 32, 64, 100, 150, 512, 1024, 100000, 1000000, Integer.MAX_VALUE
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 32, 64, 100, 150, 512, 1024, 100000, 1000000, Integer.MAX_VALUE,
       };
 
   @Test
@@ -226,11 +226,11 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     for (int size : SOME_SIZES) {
       for (int i : SOME_NUMBERS) {
         // make number negative
-        i = -i;
+        int negI = -i;
         // number might be larger than range of bitsize
         long upperBound = 1L << size;
-        long iMod = i % upperBound;
-        IntegerFormula num = imgr.makeNumber(i);
+        long iMod = negI % upperBound;
+        IntegerFormula num = imgr.makeNumber(negI);
         IntegerFormula nUnsigned = imgr.makeNumber(iMod >= 0 ? iMod : iMod + upperBound);
         IntegerFormula nSigned = imgr.makeNumber(iMod < -upperBound / 2 ? iMod + upperBound : iMod);
         BitvectorFormula bv =
