@@ -76,8 +76,23 @@ public interface FloatingPointFormulaManager {
       FormulaType<T> targetType,
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
-  /** @see #castFrom(Formula, boolean, FloatingPointType, FloatingPointRoundingMode) */
-  FloatingPointFormula castFrom(Formula number, boolean signed, FloatingPointType targetType);
+  /**
+   * Build a {@link FloatingPointFormula} from another compatible formula. This method uses the
+   * default rounding mode.
+   *
+   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
+   * cast a floating-point number into another floating-point type. We do not support casting from
+   * boolean or array types. We try to keep an exact representation, however fall back to rounding
+   * if needed.
+   *
+   * @param source the source formula of compatible type
+   * @param signed if a {@link BitvectorFormula} is given as source, we additionally use this flag.
+   *     Otherwise we ignore it.
+   * @param targetType the type of the resulting formula
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link BooleanFormula}
+   *     cannot be cast to {@link FloatingPointFormula}.
+   */
+  FloatingPointFormula castFrom(Formula source, boolean signed, FloatingPointType targetType);
 
   /**
    * Build a {@link FloatingPointFormula} from another compatible formula.
@@ -107,9 +122,8 @@ public interface FloatingPointFormulaManager {
    * target type plus 1 (for the sign bit) needs to be equal to the size of the bitvector.
    *
    * <p>Note: This method will return a value that is (numerically) far away from the original
-   * value. This method is completely different from {@link #castFrom(Formula, boolean,
-   * FloatingPointType, FloatingPointRoundingMode)}, which will produce a floating-point value close
-   * to the numeral value.
+   * value. This method is completely different from {@link #castFrom}, which will produce a
+   * floating-point value close to the numeral value.
    */
   FloatingPointFormula fromIeeeBitvector(BitvectorFormula number, FloatingPointType pTargetType);
 
