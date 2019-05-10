@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 
 public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -32,12 +31,12 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
     super(pCreator);
   }
 
-  private BooleanFormula wrap(TFormulaInfo pTerm) {
+  private Formula wrap(TFormulaInfo pTerm) {
     return getFormulaCreator().encapsulateBoolean(pTerm);
   }
 
   @Override
-  public BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2) {
+  public Formula makeStar(Formula f1, Formula f2) {
     TFormulaInfo param1 = extractInfo(f1);
     TFormulaInfo param2 = extractInfo(f2);
     return wrap(makeStar(param1, param2));
@@ -46,7 +45,7 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makeStar(TFormulaInfo e1, TFormulaInfo e2);
 
   @Override
-  public BooleanFormula makePointsTo(IntegerFormula ptr, IntegerFormula to) {
+  public Formula makePointsTo(Formula ptr, Formula to) {
     TFormulaInfo param1 = extractInfo(ptr);
     TFormulaInfo param2 = extractInfo(to);
     return wrap(makePointsTo(param1, param2));
@@ -55,7 +54,7 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makePointsTo(TFormulaInfo ptr, TFormulaInfo to);
 
   @Override
-  public BooleanFormula makeMagicWand(BooleanFormula f1, BooleanFormula f2) {
+  public Formula makeMagicWand(Formula f1, Formula f2) {
     TFormulaInfo param1 = extractInfo(f1);
     TFormulaInfo param2 = extractInfo(f2);
     return wrap(makeMagicWand(param1, param2));
@@ -64,7 +63,7 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makeMagicWand(TFormulaInfo e1, TFormulaInfo e2);
 
   @Override
-  public BooleanFormula makeEmptyHeap(IntegerFormula f1, IntegerFormula f2) {
+  public Formula makeEmptyHeap(Formula f1, Formula f2) {
     TFormulaInfo param1 = extractInfo(f1);
     TFormulaInfo param2 = extractInfo(f2);
     return wrap(makeEmptyHeap(param1, param2));
@@ -73,7 +72,7 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makeEmptyHeap(TFormulaInfo e1, TFormulaInfo e2);
 
   @Override
-  public BooleanFormula makeNilElement(IntegerFormula type) {
+  public Formula makeNilElement(Formula type) {
     TFormulaInfo param1 = extractInfo(type);
     return wrap(makeNilElement(param1));
   }

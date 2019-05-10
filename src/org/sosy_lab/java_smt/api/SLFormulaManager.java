@@ -19,18 +19,16 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
 public interface SLFormulaManager {
 
-  BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2);
+  Formula makeStar(Formula f1, Formula f2);
 
-  BooleanFormula makePointsTo(IntegerFormula ptr, IntegerFormula to);
+  Formula makePointsTo(Formula ptr, Formula to);
 
-  BooleanFormula makeMagicWand(BooleanFormula f1, BooleanFormula f2);
+  Formula makeMagicWand(Formula f1, Formula f2);
 
-  BooleanFormula makeEmptyHeap(IntegerFormula f1, IntegerFormula f2);
+  Formula makeEmptyHeap(Formula f1, Formula f2);
 
-  BooleanFormula makeNilElement(IntegerFormula t);
+  Formula makeNilElement(Formula t);
 }
 
