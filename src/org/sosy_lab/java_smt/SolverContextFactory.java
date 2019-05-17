@@ -22,9 +22,17 @@ package org.sosy_lab.java_smt;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -309,13 +317,57 @@ public class SolverContextFactory {
             .setDirectLoadClasses(Z3_CLASSES)
             .setCustomLookupNativeLibraries(Z3_LIBRARY_NAMES::contains);
 
+    // The new class loader needs to be able to load classes from all the packages in Z3_CLASSES,
+    // and for this it needs the URLs for both the JavaSMT and Z3 libs.
     if (parentClassLoader instanceof URLClassLoader) {
+      // Up to Java 8, we can easily get all URLs from the current class loader,
+      // which includes the required URLs.
       @SuppressWarnings("resource")
       URLClassLoader uParentClassLoader = (URLClassLoader) parentClassLoader;
       builder.setUrls(uParentClassLoader.getURLs());
+
     } else {
-      builder.setUrls(
-          SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation());
+      // From Java 9 on, the class loader is no longer a URLClassLoader.
+      // We need to manually get the URL for the JavaSMT lib (easy),
+      // and for Z3 (more complex, because we do not actually want to load a class from it).
+      final List<URL> libs = new ArrayList<>(2);
+      libs.add(SolverContextFactory.class.getProtectionDomain().getCodeSource().getLocation());
+
+      final URL z3Class = parentClassLoader.getResource("com/microsoft/z3/Native.class");
+      if (z3Class == null) {
+        // Z3 cannot be found in the current class loader.
+        // Even without a custom class loader we would just get a class-loading error,
+        // so we do nothing here.
+
+      } else if (z3Class.getProtocol().equals("jar")) {
+        // This is a URL of the form "jar:...!com/microsoft/z3/Native.class",
+        // typically "jar:file:/.../com.microsoft.z3.jar!com/microsoft/z3/Native.class".
+        // We get the "file:/.../com.microsoft.z3.jar" part out of it:
+        try {
+          URLConnection conn = z3Class.openConnection(); // does not actually open a connection
+          if (conn instanceof JarURLConnection) { // guaranteed by URL.openConnection() for JARs
+            libs.add(((JarURLConnection) conn).getJarFileURL());
+          } else {
+            throw new AssertionError(
+                "URL.openConnection() did not return a JarURLConnection for a JAR URL");
+          }
+        } catch (IOException e) {
+          // Should never occur: URL is valid (because produced by ClassLoader) and no I/O is done
+          throw new AssertionError(e);
+        }
+
+      } else {
+        // This is a regular URL, happens if Z3 classes are in a directory structure.
+        // We need to get the base URL.
+        try {
+          libs.add(z3Class.toURI().resolve("../../..").toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
+          // Should never occur: URL is valid (because produced by ClassLoader)
+          throw new AssertionError(e);
+        }
+      }
+
+      builder.setUrls(libs);
     }
 
     return builder.build();
