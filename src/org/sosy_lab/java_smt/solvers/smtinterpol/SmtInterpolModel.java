@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -94,7 +93,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
         Term index = params[1];
         Term content = params[2];
 
-        List<Object> innerIndices = Lists.newArrayList(upperIndices);
+        List<Object> innerIndices = new ArrayList<>(upperIndices);
         innerIndices.add(evaluateImpl(index));
 
         Term select = creator.getEnv().term("select", key, index);

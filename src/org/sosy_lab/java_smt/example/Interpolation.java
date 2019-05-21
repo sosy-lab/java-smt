@@ -1,7 +1,8 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -103,7 +104,7 @@ public class Interpolation {
     {
       // example 1a :
       // get a sequence of interpolants for three formulas: (get-interpolants IP_0 IP_1 IP_2).
-      itps = prover.getSeqInterpolants0(Lists.newArrayList(ip0, ip1, ip2));
+      itps = prover.getSeqInterpolants0(ImmutableList.of(ip0, ip1, ip2));
       logger.log(Level.INFO, "1a :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
     }
 
@@ -113,7 +114,7 @@ public class Interpolation {
       Set<T> partition0 = Collections.singleton(ip0);
       Set<T> partition1 = Collections.singleton(ip1);
       Set<T> partition2 = Collections.singleton(ip2);
-      itps = prover.getSeqInterpolants(Lists.newArrayList(partition0, partition1, partition2));
+      itps = prover.getSeqInterpolants(ImmutableList.of(partition0, partition1, partition2));
       logger.log(Level.INFO, "1b :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
     }
 
@@ -124,7 +125,7 @@ public class Interpolation {
       Set<T> partition4 = new HashSet<>();
       partition4.add(ip1);
       partition4.add(ip2);
-      itps = prover.getSeqInterpolants(Lists.newArrayList(partition3, partition4));
+      itps = prover.getSeqInterpolants(ImmutableList.of(partition3, partition4));
       logger.log(Level.INFO, "2a :: Interpolants for [{ip0},{ip1,ip2}] are:", itps);
     }
 
@@ -132,7 +133,7 @@ public class Interpolation {
       // example 2b :
       // alternative solution, works when there are exactly two (!) groups of formulas.
       // only one part is given as parameter, the rest is taken from the already asserted formulas.
-      BooleanFormula itp = prover.getInterpolant(Lists.newArrayList(ip0));
+      BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip0));
       logger.log(Level.INFO, "2b :: Interpolants for [{ip0},{ip1,ip2}] are:", itp);
     }
   }
@@ -172,7 +173,7 @@ public class Interpolation {
 
     // create and assert some formulas.
     List<BooleanFormula> programTrace =
-        Lists.newArrayList(
+        ImmutableList.of(
             imgr.equal(i, zero),
             imgr.equal(k, j),
             imgr.lessThan(i, fifty),
@@ -183,7 +184,7 @@ public class Interpolation {
             imgr.lessThan(k1, fifty));
 
     // assert all formulas in the prover
-    List<T> handles = Lists.newArrayList();
+    List<T> handles = new ArrayList<>();
     for (BooleanFormula step : programTrace) {
       handles.add(prover.addConstraint(step));
     }

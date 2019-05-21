@@ -27,7 +27,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -1081,7 +1080,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireArrays();
 
     for (String query :
-        Lists.newArrayList(
+        ImmutableList.of(
             SMALL_ARRAY_QUERY, MEDIUM_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, false);
@@ -1097,7 +1096,7 @@ public class ModelTest extends SolverBasedTest0 {
     // only Z3 fulfills these requirements
 
     for (String query :
-        Lists.newArrayList(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
+        ImmutableList.of(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, true);
       checkModelIteration(formula, false);
@@ -1130,10 +1129,8 @@ public class ModelTest extends SolverBasedTest0 {
   public void arrayTest3() throws SolverException, InterruptedException {
     requireArrays();
 
-    for (String query : Lists.newArrayList(ARRAY_QUERY_INT)) {
-      BooleanFormula formula = context.getFormulaManager().parse(query);
-      checkModelIteration(formula, false);
-    }
+    BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
+    checkModelIteration(formula, false);
   }
 
   @Test
@@ -1145,10 +1142,8 @@ public class ModelTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
-    for (String query : Lists.newArrayList(ARRAY_QUERY_BV)) {
-      BooleanFormula formula = context.getFormulaManager().parse(query);
-      checkModelIteration(formula, false);
-    }
+    BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
+    checkModelIteration(formula, false);
   }
 
   @Test

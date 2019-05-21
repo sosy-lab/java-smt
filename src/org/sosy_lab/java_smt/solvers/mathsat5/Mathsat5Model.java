@@ -35,7 +35,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -120,7 +119,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
         continue;
       }
 
-      List<Object> innerIndices = Lists.newArrayList(upperIndices);
+      List<Object> innerIndices = new ArrayList<>(upperIndices);
       innerIndices.add(evaluateImpl(index));
       long select = msat_make_array_read(creator.getEnv(), key, index);
       if (msat_is_array_type(creator.getEnv(), msat_term_get_type(content))) {

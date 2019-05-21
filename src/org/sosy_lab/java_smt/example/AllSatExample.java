@@ -1,7 +1,6 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +99,7 @@ public class AllSatExample {
             return models;
           }
         },
-        Lists.newArrayList(q, p));
+        ImmutableList.of(q, p));
   }
 
   /** For boolean symbols we can also ask the model directly for evaluations of symbols. */

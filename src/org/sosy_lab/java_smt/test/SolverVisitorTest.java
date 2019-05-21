@@ -23,7 +23,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -228,7 +227,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
           }
         };
     mgr.visitRecursively(f, nameExtractor);
-    assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
+    assertThat(usedVariables).containsExactly("x", "y", "z");
   }
 
   @Test

@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
@@ -27,6 +26,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Map;
 import org.junit.Before;
@@ -228,7 +228,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula f =
         qmgr.exists(
-            newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
+            ImmutableList.of(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
 
     try {
       ackermannization.eliminateUfs(f);

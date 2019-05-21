@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -66,7 +65,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvType() {
-    for (int i : Lists.newArrayList(1, 2, 4, 32, 64, 1000)) {
+    for (int i : new int[] {1, 2, 4, 32, 64, 1000}) {
       BitvectorType type = FormulaType.getBitvectorTypeWithSize(i);
       assertThat(type.getSize()).named("bitvector type size").isEqualTo(i);
       BitvectorFormula var = bvmgr.makeVariable(type, "x" + i);
@@ -77,7 +76,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvOne() throws SolverException, InterruptedException {
-    for (int i : Lists.newArrayList(1, 2, 4, 32, 64, 1000)) {
+    for (int i : new int[] {1, 2, 4, 32, 64, 1000}) {
       BitvectorFormula var = bvmgr.makeVariable(i, "x" + i);
       BitvectorFormula num0 = bvmgr.makeBitvector(i, 0);
       BitvectorFormula num1 = bvmgr.makeBitvector(i, 1);
@@ -155,7 +154,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToInt() throws SolverException, InterruptedException {
-    for (int size : Lists.newArrayList(1, 2, 4, 8)) {
+    for (int size : new int[] {1, 2, 4, 8}) {
       int max = 1 << size;
       // number is in range of bitsize
       for (int i = -max / 2; i < max; i++) {
@@ -178,8 +177,8 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEquality() throws SolverException, InterruptedException {
-    for (int size : Lists.newArrayList(10, 16, 20, 32, 64)) {
-      for (int i : Lists.newArrayList(1, 2, 4, 32, 64, 100)) {
+    for (int size : new int[] {10, 16, 20, 32, 64}) {
+      for (int i : new int[] {1, 2, 4, 32, 64, 100}) {
         // number is in range of bitsize
         BitvectorFormula bv = bvmgr.makeBitvector(size, i);
         IntegerFormula num = imgr.makeNumber(i);

@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.google.common.base.Preconditions;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
@@ -240,7 +239,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
       Native.incRef(z3context, select);
 
-      List<Object> innerIndices = Lists.newArrayList(upperIndices);
+      List<Object> innerIndices = new ArrayList<>(upperIndices);
       innerIndices.add(evaluateImpl(arrayIndex));
 
       if (z3creator.isConstant(arrayValue)) {
