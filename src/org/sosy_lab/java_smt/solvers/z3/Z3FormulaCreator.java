@@ -25,7 +25,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
@@ -39,6 +38,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -114,7 +114,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
   private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
-      Maps.newIdentityHashMap();
+      new IdentityHashMap<>();
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
