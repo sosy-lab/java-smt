@@ -20,9 +20,9 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -77,7 +77,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
 
   default List<BooleanFormula> getSeqInterpolants0(List<T> formulas)
       throws SolverException, InterruptedException {
-    return getSeqInterpolants(Lists.transform(formulas, Collections::singleton));
+    return getSeqInterpolants(Lists.transform(formulas, ImmutableSet::of));
   }
 
   /**
@@ -120,7 +120,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
 
   default List<BooleanFormula> getTreeInterpolants0(List<T> formulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    return getTreeInterpolants(Lists.transform(formulas, Collections::singleton), startOfSubTree);
+    return getTreeInterpolants(Lists.transform(formulas, ImmutableSet::of), startOfSubTree);
   }
 
   /** Checks for a valid subtree-structure. This code is taken from SMTinterpol. */

@@ -28,7 +28,6 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -111,7 +110,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     try {
       long symbol = Native.getDeclName(z3context, keyDecl);
       if (z3creator.isConstant(value)) {
-        return Collections.singletonList(
+        return ImmutableList.of(
             new ValueAssignment(
                 z3creator.encapsulateWithTypeOf(var),
                 z3creator.encapsulateWithTypeOf(value),

@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.api;
 
-import java.util.Collections;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
@@ -56,12 +56,12 @@ public interface QuantifiedFormulaManager {
 
   /** Syntax sugar, see {@link #forall(List, BooleanFormula)}. */
   default BooleanFormula forall(Formula quantifiedArg, BooleanFormula pBody) {
-    return forall(Collections.singletonList(quantifiedArg), pBody);
+    return forall(ImmutableList.of(quantifiedArg), pBody);
   }
 
   /** Syntax sugar, see {@link #exists(List, BooleanFormula)}. */
   default BooleanFormula exists(Formula quantifiedArg, BooleanFormula pBody) {
-    return exists(Collections.singletonList(quantifiedArg), pBody);
+    return exists(ImmutableList.of(quantifiedArg), pBody);
   }
 
   /**

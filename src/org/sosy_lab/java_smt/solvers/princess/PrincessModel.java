@@ -37,7 +37,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -135,7 +134,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
           }
           fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
           name = arrayF.toString();
-          argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex));
+          argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex));
           break;
         case "store":
           // array-access, for explanation see #getArrayAddresses
@@ -152,7 +151,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
           fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
           fValue = arrayContent;
           name = arrayF2.toString();
-          argumentInterpretations = Collections.singleton(creator.convertValue(arrayIndex2));
+          argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex2));
           break;
         default:
           // normal variable or UF

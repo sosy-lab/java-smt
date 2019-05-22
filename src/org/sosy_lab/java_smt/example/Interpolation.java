@@ -2,8 +2,8 @@ package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -111,9 +111,9 @@ public class Interpolation {
     {
       // example 1b :
       // alternative solution ... with more code and partitioned formulas.
-      Set<T> partition0 = Collections.singleton(ip0);
-      Set<T> partition1 = Collections.singleton(ip1);
-      Set<T> partition2 = Collections.singleton(ip2);
+      Set<T> partition0 = ImmutableSet.of(ip0);
+      Set<T> partition1 = ImmutableSet.of(ip1);
+      Set<T> partition2 = ImmutableSet.of(ip2);
       itps = prover.getSeqInterpolants(ImmutableList.of(partition0, partition1, partition2));
       logger.log(Level.INFO, "1b :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
     }
@@ -121,7 +121,7 @@ public class Interpolation {
     {
       // example 2a :
       // get a sequence of interpolants for two formulas: (get-interpolants IP_1 (and IP_0 IP_2)).
-      Set<T> partition3 = Collections.singleton(ip0);
+      Set<T> partition3 = ImmutableSet.of(ip0);
       Set<T> partition4 = new HashSet<>();
       partition4.add(ip1);
       partition4.add(ip2);

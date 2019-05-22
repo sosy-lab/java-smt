@@ -28,7 +28,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -87,7 +86,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
       assertThat(check).named("formulas must be contradicting").isTrue();
-      prover.getInterpolant(Collections.singletonList(id2));
+      prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
   }
@@ -301,13 +300,13 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     List<BooleanFormula> itps4 =
         stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), Collections::singleton));
+            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
     List<BooleanFormula> itps5 =
         stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), Collections::singleton));
+            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
     List<BooleanFormula> itps6 =
         stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), Collections::singleton));
+            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
