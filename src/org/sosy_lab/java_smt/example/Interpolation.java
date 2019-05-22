@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -122,9 +121,7 @@ public class Interpolation {
       // example 2a :
       // get a sequence of interpolants for two formulas: (get-interpolants IP_1 (and IP_0 IP_2)).
       Set<T> partition3 = ImmutableSet.of(ip0);
-      Set<T> partition4 = new HashSet<>();
-      partition4.add(ip1);
-      partition4.add(ip2);
+      Set<T> partition4 = ImmutableSet.of(ip1, ip2);
       itps = prover.getSeqInterpolants(ImmutableList.of(partition3, partition4));
       logger.log(Level.INFO, "2a :: Interpolants for [{ip0},{ip1,ip2}] are:", itps);
     }
