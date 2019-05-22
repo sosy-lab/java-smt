@@ -132,11 +132,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   public void visitFloorTest() {
     requireRationals();
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
-    assertEquals(mgr.extractVariables(f).size(), 1);
+    assertEquals(1, mgr.extractVariables(f).size());
     FunctionCollector collector = new FunctionCollector();
     assertTrue(mgr.visit(f, collector));
     assertEquals(
-        Iterables.getOnlyElement(collector.functions).getKind(), FunctionDeclarationKind.FLOOR);
+        FunctionDeclarationKind.FLOOR, Iterables.getOnlyElement(collector.functions).getKind());
   }
 
   private static final class FunctionCollector extends DefaultFormulaVisitor<Boolean> {
