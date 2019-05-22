@@ -102,7 +102,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     final IExpression fKey;
     final String name;
     final IFormula fAssignment;
-    Collection<Object> argumentInterpretations = Collections.emptyList();
+    Collection<Object> argumentInterpretations = ImmutableList.of();
 
     if (key instanceof IAtom) {
       fKey = key;

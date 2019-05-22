@@ -123,7 +123,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       } else if (Native.isAsArray(z3context, value)) {
         long arrayFormula = Native.mkConst(z3context, symbol, Native.getSort(z3context, value));
         Native.incRef(z3context, arrayFormula);
-        return getArrayAssignments(symbol, arrayFormula, value, Collections.emptyList());
+        return getArrayAssignments(symbol, arrayFormula, value, ImmutableList.of());
 
       } else if (Native.isApp(z3context, value)) {
         long decl = Native.getAppDecl(z3context, value);
