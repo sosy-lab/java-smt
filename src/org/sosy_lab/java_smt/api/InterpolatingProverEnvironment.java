@@ -75,6 +75,12 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
     return getTreeInterpolants(partitionedFormulas, new int[partitionedFormulas.size()]);
   }
 
+  /**
+   * This utility method wraps each formula in a collection and then forwards to {@link
+   * #getSeqInterpolants}.
+   *
+   * @see #getSeqInterpolants
+   */
   default List<BooleanFormula> getSeqInterpolants0(List<T> formulas)
       throws SolverException, InterruptedException {
     return getSeqInterpolants(Lists.transform(formulas, ImmutableSet::of));
@@ -118,6 +124,12 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException;
 
+  /**
+   * This utility method wraps each formula in a collection and then forwards to {@link
+   * #getTreeInterpolants}.
+   *
+   * @see #getTreeInterpolants
+   */
   default List<BooleanFormula> getTreeInterpolants0(List<T> formulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     return getTreeInterpolants(Lists.transform(formulas, ImmutableSet::of), startOfSubTree);
