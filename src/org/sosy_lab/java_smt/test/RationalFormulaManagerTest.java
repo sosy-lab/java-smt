@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -132,7 +133,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   public void visitFloorTest() {
     requireRationals();
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
-    assertEquals(1, mgr.extractVariables(f).size());
+    assertThat(mgr.extractVariables(f)).hasSize(1);
     FunctionCollector collector = new FunctionCollector();
     assertTrue(mgr.visit(f, collector));
     assertEquals(
