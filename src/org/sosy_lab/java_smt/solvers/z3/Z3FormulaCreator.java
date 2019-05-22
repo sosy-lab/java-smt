@@ -463,6 +463,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.MUL;
       case Z3_OP_MOD:
         return FunctionDeclarationKind.MODULO;
+      case Z3_OP_TO_INT:
+        return FunctionDeclarationKind.FLOOR;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;

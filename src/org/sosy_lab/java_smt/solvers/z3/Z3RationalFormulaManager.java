@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.microsoft.z3.Native;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -44,5 +45,10 @@ class Z3RationalFormulaManager extends Z3NumeralFormulaManager<NumeralFormula, R
   @Override
   protected Long makeNumberImpl(BigDecimal pNumber) {
     return makeNumberImpl(pNumber.toPlainString());
+  }
+
+  @Override
+  protected Long floor(Long pNumber) {
+    return Native.mkReal2int(z3context, pNumber);
   }
 }

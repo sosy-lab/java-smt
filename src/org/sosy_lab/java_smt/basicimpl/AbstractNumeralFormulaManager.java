@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 /**
@@ -426,4 +427,20 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public IntegerFormula floor(ParamFormulaType number) {
+    if (getFormulaCreator().getFormulaType(number) == FormulaType.IntegerType) {
+      return (IntegerFormula) number;
+    } else {
+      return getFormulaCreator().encapsulate(FormulaType.IntegerType, floor(extractInfo(number)));
+    }
+  }
+
+  protected TFormulaInfo floor(TFormulaInfo number) {
+    // identity function for integers, method is overridden for rationals
+    throw new AssertionError(
+        "method should only be called for RationalFormulae, but type is "
+            + getFormulaCreator().getFormulaType(number));
+  }
 }

@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_floor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
@@ -138,5 +139,10 @@ abstract class Mathsat5NumeralFormulaManager<
   @Override
   public Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return msat_make_leq(mathsatEnv, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long floor(Long pNumber) {
+    return msat_make_floor(mathsatEnv, pNumber);
   }
 }

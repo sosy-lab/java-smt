@@ -97,6 +97,9 @@ public enum FunctionDeclarationKind {
   /** Unary comparison with zero. */
   GTE_ZERO,
 
+  /** Floor operation, converts from rationals to integers, also known as {@code to_int}. */
+  FLOOR,
+
   // Simple bitvector operations
 
   /** Extraction over bitvectors. */
