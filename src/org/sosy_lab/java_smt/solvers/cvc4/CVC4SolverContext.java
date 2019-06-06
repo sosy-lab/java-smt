@@ -32,6 +32,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     NativeLibraries.loadLibrary("cvc4jni");
     ExprManager exprManager = new ExprManager();
     SmtEngine smt = new SmtEngine(exprManager);
+    smt.setLogic("QF_ALL_SUPPORTED");
     smt.setOption("incremental", new SExpr(false));
 
     CVC4Environment env = new CVC4Environment(exprManager, randomSeed, pShutdownNotifier);
