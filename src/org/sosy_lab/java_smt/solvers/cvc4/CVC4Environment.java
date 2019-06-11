@@ -77,7 +77,7 @@ public class CVC4Environment {
   }
 
   public void push() {
-    smtEngine.setOption("incremental", new SExpr(false));
+    smtEngine.setOption("incremental", new SExpr(true));
     smtEngine.push();
     smtEngine.setOption("incremental", new SExpr(incrementalModeOn));
   }
