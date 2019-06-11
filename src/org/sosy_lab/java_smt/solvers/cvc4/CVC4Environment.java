@@ -34,12 +34,14 @@ public class CVC4Environment {
   private SmtEngine smtEngine;
   private final ShutdownNotifier shutdownNotifier;
   private AtomicBoolean interrupted;
+  private final boolean incrementalModeOn;
 
   public CVC4Environment(
       ExprManager pExprManager,
       int randomSeed,
       ShutdownNotifier pShutdownNotifier,
-      boolean incrementalModeOn) {
+      boolean pIncrementalModeOn) {
+    incrementalModeOn = pIncrementalModeOn;
     exprManager = pExprManager;
     shutdownNotifier = pShutdownNotifier;
     interrupted = new AtomicBoolean(false);
@@ -75,7 +77,9 @@ public class CVC4Environment {
   }
 
   public void push() {
+    smtEngine.setOption("incremental", new SExpr(false));
     smtEngine.push();
+    smtEngine.setOption("incremental", new SExpr(incrementalModeOn));
   }
 
   public void assertFormula(Expr pExp) {
