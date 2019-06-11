@@ -36,12 +36,15 @@ public class CVC4Environment {
   private AtomicBoolean interrupted;
 
   public CVC4Environment(
-      ExprManager pExprManager, int randomSeed, ShutdownNotifier pShutdownNotifier) {
+      ExprManager pExprManager,
+      int randomSeed,
+      ShutdownNotifier pShutdownNotifier,
+      boolean incrementalModeOn) {
     exprManager = pExprManager;
     shutdownNotifier = pShutdownNotifier;
     interrupted = new AtomicBoolean(false);
     smtEngine = new SmtEngine(exprManager);
-    smtEngine.setOption("incremental", new SExpr(true));
+    smtEngine.setOption("incremental", new SExpr(incrementalModeOn));
     smtEngine.setOption("produce-models", new SExpr(true));
     smtEngine.setOption("produce-assertions", new SExpr(true));
     smtEngine.setOption("dump-models", new SExpr(true));
