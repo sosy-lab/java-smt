@@ -149,7 +149,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long extractInfo(Formula pT) {
-    return Z3FormulaManager.getZ3Expr(pT);
+    if (pT instanceof Z3Formula) {
+      return ((Z3Formula) pT).getFormulaInfo();
+    }
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
   @SuppressWarnings("unchecked")

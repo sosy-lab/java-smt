@@ -39,7 +39,6 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -48,7 +47,7 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
-  private final FormulaManager mgr;
+  private final Z3FormulaManager mgr;
 
   protected boolean closed = false;
 
@@ -61,7 +60,10 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3AbstractProver(
-      Z3FormulaCreator pCreator, long z3params, FormulaManager pMgr, Set<ProverOptions> pOptions) {
+      Z3FormulaCreator pCreator,
+      long z3params,
+      Z3FormulaManager pMgr,
+      Set<ProverOptions> pOptions) {
     super(pOptions);
     creator = pCreator;
     z3context = creator.getEnv();
@@ -245,7 +247,7 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
     long[] importantFormulas = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {
-      importantFormulas[i++] = Z3FormulaManager.getZ3Expr(impF);
+      importantFormulas[i++] = mgr.extractInfo(impF);
     }
 
     try {
