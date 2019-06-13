@@ -31,4 +31,3 @@ public interface SLFormulaManager {
 
   Formula makeNilElement(Formula t);
 }
-

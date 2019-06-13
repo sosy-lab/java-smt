@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 public abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        Expr, Type, CVC4Environment, ParamFormulaType, ResultFormulaType, Expr> {
+        Expr, Type, ExprManager, ParamFormulaType, ResultFormulaType, Expr> {
 
   protected final ExprManager exprManager;
 

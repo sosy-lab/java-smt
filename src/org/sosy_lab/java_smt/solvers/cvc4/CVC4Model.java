@@ -23,6 +23,7 @@ import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
@@ -35,7 +36,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
-public class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment> {
+public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   private final CVC4FormulaCreator cvc4Creator;
   private final ImmutableList<ValueAssignment> model;

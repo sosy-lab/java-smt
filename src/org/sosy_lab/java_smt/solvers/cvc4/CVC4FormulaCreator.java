@@ -51,20 +51,19 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environment, Expr> {
+public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   protected final Map<String, Expr> variablesCache = new HashMap<>();
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(CVC4Environment pEnvironment) {
+  protected CVC4FormulaCreator(ExprManager pExprManager) {
     super(
-        pEnvironment,
-        pEnvironment.getExprManager().booleanType(),
-        pEnvironment.getExprManager().integerType(),
-        pEnvironment.getExprManager().realType());
-    exprManager = pEnvironment.getExprManager();
-
+        pExprManager,
+        pExprManager.booleanType(),
+        pExprManager.integerType(),
+        pExprManager.realType());
+    exprManager = pExprManager;
   }
 
   @Override
@@ -119,8 +118,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    CVC4Environment env = getEnv();
-
     if (pFormula instanceof BitvectorFormula) {
       return (FormulaType<T>) getFormulaType(((CVC4BitvectorFormula) pFormula).getTerm());
     }

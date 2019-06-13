@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +30,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
 public class CVC4FloatingPointFormulaManager
-    extends AbstractFloatingPointFormulaManager<Expr, Type, CVC4Environment, Expr> {
-  protected final ExprManager exprManager;
+    extends AbstractFloatingPointFormulaManager<Expr, Type, ExprManager, Expr> {
+
+  private final ExprManager exprManager;
 
   protected CVC4FloatingPointFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
