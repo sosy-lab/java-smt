@@ -23,11 +23,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Result;
+import edu.nyu.acsys.CVC4.SExpr;
+import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.UnsatCore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
@@ -36,37 +40,67 @@ import org.sosy_lab.java_smt.api.SolverException;
 abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final CVC4FormulaCreator creator;
-  protected final CVC4Environment env;
+  protected final SmtEngine smtEngine;
 
+  protected final AtomicBoolean interrupted = new AtomicBoolean(false);
   protected boolean closed = false;
 
-  protected CVC4AbstractProver(CVC4FormulaCreator pFormulaCreator) {
-    creator = pFormulaCreator;
-    env = pFormulaCreator.getEnv();
-    env.reset(); // Gets a fresh SMTEngine
+  protected CVC4AbstractProver(
+      CVC4FormulaCreator pFormulaCreator, ShutdownNotifier pShutdownNotifier, int randomSeed) {
 
-    createConfig();
+    creator = pFormulaCreator;
+    smtEngine = new SmtEngine(creator.getExprManager());
+
+    setOptions(randomSeed);
+    registerShutdownHandler(pShutdownNotifier);
   }
 
-  protected void createConfig() {
+  private void setOptions(int randomSeed) {
+    smtEngine.setOption("incremental", new SExpr(true));
+    smtEngine.setOption("produce-models", new SExpr(true));
+    smtEngine.setOption("produce-assertions", new SExpr(true));
+    smtEngine.setOption("dump-models", new SExpr(true));
+    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+    smtEngine.setOption("output-language", new SExpr("smt2"));
+    smtEngine.setOption("random-seed", new SExpr(randomSeed));
+  }
+
+  // Due to a bug in CVC4, smtEngine.interrupt() has no effect when it is called too soon.
+  // For example in the case of smtEngine.checkSat(), this is if interrupt() is called
+  // before the line "Result result = d_propEngine->checkSat();" is called in the CVC4 C++
+  // method SmtEngine::check(), which seems to take about 10 ms. When this is fixed in
+  // CVC4, we can remove the Thread.sleep(10), the AtomicBoolean interrupted and the while
+  // loop surrounding this block.
+  private void registerShutdownHandler(ShutdownNotifier pShutdownNotifier) {
+    pShutdownNotifier.register(
+        (reason) -> {
+          interrupted.set(true);
+          while (interrupted.get()) {
+            smtEngine.interrupt();
+            try {
+              Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+          }
+        });
   }
 
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    env.push();
+    smtEngine.push();
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    env.pop();
+    smtEngine.pop();
   }
 
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
-    return CVC4Model.create(creator);
+    return new CVC4Model(creator, smtEngine);
   }
 
   @Override
@@ -80,29 +114,30 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    Result result = env.checkSat();
-
+    Result result = smtEngine.checkSat();
+    if (interrupted.get()) {
+      interrupted.set(false); // Should we throw InterruptException?
+    }
     if (result.isUnknown()) {
       if (result.whyUnknown().equals(Result.UnknownExplanation.INTERRUPTED)) {
         throw new InterruptedException();
       } else {
         throw new SolverException("CVC4 returned null or unknown on sat check (" + result + ")");
       }
+    }
+    if (result.isSat() == Result.Sat.SAT) {
+      return false;
+    } else if (result.isSat() == Result.Sat.UNSAT) {
+      return true;
     } else {
-      if (result.isSat() == Result.Sat.SAT) {
-        return false;
-      } else if (result.isSat() == Result.Sat.UNSAT) {
-        return true;
-      } else {
-        throw new SolverException("CVC4 returned unknown on sat check");
-      }
+      throw new SolverException("CVC4 returned unknown on sat check");
     }
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
-    UnsatCore core = env.getUnsatCore();
+    UnsatCore core = smtEngine.getUnsatCore();
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : core) {
       converted.add(creator.encapsulateBoolean(aCore));
@@ -133,7 +168,7 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public void close() {
     Preconditions.checkState(!closed);
-    env.delete();
+    smtEngine.delete();
     closed = true;
   }
 }

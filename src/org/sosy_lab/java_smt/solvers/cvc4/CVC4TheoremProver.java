@@ -22,13 +22,15 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Preconditions;
 import edu.nyu.acsys.CVC4.Expr;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
 public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
 
-  protected CVC4TheoremProver(CVC4FormulaCreator creator) {
-    super(creator);
+  protected CVC4TheoremProver(
+      CVC4FormulaCreator pFormulaCreator, ShutdownNotifier pShutdownNotifier, int randomSeed) {
+    super(pFormulaCreator, pShutdownNotifier, randomSeed);
   }
 
   @Override
@@ -36,7 +38,7 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
   public Void addConstraint(BooleanFormula pF) {
     Preconditions.checkState(!closed);
     Expr exp = creator.extractInfo(pF);
-    env.assertFormula(exp);
+    smtEngine.assertFormula(exp);
     return null;
   }
 }
