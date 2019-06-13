@@ -25,6 +25,9 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
 import java.util.Collection;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC4BooleanFormulaManager
@@ -82,6 +85,11 @@ public class CVC4BooleanFormulaManager
   }
 
   @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::and);
+  }
+
+  @Override
   protected Expr or(Expr pParam1, Expr pParam2) {
     if (isTrue(pParam1)) {
       return cvc4True;
@@ -104,6 +112,11 @@ public class CVC4BooleanFormulaManager
       vExpr.add(e);
     }
     return exprManager.mkExpr(Kind.OR, vExpr);
+  }
+
+  @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   @Override
