@@ -2,7 +2,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.CVC4JNI;
 import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.SmtEngine;
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -30,10 +29,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
     ExprManager exprManager = new ExprManager();
-    SmtEngine smt = new SmtEngine(exprManager);
-    smt.setLogic("QF_ALL_SUPPORTED");
-
-    CVC4Environment env = new CVC4Environment(exprManager, randomSeed, pShutdownNotifier, false);
+    CVC4Environment env = new CVC4Environment(exprManager, randomSeed, pShutdownNotifier);
 
     // Create CVC4FormulaCreator
     CVC4FormulaCreator creator = new CVC4FormulaCreator(env);

@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import edu.nyu.acsys.CVC4.Result;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -32,11 +33,31 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   protected boolean closed = false;
 
   protected CVC4AbstractProver(CVC4FormulaCreator pFormulaCreator) {
-    this.creator = pFormulaCreator;
-    this.env = pFormulaCreator.getEnv();
+    creator = pFormulaCreator;
+    env = pFormulaCreator.getEnv();
+    env.reset(); // Gets a fresh SMTEngine
+
+    createConfig();
   }
 
   protected abstract CVC4Model getCVC4Model();
+
+  protected void createConfig() {
+  }
+
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    env.push();
+  }
+
+  @Override
+  public void pop() {
+    Preconditions.checkState(!closed);
+    env.pop();
+  }
+
+
 
   @Override
   public CVC4Model getModel() {
@@ -44,11 +65,42 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
     return CVC4Model.create(creator);
   }
 
+
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
     try (CVC4Model model = getModel()) {
       return model.modelToList();
     }
+  }
+
+  @Override
+  public boolean isUnsat() throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
+    Result result = env.checkSat();
+
+    if (result.isUnknown()) {
+      if (result.whyUnknown().equals(Result.UnknownExplanation.INTERRUPTED)) {
+        throw new InterruptedException();
+      } else {
+        throw new SolverException(
+            "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
+      }
+    } else {
+      if (result.isSat() == Result.Sat.SAT) {
+        return false;
+      } else if (result.isSat() == Result.Sat.UNSAT) {
+        return true;
+      } else {
+        throw new SolverException("CVC4 returned unknown on sat check");
+      }
+    }
+  }
+
+  @Override
+  public void close() {
+    Preconditions.checkState(!closed);
+    env.delete();
+    closed = true;
   }
 }

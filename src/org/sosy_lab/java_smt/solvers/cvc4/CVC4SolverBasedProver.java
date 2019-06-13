@@ -19,76 +19,9 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Preconditions;
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.Result;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.SolverException;
-
 public abstract class CVC4SolverBasedProver<T> extends CVC4AbstractProver<T> {
-  private final List<Expr> assertedFormulas = new ArrayList<>();
 
   CVC4SolverBasedProver(CVC4FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    env.push();
-  }
-
-  @Nullable
-  protected Expr addConstraint0(BooleanFormula pF) {
-    Preconditions.checkState(!closed);
-    Expr exp = creator.extractInfo(pF);
-    env.assertFormula(exp);
-    assertedFormulas.add(exp);
-    return exp;
-  }
-
-  @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    assertedFormulas.remove(assertedFormulas.size() - 1);
-    env.pop();
-  }
-
-  @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    Result result = env.checkSat();
-
-    if (result.isUnknown()) {
-      if (result.whyUnknown().equals(Result.UnknownExplanation.INTERRUPTED)) {
-        throw new InterruptedException();
-      } else {
-        throw new SolverException(
-            "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
-      }
-    } else {
-      if (result.isSat() == Result.Sat.SAT) {
-        return false;
-      } else if (result.isSat() == Result.Sat.UNSAT) {
-        return true;
-      } else {
-        throw new SolverException("CVC4 returned unknown on sat check");
-      }
-    }
-  }
-
-  @Override
-  public void close() {
-    Preconditions.checkState(!closed);
-    env.delete();
-    closed = true;
-  }
-
-  @Override
-  protected CVC4Model getCVC4Model() {
-    return getModel();
   }
 }

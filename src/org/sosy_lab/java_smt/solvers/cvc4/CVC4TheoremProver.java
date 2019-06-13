@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements ProverEnvironment {
+public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
 
   protected CVC4TheoremProver(CVC4FormulaCreator creator) {
     super(creator);
@@ -48,7 +48,9 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula pF) {
-    super.addConstraint0(pF);
+    Preconditions.checkState(!closed);
+    Expr exp = creator.extractInfo(pF);
+    env.assertFormula(exp);
     return null;
   }
 
@@ -63,12 +65,12 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
     return converted;
   }
 
-  @Override
-  public void close() {
-    Preconditions.checkState(!closed);
-    // smtEngine.delete();
-    closed = true;
-  }
+  // @Override
+  // public void close() {
+  // Preconditions.checkState(!closed);
+  // // smtEngine.delete();
+  // closed = true;
+  // }
 
   // @Override
   // public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
@@ -136,5 +138,11 @@ public class CVC4TheoremProver extends CVC4SolverBasedProver<Void> implements Pr
       throws InterruptedException, SolverException {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException();
+  }
+
+
+  @Override
+  protected CVC4Model getCVC4Model() {
+    return getModel();
   }
 }

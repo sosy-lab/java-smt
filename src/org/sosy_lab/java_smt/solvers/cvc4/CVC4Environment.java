@@ -34,25 +34,17 @@ public class CVC4Environment {
   private SmtEngine smtEngine;
   private final ShutdownNotifier shutdownNotifier;
   private AtomicBoolean interrupted;
-  private final boolean incrementalModeOn;
+  private final int randomSeed;
 
   public CVC4Environment(
       ExprManager pExprManager,
-      int randomSeed,
-      ShutdownNotifier pShutdownNotifier,
-      boolean pIncrementalModeOn) {
-    incrementalModeOn = pIncrementalModeOn;
+      int pRandomSeed,
+      ShutdownNotifier pShutdownNotifier) {
     exprManager = pExprManager;
     shutdownNotifier = pShutdownNotifier;
     interrupted = new AtomicBoolean(false);
-    smtEngine = new SmtEngine(exprManager);
-    smtEngine.setOption("incremental", new SExpr(incrementalModeOn));
-    smtEngine.setOption("produce-models", new SExpr(true));
-    smtEngine.setOption("produce-assertions", new SExpr(true));
-    smtEngine.setOption("dump-models", new SExpr(true));
-    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
-    smtEngine.setOption("output-language", new SExpr("smt2"));
-    smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    randomSeed = pRandomSeed;
+    reset();
     shutdownNotifier.register(
         (reason) -> {
           interrupted.set(true);
@@ -77,9 +69,7 @@ public class CVC4Environment {
   }
 
   public void push() {
-    smtEngine.setOption("incremental", new SExpr(true));
     smtEngine.push();
-    smtEngine.setOption("incremental", new SExpr(incrementalModeOn));
   }
 
   public void assertFormula(Expr pExp) {
@@ -108,5 +98,28 @@ public class CVC4Environment {
 
   public Expr getValue(Expr pExp) {
     return smtEngine.getValue(pExp);
+  }
+
+  public void reset() {
+    if (smtEngine != null) {
+      smtEngine.delete();
+    }
+    smtEngine = new SmtEngine(exprManager);
+    setDefaultOptions();
+  }
+
+  public void setOption(String option, SExpr val) {
+    smtEngine.setOption(option, val);
+  }
+
+  private void setDefaultOptions() {
+    smtEngine = new SmtEngine(exprManager);
+    smtEngine.setOption("incremental", new SExpr(true));
+    smtEngine.setOption("produce-models", new SExpr(true));
+    smtEngine.setOption("produce-assertions", new SExpr(true));
+    smtEngine.setOption("dump-models", new SExpr(true));
+    // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+    smtEngine.setOption("output-language", new SExpr("smt2"));
+    smtEngine.setOption("random-seed", new SExpr(randomSeed));
   }
 }
