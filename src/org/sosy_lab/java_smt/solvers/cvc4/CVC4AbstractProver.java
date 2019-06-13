@@ -158,7 +158,7 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
+  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
     // TODO inherit from ProverWithAllSat after merging from master-branch,
     // then we can remove this part.
