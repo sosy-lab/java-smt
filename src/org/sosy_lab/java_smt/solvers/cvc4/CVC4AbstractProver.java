@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,20 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Result;
+import edu.nyu.acsys.CVC4.UnsatCore;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
+
   protected final CVC4FormulaCreator creator;
   protected final CVC4Environment env;
 
@@ -39,8 +47,6 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
 
     createConfig();
   }
-
-  protected abstract CVC4Model getCVC4Model();
 
   protected void createConfig() {
   }
@@ -57,14 +63,11 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
     env.pop();
   }
 
-
-
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
     return CVC4Model.create(creator);
   }
-
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
@@ -83,8 +86,7 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
       if (result.whyUnknown().equals(Result.UnknownExplanation.INTERRUPTED)) {
         throw new InterruptedException();
       } else {
-        throw new SolverException(
-            "CVC4 returned null or unknown on sat check (" + result.toString() + ")");
+        throw new SolverException("CVC4 returned null or unknown on sat check (" + result + ")");
       }
     } else {
       if (result.isSat() == Result.Sat.SAT) {
@@ -95,6 +97,37 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
         throw new SolverException("CVC4 returned unknown on sat check");
       }
     }
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed);
+    UnsatCore core = env.getUnsatCore();
+    List<BooleanFormula> converted = new ArrayList<>();
+    for (Expr aCore : core) {
+      converted.add(creator.encapsulateBoolean(aCore));
+    }
+    return converted;
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
+      throws InterruptedException, SolverException {
+    // TODO inherit from ProverWithAllSat after merging from master-branch,
+    // then we can remove this part.
+    throw new UnsupportedOperationException();
   }
 
   @Override
