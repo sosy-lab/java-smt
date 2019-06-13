@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -207,7 +207,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public SLFormulaManager getSLFormulaManager() {
     if (slManager == null) {
-      throw new UnsupportedOperationException("Solver does not support Seperation Logic theory");
+      throw new UnsupportedOperationException("Solver does not support seperation logic theory");
     }
     return slManager;
   }

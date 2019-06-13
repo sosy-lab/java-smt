@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,9 +44,7 @@ public abstract class CVC4NumeralFormulaManager<
 
   @Override
   public boolean isNumeral(Expr pVal) {
-    return pVal.getType().isInteger()
-        || pVal.getType().isFloatingPoint()
-        || pVal.getType().isReal(); // TODO is bitvector numeral?
+    return (pVal.getType().isInteger() || pVal.getType().isReal()) && pVal.isConst();
   }
 
   @Override

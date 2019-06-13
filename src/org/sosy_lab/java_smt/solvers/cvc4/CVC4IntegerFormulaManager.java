@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -39,15 +38,14 @@ public class CVC4IntegerFormulaManager
   }
 
   @Override
-  public FormulaType<IntegerFormula> getFormulaType() {
-    return FormulaType.IntegerType;
+  protected Type getNumeralType() {
+    return getFormulaCreator().getIntegerType();
   }
 
   @Override
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
-    Expr result = exprManager.mkConst(new Rational(pI));
-    return result;
+    return exprManager.mkConst(new Rational(pI));
   }
 
   @Override
@@ -93,11 +91,5 @@ public class CVC4IntegerFormulaManager
   @Override
   protected Expr makeVariableImpl(String pI) {
     return formulaCreator.makeVariable(getFormulaCreator().getIntegerType(), pI);
-  }
-
-  @Override
-  protected Type getNumeralType() {
-    // TODO Auto-generated method stub
-    return getFormulaCreator().getIntegerType();
   }
 }

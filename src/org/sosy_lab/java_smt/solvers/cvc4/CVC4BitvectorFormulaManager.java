@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,9 +76,6 @@ public class CVC4BitvectorFormulaManager
     return getFormulaCreator().makeVariable(type, varName);
   }
 
-  /**
-   * Return a term representing the (arithmetic if signed is true) right shift of number by toShift.
-   */
   @Override
   protected Expr shiftRight(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {

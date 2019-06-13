@@ -128,6 +128,6 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr ifThenElse(Expr pCond, Expr pF1, Expr pF2) {
-    return pCond.iteExpr(pF1, pF2);
+    return exprManager.mkExpr(Kind.ITE, pCond, pF1, pF2);
   }
 }
