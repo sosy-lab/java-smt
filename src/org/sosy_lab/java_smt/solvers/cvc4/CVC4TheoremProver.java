@@ -47,7 +47,7 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void, Expr> implements
     Preconditions.checkState(!closed);
     closeAllModels();
     Expr exp = creator.extractInfo(pF);
-    smtEngine.assertFormula(exp);
+    smtEngine.assertFormula(importExpr(exp));
     assertedFormulas.peek().add(exp);
     return null;
   }

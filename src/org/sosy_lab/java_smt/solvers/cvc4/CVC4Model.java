@@ -64,7 +64,8 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   @Override
   public Object evaluateImpl(Expr f) {
     Preconditions.checkState(!closed);
-    return getValue(smtEngine.getValue(f), f.getType());
+    Expr exp = prover.importExpr(f);
+    return getValue(smtEngine.getValue(exp), exp.getType());
   }
 
   private ImmutableList<ValueAssignment> generateModel() {
@@ -114,7 +115,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
       argumentInterpretation.add(evaluateImpl(param));
     }
     Expr name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
-    Expr valueTerm = smtEngine.getValue(pKeyTerm);
+    Expr valueTerm = prover.exportExpr(smtEngine.getValue(prover.importExpr(pKeyTerm)));
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
     BooleanFormula equation =

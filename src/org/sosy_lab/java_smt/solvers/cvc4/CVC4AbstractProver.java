@@ -22,10 +22,11 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.ExprManagerMapCollection;
 import edu.nyu.acsys.CVC4.Result;
 import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
-import edu.nyu.acsys.CVC4.UnsatCore;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +60,20 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
    */
   private final Set<CVC4Model> models = new LinkedHashSet<>();
 
+  /**
+   * The local exprManager allows to set options per Prover (and not globally). See <a
+   * href="https://github.com/CVC4/CVC4/issues/3055">Issue 3055</a> for details.
+   *
+   * <p>TODO If the overhead of importing/exporting the expressions is too expensive, we can disable
+   * this behavior. This change would cost us the flexibility of setting options per Prover.
+   */
+  private final ExprManager exprManager = new ExprManager();
+
+  /** We copy expression between different ExprManagers. The map serves as cache. */
+  private final ExprManagerMapCollection importMap = new ExprManagerMapCollection();
+
+  private final ExprManagerMapCollection exportMap = new ExprManagerMapCollection();
+
   protected CVC4AbstractProver(
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
@@ -66,7 +81,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
       Set<ProverOptions> pOptions) {
 
     creator = pFormulaCreator;
-    smtEngine = new SmtEngine(creator.getEnv());
+    smtEngine = new SmtEngine(exprManager);
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
@@ -107,6 +122,16 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
             }
           }
         });
+  }
+
+  /** import an expression from global context into this prover's context. */
+  protected Expr importExpr(Expr expr) {
+    return expr.exportTo(exprManager, importMap);
+  }
+
+  /** export an expression from this prover's context into global context. */
+  protected Expr exportExpr(Expr expr) {
+    return expr.exportTo(creator.getEnv(), exportMap);
   }
 
   @Override
@@ -185,10 +210,9 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
-    UnsatCore core = smtEngine.getUnsatCore();
     List<BooleanFormula> converted = new ArrayList<>();
-    for (Expr aCore : core) {
-      converted.add(creator.encapsulateBoolean(aCore));
+    for (Expr aCore : smtEngine.getUnsatCore()) {
+      converted.add(creator.encapsulateBoolean(exportExpr(aCore)));
     }
     return converted;
   }
@@ -222,7 +246,10 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
     if (!closed) {
       closeAllModels();
       assertedFormulas.clear();
+      importMap.delete();
+      exportMap.delete();
       smtEngine.delete();
+      exprManager.delete();
       closed = true;
     }
   }
