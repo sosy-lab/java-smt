@@ -30,8 +30,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -47,8 +49,14 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   protected final AtomicBoolean interrupted = new AtomicBoolean(false);
   protected boolean closed = false;
 
-  /** track formulas on the stack, needed for model generation. */
+  /** Tracks formulas on the stack, needed for model generation. */
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
+
+  /**
+   * Tracks provided models to inform them when the SmtEngine is closed. We can no longer access
+   * model evaluation after closing the SmtEngine.
+   */
+  private final Set<CVC4Model> models = new LinkedHashSet<>();
 
   protected CVC4AbstractProver(
       CVC4FormulaCreator pFormulaCreator, ShutdownNotifier pShutdownNotifier, int randomSeed) {
@@ -95,6 +103,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public void push() {
     Preconditions.checkState(!closed);
+    closeAllModels();
     assertedFormulas.push(new ArrayList<>());
     smtEngine.push();
   }
@@ -102,6 +111,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    closeAllModels();
     assertedFormulas.pop();
     Preconditions.checkState(assertedFormulas.size() > 0, "initial level must remain until close");
     smtEngine.pop();
@@ -110,7 +120,25 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
-    return new CVC4Model(creator, smtEngine, getAssertedExpressions());
+    CVC4Model model = new CVC4Model(this, creator, smtEngine, getAssertedExpressions());
+    models.add(model);
+    return model;
+  }
+
+  void unregisterModel(CVC4Model model) {
+    models.remove(model);
+  }
+
+  /**
+   * whenever the SmtEngine changes, we need to invalidate all models.
+   *
+   * <p>See for details <a href="https://github.com/CVC4/CVC4/issues/2648">Issue 2648</a> .
+   */
+  protected void closeAllModels() {
+    for (CVC4Model model : models) {
+      model.close();
+    }
+    Preconditions.checkState(models.isEmpty(), "all models should be closed");
   }
 
   @Override
@@ -124,6 +152,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    closeAllModels();
     Result result = smtEngine.checkSat();
     if (interrupted.get()) {
       interrupted.set(false); // Should we throw InterruptException?
@@ -170,6 +199,8 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
+    Preconditions.checkState(!closed);
+    closeAllModels();
     // TODO inherit from ProverWithAllSat after merging from master-branch,
     // then we can remove this part.
     throw new UnsupportedOperationException();
@@ -180,6 +211,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public void close() {
     if (!closed) {
+      closeAllModels();
       assertedFormulas.clear();
       smtEngine.delete();
       closed = true;

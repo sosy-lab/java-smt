@@ -40,6 +40,7 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void, Expr> implements
   @Nullable
   public Void addConstraint(BooleanFormula pF) {
     Preconditions.checkState(!closed);
+    closeAllModels();
     Expr exp = creator.extractInfo(pF);
     smtEngine.assertFormula(exp);
     assertedFormulas.peek().add(exp);

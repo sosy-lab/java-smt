@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import edu.nyu.acsys.CVC4.Expr;
@@ -41,11 +42,17 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
   private final ImmutableList<Expr> assertedExpressions;
+  private final CVC4AbstractProver<?, ?> prover;
+  protected boolean closed = false;
 
   CVC4Model(
-      CVC4FormulaCreator pCreator, SmtEngine pSmtEngine, Collection<Expr> pAssertedExpressions) {
+      CVC4AbstractProver<?, ?> pProver,
+      CVC4FormulaCreator pCreator,
+      SmtEngine pSmtEngine,
+      Collection<Expr> pAssertedExpressions) {
     super(pCreator);
     smtEngine = pSmtEngine;
+    prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a
@@ -56,6 +63,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public Object evaluateImpl(Expr f) {
+    Preconditions.checkState(!closed);
     return getValue(smtEngine.getValue(f), f.getType());
   }
 
@@ -118,7 +126,8 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
+    prover.unregisterModel(this);
+    closed = true;
   }
 
   @Override
