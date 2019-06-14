@@ -48,6 +48,11 @@ public class CVC4SLProver extends CVC4AbstractProver<Void> implements ProverEnvi
   }
 
   @Override
+  public void push() {
+    // No actual push() cause CVC4 does not support separation login in incremental mode.
+  }
+
+  @Override
   public Void push(BooleanFormula pF) {
     Expr exp = creator.extractInfo(pF);
     // No actual push() cause CVC4 does not support separation login in incremental mode.
