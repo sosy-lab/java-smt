@@ -251,7 +251,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     if (f.isConst()) {
       if (type.isBoolean()) {
         return visitor.visitConstant(formula, f.getConstBoolean());
-      } else if (type.isInteger() || type.isFloatingPoint()) {
+      } else if (type.isInteger() || type.isReal()) {
         return visitor.visitConstant(formula, f.getConstRational());
       } else if (type.isBitVector()) {
         // TODO is this correct?

@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
@@ -27,8 +28,9 @@ import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
@@ -53,30 +55,31 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public Object evaluateImpl(Expr f) {
-    return getValue(smtEngine.getValue(f));
+    return getValue(smtEngine.getValue(f), f.getType());
   }
 
   private ImmutableList<ValueAssignment> generateModel() {
-    Collection<Expr> extracted = new LinkedHashSet<>();
+    ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     for (Expr expr : assertedExpressions) {
-      extracted.addAll(creator.extractVariablesAndUFs(expr, true).values());
+      creator.extractVariablesAndUFs(
+          expr,
+          true,
+          (name, f) -> {
+            builder.add(getAssignment(f));
+          });
     }
-
-    ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
-    for (Expr lKeyTerm : extracted) {
-      builder.add(getAssignment(lKeyTerm));
-    }
-    return builder.build();
+    return builder.build().asList();
   }
 
-  private static Object getValue(Expr value) {
+  /** return an object representing the value, try to get a matching type */
+  private static Object getValue(Expr value, Type pType) {
     if (value.getType().isBoolean()) {
       return value.getConstBoolean();
 
-    } else if (value.getType().isInteger()) {
+    } else if (value.getType().isInteger() && pType.isInteger()) {
       return new BigInteger(value.getConstRational().toString());
 
-    } else if (value.getType().isReal()) {
+    } else if (value.getType().isReal() && pType.isReal()) {
       Rational rat = value.getConstRational();
       return org.sosy_lab.common.rationals.Rational.of(
           new BigInteger(rat.getNumerator().toString()),
@@ -89,14 +92,19 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   }
 
   private ValueAssignment getAssignment(Expr pKeyTerm) {
+    List<Object> argumentInterpretation = new ArrayList<>();
+    for (Expr param : pKeyTerm) {
+      argumentInterpretation.add(evaluateImpl(param));
+    }
+    Expr name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
     Expr valueTerm = smtEngine.getValue(pKeyTerm);
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
     BooleanFormula equation =
         creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, valueTerm));
-    Object value = getValue(valueTerm);
+    Object value = getValue(valueTerm, pKeyTerm.getType());
     return new ValueAssignment(
-        keyFormula, valueFormula, equation, pKeyTerm.toString(), value, ImmutableList.of());
+        keyFormula, valueFormula, equation, name.toString(), value, argumentInterpretation);
   }
 
   @Override
