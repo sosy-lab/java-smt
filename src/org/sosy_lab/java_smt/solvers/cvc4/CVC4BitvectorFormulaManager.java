@@ -62,12 +62,12 @@ public class CVC4BitvectorFormulaManager
 
   @Override
   protected Expr makeBitvectorImpl(int pLength, long pI) {
-    return exprManager.mkConst(new BitVector(pI, pLength));
+    return exprManager.mkConst(new BitVector(pLength, pI));
   }
 
   @Override
   protected Expr makeBitvectorImpl(int pLength, BigInteger pI) {
-    return exprManager.mkConst(new BitVector(pI.toString(), pLength));
+    return exprManager.mkConst(new BitVector(pLength, pI));
   }
 
   @Override

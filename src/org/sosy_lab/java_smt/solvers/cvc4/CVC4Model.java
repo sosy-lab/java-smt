@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
@@ -84,6 +85,14 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
       return org.sosy_lab.common.rationals.Rational.of(
           new BigInteger(rat.getNumerator().toString()),
           new BigInteger(rat.getDenominator().toString()));
+
+    } else if (value.getType().isBitVector()) {
+      Integer bv = value.getConstBitVector().getValue();
+      if (bv.fitsSignedLong()) {
+        return BigInteger.valueOf(bv.getLong());
+      } else {
+        return value.toString(); // default
+      }
 
     } else {
       // String serialization for unknown terms.
