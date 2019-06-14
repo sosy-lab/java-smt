@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Collections;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
@@ -42,19 +43,20 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   private final CVC4FormulaCreator cvc4Creator;
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
+  private final ImmutableList<Expr> assertedExpressions;
 
-  // private final ImmutableList<Expr> assertedFormulas;
-
-  CVC4Model(CVC4FormulaCreator pCreator, SmtEngine pSmtEngine) {
+  CVC4Model(
+      CVC4FormulaCreator pCreator, SmtEngine pSmtEngine, Collection<Expr> pAssertedExpressions) {
     super(pCreator);
     cvc4Creator = pCreator;
     smtEngine = pSmtEngine;
+
+    assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a
     // persistent reference to the model. If the SMT engine is used somewhere else, the values we
     // get out of it might change!
     model = generateModel();
-    // this.assertedFormulas = ImmutableList.copyOf(assertedFormulas);
   }
 
   @Override

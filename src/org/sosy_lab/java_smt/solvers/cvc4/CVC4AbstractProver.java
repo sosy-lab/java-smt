@@ -26,8 +26,10 @@ import edu.nyu.acsys.CVC4.Result;
 import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.UnsatCore;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,13 +39,16 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
+abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
 
   protected final CVC4FormulaCreator creator;
   protected final SmtEngine smtEngine;
 
   protected final AtomicBoolean interrupted = new AtomicBoolean(false);
   protected boolean closed = false;
+
+  /** track formulas on the stack, needed for model generation. */
+  protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
 
   protected CVC4AbstractProver(
       CVC4FormulaCreator pFormulaCreator, ShutdownNotifier pShutdownNotifier, int randomSeed) {
@@ -88,19 +93,21 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public void push() {
     Preconditions.checkState(!closed);
+    assertedFormulas.add(new ArrayList<>());
     smtEngine.push();
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    assertedFormulas.pop();
     smtEngine.pop();
   }
 
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
-    return new CVC4Model(creator, smtEngine);
+    return new CVC4Model(creator, smtEngine, getAssertedExpressions());
   }
 
   @Override
@@ -165,9 +172,12 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
     throw new UnsupportedOperationException();
   }
 
+  protected abstract Collection<Expr> getAssertedExpressions();
+
   @Override
   public void close() {
     if (!closed) {
+      assertedFormulas.clear();
       smtEngine.delete();
       closed = true;
     }
