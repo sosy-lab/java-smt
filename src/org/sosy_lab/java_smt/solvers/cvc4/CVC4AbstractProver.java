@@ -39,6 +39,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
@@ -59,20 +60,28 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   private final Set<CVC4Model> models = new LinkedHashSet<>();
 
   protected CVC4AbstractProver(
-      CVC4FormulaCreator pFormulaCreator, ShutdownNotifier pShutdownNotifier, int randomSeed) {
+      CVC4FormulaCreator pFormulaCreator,
+      ShutdownNotifier pShutdownNotifier,
+      int randomSeed,
+      Set<ProverOptions> pOptions) {
 
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(creator.getExprManager());
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
-    setOptions(randomSeed);
+    setOptions(randomSeed, pOptions);
     registerShutdownHandler(pShutdownNotifier);
   }
 
-  private void setOptions(int randomSeed) {
+  private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
     smtEngine.setOption("incremental", new SExpr(true));
-    smtEngine.setOption("produce-models", new SExpr(true));
+    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
+      smtEngine.setOption("produce-models", new SExpr(true));
+    }
+    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
+      smtEngine.setOption("produce-unsat-cores", new SExpr(true));
+    }
     smtEngine.setOption("produce-assertions", new SExpr(true));
     smtEngine.setOption("dump-models", new SExpr(true));
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));

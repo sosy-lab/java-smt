@@ -24,16 +24,21 @@ import edu.nyu.acsys.CVC4.Expr;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 public class CVC4TheoremProver extends CVC4AbstractProver<Void, Expr> implements ProverEnvironment {
 
   protected CVC4TheoremProver(
-      CVC4FormulaCreator pFormulaCreator, ShutdownNotifier pShutdownNotifier, int randomSeed) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed);
+      CVC4FormulaCreator pFormulaCreator,
+      ShutdownNotifier pShutdownNotifier,
+      int randomSeed,
+      Set<ProverOptions> pOptions) {
+    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions);
   }
 
   @Override
