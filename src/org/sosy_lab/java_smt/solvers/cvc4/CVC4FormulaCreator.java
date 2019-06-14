@@ -53,7 +53,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
-  protected final Map<String, Expr> variablesCache = new HashMap<>();
+  private final Map<String, Expr> variablesCache = new HashMap<>();
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
@@ -68,14 +68,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr makeVariable(Type type, String name) {
-    if (variablesCache.containsKey(name)) {
-      Expr oldExp = variablesCache.get(name);
-      assert type.equals(oldExp.getType());
-      return oldExp;
-    }
-
-    Expr exp = exprManager.mkVar(name, type);
-    variablesCache.put(name, exp);
+    Expr exp = variablesCache.computeIfAbsent(name, n -> exprManager.mkVar(name, type));
+    assert type.equals(exp.getType());
     return exp;
   }
 
@@ -403,17 +397,15 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
-    if (!functionsCache.containsKey(pName)) {
+    Expr exp = functionsCache.get(pName);
+    if (exp == null) {
       vectorType args = new vectorType();
       for (Type t : pArgTypes) {
         args.add(t);
       }
-      Type requestedFunctionType = exprManager.mkFunctionType(args, pReturnType);
-      Expr result = exprManager.mkVar(pName, requestedFunctionType);
-      functionsCache.put(pName, result);
-      return result;
-    } else {
-      return functionsCache.get(pName);
+      exp = exprManager.mkVar(pName, exprManager.mkFunctionType(args, pReturnType));
+      functionsCache.put(pName, exp);
     }
+    return exp;
   }
 }
