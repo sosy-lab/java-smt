@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
@@ -30,17 +28,13 @@ import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
-  private final CVC4FormulaCreator cvc4Creator;
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
   private final ImmutableList<Expr> assertedExpressions;
@@ -48,9 +42,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   CVC4Model(
       CVC4FormulaCreator pCreator, SmtEngine pSmtEngine, Collection<Expr> pAssertedExpressions) {
     super(pCreator);
-    cvc4Creator = pCreator;
     smtEngine = pSmtEngine;
-
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a
@@ -64,81 +56,56 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     return getValue(smtEngine.getValue(f));
   }
 
-  public Map<String, Object> createAllsatModel(
-      Collection<Expr> assertedFormulas, CVC4FormulaCreator creator) {
-    Collection<Expr> extracted = new HashSet<>();
-    Map<String, Object> evaluation = new HashMap<>();
-
-    for (Expr expr : assertedFormulas) {
+  private ImmutableList<ValueAssignment> generateModel() {
+    Collection<Expr> extracted = new LinkedHashSet<>();
+    for (Expr expr : assertedExpressions) {
       extracted.addAll(creator.extractVariablesAndUFs(expr, true).values());
     }
+
+    ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
     for (Expr lKeyTerm : extracted) {
-      Expr lValueTerm = smtEngine.getValue(lKeyTerm);
-      Object lValue = getValue(lValueTerm);
-      // Duplicate entries may occur if "uf(a)" and "uf(b)" occur in the formulas
-      // and "a" and "b" have the same value, because "a" and "b" will both be resolved,
-      // leading to two entries for "uf(1)" (if value is 1).
-      Object existingValue = evaluation.get(lKeyTerm.toString());
-      Verify.verify(
-          existingValue == null || lValue.equals(existingValue),
-          "Duplicate values for model entry %s: %s and %s",
-          lKeyTerm,
-          existingValue,
-          lValue);
-      evaluation.put(lKeyTerm.toString(), lValue);
+      builder.add(getAssignment(lKeyTerm));
     }
-    return evaluation;
+    return builder.build();
   }
 
   private static Object getValue(Expr value) {
     if (value.getType().isBoolean()) {
       return value.getConstBoolean();
-    } else if (value.getType().isInteger() || value.getType().isFloatingPoint()) {
-      Rational rat = value.getConstRational();
-      if (rat.isIntegral()) {
-        return new BigInteger(rat.getNumerator().toString());
-      } else {
-        return org.sosy_lab.common.rationals.Rational.of(
-            new BigInteger(rat.getNumerator().toString()),
-            new BigInteger(rat.getDenominator().toString()));
-      }
-    } else {
 
+    } else if (value.getType().isInteger()) {
+      return new BigInteger(value.getConstRational().toString());
+
+    } else if (value.getType().isReal()) {
+      Rational rat = value.getConstRational();
+      return org.sosy_lab.common.rationals.Rational.of(
+          new BigInteger(rat.getNumerator().toString()),
+          new BigInteger(rat.getDenominator().toString()));
+
+    } else {
       // String serialization for unknown terms.
       return value.toString();
     }
   }
 
+  private ValueAssignment getAssignment(Expr pKeyTerm) {
+    Expr valueTerm = smtEngine.getValue(pKeyTerm);
+    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
+    Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
+    BooleanFormula equation =
+        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, valueTerm));
+    Object value = getValue(valueTerm);
+    return new ValueAssignment(
+        keyFormula, valueFormula, equation, pKeyTerm.toString(), value, ImmutableList.of());
+  }
+
   @Override
   public void close() {
     // TODO Auto-generated method stub
-
-  }
-
-  private ImmutableList<ValueAssignment> generateModel() {
-    Builder<ValueAssignment> out = ImmutableList.builder();
-
-    for (Expr lKeyTerm : cvc4Creator.variablesCache.values()) {
-      Expr lValueTerm = smtEngine.getValue(lKeyTerm);
-      out.add(getAssignment(lKeyTerm, lValueTerm));
-    }
-
-    return out.build();
   }
 
   @Override
   public ImmutableList<ValueAssignment> modelToList() {
     return model;
-  }
-
-  private ValueAssignment getAssignment(Expr pKeyTerm, Expr pValueTerm) {
-
-    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
-    Formula valueFormula = creator.encapsulateWithTypeOf(pValueTerm);
-    BooleanFormula equation =
-        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, pValueTerm));
-    Object value = getValue(pValueTerm);
-    return new ValueAssignment(
-        keyFormula, valueFormula, equation, pKeyTerm.toString(), value, ImmutableList.of());
   }
 }
