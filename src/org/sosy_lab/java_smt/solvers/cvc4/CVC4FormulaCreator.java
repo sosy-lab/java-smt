@@ -75,10 +75,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return exp;
   }
 
-  protected ExprManager getExprManager() {
-    return exprManager;
-  }
-
   @Override
   public Type getBitvectorType(int pBitwidth) {
     return exprManager.mkBitVectorType(pBitwidth);

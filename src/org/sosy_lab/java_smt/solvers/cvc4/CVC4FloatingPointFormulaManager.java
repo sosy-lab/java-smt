@@ -36,7 +36,7 @@ public class CVC4FloatingPointFormulaManager
 
   protected CVC4FloatingPointFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
   }
 
   @Override

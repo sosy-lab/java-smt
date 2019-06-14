@@ -30,7 +30,7 @@ public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManag
 
   protected CVC4UFManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
   }
 
   /*@Override

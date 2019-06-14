@@ -54,7 +54,7 @@ public abstract class CVC4NumeralFormulaManager<
 
   CVC4NumeralFormulaManager(CVC4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
   }
 
   protected abstract Type getNumeralType();

@@ -35,7 +35,7 @@ public class CVC4ArrayFormulaManager
 
   public CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-    exprManager = pFormulaCreator.getExprManager();
+    exprManager = pFormulaCreator.getEnv();
   }
 
   @Override

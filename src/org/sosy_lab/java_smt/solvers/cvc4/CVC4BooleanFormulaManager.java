@@ -39,7 +39,7 @@ public class CVC4BooleanFormulaManager
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
     cvc4True = exprManager.mkConst(true);
     cvc4False = exprManager.mkConst(false);
   }

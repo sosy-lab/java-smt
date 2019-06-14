@@ -36,7 +36,7 @@ public class CVC4BitvectorFormulaManager
 
   protected CVC4BitvectorFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
   }
 
   @Override
