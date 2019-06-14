@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,32 +24,9 @@ import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-public class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
+class CVC4UFManager extends AbstractUFManager<Expr, Expr, Type, ExprManager> {
 
-  private final ExprManager exprManager;
-
-  protected CVC4UFManager(CVC4FormulaCreator pCreator) {
+  CVC4UFManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getEnv();
   }
-
-  /*@Override
-  protected Expr declareUninterpretedFunctionImpl(
-      String pName, Type pReturnType, List<Type> pArgTypes) {
-    vectorType argTypes = new vectorType();
-    for (Type t : pArgTypes) {
-      argTypes.add(t);
-    }
-    FunctionType functionType = exprManager.mkFunctionType(argTypes, pReturnType);
-    return formulaCreator.makeVariable(functionType, pName);
-  }
-
-  @Override
-  protected Expr createUninterpretedFunctionCallImpl(Expr pFunc, List<Expr> pArgs) {
-    vectorExpr args = new vectorExpr();
-    for (Expr t : pArgs) {
-      args.add(t);
-    }
-    return exprManager.mkExpr(Kind.APPLY_UF, pFunc, args);
-  }*/
 }
