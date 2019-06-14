@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Preconditions;
 import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
@@ -112,11 +114,24 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+    Type t = extractInfo(pFormula).getType();
     if (pFormula instanceof BitvectorFormula) {
-      return (FormulaType<T>) getFormulaType(((CVC4BitvectorFormula) pFormula).getTerm());
+      checkArgument(t.isBitVector(), "BitvectorFormula with actual type " + t + ": " + pFormula);
+      return (FormulaType<T>) getFormulaType(extractInfo(pFormula));
+
+    } else if (pFormula instanceof FloatingPointFormula) {
+      checkArgument(
+          t.isFloatingPoint(), "FloatingPointFormula with actual type " + t + ": " + pFormula);
+      return (FormulaType<T>)
+          FormulaType.getFloatingPointType(
+              (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),
+              (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getSignificandSize());
+
+    } else if (pFormula instanceof ArrayFormula<?, ?>) {
+      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
-    // TODO: handle ArrayFormula (and FloatingPointFormula)
-    // (HINT: look at corresponding method in MathSat5 part)
     return super.getFormulaType(pFormula);
   }
 
@@ -152,6 +167,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // The theory REAL in CVC4 is the theory of (infinite precision!) real numbers.
       // As such, the theory RATIONAL is contained in REAL. TODO: find a better solution.
       return FormulaType.RationalType;
+    } else if (t.isArray()) {
+      ArrayType arrayType = new ArrayType(t); // instead of casting, create a new type.
+      Type indexType = arrayType.getIndexType();
+      Type elementType = arrayType.getConstituentType();
+      return FormulaType.getArrayType(
+          getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
     } else {
       throw new AssertionError("Unhandled type " + t.getBaseType());
     }

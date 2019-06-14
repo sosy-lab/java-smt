@@ -19,12 +19,25 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static edu.nyu.acsys.CVC4.Kind.DIVISION;
+import static edu.nyu.acsys.CVC4.Kind.INTS_DIVISION;
+import static edu.nyu.acsys.CVC4.Kind.INTS_MODULUS;
+import static edu.nyu.acsys.CVC4.Kind.ITE;
+import static edu.nyu.acsys.CVC4.Kind.MINUS;
+import static edu.nyu.acsys.CVC4.Kind.MULT;
+import static edu.nyu.acsys.CVC4.Kind.PLUS;
+
+import com.google.common.collect.ImmutableSet;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
@@ -32,6 +45,10 @@ public abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
         Expr, Type, ExprManager, ParamFormulaType, ResultFormulaType, Expr> {
+
+  /** Operators for arithmetic functions that return a numeric value. */
+  private static final ImmutableSet<Kind> NUMERIC_FUNCTIONS =
+      ImmutableSet.of(PLUS, MINUS, MULT, DIVISION, INTS_DIVISION, INTS_MODULUS);
 
   protected final ExprManager exprManager;
 
@@ -45,6 +62,39 @@ public abstract class CVC4NumeralFormulaManager<
   @Override
   public boolean isNumeral(Expr pVal) {
     return (pVal.getType().isInteger() || pVal.getType().isReal()) && pVal.isConst();
+  }
+
+  /**
+   * Check whether the current term is numeric and the value of a term is determined by only
+   * numerals, i.e. no variable is contained. This method should check as precisely as possible the
+   * situations in which CVC4 supports arithmetic operations like multiplications.
+   *
+   * <p>Example: TRUE for "1", "2+3", "ite(x,2,3) and FALSE for "x", "x+2", "ite(1=2,x,0)"
+   */
+  boolean consistsOfNumerals(Expr val) {
+    Set<Expr> finished = new HashSet<>();
+    Deque<Expr> waitlist = new ArrayDeque<>();
+    waitlist.add(val);
+    while (!waitlist.isEmpty()) {
+      Expr e = waitlist.pop();
+      if (!finished.add(e)) {
+        continue;
+      }
+      if (isNumeral(e)) {
+        // true, skip and check others
+      } else if (NUMERIC_FUNCTIONS.contains(e.getKind())) {
+        for (Expr param : e) {
+          waitlist.add(param);
+        }
+      } else if (ITE.equals(e.getKind())) {
+        // ignore condition, just use the if- and then-case
+        waitlist.add(e.getChild(1));
+        waitlist.add(e.getChild(2));
+      } else {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -75,7 +125,11 @@ public abstract class CVC4NumeralFormulaManager<
 
   @Override
   public Expr multiply(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
+    if (consistsOfNumerals(pParam1) || consistsOfNumerals(pParam2)) {
+      return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
+    } else {
+      return super.multiply(pParam1, pParam2);
+    }
   }
 
   @Override

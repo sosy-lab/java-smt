@@ -661,14 +661,20 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula _b_at_i_plus_1 = amgr.select(_b, _i_plus_1);
 
-    if (solver == Solvers.MATHSAT5) {
-      // Mathsat5 has a different internal representation of the formula
-      assertThat(_b_at_i_plus_1.toString()).isEqualTo("(`read_int_int` b (`+_int` i 1))");
-    } else if (solver == Solvers.PRINCESS) {
-      assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
-    } else {
-      assertThat(_b_at_i_plus_1.toString())
-          .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
+    switch (solver) {
+      case MATHSAT5:
+        // Mathsat5 has a different internal representation of the formula
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(`read_int_int` b (`+_int` i 1))");
+        break;
+      case PRINCESS:
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
+        break;
+      case CVC4:
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("b[i + 1]");
+        break;
+      default:
+        assertThat(_b_at_i_plus_1.toString())
+            .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
     }
   }
 
@@ -690,12 +696,17 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
             FormulaType.getBitvectorTypeWithSize(32));
     BitvectorFormula _b_at_i = amgr.select(_b, _i);
 
-    if (solver == Solvers.MATHSAT5) {
-      // Mathsat5 has a different internal representation of the formula
-      assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
-    } else {
-      assertThat(_b_at_i.toString())
-          .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
+    switch (solver) {
+      case MATHSAT5:
+        // Mathsat5 has a different internal representation of the formula
+        assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
+        break;
+      case CVC4:
+        assertThat(_b_at_i.toString()).isEqualTo("b[i]");
+        break;
+      default:
+        assertThat(_b_at_i.toString())
+            .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
     }
   }
 
@@ -713,11 +724,16 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     RationalFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
 
-    if (solver == Solvers.MATHSAT5) {
-      assertThat(valueInMulti.toString())
-          .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
-    } else {
-      assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    switch (solver) {
+      case MATHSAT5:
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+        break;
+      case CVC4:
+        assertThat(valueInMulti.toString()).isEqualTo("multi[i][i]");
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
     }
   }
 
@@ -741,13 +757,17 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BitvectorFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
 
-    if (solver == Solvers.MATHSAT5) {
-      assertThat(valueInMulti.toString())
-          .isEqualTo(
-              "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, "
-                  + ">` multi i) i)");
-    } else {
-      assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    switch (solver) {
+      case MATHSAT5:
+        assertThat(valueInMulti.toString())
+            .isEqualTo(
+                "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)");
+        break;
+      case CVC4:
+        assertThat(valueInMulti.toString()).isEqualTo("multi[i][i]");
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
     }
   }
 
@@ -1010,7 +1030,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assume()
         .withMessage("TODO: Z3BitvectorFormulaManager does not correctly implement this")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNoneOf(Solvers.Z3, Solvers.CVC4);
 
     try {
       bvmgr.makeBitvector(4, 32);
