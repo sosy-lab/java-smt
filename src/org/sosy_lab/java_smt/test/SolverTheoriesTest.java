@@ -669,9 +669,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       case PRINCESS:
         assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
         break;
-      case CVC4:
-        assertThat(_b_at_i_plus_1.toString()).isEqualTo("b[i + 1]");
-        break;
       default:
         assertThat(_b_at_i_plus_1.toString())
             .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
@@ -701,9 +698,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         // Mathsat5 has a different internal representation of the formula
         assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
         break;
-      case CVC4:
-        assertThat(_b_at_i.toString()).isEqualTo("b[i]");
-        break;
       default:
         assertThat(_b_at_i.toString())
             .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
@@ -728,9 +722,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       case MATHSAT5:
         assertThat(valueInMulti.toString())
             .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
-        break;
-      case CVC4:
-        assertThat(valueInMulti.toString()).isEqualTo("multi[i][i]");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -762,9 +753,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         assertThat(valueInMulti.toString())
             .isEqualTo(
                 "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)");
-        break;
-      case CVC4:
-        assertThat(valueInMulti.toString()).isEqualTo("multi[i][i]");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");

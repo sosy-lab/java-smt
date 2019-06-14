@@ -21,6 +21,8 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.CVC4JNI;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.SExpr;
+import edu.nyu.acsys.CVC4.SmtEngine;
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -60,6 +62,13 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     // ExprManager is the central class for creating expressions/terms/formulae.
     ExprManager exprManager = new ExprManager();
     CVC4FormulaCreator creator = new CVC4FormulaCreator(exprManager);
+
+    // set common options.
+    // temporary SmtEngine instance, until ExprManager.getOptions() works without SegFault.
+    SmtEngine smtEngine = new SmtEngine(exprManager);
+    smtEngine.setOption("output-language", new SExpr("smt2"));
+    smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    smtEngine.delete();
 
     // Create managers
     CVC4UFManager functionTheory = new CVC4UFManager(creator);
