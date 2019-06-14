@@ -66,13 +66,6 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements Prove
   }
 
   // @Override
-  // public void close() {
-  // Preconditions.checkState(!closed);
-  // // smtEngine.delete();
-  // closed = true;
-  // }
-
-  // @Override
   // public <T> T allSat(AllSatCallback<T> pCallback, List<BooleanFormula> pImportant)
   //     throws InterruptedException, SolverException {
   //   Preconditions.checkState(!closed);

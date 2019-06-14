@@ -66,6 +66,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     // TODO: closing context.
+    creator.getEnv().delete();
   }
 
   @Override
@@ -75,7 +76,11 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   @Override
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new CVC4TheoremProver(creator);
+    // if (pOptions.contains(ProverOptions.SEPARATION_LOGIC)) {
+    // return new CVC4SLProver(creator);
+    // }
+    // return new CVC4TheoremProver(creator);
+    return new CVC4SLProver(creator);
   }
 
   @Override

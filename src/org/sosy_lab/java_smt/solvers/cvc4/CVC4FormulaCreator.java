@@ -119,8 +119,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, CVC4Environme
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    CVC4Environment env = getEnv();
-
     if (pFormula instanceof BitvectorFormula) {
       return (FormulaType<T>) getFormulaType(((CVC4BitvectorFormula) pFormula).getTerm());
     }

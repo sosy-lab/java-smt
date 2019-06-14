@@ -105,7 +105,6 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, CVC4Environment>
   @Override
   public void close() {
     // TODO Auto-generated method stub
-
   }
 
   private ImmutableList<ValueAssignment> generateModel() {
