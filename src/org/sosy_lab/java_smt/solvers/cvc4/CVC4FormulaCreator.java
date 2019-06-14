@@ -226,28 +226,16 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
-  private String getName(Expr pT) {
-    Preconditions.checkState(!pT.isNull());
-
-    if (pT.isConst() || pT.isVariable()) {
-      return dequote(pT.toString());
-    } else {
-      return dequote(pT.getOperator().toString());
+  private static String getName(Expr e) {
+    Preconditions.checkState(!e.isNull());
+    if (!e.isConst() && !e.isVariable()) {
+      e = e.getOperator();
     }
+    return dequote(e.toString());
   }
 
-  /*
-  private Expr replaceArgs(Expr pT, List<Expr> pNewArgs) {
-    // TODO!
-    throw new UnsupportedOperationException("Not implemented");
-  }
-  */
-
-  /**
-   * Variable names can be wrapped with "|". This function removes those chars. I copied it from
-   * SMTInterpolFormulaCreator. TODO: remove code duplication
-   */
-  private String dequote(String s) {
+  /** Variable names can be wrapped with "|". This function removes those chars. */
+  private static String dequote(String s) {
     int l = s.length();
     if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
       return s.substring(1, l - 1);
@@ -279,13 +267,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
-      String name = getName(f);
-      long arity = f.getNumChildren();
-
-      List<Formula> args = new ArrayList<>((int) arity);
-      List<FormulaType<?>> argsTypes = new ArrayList<>((int) arity);
-      for (int i = 0; i < arity; i++) {
-        Expr arg = f.getChild(i);
+      List<Formula> args = new ArrayList<>();
+      List<FormulaType<?>> argsTypes = new ArrayList<>();
+      for (Expr arg : f) {
         FormulaType<?> argType = getFormulaType(arg);
         args.add(encapsulateWithTypeOf(arg));
         argsTypes.add(argType);
@@ -295,7 +279,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           formula,
           args,
           FunctionDeclarationImpl.of(
-              name, getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
+              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
     }
   }
 
@@ -358,7 +342,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   protected Expr getBooleanVarDeclarationImpl(Expr pTFormulaInfo) {
     Kind kind = pTFormulaInfo.getKind();
-    assert (kind == Kind.APPLY_UF || kind == Kind.VARIABLE) : pTFormulaInfo.getKind();
+    assert kind == Kind.APPLY_UF || kind == Kind.VARIABLE : pTFormulaInfo.getKind();
     if (kind == Kind.APPLY_UF) {
       return pTFormulaInfo.getOperator();
     } else {
