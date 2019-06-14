@@ -88,10 +88,19 @@ public interface SolverContext extends AutoCloseable {
    */
   OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options);
 
-  /** Get version information out of the solver. */
+  /**
+   * Get version information out of the solver.
+   *
+   * <p>In most cases, the version contains the name of the solver followed by some numbers and
+   * additional info about the version, e.g., "SMTInterpol 2.5-12-g3d15a15c".
+   */
   String getVersion();
 
-  /** Get solver name (MATHSAT5/Z3/etc...). */
+  /**
+   * Get solver name (MATHSAT5/Z3/etc...).
+   *
+   * <p>This is an uppercase String matching the enum identifier from {@link Solvers}
+   */
   Solvers getSolverName();
 
   /**
