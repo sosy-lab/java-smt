@@ -167,8 +167,9 @@ abstract class CVC4AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
-    smtEngine.delete();
-    closed = true;
+    if (!closed) {
+      smtEngine.delete();
+      closed = true;
+    }
   }
 }

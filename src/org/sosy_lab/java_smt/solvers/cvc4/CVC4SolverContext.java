@@ -34,7 +34,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class CVC4SolverContext extends AbstractSolverContext {
 
-  private final CVC4FormulaCreator creator;
+  // creator is final, except after closing, then null.
+  private CVC4FormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
 
@@ -54,7 +55,6 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownNotifier) {
 
-    // Init CVC4
     NativeLibraries.loadLibrary("cvc4jni");
 
     // ExprManager is the central class for creating expressions/terms/formulae.
@@ -92,7 +92,10 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    // TODO: closing context.
+    if (creator != null) {
+      creator.getExprManager().delete();
+      creator = null;
+    }
   }
 
   @Override
