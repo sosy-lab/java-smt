@@ -45,7 +45,7 @@ public class CVC4IntegerFormulaManager
   @Override
   @SuppressWarnings("checkstyle:illegalinstantiation")
   public Expr makeNumberImpl(long pI) {
-    return exprManager.mkConst(new Rational(pI));
+    return makeNumberImpl(Long.toString(pI));
   }
 
   @Override
