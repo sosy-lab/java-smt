@@ -56,7 +56,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(creator.getExprManager());
 
-    assertedFormulas.addLast(new ArrayList<>()); // create initial level
+    assertedFormulas.push(new ArrayList<>()); // create initial level
 
     setOptions(randomSeed);
     registerShutdownHandler(pShutdownNotifier);
@@ -95,7 +95,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    assertedFormulas.add(new ArrayList<>());
+    assertedFormulas.push(new ArrayList<>());
     smtEngine.push();
   }
 
