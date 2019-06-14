@@ -22,6 +22,8 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
@@ -297,93 +299,60 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     }
   }
 
+  // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)
+  private static final ImmutableMap<Kind, FunctionDeclarationKind> KIND_MAPPING =
+      ImmutableMap.<Kind, FunctionDeclarationKind>builder()
+          .put(Kind.EQUAL, FunctionDeclarationKind.EQ)
+          .put(Kind.DISTINCT, FunctionDeclarationKind.DISTINCT)
+          .put(Kind.NOT, FunctionDeclarationKind.NOT)
+          .put(Kind.AND, FunctionDeclarationKind.AND)
+          .put(Kind.IMPLIES, FunctionDeclarationKind.IMPLIES)
+          .put(Kind.OR, FunctionDeclarationKind.OR)
+          .put(Kind.XOR, FunctionDeclarationKind.XOR)
+          .put(Kind.ITE, FunctionDeclarationKind.ITE)
+          .put(Kind.APPLY_UF, FunctionDeclarationKind.UF)
+          .put(Kind.PLUS, FunctionDeclarationKind.ADD)
+          .put(Kind.MULT, FunctionDeclarationKind.MUL)
+          .put(Kind.MINUS, FunctionDeclarationKind.SUB)
+          .put(Kind.DIVISION, FunctionDeclarationKind.DIV)
+          .put(Kind.LT, FunctionDeclarationKind.LT)
+          .put(Kind.LEQ, FunctionDeclarationKind.LTE)
+          .put(Kind.GT, FunctionDeclarationKind.GT)
+          .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          .put(Kind.BITVECTOR_PLUS, FunctionDeclarationKind.BV_ADD)
+          .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
+          .put(Kind.BITVECTOR_MULT, FunctionDeclarationKind.BV_MUL)
+          .put(Kind.BITVECTOR_AND, FunctionDeclarationKind.BV_AND)
+          .put(Kind.BITVECTOR_OR, FunctionDeclarationKind.BV_OR)
+          .put(Kind.BITVECTOR_XOR, FunctionDeclarationKind.BV_XOR)
+          .put(Kind.BITVECTOR_SLT, FunctionDeclarationKind.BV_SLT)
+          .put(Kind.BITVECTOR_ULT, FunctionDeclarationKind.BV_ULT)
+          .put(Kind.BITVECTOR_SLE, FunctionDeclarationKind.BV_SLE)
+          .put(Kind.BITVECTOR_ULE, FunctionDeclarationKind.BV_ULE)
+          .put(Kind.BITVECTOR_SGT, FunctionDeclarationKind.BV_SGT)
+          .put(Kind.BITVECTOR_UGT, FunctionDeclarationKind.BV_UGT)
+          .put(Kind.BITVECTOR_SGE, FunctionDeclarationKind.BV_SGE)
+          .put(Kind.BITVECTOR_UGE, FunctionDeclarationKind.BV_UGE)
+          .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
+          .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
+          .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
+          // TODO: find out where Kind.BITVECTOR_SMOD fits in here
+          .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
+          .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
+          .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
+          .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
+          .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .build();
+
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
     Kind kind = f.getKind();
-    // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)
-    if (kind == Kind.EQUAL) {
-      return FunctionDeclarationKind.EQ;
-    } else if (kind == Kind.DISTINCT) {
-      return FunctionDeclarationKind.DISTINCT;
-    } else if (kind == Kind.NOT) {
-      return FunctionDeclarationKind.NOT;
-    } else if (kind == Kind.AND) {
-      return FunctionDeclarationKind.AND;
-    } else if (kind == Kind.EQUAL) {
+
+    // special case: IFF for Boolean, EQ for all other types
+    if (kind == Kind.EQUAL && Iterables.all(f, child -> child.getType().isBoolean())) {
       return FunctionDeclarationKind.IFF;
-    } else if (kind == Kind.IMPLIES) {
-      return FunctionDeclarationKind.IMPLIES;
-    } else if (kind == Kind.OR) {
-      return FunctionDeclarationKind.OR;
-    } else if (kind == Kind.XOR) {
-      return FunctionDeclarationKind.XOR;
-    } else if (kind == Kind.ITE) {
-      return FunctionDeclarationKind.ITE;
-    } else if (kind == Kind.APPLY_UF) {
-      return FunctionDeclarationKind.UF;
-    } else if (kind == Kind.PLUS) {
-      return FunctionDeclarationKind.ADD;
-    } else if (kind == Kind.MULT) {
-      return FunctionDeclarationKind.MUL;
-    } else if (kind == Kind.MINUS) {
-      return FunctionDeclarationKind.SUB;
-    } else if (kind == Kind.DIVISION) {
-      return FunctionDeclarationKind.DIV;
-    } else if (kind == Kind.LT) {
-      return FunctionDeclarationKind.LT;
-    } else if (kind == Kind.LEQ) {
-      return FunctionDeclarationKind.LTE;
-    } else if (kind == Kind.GT) {
-      return FunctionDeclarationKind.GT;
-    } else if (kind == Kind.GEQ) {
-      return FunctionDeclarationKind.GTE;
-    } else if (kind == Kind.BITVECTOR_PLUS) {
-      return FunctionDeclarationKind.BV_ADD;
-    } else if (kind == Kind.BITVECTOR_SUB) {
-      return FunctionDeclarationKind.BV_SUB;
-    } else if (kind == Kind.BITVECTOR_MULT) {
-      return FunctionDeclarationKind.BV_MUL;
-    } else if (kind == Kind.BITVECTOR_AND) {
-      return FunctionDeclarationKind.BV_AND;
-    } else if (kind == Kind.BITVECTOR_OR) {
-      return FunctionDeclarationKind.BV_OR;
-    } else if (kind == Kind.BITVECTOR_XOR) {
-      return FunctionDeclarationKind.BV_XOR;
-    } else if (kind == Kind.BITVECTOR_SLT) {
-      return FunctionDeclarationKind.BV_SLT;
-    } else if (kind == Kind.BITVECTOR_ULT) {
-      return FunctionDeclarationKind.BV_ULT;
-    } else if (kind == Kind.BITVECTOR_SLE) {
-      return FunctionDeclarationKind.BV_SLE;
-    } else if (kind == Kind.BITVECTOR_ULE) {
-      return FunctionDeclarationKind.BV_ULE;
-    } else if (kind == Kind.BITVECTOR_SGT) {
-      return FunctionDeclarationKind.BV_SGT;
-    } else if (kind == Kind.BITVECTOR_UGT) {
-      return FunctionDeclarationKind.BV_UGT;
-    } else if (kind == Kind.BITVECTOR_SGE) {
-      return FunctionDeclarationKind.BV_SGE;
-    } else if (kind == Kind.BITVECTOR_UGE) {
-      return FunctionDeclarationKind.BV_UGE;
-    } else if (kind == Kind.BITVECTOR_SDIV) {
-      return FunctionDeclarationKind.BV_SDIV;
-    } else if (kind == Kind.BITVECTOR_UDIV) {
-      return FunctionDeclarationKind.BV_UDIV;
-    } else if (kind == Kind.BITVECTOR_SREM) {
-      // TODO: find out where Kind.BITVECTOR_SMOD fits in here
-      return FunctionDeclarationKind.BV_SREM;
-    } else if (kind == Kind.BITVECTOR_UREM) {
-      return FunctionDeclarationKind.BV_UREM;
-    } else if (kind == Kind.BITVECTOR_NOT) {
-      return FunctionDeclarationKind.BV_NOT;
-    } else if (kind == Kind.BITVECTOR_NEG) {
-      return FunctionDeclarationKind.BV_NEG;
-    } else if (kind == Kind.BITVECTOR_EXTRACT) {
-      return FunctionDeclarationKind.BV_EXTRACT;
-    } else if (kind == Kind.BITVECTOR_CONCAT) {
-      return FunctionDeclarationKind.BV_CONCAT;
-    } else {
-      return FunctionDeclarationKind.OTHER;
     }
+
+    return KIND_MAPPING.getOrDefault(kind, FunctionDeclarationKind.OTHER);
   }
 
   @Override
