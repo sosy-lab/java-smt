@@ -33,10 +33,12 @@ import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
+import edu.nyu.acsys.CVC4.vectorExpr;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
@@ -175,5 +177,12 @@ public abstract class CVC4NumeralFormulaManager<
   @Override
   public Expr lessOrEquals(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.LEQ, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr distinctImpl(List<Expr> pParam) {
+    vectorExpr param = new vectorExpr();
+    pParam.forEach(param::add);
+    return exprManager.mkExpr(Kind.DISTINCT, param);
   }
 }

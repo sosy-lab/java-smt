@@ -28,10 +28,13 @@ import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
 import edu.nyu.acsys.CVC4.vectorType;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -326,6 +329,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
@@ -377,5 +381,40 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       functionsCache.put(pName, exp);
     }
     return exp;
+  }
+
+  @Override
+  public Object convertValue(Expr pF) {
+    throw new UnsupportedOperationException(
+        "CVC4 needs a second term to determine a correct type. Please use the other method.");
+  }
+
+  @Override
+  public Object convertValue(Expr expForType, Expr value) {
+    final Type type = expForType.getType();
+    if (value.getType().isBoolean()) {
+      return value.getConstBoolean();
+
+    } else if (value.getType().isInteger() && type.isInteger()) {
+      return new BigInteger(value.getConstRational().toString());
+
+    } else if (value.getType().isReal() && type.isReal()) {
+      Rational rat = value.getConstRational();
+      return org.sosy_lab.common.rationals.Rational.of(
+          new BigInteger(rat.getNumerator().toString()),
+          new BigInteger(rat.getDenominator().toString()));
+
+    } else if (value.getType().isBitVector()) {
+      Integer bv = value.getConstBitVector().getValue();
+      if (bv.fitsSignedLong()) {
+        return BigInteger.valueOf(bv.getLong());
+      } else {
+        return value.toString(); // default
+      }
+
+    } else {
+      // String serialization for unknown terms.
+      return value.toString();
+    }
   }
 }

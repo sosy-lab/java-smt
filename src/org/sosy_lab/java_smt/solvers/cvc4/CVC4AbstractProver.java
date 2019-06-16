@@ -39,17 +39,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
+abstract class CVC4AbstractProver<T, AF> extends AbstractProverWithAllSat<T>
+    implements BasicProverEnvironment<T> {
 
   protected final CVC4FormulaCreator creator;
   protected final SmtEngine smtEngine;
 
   protected final AtomicBoolean interrupted = new AtomicBoolean(false);
-  protected boolean closed = false;
 
   /** Tracks formulas on the stack, needed for model generation. */
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
@@ -76,7 +78,9 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
-      Set<ProverOptions> pOptions) {
+      Set<ProverOptions> pOptions,
+      BooleanFormulaManager pBmgr) {
+    super(pOptions, pBmgr, pShutdownNotifier);
 
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
@@ -152,6 +156,12 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
+    return getModelWithoutChecks();
+  }
+
+  @Override
+  protected CVC4Model getModelWithoutChecks() {
     CVC4Model model = new CVC4Model(this, creator, smtEngine, getAssertedExpressions());
     models.add(model);
     return model;
@@ -177,7 +187,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
     try (CVC4Model model = getModel()) {
-      return model.modelToList();
+      return model.toList();
     }
   }
 
@@ -208,6 +218,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));
@@ -224,16 +235,6 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    closeAllModels();
-    // TODO inherit from ProverWithAllSat after merging from master-branch,
-    // then we can remove this part.
     throw new UnsupportedOperationException();
   }
 

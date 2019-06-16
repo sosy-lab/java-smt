@@ -24,12 +24,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import edu.nyu.acsys.CVC4.Type;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,10 +59,14 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   }
 
   @Override
-  public Object evaluateImpl(Expr f) {
+  public Expr evalImpl(Expr f) {
     Preconditions.checkState(!closed);
-    Expr exp = prover.importExpr(f);
-    return getValue(smtEngine.getValue(exp), exp.getType());
+    return getValue(f);
+  }
+
+  /** we need to convert the given expression into the current context. */
+  private Expr getValue(Expr f) {
+    return prover.exportExpr(smtEngine.getValue(prover.importExpr(f)));
   }
 
   private ImmutableList<ValueAssignment> generateModel() {
@@ -81,46 +82,18 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     return builder.build().asList();
   }
 
-  /** return an object representing the value, try to get a matching type */
-  private static Object getValue(Expr value, Type pType) {
-    if (value.getType().isBoolean()) {
-      return value.getConstBoolean();
-
-    } else if (value.getType().isInteger() && pType.isInteger()) {
-      return new BigInteger(value.getConstRational().toString());
-
-    } else if (value.getType().isReal() && pType.isReal()) {
-      Rational rat = value.getConstRational();
-      return org.sosy_lab.common.rationals.Rational.of(
-          new BigInteger(rat.getNumerator().toString()),
-          new BigInteger(rat.getDenominator().toString()));
-
-    } else if (value.getType().isBitVector()) {
-      Integer bv = value.getConstBitVector().getValue();
-      if (bv.fitsSignedLong()) {
-        return BigInteger.valueOf(bv.getLong());
-      } else {
-        return value.toString(); // default
-      }
-
-    } else {
-      // String serialization for unknown terms.
-      return value.toString();
-    }
-  }
-
   private ValueAssignment getAssignment(Expr pKeyTerm) {
     List<Object> argumentInterpretation = new ArrayList<>();
     for (Expr param : pKeyTerm) {
       argumentInterpretation.add(evaluateImpl(param));
     }
     Expr name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
-    Expr valueTerm = prover.exportExpr(smtEngine.getValue(prover.importExpr(pKeyTerm)));
+    Expr valueTerm = getValue(pKeyTerm);
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
     BooleanFormula equation =
         creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, valueTerm));
-    Object value = getValue(valueTerm, pKeyTerm.getType());
+    Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
         keyFormula, valueFormula, equation, name.toString(), value, argumentInterpretation);
   }
@@ -132,7 +105,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> modelToList() {
+  protected ImmutableList<ValueAssignment> toList() {
     return model;
   }
 }

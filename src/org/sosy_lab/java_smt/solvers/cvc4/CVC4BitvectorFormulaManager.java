@@ -21,8 +21,10 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.BitVector;
 import edu.nyu.acsys.CVC4.BitVectorExtract;
+import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.IntToBitVector;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
@@ -187,5 +189,38 @@ public class CVC4BitvectorFormulaManager
     } else {
       return exprManager.mkExpr(Kind.BITVECTOR_UGE, pParam1, pParam2);
     }
+  }
+
+  @Override
+  protected Expr makeBitvectorImpl(int pLength, Expr pParam1) {
+    Expr size = exprManager.mkConst(new IntToBitVector(pLength));
+    return exprManager.mkExpr(Kind.INT_TO_BITVECTOR, size, pParam1);
+  }
+
+  @Override
+  protected Expr toIntegerFormulaImpl(Expr pBv, boolean pSigned) {
+    Expr intExpr = exprManager.mkExpr(Kind.BITVECTOR_TO_NAT, pBv);
+
+    // CVC4 returns unsigned int by default
+    if (pSigned) {
+
+      // TODO check what is cheaper for the solver:
+      // checking the first BV-bit or computing max-int-value for the given size
+
+      final int size = Math.toIntExact((new BitVectorType(pBv.getType())).getSize());
+      final BigInteger modulo = BigInteger.ONE.shiftLeft(size);
+      final BigInteger maxInt = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
+      final Expr moduloExpr = exprManager.mkConst(new Rational(modulo.toString()));
+      final Expr maxIntExpr = exprManager.mkConst(new Rational(maxInt.toString()));
+
+      intExpr =
+          exprManager.mkExpr(
+              Kind.ITE,
+              exprManager.mkExpr(Kind.GT, intExpr, maxIntExpr),
+              exprManager.mkExpr(Kind.MINUS, intExpr, moduloExpr),
+              intExpr);
+    }
+
+    return intExpr;
   }
 }

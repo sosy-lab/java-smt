@@ -203,4 +203,16 @@ public class CVC4FloatingPointFormulaManager
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  protected Expr isNormal(Expr pParam) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected Expr isNegative(Expr pParam) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
+  }
 }
