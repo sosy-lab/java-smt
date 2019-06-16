@@ -63,12 +63,22 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr makeBitvectorImpl(int pLength, long pI) {
-    return exprManager.mkConst(new BitVector(pLength, pI));
-  }
-
-  @Override
   protected Expr makeBitvectorImpl(int pLength, BigInteger pI) {
+    if (pI.signum() < 0) {
+      BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
+      if (pI.compareTo(max.negate()) < 0) {
+        throw new IllegalArgumentException(
+            pI + " is to small for a bitvector with length " + pLength);
+      }
+      BigInteger n = BigInteger.valueOf(2).pow(pLength);
+      pI = pI.add(n);
+    } else {
+      BigInteger max = BigInteger.valueOf(2).pow(pLength);
+      if (pI.compareTo(max) >= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to large for a bitvector with length " + pLength);
+      }
+    }
     return exprManager.mkConst(new BitVector(pLength, pI));
   }
 
