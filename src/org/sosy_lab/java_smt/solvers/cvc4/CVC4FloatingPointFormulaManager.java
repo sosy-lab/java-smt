@@ -33,22 +33,31 @@ public class CVC4FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
+  private final Expr roundingMode;
 
-  protected CVC4FloatingPointFormulaManager(CVC4FormulaCreator pCreator) {
+  protected CVC4FloatingPointFormulaManager(
+      CVC4FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
     exprManager = pCreator.getEnv();
+    roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
   @Override
   protected Expr getDefaultRoundingMode() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return roundingMode;
   }
 
   @Override
   protected Expr getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN:
+      case NEAREST_TIES_AWAY:
+      case TOWARD_POSITIVE:
+      case TOWARD_NEGATIVE:
+      case TOWARD_ZERO:
+      default:
+        throw new AssertionError("Unexpected branch");
+    }
   }
 
   @Override

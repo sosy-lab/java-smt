@@ -20,13 +20,17 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.CVC4JNI;
+import edu.nyu.acsys.CVC4.Configuration;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.SExpr;
 import edu.nyu.acsys.CVC4.SmtEngine;
 import java.util.Set;
+import java.util.logging.Level;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -53,9 +57,11 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   }
 
   public static SolverContext create(
+      LogManager pLogger,
+      ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
-      ShutdownNotifier pShutdownNotifier) {
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
 
     NativeLibraries.loadLibrary("cvc4jni");
 
@@ -78,6 +84,16 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     CVC4RationalFormulaManager rationalTheory =
         new CVC4RationalFormulaManager(creator, pNonLinearArithmetic);
     CVC4BitvectorFormulaManager bitvectorTheory = new CVC4BitvectorFormulaManager(creator);
+
+    CVC4FloatingPointFormulaManager fpTheory;
+    if (Configuration.isBuiltWithSymFPU()) {
+      fpTheory = new CVC4FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
+    } else {
+      fpTheory = null;
+      pLogger.log(Level.INFO, "CVC4 was built without support for FloatingPoint theory");
+      // throw new AssertionError("CVC4 was built without support for FloatingPoint theory");
+    }
+
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
     CVC4SLFormulaManager slTheory = new CVC4SLFormulaManager(creator);
     CVC4FormulaManager manager =
@@ -88,6 +104,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             integerTheory,
             rationalTheory,
             bitvectorTheory,
+            fpTheory,
             arrayTheory,
             slTheory);
 

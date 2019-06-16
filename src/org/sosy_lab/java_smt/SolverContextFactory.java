@@ -186,7 +186,12 @@ public class SolverContextFactory {
       throws InvalidConfigurationException {
     switch (solverToCreate) {
       case CVC4:
-        return CVC4SolverContext.create((int) randomSeed, nonLinearArithmetic, shutdownNotifier);
+        return CVC4SolverContext.create(
+            logger,
+            shutdownNotifier,
+            (int) randomSeed,
+            nonLinearArithmetic,
+            floatingPointRoundingMode);
 
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
