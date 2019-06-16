@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,11 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +55,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 @RunWith(Parameterized.class)
 public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
+  private static final int NUM_RANDOM_TESTS = 100;
+
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -65,6 +71,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   private FloatingPointType singlePrecType;
+  private FloatingPointType doublePrecType;
   private FloatingPointFormula nan;
   private FloatingPointFormula posInf;
   private FloatingPointFormula negInf;
@@ -76,6 +83,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     requireFloats();
 
     singlePrecType = FormulaType.getSinglePrecisionFloatingPointType();
+    doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
     nan = fpmgr.makeNaN(singlePrecType);
     posInf = fpmgr.makePlusInfinity(singlePrecType);
     negInf = fpmgr.makeMinusInfinity(singlePrecType);
@@ -91,6 +99,56 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
     assertThat(result.getExponentSize()).named("exponent size").isEqualTo(type.getExponentSize());
     assertThat(result.getMantissaSize()).named("mantissa size").isEqualTo(type.getMantissaSize());
+  }
+
+  @Test
+  public void negative() throws SolverException, InterruptedException {
+    for (double d : new double[] {-1, -2, -0.0, Double.NEGATIVE_INFINITY}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isTautological();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+    for (double d : new double[] {1, 2, 0.0, Double.POSITIVE_INFINITY}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+  }
+
+  @Test
+  public void parser() throws SolverException, InterruptedException {
+    for (String s : new String[] {"-1", "-Infinity", "-0", "-0.0", "-0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isTautological();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+    for (String s : new String[] {"1", "Infinity", "0", "0.0", "0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+    for (String s : new String[] {"+1", "+Infinity", "+0", "+0.0", "+0.000"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+    }
+    // NaN is not positive and not negative.
+    for (String s : new String[] {"NaN", "-NaN", "+NaN"}) {
+      FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
+      assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
+      assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void negativeZeroDivision() throws SolverException, InterruptedException {
+    BooleanFormula formula =
+        fpmgr.equalWithFPSemantics(
+            fpmgr.divide(
+                one, fpmgr.makeNumber(-0.0, singlePrecType), FloatingPointRoundingMode.TOWARD_ZERO),
+            fpmgr.makeMinusInfinity(singlePrecType));
+    assertThatFormula(formula).isSatisfiable();
+    assertThatFormula(bmgr.not(formula)).isUnsatisfiable();
   }
 
   @Test
@@ -126,15 +184,29 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void specialValueFunctions() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.isInfinity(posInf)).isTautological();
+    assertThatFormula(fpmgr.isNormal(posInf)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(posInf)).isUnsatisfiable();
+
     assertThatFormula(fpmgr.isInfinity(negInf)).isTautological();
+    assertThatFormula(fpmgr.isNormal(negInf)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(negInf)).isUnsatisfiable();
 
     assertThatFormula(fpmgr.isNaN(nan)).isTautological();
+    assertThatFormula(fpmgr.isNormal(nan)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(nan)).isUnsatisfiable();
 
     assertThatFormula(fpmgr.isZero(zero)).isTautological();
-    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(-0.0, singlePrecType))).isTautological();
+    assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
+
+    FloatingPointFormula negZero = fpmgr.makeNumber(-0.0, singlePrecType);
+    assertThatFormula(fpmgr.isZero(negZero)).isTautological();
+    assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
 
     FloatingPointFormula minPosNormalValue = fpmgr.makeNumber(Float.MIN_NORMAL, singlePrecType);
     assertThatFormula(fpmgr.isSubnormal(minPosNormalValue)).isUnsatisfiable();
+    assertThatFormula(fpmgr.isNormal(minPosNormalValue)).isSatisfiable();
     assertThatFormula(fpmgr.isZero(minPosNormalValue)).isUnsatisfiable();
   }
 
@@ -167,17 +239,50 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void numberConstants() throws SolverException, InterruptedException {
-    FloatingPointType doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, doublePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, singlePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, doublePrecType);
+
+    // check unequality for large types
+    FloatingPointType nearDouble = FormulaType.getFloatingPointType(12, 52);
+    FloatingPointFormula h1 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(309).multiply(BigDecimal.valueOf(1.0001)), nearDouble);
+    FloatingPointFormula h2 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(309).multiply(BigDecimal.valueOf(1.0002)), nearDouble);
+    assertThatFormula(fpmgr.equalWithFPSemantics(h1, h2)).isUnsatisfiable();
+
+    // check equality for short types
+    FloatingPointType smallType = FormulaType.getFloatingPointType(4, 4);
+    FloatingPointFormula i1 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.001)), smallType);
+    FloatingPointFormula i2 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.002)), smallType);
+    assertThatFormula(fpmgr.equalWithFPSemantics(i1, i2)).isTautological();
+
+    // check equality for short types
+    FloatingPointType smallType2 = FormulaType.getFloatingPointType(4, 4);
+    FloatingPointFormula j1 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.001)), smallType2);
+    FloatingPointFormula j2 =
+        fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.002)), smallType2);
+    assertThatFormula(fpmgr.equalWithFPSemantics(j1, j2)).isTautological();
+
+    // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
+    if (!solver.equals(Solvers.Z3)) {
+      // check unequality for very large types
+      FloatingPointType largeType = FormulaType.getFloatingPointType(100, 100);
+      FloatingPointFormula k1 =
+          fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.001)), largeType);
+      FloatingPointFormula k2 =
+          fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.002)), largeType);
+      assertThatFormula(fpmgr.equalWithFPSemantics(k1, k2)).isUnsatisfiable();
+    }
   }
 
   @Test
   public void cast() throws SolverException, InterruptedException {
-    FloatingPointType doublePrecType = FormulaType.getDoublePrecisionFloatingPointType();
     FloatingPointFormula doublePrecNumber = fpmgr.makeNumber(1.5, doublePrecType);
     FloatingPointFormula singlePrecNumber = fpmgr.makeNumber(1.5, singlePrecType);
 
@@ -445,6 +550,100 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
             bvmgr.equal(var, fpmgr.toIeeeBitvector(fpmgr.fromIeeeBitvector(var, singlePrecType))))
+        .isTautological();
+  }
+
+  @Test
+  public void checkIeeeFpConversion32() throws SolverException, InterruptedException {
+    for (float f : getListOfFloats()) {
+      checkFP(
+          singlePrecType,
+          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
+          fpmgr.makeNumber(f, singlePrecType));
+    }
+  }
+
+  @Test
+  public void checkIeeeFpConversion64() throws SolverException, InterruptedException {
+    for (double d : getListOfDoubles()) {
+      checkFP(
+          doublePrecType,
+          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
+          fpmgr.makeNumber(d, doublePrecType));
+    }
+  }
+
+  private List<Float> getListOfFloats() {
+    List<Float> flts =
+        Lists.newArrayList(
+            // Float.NaN, // NaN is no unique bitvector
+            Float.MIN_NORMAL,
+            Float.MIN_VALUE,
+            Float.MAX_VALUE,
+            Float.POSITIVE_INFINITY,
+            Float.NEGATIVE_INFINITY,
+            0.0f // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
+            );
+
+    for (int i = 1; i < 20; i++) {
+      for (int j = 1; j < 20; j++) {
+        flts.add((float) (i * Math.pow(10, j)));
+      }
+    }
+
+    Random rand = new Random(0);
+    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+      float flt = Float.intBitsToFloat(rand.nextInt());
+      if (!Float.isNaN(flt)) {
+        flts.add(flt);
+      }
+    }
+
+    return flts;
+  }
+
+  private List<Double> getListOfDoubles() {
+    List<Double> dbls =
+        Lists.newArrayList(
+            // Double.NaN, // NaN is no unique bitvector
+            Double.MIN_NORMAL,
+            Double.MIN_VALUE,
+            Double.MAX_VALUE,
+            Double.POSITIVE_INFINITY,
+            Double.NEGATIVE_INFINITY,
+            0.0 // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
+            );
+
+    for (int i = 1; i < 20; i++) {
+      for (int j = 1; j < 20; j++) {
+        dbls.add(i * Math.pow(10, j));
+      }
+    }
+
+    Random rand = new Random(0);
+    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+      double d = Double.longBitsToDouble(rand.nextLong());
+      if (!Double.isNaN(d)) {
+        dbls.add(d);
+      }
+    }
+
+    return dbls;
+  }
+
+  private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
+      throws SolverException, InterruptedException {
+    BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
+
+    Truth.assertThat(mgr.getFormulaType(var))
+        .isEqualTo(mgr.getFormulaType(fpmgr.toIeeeBitvector(flt)));
+    Truth.assertThat(mgr.getFormulaType(flt))
+        .isEqualTo(mgr.getFormulaType(fpmgr.fromIeeeBitvector(bv, type)));
+
+    assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, fpmgr.toIeeeBitvector(flt))))
+        .isSatisfiable();
+    assertThatFormula(bvmgr.equal(bv, fpmgr.toIeeeBitvector(flt))).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(flt, fpmgr.fromIeeeBitvector(bv, type)))
         .isTautological();
   }
 

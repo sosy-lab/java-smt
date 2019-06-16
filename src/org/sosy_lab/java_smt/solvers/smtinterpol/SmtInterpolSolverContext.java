@@ -21,7 +21,7 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -82,7 +82,7 @@ public class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    return new ReusableStackInterpolatingProver<>(environment.getInterpolator(manager));
+    return new ReusableStackInterpolatingProver<>(environment.getInterpolator(manager, options));
   }
 
   @Override

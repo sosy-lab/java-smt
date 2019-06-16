@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.errorprone.annotations.Immutable;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
  * @param <T> Formula class corresponding to the given formula type.
  */
 @SuppressWarnings("checkstyle:constantname")
+@Immutable
 public abstract class FormulaType<T extends Formula> {
 
   private FormulaType() {}
@@ -74,6 +76,7 @@ public abstract class FormulaType<T extends Formula> {
   @Override
   public abstract String toString();
 
+  @Immutable
   public abstract static class NumeralType<T extends NumeralFormula> extends FormulaType<T> {
 
     @Override
@@ -128,11 +131,12 @@ public abstract class FormulaType<T extends Formula> {
     return new BitvectorType(size);
   }
 
+  @Immutable
   public static final class BitvectorType extends FormulaType<BitvectorFormula> {
     private final int size;
 
     private BitvectorType(int size) {
-      this.size = (size);
+      this.size = size;
     }
 
     @Override
@@ -179,6 +183,7 @@ public abstract class FormulaType<T extends Formula> {
     return FloatingPointType.DOUBLE_PRECISION_FP_TYPE;
   }
 
+  @Immutable
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
 
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE = new FloatingPointType(8, 23);

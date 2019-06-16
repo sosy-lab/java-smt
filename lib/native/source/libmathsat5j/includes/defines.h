@@ -347,6 +347,13 @@ typedef jobject jjnamedtermswrapper;
   CALL1(msat_type, get_##name##_type) \
   TYPE_RETURN
 
+#define make_term_unary(name) \
+  DEFINE_FUNC(jterm, 1make_1##name) WITH_TWO_ARGS(jenv, jterm) \
+  ENV_ARG(1) \
+  TERM_ARG(2) \
+  CALL2(msat_term, make_##name) \
+  TERM_RETURN
+
 #define make_term_binary(name) \
   DEFINE_FUNC(jterm, 1make_1##name) WITH_THREE_ARGS(jenv, jterm, jterm) \
   ENV_ARG(1) \

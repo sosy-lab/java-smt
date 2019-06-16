@@ -19,5 +19,8 @@
  */
 package org.sosy_lab.java_smt.api;
 
+import com.google.errorprone.annotations.Immutable;
+
 /** Formula of the floating point sort. */
+@Immutable
 public interface FloatingPointFormula extends Formula {}

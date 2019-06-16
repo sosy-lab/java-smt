@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -36,8 +36,31 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
 
   /**
-   * Evaluate a given formula substituting the values from the model. Can be absent if the value is
-   * not relevant to the satisfiability result.
+   * Evaluate a given formula substituting the values from the model and return it as formula.
+   *
+   * <p>If a value is not relevant to the satisfiability result, the solver can choose either to
+   * insert an arbitrary value (e.g., the value <code>0</code> for the matching type) or just return
+   * <code>null</code>.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression. The solver
+   * will replace all symbols from the formula with their model values and then simplify the formula
+   * into a simple formula, e.g., consisting only of a numeral expression.
+   *
+   * @param formula Input formula to be evaluated.
+   * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
+   *     better evaluation.
+   */
+  @Nullable
+  <T extends Formula> T eval(T formula);
+
+  /**
+   * Evaluate a given formula substituting the values from the model.
+   *
+   * <p>If a value is not relevant to the satisfiability result, the model can choose either an
+   * arbitrary value (e.g., the value <code>0</code> for the matching type) or just return <code>
+   * null</code>.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
    *
    * @param f Input formula
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
@@ -46,19 +69,35 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   @Nullable
   Object evaluate(Formula f);
 
-  /** Type-safe evaluation for integer formulas. */
+  /**
+   * Type-safe evaluation for integer formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   BigInteger evaluate(IntegerFormula f);
 
-  /** Type-safe evaluation for rational formulas. */
+  /**
+   * Type-safe evaluation for rational formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   Rational evaluate(RationalFormula f);
 
-  /** Type-safe evaluation for boolean formulas. */
+  /**
+   * Type-safe evaluation for boolean formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   Boolean evaluate(BooleanFormula f);
 
-  /** Type-safe evaluation for bitvector formulas. */
+  /**
+   * Type-safe evaluation for bitvector formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
   @Nullable
   BigInteger evaluate(BitvectorFormula f);
 
@@ -68,7 +107,12 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * BasicProverEnvironment#getModelAssignments()} instead in this case.
    */
   @Override
-  Iterator<ValueAssignment> iterator();
+  default Iterator<ValueAssignment> iterator() {
+    return asList().iterator();
+  }
+
+  /** Build a list of assignments that stays valid after closing the model. */
+  ImmutableList<ValueAssignment> asList();
 
   /** Pretty-printing of the model values. */
   @Override

@@ -58,7 +58,7 @@ class SmtInterpolFormulaCreator
     return getFormulaTypeOfSort(pFormula.getSort());
   }
 
-  FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
+  private FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
     if (pSort == integerSort) {
       return FormulaType.IntegerType;
     } else if (pSort == realSort) {
@@ -109,6 +109,35 @@ class SmtInterpolFormulaCreator
   @Override
   public Sort getArrayType(final Sort pIndexType, final Sort pElementType) {
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
+  }
+
+  /** convert a boolean or numeral term into an object of type Boolean, BigInteger, or Rational. */
+  @Override
+  public Object convertValue(Term value) {
+    FormulaType<?> type = getFormulaType(value);
+    if (type.isBooleanType()) {
+      return value.getTheory().mTrue == value;
+    } else if (value instanceof ConstantTerm
+        && ((ConstantTerm) value).getValue() instanceof Rational) {
+
+      /*
+       * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
+       * the output is SmtInterpol's Rational unless it is a bitvector,
+       * and currently we do not support bitvectors for SmtInterpol.
+       */
+      Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
+      org.sosy_lab.common.rationals.Rational out =
+          org.sosy_lab.common.rationals.Rational.of(
+              rationalValue.numerator(), rationalValue.denominator());
+      if (getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
+        assert out.isIntegral();
+        return out.getNum();
+      } else {
+        return out;
+      }
+    } else {
+      throw new IllegalArgumentException("Unexpected value: " + value);
+    }
   }
 
   /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
@@ -240,6 +269,26 @@ class SmtInterpolFormulaCreator
         return FunctionDeclarationKind.SELECT;
       case "store":
         return FunctionDeclarationKind.STORE;
+      case "*":
+        return FunctionDeclarationKind.MUL;
+      case "+":
+        return FunctionDeclarationKind.ADD;
+      case "-":
+        return FunctionDeclarationKind.SUB;
+      case "/":
+        return FunctionDeclarationKind.DIV;
+      case "%":
+        return FunctionDeclarationKind.MODULO;
+      case "<":
+        return FunctionDeclarationKind.LT;
+      case "<=":
+        return FunctionDeclarationKind.LTE;
+      case ">":
+        return FunctionDeclarationKind.GT;
+      case ">=":
+        return FunctionDeclarationKind.GTE;
+      case "to_int":
+        return FunctionDeclarationKind.FLOOR;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;

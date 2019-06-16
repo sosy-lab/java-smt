@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -84,7 +85,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
-    try (ProverEnvironment pe = context.newProverEnvironment()) {
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       pe.push();
       pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
       pe.addConstraint(c);
@@ -143,7 +144,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
-        .withMessage("Princess and Mathsat5 do not support unsat core generation")
+        .withMessage("Princess and Mathsat5 do not support unsat core generation over assumptions")
         .that(solverToUse())
         .isNoneOf(PRINCESS, MATHSAT5, CVC4);
     try (ProverEnvironment pe =

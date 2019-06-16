@@ -21,7 +21,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -87,11 +87,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
           "Princess does not support unsat core generation with assumptions yet");
     }
     return new ReusableStackTheoremProver(
-        (PrincessTheoremProver)
-            creator
-                .getEnv()
-                .getNewProver(
-                    false, options.contains(ProverOptions.GENERATE_UNSAT_CORE), manager, creator));
+        (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator, options));
   }
 
   @SuppressWarnings("resource")
@@ -100,10 +96,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       Set<ProverOptions> options) {
     return new ReusableStackInterpolatingProver<>(
         (PrincessInterpolatingProver)
-            creator
-                .getEnv()
-                .getNewProver(
-                    true, options.contains(ProverOptions.GENERATE_UNSAT_CORE), manager, creator));
+            creator.getEnv().getNewProver(true, manager, creator, options));
   }
 
   @Override

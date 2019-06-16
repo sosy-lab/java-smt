@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 /** Interface to the SMT solver SMTInterpol. */
-@javax.annotation.CheckReturnValue
+@com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
 @org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault

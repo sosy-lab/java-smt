@@ -45,13 +45,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -171,7 +170,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Mathsat5Model getModel() throws SolverException {
 
     // Get to the last objective in the stack.
     // todo: code duplication.

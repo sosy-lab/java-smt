@@ -36,12 +36,16 @@ public enum FunctionDeclarationKind {
   /** If-then-else operator. */
   ITE,
 
-  /** Exclusive OR over two variables. */
+  /** Exclusive OR over two formulas. */
   XOR,
+
+  /** Implication between two boolean formulas. */
   IMPLIES,
+
+  /** Distinct operator for a set of numeric formulas. */
   DISTINCT,
 
-  /** Store and select on arrays */
+  /** Store and select on arrays. */
   STORE,
   SELECT,
 
@@ -92,6 +96,9 @@ public enum FunctionDeclarationKind {
 
   /** Unary comparison with zero. */
   GTE_ZERO,
+
+  /** Floor operation, converts from rationals to integers, also known as {@code to_int}. */
+  FLOOR,
 
   // Simple bitvector operations
 

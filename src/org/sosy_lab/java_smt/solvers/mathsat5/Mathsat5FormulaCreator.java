@@ -45,6 +45,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ADD;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_DIV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_EQ;
@@ -60,6 +61,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -355,6 +357,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case MSAT_TAG_ITE:
         return FunctionDeclarationKind.ITE;
 
+      case MSAT_TAG_TIMES:
+        return FunctionDeclarationKind.MUL;
       case MSAT_TAG_PLUS:
         return FunctionDeclarationKind.ADD;
       case MSAT_TAG_LEQ:
@@ -443,12 +447,22 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             return FunctionDeclarationKind.OTHER;
         }
 
+      case MSAT_TAG_FLOOR:
+        return FunctionDeclarationKind.FLOOR;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }
   }
 
-  Object convertValue(long key, long term) {
+  @Override
+  public Object convertValue(Long key) {
+    throw new UnsupportedOperationException(
+        "Mathsat needs a second term to determine a correct type. Please use the other method.");
+  }
+
+  @Override
+  public Object convertValue(Long key, Long term) {
 
     // To get the correct type, we generate it from the key, not the value.
     FormulaType<?> type = getFormulaType(key);
@@ -507,7 +521,13 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public Long declareUFImpl(String pName, Long returnType, List<Long> pArgTypes) {
     long[] types = Longs.toArray(pArgTypes);
-    long msatFuncType = msat_get_function_type(environment, types, types.length, returnType);
+    final long msatFuncType;
+    if (pArgTypes.isEmpty()) {
+      // a nullary function is a plain symbol (variable)
+      msatFuncType = returnType;
+    } else {
+      msatFuncType = msat_get_function_type(environment, types, types.length, returnType);
+    }
     long decl = msat_declare_function(environment, pName, msatFuncType);
     return decl;
   }

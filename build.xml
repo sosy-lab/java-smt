@@ -13,6 +13,9 @@
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
     <property name="documentation.javadoc.exclude" value="org.sosy_lab.java_smt.solvers.mathsat5,org.sosy_lab.java_smt.solvers.princess,org.sosy_lab.java_smt.solvers.smtinterpol,org.sosy_lab.java_smt.solvers.z3"/>
 
+    <!-- This check crashes current error-prone -->
+    <property name="errorprone.options" value="-Xep:Finally:OFF"/>
+
     <!-- Maven Central metadata -->
     <property name="ivy.pom.description" value="Unified acccess layer to SMT solvers"/>
     <property name="ivy.pom.url" value="https://github.com/sosy-lab/java-smt"/>
@@ -36,6 +39,11 @@
     <path id="classpath">
         <pathelement location="${class.dir}"/>
         <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
+    </path>
+
+    <!-- Needs to include all annotation processors and error-prone -->
+    <path id="processorpath">
+        <fileset dir="${ivy.lib.dir}" includes="build/*.jar runtime/common.jar"/>
     </path>
 
 

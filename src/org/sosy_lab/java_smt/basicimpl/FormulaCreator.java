@@ -31,11 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -198,6 +199,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       t = FormulaType.IntegerType;
     } else if (formula instanceof RationalFormula) {
       t = FormulaType.RationalType;
+    } else if (formula instanceof FloatingPointRoundingModeFormula) {
+      t = FormulaType.FloatingPointRoundingModeType;
     } else if (formula instanceof ArrayFormula) {
       throw new UnsupportedOperationException(
           "SMT solvers with support for arrays need to overwrite FormulaCreator.getFormulaType()");
@@ -360,4 +363,27 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   protected abstract TFuncDecl getBooleanVarDeclarationImpl(TFormulaInfo pTFormulaInfo);
+
+  /**
+   * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
+   * simple type like Boolean, BigInteger, or Rational.
+   *
+   * <p>If the formula is not a simple constant expression, we simple return <code>null</code>.
+   *
+   * @param pF the formula to be converted.
+   */
+  public abstract Object convertValue(TFormulaInfo pF);
+
+  /**
+   * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
+   * simple type.
+   *
+   * @param pAdditionalF an additonal formula where the type can be received from.
+   * @param pF the formula to be converted.
+   */
+  // TODO only Mathsat5 needs the second (first) parameter, other solvers ignore it. Avoid it?
+  public Object convertValue(
+      @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
+    return convertValue(pF);
+  }
 }

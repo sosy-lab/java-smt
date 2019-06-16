@@ -23,7 +23,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -36,15 +35,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T> {
+abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   private boolean closed = false;
   protected final SmtInterpolEnvironment env;
@@ -57,7 +57,8 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames
 
-  SmtInterpolBasicProver(SmtInterpolFormulaManager pMgr) {
+  SmtInterpolAbstractProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
+    super(options);
     checkState(
         pMgr.getEnvironment().getStackDepth() == 0,
         "Not allowed to create a new prover environment while solver stack is still non-empty, "
@@ -94,37 +95,42 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   @Override
   public SmtInterpolModel getModel() {
     Preconditions.checkState(!closed);
-    return new SmtInterpolModel(env.getModel(), creator, getAssertedTerms());
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (SmtInterpolModel model = getModel()) {
-      return model.modelToList();
-    }
+    checkGenerateModels();
+    return new SmtInterpolModel(env.getModel(), creator);
   }
 
   protected static String generateTermName() {
     return PREFIX + termIdGenerator.getFreshId();
   }
 
-  protected abstract Collection<Term> getAssertedTerms();
-
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!isClosed());
-    Term[] terms = env.getUnsatCore();
+    checkGenerateUnsatCores();
+    return getUnsatCore0();
+  }
+
+  /**
+   * small helper method, because we guarantee that {@link
+   * ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} is independent of {@link
+   * ProverOptions#GENERATE_UNSAT_CORE}.
+   */
+  private List<BooleanFormula> getUnsatCore0() {
     return Collections3.transformedImmutableListCopy(
-        terms, input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
+        env.getUnsatCore(),
+        input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException {
+    Preconditions.checkState(!isClosed());
+    checkGenerateUnsatCoresOverAssumptions();
     push();
     Preconditions.checkState(
         annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core" + " over assumptions.");
+        "Empty environment required for UNSAT core over assumptions: %s",
+        annotatedTerms);
     for (BooleanFormula assumption : assumptions) {
       String termName = generateTermName();
       Term t = mgr.extractInfo(assumption);
@@ -135,7 +141,7 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
     if (!isUnsat()) {
       return Optional.empty();
     }
-    List<BooleanFormula> out = getUnsatCore();
+    List<BooleanFormula> out = getUnsatCore0();
     pop();
     return Optional.of(out);
   }
@@ -159,6 +165,8 @@ abstract class SmtInterpolBasicProver<T, AF> implements BasicProverEnvironment<T
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
+    checkGenerateAllSat();
+
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {
