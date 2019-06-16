@@ -64,16 +64,15 @@ public class CVC4BitvectorFormulaManager
 
   @Override
   protected Expr makeBitvectorImpl(int pLength, BigInteger pI) {
+    final BigInteger max = BigInteger.valueOf(2).pow(pLength);
     if (pI.signum() < 0) {
-      BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
-      if (pI.compareTo(max.negate()) < 0) {
+      BigInteger min = BigInteger.valueOf(2).pow(pLength - 1).negate();
+      if (pI.compareTo(min) < 0) {
         throw new IllegalArgumentException(
             pI + " is to small for a bitvector with length " + pLength);
       }
-      BigInteger n = BigInteger.valueOf(2).pow(pLength);
-      pI = pI.add(n);
+      pI = pI.add(max);
     } else {
-      BigInteger max = BigInteger.valueOf(2).pow(pLength);
       if (pI.compareTo(max) >= 0) {
         throw new IllegalArgumentException(
             pI + " is to large for a bitvector with length " + pLength);
