@@ -70,9 +70,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
   private final ExprManager exprManager = new ExprManager();
 
   /** We copy expression between different ExprManagers. The map serves as cache. */
-  private final ExprManagerMapCollection importMap = new ExprManagerMapCollection();
-
-  private final ExprManagerMapCollection exportMap = new ExprManagerMapCollection();
+  private final ExprManagerMapCollection exportMapping = new ExprManagerMapCollection();
 
   protected CVC4AbstractProver(
       CVC4FormulaCreator pFormulaCreator,
@@ -126,12 +124,12 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
 
   /** import an expression from global context into this prover's context. */
   protected Expr importExpr(Expr expr) {
-    return expr.exportTo(exprManager, importMap);
+    return expr.exportTo(exprManager, exportMapping);
   }
 
   /** export an expression from this prover's context into global context. */
   protected Expr exportExpr(Expr expr) {
-    return expr.exportTo(creator.getEnv(), exportMap);
+    return expr.exportTo(creator.getEnv(), exportMapping);
   }
 
   @Override
@@ -246,8 +244,7 @@ abstract class CVC4AbstractProver<T, AF> implements BasicProverEnvironment<T> {
     if (!closed) {
       closeAllModels();
       assertedFormulas.clear();
-      importMap.delete();
-      exportMap.delete();
+      exportMapping.delete();
       smtEngine.delete();
       exprManager.delete();
       closed = true;
