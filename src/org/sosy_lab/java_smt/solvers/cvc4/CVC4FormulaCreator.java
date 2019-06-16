@@ -407,7 +407,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (value.getType().isBitVector()) {
       Integer bv = value.getConstBitVector().getValue();
       if (bv.fitsSignedLong()) {
-        return BigInteger.valueOf(bv.getLong());
+        return BigInteger.valueOf(bv.getUnsignedLong());
       } else {
         return value.toString(); // default
       }
