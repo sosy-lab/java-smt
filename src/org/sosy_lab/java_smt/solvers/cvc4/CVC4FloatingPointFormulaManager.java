@@ -21,7 +21,10 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.FloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.RoundingMode;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -51,10 +54,15 @@ public class CVC4FloatingPointFormulaManager
   protected Expr getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
     switch (pFloatingPointRoundingMode) {
       case NEAREST_TIES_TO_EVEN:
+        return exprManager.mkConst(RoundingMode.roundNearestTiesToEven);
       case NEAREST_TIES_AWAY:
+        return exprManager.mkConst(RoundingMode.roundNearestTiesToAway);
       case TOWARD_POSITIVE:
+        return exprManager.mkConst(RoundingMode.roundTowardPositive);
       case TOWARD_NEGATIVE:
+        return exprManager.mkConst(RoundingMode.roundTowardNegative);
       case TOWARD_ZERO:
+        return exprManager.mkConst(RoundingMode.roundTowardZero);
       default:
         throw new AssertionError("Unexpected branch");
     }
@@ -91,20 +99,26 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makePlusInfinityImpl(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    long pExponentSize = pType.getExponentSize();
+    long pMantissaSize = pType.getMantissaSize();
+    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
+    return exprManager.mkConst(FloatingPoint.makeInf(type, /* sign */ true));
   }
 
   @Override
   protected Expr makeMinusInfinityImpl(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    long pExponentSize = pType.getExponentSize();
+    long pMantissaSize = pType.getMantissaSize();
+    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
+    return exprManager.mkConst(FloatingPoint.makeInf(type, /* sign */ false));
   }
 
   @Override
   protected Expr makeNaNImpl(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    long pExponentSize = pType.getExponentSize();
+    long pMantissaSize = pType.getMantissaSize();
+    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
+    return exprManager.mkConst(FloatingPoint.makeNaN(type));
   }
 
   @Override
@@ -127,22 +141,22 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr add(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_PLUS, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_PLUS, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
-  protected Expr subtract(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_SUB, pParam1, pParam2);
+  protected Expr subtract(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_SUB, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
-  protected Expr divide(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_DIV, pParam1, pParam2);
+  protected Expr divide(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_DIV, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
-  protected Expr multiply(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_MULT, pParam1, pParam2);
+  protected Expr multiply(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_MULT, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
@@ -196,31 +210,27 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr fromIeeeBitvectorImpl(Expr pNumber, FloatingPointType pTargetType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected Expr toIeeeBitvectorImpl(Expr pNumber) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   protected Expr isNormal(Expr pParam) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISN, pParam);
   }
 
   @Override
   protected Expr isNegative(Expr pParam) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISNEG, pParam);
+  }
+
+  @Override
+  protected Expr fromIeeeBitvectorImpl(Expr pNumber, FloatingPointType pTargetType) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, pNumber);
+  }
+
+  @Override
+  protected Expr toIeeeBitvectorImpl(Expr pNumber) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
+  }
+
+  @Override
+  protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException();
   }
