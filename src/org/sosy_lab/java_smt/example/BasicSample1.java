@@ -117,33 +117,25 @@ public class BasicSample1 {
       // create atoms
       RationalFormula a = rationalFormularMgr.makeVariable("a");
       RationalFormula b = rationalFormularMgr.makeVariable("b");
-      // RationalFormula c = rationalFormularMgr.makeVariable("c");
 
       // create formula
-
-      RationalFormula a_square = rationalFormularMgr.multiply(a, a);
-      RationalFormula b_square = rationalFormularMgr.multiply(b, b);
-      // a^2 + b^2 < 1
-      BooleanFormula eqR1 =
-          rationalFormularMgr.lessThan(
-              rationalFormularMgr.add(a_square, b_square),
-              rationalFormularMgr.makeNumber(1));
-      // x*y > 0.1
-      BooleanFormula eqR2 =
-          rationalFormularMgr
-              .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(0.1));
-
-      BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqR1, eqR2); // Formula to solve (1/8,
-                                                                          // 7/8)
-
-      // x*y > 1
-      BooleanFormula eqR3 =
-          rationalFormularMgr
-              .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(1));
-
-      BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqR1, eqR3); // Formula to solve
-                                                                          // (UNSAT)
-
+      /*
+       * UNSUPPORTED a^2 RationalFormula a_square = rationalFormularMgr.multiply(a, a);
+       * RationalFormula b_square = rationalFormularMgr.multiply(b, b); // a^2 + b^2 < 1
+       * BooleanFormula eqR1 = rationalFormularMgr.lessThan( rationalFormularMgr.add(a_square,
+       * b_square), rationalFormularMgr.makeNumber(1)); // x*y > 0.1 BooleanFormula eqR2 =
+       * rationalFormularMgr .greaterThan(rationalFormularMgr.multiply(a, b),
+       * rationalFormularMgr.makeNumber(0.1));
+       * 
+       * BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqR1, eqR2); // Formula to solve
+       * (1/8, // 7/8)
+       * 
+       * // x*y > 1 BooleanFormula eqR3 = rationalFormularMgr
+       * .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(1));
+       * 
+       * BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqR1, eqR3); // Formula to solve //
+       * (UNSAT)
+       */
       boolean isUnsat;
 
       // Solve formulae, get model, and print variable assignment
@@ -171,19 +163,19 @@ public class BasicSample1 {
           System.out.printf("SAT : ");
         // }
 
-        prover.addConstraint(ratTheorySample1);
-        isUnsat = prover.isUnsat();
-        assert !isUnsat;
-        // try (Model model = prover.getModel()) {
-          System.out.printf("SAT : ");
-        // }
-
-        prover.addConstraint(ratTheorySample2);
-        isUnsat = prover.isUnsat();
-        assert isUnsat;
-        // try (Model model = prover.getModel()) {
-          System.out.printf("UNSAT : ");
-        // }
+        // prover.addConstraint(ratTheorySample1);
+        // isUnsat = prover.isUnsat();
+        // assert !isUnsat;
+        // // try (Model model = prover.getModel()) {
+        // System.out.printf("SAT : ");
+        // // }
+        //
+        // prover.addConstraint(ratTheorySample2);
+        // isUnsat = prover.isUnsat();
+        // assert isUnsat;
+        // // try (Model model = prover.getModel()) {
+        // System.out.printf("UNSAT : ");
+        // // }
 
       }
     }
