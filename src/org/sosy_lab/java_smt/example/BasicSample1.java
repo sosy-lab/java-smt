@@ -117,12 +117,12 @@ public class BasicSample1 {
       // create atoms
       RationalFormula a = rationalFormularMgr.makeVariable("a");
       RationalFormula b = rationalFormularMgr.makeVariable("b");
-      RationalFormula c = rationalFormularMgr.makeVariable("c");
+      // RationalFormula c = rationalFormularMgr.makeVariable("c");
 
       // create formula
 
-      RationalFormula a_square = rationalFormularMgr.multiply(x, x);
-      RationalFormula b_square = rationalFormularMgr.multiply(y, y);
+      RationalFormula a_square = rationalFormularMgr.multiply(a, a);
+      RationalFormula b_square = rationalFormularMgr.multiply(b, b);
       // a^2 + b^2 < 1
       BooleanFormula eqR1 =
           rationalFormularMgr.lessThan(
@@ -133,7 +133,7 @@ public class BasicSample1 {
           rationalFormularMgr
               .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(0.1));
 
-      BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqB1, eqB2); // Formula to solve (1/8,
+      BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqR1, eqR2); // Formula to solve (1/8,
                                                                           // 7/8)
 
       // x*y > 1
@@ -141,7 +141,7 @@ public class BasicSample1 {
           rationalFormularMgr
               .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(1));
 
-      BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqB1, eqB2); // Formula to solve
+      BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqR1, eqR3); // Formula to solve
                                                                           // (UNSAT)
 
       boolean isUnsat;
