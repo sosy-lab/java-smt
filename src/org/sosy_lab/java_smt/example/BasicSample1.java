@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -38,7 +37,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class MySample1 {
+public class BasicSample1 {
   public static void main(String[] args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
 
@@ -153,38 +152,38 @@ public class MySample1 {
         prover.addConstraint(two_bit_adder);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
-        try (Model model = prover.getModel()) {
+        // try (Model model = prover.getModel()) {
           System.out.printf("SAT : 2-bit Adder ");
-        }
+        // }
 
         prover.addConstraint(intTheorySampleA);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
-        try (Model model = prover.getModel()) {
+        // try (Model model = prover.getModel()) {
           // System.out.printf("SAT with a = %s, b = %s", model.evaluate(a), model.evaluate(b));
           System.out.printf("SAT : ");
-        }
+        // }
 
         prover.addConstraint(intTheorySampleB);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
-        try (Model model = prover.getModel()) {
+        // try (Model model = prover.getModel()) {
           System.out.printf("SAT : ");
-        }
+        // }
 
         prover.addConstraint(ratTheorySample1);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
-        try (Model model = prover.getModel()) {
+        // try (Model model = prover.getModel()) {
           System.out.printf("SAT : ");
-        }
+        // }
 
         prover.addConstraint(ratTheorySample2);
         isUnsat = prover.isUnsat();
         assert isUnsat;
-        try (Model model = prover.getModel()) {
+        // try (Model model = prover.getModel()) {
           System.out.printf("UNSAT : ");
-        }
+        // }
 
       }
     }
