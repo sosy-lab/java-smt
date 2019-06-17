@@ -36,6 +36,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class BasicSample1 {
+  private BasicSample1() {}
+
   public static void main(String[] args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
 
