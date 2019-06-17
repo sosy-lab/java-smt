@@ -19,15 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
-
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Longs;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
-import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,18 +34,15 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-abstract class Z3AbstractProver<T> extends AbstractProver<T> {
+abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
-  private final FormulaManager mgr;
-
-  protected boolean closed = false;
+  private final Z3FormulaManager mgr;
 
   protected final long z3solver;
 
@@ -61,8 +53,11 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
   Z3AbstractProver(
-      Z3FormulaCreator pCreator, long z3params, FormulaManager pMgr, Set<ProverOptions> pOptions) {
-    super(pOptions);
+      Z3FormulaCreator pCreator,
+      long z3params,
+      Z3FormulaManager pMgr,
+      Set<ProverOptions> pOptions) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pCreator.shutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
@@ -120,6 +115,11 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   public Z3Model getModel() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
+    return getModelWithoutChecks();
+  }
+
+  @Override
+  protected Z3Model getModelWithoutChecks() {
     return Z3Model.create(z3context, getZ3Model(), creator);
   }
 
@@ -238,59 +238,11 @@ abstract class Z3AbstractProver<T> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    checkGenerateAllSat();
-
-    // Unpack formulas to terms.
-    long[] importantFormulas = new long[important.size()];
-    int i = 0;
-    for (BooleanFormula impF : important) {
-      importantFormulas[i++] = Z3FormulaManager.getZ3Expr(impF);
-    }
-
     try {
-      push();
+      return super.allSat(callback, important);
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }
-
-    while (!isUnsat()) {
-      List<Long> valuesOfModel = new ArrayList<>(importantFormulas.length);
-      long z3model = getZ3Model();
-
-      for (int j = 0; j < importantFormulas.length; j++) {
-        long funcDecl = Native.getAppDecl(z3context, importantFormulas[j]);
-        long valueOfExpr = Native.modelGetConstInterp(z3context, z3model, funcDecl);
-        if (valueOfExpr == 0) {
-          // This is a legal return value for modelGetConstInterp
-          // and means that the value doesn't matter. We ignore this assignment.
-
-        } else if (isOP(z3context, valueOfExpr, Z3_decl_kind.Z3_OP_FALSE.toInt())) {
-          long negated = Native.mkNot(z3context, importantFormulas[j]);
-          Native.incRef(z3context, negated);
-          valuesOfModel.add(negated);
-        } else {
-          valuesOfModel.add(importantFormulas[j]);
-        }
-      }
-
-      callback.apply(Lists.transform(valuesOfModel, f -> creator.encapsulateBoolean(f)));
-
-      try {
-        long negatedModel =
-            Native.mkNot(
-                z3context,
-                Native.mkAnd(z3context, valuesOfModel.size(), Longs.toArray(valuesOfModel)));
-        Native.incRef(z3context, negatedModel);
-        assertContraint(negatedModel);
-      } catch (Z3Exception e) {
-        throw creator.handleZ3Exception(e);
-      }
-    }
-
-    // we pushed some levels on assertionStack, remove them and delete solver
-    pop();
-    return callback.getResult();
   }
 
   protected void assertContraint(long negatedModel) {

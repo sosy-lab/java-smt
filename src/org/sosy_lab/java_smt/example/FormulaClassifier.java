@@ -20,13 +20,13 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -291,7 +291,7 @@ public class FormulaClassifier {
           // $FALL-THROUGH$
         default:
           if (pFunctionDeclaration.getType().isBooleanType()) {
-            if (Sets.newHashSet(
+            if (EnumSet.of(
                     FunctionDeclarationKind.LT,
                     FunctionDeclarationKind.LTE,
                     FunctionDeclarationKind.GT,

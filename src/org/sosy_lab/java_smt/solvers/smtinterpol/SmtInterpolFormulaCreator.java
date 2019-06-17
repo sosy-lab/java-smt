@@ -287,6 +287,8 @@ class SmtInterpolFormulaCreator
         return FunctionDeclarationKind.GT;
       case ">=":
         return FunctionDeclarationKind.GTE;
+      case "to_int":
+        return FunctionDeclarationKind.FLOOR;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;

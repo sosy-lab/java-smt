@@ -42,7 +42,6 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -63,7 +62,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       long z3params,
       LogManager pLogger,
       @Nullable PathCounterTemplate pDumpFailedInterpolationQueries,
-      FormulaManager pMgr,
+      Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions) {
     super(creator, z3params, pMgr, pOptions);
     logger = pLogger;

@@ -26,9 +26,8 @@ import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -87,7 +86,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
       assertThat(check).named("formulas must be contradicting").isTrue();
-      prover.getInterpolant(Collections.singletonList(id2));
+      prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
   }
@@ -301,13 +300,13 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     List<BooleanFormula> itps4 =
         stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), Collections::singleton));
+            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
     List<BooleanFormula> itps5 =
         stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), Collections::singleton));
+            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
     List<BooleanFormula> itps6 =
         stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), Collections::singleton));
+            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
 
     stack.pop(); // clear stack, such that we can re-use the solver
     stack.pop();
@@ -358,7 +357,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     assertThat(stack).isUnsatisfiable();
 
     // list of one partition
-    List<T> partition = Lists.newArrayList(TA, TB);
+    List<T> partition = ImmutableList.of(TA, TB);
     List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
     assertThat(itps).isEmpty();
   }
@@ -385,7 +384,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     assertThat(stack).isUnsatisfiable();
 
-    Set<T> partition = Sets.newHashSet(TA, TB);
+    Set<T> partition = ImmutableSet.of(TA, TB);
     List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(partition));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
@@ -733,11 +732,11 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     BooleanFormula R2 = imgr.equal(d, e);
     BooleanFormula D = imgr.equal(e, five);
 
-    Set<T> TB = Sets.newHashSet(stack.push(A), stack.push(B));
-    Set<T> TR1 = Sets.newHashSet(stack.push(R1));
-    Set<T> TC = Sets.newHashSet(stack.push(A), stack.push(C));
-    Set<T> TR2 = Sets.newHashSet(stack.push(R2));
-    Set<T> TD = Sets.newHashSet(stack.push(A), stack.push(D));
+    Set<T> TB = ImmutableSet.of(stack.push(A), stack.push(B));
+    Set<T> TR1 = ImmutableSet.of(stack.push(R1));
+    Set<T> TC = ImmutableSet.of(stack.push(A), stack.push(C));
+    Set<T> TR2 = ImmutableSet.of(stack.push(R2));
+    Set<T> TD = ImmutableSet.of(stack.push(A), stack.push(D));
 
     assertThat(stack).isUnsatisfiable();
 
@@ -782,7 +781,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     BooleanFormula A = imgr.equal(one, a);
     BooleanFormula B = imgr.equal(a, zero);
 
-    List<T> formulas = Lists.newArrayList(stack.push(A), stack.push(B));
+    List<T> formulas = ImmutableList.of(stack.push(A), stack.push(B));
 
     assertThat(stack).isUnsatisfiable();
 
@@ -816,7 +815,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     BooleanFormula F = imgr.equal(e, zero);
 
     List<T> formulas =
-        Lists.newArrayList(
+        ImmutableList.of(
             stack.push(A),
             stack.push(B),
             stack.push(C),
@@ -838,7 +837,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = Sets.newHashSet(stack.push(A));
+    Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0});
@@ -852,7 +851,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = Sets.newHashSet(stack.push(A));
+    Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4});
@@ -866,7 +865,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = Sets.newHashSet(stack.push(A));
+    Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0});
@@ -952,7 +951,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     assertThat(stack).isUnsatisfiable();
 
     // list of one partition
-    List<T> partition = Lists.newArrayList(TA, TB);
+    List<T> partition = ImmutableList.of(TA, TB);
     List<BooleanFormula> itps =
         stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0});
     assertThat(itps).isEmpty();

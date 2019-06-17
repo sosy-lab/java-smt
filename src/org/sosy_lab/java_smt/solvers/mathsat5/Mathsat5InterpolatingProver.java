@@ -27,9 +27,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -145,7 +145,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
-          getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
+          getInterpolant(
+              ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }
     return itps;
   }

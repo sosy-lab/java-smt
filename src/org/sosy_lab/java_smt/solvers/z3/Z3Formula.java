@@ -59,7 +59,10 @@ abstract class Z3Formula implements Formula {
 
   @Override
   public final boolean equals(@Nullable Object obj) {
-    if (obj == null || !(obj instanceof Z3Formula)) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof Z3Formula)) {
       return false;
     }
     Z3Formula other = (Z3Formula) obj;
