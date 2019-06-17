@@ -30,9 +30,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -73,7 +71,7 @@ public class BasicSample1 {
       // create formular
       BooleanFormula lowXOR = booleFormularMgr.xor(xL, yL);
       BooleanFormula highXOR = booleFormularMgr.xor(xH, yH);
-      BooleanFormula two_bit_adder = booleFormularMgr.and(lowXOR, highXOR); // Formula to solve
+      BooleanFormula twoBitAdder = booleFormularMgr.and(lowXOR, highXOR); // Formula to solve
 
       /* LRA (Integer) THEORY */
       // create the manager
@@ -85,16 +83,16 @@ public class BasicSample1 {
 
       // create formula
 
-      IntegerFormula two_x = intFormularMgr.multiply(x, intFormularMgr.makeNumber(2));
-      IntegerFormula three_x = intFormularMgr.multiply(x, intFormularMgr.makeNumber(3));
-      IntegerFormula two_y = intFormularMgr.multiply(y, intFormularMgr.makeNumber(2));
+      IntegerFormula twoX = intFormularMgr.multiply(x, intFormularMgr.makeNumber(2));
+      IntegerFormula threeX = intFormularMgr.multiply(x, intFormularMgr.makeNumber(3));
+      IntegerFormula twoY = intFormularMgr.multiply(y, intFormularMgr.makeNumber(2));
 
       // 3*x + y = 11
       BooleanFormula eqA1 =
-          intFormularMgr.equal(intFormularMgr.add(three_x, y), intFormularMgr.makeNumber(11));
+          intFormularMgr.equal(intFormularMgr.add(threeX, y), intFormularMgr.makeNumber(11));
       // 2*x + y = 8
       BooleanFormula eqA2 =
-          intFormularMgr.equal(intFormularMgr.add(two_x, y), intFormularMgr.makeNumber(8));
+          intFormularMgr.equal(intFormularMgr.add(twoX, y), intFormularMgr.makeNumber(8));
 
       BooleanFormula intTheorySampleA = booleFormularMgr.and(eqA1, eqA2); // Formula to solve (3,2)
 
@@ -104,19 +102,19 @@ public class BasicSample1 {
       BooleanFormula eqB2 = intFormularMgr.lessThan(y, intFormularMgr.makeNumber(10));
       // x+2*y == 7 (how do I differentiate)
       BooleanFormula eqB3 =
-          intFormularMgr.equal(intFormularMgr.add(x, two_y), intFormularMgr.makeNumber(7));
+          intFormularMgr.equal(intFormularMgr.add(x, twoY), intFormularMgr.makeNumber(7));
 
       BooleanFormula intTheorySampleB = booleFormularMgr.and(eqB1, eqB2, eqB3); // Formula to solve
-                                                                                // (0,7)
+      // (0,7)
 
       /* LRA (Rational) THEORY */
       // create the manager
-      RationalFormulaManager rationalFormularMgr =
-          context.getFormulaManager().getRationalFormulaManager();
+      // RationalFormulaManager rationalFormularMgr =
+      // context.getFormulaManager().getRationalFormulaManager();
 
       // create atoms
-      RationalFormula a = rationalFormularMgr.makeVariable("a");
-      RationalFormula b = rationalFormularMgr.makeVariable("b");
+      // RationalFormula a = rationalFormularMgr.makeVariable("a");
+      // RationalFormula b = rationalFormularMgr.makeVariable("b");
 
       // create formula
       /*
@@ -126,13 +124,13 @@ public class BasicSample1 {
        * b_square), rationalFormularMgr.makeNumber(1)); // x*y > 0.1 BooleanFormula eqR2 =
        * rationalFormularMgr .greaterThan(rationalFormularMgr.multiply(a, b),
        * rationalFormularMgr.makeNumber(0.1));
-       * 
+       *
        * BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqR1, eqR2); // Formula to solve
        * (1/8, // 7/8)
-       * 
+       *
        * // x*y > 1 BooleanFormula eqR3 = rationalFormularMgr
        * .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(1));
-       * 
+       *
        * BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqR1, eqR3); // Formula to solve //
        * (UNSAT)
        */
@@ -141,26 +139,26 @@ public class BasicSample1 {
       // Solve formulae, get model, and print variable assignment
       try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
-        prover.addConstraint(two_bit_adder);
+        prover.addConstraint(twoBitAdder);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
         // try (Model model = prover.getModel()) {
-          System.out.printf("SAT : 2-bit Adder ");
+        System.out.printf("SAT : 2-bit Adder ");
         // }
 
         prover.addConstraint(intTheorySampleA);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
         // try (Model model = prover.getModel()) {
-          // System.out.printf("SAT with a = %s, b = %s", model.evaluate(a), model.evaluate(b));
-          System.out.printf("SAT : ");
+        // System.out.printf("SAT with a = %s, b = %s", model.evaluate(a), model.evaluate(b));
+        System.out.printf("SAT : ");
         // }
 
         prover.addConstraint(intTheorySampleB);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
         // try (Model model = prover.getModel()) {
-          System.out.printf("SAT : ");
+        System.out.printf("SAT : ");
         // }
 
         // prover.addConstraint(ratTheorySample1);
@@ -180,5 +178,4 @@ public class BasicSample1 {
       }
     }
   }
-
 }
