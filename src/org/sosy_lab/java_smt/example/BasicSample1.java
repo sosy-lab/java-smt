@@ -30,7 +30,9 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -96,7 +98,8 @@ public class BasicSample1 {
       BooleanFormula eqA2 =
           intFormularMgr.equal(intFormularMgr.add(twoX, y), intFormularMgr.makeNumber(8));
 
-      BooleanFormula intTheorySampleA = booleFormularMgr.and(eqA1, eqA2); // Formula to solve (3,2)
+      // Formula to solve (3,2)
+      BooleanFormula intTheorySampleA = booleFormularMgr.and(eqA1, eqA2);
 
       // x>2
       BooleanFormula eqB1 = intFormularMgr.greaterThan(x, intFormularMgr.makeNumber(2));
@@ -106,26 +109,33 @@ public class BasicSample1 {
       BooleanFormula eqB3 =
           intFormularMgr.equal(intFormularMgr.add(x, twoY), intFormularMgr.makeNumber(7));
 
-      BooleanFormula intTheorySampleB = booleFormularMgr.and(eqB1, eqB2, eqB3); // Formula to solve
-      // (0,7)
+      // Formula to solve (0,7)
+      BooleanFormula intTheorySampleB = booleFormularMgr.and(eqB1, eqB2, eqB3);
+
 
       /* LRA (Rational) THEORY */
       // create the manager
-      // RationalFormulaManager rationalFormularMgr =
-      // context.getFormulaManager().getRationalFormulaManager();
+      RationalFormulaManager rationalFormularMgr =
+          context.getFormulaManager().getRationalFormulaManager();
 
       // create atoms
       // RationalFormula a = rationalFormularMgr.makeVariable("a");
       // RationalFormula b = rationalFormularMgr.makeVariable("b");
 
+      RationalFormula a1 = rationalFormularMgr.makeVariable("a1");
+      RationalFormula a2 = rationalFormularMgr.makeVariable("a2");
+      RationalFormula b1 = rationalFormularMgr.makeVariable("b1");
+      RationalFormula b2 = rationalFormularMgr.makeVariable("b2");
+
       // create formula
       /*
-       * UNSUPPORTED a^2 RationalFormula a_square = rationalFormularMgr.multiply(a, a);
-       * RationalFormula b_square = rationalFormularMgr.multiply(b, b); // a^2 + b^2 < 1
-       * BooleanFormula eqR1 = rationalFormularMgr.lessThan( rationalFormularMgr.add(a_square,
-       * b_square), rationalFormularMgr.makeNumber(1)); // x*y > 0.1 BooleanFormula eqR2 =
-       * rationalFormularMgr .greaterThan(rationalFormularMgr.multiply(a, b),
-       * rationalFormularMgr.makeNumber(0.1));
+       * UNSUPPORTED a^2 ==> this is linear
+       *
+       * RationalFormula a_square = rationalFormularMgr.multiply(a, a); RationalFormula b_square =
+       * rationalFormularMgr.multiply(b, b); // a^2 + b^2 < 1 BooleanFormula eqR1 =
+       * rationalFormularMgr.lessThan( rationalFormularMgr.add(a_square, b_square),
+       * rationalFormularMgr.makeNumber(1)); // x*y > 0.1 BooleanFormula eqR2 = rationalFormularMgr
+       * .greaterThan(rationalFormularMgr.multiply(a, b), rationalFormularMgr.makeNumber(0.1));
        *
        * BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqR1, eqR2); // Formula to solve
        * (1/8, // 7/8)
@@ -136,6 +146,33 @@ public class BasicSample1 {
        * BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqR1, eqR3); // Formula to solve //
        * (UNSAT)
        */
+
+      BooleanFormula aEquals = rationalFormularMgr.equal(a1, a2);
+      BooleanFormula bEquals = rationalFormularMgr.equal(b1, b2);
+
+      RationalFormula a_square = rationalFormularMgr.multiply(a1, a2);
+      RationalFormula b_square = rationalFormularMgr.multiply(b1, b2);
+      // a^2 + b^2 < 1
+      BooleanFormula eqR1 =
+          rationalFormularMgr.lessThan(
+              rationalFormularMgr.add(a_square, b_square),
+              rationalFormularMgr.makeNumber(1));
+      // x*y > 0.1
+      BooleanFormula eqR2 =
+          rationalFormularMgr.greaterThan(
+              rationalFormularMgr.multiply(a1, b1),
+              rationalFormularMgr.makeNumber(0.1));
+
+      // Formula to solve (1/8, // 7/8)
+      BooleanFormula ratTheorySample1 = booleFormularMgr.and(eqR1, eqR2, aEquals, bEquals);
+
+      // x*y > 1
+      BooleanFormula eqR3 =
+          rationalFormularMgr
+              .greaterThan(rationalFormularMgr.multiply(a1, b1), rationalFormularMgr.makeNumber(1));
+      // Formula to solve (UNSAT)
+      BooleanFormula ratTheorySample2 = booleFormularMgr.and(eqR1, eqR3, aEquals, bEquals);
+
       boolean isUnsat;
 
       // Solve formulae, get model, and print variable assignment
@@ -145,7 +182,7 @@ public class BasicSample1 {
         isUnsat = prover.isUnsat();
         assert !isUnsat;
         // try (Model model = prover.getModel()) {
-        System.out.printf("SAT : 2-bit Adder ");
+        System.out.println("SAT : 2-bit Adder ");
         // }
 
         prover.addConstraint(intTheorySampleA);
@@ -153,29 +190,29 @@ public class BasicSample1 {
         assert !isUnsat;
         // try (Model model = prover.getModel()) {
         // System.out.printf("SAT with a = %s, b = %s", model.evaluate(a), model.evaluate(b));
-        System.out.printf("SAT : ");
+        System.out.println("SAT : 2 equations  3*x + y = 11 AND 2*x + y = 8");
         // }
 
         prover.addConstraint(intTheorySampleB);
         isUnsat = prover.isUnsat();
         assert !isUnsat;
         // try (Model model = prover.getModel()) {
-        System.out.printf("SAT : ");
+        System.out.println("SAT : 3 equations  x>2 AND y<10 AND x+2*y == 7");
         // }
 
-        // prover.addConstraint(ratTheorySample1);
-        // isUnsat = prover.isUnsat();
-        // assert !isUnsat;
-        // // try (Model model = prover.getModel()) {
-        // System.out.printf("SAT : ");
-        // // }
-        //
-        // prover.addConstraint(ratTheorySample2);
-        // isUnsat = prover.isUnsat();
-        // assert isUnsat;
-        // // try (Model model = prover.getModel()) {
-        // System.out.printf("UNSAT : ");
-        // // }
+        prover.addConstraint(ratTheorySample1);
+        isUnsat = prover.isUnsat();
+        assert !isUnsat;
+        // try (Model model = prover.getModel()) {
+        System.out.println("SAT : 2 equations  a^2 + b^2 < 1 AND x*y > 0.1 ");
+        // }
+
+        prover.addConstraint(ratTheorySample2);
+        isUnsat = prover.isUnsat();
+        assert isUnsat;
+        // try (Model model = prover.getModel()) {
+        System.out.println("UNSAT : 2 equations a^2 + b^2 < 1 AND x*y > 1 ");
+        // }
 
       }
     }
