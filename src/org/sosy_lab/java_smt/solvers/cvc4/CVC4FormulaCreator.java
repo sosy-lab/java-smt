@@ -55,6 +55,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BooleanFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
@@ -123,10 +124,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (pFormula instanceof FloatingPointFormula) {
       checkArgument(
           t.isFloatingPoint(), "FloatingPointFormula with actual type " + t + ": " + pFormula);
+      edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
           FormulaType.getFloatingPointType(
-              (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),
-              (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getSignificandSize());
+              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize());
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
@@ -161,9 +162,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // not hold, hence we use the new BitVectorType(t) here as a workaround:
       return FormulaType.getBitvectorTypeWithSize((int) (new BitVectorType(t)).getSize());
     } else if (t.isFloatingPoint()) {
+      edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return FormulaType.getFloatingPointType(
-          (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getExponentSize(),
-          (int) ((edu.nyu.acsys.CVC4.FloatingPointType) t).getSignificandSize());
+          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize());
+    } else if (t.isRoundingMode()) {
+      return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
       // The theory REAL in CVC4 is the theory of (infinite precision!) real numbers.
       // As such, the theory RATIONAL is contained in REAL. TODO: find a better solution.
@@ -186,7 +189,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
         : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+            "Trying to encapsulate formula %s of type %s as %s",
+            pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC4BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -200,8 +204,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return (T) new CVC4BitvectorFormula(pTerm);
     } else if (pType.isFloatingPointType()) {
       return (T) new CVC4FloatingPointFormula(pTerm);
+    } else if (pType.isFloatingPointRoundingModeType()) {
+      return (T) new CVC4FloatingPointRoundingModeFormula(pTerm);
     }
-    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
+    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in CVC4");
   }
 
   @Override
@@ -260,8 +266,14 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isBitVector()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstBitVector().getValue());
+      } else if (type.isFloatingPoint()) {
+        // TODO is this correct?
+        return visitor.visitConstant(formula, f.getConstFloatingPoint());
+      } else if (type.isRoundingMode()) {
+        // TODO is this correct?
+        return visitor.visitConstant(formula, f.getConstRoundingMode());
       } else {
-        throw new UnsupportedOperationException("Unhandled constant kind");
+        throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
 
     } else if (f.isVariable()) {
@@ -411,6 +423,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else {
         return value.toString(); // default
       }
+
+    } else if (value.getType().isFloatingPoint()) {
+      Rational rat = value.getConstFloatingPoint().convertToRationalTotal(new Rational(0));
+      return org.sosy_lab.common.rationals.Rational.of(
+          new BigInteger(rat.getNumerator().toString()),
+          new BigInteger(rat.getDenominator().toString()));
 
     } else {
       // String serialization for unknown terms.

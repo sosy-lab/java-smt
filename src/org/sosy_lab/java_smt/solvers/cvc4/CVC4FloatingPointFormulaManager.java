@@ -19,16 +19,22 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import com.google.common.collect.ImmutableList;
+import edu.nyu.acsys.CVC4.BitVector;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.FloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointConvertSort;
 import edu.nyu.acsys.CVC4.FloatingPointSize;
+import edu.nyu.acsys.CVC4.FloatingPointToFPFloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointToSBV;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.RoundingMode;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
@@ -43,6 +49,13 @@ public class CVC4FloatingPointFormulaManager
     super(pCreator);
     exprManager = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
+  }
+
+  private static FloatingPointSize getFPSize(FloatingPointType pType) {
+    long pExponentSize = pType.getExponentSize();
+    long pMantissaSize = pType.getMantissaSize();
+    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
+    return type;
   }
 
   @Override
@@ -71,8 +84,12 @@ public class CVC4FloatingPointFormulaManager
   @Override
   protected Expr makeNumberImpl(
       double pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkConst(
+        new FloatingPoint(
+            getFPSize(pType),
+            pFloatingPointRoundingMode.getConstRoundingMode(),
+            new BitVector(64, Double.doubleToLongBits(pN)),
+            false));
   }
 
   @Override
@@ -99,32 +116,53 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makePlusInfinityImpl(FloatingPointType pType) {
-    long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSize();
-    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
-    return exprManager.mkConst(FloatingPoint.makeInf(type, /* sign */ true));
+    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ true));
   }
 
   @Override
   protected Expr makeMinusInfinityImpl(FloatingPointType pType) {
-    long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSize();
-    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
-    return exprManager.mkConst(FloatingPoint.makeInf(type, /* sign */ false));
+    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ false));
   }
 
   @Override
   protected Expr makeNaNImpl(FloatingPointType pType) {
-    long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSize();
-    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
-    return exprManager.mkConst(FloatingPoint.makeNaN(type));
+    return exprManager.mkConst(FloatingPoint.makeNaN(getFPSize(pType)));
   }
 
   @Override
   protected Expr castToImpl(Expr pNumber, FormulaType<?> pTargetType, Expr pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    if (pTargetType.isFloatingPointType()) {
+      FloatingPointType targetType = (FloatingPointType) pTargetType;
+      long pExponentSize = targetType.getExponentSize();
+      long pMantissaSize = targetType.getMantissaSize();
+      FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize);
+      FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(fpSize);
+      Expr op = exprManager.mkConst(new FloatingPointToFPFloatingPoint(fpConvertSort));
+      return exprManager.mkExpr(op, pRoundingMode, pNumber);
+
+    } else if (pTargetType.isBitvectorType()) {
+      BitvectorType targetType = (BitvectorType) pTargetType;
+      Expr op = exprManager.mkConst(new FloatingPointToSBV(targetType.getSize()));
+      return exprManager.mkExpr(op, pRoundingMode, pNumber);
+
+    } else if (pTargetType.isRationalType()) {
+      return exprManager.mkExpr(Kind.FLOATINGPOINT_TO_REAL, pNumber);
+
+    } else {
+      return genericCast(pNumber, pTargetType);
+    }
+  }
+
+  private Expr genericCast(Expr pNumber, FormulaType<?> pTargetType) {
+    Type type = pNumber.getType();
+    FormulaType<?> argType = getFormulaCreator().getFormulaType(pNumber);
+    Expr castFuncDecl =
+        getFormulaCreator()
+            .declareUFImpl(
+                "__cast_" + argType + "_to_" + pTargetType,
+                toSolverType(pTargetType),
+                ImmutableList.of(type));
+    return exprManager.mkExpr(Kind.APPLY_UF, castFuncDecl, pNumber);
   }
 
   @Override
