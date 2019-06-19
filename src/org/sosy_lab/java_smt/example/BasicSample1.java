@@ -30,9 +30,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -118,17 +116,17 @@ public class BasicSample1 {
 
         /* LRA (Rational) THEORY */
         // create the manager
-        RationalFormulaManager rationalFormularMgr =
-            context.getFormulaManager().getRationalFormulaManager();
+        // RationalFormulaManager rationalFormularMgr =
+        // context.getFormulaManager().getRationalFormulaManager();
 
         // create atoms
         // RationalFormula a = rationalFormularMgr.makeVariable("a");
         // RationalFormula b = rationalFormularMgr.makeVariable("b");
 
-        RationalFormula a1 = rationalFormularMgr.makeVariable("a1");
-        RationalFormula a2 = rationalFormularMgr.makeVariable("a2");
-        RationalFormula b1 = rationalFormularMgr.makeVariable("b1");
-        RationalFormula b2 = rationalFormularMgr.makeVariable("b2");
+        // RationalFormula a1 = rationalFormularMgr.makeVariable("a1");
+        // RationalFormula a2 = rationalFormularMgr.makeVariable("a2");
+        // RationalFormula b1 = rationalFormularMgr.makeVariable("b1");
+        // RationalFormula b2 = rationalFormularMgr.makeVariable("b2");
 
         // create formula
         /*
