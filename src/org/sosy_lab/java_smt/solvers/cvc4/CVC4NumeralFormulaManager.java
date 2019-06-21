@@ -40,13 +40,22 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
-public abstract class CVC4NumeralFormulaManager<
+abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
         Expr, Type, ExprManager, ParamFormulaType, ResultFormulaType, Expr> {
+
+  /**
+   * CVC4 fails hard when creating Integers/Rationals instead of throwing an exception for invalid
+   * number format. Thus lets check the format.
+   */
+  public static final Pattern INTEGER_NUMBER = Pattern.compile("(-)?(\\d)+");
+
+  public static final Pattern RATIONAL_NUMBER = Pattern.compile("(-)?(\\d)+(.)?(\\d)*");
 
   /** Operators for arithmetic functions that return a numeric value. */
   private static final ImmutableSet<Kind> NUMERIC_FUNCTIONS =
@@ -112,6 +121,9 @@ public abstract class CVC4NumeralFormulaManager<
 
   @Override
   protected Expr makeNumberImpl(String pI) {
+    if (!RATIONAL_NUMBER.matcher(pI).matches()) {
+      throw new NumberFormatException("number is not an rational value: " + pI);
+    }
     return exprManager.mkConst(Rational.fromDecimal(pI));
   }
 

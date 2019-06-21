@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -79,7 +78,10 @@ public class CVC4IntegerFormulaManager
 
   @Override
   protected Expr makeNumberImpl(String pI) {
-    return exprManager.mkConst(new Rational(pI));
+    if (!INTEGER_NUMBER.matcher(pI).matches()) {
+      throw new NumberFormatException("number is not an integer value: " + pI);
+    }
+    return super.makeNumberImpl(pI);
   }
 
   @Override

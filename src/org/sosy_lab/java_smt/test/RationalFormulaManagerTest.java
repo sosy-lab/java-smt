@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.google.common.collect.Iterables;
 import java.util.HashSet;
@@ -155,5 +156,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
     protected Boolean visitDefault(Formula pF) {
       return true;
     }
+  }
+
+  @Test(expected = Exception.class)
+  public void failOnInvalidString() {
+    rmgr.makeNumber("a");
+    fail();
   }
 }

@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -54,6 +55,9 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
+
+  // numbers are small enough to be precise with single precision
+  private static final int[] SINGLE_PREC_INTS = new int[] {0, 1, 2, 5, 10, 20, 50, 100, 200, 500};
 
   private static final int NUM_RANDOM_TESTS = 100;
 
@@ -303,17 +307,30 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void bvToFpOne() throws SolverException, InterruptedException {
+  public void bvToFpSinglePrec() throws SolverException, InterruptedException {
     requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      bvToFp(i, singlePrecType);
+    }
+  }
 
-    BitvectorFormula bvOne = bvmgr.makeBitvector(32, 1);
-    FloatingPointFormula fpOne = fpmgr.makeNumber(1.0, singlePrecType);
+  @Test
+  public void bvToFpDoublePrec() throws SolverException, InterruptedException {
+    requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      bvToFp(i, doublePrecType);
+    }
+  }
 
-    FloatingPointFormula signedBvToFpOne = fpmgr.castFrom(bvOne, true, singlePrecType);
-    FloatingPointFormula unsignedBvToFpOne = fpmgr.castFrom(bvOne, false, singlePrecType);
+  private void bvToFp(int i, FloatingPointType prec) throws SolverException, InterruptedException {
+    BitvectorFormula bv = bvmgr.makeBitvector(32, i);
+    FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
 
-    assertThatFormula(fpmgr.equalWithFPSemantics(fpOne, signedBvToFpOne)).isTautological();
-    assertThatFormula(fpmgr.equalWithFPSemantics(fpOne, unsignedBvToFpOne)).isTautological();
+    FloatingPointFormula signedBvToFp = fpmgr.castFrom(bv, true, prec);
+    FloatingPointFormula unsignedBvToFp = fpmgr.castFrom(bv, false, prec);
+
+    assertThatFormula(fpmgr.equalWithFPSemantics(fp, signedBvToFp)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fp, unsignedBvToFp)).isTautological();
   }
 
   /** check whether rounded input is equal to result with rounding-mode. */
@@ -412,26 +429,44 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void fpToBvOne() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNumbersSinglePrec() throws SolverException, InterruptedException {
     requireBitvectors();
-
-    BitvectorFormula bvOne = bvmgr.makeBitvector(32, 1);
-    FloatingPointFormula fpOne = fpmgr.makeNumber(1.0, singlePrecType);
-
-    BitvectorFormula fpToBvOne = fpmgr.castTo(fpOne, FormulaType.getBitvectorTypeWithSize(32));
-
-    assertThatFormula(bvmgr.equal(bvOne, fpToBvOne)).isTautological();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(i, singlePrecType);
+    }
   }
 
   @Test
-  public void fpToBvMinusOne() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNegativeNumbersSinglePrec() throws SolverException, InterruptedException {
     requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(-i, singlePrecType);
+    }
+  }
 
-    BitvectorFormula bvOne = bvmgr.makeBitvector(32, -1);
-    FloatingPointFormula fpOne = fpmgr.makeNumber(-1.0, singlePrecType);
+  @Test
+  public void fpToBvSimpleNumbersDoublePrec() throws SolverException, InterruptedException {
+    requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(i, doublePrecType);
+    }
+  }
 
-    BitvectorFormula fpToBvOne = fpmgr.castTo(fpOne, FormulaType.getBitvectorTypeWithSize(32));
-    assertThatFormula(bvmgr.equal(bvOne, fpToBvOne)).isTautological();
+  @Test
+  public void fpToBvSimpleNegativeNumbersDoublePrec() throws SolverException, InterruptedException {
+    requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(-i, doublePrecType);
+    }
+  }
+
+  private void fpToBv(int i, FloatingPointType prec) throws SolverException, InterruptedException {
+    BitvectorFormula bv = bvmgr.makeBitvector(prec.getTotalSize(), i);
+    FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
+
+    BitvectorFormula fpToBv =
+        fpmgr.castTo(fp, FormulaType.getBitvectorTypeWithSize(prec.getTotalSize()));
+    assertThatFormula(bvmgr.equal(bv, fpToBv)).isTautological();
   }
 
   @Test
@@ -736,5 +771,11 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       assertThatFormula(f1).implies(itp);
       assertThatFormula(bmgr.and(itp, f2)).isUnsatisfiable();
     }
+  }
+
+  @Test(expected = Exception.class)
+  public void failOnInvalidString() {
+    fpmgr.makeNumber("a", singlePrecType);
+    fail();
   }
 }
