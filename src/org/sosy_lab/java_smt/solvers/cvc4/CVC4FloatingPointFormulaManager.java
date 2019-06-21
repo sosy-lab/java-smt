@@ -85,21 +85,13 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr makeNumberImpl(
-      double pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkConst(
-        new FloatingPoint(
-            getFPSize(pType),
-            pFloatingPointRoundingMode.getConstRoundingMode(),
-            new BitVector(64, Double.doubleToLongBits(pN)),
-            false));
+  protected Expr makeNumberImpl(double pN, FloatingPointType pType, Expr pRoundingMode) {
+    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
-  protected Expr makeNumberImpl(
-      BigDecimal pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr makeNumberImpl(BigDecimal pN, FloatingPointType pType, Expr pRoundingMode) {
+    return makeNumberImpl(pN.toString(), pType, pRoundingMode);
   }
 
   @Override
@@ -160,6 +152,17 @@ public class CVC4FloatingPointFormulaManager
     }
   }
 
+  @Override
+  protected Expr castFromImpl(
+      Expr pNumber, boolean pSigned, FloatingPointType pTargetType, Expr pRoundingMode) {
+    FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
+    if (formulaType.isFloatingPointType()) {
+      return castToImpl(pNumber, pTargetType, pRoundingMode);
+    } else {
+      return genericCast(pNumber, pTargetType);
+    }
+  }
+
   private Expr genericCast(Expr pNumber, FormulaType<?> pTargetType) {
     Type type = pNumber.getType();
     FormulaType<?> argType = getFormulaCreator().getFormulaType(pNumber);
@@ -170,13 +173,6 @@ public class CVC4FloatingPointFormulaManager
                 toSolverType(pTargetType),
                 ImmutableList.of(type));
     return exprManager.mkExpr(Kind.APPLY_UF, castFuncDecl, pNumber);
-  }
-
-  @Override
-  protected Expr castFromImpl(
-      Expr pNumber, boolean pSigned, FloatingPointType pTargetType, Expr pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
   }
 
   @Override
