@@ -116,12 +116,12 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makePlusInfinityImpl(FloatingPointType pType) {
-    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ true));
+    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ false));
   }
 
   @Override
   protected Expr makeMinusInfinityImpl(FloatingPointType pType) {
-    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ false));
+    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ true));
   }
 
   @Override
