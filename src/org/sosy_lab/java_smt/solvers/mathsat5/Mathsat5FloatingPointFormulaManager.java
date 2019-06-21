@@ -107,36 +107,19 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
-    if (pN.startsWith("+")) {
-      pN = pN.substring(1);
+  protected Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
+    try {
+      if (isNegativeZero(Double.valueOf(pN))) {
+        return msat_make_fp_neg(
+            mathsatEnv,
+            msat_make_fp_rat_number(
+                mathsatEnv, "0", pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode));
+      }
+    } catch (NumberFormatException e) {
+      // ignore and fallback to floating point from rational numbers
     }
-    switch (pN) {
-      case "NaN":
-      case "-NaN":
-        return makeNaNImpl(pType);
-      case "Infinity":
-        return makePlusInfinityImpl(pType);
-      case "-Infinity":
-        return makeMinusInfinityImpl(pType);
-      default:
-        try {
-          if (Double.valueOf("-0.0").equals(Double.valueOf(pN))) {
-            return msat_make_fp_neg(
-                mathsatEnv,
-                msat_make_fp_rat_number(
-                    mathsatEnv,
-                    "0",
-                    pType.getExponentSize(),
-                    pType.getMantissaSize(),
-                    pRoundingMode));
-          }
-        } catch (NumberFormatException e) {
-          // ignore and fallback to floating point from rational numbers
-        }
-        return msat_make_fp_rat_number(
-            mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode);
-    }
+    return msat_make_fp_rat_number(
+        mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode);
   }
 
   @Override

@@ -121,8 +121,31 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(
-      String n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
+  /** directly catch the most common special String constants */
+  protected TFormulaInfo makeNumberImpl(
+      String n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode) {
+    if (n.startsWith("+")) {
+      n = n.substring(1);
+    }
+    switch (n) {
+      case "NaN":
+      case "-NaN":
+        return makeNaNImpl(type);
+      case "Infinity":
+        return makePlusInfinityImpl(type);
+      case "-Infinity":
+        return makeMinusInfinityImpl(type);
+      default:
+        return makeNumberAndRound(n, type, pFloatingPointRoundingMode);
+    }
+  }
+
+  protected static boolean isNegativeZero(Double pN) {
+    return Double.valueOf("-0.0").equals(pN);
+  }
+
+  protected abstract TFormulaInfo makeNumberAndRound(
+      String pN, FloatingPointType pType, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {

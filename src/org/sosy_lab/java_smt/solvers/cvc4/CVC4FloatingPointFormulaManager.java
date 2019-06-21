@@ -29,6 +29,7 @@ import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.FloatingPointToFPFloatingPoint;
 import edu.nyu.acsys.CVC4.FloatingPointToSBV;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.RoundingMode;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
@@ -102,9 +103,19 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr makeNumberImpl(
-      String pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
+  protected Expr makeNumberAndRound(String pN, FloatingPointType pType, Expr pRoundingMode) {
+    try {
+      if (isNegativeZero(Double.valueOf(pN))) {
+        return negate(
+            exprManager.mkConst(
+                new FloatingPoint(
+                    getFPSize(pType),
+                    pRoundingMode.getConstRoundingMode(),
+                    Rational.fromDecimal(pN))));
+      }
+    } catch (NumberFormatException e) {
+      // ignore and fallback to floating point from rational numbers
+    }
     throw new UnsupportedOperationException();
   }
 

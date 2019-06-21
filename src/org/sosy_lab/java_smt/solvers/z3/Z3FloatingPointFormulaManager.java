@@ -91,24 +91,7 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
-    if (pN.startsWith("+")) {
-      pN = pN.substring(1);
-    }
-    switch (pN) {
-      case "NaN":
-      case "-NaN":
-        return makeNaNImpl(pType);
-      case "Infinity":
-        return makePlusInfinityImpl(pType);
-      case "-Infinity":
-        return makeMinusInfinityImpl(pType);
-      default:
-        return makeNumberAndRound(pN, pType, pRoundingMode);
-    }
-  }
-
-  private Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
+  protected Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
