@@ -101,7 +101,8 @@ public abstract class CVC4NumeralFormulaManager<
 
   @Override
   protected Expr makeNumberImpl(long i) {
-    return exprManager.mkConst(new Rational(i));
+    // we connot use "new Rational(long)", because it uses "unsigned long".
+    return makeNumberImpl(Long.toString(i));
   }
 
   @Override
@@ -111,7 +112,7 @@ public abstract class CVC4NumeralFormulaManager<
 
   @Override
   protected Expr makeNumberImpl(String pI) {
-    return exprManager.mkConst(new Rational(pI));
+    return exprManager.mkConst(Rational.fromDecimal(pI));
   }
 
   @Override

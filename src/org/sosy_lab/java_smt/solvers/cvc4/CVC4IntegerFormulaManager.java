@@ -43,12 +43,6 @@ public class CVC4IntegerFormulaManager
   }
 
   @Override
-  @SuppressWarnings("checkstyle:illegalinstantiation")
-  public Expr makeNumberImpl(long pI) {
-    return makeNumberImpl(Long.toString(pI));
-  }
-
-  @Override
   protected Expr makeNumberImpl(double pNumber) {
     return makeNumberImpl((long) pNumber);
   }
