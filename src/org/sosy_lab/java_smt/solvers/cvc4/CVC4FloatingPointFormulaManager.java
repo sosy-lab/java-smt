@@ -90,11 +90,6 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr makeNumberImpl(BigDecimal pN, FloatingPointType pType, Expr pRoundingMode) {
-    return makeNumberImpl(pN.toString(), pType, pRoundingMode);
-  }
-
-  @Override
   protected Expr makeNumberAndRound(String pN, FloatingPointType pType, Expr pRoundingMode) {
     try {
       if (isNegativeZero(Double.valueOf(pN))) {

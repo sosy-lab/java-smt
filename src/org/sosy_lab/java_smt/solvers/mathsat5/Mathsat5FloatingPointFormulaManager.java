@@ -51,7 +51,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 
 import com.google.common.collect.ImmutableList;
-import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -99,11 +98,6 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
-  }
-
-  @Override
-  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType, Long pRoundingMode) {
-    return makeNumberImpl(pN.toPlainString(), pType, pRoundingMode);
   }
 
   @Override

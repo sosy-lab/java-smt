@@ -107,8 +107,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(
-      BigDecimal n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
+  protected TFormulaInfo makeNumberImpl(
+      BigDecimal n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode) {
+    return makeNumberImpl(n.toPlainString(), type, pFloatingPointRoundingMode);
+  }
 
   @Override
   public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type) {

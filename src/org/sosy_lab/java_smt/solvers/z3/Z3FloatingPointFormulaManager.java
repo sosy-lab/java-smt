@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
-import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -80,14 +79,6 @@ class Z3FloatingPointFormulaManager
   @Override
   public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
-  }
-
-  @Override
-  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType, Long pRoundingMode) {
-    // Using toString() fails in CPAchecker with parse error for seemingly correct strings like
-    // "3.4028234663852886E+38" and I have no idea why and cannot reproduce it in unit tests,
-    // but toPlainString() seems to work at least.
-    return makeNumberImpl(pN.toPlainString(), pType, pRoundingMode);
   }
 
   @Override
