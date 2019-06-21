@@ -51,11 +51,13 @@ public class CVC4FloatingPointFormulaManager
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
+  // TODO Is there a difference in `FloatingPointSize` and `FloatingPointType` in CVC4?
+  // They are both just pairs of `exponent size` and `significant size`.
+
   private static FloatingPointSize getFPSize(FloatingPointType pType) {
     long pExponentSize = pType.getExponentSize();
     long pMantissaSize = pType.getMantissaSize();
-    FloatingPointSize type = new FloatingPointSize(pExponentSize, pMantissaSize);
-    return type;
+    return new FloatingPointSize(pExponentSize, pMantissaSize + 1); // plus sign bit
   }
 
   @Override
@@ -108,10 +110,7 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makeVariableImpl(String varName, FloatingPointType pType) {
-    long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSize();
-    Type type = exprManager.mkFloatingPointType(pExponentSize, pMantissaSize);
-    return exprManager.mkVar(varName, type);
+    return exprManager.mkVar(varName, formulaCreator.getFloatingPointType(pType));
   }
 
   @Override
@@ -133,10 +132,7 @@ public class CVC4FloatingPointFormulaManager
   protected Expr castToImpl(Expr pNumber, FormulaType<?> pTargetType, Expr pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FloatingPointType targetType = (FloatingPointType) pTargetType;
-      long pExponentSize = targetType.getExponentSize();
-      long pMantissaSize = targetType.getMantissaSize();
-      FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize);
-      FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(fpSize);
+      FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(getFPSize(targetType));
       Expr op = exprManager.mkConst(new FloatingPointToFPFloatingPoint(fpConvertSort));
       return exprManager.mkExpr(op, pRoundingMode, pNumber);
 

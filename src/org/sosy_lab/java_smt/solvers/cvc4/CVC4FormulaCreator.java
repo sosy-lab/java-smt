@@ -88,7 +88,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Type getFloatingPointType(FloatingPointType pType) {
-    return exprManager.mkFloatingPointType(pType.getExponentSize(), pType.getMantissaSize());
+    return exprManager.mkFloatingPointType(
+        pType.getExponentSize(), pType.getMantissaSize() + 1); // plus sign bit
   }
 
   @Override
@@ -127,7 +128,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
           FormulaType.getFloatingPointType(
-              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize());
+              (int) fpType.getExponentSize(),
+              (int) fpType.getSignificandSize() - 1); // without sign bit
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
@@ -164,7 +166,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (t.isFloatingPoint()) {
       edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return FormulaType.getFloatingPointType(
-          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize());
+          (int) fpType.getExponentSize(),
+          (int) fpType.getSignificandSize() - 1); // without sign bit
     } else if (t.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
