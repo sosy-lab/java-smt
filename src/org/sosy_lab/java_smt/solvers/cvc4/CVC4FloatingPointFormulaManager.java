@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
-import edu.nyu.acsys.CVC4.BitVector;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.FloatingPoint;
@@ -28,6 +27,7 @@ import edu.nyu.acsys.CVC4.FloatingPointConvertSort;
 import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.FloatingPointToFPFloatingPoint;
 import edu.nyu.acsys.CVC4.FloatingPointToSBV;
+import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.RoundingMode;
@@ -108,7 +108,33 @@ public class CVC4FloatingPointFormulaManager
     } catch (NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
     }
-    throw new UnsupportedOperationException();
+    return exprManager.mkConst(
+        new FloatingPoint(getFPSize(pType), pRoundingMode.getConstRoundingMode(), toRational(pN)));
+  }
+
+  /**
+   * Try to convert a String numeral into a Rational.
+   *
+   * <p>If we do not check all invalid formatted numbers in our own code, CVC4 will fail hard and
+   * immediately terminate the whole program.
+   */
+  private Rational toRational(String pN) throws NumberFormatException {
+    try {
+      // first try something like -123.567
+      return Rational.fromDecimal(new BigDecimal(pN).toPlainString());
+
+    } catch (NumberFormatException e1) {
+      try {
+        // then try something like -123/456
+        org.sosy_lab.common.rationals.Rational r =
+            org.sosy_lab.common.rationals.Rational.ofString(pN);
+        return new Rational(new Integer(r.getNum().toString()), new Integer(r.getDen().toString()));
+
+      } catch (NumberFormatException e2) {
+        // we cannot handle the number
+        throw new NumberFormatException("invalid numeral: " + pN);
+      }
+    }
   }
 
   @Override
