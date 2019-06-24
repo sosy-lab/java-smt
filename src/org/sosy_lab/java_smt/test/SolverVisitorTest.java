@@ -59,10 +59,15 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
 
+  /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   private final class FunctionDeclarationVisitor extends DefaultFormulaVisitor<Formula> {
+
+    private final List<FunctionDeclarationKind> found = new ArrayList<>();
+
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      found.add(functionDeclaration.getKind());
       Truth.assert_()
           .withMessage(
               "unexpected declaration kind '%s' in function '%s' with args '%s'.",
@@ -178,6 +183,55 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
       mgr.visit(f, new FunctionDeclarationVisitor());
     }
+  }
+
+  @Test
+  public void floatMoreVisit() {
+    requireFloats();
+    FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
+    FloatingPointFormula x = fpmgr.makeVariable("x", fp);
+    BitvectorFormula z = bvmgr.makeVariable(32, "z");
+
+    checkKind(
+        fpmgr.castTo(x, FormulaType.getBitvectorTypeWithSize(32)),
+        FunctionDeclarationKind.FP_CASTTO_SBV);
+    checkKind(
+        fpmgr.castTo(x, FormulaType.getDoublePrecisionFloatingPointType()),
+        FunctionDeclarationKind.FP_CASTTO_FP);
+    checkKind(fpmgr.isNaN(x), FunctionDeclarationKind.FP_IS_NAN);
+    checkKind(fpmgr.isNegative(x), FunctionDeclarationKind.FP_IS_NEGATIVE);
+    checkKind(fpmgr.isInfinity(x), FunctionDeclarationKind.FP_IS_INF);
+    checkKind(fpmgr.isNormal(x), FunctionDeclarationKind.FP_IS_NORMAL);
+    checkKind(fpmgr.isSubnormal(x), FunctionDeclarationKind.FP_IS_SUBNORMAL);
+    checkKind(fpmgr.isZero(x), FunctionDeclarationKind.FP_IS_ZERO);
+    checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
+    checkKind(
+        fpmgr.castFrom(z, true, FormulaType.getSinglePrecisionFloatingPointType()),
+        FunctionDeclarationKind.BV_SCASTTO_FP);
+    checkKind(
+        fpmgr.castFrom(z, false, FormulaType.getSinglePrecisionFloatingPointType()),
+        FunctionDeclarationKind.BV_UCASTTO_FP);
+  }
+
+  @Test
+  public void bvVisit() {
+    requireBitvectors();
+    BitvectorFormula x = bvmgr.makeVariable(5, "x");
+
+    for (Formula f : ImmutableList.of(bvmgr.extend(x, 10, true), bvmgr.extend(x, 10, false))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
+    }
+  }
+
+  private void checkKind(Formula f, FunctionDeclarationKind expected) {
+    FunctionDeclarationVisitor visitor = new FunctionDeclarationVisitor();
+    mgr.visit(f, visitor);
+    Truth.assert_()
+        .withMessage(
+            "declaration kind '%s' in function '%s' not available, only found '%s'.",
+            expected, f, visitor.found)
+        .that(visitor.found)
+        .contains(expected);
   }
 
   @Test

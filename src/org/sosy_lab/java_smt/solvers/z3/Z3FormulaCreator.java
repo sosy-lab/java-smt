@@ -556,6 +556,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_LSHR;
       case Z3_OP_BASHR:
         return FunctionDeclarationKind.BV_ASHR;
+      case Z3_OP_SIGN_EXT:
+        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      case Z3_OP_ZERO_EXT:
+        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
@@ -589,7 +593,34 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_ROUND_ZERO;
       case Z3_OP_FPA_ROUND_TO_INTEGRAL:
         return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
-
+      case Z3_OP_FPA_TO_FP_UNSIGNED:
+        return FunctionDeclarationKind.BV_UCASTTO_FP;
+      case Z3_OP_FPA_TO_SBV:
+        return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case Z3_OP_FPA_TO_IEEE_BV:
+        return FunctionDeclarationKind.FP_AS_IEEEBV;
+      case Z3_OP_FPA_TO_FP:
+        Z3_sort_kind sortKind =
+            Z3_sort_kind.fromInt(
+                Native.getSortKind(
+                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 1))));
+        if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
+          return FunctionDeclarationKind.BV_SCASTTO_FP;
+        } else {
+          return FunctionDeclarationKind.FP_CASTTO_FP;
+        }
+      case Z3_OP_FPA_IS_NAN:
+        return FunctionDeclarationKind.FP_IS_NAN;
+      case Z3_OP_FPA_IS_INF:
+        return FunctionDeclarationKind.FP_IS_INF;
+      case Z3_OP_FPA_IS_ZERO:
+        return FunctionDeclarationKind.FP_IS_ZERO;
+      case Z3_OP_FPA_IS_NEGATIVE:
+        return FunctionDeclarationKind.FP_IS_NEGATIVE;
+      case Z3_OP_FPA_IS_SUBNORMAL:
+        return FunctionDeclarationKind.FP_IS_SUBNORMAL;
+      case Z3_OP_FPA_IS_NORMAL:
+        return FunctionDeclarationKind.FP_IS_NORMAL;
       default:
         return FunctionDeclarationKind.OTHER;
     }
