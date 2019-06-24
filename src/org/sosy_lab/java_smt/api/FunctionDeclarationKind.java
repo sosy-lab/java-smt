@@ -186,10 +186,10 @@ public enum FunctionDeclarationKind {
   /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
   BV_ASHR,
 
-  /** Cast an unsigned bitvector to a floating-point number */
+  /** Cast an unsigned bitvector to a floating-point number. */
   BV_UCASTTO_FP,
 
-  /** Cast a signed bitvector to a floating-point number */
+  /** Cast a signed bitvector to a floating-point number. */
   BV_SCASTTO_FP,
 
   // Simple floating point operations
