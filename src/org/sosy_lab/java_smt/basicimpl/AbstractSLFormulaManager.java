@@ -19,7 +19,9 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 
 public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -31,12 +33,12 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
     super(pCreator);
   }
 
-  private Formula wrap(TFormulaInfo pTerm) {
+  private BooleanFormula wrap(TFormulaInfo pTerm) {
     return getFormulaCreator().encapsulateBoolean(pTerm);
   }
 
   @Override
-  public Formula makeStar(Formula f1, Formula f2) {
+  public BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2) {
     TFormulaInfo param1 = extractInfo(f1);
     TFormulaInfo param2 = extractInfo(f2);
     return wrap(makeStar(param1, param2));
@@ -45,7 +47,7 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makeStar(TFormulaInfo e1, TFormulaInfo e2);
 
   @Override
-  public Formula makePointsTo(Formula ptr, Formula to) {
+  public BooleanFormula makePointsTo(Formula ptr, Formula to) {
     TFormulaInfo param1 = extractInfo(ptr);
     TFormulaInfo param2 = extractInfo(to);
     return wrap(makePointsTo(param1, param2));
@@ -54,7 +56,7 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makePointsTo(TFormulaInfo ptr, TFormulaInfo to);
 
   @Override
-  public Formula makeMagicWand(Formula f1, Formula f2) {
+  public BooleanFormula makeMagicWand(BooleanFormula f1, BooleanFormula f2) {
     TFormulaInfo param1 = extractInfo(f1);
     TFormulaInfo param2 = extractInfo(f2);
     return wrap(makeMagicWand(param1, param2));
@@ -63,19 +65,24 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
   protected abstract TFormulaInfo makeMagicWand(TFormulaInfo e1, TFormulaInfo e2);
 
   @Override
-  public Formula makeEmptyHeap(Formula f1, Formula f2) {
-    TFormulaInfo param1 = extractInfo(f1);
-    TFormulaInfo param2 = extractInfo(f2);
-    return wrap(makeEmptyHeap(param1, param2));
+  public <
+          AF extends Formula,
+          VF extends Formula,
+          AT extends FormulaType<AF>,
+          VT extends FormulaType<VF>>
+      BooleanFormula makeEmptyHeap(AT pAdressType, VT pValueType) {
+    final TType adressType = toSolverType(pAdressType);
+    final TType valueType = toSolverType(pValueType);
+    return wrap(makeEmptyHeap(adressType, valueType));
   }
 
-  protected abstract TFormulaInfo makeEmptyHeap(TFormulaInfo e1, TFormulaInfo e2);
+  protected abstract TFormulaInfo makeEmptyHeap(TType e1, TType e2);
 
   @Override
-  public Formula makeNilElement(Formula type) {
-    TFormulaInfo param1 = extractInfo(type);
-    return wrap(makeNilElement(param1));
+  public <AF extends Formula, AT extends FormulaType<AF>> AF makeNilElement(AT pAdressType) {
+    final TType type = toSolverType(pAdressType);
+    return getFormulaCreator().encapsulate(pAdressType, makeNilElement(type));
   }
 
-  protected abstract TFormulaInfo makeNilElement(TFormulaInfo type);
+  protected abstract TFormulaInfo makeNilElement(TType type);
 }

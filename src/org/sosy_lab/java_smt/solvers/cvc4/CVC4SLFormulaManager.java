@@ -50,12 +50,12 @@ public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, E
   }
 
   @Override
-  protected Expr makeEmptyHeap(Expr pE1, Expr pE2) {
-    return exprManager.mkExpr(Kind.SEP_EMP, pE1, pE2);
+  protected Expr makeEmptyHeap(Type pT1, Type pT2) {
+    return exprManager.mkExpr(Kind.SEP_EMP, pT1.mkGroundTerm(), pT2.mkGroundTerm());
   }
 
   @Override
-  protected Expr makeNilElement(Expr pType) {
-    return exprManager.mkExpr(Kind.SEP_NIL, pType);
+  protected Expr makeNilElement(Type pType) {
+    return exprManager.mkExpr(Kind.SEP_NIL, pType.mkGroundTerm());
   }
 }
