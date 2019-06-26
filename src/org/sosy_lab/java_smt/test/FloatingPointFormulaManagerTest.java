@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -97,8 +98,12 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     FloatingPointFormula var = fpmgr.makeVariable("x", type);
     FloatingPointType result = (FloatingPointType) mgr.getFormulaType(var);
 
-    assertThat(result.getExponentSize()).named("exponent size").isEqualTo(type.getExponentSize());
-    assertThat(result.getMantissaSize()).named("mantissa size").isEqualTo(type.getMantissaSize());
+    assertWithMessage("exponent size")
+        .that(result.getExponentSize())
+        .isEqualTo(type.getExponentSize());
+    assertWithMessage("mantissa size")
+        .that(result.getMantissaSize())
+        .isEqualTo(type.getMantissaSize());
   }
 
   @Test

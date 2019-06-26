@@ -486,7 +486,7 @@ public class ModelTest extends SolverBasedTest0 {
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
         .that(solver)
-        .isNotSameAs(Solvers.PRINCESS);
+        .isNotSameInstanceAs(Solvers.PRINCESS);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =

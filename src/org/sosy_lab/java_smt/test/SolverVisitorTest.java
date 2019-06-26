@@ -358,7 +358,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
           }
         });
 
-    assertThat(found).containsAllOf("a", "b");
+    assertThat(found).containsAtLeast("a", "b");
     assertThat(found).hasSize(3); // all of the above plus the boolean "and" function
     assertThat(found).doesNotContain(ab.toString());
   }
