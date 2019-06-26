@@ -58,14 +58,14 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-323-ge8e29f7" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-357-gc47b29f" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="27.0.1-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="28.0-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="27.0.1-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="28.0-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -114,9 +114,9 @@
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.32.0" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.9" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.12" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.9" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.12" conf="runtime->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- SmtInterpol -->
