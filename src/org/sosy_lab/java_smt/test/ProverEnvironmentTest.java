@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
@@ -41,6 +42,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -83,7 +85,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
-    try (ProverEnvironment pe = context.newProverEnvironment()) {
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       pe.push();
       pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
       pe.addConstraint(c);
@@ -101,6 +103,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
+  }
+
+  @Test
+  public void unsatCoreTestItp() throws SolverException, InterruptedException {
+    requireInterpolation();
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
@@ -137,9 +144,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
-        .withMessage("Princess and Mathsat5 do not support unsat core generation")
+        .withMessage("Princess and Mathsat5 do not support unsat core generation over assumptions")
         .that(solverToUse())
-        .isNoneOf(PRINCESS, MATHSAT5);
+        .isNoneOf(PRINCESS, MATHSAT5, CVC4);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

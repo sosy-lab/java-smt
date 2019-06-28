@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Splitter;
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 import java.io.IOException;
 import org.sosy_lab.common.Appender;
@@ -31,18 +32,19 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, CVC4Environment, Expr> {
+class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager, Expr> {
 
   CVC4FormulaManager(
-      FormulaCreator<Expr, Type, CVC4Environment, Expr> pFormulaCreator,
+      FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator,
       CVC4UFManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr,
       CVC4RationalFormulaManager pRfmgr,
       CVC4BitvectorFormulaManager pBvfmgr,
+      CVC4FloatingPointFormulaManager pFpfmgr,
       CVC4ArrayFormulaManager pAfmgr,
       CVC4SLFormulaManager pSLfmgr) {
-    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, pBvfmgr, null, null, pAfmgr, pSLfmgr);
+    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, pBvfmgr, pFpfmgr, null, pAfmgr, pSLfmgr);
   }
 
   static Expr getCVC4Expr(Formula pT) {

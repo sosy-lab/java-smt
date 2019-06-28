@@ -56,8 +56,9 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -66,6 +67,8 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -99,7 +102,7 @@ class SmtInterpolEnvironment {
   private final LogProxy smtInterpolLogProxy;
   private final ShutdownNotifier shutdownNotifier;
 
-  /** the wrapped Script */
+  /** the wrapped Script. */
   private final Script script;
 
   private final Theory theory;
@@ -176,7 +179,8 @@ class SmtInterpolEnvironment {
     return theory;
   }
 
-  SmtInterpolInterpolatingProver getInterpolator(SmtInterpolFormulaManager mgr) {
+  SmtInterpolInterpolatingProver getInterpolator(
+      SmtInterpolFormulaManager mgr, Set<ProverOptions> pOptions) {
     if (smtLogfile != null) {
       Path logfile = smtLogfile.getFreshPath();
 
@@ -186,8 +190,14 @@ class SmtInterpolEnvironment {
         out.println("(set-option :global-declarations true)");
         out.println("(set-option :random-seed " + script.getOption(":random-seed") + ")");
         out.println("(set-option :produce-interpolants true)");
-        out.println("(set-option :produce-models true)");
-        out.println("(set-option :produce-unsat-cores true)");
+        out.println(
+            String.format(
+                "(set-option :produce-models %s)",
+                pOptions.contains(ProverOptions.GENERATE_MODELS)));
+        out.println(
+            String.format(
+                "(set-option :produce-unsat-cores %s)",
+                pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)));
         if (checkResults) {
           out.println("(set-option :interpolant-check-mode true)");
           out.println("(set-option :unsat-core-check-mode true)");
@@ -195,13 +205,13 @@ class SmtInterpolEnvironment {
         }
 
         out.println("(set-logic " + theory.getLogic().name() + ")");
-        return new LoggingSmtInterpolInterpolatingProver(mgr, out);
+        return new LoggingSmtInterpolInterpolatingProver(mgr, pOptions, out);
       } catch (IOException e) {
         logger.logUserException(Level.WARNING, e, "Could not write interpolation query to file");
       }
     }
 
-    return new SmtInterpolInterpolatingProver(mgr);
+    return new SmtInterpolInterpolatingProver(mgr, pOptions);
   }
 
   int getStackDepth() {
@@ -336,7 +346,16 @@ class SmtInterpolEnvironment {
 
   /** This function returns a map, that contains assignments term->term for all terms in terms. */
   public Model getModel() {
-    return script.getModel();
+    try {
+      return script.getModel();
+    } catch (SMTLIBException e) {
+      if (e.getMessage().contains("Context is inconsistent")) {
+        throw new IllegalStateException(BasicProverEnvironment.NO_MODEL_HELP, e);
+      } else {
+        // new stacktrace, but only the library calls are missing.
+        throw e;
+      }
+    }
   }
 
   public Object getInfo(String info) {
@@ -386,22 +405,22 @@ class SmtInterpolEnvironment {
     return script.annotate(t, annotations);
   }
 
-  /** returns a number of type INT or REAL */
+  /** returns a number of type INT or REAL. */
   public Term numeral(BigInteger num) {
     return script.numeral(num);
   }
 
-  /** returns a number of type INT or REAL */
+  /** returns a number of type INT or REAL. */
   public Term numeral(String num) {
     return script.numeral(num);
   }
 
-  /** returns a number of type REAL */
+  /** returns a number of type REAL. */
   public Term decimal(String num) {
     return script.decimal(num);
   }
 
-  /** returns a number of type REAL */
+  /** returns a number of type REAL. */
   public Term decimal(BigDecimal num) {
     return script.decimal(num);
   }
@@ -412,29 +431,6 @@ class SmtInterpolEnvironment {
 
   public Term binary(String bin) {
     return script.binary(bin);
-  }
-
-  /**
-   * This function returns a list of interpolants for the partitions. Each partition must be a named
-   * term or a conjunction of named terms. There should be (n-1) interpolants for n partitions.
-   */
-  public Term[] getInterpolants(Term[] partition) throws SolverException, InterruptedException {
-    checkState(stackDepth > 0, "interpolants should be on higher levels");
-    try {
-      return script.getInterpolants(partition);
-    } catch (UnsupportedOperationException e) {
-      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
-        // Not a bug, interpolation procedure is incomplete
-        throw new SolverException(e.getMessage(), e);
-      } else {
-        throw e;
-      }
-    } catch (SMTLIBException e) {
-      if ("Timeout exceeded".equals(e.getMessage())) {
-        shutdownNotifier.shutdownIfNecessary();
-      }
-      throw new AssertionError(e);
-    }
   }
 
   /**

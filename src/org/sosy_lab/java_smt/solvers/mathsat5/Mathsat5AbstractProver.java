@@ -27,6 +27,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
@@ -36,7 +37,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_not;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -46,17 +46,15 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
-abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> {
+abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   protected final Mathsat5SolverContext context;
   protected final long curEnv;
@@ -68,12 +66,13 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
 
   protected Mathsat5AbstractProver(
       Mathsat5SolverContext pContext,
-      Set<ProverOptions> opts,
-      Mathsat5FormulaCreator creator,
+      Set<ProverOptions> pOptions,
+      Mathsat5FormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier) {
+    super(pOptions);
     context = pContext;
-    this.creator = creator;
-    curConfig = buildConfig(opts);
+    creator = pCreator;
+    curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
     terminationTest = context.addTerminationTest(curEnv);
     shutdownNotifier = pShutdownNotifier;
@@ -131,20 +130,15 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Mathsat5Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
     return new Mathsat5Model(getMsatModel(), creator, this);
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (Mathsat5Model model = new Mathsat5Model(getMsatModel(), creator, this)) {
-      return model.modelToList();
-    }
   }
 
   /** @throws SolverException if an expected MathSAT failure occurs */
   protected long getMsatModel() throws SolverException {
+    checkGenerateModels();
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
@@ -157,19 +151,24 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
     long[] terms = msat_get_unsat_core(curEnv);
+    return encapsulate(terms);
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    long[] unsatAssumptions = msat_get_unsat_assumptions(curEnv);
+    return Optional.of(encapsulate(unsatAssumptions));
+  }
+
+  private List<BooleanFormula> encapsulate(long[] terms) {
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {
       result.add(creator.encapsulateBoolean(t));
     }
     return result;
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      @SuppressWarnings("unused") Collection<BooleanFormula> assumptions) {
-    throw new UnsupportedOperationException(
-        "Mathsat5 does not support finding UNSAT core over " + "assumptions");
   }
 
   @Override
@@ -186,6 +185,7 @@ abstract class Mathsat5AbstractProver<T2> implements BasicProverEnvironment<T2> 
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    checkGenerateAllSat();
     long[] imp = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

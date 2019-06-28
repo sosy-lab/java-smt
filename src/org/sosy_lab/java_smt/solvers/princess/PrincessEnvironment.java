@@ -65,7 +65,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -76,6 +76,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.Seq;
@@ -151,11 +152,12 @@ class PrincessEnvironment {
    */
   PrincessAbstractProver<?, ?> getNewProver(
       boolean useForInterpolation,
-      boolean unsatCores,
       PrincessFormulaManager mgr,
-      PrincessFormulaCreator creator) {
+      PrincessFormulaCreator creator,
+      Set<ProverOptions> pOptions) {
 
-    SimpleAPI newApi = getNewApi(useForInterpolation || unsatCores);
+    SimpleAPI newApi =
+        getNewApi(useForInterpolation || pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE));
 
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(newApi::addBooleanVariable);
@@ -164,9 +166,9 @@ class PrincessEnvironment {
 
     PrincessAbstractProver<?, ?> prover;
     if (useForInterpolation) {
-      prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier);
+      prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier, pOptions);
     } else {
-      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier, unsatCores);
+      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier, pOptions);
     }
     registeredProvers.add(prover);
     return prover;

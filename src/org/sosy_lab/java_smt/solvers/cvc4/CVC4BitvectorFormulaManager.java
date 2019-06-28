@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,10 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.BitVector;
 import edu.nyu.acsys.CVC4.BitVectorExtract;
+import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.IntToBitVector;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.Type;
@@ -30,13 +32,13 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 public class CVC4BitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Expr, Type, CVC4Environment, Expr> {
+    extends AbstractBitvectorFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 
   protected CVC4BitvectorFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
   }
 
   @Override
@@ -61,13 +63,22 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr makeBitvectorImpl(int pLength, long pI) {
-    return exprManager.mkConst(new BitVector(pI, pLength));
-  }
-
-  @Override
   protected Expr makeBitvectorImpl(int pLength, BigInteger pI) {
-    return exprManager.mkConst(new BitVector(pI.toString(), pLength));
+    final BigInteger max = BigInteger.valueOf(2).pow(pLength);
+    if (pI.signum() < 0) {
+      BigInteger min = BigInteger.valueOf(2).pow(pLength - 1).negate();
+      if (pI.compareTo(min) < 0) {
+        throw new IllegalArgumentException(
+            pI + " is to small for a bitvector with length " + pLength);
+      }
+      pI = pI.add(max);
+    } else {
+      if (pI.compareTo(max) >= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to large for a bitvector with length " + pLength);
+      }
+    }
+    return exprManager.mkConst(new BitVector(pLength, pI));
   }
 
   @Override
@@ -76,9 +87,6 @@ public class CVC4BitvectorFormulaManager
     return getFormulaCreator().makeVariable(type, varName);
   }
 
-  /**
-   * Return a term representing the (arithmetic if signed is true) right shift of number by toShift.
-   */
   @Override
   protected Expr shiftRight(Expr pParam1, Expr pParam2, boolean signed) {
     if (signed) {
@@ -190,5 +198,38 @@ public class CVC4BitvectorFormulaManager
     } else {
       return exprManager.mkExpr(Kind.BITVECTOR_UGE, pParam1, pParam2);
     }
+  }
+
+  @Override
+  protected Expr makeBitvectorImpl(int pLength, Expr pParam1) {
+    Expr size = exprManager.mkConst(new IntToBitVector(pLength));
+    return exprManager.mkExpr(Kind.INT_TO_BITVECTOR, size, pParam1);
+  }
+
+  @Override
+  protected Expr toIntegerFormulaImpl(Expr pBv, boolean pSigned) {
+    Expr intExpr = exprManager.mkExpr(Kind.BITVECTOR_TO_NAT, pBv);
+
+    // CVC4 returns unsigned int by default
+    if (pSigned) {
+
+      // TODO check what is cheaper for the solver:
+      // checking the first BV-bit or computing max-int-value for the given size
+
+      final int size = Math.toIntExact((new BitVectorType(pBv.getType())).getSize());
+      final BigInteger modulo = BigInteger.ONE.shiftLeft(size);
+      final BigInteger maxInt = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
+      final Expr moduloExpr = exprManager.mkConst(new Rational(modulo.toString()));
+      final Expr maxIntExpr = exprManager.mkConst(new Rational(maxInt.toString()));
+
+      intExpr =
+          exprManager.mkExpr(
+              Kind.ITE,
+              exprManager.mkExpr(Kind.GT, intExpr, maxIntExpr),
+              exprManager.mkExpr(Kind.MINUS, intExpr, moduloExpr),
+              intExpr);
+    }
+
+    return intExpr;
   }
 }

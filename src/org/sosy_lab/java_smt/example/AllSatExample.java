@@ -1,7 +1,6 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +40,12 @@ public class AllSatExample {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
     for (Solvers solver : Solvers.values()) {
-      System.out.println("\nUsing solver " + solver);
       try (SolverContext context =
               SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-          ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+          ProverEnvironment prover =
+              context.newProverEnvironment(
+                  ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
+        System.out.println("\nUsing solver " + solver + " in version " + context.getVersion());
 
         AllSatExample ase = new AllSatExample(context, prover);
 
@@ -98,7 +99,7 @@ public class AllSatExample {
             return models;
           }
         },
-        Lists.newArrayList(q, p));
+        ImmutableList.of(q, p));
   }
 
   /** For boolean symbols we can also ask the model directly for evaluations of symbols. */
@@ -178,10 +179,12 @@ public class AllSatExample {
       throws InterruptedException, SolverException {
 
     IntegerFormula a = ifmgr.makeVariable("a");
+    IntegerFormula b = ifmgr.makeVariable("b");
     BooleanFormula p = bfmgr.makeVariable("p");
     BooleanFormula q = bfmgr.makeVariable("q");
 
     prover.addConstraint(ifmgr.lessOrEquals(num(1), a));
+    prover.addConstraint(ifmgr.equal(num(0), b));
     prover.addConstraint(ifmgr.lessOrEquals(a, num(3)));
     prover.addConstraint(bfmgr.equivalence(p, q));
 

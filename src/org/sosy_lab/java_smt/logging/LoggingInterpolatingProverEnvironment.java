@@ -40,7 +40,7 @@ class LoggingInterpolatingProverEnvironment<T> extends LoggingBasicProverEnviron
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<T> formulasOfA)
+  public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
     logger.log(Level.FINE, "formulasOfA:", formulasOfA);
     BooleanFormula bf = wrapped.getInterpolant(formulasOfA);

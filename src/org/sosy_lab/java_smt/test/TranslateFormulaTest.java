@@ -60,7 +60,7 @@ public class TranslateFormulaTest {
   @Parameter(1)
   public Solvers translateTo;
 
-  @Parameters
+  @Parameters(name = "{index}: {0} --> {1}")
   public static Object[] getSolversProduct() {
     // Every combination: translateFrom and translateTo.
     int len = Solvers.values().length;

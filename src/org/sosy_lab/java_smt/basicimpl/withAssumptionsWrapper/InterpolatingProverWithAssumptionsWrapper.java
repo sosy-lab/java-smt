@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,9 +50,9 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<T> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
       throws SolverException, InterruptedException {
-    List<T> completeListOfA = Lists.newArrayList(pFormulasOfA);
+    List<T> completeListOfA = new ArrayList<>(pFormulasOfA);
     completeListOfA.addAll(solverAssumptionsFromPush);
     BooleanFormula interpolant = delegate.getInterpolant(completeListOfA);
 

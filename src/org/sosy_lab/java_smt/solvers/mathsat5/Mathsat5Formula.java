@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -29,6 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
+@Immutable
 abstract class Mathsat5Formula implements Formula {
 
   private final long msatTerm;
@@ -62,6 +64,7 @@ abstract class Mathsat5Formula implements Formula {
     return msatTerm;
   }
 
+  @Immutable
   static final class Mathsat5ArrayFormula<TI extends Formula, TE extends Formula>
       extends Mathsat5Formula implements ArrayFormula<TI, TE> {
 
@@ -83,12 +86,14 @@ abstract class Mathsat5Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Mathsat5BitvectorFormula extends Mathsat5Formula implements BitvectorFormula {
     Mathsat5BitvectorFormula(long pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
   static final class Mathsat5FloatingPointFormula extends Mathsat5Formula
       implements FloatingPointFormula {
     Mathsat5FloatingPointFormula(long pTerm) {
@@ -96,6 +101,7 @@ abstract class Mathsat5Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Mathsat5FloatingPointRoundingModeFormula extends Mathsat5Formula
       implements FloatingPointRoundingModeFormula {
     Mathsat5FloatingPointRoundingModeFormula(long pTerm) {
@@ -103,18 +109,21 @@ abstract class Mathsat5Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Mathsat5IntegerFormula extends Mathsat5Formula implements IntegerFormula {
     Mathsat5IntegerFormula(long pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
   static final class Mathsat5RationalFormula extends Mathsat5Formula implements RationalFormula {
     Mathsat5RationalFormula(long pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
   static final class Mathsat5BooleanFormula extends Mathsat5Formula implements BooleanFormula {
     Mathsat5BooleanFormula(long pTerm) {
       super(pTerm);

@@ -24,7 +24,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 /**
@@ -32,6 +32,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
  * provides only the common operations. In most cases, just use one of the two sub-interfaces
  */
 public interface BasicProverEnvironment<T> extends AutoCloseable {
+
+  String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
 
   /**
    * Push a backtracking point and add a formula to the environment stack, asserting it. The return
@@ -84,7 +86,11 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException;
+  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    try (Model model = getModel()) {
+      return model.asList();
+    }
+  }
 
   /**
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that

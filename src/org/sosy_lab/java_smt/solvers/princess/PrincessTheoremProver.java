@@ -24,10 +24,12 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import javax.annotation.Nullable;
+import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     implements ProverEnvironment {
@@ -37,8 +39,8 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier,
-      boolean computeUnsatCores) {
-    super(pMgr, creator, pApi, pShutdownNotifier, computeUnsatCores);
+      Set<ProverOptions> pOptions) {
+    super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
   }
 
   @Override
@@ -47,7 +49,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
     Preconditions.checkState(!closed);
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
     final int formulaId = addAssertedFormula(t);
-    if (computeUnsatCores) {
+    if (generateUnsatCores) {
       api.setPartitionNumber(formulaId);
     }
     addConstraint0(t);

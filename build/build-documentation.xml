@@ -13,6 +13,7 @@
     <property name="documentation.options.file" value="${class.dir}/org/sosy_lab/${package}/ConfigurationOptions.txt"/>
     <property name="documentation.javadoc.dir" value="Javadoc"/>
     <property name="documentation.javadoc.exclude" value=""/>
+    <property name="javadoc.doclint" value="-Xdoclint:all,-missing"/>
 
     <target name="collect-options" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
@@ -55,6 +56,7 @@
             <tag name="apiNote" description="API Note:"/>
             <tag name="implSpec" description="Implementation Requirements:"/>
             <tag name="implNote" description="Implementation Note:"/>
+            <arg line="${javadoc.doclint}"/>
         </javadoc>
     </target>
 

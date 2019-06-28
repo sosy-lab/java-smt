@@ -19,16 +19,24 @@
  */
 package org.sosy_lab.java_smt.api;
 
+/**
+ * The {@link SLFormulaManager} can build formulae for separation logic.
+ *
+ * <p>Info: A {@link ProverEnvironment} only supports the assertion of well-typed SL-formulae, i.e.
+ * all formulae for one heap need to use matching types (sorts) for the AdressFormulae and
+ * ValueFormulae. The user has to take care of this, otherwise the {@link ProverEnvironment}
+ * complains at runtime!
+ */
 public interface SLFormulaManager {
 
-  Formula makeStar(Formula f1, Formula f2);
+  BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2);
 
-  Formula makePointsTo(Formula ptr, Formula to);
+  <AF extends Formula, VF extends Formula> BooleanFormula makePointsTo(AF ptr, VF to);
 
-  Formula makeMagicWand(Formula f1, Formula f2);
+  BooleanFormula makeMagicWand(BooleanFormula f1, BooleanFormula f2);
 
-  Formula makeEmptyHeap(Formula f1, Formula f2);
+  <AF extends Formula, VF extends Formula, AT extends FormulaType<AF>, VT extends FormulaType<VF>>
+      BooleanFormula makeEmptyHeap(AT pAdressType, VT pValueType);
 
-  Formula makeNilElement(Formula t);
+  <AF extends Formula, AT extends FormulaType<AF>> AF makeNilElement(AT pAdressType);
 }
-

@@ -85,4 +85,9 @@ class SmtInterpolRationalFormulaManager
       return super.divide(pNumber1, pNumber2);
     }
   }
+
+  @Override
+  protected Term floor(Term pNumber) {
+    return getFormulaCreator().getEnv().term("to_int", pNumber);
+  }
 }

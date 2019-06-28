@@ -21,12 +21,12 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +73,33 @@ public class ModelTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  @Test
+  public void testEmpty() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m).isEmpty();
+      }
+
+      assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
+  public void testOnlyTrue() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeTrue());
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m).isEmpty();
+      }
+
+      assertThat(prover.getModelAssignments()).isEmpty();
+    }
   }
 
   @Test
@@ -147,7 +174,17 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetMultipleUFs() throws SolverException, InterruptedException {
+  public void testGetUFwithMoreParams() throws Exception {
+    IntegerFormula x =
+        fmgr.declareAndCallUF(
+            "UF",
+            IntegerType,
+            ImmutableList.of(imgr.makeVariable("arg1"), imgr.makeVariable("arg2")));
+    testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+  }
+
+  @Test
+  public void testGetMultipleUFs() throws Exception {
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
     FunctionDeclaration<IntegerFormula> declaration =
@@ -317,6 +354,20 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testPartialModels2() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      IntegerFormula x = imgr.makeVariable("x");
+      prover.push(imgr.greaterThan(x, imgr.makeNumber(0)));
+      assertThat(prover).isSatisfiable();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+        // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
+        // solvers.
+      }
+    }
+  }
+
+  @Test
   public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
         .withMessage("As of now, only Z3 and Princess support partial model evaluation")
@@ -341,8 +392,43 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.makeNumber(0))).isEqualTo(BigInteger.ZERO);
         assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(imgr.makeNumber(100))).isEqualTo(BigInteger.valueOf(100));
         assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        if (bvmgr != null) {
+          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+            assertThat(m.evaluate(bvmgr.makeBitvector(i, 0))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.makeBitvector(i, 1))).isEqualTo(BigInteger.ONE);
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testEvaluatingConstantsWithOperation() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeVariable("b"));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(imgr.add(imgr.makeNumber(45), imgr.makeNumber(55))))
+            .isEqualTo(BigInteger.valueOf(100));
+        assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
+            .isEqualTo(BigInteger.valueOf(100));
+        assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
+            .isEqualTo(true);
+        if (bvmgr != null) {
+          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+            BitvectorFormula zero = bvmgr.makeBitvector(i, 0);
+            BitvectorFormula one = bvmgr.makeBitvector(i, 1);
+            assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
+            assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
+            assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
+          }
+        }
       }
     }
   }
@@ -461,6 +547,7 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireArrays();
 
@@ -479,9 +566,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        @SuppressWarnings("unused")
-        Object evaluation =
-            m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
+        m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
       }
     }
   }
@@ -633,7 +718,7 @@ public class ModelTest extends SolverBasedTest0 {
     ImmutableList<ValueAssignment> assignments;
     try (BasicProverEnvironment<?> prover =
         useOptProver
-            ? context.newOptimizationProverEnvironment()
+            ? context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)
             : context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
       assertThat(prover.isUnsat()).isFalse();
@@ -646,6 +731,9 @@ public class ModelTest extends SolverBasedTest0 {
         assignments = prover.getModelAssignments();
       }
     }
+
+    assertThat(assignments.size())
+        .isEqualTo(assignments.stream().map(ValueAssignment::getKey).distinct().count());
 
     List<BooleanFormula> assignmentFormulas = new ArrayList<>();
     for (ValueAssignment va : assignments) {
@@ -992,7 +1080,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireArrays();
 
     for (String query :
-        Lists.newArrayList(
+        ImmutableList.of(
             SMALL_ARRAY_QUERY, MEDIUM_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, false);
@@ -1008,11 +1096,54 @@ public class ModelTest extends SolverBasedTest0 {
     // only Z3 fulfills these requirements
 
     for (String query :
-        Lists.newArrayList(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
+        ImmutableList.of(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, true);
       checkModelIteration(formula, false);
     }
+  }
+
+  static final String ARRAY_QUERY_INT =
+      "(declare-fun i () Int)"
+          + "(declare-fun X () (Array Int Int))"
+          + "(declare-fun Y () (Array Int Int))"
+          + "(declare-fun Z () (Array Int Int))"
+          + "(assert (and "
+          + "  (= Y (store X i 0))"
+          + "  (= (select Y 5) 1)"
+          + "  (= Z (store Y 5 2))"
+          + "))";
+
+  static final String ARRAY_QUERY_BV =
+      "(declare-fun v () (_ BitVec 64))"
+          + "(declare-fun A () (Array (_ BitVec 64) (_ BitVec 32)))"
+          + "(declare-fun B () (Array (_ BitVec 64) (_ BitVec 32)))"
+          + "(declare-fun C () (Array (_ BitVec 64) (_ BitVec 32)))"
+          + "(assert (and "
+          + "  (= B (store A v (_ bv0 32)))"
+          + "  (= (select B (_ bv5 64)) (_ bv1 32))"
+          + "  (= C (store B (_ bv5 64) (_ bv2 32)))"
+          + "))";
+
+  @Test
+  public void arrayTest3() throws SolverException, InterruptedException {
+    requireArrays();
+
+    BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
+    checkModelIteration(formula, false);
+  }
+
+  @Test
+  public void arrayTest4() throws SolverException, InterruptedException {
+    requireArrays();
+    requireBitvectors();
+    assume()
+        .withMessage("solver does not fully support arrays over bitvectors")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
+    checkModelIteration(formula, false);
   }
 
   @Test
@@ -1057,6 +1188,93 @@ public class ModelTest extends SolverBasedTest0 {
       // ignore
     } finally {
       m.close();
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGenerateModelsOption() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
+      assertThat(prover).isSatisfiable();
+      prover.getModel();
+      fail();
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGenerateModelsOption2() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
+      assertThat(prover).isSatisfiable();
+      prover.getModelAssignments();
+      fail();
+    }
+  }
+
+  @Test
+  public void testGetSmallIntegers1() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeVariable("x")),
+        BigInteger.valueOf(20));
+  }
+
+  @Test
+  public void testGetSmallIntegers2() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
+        BigInteger.valueOf(11));
+  }
+
+  @Test
+  public void testGetNegativeIntegers1() throws SolverException, InterruptedException {
+    evaluateInModel(
+        imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
+        imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
+        BigInteger.valueOf(-9));
+  }
+
+  @Test
+  public void testGetSmallIntegralRationals1() throws SolverException, InterruptedException {
+    requireRationals();
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
+        rmgr.add(rmgr.makeVariable("x"), rmgr.makeVariable("x")),
+        Rational.of(2));
+  }
+
+  @Test
+  public void testGetRationals1() throws SolverException, InterruptedException {
+    requireRationals();
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.divide(rmgr.makeVariable("x"), rmgr.makeNumber(2)),
+        Rational.ofString("1/6"));
+  }
+
+  @Test
+  public void testGetBooleans1() throws SolverException, InterruptedException {
+    evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true);
+    evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(false), false);
+    evaluateInModel(
+        bmgr.makeVariable("x"),
+        bmgr.or(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
+        true);
+    evaluateInModel(
+        bmgr.makeVariable("x"),
+        bmgr.and(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
+        false);
+  }
+
+  private void evaluateInModel(BooleanFormula constraint, Formula variable, Object expectedValue)
+      throws SolverException, InterruptedException {
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(constraint);
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
+      }
     }
   }
 }

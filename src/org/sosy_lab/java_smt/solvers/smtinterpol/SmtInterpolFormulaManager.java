@@ -139,7 +139,7 @@ class SmtInterpolFormulaManager
         // This is the same as t.toString() does,
         // but directly uses the Appendable for better performance
         // and less memory consumption.
-        Term letted = (new FormulaLet()).let(formula);
+        Term letted = new FormulaLet().let(formula);
         termPrinter.append(out, letted);
 
         out.append(")");

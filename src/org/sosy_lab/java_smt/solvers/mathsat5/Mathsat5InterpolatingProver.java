@@ -22,15 +22,15 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,6 +47,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGES =
       ImmutableSet.of(
+          "Unexpected proof rule to split: PN4msat5proof5ProofE",
           "impossible to build a suitable congruence graph!",
           "can't build ie-local interpolant",
           "set_raised on an already-raised proof",
@@ -101,7 +102,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     // As this is a bug in MathSAT and not in our code, we throw a SolverException.
     // We do it only in InterpolatingProver because without interpolation this is not expected.
     try {
-      return msat_get_model(curEnv);
+      return super.getMsatModel();
     } catch (IllegalArgumentException e) {
       String msg = Strings.emptyToNull(e.getMessage());
       throw new SolverException(
@@ -113,15 +114,10 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(List<Integer> formulasOfA) throws SolverException {
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
     Preconditions.checkState(!closed);
 
-    int[] groupsOfA = new int[formulasOfA.size()];
-    int i = 0;
-    for (Integer f : formulasOfA) {
-      groupsOfA[i++] = f;
-    }
-
+    int[] groupsOfA = Ints.toArray(formulasOfA);
     long itp;
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
@@ -142,11 +138,15 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+
     // the fallback to a loop is sound and returns an inductive sequence of interpolants
     final List<BooleanFormula> itps = new ArrayList<>();
-    for (int i = 0; i < partitionedFormulas.size(); i++) {
+    for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
-          getInterpolant(Lists.newArrayList(Iterables.concat(partitionedFormulas.subList(0, i)))));
+          getInterpolant(
+              ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }
     return itps;
   }

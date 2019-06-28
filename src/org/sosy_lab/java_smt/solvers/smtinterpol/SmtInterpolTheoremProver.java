@@ -22,23 +22,17 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import com.google.common.base.Preconditions;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
+class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void, Term>
     implements ProverEnvironment {
 
-  private final boolean generateUnsatCores;
-
   SmtInterpolTheoremProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
-    super(pMgr);
-    generateUnsatCores = options.contains(ProverOptions.GENERATE_UNSAT_CORE);
+    super(pMgr, options);
   }
 
   @Override
@@ -56,12 +50,5 @@ class SmtInterpolTheoremProver extends SmtInterpolBasicProver<Void, Term>
     }
     assertedFormulas.peek().add(t);
     return null;
-  }
-
-  @Override
-  protected Collection<Term> getAssertedTerms() {
-    List<Term> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
   }
 }

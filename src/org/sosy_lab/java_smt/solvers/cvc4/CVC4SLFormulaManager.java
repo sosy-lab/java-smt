@@ -25,14 +25,13 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 
-public class CVC4SLFormulaManager
-    extends AbstractSLFormulaManager<Expr, Type, CVC4Environment, Expr> {
+public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 
   protected CVC4SLFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
   }
 
   @Override
@@ -51,12 +50,12 @@ public class CVC4SLFormulaManager
   }
 
   @Override
-  protected Expr makeEmptyHeap(Expr pE1, Expr pE2) {
-    return exprManager.mkExpr(Kind.SEP_EMP, pE1, pE2);
+  protected Expr makeEmptyHeap(Type pT1, Type pT2) {
+    return exprManager.mkExpr(Kind.SEP_EMP, pT1.mkGroundTerm(), pT2.mkGroundTerm());
   }
 
   @Override
-  protected Expr makeNilElement(Expr pType) {
-    return exprManager.mkExpr(Kind.SEP_NIL, pType);
+  protected Expr makeNilElement(Type pType) {
+    return exprManager.mkExpr(Kind.SEP_NIL, pType.mkGroundTerm());
   }
 }

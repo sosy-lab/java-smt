@@ -250,4 +250,20 @@ public interface FormulaManager {
    * </ul>
    */
   boolean isValidName(String variableName);
+
+  /**
+   * Get an escaped symbol/name for variables or undefined functions, if necessary.
+   *
+   * <p>See {@link #isValidName(String)} for further details.
+   */
+  String escape(String variableName);
+
+  /**
+   * Unescape the symbol/name for variables or undefined functions, if necessary.
+   *
+   * <p>The result is undefined for Strings that are not properly escaped.
+   *
+   * <p>See {@link #isValidName(String)} for further details.
+   */
+  String unescape(String variableName);
 }

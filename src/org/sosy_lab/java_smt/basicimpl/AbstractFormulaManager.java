@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,13 +24,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Map.Entry;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -92,7 +94,16 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
-  static final CharMatcher DISALLOWED_CHARACTERS = CharMatcher.anyOf("|\\");
+  private static final CharMatcher DISALLOWED_CHARACTERS = CharMatcher.anyOf("|\\");
+
+  /** Mapping of disallowed char to their escaped counterparts. */
+  /* Keep this map in sync with {@link #DISALLOWED_CHARACTERS}.
+   * Counterparts can be any unique string. For optimization we could even use plain chars. */
+  @VisibleForTesting
+  public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
+      ImmutableBiMap.<Character, String>builder().put('|', "pipe").put('\\', "backslash").build();
+
+  private static final char ESCAPE = '$'; // just some allowed symbol, can be any char
 
   private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       arrayManager;
@@ -118,7 +129,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
-  /** Builds a solver from the given theory implementations */
+  /** Builds a solver from the given theory implementations. */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,
@@ -207,7 +218,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public SLFormulaManager getSLFormulaManager() {
     if (slManager == null) {
-      throw new UnsupportedOperationException("Solver does not support Seperation Logic theory");
+      throw new UnsupportedOperationException("Solver does not support seperation logic theory");
     }
     return slManager;
   }
@@ -439,7 +450,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>This method must be kept in sync with {@link #checkVariableName}.
    */
   @Override
-  public boolean isValidName(String pVar) {
+  public final boolean isValidName(String pVar) {
     if (pVar.isEmpty()) {
       return false;
     }
@@ -468,20 +479,80 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     Preconditions.checkArgument(
         !variableName.isEmpty(), "Identifier for variable should not be empty.");
     Preconditions.checkArgument(
-        !AbstractFormulaManager.BASIC_OPERATORS.contains(variableName),
+        !BASIC_OPERATORS.contains(variableName),
         "Identifier '%s' should not be a simple operator. %s",
         variableName,
         help);
     Preconditions.checkArgument(
-        !AbstractFormulaManager.SMTLIB2_KEYWORDS.contains(variableName),
+        !SMTLIB2_KEYWORDS.contains(variableName),
         "Identifier '%s' should not be a keyword of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(
-        AbstractFormulaManager.DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
+        DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
         "Identifier '%s' should contain an escape character %s of SMT-LIB2. %s",
         variableName,
-        DISALLOWED_CHARACTERS, // toString prints UTF8-encoded escape sequence, better than nothing.
+        DISALLOWED_CHARACTER_REPLACEMENT
+            .keySet(), // toString prints UTF8-encoded escape sequence, better than nothing.
         help);
+  }
+
+  /* This escaping works for simple escape sequences only, i.e., keywords are unique enough. */
+  @Override
+  public final String escape(String pVar) {
+    // as long as keywords stay simple, this simple escaping is sufficient
+    if (pVar.isEmpty() || BASIC_OPERATORS.contains(pVar) || SMTLIB2_KEYWORDS.contains(pVar)) {
+      return ESCAPE + pVar;
+    }
+    if (pVar.indexOf(ESCAPE) != -1) {
+      pVar = pVar.replace("" + ESCAPE, "" + ESCAPE + ESCAPE);
+    }
+    if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
+      for (Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
+        pVar = pVar.replace(e.getKey().toString(), ESCAPE + e.getValue());
+      }
+    }
+    return pVar; // unchanged
+  }
+
+  /* This unescaping works for simple escape sequences only, i.e., keywords are unique enough. */
+  @Override
+  public final String unescape(String pVar) {
+    int idx = pVar.indexOf(ESCAPE);
+    if (idx != -1) {
+      // unescape BASIC_OPERATORS and SMTLIB2_KEYWORDS
+      if (idx == 0) {
+        String tmp = pVar.substring(1);
+        if (tmp.isEmpty() || BASIC_OPERATORS.contains(tmp) || SMTLIB2_KEYWORDS.contains(tmp)) {
+          return tmp;
+        }
+      }
+
+      // unescape DISALLOWED_CHARACTERS
+      StringBuilder str = new StringBuilder();
+      int i = 0;
+      while (i < pVar.length()) {
+        if (pVar.charAt(i) == ESCAPE) {
+          if (pVar.charAt(i + 1) == ESCAPE) {
+            str.append(ESCAPE);
+            i++;
+          } else {
+            String rest = pVar.substring(i + 1);
+            for (Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
+              if (rest.startsWith(e.getValue())) {
+                str.append(e.getKey());
+                i += e.getValue().length();
+                break;
+              }
+            }
+          }
+        } else {
+          str.append(pVar.charAt(i));
+        }
+        i++;
+      }
+      return str.toString();
+    }
+    return pVar; // unchanged
   }
 }

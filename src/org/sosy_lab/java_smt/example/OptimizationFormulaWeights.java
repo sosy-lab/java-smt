@@ -1,6 +1,6 @@
 package org.sosy_lab.java_smt.example;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -17,6 +17,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -39,7 +40,8 @@ public class OptimizationFormulaWeights {
 
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-        OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+        OptimizationProverEnvironment prover =
+            context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -81,7 +83,7 @@ public class OptimizationFormulaWeights {
     // generate weighted formulas: if a formula should be satisfied,
     // use higher weight for the positive instance than for its negated instance.
     List<IntegerFormula> weights =
-        Lists.newArrayList(
+        ImmutableList.of(
             bmgr.ifThenElse(imgr.lessOrEquals(x, zero), scoreHigh, scoreBasic), // important
             bmgr.ifThenElse(imgr.lessOrEquals(x, four), scoreHigh, scoreBasic), // important
             bmgr.ifThenElse(imgr.lessOrEquals(y, zero), scoreMedium, scoreBasic), // less important

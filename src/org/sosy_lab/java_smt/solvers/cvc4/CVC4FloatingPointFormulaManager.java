@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,95 +19,181 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import com.google.common.collect.ImmutableList;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.FloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointConvertSort;
+import edu.nyu.acsys.CVC4.FloatingPointSize;
+import edu.nyu.acsys.CVC4.FloatingPointToFPFloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointToSBV;
+import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
+import edu.nyu.acsys.CVC4.Rational;
+import edu.nyu.acsys.CVC4.RoundingMode;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
 public class CVC4FloatingPointFormulaManager
-    extends AbstractFloatingPointFormulaManager<Expr, Type, CVC4Environment, Expr> {
-  protected final ExprManager exprManager;
+    extends AbstractFloatingPointFormulaManager<Expr, Type, ExprManager, Expr> {
 
-  protected CVC4FloatingPointFormulaManager(CVC4FormulaCreator pCreator) {
+  private final ExprManager exprManager;
+  private final Expr roundingMode;
+
+  protected CVC4FloatingPointFormulaManager(
+      CVC4FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
+    roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
+  }
+
+  // TODO Is there a difference in `FloatingPointSize` and `FloatingPointType` in CVC4?
+  // They are both just pairs of `exponent size` and `significant size`.
+
+  private static FloatingPointSize getFPSize(FloatingPointType pType) {
+    long pExponentSize = pType.getExponentSize();
+    long pMantissaSize = pType.getMantissaSize();
+    return new FloatingPointSize(pExponentSize, pMantissaSize + 1); // plus sign bit
   }
 
   @Override
   protected Expr getDefaultRoundingMode() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return roundingMode;
   }
 
   @Override
   protected Expr getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN:
+        return exprManager.mkConst(RoundingMode.roundNearestTiesToEven);
+      case NEAREST_TIES_AWAY:
+        return exprManager.mkConst(RoundingMode.roundNearestTiesToAway);
+      case TOWARD_POSITIVE:
+        return exprManager.mkConst(RoundingMode.roundTowardPositive);
+      case TOWARD_NEGATIVE:
+        return exprManager.mkConst(RoundingMode.roundTowardNegative);
+      case TOWARD_ZERO:
+        return exprManager.mkConst(RoundingMode.roundTowardZero);
+      default:
+        throw new AssertionError("Unexpected branch");
+    }
   }
 
   @Override
-  protected Expr makeNumberImpl(
-      double pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr makeNumberImpl(double pN, FloatingPointType pType, Expr pRoundingMode) {
+    return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
-  protected Expr makeNumberImpl(
-      BigDecimal pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  protected Expr makeNumberAndRound(String pN, FloatingPointType pType, Expr pRoundingMode) {
+    try {
+      if (isNegativeZero(Double.valueOf(pN))) {
+        return negate(
+            exprManager.mkConst(
+                new FloatingPoint(
+                    getFPSize(pType),
+                    pRoundingMode.getConstRoundingMode(),
+                    Rational.fromDecimal(pN))));
+      }
+    } catch (NumberFormatException e) {
+      // ignore and fallback to floating point from rational numbers
+    }
+    return exprManager.mkConst(
+        new FloatingPoint(getFPSize(pType), pRoundingMode.getConstRoundingMode(), toRational(pN)));
   }
 
-  @Override
-  protected Expr makeNumberImpl(
-      String pN, FloatingPointType pType, Expr pFloatingPointRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+  /**
+   * Try to convert a String numeral into a Rational.
+   *
+   * <p>If we do not check all invalid formatted numbers in our own code, CVC4 will fail hard and
+   * immediately terminate the whole program.
+   */
+  private Rational toRational(String pN) throws NumberFormatException {
+    try {
+      // first try something like -123.567
+      return Rational.fromDecimal(new BigDecimal(pN).toPlainString());
+
+    } catch (NumberFormatException e1) {
+      try {
+        // then try something like -123/456
+        org.sosy_lab.common.rationals.Rational r =
+            org.sosy_lab.common.rationals.Rational.ofString(pN);
+        return new Rational(new Integer(r.getNum().toString()), new Integer(r.getDen().toString()));
+
+      } catch (NumberFormatException e2) {
+        // we cannot handle the number
+        throw new NumberFormatException("invalid numeral: " + pN);
+      }
+    }
   }
 
   @Override
   protected Expr makeVariableImpl(String varName, FloatingPointType pType) {
-    long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSize();
-    Type type = exprManager.mkFloatingPointType(pExponentSize, pMantissaSize);
-    return exprManager.mkVar(varName, type);
+    return exprManager.mkVar(varName, formulaCreator.getFloatingPointType(pType));
   }
 
   @Override
   protected Expr makePlusInfinityImpl(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ false));
   }
 
   @Override
   protected Expr makeMinusInfinityImpl(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkConst(FloatingPoint.makeInf(getFPSize(pType), /* sign */ true));
   }
 
   @Override
   protected Expr makeNaNImpl(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkConst(FloatingPoint.makeNaN(getFPSize(pType)));
   }
 
   @Override
   protected Expr castToImpl(Expr pNumber, FormulaType<?> pTargetType, Expr pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    if (pTargetType.isFloatingPointType()) {
+      FloatingPointType targetType = (FloatingPointType) pTargetType;
+      FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(getFPSize(targetType));
+      Expr op = exprManager.mkConst(new FloatingPointToFPFloatingPoint(fpConvertSort));
+      return exprManager.mkExpr(op, pRoundingMode, pNumber);
+
+    } else if (pTargetType.isBitvectorType()) {
+      BitvectorType targetType = (BitvectorType) pTargetType;
+      Expr op = exprManager.mkConst(new FloatingPointToSBV(targetType.getSize()));
+      return exprManager.mkExpr(op, pRoundingMode, pNumber);
+
+    } else if (pTargetType.isRationalType()) {
+      return exprManager.mkExpr(Kind.FLOATINGPOINT_TO_REAL, pNumber);
+
+    } else {
+      return genericCast(pNumber, pTargetType);
+    }
   }
 
   @Override
   protected Expr castFromImpl(
       Expr pNumber, boolean pSigned, FloatingPointType pTargetType, Expr pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
+    if (formulaType.isFloatingPointType()) {
+      return castToImpl(pNumber, pTargetType, pRoundingMode);
+    } else {
+      return genericCast(pNumber, pTargetType);
+    }
+  }
+
+  private Expr genericCast(Expr pNumber, FormulaType<?> pTargetType) {
+    Type type = pNumber.getType();
+    FormulaType<?> argType = getFormulaCreator().getFormulaType(pNumber);
+    Expr castFuncDecl =
+        getFormulaCreator()
+            .declareUFImpl(
+                "__cast_" + argType + "_to_" + pTargetType,
+                toSolverType(pTargetType),
+                ImmutableList.of(type));
+    return exprManager.mkExpr(Kind.APPLY_UF, castFuncDecl, pNumber);
   }
 
   @Override
@@ -117,22 +203,22 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr add(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_PLUS, pParam1, pParam2);
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_PLUS, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
-  protected Expr subtract(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_SUB, pParam1, pParam2);
+  protected Expr subtract(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_SUB, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
-  protected Expr divide(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_DIV, pParam1, pParam2);
+  protected Expr divide(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_DIV, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
-  protected Expr multiply(Expr pParam1, Expr pParam2, Expr pFloatingPointRoundingMode) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_MULT, pParam1, pParam2);
+  protected Expr multiply(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_MULT, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
@@ -186,15 +272,23 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
+  protected Expr isNormal(Expr pParam) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISN, pParam);
+  }
+
+  @Override
+  protected Expr isNegative(Expr pParam) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ISNEG, pParam);
+  }
+
+  @Override
   protected Expr fromIeeeBitvectorImpl(Expr pNumber, FloatingPointType pTargetType) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, pNumber);
   }
 
   @Override
   protected Expr toIeeeBitvectorImpl(Expr pNumber) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
   }
 
   @Override

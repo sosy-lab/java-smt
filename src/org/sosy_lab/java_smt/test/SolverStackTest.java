@@ -76,7 +76,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   private BasicProverEnvironment<?> newEnvironmentForTest(ProverOptions... options) {
     if (useInterpolatingEnvironment) {
       requireInterpolation();
-      return context.newProverEnvironmentWithInterpolation();
+      return context.newProverEnvironmentWithInterpolation(options);
     } else {
       return context.newProverEnvironment(options);
     }
@@ -425,6 +425,20 @@ public class SolverStackTest extends SolverBasedTest0 {
   public void modelForUnsatFormula() throws SolverException, InterruptedException {
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      assertThat(stack).isUnsatisfiable();
+
+      thrown.expect(Exception.class);
+      stack.getModel();
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void modelForUnsatFormula2() throws SolverException, InterruptedException {
+    try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      assertThat(stack).isSatisfiable();
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       assertThat(stack).isUnsatisfiable();
 

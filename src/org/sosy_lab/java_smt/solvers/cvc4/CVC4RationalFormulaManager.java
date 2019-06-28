@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.Expr;
+import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -48,5 +49,10 @@ public class CVC4RationalFormulaManager
   @Override
   protected Expr makeNumberImpl(BigDecimal pNumber) {
     return makeNumberImpl(pNumber.toPlainString());
+  }
+
+  @Override
+  protected Expr floor(Expr pNumber) {
+    return exprManager.mkExpr(Kind.TO_INTEGER, pNumber);
   }
 }

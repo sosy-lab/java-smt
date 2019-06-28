@@ -19,16 +19,19 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import com.google.errorprone.annotations.Immutable;
 import edu.nyu.acsys.CVC4.Expr;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
+@Immutable
 public class CVC4Formula implements Formula {
   private final Expr cvc4term;
 
@@ -54,15 +57,14 @@ public class CVC4Formula implements Formula {
 
   @Override
   public final int hashCode() {
-    // unfortunately we cannot do better, as hashCode is not implemented in the
-    // CVC4Wrapper
-    return 0;
+    return (int) cvc4term.getId(); // ID should work like a hashCode, TODO test this
   }
 
   final Expr getTerm() {
     return cvc4term;
   }
 
+  @Immutable
   static final class CVC4ArrayFormula<TI extends Formula, TE extends Formula> extends CVC4Formula
       implements ArrayFormula<TI, TE> {
 
@@ -84,30 +86,43 @@ public class CVC4Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class CVC4BitvectorFormula extends CVC4Formula implements BitvectorFormula {
     CVC4BitvectorFormula(Expr pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
   static final class CVC4FloatingPointFormula extends CVC4Formula implements FloatingPointFormula {
     CVC4FloatingPointFormula(Expr pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
+  static final class CVC4FloatingPointRoundingModeFormula extends CVC4Formula
+      implements FloatingPointRoundingModeFormula {
+    CVC4FloatingPointRoundingModeFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
   static final class CVC4IntegerFormula extends CVC4Formula implements IntegerFormula {
     CVC4IntegerFormula(Expr pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
   static final class CVC4RationalFormula extends CVC4Formula implements RationalFormula {
     CVC4RationalFormula(Expr pTerm) {
       super(pTerm);
     }
   }
 
+  @Immutable
   static final class CVC4BooleanFormula extends CVC4Formula implements BooleanFormula {
     CVC4BooleanFormula(Expr pTerm) {
       super(pTerm);

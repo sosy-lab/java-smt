@@ -29,6 +29,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
@@ -50,7 +51,7 @@ abstract class SmtInterpolNumeralFormulaManager<
     env = pCreator.getEnv();
   }
 
-  /** check for ConstantTerm with Number or ApplicationTerm with negative Number */
+  /** check for ConstantTerm with Number or ApplicationTerm with negative Number. */
   @Override
   protected final boolean isNumeral(Term t) {
     boolean is = false;
@@ -153,6 +154,11 @@ abstract class SmtInterpolNumeralFormulaManager<
   @Override
   public Term equal(Term pNumber1, Term pNumber2) {
     return env.term("=", pNumber1, pNumber2);
+  }
+
+  @Override
+  public Term distinctImpl(List<Term> pNumbers) {
+    return env.term("distinct", pNumbers.toArray(new Term[0]));
   }
 
   @Override

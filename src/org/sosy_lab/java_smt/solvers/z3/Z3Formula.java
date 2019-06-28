@@ -21,8 +21,10 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import com.microsoft.z3.Native;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -33,12 +35,13 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
+@Immutable
 abstract class Z3Formula implements Formula {
 
   private final long z3expr;
   private final long z3context;
 
-  private int hashCache = 0;
+  @LazyInit private int hashCache = 0;
 
   private Z3Formula(long z3context, long z3expr) {
     checkArgument(z3context != 0, "Z3 context is null");
@@ -56,7 +59,10 @@ abstract class Z3Formula implements Formula {
 
   @Override
   public final boolean equals(@Nullable Object obj) {
-    if (obj == null || !(obj instanceof Z3Formula)) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof Z3Formula)) {
       return false;
     }
     Z3Formula other = (Z3Formula) obj;
@@ -97,6 +103,7 @@ abstract class Z3Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Z3BitvectorFormula extends Z3Formula implements BitvectorFormula {
 
     Z3BitvectorFormula(long z3context, long z3expr) {
@@ -104,6 +111,7 @@ abstract class Z3Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Z3FloatingPointFormula extends Z3Formula implements FloatingPointFormula {
 
     Z3FloatingPointFormula(long z3context, long z3expr) {
@@ -111,6 +119,7 @@ abstract class Z3Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Z3FloatingPointRoundingModeFormula extends Z3Formula
       implements FloatingPointRoundingModeFormula {
 
@@ -119,6 +128,7 @@ abstract class Z3Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Z3IntegerFormula extends Z3Formula implements IntegerFormula {
 
     Z3IntegerFormula(long z3context, long z3expr) {
@@ -126,6 +136,7 @@ abstract class Z3Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Z3RationalFormula extends Z3Formula implements RationalFormula {
 
     Z3RationalFormula(long z3context, long z3expr) {
@@ -133,6 +144,7 @@ abstract class Z3Formula implements Formula {
     }
   }
 
+  @Immutable
   static final class Z3BooleanFormula extends Z3Formula implements BooleanFormula {
     Z3BooleanFormula(long z3context, long z3expr) {
       super(z3context, z3expr);

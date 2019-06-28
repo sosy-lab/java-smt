@@ -30,17 +30,19 @@
 
     <developers>
         <developer>
-            <name>George Karpenkov</name>
-            <email>george@metaworld.me</email>
-            <url>http://metaworld.me</url>
+            <name>Karlheinz Friedberger</name>
+            <email>kfriedberger@gmail.com</email>
+            <organization>Software Systems Lab</organization>
+            <url>https://www.sosy-lab.org/people/friedberger/</url>
             <roles>
                 <role>project maintainer</role>
             </roles>
         </developer>
         <developer>
-            <name>Karlheinz Friedberger</name>
-            <email>kfriedberger@gmail.com</email>
-            <url>https://www.sosy-lab.org/people/friedberger/</url>
+            <name>Philipp Wendler</name>
+            <email>uni@philippwendler.de</email>
+            <organization>Software Systems Lab</organization>
+            <url>https://www.sosy-lab.org/people/wendler/</url>
             <roles>
                 <role>project maintainer</role>
             </roles>

@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2018  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,68 +21,62 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
-import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
-import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.FormulaType;
+import java.util.Map.Entry;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvironment> {
 
   private final Model model;
-  private final ImmutableList<Term> assertedTerms;
-  private final SmtInterpolFormulaCreator formulaCreator;
 
-  SmtInterpolModel(
-      Model pModel,
-      FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator,
-      Collection<Term> assertedTerms) {
+  SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator) {
     super(pCreator);
-    formulaCreator = (SmtInterpolFormulaCreator) pCreator;
     model = pModel;
-    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
-  }
-
-  @Nullable
-  @Override
-  public Object evaluateImpl(Term f) {
-    Term out = model.evaluate(f);
-    return getValue(out);
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> modelToList() {
+  protected ImmutableList<ValueAssignment> toList() {
 
-    Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
-    for (Term t : assertedTerms) {
-      creator.extractVariablesAndUFs(
-          t,
-          true,
-          (name, f) -> {
-            if (f.getSort().isArraySort()) {
-              assignments.addAll(getArrayAssignment(name, f, f, Collections.emptyList()));
-            } else {
-              assignments.add(getAssignment(name, (ApplicationTerm) f));
-            }
-          });
+    for (FunctionSymbol symbol : model.getDefinedFunctions()) {
+      final String name = unescape(symbol.getApplicationString());
+      if (symbol.getParameterSorts().length == 0) { // simple variable or array
+        Term variable = creator.getEnv().term(name);
+        if (symbol.getReturnSort().isArraySort()) {
+          assignments.addAll(getArrayAssignment(name, variable, variable, ImmutableList.of()));
+        } else {
+          assignments.add(getAssignment(name, (ApplicationTerm) variable));
+        }
+      } else { // uninterpreted function
+        assignments.addAll(getUFAssignments(symbol));
+      }
     }
 
     return assignments.build().asList();
   }
 
+  private static String unescape(String s) {
+    return s.startsWith("|") ? s.substring(1, s.length() - 1) : s;
+  }
+
+  /**
+   * Get all modeled assignments for the given array.
+   *
+   * @param symbol name of the array
+   * @param key term of the whole array, such that a select operation returns the evaluation,
+   * @param array term of the array, such that an evaluation returns its whole content
+   * @param upperIndices indices for multi-dimensional arrays
+   */
   private Collection<ValueAssignment> getArrayAssignment(
       String symbol, Term key, Term array, List<Object> upperIndices) {
     assert array.getSort().isArraySort();
@@ -98,7 +92,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
         Term index = params[1];
         Term content = params[2];
 
-        List<Object> innerIndices = Lists.newArrayList(upperIndices);
+        List<Object> innerIndices = new ArrayList<>(upperIndices);
         innerIndices.add(evaluateImpl(index));
 
         Term select = creator.getEnv().term("select", key, index);
@@ -125,13 +119,39 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     return assignments;
   }
 
+  /** Get all modeled assignments for the UF. */
+  private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol) {
+    final Collection<ValueAssignment> assignments = new ArrayList<>();
+    final String name = unescape(symbol.getApplicationString());
+
+    // direct interaction with internal classes and internal behaviour of SMTInterpol.
+    // they made some classes 'public' especially for us,
+    // because there is no nicer way of iterating over UF-assignments,
+    // except building an ITE-formula in SMTInterpol and splitting it here (alternative solution).
+
+    de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model mmodel =
+        (de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model) model;
+
+    for (Entry<Index, Integer> v : mmodel.getFunctionValue(symbol).values().entrySet()) {
+      int[] indizes = v.getKey().getArray();
+      Term[] arguments = new Term[indizes.length];
+      for (int i = 0; i < indizes.length; i++) {
+        arguments[i] = mmodel.toModelTerm(indizes[i], symbol.getParameterSorts()[i]);
+      }
+      assignments.add(
+          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, arguments)));
+    }
+
+    return assignments;
+  }
+
   private ValueAssignment getAssignment(String key, ApplicationTerm term) {
+    Term value = model.evaluate(term);
     List<Object> argumentInterpretation = new ArrayList<>();
     for (Term param : term.getParameters()) {
       argumentInterpretation.add(evaluateImpl(param));
     }
 
-    Term value = model.evaluate(term);
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(term),
         creator.encapsulateWithTypeOf(value),
@@ -146,34 +166,11 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     return model.toString();
   }
 
-  private Object getValue(Term value) {
-    FormulaType<?> type = creator.getFormulaType(value);
-    if (type.isBooleanType()) {
-      return value.getTheory().mTrue == value;
-    } else if (value instanceof ConstantTerm
-        && ((ConstantTerm) value).getValue() instanceof Rational) {
-
-      /*
-       * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
-       * the output is SmtInterpol's Rational unless it is a bitvector,
-       * and currently we do not support bitvectors for SmtInterpol.
-       */
-      Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
-      org.sosy_lab.common.rationals.Rational out =
-          org.sosy_lab.common.rationals.Rational.of(
-              rationalValue.numerator(), rationalValue.denominator());
-      if (formulaCreator.getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
-        assert out.isIntegral();
-        return out.getNum();
-      } else {
-        return out;
-      }
-    } else {
-
-      throw new IllegalArgumentException("Unexpected value: " + value);
-    }
-  }
-
   @Override
   public void close() {}
+
+  @Override
+  protected Term evalImpl(Term formula) {
+    return model.evaluate(formula);
+  }
 }

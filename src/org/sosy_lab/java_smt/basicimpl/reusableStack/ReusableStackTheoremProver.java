@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.basicimpl.reusableStack;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
 public class ReusableStackTheoremProver extends ReusableStackAbstractProver<Void, ProverEnvironment>
@@ -27,10 +26,5 @@ public class ReusableStackTheoremProver extends ReusableStackAbstractProver<Void
 
   public ReusableStackTheoremProver(ProverEnvironment pDelegate) {
     super(pDelegate);
-  }
-
-  @Override
-  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    return delegate.addConstraint(pConstraint);
   }
 }

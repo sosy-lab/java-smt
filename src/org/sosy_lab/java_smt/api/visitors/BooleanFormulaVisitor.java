@@ -75,7 +75,7 @@ public interface BooleanFormulaVisitor<R> {
   R visitXor(BooleanFormula operand1, BooleanFormula operand2);
 
   /**
-   * Visit an equivalence between two formulas of boolean sort: {@code operand1 = operand2}
+   * Visit an equivalence between two formulas of boolean sort: {@code operand1 = operand2}.
    *
    * @see BooleanFormulaManager#equivalence
    */

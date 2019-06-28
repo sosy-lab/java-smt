@@ -25,10 +25,13 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import edu.nyu.acsys.CVC4.vectorExpr;
 import java.util.Collection;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC4BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Expr, Type, CVC4Environment, Expr> {
+    extends AbstractBooleanFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final Expr cvc4True;
   private final Expr cvc4False;
@@ -36,7 +39,7 @@ public class CVC4BooleanFormulaManager
 
   protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
-    exprManager = pCreator.getExprManager();
+    exprManager = pCreator.getEnv();
     cvc4True = exprManager.mkConst(true);
     cvc4False = exprManager.mkConst(false);
   }
@@ -82,6 +85,11 @@ public class CVC4BooleanFormulaManager
   }
 
   @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::and);
+  }
+
+  @Override
   protected Expr or(Expr pParam1, Expr pParam2) {
     if (isTrue(pParam1)) {
       return cvc4True;
@@ -107,6 +115,11 @@ public class CVC4BooleanFormulaManager
   }
 
   @Override
+  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::or);
+  }
+
+  @Override
   protected Expr xor(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.XOR, pParam1, pParam2);
   }
@@ -128,6 +141,6 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr ifThenElse(Expr pCond, Expr pF1, Expr pF2) {
-    return pCond.iteExpr(pF1, pF2);
+    return exprManager.mkExpr(Kind.ITE, pCond, pF1, pF2);
   }
 }

@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,12 +29,13 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class CVC4ArrayFormulaManager
-    extends AbstractArrayFormulaManager<Expr, Type, CVC4Environment, Expr> {
-  protected final ExprManager exprManager;
+    extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
+
+  private final ExprManager exprManager;
 
   public CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-    exprManager = pFormulaCreator.getExprManager();
+    exprManager = pFormulaCreator.getEnv();
   }
 
   @Override

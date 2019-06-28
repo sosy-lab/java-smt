@@ -25,7 +25,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
@@ -39,6 +38,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -114,7 +114,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
   private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
-      Maps.newIdentityHashMap();
+      new IdentityHashMap<>();
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -149,7 +149,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long extractInfo(Formula pT) {
-    return Z3FormulaManager.getZ3Expr(pT);
+    if (pT instanceof Z3Formula) {
+      return ((Z3Formula) pT).getFormulaInfo();
+    }
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
   @SuppressWarnings("unchecked")
@@ -178,7 +182,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
         return FormulaType.getFloatingPointType(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_DATATYPE_SORT:
@@ -309,7 +313,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
-    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize());
+    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize() + 1);
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -463,6 +467,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.MUL;
       case Z3_OP_MOD:
         return FunctionDeclarationKind.MODULO;
+      case Z3_OP_TO_INT:
+        return FunctionDeclarationKind.FLOOR;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -591,7 +597,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * @param value Z3_ast
-   * @return Whether the value is a constant and can be passed to {@link #convertValue(long)}.
+   * @return Whether the value is a constant and can be passed to {@link #convertValue(Long)}.
    */
   public boolean isConstant(long value) {
     return Native.isNumeralAst(environment, value)
@@ -605,8 +611,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
    *     FloatingPointRoundingMode}.
    */
-  public Object convertValue(long value) {
-    assert isConstant(value) : "value is not constant: " + Native.astToString(environment, value);
+  @Override
+  public Object convertValue(Long value) {
+    if (!isConstant(value)) {
+      return null;
+    }
+
     Native.incRef(environment, value);
 
     Object constantValue =

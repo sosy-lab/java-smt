@@ -21,7 +21,8 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
+import com.google.errorprone.annotations.Immutable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -37,6 +38,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
  *
  * @param <TFormulaInfo> the solver specific type.
  */
+@Immutable(containerOf = "TFormulaInfo")
 abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
   private final TFormulaInfo formulaInfo;
@@ -53,7 +55,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     if (!(o instanceof AbstractFormula)) {
       return false;
     }
-    return formulaInfo.equals(((AbstractFormula<?>) o).formulaInfo);
+    Object otherFormulaInfo = ((AbstractFormula<?>) o).formulaInfo;
+    return formulaInfo == otherFormulaInfo || formulaInfo.equals(otherFormulaInfo);
   }
 
   final TFormulaInfo getFormulaInfo() {

@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.collect.FluentIterable;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
@@ -28,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -51,7 +50,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 @Options(prefix = "solver.z3")
 final class Z3SolverContext extends AbstractSolverContext {
 
-  /** Optimization settings */
+  /** Optimization settings. */
   @Option(
       secure = true,
       description = "Engine to use for the optimization",
@@ -234,15 +233,15 @@ final class Z3SolverContext extends AbstractSolverContext {
         z3context,
         z3params,
         Native.mkStringSymbol(z3context, ":model"),
-        options.contains(ProverOptions.GENERATE_MODELS));
+        options.contains(ProverOptions.GENERATE_MODELS)
+            || options.contains(ProverOptions.GENERATE_ALL_SAT));
     Native.paramsSetBool(
         z3context,
         z3params,
         Native.mkStringSymbol(z3context, ":unsat_core"),
         options.contains(ProverOptions.GENERATE_UNSAT_CORE)
             || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
-    return new Z3TheoremProver(
-        creator, manager, z3params, options.contains(ProverOptions.GENERATE_UNSAT_CORE));
+    return new Z3TheoremProver(creator, manager, z3params, options);
   }
 
   @Override
@@ -253,24 +252,14 @@ final class Z3SolverContext extends AbstractSolverContext {
     Native.paramsSetBool(
         z3context, z3params, Native.mkStringSymbol(z3context, ":unsat_core"), false);
     return new Z3InterpolatingProver(
-        creator,
-        z3params,
-        logger,
-        dumpFailedInterpolationQueries,
-        manager,
-        FluentIterable.from(options).contains(ProverOptions.GENERATE_UNSAT_CORE));
+        creator, z3params, logger, dumpFailedInterpolationQueries, manager, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Z3OptimizationProver out =
-        new Z3OptimizationProver(
-            creator,
-            logger,
-            z3params,
-            manager,
-            FluentIterable.from(options).contains(ProverOptions.GENERATE_UNSAT_CORE));
+        new Z3OptimizationProver(creator, logger, z3params, manager, options);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;

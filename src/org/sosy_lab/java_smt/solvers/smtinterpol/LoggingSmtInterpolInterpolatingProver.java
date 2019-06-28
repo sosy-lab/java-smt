@@ -22,10 +22,13 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 // reason: not maintained, some implementations for methods are missing
@@ -33,8 +36,9 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
 
   private final PrintWriter out;
 
-  LoggingSmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, PrintWriter pOut) {
-    super(pMgr);
+  LoggingSmtInterpolInterpolatingProver(
+      SmtInterpolFormulaManager pMgr, Set<ProverOptions> pOptions, PrintWriter pOut) {
+    super(pMgr, pOptions);
     out = checkNotNull(pOut);
   }
 
@@ -80,10 +84,13 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  protected BooleanFormula getInterpolant(Term pTermA, Term pTermB)
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    out.println("(get-interpolants " + pTermA + " " + pTermB + ")");
-    return super.getInterpolant(pTermA, pTermB);
+    // TODO export in correct format
+    out.println(
+        "(get-interpolants " + partitionedTermNames + " " + Arrays.toString(startOfSubTree) + ")");
+    return super.getTreeInterpolants(partitionedTermNames, startOfSubTree);
   }
 
   @Override

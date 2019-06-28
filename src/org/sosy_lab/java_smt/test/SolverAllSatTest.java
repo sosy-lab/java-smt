@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -71,19 +72,22 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   public void setupEnvironment() {
     switch (proverEnv) {
       case "normal":
-        env = context.newProverEnvironment();
+        env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
         break;
       case "itp":
 
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
-        env = context.newProverEnvironmentWithInterpolation();
+        // CVC4 does not support interpolation
+        assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
+
+        env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
         break;
 
       case "opt":
         requireOptimization();
-        env = context.newOptimizationProverEnvironment();
+        env = context.newOptimizationProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
         break;
       default:
         throw new AssertionError("unexpected");
