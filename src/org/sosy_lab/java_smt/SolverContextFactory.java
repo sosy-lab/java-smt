@@ -51,6 +51,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
+import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
@@ -68,7 +69,8 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
-    PRINCESS
+    PRINCESS,
+    BOOLECTOR
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -214,6 +216,9 @@ public class SolverContextFactory {
       case PRINCESS:
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+
+      case BOOLECTOR:
+        return BoolectorSolverContext.create(config, shutdownNotifier, (int) randomSeed);
 
       default:
         throw new AssertionError("no solver selected");

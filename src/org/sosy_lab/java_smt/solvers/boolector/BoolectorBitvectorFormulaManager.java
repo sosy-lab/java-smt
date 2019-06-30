@@ -19,38 +19,38 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_add;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_and;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_concat;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_eq;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_mul;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_neg;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_not;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_or;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sdiv;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sext;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sgt;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sgte;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sll;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_slt;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_slte;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_smod;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sra;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_srl;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_sub;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_udiv;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_uext;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_ugt;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_ugte;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_ult;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_ulte;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_urem;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_xor;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_add;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_and;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_concat;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_eq;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_mul;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_neg;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_not;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_or;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sdiv;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sext;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sgt;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sgte;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sll;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_slt;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_slte;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_smod;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sra;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_srl;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sub;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_udiv;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_uext;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_ugt;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_ugte;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_ult;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_ulte;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_urem;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_xor;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class BoolectorBitvectorFormulaManager
+class BoolectorBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
@@ -61,15 +61,19 @@ public class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  public Long makeBitvectorImpl(int pLength, Long pParam1) {
-    // TODO Auto-generated method stub
-    return null;
+  public Long makeBitvectorImpl(int pLength, long pParam1) {
+    checkRange(pLength, BigInteger.valueOf(pParam1));
+    int i = (int) pParam1;
+    if (i == pParam1 && i > 0) {
+      long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
+      return BtorJNI.boolector_int(btor, i, sort);
+    }
+    return makeBitvectorImpl(pLength, BigInteger.valueOf(pParam1));
   }
 
   @Override
   public Long toIntegerFormulaImpl(Long pI, boolean pSigned) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Operation not supported.");
   }
 
   @Override
@@ -173,14 +177,19 @@ public class BoolectorBitvectorFormulaManager
 
   @Override
   public Long makeBitvectorImpl(int pLength, BigInteger pI) {
-    // TODO Auto-generated method stub
-    return null;
+    checkRange(pLength, pI);
+    long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
+    return BtorJNI.boolector_constd(btor, sort, pI.toString());
   }
 
   @Override
   public Long makeVariableImpl(int pLength, String pVar) {
-    // TODO Auto-generated method stub
-    return null;
+    if (pLength < pVar.length()) {
+      throw new IllegalArgumentException(
+          pVar + " is to small for a bitvector with length " + pLength);
+    }
+    long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
+    return BtorJNI.boolector_constd(btor, sort, pVar);
   }
 
   @Override
@@ -203,9 +212,8 @@ public class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  public Long extract(Long pNumber, int pMsb, int pLsb, boolean pSigned) {
-    // TODO Auto-generated method stub
-    return null;
+  public Long extract(Long pNode, int pMsb, int pLsb, boolean pSigned) {
+    return BtorJNI.boolector_slice(btor, pNode, pMsb, pLsb);
   }
 
   @Override
@@ -215,6 +223,36 @@ public class BoolectorBitvectorFormulaManager
     } else {
       return boolector_uext(btor, bitVec, extensionBits);
     }
+  }
+
+  /**
+   * Taken from Z3BitvectorFormulaManager
+   */
+  private static void checkRange(int pLength, BigInteger pI) {
+    if (pI.signum() > 0) {
+      BigInteger max = BigInteger.ONE.shiftLeft(pLength);
+      if (pI.compareTo(max) >= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to big for a bitvector with length " + pLength);
+      }
+    } else if (pI.signum() < 0) {
+      BigInteger min = BigInteger.ONE.shiftLeft(pLength).negate();
+      if (pI.compareTo(min) <= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to small for a bitvector with length " + pLength);
+      }
+    }
+  }
+
+  @Override
+  protected Long makeBitvectorImpl(int pLength, Long pParam1) {
+    checkRange(pLength, BigInteger.valueOf(pParam1));
+    int i = (int) pParam1.doubleValue();
+    if (i == pParam1 && i > 0) {
+      long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
+      return BtorJNI.boolector_int(btor, i, sort);
+    }
+    return makeBitvectorImpl(pLength, BigInteger.valueOf(pParam1));
   }
 
 }

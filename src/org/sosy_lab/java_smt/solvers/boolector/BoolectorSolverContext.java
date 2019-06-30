@@ -19,17 +19,41 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_new;
+
 import java.util.Set;
+import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
-public class BoolectorSolverContext extends AbstractSolverContext {
+public final class BoolectorSolverContext extends AbstractSolverContext {
 
   // todo solvercontextfactory stuff
 
+  protected BoolectorSolverContext(FormulaManager pFmgr) {
+    super(pFmgr);
+    // TODO Auto-generated constructor stub
+  }
+
+  public static BoolectorSolverContext create(
+      Configuration config,
+      ShutdownNotifier pShutdownNotifier,
+      long randomSeed)
+      throws InvalidConfigurationException {
+
+    NativeLibraries.loadLibrary("boolector");
+
+
+    long btor = boolector_new();
+    return null;
+  }
 
   @Override
   public String getVersion() {

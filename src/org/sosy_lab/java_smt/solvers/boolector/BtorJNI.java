@@ -8,9 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.boolector;
 
-class boolectorNativeAPI {
-
-  // private boolectorNativeApi() {}
+class BtorJNI {
 
   public final static native int BOOLECTOR_PARSE_ERROR_get();
   public final static native int BOOLECTOR_PARSE_UNKNOWN_get();

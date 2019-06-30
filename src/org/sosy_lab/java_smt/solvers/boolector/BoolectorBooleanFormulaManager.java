@@ -19,14 +19,14 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_and;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_cond;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_false;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_iff;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_not;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_or;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_true;
-import static org.sosy_lab.java_smt.solvers.boolector.boolectorNativeAPI.boolector_xor;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_and;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_cond;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_false;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_iff;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_not;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_or;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_true;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_xor;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
