@@ -19,12 +19,13 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import ap.SimpleAPI;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 public class BoolectorEnvironment {
 
@@ -32,7 +33,7 @@ public class BoolectorEnvironment {
   private final @Nullable PathCounterTemplate basicLogfile;
   private final ShutdownNotifier shutdownNotifier;
 
-  private final SimpleAPI api;
+  private final long btor;
 
   BoolectorEnvironment(
       Configuration config,
@@ -40,12 +41,32 @@ public class BoolectorEnvironment {
       ShutdownNotifier pShutdownNotifier,
       final int pRandomSeed)
       throws InvalidConfigurationException {
+
     config.inject(this);
 
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
 
-    api = getNewApi(false);
+    btor = getNewBtor();
+  }
+
+  BoolectorAbstractProver<?, ?> getNewProver(
+      BoolectorFormulaManager manager,
+      BoolectorFormulaCreator creator,
+      Set<ProverOptions> pOptions) {
+
+    long newBtor = getNewBtor();
+
+    // clone Btor
+
+    BoolectorAbstractProver<?, ?> prover =
+        new BoolectorTheoremProver(manager, creator, newApi, shutdownNotifier, pOptions);
+    registeredProvers.add(prover);
+    return prover;
+  }
+
+  private long getNewBtor() {
+
   }
 }
