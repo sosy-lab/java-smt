@@ -218,7 +218,8 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case BOOLECTOR:
-        return BoolectorSolverContext.create(config, shutdownNotifier, (int) randomSeed);
+        return BoolectorSolverContext
+            .create(config, logger, shutdownNotifier, logfile, (int) randomSeed);
 
       default:
         throw new AssertionError("no solver selected");

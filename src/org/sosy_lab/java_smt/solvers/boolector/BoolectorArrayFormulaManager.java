@@ -33,29 +33,30 @@ public class BoolectorArrayFormulaManager
     this.btor = pCreator.getEnv();
   }
 
+  // pIndex should be a bitVector
   @Override
-  public Long select(Long pArray, Long pIndex) {
-    // TODO Auto-generated method stub
-    return null;
+  protected Long select(Long pArray, Long pIndex) {
+    return BtorJNI.boolector_read(btor, pArray, pIndex);
+  }
+
+  /*
+   * (non-Javadoc) pINdex and pValue should be bitVectors
+   */
+  @Override
+  protected Long store(Long pArray, Long pIndex, Long pValue) {
+    return BtorJNI.boolector_write(btor, pArray, pIndex, pValue);
   }
 
   @Override
-  public Long store(Long pArray, Long pIndex, Long pValue) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public <TI extends Formula, TE extends Formula> Long
+  protected <TI extends Formula, TE extends Formula> Long
       internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long equivalence(Long pArray1, Long pArray2) {
-    // TODO Auto-generated method stub
-    return null;
+  protected Long equivalence(Long pArray1, Long pArray2) {
+    return BtorJNI.boolector_eq(btor, pArray1, pArray2);
   }
 
 }

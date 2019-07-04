@@ -19,15 +19,13 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_new;
-
 import java.util.Set;
-import org.sosy_lab.common.NativeLibraries;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -35,42 +33,56 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class BoolectorSolverContext extends AbstractSolverContext {
 
-  // todo solvercontextfactory stuff
+  private final BoolectorFormulaManager manager;
+  private final BoolectorFormulaCreator creator;
 
-  protected BoolectorSolverContext(FormulaManager pFmgr) {
-    super(pFmgr);
-    // TODO Auto-generated constructor stub
+  protected BoolectorSolverContext(
+      BoolectorFormulaManager manager,
+      BoolectorFormulaCreator creator) {
+    super(manager);
+    this.manager = manager;
+    this.creator = creator;
   }
 
   public static BoolectorSolverContext create(
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate solverLogfile,
       long randomSeed)
       throws InvalidConfigurationException {
 
-    NativeLibraries.loadLibrary("boolector");
+    BoolectorEnvironment env =
+        new BoolectorEnvironment(config, solverLogfile, pShutdownNotifier, randomSeed);
+    BoolectorFormulaCreator creator = new BoolectorFormulaCreator(env);
 
-
-    long btor = boolector_new();
-    return null;
+    BoolectorUFManager functionTheory = new BoolectorUFManager(creator);
+    BoolectorBooleanFormulaManager booleanTheory = new BoolectorBooleanFormulaManager(creator);
+    BoolectorBitvectorFormulaManager bitvectorTheory =
+        new BoolectorBitvectorFormulaManager(creator);
+    BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
+    BoolectorFormulaManager manager =
+        new BoolectorFormulaManager(
+            creator,
+            functionTheory,
+            booleanTheory,
+            bitvectorTheory,
+            arrayTheory);
+    return new BoolectorSolverContext(manager, creator);
   }
 
   @Override
   public String getVersion() {
-    // TODO Auto-generated method stub
-    return null;
+    return BtorJNI.boolector_version();// btor env einsetzen
   }
 
   @Override
   public Solvers getSolverName() {
-    // TODO Auto-generated method stub
-    return null;
+    return Solvers.BOOLECTOR;
   }
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
-
+    BtorJNI.boolector_delete();// btor env einsetzen
   }
 
   @Override
@@ -82,20 +94,17 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?>
       newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Boolector does not support interpolation");
   }
 
   @Override
   protected OptimizationProverEnvironment
       newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Boolector does not support optimization");
   }
 
   @Override
   protected boolean supportsAssumptionSolving() {
-    // TODO Auto-generated method stub
-    return false;
+    return true;
   }
 }

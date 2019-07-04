@@ -195,4 +195,9 @@ class BtorJNI {
   public final static native void delete_BtorAbortCallback(long jarg1);
   public final static native void btor_abort_callback_set(long jarg1);
   public final static native long btor_abort_callback_get();
+
+  // jarg1 = btor*
+  // returns string dump in smt2 format from btor directly
+  // no guarantee that that string is useful
+  public final static native String boolector_help_dump_smt2(long jarg1);
 }
