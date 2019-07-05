@@ -19,39 +19,23 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Long> {
-  // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
-  // AF = assertedFormulas; E = ?
+class BoolectorTheoremProver extends BoolectorAbstractProver<Long>
+    implements ProverEnvironment {
+  // Used as standard prover. Built by method newProverEnvironment0 in BtorSolverContext
 
-  protected final long btor;
-  protected final BoolectorFormulaManager manager;
-  private final BoolectorFormulaCreator creator;
-  // protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>(); // all terms on all
-  // levels
-  // private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
-  protected final ShutdownNotifier shutdownNotifier;
-
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
-
-  // Used/Built by TheoremProver
-  protected BoolectorAbstractProver(
+  protected BoolectorTheoremProver(
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       long btor,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pOptions, manager.getBooleanFormulaManager(), pShutdownNotifier);
-    this.manager = manager;
-    this.creator = creator;
-    this.btor = checkNotNull(btor);
-    this.shutdownNotifier = checkNotNull(pShutdownNotifier);
+    super(manager, creator, btor, pShutdownNotifier, pOptions);
   }
+
 
 }

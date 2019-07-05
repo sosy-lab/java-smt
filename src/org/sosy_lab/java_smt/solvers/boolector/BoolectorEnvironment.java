@@ -51,6 +51,10 @@ public class BoolectorEnvironment {
     btor = getNewBtor();
   }
 
+  /**
+   * This method returns a new prover, that is registered in this environment. All variables are
+   * shared in all registered Boolector instances(btor).
+   */
   BoolectorAbstractProver<?, ?> getNewProver(
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
@@ -61,7 +65,7 @@ public class BoolectorEnvironment {
     // clone Btor
 
     BoolectorAbstractProver<?, ?> prover =
-        new BoolectorTheoremProver(manager, creator, newApi, shutdownNotifier, pOptions);
+        new BoolectorTheoremProver(manager, creator, newBtor, shutdownNotifier, pOptions);
     registeredProvers.add(prover);
     return prover;
   }

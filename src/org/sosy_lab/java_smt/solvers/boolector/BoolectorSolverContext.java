@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 public final class BoolectorSolverContext extends AbstractSolverContext {
 
@@ -87,8 +88,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    // TODO Auto-generated method stub
-    return null;
+    return new ReusableStackTheoremProver(
+        (BoolectorTheoremProver) creator.getEnv().getNewProver(false, manager, creator, pOptions));
   }
 
   @Override
