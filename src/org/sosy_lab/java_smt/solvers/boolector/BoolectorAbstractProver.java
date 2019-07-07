@@ -21,9 +21,11 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Preconditions;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Long> {
@@ -52,6 +54,35 @@ abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Lo
     this.creator = creator;
     this.btor = checkNotNull(btor);
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
+  }
+
+  @Override
+  public void close() {
+    if (!closed) {
+      BtorJNI.boolector_delete(btor);
+      closed = true;
+    }
+  }
+
+  /*
+   * Boolector should throw its own exceptions that tell you what went wrong!
+   */
+  @Override
+  public boolean isUnsat() throws SolverException {
+    Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
+    final int result = (int) BtorJNI.boolector_sat(btor);
+    if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_SAT) {
+      wasLastSatCheckSat = true;
+      return false;
+    } else if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_UNSAT) {
+      return true;
+    } else if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_UNKNOWN) {
+      throw new SolverException(
+          "Boolector may have ran out of stack or heap memory, try increasing their sizes.");
+    } else {
+      throw new SolverException("Boolector sat call returned " + result);
+    }
   }
 
 }
