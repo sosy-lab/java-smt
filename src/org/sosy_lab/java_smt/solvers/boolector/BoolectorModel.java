@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -27,12 +28,15 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private final long model;
   private boolean closed = false;
+  private BoolectorAbstractProver<?> prover;
 
   BoolectorModel(
       long model,
-      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator) {
+      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator,
+      BoolectorAbstractProver<?> prover) {
     super(creator);
     this.model = model;
+    this.prover = prover;
   }
 
   @Override
@@ -45,17 +49,17 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   @Override
   protected ImmutableList<ValueAssignment> toList() {
-    // TODO Auto-generated method stub
+    Preconditions.checkState(!closed);
+
     return null;
   }
 
   @Override
   protected Long evalImpl(Long pFormula) {
-    if (BtorJNI.boolector_is_array_var(model, pFormula)) {
-      BtorJNI.boolector_array_assignment(model, jarg2, jarg3, jarg4, jarg5);
-    } else if (BtorJNI.boolector_is_var(model, pFormula)) {
-
-    } else if (false /* uf var */) {
+    Preconditions.checkState(!closed);
+    if (BtorJNI.boolector_is_var(model, pFormula)) {
+      BtorJNI.boolector_bv_assignment(model, pFormula);
+    } else if (/*do i need uf/array here?*/) {
 
     } else {
       throw new AssertionError("Unexpected formula: " + pFormula);
