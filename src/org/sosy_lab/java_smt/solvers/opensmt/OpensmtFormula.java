@@ -19,8 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.Formula;
 
+@Immutable
 abstract class OpensmtFormula implements Formula {
   // TODO: 1. IMPLEMENT
 }
