@@ -1,4 +1,4 @@
-#include "include/Bar.hpp"
+#include "../include/Bar.hpp"
 #include <sstream>
 #include <iostream>
 

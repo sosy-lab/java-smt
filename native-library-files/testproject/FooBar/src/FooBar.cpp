@@ -1,9 +1,9 @@
-#include "include/FooBar.hpp"
-//#include <string>
+#include "../include/FooBar.hpp"
+#include "../../Bar/include/Bar.hpp"
+#include "../../Foo/include/Foo.hpp"
+
 #include <sstream>
 #include <iostream>
-#include "../../Bar/src/include/Bar.hpp"
-#include "../../Foo/src/include/Foo.hpp"
 
 namespace foobar {
 std::string foobarHello(int level) {

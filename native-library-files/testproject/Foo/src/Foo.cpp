@@ -1,7 +1,7 @@
-#include "include/Foo.hpp"
+#include "../include/Foo.hpp"
+
 #include <sstream>
 #include <iostream>
-//#include <string>
 
 namespace foo {
 std::string fooHello(int level) {
