@@ -26,6 +26,8 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironment> {
 
+  private final static char BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT = '1';
+
   private final long model;
   private boolean closed = false;
   private BoolectorAbstractProver<?> prover;
@@ -58,12 +60,37 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
     if (BtorJNI.boolector_is_var(model, pFormula)) {
-      BtorJNI.boolector_bv_assignment(model, pFormula);
-    } else if (/*do i need uf/array here?*/) {
-
+      String assignment = BtorJNI.boolector_bv_assignment(model, pFormula);
+      return parseLong(assignment);
+    } else if (false/* do i need uf/array here? */) {
+      return (long) 0;
     } else {
       throw new AssertionError("Unexpected formula: " + pFormula);
     }
+  }
+
+  /**
+   * Boolector puts out Strings containing 1,0 or x that have to be parsed. If you want different
+   * values for x, change it here.
+   *
+   * @param assignment String with the assignment of Boolector var.
+   * @return long representation of assignment String.
+   */
+  private Long parseLong(String assignment) {
+    try {
+      return Long.parseLong(assignment);
+    } catch (NumberFormatException e) {
+    }
+    char[] charArray = assignment.toCharArray();
+    for (int i = 0; i < charArray.length; i++) {
+      if (charArray[i] == 'x') {
+        charArray[i] = BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT;
+      } else if (charArray[i] != '0' && charArray[i] != '1') {
+        throw new IllegalArgumentException(
+            "Boolector gave back an assignment that is not parseable.");
+      }
+    }
+    return Long.parseLong(charArray.toString());
   }
 
 }
