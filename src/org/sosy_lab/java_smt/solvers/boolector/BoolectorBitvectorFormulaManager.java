@@ -57,7 +57,7 @@ class BoolectorBitvectorFormulaManager
 
   public BoolectorBitvectorFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
-    this.btor = pCreator.getEnv();
+    this.btor = pCreator.getEnv().getBtor();
   }
 
   @Override

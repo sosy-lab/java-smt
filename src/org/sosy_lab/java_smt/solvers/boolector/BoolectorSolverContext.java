@@ -53,7 +53,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
 
     BoolectorEnvironment env =
-        new BoolectorEnvironment(config, solverLogfile, pShutdownNotifier, randomSeed);
+        new BoolectorEnvironment(config, solverLogfile, pShutdownNotifier, (int) randomSeed);
     BoolectorFormulaCreator creator = new BoolectorFormulaCreator(env);
 
     BoolectorUFManager functionTheory = new BoolectorUFManager(creator);
@@ -73,7 +73,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return BtorJNI.boolector_version();// btor env einsetzen
+    return BtorJNI.boolector_version(creator.getEnv());// btor env einsetzen
   }
 
   @Override

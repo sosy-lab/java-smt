@@ -19,56 +19,92 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.List;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
+public class BoolectorFormulaCreator
+    extends FormulaCreator<Long, Long, BoolectorEnvironment, Long> {
 
-  protected BoolectorFormulaCreator(
-      Long pEnv,
-      Long pBoolType,
-      @Nullable Long pIntegerType,
-      @Nullable Long pRationalType) {
-    super(pEnv, pBoolType, pIntegerType, pRationalType);
-    // TODO Auto-generated constructor stub
+  BoolectorFormulaCreator(BoolectorEnvironment pEnv) {
+    super(pEnv, pEnv.getBoolSort(), null, null);
   }
 
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
-    long type = msat_term_get_type(pFormula);
-    return getFormulaTypeFromTermType(type);
+    long btor = getEnv().getBtor();
+    long sort = BtorJNI.boolector_get_sort(btor, pFormula);
+    long env = getEnv().getBtor();
+    if (BtorJNI.boolector_is_bitvec_sort(env, sort)) {
+      if (sort == 1) {
+        return FormulaType.BooleanType;
+      } else {
+        return FormulaType
+            .getBitvectorTypeWithSize((int) BtorJNI.boolector_get_width(btor, pFormula));
+      }
+    } else if (BtorJNI.boolector_is_array_sort(env, sort)) {
+      int indexWidth = (int) BtorJNI.boolector_get_index_width(btor, pFormula);
+      int elementWidth = (int) BtorJNI.boolector_get_width(btor, pFormula);
+      return FormulaType.getArrayType(
+          FormulaType.getBitvectorTypeWithSize(indexWidth),
+          FormulaType.getBitvectorTypeWithSize(elementWidth));
+    }
+    throw new IllegalArgumentException("Unknown formula type for " + pFormula);
   }
 
-  private FormulaType<?> getFormulaTypeFromTermType(Long type) {
-    long env = getEnv();
-    if (msat_is_bool_type(env, type)) {
-      return FormulaType.BooleanType;
-    } else if (msat_is_integer_type(env, type)) {
-      return FormulaType.IntegerType;
-    } else if (msat_is_rational_type(env, type)) {
-      return FormulaType.RationalType;
-    } else if (msat_is_bv_type(env, type)) {
-      return FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
-    } else if (msat_is_fp_type(env, type)) {
-      return FormulaType.getFloatingPointType(
-          msat_get_fp_type_exp_width(env, type),
-          msat_get_fp_type_mant_width(env, type));
-    } else if (msat_is_fp_roundingmode_type(env, type)) {
-      return FormulaType.FloatingPointRoundingModeType;
-    } else if (msat_is_array_type(env, type)) {
-      long indexType = msat_get_array_index_type(env, type);
-      long elementType = msat_get_array_element_type(env, type);
-      return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(indexType),
-          getFormulaTypeFromTermType(elementType));
-    }
-    throw new IllegalArgumentException("Unknown formula type " + msat_type_repr(type));
+  // In Boolector a type is called a sort
+  @Override
+  public Long getBitvectorType(int pBitwidth) {
+    return BtorJNI.boolector_bitvec_sort(getEnv().getBtor(), pBitwidth);
   }
 
   @Override
-  public Long getBitvectorType(int pBitwidth) {
-    return msat_get_bv_type(getEnv(), pBitwidth);
+  public Long getFloatingPointType(FloatingPointType pType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Long getArrayType(Long pIndexType, Long pElementType) {
+    return BtorJNI.boolector_array_sort(getEnv().getBtor(), pIndexType, pElementType);
+  }
+
+  @Override
+  public Long makeVariable(Long pType, String pVarName) {
+    return BtorJNI.boolector_var(getEnv().getBtor(), pType, pVarName);
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pF) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  protected Long getBooleanVarDeclarationImpl(Long pTFormulaInfo) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Object convertValue(Long pF) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

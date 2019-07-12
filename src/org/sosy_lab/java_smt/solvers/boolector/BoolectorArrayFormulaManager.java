@@ -30,7 +30,7 @@ public class BoolectorArrayFormulaManager
 
   BoolectorArrayFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
-    this.btor = pCreator.getEnv();
+    this.btor = pCreator.getEnv().getBtor();
   }
 
   // pIndex should be a bitVector
