@@ -19,16 +19,18 @@
  */
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import net.saheed.foobar.FooBar;
 import org.junit.Assert;
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
-import org.sosy_lab.java_smt.solvers.opensmt2.opensmt2java;
-import org.sosy_lab.java_smt.solvers.opensmt2.osmt_context;
-import org.sosy_lab.java_smt.solvers.opensmt2.osmt_expr;
-import org.sosy_lab.java_smt.solvers.opensmt2.osmt_logic;
-import org.sosy_lab.java_smt.solvers.opensmt2.osmt_result;
+import org.sosy_lab.java_smt.opensmt2Japi;
+import org.sosy_lab.java_smt.osmt_context;
+import org.sosy_lab.java_smt.osmt_expr;
+import org.sosy_lab.java_smt.osmt_logic;
+import org.sosy_lab.java_smt.osmt_result;
 
 public class OpensmtNativeApiTest {
 
@@ -36,34 +38,61 @@ public class OpensmtNativeApiTest {
   public static void loadOpensmt2Library() {
     try {
       NativeLibraries.loadLibrary("opensmt2api");
-
+      NativeLibraries.loadLibrary("foobarapi");
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("Cannot find OpenSMT2 native library", e);
+      throw new AssumptionViolatedException("Cannot find at least one native library", e);
     }
   }
 
+  // @Ignore
+  // @BeforeClass
+  // public static void loadFooBarLibrary() {
+  // try {
+  // NativeLibraries.loadLibrary("foobarapi");
+  //
+  // } catch (UnsatisfiedLinkError e) {
+  // throw new AssumptionViolatedException("Cannot find FOOBAR native library", e);
+  // }
+  // }
+
   osmt_context context = null;
 
+
   @Test
-  public void getOpensmtVersion() throws Exception {
-    System.out.println(opensmt2java.osmt_version());
-    Assert.assertEquals("2", opensmt2java.osmt_version());
+  public void getFooBarObject() {
+    FooBar fb = new FooBar();
+    System.out.println(fb.welcome());
   }
 
+
+  @Test
+  public void getFooBarHelloLevels() {
+    System.out.println(FooBar.hello(1));
+  }
+
+  // @Ignore
+  @Test(expected = RuntimeException.class)
+  public void getOpensmtVersion() throws Exception {
+    System.out.println(opensmt2Japi.osmt_version());
+    // Assert.assertEquals("2", opensmt2Japi.osmt_version());
+  }
+
+  @Ignore
   @Test
   public void createOpensmt2ApiContextForBool() throws Exception {
     osmt_logic boolQF = osmt_logic.qf_bool; // TODO: osmt_logic
 
     System.out.println(boolQF.swigValue());
-    context = opensmt2java.osmt_mk_context(boolQF);
+    context = opensmt2Japi.osmt_mk_context(boolQF);
     Assert.assertNotNull(context);
   }
 
+  @Ignore
   @Test
   public void opensmt2ApiGetBoolValue() throws Exception {
     createOpensmt2ApiContextForBool();
-    osmt_expr boolVar = opensmt2java.osmt_mk_bool_var(context, "a");
-    Assert.assertEquals(osmt_result.l_false, opensmt2java.osmt_get_bool(context, boolVar));
+    osmt_expr boolVar = opensmt2Japi.osmt_mk_bool_var(context, "a");
+    Assert.assertEquals(osmt_result.l_false, opensmt2Japi.osmt_get_bool(context, boolVar));
 
   }
 

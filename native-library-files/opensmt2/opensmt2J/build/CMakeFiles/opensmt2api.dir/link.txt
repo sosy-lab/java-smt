@@ -1,0 +1,1 @@
+/usr/bin/gcc -fPIC -g  -shared  -o libopensmt2api.so CMakeFiles/opensmt2api.dir/org/sosy_lab/java_smt/opensmt2JapiJAVA_wrap.c.o -Wl,-rpath,/home/lubuntu/SAHEED/gsoc/CODE/java-smt/native-library-files/opensmt2/opensmt2J/lib ../lib/libopensmt2.so 
