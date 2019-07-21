@@ -23,6 +23,8 @@ import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.java_smt.native_api.stp.ifaceflag_t;
+import org.sosy_lab.java_smt.native_api.stp.stpJapi;
 
 public class StpNativeApiTest {
 
@@ -36,8 +38,27 @@ public class StpNativeApiTest {
   }
 
   @Test
-  public void testStpGitVersion() {
+  public void testStpGitVersion() throws Exception {
+    String version_sha = stpJapi.get_git_version_sha();
+    System.out.println("\nSHA of this STP version is :");
+    System.out.println(version_sha);
+
+    String version_tag = stpJapi.get_git_version_tag();
+    System.out.println("\nThis STP version is :");
+    System.out.println(version_tag);
 
   }
 
+  @Test
+  public void testStpCompilationEnvironment() throws Exception {
+    String compile_env = stpJapi.get_compilation_env();
+    System.out.println("\nCompilation Environment of this STP version is :");
+
+    System.out.println(compile_env);
+
+    // stpJapi.
+    ifaceflag_t x = ifaceflag_t.EXPRDELETE;
+  }
+
 }
+

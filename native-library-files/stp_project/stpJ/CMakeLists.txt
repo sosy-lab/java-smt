@@ -65,7 +65,16 @@ set_property(TARGET stpJapi PROPERTY SWIG_COMPILE_OPTIONS -Wall -g)
 
 add_jar(
     stpJavaAPI
-    SOURCES    ${JAVA_API_DIR}/stpJapi.java
-    	       ${JAVA_API_DIR}/stpJapiJNI.java
+    SOURCES     ${JAVA_API_DIR}/stpJapi.java 
+                ${JAVA_API_DIR}/stpJapiJNI.java
+                ${JAVA_API_DIR}/exprkind_t.java
+                ${JAVA_API_DIR}/ifaceflag_t.java
+                ${JAVA_API_DIR}/type_t.java
 )
+
+FILE(GLOB_RECURSE ALL_JAVA_FILES ${JAVA_API_DIR}/*.java)
+#add_jar(
+#    stpJavaAPI
+#    SOURCES ${ALL_JAVA_FILES}
+#)
 add_dependencies( stpJavaAPI stpJapi )

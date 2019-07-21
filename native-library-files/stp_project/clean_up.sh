@@ -2,7 +2,7 @@
 set -e
 
 # remove STP repo
-[ -d "./stp" ] && rm -rf ./stp ||:
+#[ -d "./stp" ] && rm -rf ./stp ||:
 
 
 # the built STP library should have been copied out 
