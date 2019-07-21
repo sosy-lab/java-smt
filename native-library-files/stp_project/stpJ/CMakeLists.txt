@@ -70,6 +70,10 @@ add_jar(
                 ${JAVA_API_DIR}/exprkind_t.java
                 ${JAVA_API_DIR}/ifaceflag_t.java
                 ${JAVA_API_DIR}/type_t.java
+                ${JAVA_API_DIR}/Expr.java 
+                ${JAVA_API_DIR}/Type.java
+                ${JAVA_API_DIR}/VC.java
+                ${JAVA_API_DIR}/WholeCounterExample.java
 )
 
 FILE(GLOB_RECURSE ALL_JAVA_FILES ${JAVA_API_DIR}/*.java)

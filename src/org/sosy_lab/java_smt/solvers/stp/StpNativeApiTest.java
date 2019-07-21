@@ -23,6 +23,8 @@ import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.java_smt.native_api.stp.Expr;
+import org.sosy_lab.java_smt.native_api.stp.VC;
 import org.sosy_lab.java_smt.native_api.stp.ifaceflag_t;
 import org.sosy_lab.java_smt.native_api.stp.stpJapi;
 
@@ -58,7 +60,88 @@ public class StpNativeApiTest {
 
     // stpJapi.
     ifaceflag_t x = ifaceflag_t.EXPRDELETE;
+
   }
 
+  @Test
+  public void testStpSampleFromRepo() throws Exception {
+
+    int width = 8;
+
+    VC handle = stpJapi.vc_createValidityChecker();
+
+    // Register a callback for errors
+    // stpJapi.vc_registerErrorHandler(errorHandler);
+
+    // Create variable "x"
+    Expr x = stpJapi.vc_varExpr(handle, "x", stpJapi.vc_bvType(handle, width));
+
+    // Create bitvector x + x
+    Expr xPlusx = stpJapi.vc_bvPlusExpr(handle, width, x, x);
+
+    // Create bitvector constant 2
+    Expr two = stpJapi.vc_bvConstExprFromInt(handle, width, 2);
+
+    // Create bitvector 2*x
+    Expr xTimes2 = stpJapi.vc_bvMultExpr(handle, width, two, x);
+
+    // Create bool expression x + x = 2*x
+    Expr equality = stpJapi.vc_eqExpr(handle, xPlusx, xTimes2);
+
+    stpJapi.vc_assertFormula(handle, stpJapi.vc_trueExpr(handle));
+
+    // We are asking STP: ∀ x. true → ( x + x = 2*x )
+    // This should be VALID.
+    System.out.println("######First Query\n");
+    handleQuery(handle, equality);
+
+    // We are asking STP: ∀ x. true → ( x + x = 2 )
+    // This should be INVALID.
+    System.out.println("######Second Query\n");
+    // Create bool expression x + x = 2
+    Expr badEquality = stpJapi.vc_eqExpr(handle, xPlusx, two);
+    handleQuery(handle, badEquality);
+
+    // Clean up
+    stpJapi.vc_Destroy(handle);
+
+  }
+
+  // void handleQuery(VC handle, Expr queryExpr);
+
+  // Error handler
+  void errorHandler(String err_msg) throws Exception {
+    System.out.printf("Error: %s\n", err_msg);
+    throw new Exception(err_msg);
+  }
+
+  void handleQuery(VC handle, Expr queryExpr) {
+    // Print the assertions
+    System.out.println("Assertions:\n");
+    stpJapi.vc_printAsserts(handle, 0);
+
+    int result = stpJapi.vc_query(handle, queryExpr);
+    System.out.println("Query:\n");
+    stpJapi.vc_printQuery(handle);
+    switch (result) {
+      case 0:
+        System.out.println("Query is INVALID\n");
+
+        // print counter example
+        System.out.println("Counter example:\n");
+        stpJapi.vc_printCounterExample(handle);
+        break;
+
+      case 1:
+        System.out.println("Query is VALID\n");
+        break;
+      case 2:
+        System.out.println("Could not answer query\n");
+        break;
+      case 3:
+        System.out.println("Unhandled error\n");
+    }
+    System.out.println("\n\n");
+  }
 }
 
