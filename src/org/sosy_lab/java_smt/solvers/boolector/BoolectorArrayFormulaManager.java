@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class BoolectorArrayFormulaManager
-    extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
+    extends AbstractArrayFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   private final long btor;
 

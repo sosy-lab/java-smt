@@ -73,7 +73,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return BtorJNI.boolector_version(creator.getEnv());// btor env einsetzen
+    return BtorJNI.boolector_version(creator.getEnv().getBtor());
   }
 
   @Override
@@ -83,13 +83,13 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    BtorJNI.boolector_delete();// btor env einsetzen
+    BtorJNI.boolector_delete(creator.getEnv().getBtor());
   }
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     return new ReusableStackTheoremProver(
-        (BoolectorTheoremProver) creator.getEnv().getNewProver(false, manager, creator, pOptions));
+        (BoolectorTheoremProver) creator.getEnv().getNewProver(manager, creator, pOptions));
   }
 
   @Override

@@ -31,7 +31,7 @@ import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_xor;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class BoolectorBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
+    extends AbstractBooleanFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   private final long btor;
 

@@ -43,6 +43,7 @@ class BoolectorTheoremProver extends BoolectorAbstractProver<Long>
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
 
+    BtorJNI.boolector_assert(btor, constraint);
   }
 
 

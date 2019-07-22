@@ -200,4 +200,16 @@ class BtorJNI {
   // returns string dump in smt2 format from btor directly
   // no guarantee that that string is useful
   public final static native String boolector_help_dump_smt2(long jarg1);
+
+  // Takes btor* and array_Node
+  // Returns 2Dim Array or Strings. Size [2][x], x beeing the length of the array used.
+  // First String Array will be argument assignment strings.
+  // Second String Array will be value assignment strings.
+  public final static native String[][] boolector_array_assignment_helper(long jarg1, long jarg2);
+
+  // Takes btor* and uf_Node
+  // Returns 2Dim Array or Strings. Size [2][x], x beeing the length of the uf used.
+  // First String Array will be argument assignment strings.
+  // Second String Array will be value assignment strings.
+  public final static native String[][] boolector_uf_assignment_helper(long jarg1, long jarg2);
 }

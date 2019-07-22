@@ -20,13 +20,11 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class BoolectorUFManager extends AbstractUFManager<Long, Long, Long, Long> {
+class BoolectorUFManager extends AbstractUFManager<Long, Long, Long, BoolectorEnvironment> {
 
-  protected BoolectorUFManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
+  protected BoolectorUFManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
   }
 
 }

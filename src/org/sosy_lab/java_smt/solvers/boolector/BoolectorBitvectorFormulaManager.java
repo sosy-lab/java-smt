@@ -51,7 +51,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 class BoolectorBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
+    extends AbstractBitvectorFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   private final long btor;
 
