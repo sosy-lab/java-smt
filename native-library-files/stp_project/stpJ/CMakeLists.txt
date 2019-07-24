@@ -15,7 +15,7 @@ include(UseJava)
 include_directories(${JNI_INCLUDE_DIRS}) # add jni to includes
 
 # variable setups
-set(STP_SWIG_INTERFACE stpJapi.i)
+set(STP_SWIG_INTERFACE StpJavaApi.i)
 set(CMAKE_SWIG_OUTPUTDIR "swig_builds")
 
 # find_library(OPENSMT_RAW_LIB "opensmt2" PATHS "./lib" NO_DEFAULT_PATH )
@@ -31,10 +31,10 @@ message("Full path to STP binary is ${STP_FULL_PATH}")
 
 
 # JAVA package
-set(CMAKE_SWIG_FLAGS -package org.sosy_lab.java_smt.native_api.stp)
-set(CMAKE_SWIG_OUTDIR "org/sosy_lab/java_smt/native_api/stp")
+set(CMAKE_SWIG_FLAGS -package org.sosy_lab.java_smt.solvers.stp)
+set(CMAKE_SWIG_OUTDIR "org/sosy_lab/java_smt/solvers/stp")
 # therefore
-set(JAVA_API_DIR "build/org/sosy_lab/java_smt/native_api/stp")
+set(JAVA_API_DIR "build/org/sosy_lab/java_smt/solvers/stp")
 
 ##################### END OF SET UP and VARIABLE SETTINGS ###############
 
@@ -65,8 +65,8 @@ set_property(TARGET stpJapi PROPERTY SWIG_COMPILE_OPTIONS -Wall -g)
 
 add_jar(
     stpJavaAPI
-    SOURCES     ${JAVA_API_DIR}/stpJapi.java 
-                ${JAVA_API_DIR}/stpJapiJNI.java
+    SOURCES     ${JAVA_API_DIR}/StpJavaApi.java 
+                ${JAVA_API_DIR}/StpJavaApiJNI.java
                 ${JAVA_API_DIR}/exprkind_t.java
                 ${JAVA_API_DIR}/ifaceflag_t.java
                 ${JAVA_API_DIR}/type_t.java
@@ -77,6 +77,7 @@ add_jar(
 )
 
 FILE(GLOB_RECURSE ALL_JAVA_FILES ${JAVA_API_DIR}/*.java)
+
 #add_jar(
 #    stpJavaAPI
 #    SOURCES ${ALL_JAVA_FILES}
