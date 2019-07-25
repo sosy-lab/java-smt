@@ -81,28 +81,32 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
-    System.out.println("I came here.");
+    // System.out.println("I came here.");
 //    long type = msat_term_get_type(pFormula);
 //    return getFormulaTypeFromTermType(type);
-    return null;
+    // return null;
+    Expr formula = new Expr(pFormula, true);
+    FormulaType<?> result = null;
+
+    switch (StpJavaApi.getType(formula)) {
+      case BOOLEAN_TYPE:
+        result = FormulaType.BooleanType;
+        break;
+      case BITVECTOR_TYPE:
+        int bvTypeSize = StpJavaApi.getBVLength(formula);
+        result = FormulaType.getBitvectorTypeWithSize(bvTypeSize);
+        break;
+      case ARRAY_TYPE:
+        // long indexType = StpJavaApi.getIWidth(formula);
+        // return FormulaType.getArrayType( getFormulaTypeFromTermType());
+        throw new IllegalArgumentException("//TODO implement this for array formula type ");
+      case UNKNOWN_TYPE:
+        throw new IllegalArgumentException("Unknown formula type ");
+    }
+    return result;
+
   }
 
-  /*
-   * private FormulaType<?> getFormulaTypeFromTermType(Long type) { // long env = getEnv(); if
-   * (msat_is_bool_type(env, type)) { return FormulaType.BooleanType; } else if
-   * (msat_is_integer_type(env, type)) { return FormulaType.IntegerType; } else if
-   * (msat_is_rational_type(env, type)) { return FormulaType.RationalType; } else if
-   * (msat_is_bv_type(env, type)) { return
-   * FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type)); } else if
-   * (msat_is_fp_type(env, type)) { return FormulaType.getFloatingPointType(
-   * msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type)); } else if
-   * (msat_is_fp_roundingmode_type(env, type)) { return FormulaType.FloatingPointRoundingModeType; }
-   * else if (msat_is_array_type(env, type)) { long indexType = msat_get_array_index_type(env,
-   * type); long elementType = msat_get_array_element_type(env, type); return
-   * FormulaType.getArrayType( getFormulaTypeFromTermType(indexType),
-   * getFormulaTypeFromTermType(elementType)); } throw new
-   * IllegalArgumentException("Unknown formula type " + msat_type_repr(type)); }
-   */
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pF) {
     // TODO Auto-generated method stub

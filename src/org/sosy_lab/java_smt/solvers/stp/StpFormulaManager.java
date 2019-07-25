@@ -23,22 +23,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public final class StpFormulaManager
     extends AbstractFormulaManager<Long, Long, Long, Long> {
 
   @SuppressWarnings("checkstyle:parameternumber")
   protected StpFormulaManager(
-      FormulaCreator pFormulaCreator,
-      // AbstractUFManager<Long, ?, Long, Long> pFunctionManager,
+      StpFormulaCreator pFormulaCreator,
       StpBooleanFormulaManager pBooleanManager,
-      // @Nullable IntegerFormulaManager pIntegerManager,
-      // @Nullable RationalFormulaManager pRationalManager,
       @Nullable StpBitvectorFormulaManager pBitvectorManager,
-      // @Nullable AbstractFloatingPointFormulaManager<Long, Long, Long, Long>
-      // pFloatingPointManager,
-      // @Nullable AbstractQuantifiedFormulaManager<Long, Long, Long, Long> pQuantifiedManager,
       @Nullable StpArrayFormulaManager pArrayManager) {
     super(
         pFormulaCreator,
@@ -54,6 +47,7 @@ public final class StpFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
+    System.out.println("OVER HERE ...");
     // TODO Implement parsing from SMTLIB-2 format to bool expr (I can see for BV and not Bool !)
     return null;
   }
