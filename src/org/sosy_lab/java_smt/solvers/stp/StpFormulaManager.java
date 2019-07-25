@@ -30,12 +30,13 @@ public final class StpFormulaManager
   @SuppressWarnings("checkstyle:parameternumber")
   protected StpFormulaManager(
       StpFormulaCreator pFormulaCreator,
+      StpUFManager pUFManager,
       StpBooleanFormulaManager pBooleanManager,
       @Nullable StpBitvectorFormulaManager pBitvectorManager,
       @Nullable StpArrayFormulaManager pArrayManager) {
     super(
         pFormulaCreator,
-        null,
+        pUFManager,
         pBooleanManager,
         null,
         null,

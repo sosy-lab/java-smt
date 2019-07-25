@@ -81,13 +81,18 @@ public final class StpSolverContext extends AbstractSolverContext {
 
     //use the FormulaCreator object to create FormulaManager object for all supported Theories
     StpBooleanFormulaManager booleanFrmMgr = new StpBooleanFormulaManager(formulaCreator);
+    StpUFManager functionFrmMgr = new StpUFManager(formulaCreator);
     StpArrayFormulaManager arrayFrmMgr = new StpArrayFormulaManager(formulaCreator);
     StpBitvectorFormulaManager bitvectorFrmMgr = new StpBitvectorFormulaManager(formulaCreator);
 
-    System.out.println("JUST right before");
     //Create the main FormulaManager to manage all supported Formula types
     StpFormulaManager formulaMgr =
-        new StpFormulaManager(formulaCreator, booleanFrmMgr, bitvectorFrmMgr, arrayFrmMgr);
+        new StpFormulaManager(
+            formulaCreator,
+            functionFrmMgr,
+            booleanFrmMgr,
+            bitvectorFrmMgr,
+            arrayFrmMgr);
 
     //Create the SolverContext with the FormulaCreator and main FormulaManager Objects
     return new StpSolverContext(formulaMgr, formulaCreator, logger);
