@@ -19,9 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
-import org.sosy_lab.java_smt.native_api.stp.Type;
 
-class StpType extends org.sosy_lab.java_smt.native_api.stp.Type {
+class StpType extends Type {
 
   protected StpType(long cPtr, boolean cMemoryOwn) {
     super(cPtr, cMemoryOwn);

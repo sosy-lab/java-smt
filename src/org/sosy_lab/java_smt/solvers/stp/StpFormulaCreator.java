@@ -25,8 +25,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.native_api.stp.VC;
-import org.sosy_lab.java_smt.native_api.stp.stpJapi;
 
 //extends FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
@@ -41,7 +39,7 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   // }
   //
   // protected StpFormulaCreator(Long pEnv) {
-  // super(pEnv, stpJapi.vc_boolType(vc), null, null);
+  // super(pEnv, StpJavaApi.vc_boolType(vc), null, null);
   //
   // }
 
@@ -52,14 +50,14 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final VC vc;
 
   protected StpFormulaCreator(VC vc) {
-    super(StpVC.getVCptr(vc), StpType.getTypePtr(stpJapi.vc_boolType(vc)), null, null);
+    super(StpVC.getVCptr(vc), Type.getCPtr(StpJavaApi.vc_boolType(vc)), null, null);
     this.vc = vc;
   }
 
 
   @Override
   public Long getBitvectorType(int pBitwidth) {
-    return StpType.getTypePtr(stpJapi.vc_bvType(vc, pBitwidth));
+    return Type.getCPtr(StpJavaApi.vc_bvType(vc, pBitwidth));
   }
 
   @Override
@@ -69,8 +67,8 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getArrayType(Long pIndexType, Long pElementType) {
-    return StpType.getTypePtr(
-        stpJapi.vc_arrayType(vc, StpType.getType(pIndexType), StpType.getType(pElementType)));
+    return Type.getCPtr(
+        StpJavaApi.vc_arrayType(vc, new Type(pIndexType, true), new Type(pElementType, true)));
   }
 
   @Override
@@ -78,41 +76,33 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     String alphaNum_ = "^[a-zA-Z0-9_]*$";
     assert (pVarName
         .matches(alphaNum_)) : "A valid Variable Name can only contain Alphanumeric and underscore";
-    return StpExpr.getExprPtr(stpJapi.vc_varExpr(vc, pVarName, StpType.getType(pType)));
+    return Expr.getCPtr(StpJavaApi.vc_varExpr(vc, pVarName, new Type(pType, true)));
   }
 
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
-    // TODO Auto-generated method stub
+    System.out.println("I came here.");
+//    long type = msat_term_get_type(pFormula);
+//    return getFormulaTypeFromTermType(type);
     return null;
   }
-  //
-  //
-  // private FormulaType<?> getFormulaTypeFromTermType(Long type) {
-  // long env = getEnv();
-  // if (msat_is_bool_type(env, type)) {
-  // return FormulaType.BooleanType;
-  // } else if (msat_is_integer_type(env, type)) {
-  // return FormulaType.IntegerType;
-  // } else if (msat_is_rational_type(env, type)) {
-  // return FormulaType.RationalType;
-  // } else if (msat_is_bv_type(env, type)) {
-  // return FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
-  // } else if (msat_is_fp_type(env, type)) {
-  // return FormulaType.getFloatingPointType(
-  // msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
-  // } else if (msat_is_fp_roundingmode_type(env, type)) {
-  // return FormulaType.FloatingPointRoundingModeType;
-  // } else if (msat_is_array_type(env, type)) {
-  // long indexType = msat_get_array_index_type(env, type);
-  // long elementType = msat_get_array_element_type(env, type);
-  // return FormulaType.getArrayType(
-  // getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
-  // }
-  // throw new IllegalArgumentException("Unknown formula type " + msat_type_repr(type));
-  // }
-  //
 
+  /*
+   * private FormulaType<?> getFormulaTypeFromTermType(Long type) { // long env = getEnv(); if
+   * (msat_is_bool_type(env, type)) { return FormulaType.BooleanType; } else if
+   * (msat_is_integer_type(env, type)) { return FormulaType.IntegerType; } else if
+   * (msat_is_rational_type(env, type)) { return FormulaType.RationalType; } else if
+   * (msat_is_bv_type(env, type)) { return
+   * FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type)); } else if
+   * (msat_is_fp_type(env, type)) { return FormulaType.getFloatingPointType(
+   * msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type)); } else if
+   * (msat_is_fp_roundingmode_type(env, type)) { return FormulaType.FloatingPointRoundingModeType; }
+   * else if (msat_is_array_type(env, type)) { long indexType = msat_get_array_index_type(env,
+   * type); long elementType = msat_get_array_element_type(env, type); return
+   * FormulaType.getArrayType( getFormulaTypeFromTermType(indexType),
+   * getFormulaTypeFromTermType(elementType)); } throw new
+   * IllegalArgumentException("Unknown formula type " + msat_type_repr(type)); }
+   */
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pF) {
     // TODO Auto-generated method stub

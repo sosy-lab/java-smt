@@ -33,8 +33,6 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.native_api.stp.VC;
-import org.sosy_lab.java_smt.native_api.stp.stpJapi;
 
 public final class StpSolverContext extends AbstractSolverContext {
 
@@ -75,7 +73,7 @@ public final class StpSolverContext extends AbstractSolverContext {
     StpEnvironment environ = // TODO: I got this wrong
         new StpEnvironment(config, logger, shutdownNotifier, stpLogfile, randomSeed);
 
-    vcStpContext = stpJapi.vc_createValidityChecker(); // this is the 'env'
+    vcStpContext = StpJavaApi.vc_createValidityChecker(); // this is the 'env'
 
     // use the 'environment' to create a FormulaCreator object
     // StpFormulaCreator formulaCreator = new StpFormulaCreator(environ);//vcStpContext
@@ -109,7 +107,7 @@ public final class StpSolverContext extends AbstractSolverContext {
     logger.log(Level.FINER, "Freeing STP environment resources");
     // stpJapi.vc_Destroy(formulaCreator.getEnv()); //TODO: use this and make vcStpContext
     // non-static
-    stpJapi.vc_Destroy(vcStpContext);
+    StpJavaApi.vc_Destroy(vcStpContext);
   }
 
   @Override

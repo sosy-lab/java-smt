@@ -20,12 +20,14 @@
 package org.sosy_lab.java_smt.native_api.stp;
 //TODO REBUILD STP API Binding change package name = ~.solver.stp and class name = StpJavaApi
 
+import org.sosy_lab.java_smt.solvers.stp.VC;
+
 public class Testing extends VC {
 
   protected Testing(long pArg0, boolean pArg1) {
     super(pArg0, pArg1);
 
-    Type t = new Type(pArg0, pArg1);
+    // Type t = new Type(pArg0, pArg1);
   }
 
 }

@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
-import org.sosy_lab.java_smt.native_api.stp.VC;
-
 /**
  * Validity Checker (VC) is Context in STP
  */

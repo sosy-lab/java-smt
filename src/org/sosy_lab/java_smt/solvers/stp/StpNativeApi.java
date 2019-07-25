@@ -21,13 +21,13 @@ package org.sosy_lab.java_smt.solvers.stp;
 
 //import org.sosy_lab.java_smt.solvers.stp.
 //import org.sosy_lab.java_smt.native_api.stp.Type;
-import org.sosy_lab.java_smt.native_api.stp.VC;
-import org.sosy_lab.java_smt.native_api.stp.stpJapi;
 
 public class StpNativeApi {
 
+  private static StpJavaApi StpJavaApi;
+
   static String getStpVersion() {
-    return stpJapi.get_git_version_tag();
+    return org.sosy_lab.java_smt.solvers.stp.StpJavaApi.get_git_version_tag();
   }
 
 
@@ -43,7 +43,7 @@ public class StpNativeApi {
     // the address of the boolType for that context
     VC vc = null;
     // Type type = stpJapi.vc_boolType(vc);
-    return StpType.getTypePtr(stpJapi.vc_boolType(vc));
+    return StpType.getTypePtr(org.sosy_lab.java_smt.solvers.stp.StpJavaApi.vc_boolType(vc));
   }
 
 }
