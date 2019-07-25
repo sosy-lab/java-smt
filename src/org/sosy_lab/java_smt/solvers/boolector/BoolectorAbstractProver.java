@@ -22,8 +22,13 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -85,4 +90,46 @@ abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Lo
     }
   }
 
+  @Override
+  public void pop() {
+    BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), 1);
+  }
+
+  @Override
+  public void push() {
+    BtorJNI.boolector_push(manager.getEnvironment().getBtor(), 1);
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>>
+      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
+          throws SolverException, InterruptedException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  protected Model getModelWithoutChecks() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

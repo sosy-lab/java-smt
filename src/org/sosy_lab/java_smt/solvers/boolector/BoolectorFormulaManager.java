@@ -19,9 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import org.sosy_lab.common.Appender;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
+final class BoolectorFormulaManager
+    extends AbstractFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   protected BoolectorFormulaManager(
       BoolectorFormulaCreator pFormulaCreator,
@@ -41,6 +44,17 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
         pArrayManager);
   }
 
+  @Override
+  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Appender dumpFormula(Long pT) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 
 }

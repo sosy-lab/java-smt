@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import ap.parser.IExpression;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -43,8 +44,13 @@ class BoolectorTheoremProver extends BoolectorAbstractProver<Long>
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
 
-    BtorJNI.boolector_assert(btor, constraint);
+    BtorJNI.boolector_assert(manager.getEnvironment().getBtor(), constraint);
+    return null;
   }
 
+  @Override
+  protected Iterable<IExpression> getAssertedFormulas() {
+    // TODO
+  }
 
 }
