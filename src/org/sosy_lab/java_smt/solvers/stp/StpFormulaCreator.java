@@ -50,7 +50,7 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final VC vc;
 
   protected StpFormulaCreator(VC vc) {
-    super(StpVC.getVCptr(vc), Type.getCPtr(StpJavaApi.vc_boolType(vc)), null, null);
+    super(VC.getCPtr(vc), Type.getCPtr(StpJavaApi.vc_boolType(vc)), null, null);
     this.vc = vc;
   }
 
@@ -84,7 +84,7 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
-    // System.out.println("I came here.");
+
 //    long type = msat_term_get_type(pFormula);
 //    return getFormulaTypeFromTermType(type);
     // return null;

@@ -24,26 +24,14 @@ package org.sosy_lab.java_smt.solvers.stp;
 
 public class StpNativeApi {
 
-  private static StpJavaApi StpJavaApi;
-
   static String getStpVersion() {
     return org.sosy_lab.java_smt.solvers.stp.StpJavaApi.get_git_version_tag();
   }
 
 
   static long getStpBoolType(StpSolverContext context) throws Exception {
-    // ToDo: IMPLEMENT
-
-    // So everything needs to start with the SolverContext
-
-    // Create a SolverContext that will manage the life span of the VC object
-    // ...
-    // ...
-    // In this method I want to get a VC object (i.e. a SolverContext) and return
-    // the address of the boolType for that context
-    VC vc = null;
-    // Type type = stpJapi.vc_boolType(vc);
-    return StpType.getTypePtr(org.sosy_lab.java_smt.solvers.stp.StpJavaApi.vc_boolType(vc));
+    VC vc = context.getFormulaCreator().getVC();
+    return Type.getCPtr(org.sosy_lab.java_smt.solvers.stp.StpJavaApi.vc_boolType(vc));
   }
 
 }

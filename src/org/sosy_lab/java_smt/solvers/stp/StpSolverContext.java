@@ -70,9 +70,6 @@ public final class StpSolverContext extends AbstractSolverContext {
     }
 
     //Create or setup the 'environment' with supplied parameters and other java-smt defaults
-    StpEnvironment environ = // TODO: I got this wrong
-        new StpEnvironment(config, logger, shutdownNotifier, stpLogfile, randomSeed);
-
     vcStpContext = StpJavaApi.vc_createValidityChecker(); // this is the 'env'
 
     // use the 'environment' to create a FormulaCreator object
@@ -96,6 +93,10 @@ public final class StpSolverContext extends AbstractSolverContext {
 
     //Create the SolverContext with the FormulaCreator and main FormulaManager Objects
     return new StpSolverContext(formulaMgr, formulaCreator, logger);
+  }
+
+  public StpFormulaCreator getFormulaCreator() {
+    return this.formulaCreator;
   }
 
   @Override
