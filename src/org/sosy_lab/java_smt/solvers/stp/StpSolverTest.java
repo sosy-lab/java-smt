@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -27,26 +29,56 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 public class StpSolverTest {
 
+  private Configuration config;
+  private LogManager logger;
+  private ShutdownNotifier shutdownNotifier;
+  private Solvers solver;
+
+  public StpSolverTest() throws InvalidConfigurationException {
+    config = Configuration.defaultConfiguration();
+    logger = BasicLogManager.create(config);
+    shutdownNotifier = ShutdownNotifier.createDummy();
+
+    solver = Solvers.STP;
+  }
+
   @Test
   public void testSolverContextClass() throws InvalidConfigurationException {
 
-    Configuration config = Configuration.defaultConfiguration();
-    LogManager logger = BasicLogManager.create(config);
-    ShutdownNotifier notifier = ShutdownNotifier.createDummy();
-
-    Solvers solver = Solvers.STP;
-
     SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, notifier, solver);
+        SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver);
 
     System.out.println(context.getSolverName() + " ::: " + context.getVersion());
-
     context.close();
 
   }
+
+
+  // USING THE CONTEXT:
+  // test create bool variable
+
+  @Test
+  public void createBooleanVariablesAndcheckEquivalence() throws InvalidConfigurationException {
+    try (SolverContext context =
+        SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver)) {
+
+      BooleanFormulaManager boolFMgr = context.getFormulaManager().getBooleanFormulaManager();
+      BooleanFormula falseVar = boolFMgr.makeVariable("falseVar");
+      BooleanFormula trueVar = boolFMgr.equivalence(falseVar, boolFMgr.makeBoolean(false));
+      assertTrue(boolFMgr.isFalse(falseVar));
+      assertTrue(boolFMgr.isTrue(trueVar));
+    }
+  }
+
+  // test create BV variable
+  // test create Array variable
+
+  // Test Prover
 
 }

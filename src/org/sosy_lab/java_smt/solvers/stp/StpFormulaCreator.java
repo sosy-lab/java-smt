@@ -54,6 +54,9 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     this.vc = vc;
   }
 
+  public VC getVC() {
+    return vc;
+  }
 
   @Override
   public Long getBitvectorType(int pBitwidth) {

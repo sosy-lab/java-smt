@@ -24,70 +24,102 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 class StpBooleanFormulaManager
     // extends AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {
     extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
-
+  private final VC vc;
   protected StpBooleanFormulaManager(StpFormulaCreator pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
+
+    vc = pCreator.getVC();
   }
 
   @Override
   protected Long makeVariableImpl(String pVar) {
-    // TODO Auto-generated method stub
-    return null;
+    long boolType = getFormulaCreator().getBoolType();
+    return getFormulaCreator().makeVariable(boolType, pVar);
   }
 
   @Override
   protected Long makeBooleanImpl(boolean pValue) {
-    // TODO Auto-generated method stub
-    return null;
+    Expr result = null;
+    if (pValue) {
+      result = StpJavaApi.vc_trueExpr(vc);
+    } else {
+      result = StpJavaApi.vc_falseExpr(vc);
+    }
+    return Expr.getCPtr(result);
   }
 
   @Override
   protected Long not(Long pParam1) {
-    // TODO Auto-generated method stub
-    return null;
+    Expr result = StpJavaApi.vc_notExpr(vc, new Expr(pParam1, true));
+    return Expr.getCPtr(result);
+
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    // TODO Auto-generated method stub
-    return null;
+    Expr result = StpJavaApi.vc_andExpr(vc, new Expr(pParam1, true), new Expr(pParam2, true));
+    return Expr.getCPtr(result);
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    // TODO Auto-generated method stub
-    return null;
+    Expr result = StpJavaApi.vc_orExpr(vc, new Expr(pParam1, true), new Expr(pParam2, true));
+    return Expr.getCPtr(result);
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
-    // TODO Auto-generated method stub
-    return null;
+    Expr result = StpJavaApi.vc_xorExpr(vc, new Expr(pParam1, true), new Expr(pParam2, true));
+    return Expr.getCPtr(result);
   }
 
   @Override
   protected Long equivalence(Long pBits1, Long pBits2) {
-    // TODO Auto-generated method stub
-    return null;
+    // Expr result = StpJavaApi.vc_eqExpr(vc, new Expr(pBits1, true), new Expr(pBits2, true));
+
+    // if and only if
+    Expr result = StpJavaApi.vc_iffExpr(vc, new Expr(pBits1, true), new Expr(pBits2, true));
+
+    return Expr.getCPtr(result);
   }
 
   @Override
   protected boolean isTrue(Long pBits) {
-    // TODO Auto-generated method stub
-    return false;
+
+    int result = StpJavaApi.vc_isBool(new Expr(pBits, true));
+    if (result == 1) {
+      return true;
+    } else {
+      return false;
+    }
+    // else if (result == 0) {
+    // return false;
+    // }else { //-1 is not boolean
+    // throw new Exception("The Formaula is not boolean");
+    // }
   }
 
   @Override
   protected boolean isFalse(Long pBits) {
-    // TODO Auto-generated method stub
-    return false;
+    int result = StpJavaApi.vc_isBool(new Expr(pBits, true));
+    if (result == 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
+  /***
+   * @return either a Bit Vector or Boolean depending on the type of formulas
+   * @param pCond must be boolean
+   * @param pF1 and @param pF2 must have the same type
+   *
+   */
   @Override
   protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO Enforce the rules stated in the doc comment above
+    Expr result =
+        StpJavaApi.vc_iteExpr(vc, new Expr(pCond, true), new Expr(pF1, true), new Expr(pF2, true));
+    return Expr.getCPtr(result);
   }
-
 }
