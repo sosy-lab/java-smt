@@ -99,6 +99,9 @@ class StpBooleanFormulaManager
     // }
   }
 
+  /**
+   * This function returns false also if Formula is not boolean TODO add Assert isBooleanFormula
+   */
   @Override
   protected boolean isFalse(Long pBits) {
     int result = StpJavaApi.vc_isBool(new Expr(pBits, true));

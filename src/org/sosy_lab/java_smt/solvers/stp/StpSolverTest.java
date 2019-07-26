@@ -71,7 +71,7 @@ public class StpSolverTest {
       BooleanFormulaManager boolFMgr = context.getFormulaManager().getBooleanFormulaManager();
       BooleanFormula falseVar = boolFMgr.makeVariable("falseVar");
       BooleanFormula trueVar = boolFMgr.equivalence(falseVar, boolFMgr.makeBoolean(false));
-      assertTrue(boolFMgr.isFalse(falseVar));
+      assertTrue(boolFMgr.isFalse(falseVar)); // TODO False negative here - test the native API
       assertTrue(boolFMgr.isTrue(trueVar));
     }
   }

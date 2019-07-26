@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -139,5 +141,37 @@ public class StpNativeApiTest {
     }
     System.out.println("\n\n");
   }
+
+  @Test
+  public void createBooleanVariable() {
+
+    // create STP context
+    VC vc = StpJavaApi.vc_createValidityChecker();
+
+    Type boolType = StpJavaApi.vc_boolType(vc);
+    Expr boolVar = StpJavaApi.vc_varExpr(vc, "boolVar", boolType);
+    // assertNotEquals(-1, StpJavaApi.vc_isBool(boolVar));
+
+    assertEquals(boolType, StpJavaApi.vc_getType(vc, boolVar));
+
+    // Clean up STP context
+    StpJavaApi.vc_Destroy(vc);
+
+  }
+
+  // vc_varExpr
+  // vc_isBool
+  // vc_arrayType
+  // vc_bvType
+  // vc_trueExpr
+  // vc_falseExpr
+  // vc_notExpr
+  // vc_andExpr
+  // vc_orExpr
+  // vc_xorExpr
+  // vc_eqExpr
+  // vc_iffExpr
+  // vc_iteExpr
+
 }
 
