@@ -19,9 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
-//import org.sosy_lab.java_smt.solvers.stp.
-//import org.sosy_lab.java_smt.native_api.stp.Type;
-
+//TODO (LATER) use the class to extend StpJavaApi and override funct and give docs
+// remove the annoying vc_isBool() from the API, if such functionality is need implement here
 public class StpNativeApi {
 
   static String getStpVersion() {
