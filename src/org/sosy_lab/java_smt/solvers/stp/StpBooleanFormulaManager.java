@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class StpBooleanFormulaManager
@@ -75,52 +77,79 @@ class StpBooleanFormulaManager
 
   @Override
   protected Long equivalence(Long pBits1, Long pBits2) {
-    // Expr result = StpJavaApi.vc_eqExpr(vc, new Expr(pBits1, true), new Expr(pBits2, true));
 
-    // if and only if
-    Expr result = StpJavaApi.vc_iffExpr(vc, new Expr(pBits1, true), new Expr(pBits2, true));
+    Expr expr1 = new Expr(pBits1, true);
+    Expr expr2 = new Expr(pBits2, true);
 
+    boolean check = StpJavaApi.getType(expr1).equals(StpJavaApi.getType(expr2));
+    checkArgument(check, "STP allows equivalence only for Formulae of the same type");
+
+    Expr result = StpJavaApi.vc_eqExpr(vc, expr1, expr2);
     return Expr.getCPtr(result);
   }
 
   @Override
   protected boolean isTrue(Long pBits) {
 
-    int result = StpJavaApi.vc_isBool(new Expr(pBits, true));
-    if (result == 1) {
-      return true;
-    } else {
-      return false;
+    Expr expr = new Expr(pBits, true);
+
+    exprkind_t result = StpJavaApi.getExprKind(expr);
+    switch (result) {
+      case TRUE:
+        return true;
+      case FALSE:
+        return false;
+      default:
+        throw new IllegalArgumentException(
+            "In STP solver: Formula of type - " + result + "needs to be SAT checked.");
     }
-    // else if (result == 0) {
-    // return false;
-    // }else { //-1 is not boolean
-    // throw new Exception("The Formaula is not boolean");
-    // }
   }
 
   /**
-   * This function returns false also if Formula is not boolean TODO add Assert isBooleanFormula
+   * This function returns false also if Formula is not boolean
    */
   @Override
   protected boolean isFalse(Long pBits) {
-    int result = StpJavaApi.vc_isBool(new Expr(pBits, true));
-    if (result == 0) {
-      return true;
-    } else {
-      return false;
+
+    Expr expr = new Expr(pBits, true);
+
+    exprkind_t result = StpJavaApi.getExprKind(expr);
+    switch (result) {
+      case TRUE:
+        return false;
+      case FALSE:
+        return true;
+      default:
+        throw new IllegalArgumentException(
+            "In STP solver: Formula of type - " + result + "needs to be SAT checked.");
     }
   }
 
   /***
    * @return either a Bit Vector or Boolean depending on the type of formulas
    * @param pCond must be boolean
-   * @param pF1 and @param pF2 must have the same type
+   * @param pF1 and @param pF2 must have the same type (Boolean or BitVector)
    *
    */
   @Override
   protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
-    // TODO Enforce the rules stated in the doc comment above
+
+    Expr cond = new Expr(pCond, true);
+    Expr thenExpr = new Expr(pF1, true);
+    Expr elseExpr = new Expr(pF2, true);
+
+    boolean checkConditon = StpJavaApi.getType(cond).equals(type_t.BOOLEAN_TYPE);
+    checkArgument(checkConditon, "The conditon for If-Then-Else must be a Boolean type");
+
+    type_t typeThen = StpJavaApi.getType(thenExpr);
+    type_t typeElse = StpJavaApi.getType(elseExpr);
+
+    checkArgument(typeThen.equals(typeElse), "Both Then and Else clauses must be of the same type");
+
+    boolean check = typeThen.equals(type_t.BITVECTOR_TYPE) || typeThen.equals(type_t.BOOLEAN_TYPE);
+    checkArgument(check, "Both Then and Else clauses must be either of BOOLEAN or BITVECTOR type");
+
+
     Expr result =
         StpJavaApi.vc_iteExpr(vc, new Expr(pCond, true), new Expr(pF1, true), new Expr(pF2, true));
     return Expr.getCPtr(result);

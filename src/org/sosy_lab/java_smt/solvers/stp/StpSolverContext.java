@@ -42,7 +42,17 @@ public final class StpSolverContext extends AbstractSolverContext {
 
   // Context is Validity Checker (VC) in STP
   // private final StpVC stpContext;
-  private final static VC vcStpContext = StpNativeApi.getStpContextVC();
+  private final static VC vcStpContext;
+  static {
+    // load the shared library
+    try {
+      NativeLibraries.loadLibrary("stpJapi");
+      vcStpContext = StpNativeApi.getStpContextVC();
+    } catch (UnsatisfiedLinkError e) {
+      throw new AssumptionViolatedException("Cannot find at the STP native library", e);
+    }
+
+  }
 
   private StpSolverContext(
       StpFormulaManager pFormulaMgr,
@@ -62,13 +72,13 @@ public final class StpSolverContext extends AbstractSolverContext {
                                          @Nullable PathCounterTemplate stpLogfile,
                                          long randomSeed)
   {
-
-    //load the shared library
-    try {
-      NativeLibraries.loadLibrary("stpJapi");
-    } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("Cannot find at the STP native library", e);
-    }
+    //
+    // //load the shared library
+    // try {
+    // NativeLibraries.loadLibrary("stpJapi");
+    // } catch (UnsatisfiedLinkError e) {
+    // throw new AssumptionViolatedException("Cannot find at the STP native library", e);
+    // }
 
     //Create or setup the 'environment' with supplied parameters and other java-smt defaults
     // vcStpContext // this is the 'env'

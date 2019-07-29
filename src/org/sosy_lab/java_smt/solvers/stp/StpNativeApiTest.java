@@ -210,7 +210,7 @@ public class StpNativeApiTest {
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
     Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar", boolType);
 
-    assertEquals(exprkind_t.BOOLEAN.name(), StpJavaApi.typeString(boolType).trim());
+    assertEquals("BOOLEAN", StpJavaApi.typeString(boolType).trim());
     assertEquals(exprkind_t.SYMBOL, StpJavaApi.getExprKind(boolVar));
     assertEquals(0, StpJavaApi.vc_query(stpContextVC, boolVar));
   }
@@ -453,6 +453,23 @@ public class StpNativeApiTest {
 
     assertEquals(8, StpJavaApi.vc_getBVLength(stpContextVC, bv8bitVar));
     assertEquals(32, StpJavaApi.vc_getBVLength(stpContextVC, bv32bitVar));
+  }
+
+  @Test
+  public void convertBoolToBitVector_() {
+
+    Type boolType = StpJavaApi.vc_boolType(stpContextVC);
+    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType);// false
+    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar1);// true
+
+    Expr bvFrom_boolVar1 = StpJavaApi.vc_boolToBVExpr(stpContextVC, boolVar1); // 1
+    Expr bvFrom_notboolVar1 = StpJavaApi.vc_boolToBVExpr(stpContextVC, notboolVar);
+
+    Type type1 = StpJavaApi.vc_getType(stpContextVC, bvFrom_boolVar1);
+    type_t type2 = StpJavaApi.getType(bvFrom_notboolVar1);
+
+    System.out.println("TYPE-1 - " + StpJavaApi.typeString(type1));
+    System.out.println("TYPE-2 - " + type2.name());
   }
 
   @Ignore

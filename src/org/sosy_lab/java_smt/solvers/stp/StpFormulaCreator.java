@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -70,15 +72,25 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getArrayType(Long pIndexType, Long pElementType) {
-    return Type.getCPtr(
-        StpJavaApi.vc_arrayType(vc, new Type(pIndexType, true), new Type(pElementType, true)));
+    Type indexType = new Type(pIndexType, true);
+    Type elementType = new Type(pElementType, true);
+    checkArgument(
+        StpJavaApi.typeString(indexType).contains("BITVECTOR"),
+        "ElementType must be a BITVECTOR");
+    checkArgument(
+        StpJavaApi.typeString(elementType).contains("BITVECTOR"),
+        "ElementType must be a BITVECTOR");
+
+    return Type.getCPtr(StpJavaApi.vc_arrayType(vc, indexType, elementType));
   }
 
   @Override
   public Long makeVariable(Long pType, String pVarName) {
     String alphaNum_ = "^[a-zA-Z0-9_]*$";
-    assert (pVarName
-        .matches(alphaNum_)) : "A valid Variable Name can only contain Alphanumeric and underscore";
+    checkArgument(
+        pVarName.matches(alphaNum_),
+        "A valid Variable Name can only contain Alphanumeric and underscore");
+
     return Expr.getCPtr(StpJavaApi.vc_varExpr(vc, pVarName, new Type(pType, true)));
   }
 
@@ -100,8 +112,15 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         result = FormulaType.getBitvectorTypeWithSize(bvTypeSize);
         break;
       case ARRAY_TYPE:
-        // long indexType = StpJavaApi.getIWidth(formula);
-        // return FormulaType.getArrayType( getFormulaTypeFromTermType());
+        // get the index type
+        // get the element/data type
+        // use it to create new Array Type and return it
+
+        // FormulaType.getArrayType(
+        // getFormulaTypeFromTermType(indexType),
+        // getFormulaTypeFromTermType(elementType));
+        // See here:
+        // TODO https://github.com/stp/stp/issues/333
         throw new IllegalArgumentException("//TODO implement this for array formula type ");
       case UNKNOWN_TYPE:
         throw new IllegalArgumentException("Unknown formula type ");
@@ -110,9 +129,13 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   }
 
+
   @Override
-  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pF) {
-    // TODO Auto-generated method stub
+  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pTerm) {
+    // TODO implement this
+    // get the Expr kind for the term
+    // ...
+
     return null;
   }
 
