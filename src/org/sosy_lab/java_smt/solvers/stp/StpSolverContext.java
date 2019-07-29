@@ -42,13 +42,14 @@ public final class StpSolverContext extends AbstractSolverContext {
 
   // Context is Validity Checker (VC) in STP
   // private final StpVC stpContext;
-  private static VC vcStpContext;
+  private final static VC vcStpContext = StpNativeApi.getStpContextVC();
 
   private StpSolverContext(
       StpFormulaManager pFormulaMgr,
       StpFormulaCreator pFormulaCreator,
       LogManager pLogger) {
     super(pFormulaMgr);
+
     this.formulaCreator = pFormulaCreator;
     this.logger = pLogger;
 
@@ -70,10 +71,9 @@ public final class StpSolverContext extends AbstractSolverContext {
     }
 
     //Create or setup the 'environment' with supplied parameters and other java-smt defaults
-    vcStpContext = StpJavaApi.vc_createValidityChecker(); // this is the 'env'
+    // vcStpContext // this is the 'env'
 
     // use the 'environment' to create a FormulaCreator object
-    // StpFormulaCreator formulaCreator = new StpFormulaCreator(environ);//vcStpContext
     StpFormulaCreator formulaCreator = new StpFormulaCreator(vcStpContext);
 
     //use the FormulaCreator object to create FormulaManager object for all supported Theories
