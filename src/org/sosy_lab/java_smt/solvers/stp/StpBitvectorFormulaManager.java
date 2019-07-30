@@ -21,157 +21,155 @@ package org.sosy_lab.java_smt.solvers.stp;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class StpBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
+    extends AbstractBitvectorFormulaManager<Expr, Type, Long, Long> {
 
-  protected StpBitvectorFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
+  protected StpBitvectorFormulaManager(StpFormulaCreator pCreator) {
     super(pCreator);
     // TODO Auto-generated constructor stub
   }
-  // extends AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   @Override
-  protected Long makeBitvectorImpl(int pLength, Long pParam1) {
+  protected Expr makeBitvectorImpl(int pLength, Expr pParam1) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long toIntegerFormulaImpl(Long pI, boolean pSigned) {
+  protected Expr toIntegerFormulaImpl(Expr pI, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long negate(Long pParam1) {
+  protected Expr negate(Expr pParam1) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long add(Long pParam1, Long pParam2) {
+  protected Expr add(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long subtract(Long pParam1, Long pParam2) {
+  protected Expr subtract(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long divide(Long pParam1, Long pParam2, boolean pSigned) {
+  protected Expr divide(Expr pParam1, Expr pParam2, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long modulo(Long pParam1, Long pParam2, boolean pSigned) {
+  protected Expr modulo(Expr pParam1, Expr pParam2, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long multiply(Long pParam1, Long pParam2) {
+  protected Expr multiply(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long equal(Long pParam1, Long pParam2) {
+  protected Expr equal(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long greaterThan(Long pParam1, Long pParam2, boolean pSigned) {
+  protected Expr greaterThan(Expr pParam1, Expr pParam2, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long greaterOrEquals(Long pParam1, Long pParam2, boolean pSigned) {
+  protected Expr greaterOrEquals(Expr pParam1, Expr pParam2, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long lessThan(Long pParam1, Long pParam2, boolean pSigned) {
+  protected Expr lessThan(Expr pParam1, Expr pParam2, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long lessOrEquals(Long pParam1, Long pParam2, boolean pSigned) {
+  protected Expr lessOrEquals(Expr pParam1, Expr pParam2, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long not(Long pParam1) {
+  protected Expr not(Expr pParam1) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long and(Long pParam1, Long pParam2) {
+  protected Expr and(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long or(Long pParam1, Long pParam2) {
+  protected Expr or(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long xor(Long pParam1, Long pParam2) {
+  protected Expr xor(Expr pParam1, Expr pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long makeBitvectorImpl(int pLength, BigInteger pI) {
+  protected Expr makeBitvectorImpl(int pLength, BigInteger pI) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long makeVariableImpl(int pLength, String pVar) {
+  protected Expr makeVariableImpl(int pLength, String pVar) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long shiftRight(Long pNumber, Long pToShift, boolean pSigned) {
+  protected Expr shiftRight(Expr pNumber, Expr pToShift, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long shiftLeft(Long pExtract, Long pExtract2) {
+  protected Expr shiftLeft(Expr pExtract, Expr pExtract2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long concat(Long pNumber, Long pAppend) {
+  protected Expr concat(Expr pNumber, Expr pAppend) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long extract(Long pNumber, int pMsb, int pLsb, boolean pSigned) {
+  protected Expr extract(Expr pNumber, int pMsb, int pLsb, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long extend(Long pNumber, int pExtensionBits, boolean pSigned) {
+  protected Expr extend(Expr pNumber, int pExtensionBits, boolean pSigned) {
     // TODO Auto-generated method stub
     return null;
   }

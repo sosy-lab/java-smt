@@ -25,9 +25,11 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public final class StpFormulaManager
-    extends AbstractFormulaManager<Long, Long, Long, Long> {
+    extends AbstractFormulaManager<Expr, Type, Long, Long> {
 
-  @SuppressWarnings("checkstyle:parameternumber")
+  /*
+
+  */
   protected StpFormulaManager(
       StpFormulaCreator pFormulaCreator,
       StpUFManager pUFManager,
@@ -48,14 +50,14 @@ public final class StpFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    System.out.println("OVER HERE ...");
-    // TODO Implement parsing from SMTLIB-2 format to bool expr (I can see for BV and not Bool !)
+    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Appender dumpFormula(Long pT) {
-    // TODO Implement - what does it do; ...
+  public Appender dumpFormula(Expr pT) {
+    // TODO Auto-generated method stub
     return null;
   }
+
 }

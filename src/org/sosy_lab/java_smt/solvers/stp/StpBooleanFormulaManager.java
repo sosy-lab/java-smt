@@ -24,76 +24,64 @@ import static com.google.common.base.Preconditions.checkArgument;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class StpBooleanFormulaManager
-    // extends AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> {
-    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
+    extends AbstractBooleanFormulaManager<Expr, Type, Long, Long> {
+
   private final VC vc;
+
   protected StpBooleanFormulaManager(StpFormulaCreator pCreator) {
     super(pCreator);
-
     vc = pCreator.getVC();
   }
 
   @Override
-  protected Long makeVariableImpl(String pVar) {
-    long boolType = getFormulaCreator().getBoolType();
+  protected Expr makeVariableImpl(String pVar) {
+    Type boolType = getFormulaCreator().getBoolType();
     return getFormulaCreator().makeVariable(boolType, pVar);
   }
 
   @Override
-  protected Long makeBooleanImpl(boolean pValue) {
-    Expr result = null;
+  protected Expr makeBooleanImpl(boolean pValue) {
+    Expr result;
     if (pValue) {
       result = StpJavaApi.vc_trueExpr(vc);
     } else {
       result = StpJavaApi.vc_falseExpr(vc);
     }
-    return Expr.getCPtr(result);
+    return result;
   }
 
   @Override
-  protected Long not(Long pParam1) {
-    Expr result = StpJavaApi.vc_notExpr(vc, new Expr(pParam1, true));
-    return Expr.getCPtr(result);
-
+  protected Expr not(Expr pParam1) {
+    return StpJavaApi.vc_notExpr(vc, pParam1);
   }
 
   @Override
-  protected Long and(Long pParam1, Long pParam2) {
-    Expr result = StpJavaApi.vc_andExpr(vc, new Expr(pParam1, true), new Expr(pParam2, true));
-    return Expr.getCPtr(result);
+  protected Expr and(Expr pParam1, Expr pParam2) {
+    return StpJavaApi.vc_andExpr(vc, pParam1, pParam2);
   }
 
   @Override
-  protected Long or(Long pParam1, Long pParam2) {
-    Expr result = StpJavaApi.vc_orExpr(vc, new Expr(pParam1, true), new Expr(pParam2, true));
-    return Expr.getCPtr(result);
+  protected Expr or(Expr pParam1, Expr pParam2) {
+    return StpJavaApi.vc_orExpr(vc, pParam1, pParam2);
   }
 
   @Override
-  protected Long xor(Long pParam1, Long pParam2) {
-    Expr result = StpJavaApi.vc_xorExpr(vc, new Expr(pParam1, true), new Expr(pParam2, true));
-    return Expr.getCPtr(result);
+  protected Expr xor(Expr pParam1, Expr pParam2) {
+    return StpJavaApi.vc_xorExpr(vc, pParam1, pParam2);
   }
 
   @Override
-  protected Long equivalence(Long pBits1, Long pBits2) {
+  protected Expr equivalence(Expr pBits1, Expr pBits2) {
 
-    Expr expr1 = new Expr(pBits1, true);
-    Expr expr2 = new Expr(pBits2, true);
-
-    boolean check = StpJavaApi.getType(expr1).equals(StpJavaApi.getType(expr2));
+    boolean check = StpJavaApi.getType(pBits1).equals(StpJavaApi.getType(pBits2));
     checkArgument(check, "STP allows equivalence only for Formulae of the same type");
 
-    Expr result = StpJavaApi.vc_eqExpr(vc, expr1, expr2);
-    return Expr.getCPtr(result);
+    return StpJavaApi.vc_eqExpr(vc, pBits1, pBits2);
   }
 
   @Override
-  protected boolean isTrue(Long pBits) {
-
-    Expr expr = new Expr(pBits, true);
-
-    exprkind_t result = StpJavaApi.getExprKind(expr);
+  protected boolean isTrue(Expr pBits) {
+    exprkind_t result = StpJavaApi.getExprKind(pBits);
     switch (result) {
       case TRUE:
         return true;
@@ -103,17 +91,13 @@ class StpBooleanFormulaManager
         throw new IllegalArgumentException(
             "In STP solver: Formula of type - " + result + "needs to be SAT checked.");
     }
+
   }
 
-  /**
-   * This function returns false also if Formula is not boolean
-   */
   @Override
-  protected boolean isFalse(Long pBits) {
+  protected boolean isFalse(Expr pBits) {
 
-    Expr expr = new Expr(pBits, true);
-
-    exprkind_t result = StpJavaApi.getExprKind(expr);
+    exprkind_t result = StpJavaApi.getExprKind(pBits);
     switch (result) {
       case TRUE:
         return false;
@@ -123,20 +107,11 @@ class StpBooleanFormulaManager
         throw new IllegalArgumentException(
             "In STP solver: Formula of type - " + result + "needs to be SAT checked.");
     }
+
   }
 
-  /***
-   * @return either a Bit Vector or Boolean depending on the type of formulas
-   * @param pCond must be boolean
-   * @param pF1 and @param pF2 must have the same type (Boolean or BitVector)
-   *
-   */
   @Override
-  protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
-
-    Expr cond = new Expr(pCond, true);
-    Expr thenExpr = new Expr(pF1, true);
-    Expr elseExpr = new Expr(pF2, true);
+  protected Expr ifThenElse(Expr cond, Expr thenExpr, Expr elseExpr) {
 
     boolean checkConditon = StpJavaApi.getType(cond).equals(type_t.BOOLEAN_TYPE);
     checkArgument(checkConditon, "The conditon for If-Then-Else must be a Boolean type");
@@ -149,9 +124,7 @@ class StpBooleanFormulaManager
     boolean check = typeThen.equals(type_t.BITVECTOR_TYPE) || typeThen.equals(type_t.BOOLEAN_TYPE);
     checkArgument(check, "Both Then and Else clauses must be either of BOOLEAN or BITVECTOR type");
 
-
-    Expr result =
-        StpJavaApi.vc_iteExpr(vc, new Expr(pCond, true), new Expr(pF1, true), new Expr(pF2, true));
-    return Expr.getCPtr(result);
+    return StpJavaApi.vc_iteExpr(vc, cond, thenExpr, elseExpr);
   }
+
 }

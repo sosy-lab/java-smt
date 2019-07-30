@@ -22,37 +22,36 @@ package org.sosy_lab.java_smt.solvers.stp;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class StpArrayFormulaManager
-    extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
+    extends AbstractArrayFormulaManager<Expr, Type, Long, Long> {
 
-  public StpArrayFormulaManager(FormulaCreator<Long, Long, Long, Long> pFormulaCreator) {
+  public StpArrayFormulaManager(StpFormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
     // TODO Auto-generated constructor stub
   }
 
   @Override
-  protected Long select(Long pArray, Long pIndex) {
+  protected Expr select(Expr pArray, Expr pIndex) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long store(Long pArray, Long pIndex, Long pValue) {
+  protected Expr store(Expr pArray, Expr pIndex, Expr pValue) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> Long
+  protected <TI extends Formula, TE extends Formula> Expr
       internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long equivalence(Long pArray1, Long pArray2) {
+  protected Expr equivalence(Expr pArray1, Expr pArray2) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -28,31 +28,12 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-//extends FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
-public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
-
-  // protected StpFormulaCreator(
-  // Long pEnv,
-  // Long pBoolType,
-  // @Nullable Long pIntegerType,
-  // @Nullable Long pRationalType) {
-  // super(pEnv, pBoolType, null, null);
-  //
-  // }
-  //
-  // protected StpFormulaCreator(Long pEnv) {
-  // super(pEnv, StpJavaApi.vc_boolType(vc), null, null);
-  //
-  // }
-
-  // protected StpFormulaCreator(StpEnvironment pEnviron) {
-  //
-  // }
+public class StpFormulaCreator extends FormulaCreator<Expr, Type, Long, Long> {
 
   private final VC vc;
 
   protected StpFormulaCreator(VC vc) {
-    super(VC.getCPtr(vc), Type.getCPtr(StpJavaApi.vc_boolType(vc)), null, null);
+    super(VC.getCPtr(vc), StpJavaApi.vc_boolType(vc), null, null);
     this.vc = vc;
   }
 
@@ -61,56 +42,46 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public Long getBitvectorType(int pBitwidth) {
-    return Type.getCPtr(StpJavaApi.vc_bvType(vc, pBitwidth));
+  public Type getBitvectorType(int pBitwidth) {
+    return StpJavaApi.vc_bvType(vc, pBitwidth);
   }
 
   @Override
-  public Long getFloatingPointType(FloatingPointType pType) {
+  public Type getFloatingPointType(FloatingPointType pType) {
     throw new UnsupportedOperationException("STP does not support FLoating Point yet");
   }
 
   @Override
-  public Long getArrayType(Long pIndexType, Long pElementType) {
-    Type indexType = new Type(pIndexType, true);
-    Type elementType = new Type(pElementType, true);
+  public Type getArrayType(Type pIndexType, Type pElementType) {
     checkArgument(
-        StpJavaApi.typeString(indexType).contains("BITVECTOR"),
+        StpJavaApi.typeString(pIndexType).contains("BITVECTOR"),
         "ElementType must be a BITVECTOR");
     checkArgument(
-        StpJavaApi.typeString(elementType).contains("BITVECTOR"),
+        StpJavaApi.typeString(pElementType).contains("BITVECTOR"),
         "ElementType must be a BITVECTOR");
 
-    return Type.getCPtr(StpJavaApi.vc_arrayType(vc, indexType, elementType));
+    return StpJavaApi.vc_arrayType(vc, pIndexType, pElementType);
   }
 
   @Override
-  public Long makeVariable(Long pType, String pVarName) {
+  public Expr makeVariable(Type pType, String pVarName) {
     String alphaNum_ = "^[a-zA-Z0-9_]*$";
     checkArgument(
         pVarName.matches(alphaNum_),
         "A valid Variable Name can only contain Alphanumeric and underscore");
 
-    return Expr.getCPtr(StpJavaApi.vc_varExpr(vc, pVarName, new Type(pType, true)));
+    return StpJavaApi.vc_varExpr(vc, pVarName, pType);
   }
 
   @Override
-  public FormulaType<?> getFormulaType(Long pFormula) {
+  public FormulaType<?> getFormulaType(Expr pFormula) {
 
-//    long type = msat_term_get_type(pFormula);
-//    return getFormulaTypeFromTermType(type);
-    // return null;
-    Expr formula = new Expr(pFormula, true);
-    FormulaType<?> result = null;
-
-    switch (StpJavaApi.getType(formula)) {
+    switch (StpJavaApi.getType(pFormula)) {
       case BOOLEAN_TYPE:
-        result = FormulaType.BooleanType;
-        break;
+        return FormulaType.BooleanType;
       case BITVECTOR_TYPE:
-        int bvTypeSize = StpJavaApi.getBVLength(formula);
-        result = FormulaType.getBitvectorTypeWithSize(bvTypeSize);
-        break;
+        int bvTypeSize = StpJavaApi.getBVLength(pFormula);
+        return FormulaType.getBitvectorTypeWithSize(bvTypeSize);
       case ARRAY_TYPE:
         // get the index type
         // get the element/data type
@@ -125,40 +96,39 @@ public class StpFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case UNKNOWN_TYPE:
         throw new IllegalArgumentException("Unknown formula type ");
     }
-    return result;
+    return null;
 
   }
 
-
   @Override
-  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pTerm) {
+  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Expr pF) {
+    // TODO Auto-generated method stub
     // TODO implement this
     // get the Expr kind for the term
     // ...
-
     return null;
   }
 
   @Override
-  public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
+  public Expr callFunctionImpl(Long pDeclaration, List<Expr> pArgs) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
+  public Long declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected Long getBooleanVarDeclarationImpl(Long pTFormulaInfo) {
+  protected Long getBooleanVarDeclarationImpl(Expr pTFormulaInfo) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Object convertValue(Long pF) {
+  public Object convertValue(Expr pF) {
     // TODO Auto-generated method stub
     return null;
   }
