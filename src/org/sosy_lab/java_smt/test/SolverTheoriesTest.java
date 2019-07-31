@@ -560,11 +560,11 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  @Ignore
   public void testUfWithBoolArg() throws SolverException, InterruptedException {
-    // Not all SMT solvers support UFs with boolean arguments.
-    // We can simulate this with "uf(ite(p,0,1))", but currently we do not need this.
-    // Thus this test is disabled and the following is enabled.
+    assume()
+        .withMessage("Solver %s does not support boolean arguments", solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     FunctionDeclaration<IntegerFormula> uf =
         fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
@@ -572,14 +572,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     IntegerFormula ufFalse = fmgr.callUF(uf, bmgr.makeBoolean(false));
 
     BooleanFormula f = bmgr.not(imgr.equal(ufTrue, ufFalse));
-    assertThat(f.toString()).isEmpty();
     assertThatFormula(f).isSatisfiable();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void testUfWithBoolArg_unsupported() {
-    fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
   }
 
   @Test
