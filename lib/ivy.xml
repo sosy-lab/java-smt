@@ -120,7 +120,7 @@
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-66-g453d36e" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-515-g2765bdd2" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
         <dependency org="uuverifiers" name="princess_2.12" rev="2018-12-06-assertionless" conf="runtime-princess->default; contrib->sources">
