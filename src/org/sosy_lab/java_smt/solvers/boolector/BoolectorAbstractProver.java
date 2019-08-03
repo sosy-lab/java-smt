@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Long> {
+abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   // AF = assertedFormulas; E = ?
 
@@ -135,9 +135,11 @@ abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Lo
 
   @Override
   @Nullable
-  public Long addConstraint(BooleanFormula constraint) {
+  public T addConstraint(BooleanFormula constraint) {
 
-    BtorJNI.boolector_assert(manager.getEnvironment().getBtor(), constraint);
+    BtorJNI.boolector_assert(
+        manager.getEnvironment().getBtor(),
+        BoolectorFormulaManager.getBtorTerm(constraint));
     return null;
   }
 

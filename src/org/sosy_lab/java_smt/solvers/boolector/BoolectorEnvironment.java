@@ -73,7 +73,7 @@ class BoolectorEnvironment {
     // Atm just enable model gen, later use Options
     BtorJNI.boolector_set_opt(newBtor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 1);
 
-    BoolectorAbstractProver<Long> prover =
+    BoolectorAbstractProver<Void> prover =
         new BoolectorTheoremProver(manager, creator, newBtor, shutdownNotifier, pOptions);
     registeredProvers.add(prover);
     return prover;
