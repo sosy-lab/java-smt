@@ -20,6 +20,8 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.errorprone.annotations.Immutable;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 
 @Immutable
@@ -31,4 +33,40 @@ abstract class BoolectorFormula implements Formula {
     this.btorTerm = term;
   }
 
+  final long getTerm() {
+    return btorTerm;
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof BoolectorFormula)) {
+      return false;
+    }
+    return btorTerm == ((BoolectorFormula) o).btorTerm;
+  }
+
+  @Override
+  public final int hashCode() {
+    return (int) btorTerm;
+  }
+
+  @Immutable
+  static final class BoolectorBitvectorFormula extends BoolectorFormula
+      implements BitvectorFormula {
+    BoolectorBitvectorFormula(long pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class BoolectorBooleanFormula extends BoolectorFormula implements BooleanFormula {
+    BoolectorBooleanFormula(long pTerm) {
+      super(pTerm);
+    }
+  }
+
+  // TODO: Array, UF
 }

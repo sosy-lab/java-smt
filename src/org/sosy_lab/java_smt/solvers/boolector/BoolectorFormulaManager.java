@@ -58,7 +58,7 @@ final class BoolectorFormulaManager
   }
 
   static long getBtorTerm(Formula pT) {
-    return ((Mathsat5Formula) pT).getTerm();
+    return ((BoolectorFormula) pT).getTerm();
   }
 
 }

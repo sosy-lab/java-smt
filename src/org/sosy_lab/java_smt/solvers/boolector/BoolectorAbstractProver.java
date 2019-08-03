@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -134,10 +135,10 @@ abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Lo
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
+  public Long addConstraint(BooleanFormula constraint) {
 
     BtorJNI.boolector_assert(manager.getEnvironment().getBtor(), constraint);
-
+    return null;
   }
 
 

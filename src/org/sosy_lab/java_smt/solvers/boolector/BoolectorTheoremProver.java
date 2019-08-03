@@ -24,7 +24,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class BoolectorTheoremProver extends BoolectorAbstractProver<Void, Long>
+class BoolectorTheoremProver extends BoolectorAbstractProver<Void>
     implements ProverEnvironment {
   // Used as standard prover. Built by method newProverEnvironment0 in BtorSolverContext
 
