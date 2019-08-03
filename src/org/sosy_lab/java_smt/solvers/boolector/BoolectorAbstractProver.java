@@ -109,27 +109,37 @@ abstract class BoolectorAbstractProver<Long> extends AbstractProverWithAllSat<Lo
 
   @Override
   public Model getModel() throws SolverException {
-    // TODO Auto-generated method stub
-    return null;
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    checkGenerateModels();
+    return getModelWithoutChecks();
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Unsat core is not supported.");
   }
 
   @Override
   public Optional<List<BooleanFormula>>
       unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
           throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Unsat core with assumptions is not supported.");
   }
 
   @Override
   protected Model getModelWithoutChecks() {
-    // TODO Auto-generated method stub
-    return null;
+    return new BoolectorModel(BtorJNI.boolector_clone(btor), creator);
   }
+
+  @Override
+  @Nullable
+  public Void addConstraint(BooleanFormula constraint) {
+
+    BtorJNI.boolector_assert(manager.getEnvironment().getBtor(), constraint);
+
+  }
+
+
+
 }

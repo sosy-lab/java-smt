@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class BoolectorFormulaManager
@@ -56,5 +57,8 @@ final class BoolectorFormulaManager
     return null;
   }
 
+  static long getBtorTerm(Formula pT) {
+    return ((Mathsat5Formula) pT).getTerm();
+  }
 
 }

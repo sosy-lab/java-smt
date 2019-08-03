@@ -28,23 +28,20 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private final static char BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT = '1';
 
-  private final long model;
+  private final long btor;
   private boolean closed = false;
-  private BoolectorAbstractProver<?> prover;
 
   BoolectorModel(
-      long model,
-      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator,
-      BoolectorAbstractProver<?> prover) {
+      long btor,
+      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator) {
     super(creator);
-    this.model = model;
-    this.prover = prover;
+    this.btor = btor;
   }
 
   @Override
   public void close() {
     if (!closed) {
-      BtorJNI.boolector_delete(model);
+      BtorJNI.boolector_delete(btor);
       closed = true;
     }
   }
@@ -59,10 +56,10 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
-    if (BtorJNI.boolector_is_var(model, pFormula)) {
-      String assignment = BtorJNI.boolector_bv_assignment(model, pFormula);
+    if (BtorJNI.boolector_is_var(btor, pFormula)) {
+      String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(assignment);
-    } else if (false/* do i need uf/array here? */) {
+    } else if (false /* do i need uf/array here? */) {
       return (long) 0;
     } else {
       throw new AssertionError("Unexpected formula: " + pFormula);
@@ -71,7 +68,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   /**
    * Boolector puts out Strings containing 1,0 or x that have to be parsed. If you want different
-   * values for x, change it here.
+   * values for x, change it in the constant! (BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT)
    *
    * @param assignment String with the assignment of Boolector var.
    * @return long representation of assignment String.

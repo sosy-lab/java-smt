@@ -19,15 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import ap.parser.IExpression;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class BoolectorTheoremProver extends BoolectorAbstractProver<Long>
+class BoolectorTheoremProver extends BoolectorAbstractProver<Void, Long>
     implements ProverEnvironment {
   // Used as standard prover. Built by method newProverEnvironment0 in BtorSolverContext
 
@@ -38,19 +35,6 @@ class BoolectorTheoremProver extends BoolectorAbstractProver<Long>
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
     super(manager, creator, btor, pShutdownNotifier, pOptions);
-  }
-
-  @Override
-  @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
-
-    BtorJNI.boolector_assert(manager.getEnvironment().getBtor(), constraint);
-    return null;
-  }
-
-  @Override
-  protected Iterable<IExpression> getAssertedFormulas() {
-    // TODO
   }
 
 }
