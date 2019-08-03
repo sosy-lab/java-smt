@@ -19,11 +19,13 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -32,9 +34,12 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironment {
 
-  protected StpTheoremProver(Set<ProverOptions> pOptions) {
-    super(pOptions);
-    // TODO Auto-generated constructor stub
+  protected StpTheoremProver(
+      StpSolverContext pContext,
+      ShutdownNotifier pShutdownNotifier,
+      StpFormulaCreator pFrmcreator,
+      Set<ProverOptions> pOptions) {
+    super(pContext, pOptions, pFrmcreator, pShutdownNotifier);
   }
 
   @Override
@@ -51,22 +56,22 @@ class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironm
 
   @Override
   public void push() {
-    // TODO Auto-generated method stub
-
+    Preconditions.checkState(!closed);
+    StpJavaApi.vc_push(currVC);
   }
+  //
+  // @Override
+  // public boolean isUnsat() throws SolverException, InterruptedException {
+  // // TODO Auto-generated method stub
+  // return false;
+  // }
 
-  @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
-  }
+  // @Override
+  // public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  // throws SolverException, InterruptedException {
+  // // TODO Auto-generated method stub
+  // return false;
+  // }
 
   @Override
   public Model getModel() throws SolverException {

@@ -19,41 +19,58 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 class StpArrayFormulaManager
-    extends AbstractArrayFormulaManager<Expr, Type, Long, Long> {
+    extends AbstractArrayFormulaManager<Expr, Type, VC, Long> {
 
+  private final VC vc;
   public StpArrayFormulaManager(StpFormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-    // TODO Auto-generated constructor stub
+    this.vc = pFormulaCreator.getEnv();
   }
 
   @Override
   protected Expr select(Expr pArray, Expr pIndex) {
-    // TODO Auto-generated method stub
-    return null;
+    boolean checkArray = type_t.ARRAY_TYPE.equals(StpJavaApi.getType(pArray));
+    checkArgument(checkArray, "Argument not of type ARRAY");
+    boolean checkIndex = type_t.BITVECTOR_TYPE.equals(StpJavaApi.getType(pIndex));
+    checkArgument(checkIndex, "Argument not of type BITVECTOR");
+
+    return StpJavaApi.vc_readExpr(vc, pArray, pIndex);
   }
 
   @Override
   protected Expr store(Expr pArray, Expr pIndex, Expr pValue) {
-    // TODO Auto-generated method stub
-    return null;
+    boolean checkArray = type_t.ARRAY_TYPE.equals(StpJavaApi.getType(pArray));
+    checkArgument(checkArray, "Argument not of type ARRAY");
+    boolean checkIndex = type_t.BITVECTOR_TYPE.equals(StpJavaApi.getType(pIndex));
+    checkArgument(checkIndex, "Argument not of type BITVECTOR");
+    boolean checkValue = type_t.BITVECTOR_TYPE.equals(StpJavaApi.getType(pValue));
+    checkArgument(checkValue, "Argument not of type BITVECTOR");
+
+    return StpJavaApi.vc_writeExpr(vc, pArray, pIndex, pValue);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> Expr
       internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    // TODO Auto-generated method stub
-    return null;
+    final ArrayFormulaType<TI, TE> arrayFormulaType =
+        FormulaType.getArrayType(pIndexType, pElementType);
+    final Type stpArrayType = toSolverType(arrayFormulaType);
+    assert "ARRAY".equals(StpJavaApi.typeString(stpArrayType));
+
+    return getFormulaCreator().makeVariable(stpArrayType, pName);
   }
 
   @Override
   protected Expr equivalence(Expr pArray1, Expr pArray2) {
-    // TODO Auto-generated method stub
-    return null;
+    return StpJavaApi.vc_eqExpr(vc, pArray1, pArray2);
   }
 
 }

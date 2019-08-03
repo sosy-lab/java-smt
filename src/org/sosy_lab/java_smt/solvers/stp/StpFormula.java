@@ -20,9 +20,79 @@
 package org.sosy_lab.java_smt.solvers.stp;
 
 import com.google.errorprone.annotations.Immutable;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 
 @Immutable
 public abstract class StpFormula implements Formula {
-  // ToDo: Implement this
+
+  private final Expr msatTerm;
+
+  StpFormula(Expr term) {
+    this.msatTerm = term;
+  }
+
+  @Override
+  public final String toString() {
+    return StpJavaApi.exprString(msatTerm);
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof StpFormula)) {
+      return false;
+    }
+    return msatTerm == ((StpFormula) o).msatTerm;
+  }
+
+  @Override
+  public final int hashCode() {
+    return (int) Expr.getCPtr(msatTerm);
+  }
+
+  final Expr getTerm() {
+    return msatTerm;
+  }
+
+  @Immutable
+  static final class StpArrayFormula<TI extends Formula, TE extends Formula> extends StpFormula
+      implements ArrayFormula<TI, TE> {
+
+    private final FormulaType<TI> indexType;
+    private final FormulaType<TE> elementType;
+
+    StpArrayFormula(Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      super(pTerm);
+      indexType = pIndexType;
+      elementType = pElementType;
+    }
+
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
+    }
+  }
+
+  @Immutable
+  static final class StpBitvectorFormula extends StpFormula implements BitvectorFormula {
+    StpBitvectorFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class StpBooleanFormula extends StpFormula implements BooleanFormula {
+    StpBooleanFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
 }

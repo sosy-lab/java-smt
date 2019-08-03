@@ -21,7 +21,7 @@ package org.sosy_lab.java_smt.solvers.stp;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-class StpUFManager extends AbstractUFManager<Expr, Long, Type, Long> {
+class StpUFManager extends AbstractUFManager<Expr, Long, Type, VC> {
 
   protected StpUFManager(StpFormulaCreator pCreator) {
     super(pCreator);

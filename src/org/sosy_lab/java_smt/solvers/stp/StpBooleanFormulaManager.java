@@ -24,13 +24,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class StpBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Expr, Type, Long, Long> {
+    extends AbstractBooleanFormulaManager<Expr, Type, VC, Long> {
 
   private final VC vc;
 
   protected StpBooleanFormulaManager(StpFormulaCreator pCreator) {
     super(pCreator);
-    vc = pCreator.getVC();
+    vc = pCreator.getEnv();
   }
 
   @Override

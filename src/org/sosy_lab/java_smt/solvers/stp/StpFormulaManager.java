@@ -25,11 +25,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public final class StpFormulaManager
-    extends AbstractFormulaManager<Expr, Type, Long, Long> {
+    extends AbstractFormulaManager<Expr, Type, VC, Long> {
 
-  /*
-
-  */
   protected StpFormulaManager(
       StpFormulaCreator pFormulaCreator,
       StpUFManager pUFManager,

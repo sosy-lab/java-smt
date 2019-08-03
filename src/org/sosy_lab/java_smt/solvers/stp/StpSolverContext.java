@@ -155,4 +155,9 @@ public final class StpSolverContext extends AbstractSolverContext {
     return false;
   }
 
+  public VC createEnvironment(Long conf) {
+    // create a new VC context or reuse existing one
+    return formulaCreator.getEnv();
+  }
+
 }

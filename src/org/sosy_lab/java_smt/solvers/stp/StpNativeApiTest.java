@@ -76,6 +76,36 @@ public class StpNativeApiTest {
 
   }
 
+  @Test
+  public void testingSAT() {
+    int width = 8;
+
+    // Create variable "x"
+    Expr x = StpJavaApi.vc_varExpr(stpContextVC, "x", StpJavaApi.vc_bvType(stpContextVC, width));
+
+    // Create bitvector x + x
+    Expr xPlusx = StpJavaApi.vc_bvPlusExpr(stpContextVC, width, x, x);
+
+    // Create bitvector constant 2
+    Expr two = StpJavaApi.vc_bvConstExprFromInt(stpContextVC, width, 20);
+
+    // Create bitvector 2*x
+    Expr xTimes2 = StpJavaApi.vc_bvMultExpr(stpContextVC, width, two, x);
+
+    // Create bool expression x + x = 2*x
+    Expr equality = StpJavaApi.vc_eqExpr(stpContextVC, xPlusx, xTimes2);
+
+    // StpJavaApi.vc_assertFormula(stpContextVC, StpJavaApi.vc_trueExpr(stpContextVC));
+    StpJavaApi.vc_assertFormula(stpContextVC, xTimes2);
+
+    // Print the assertions
+    System.out.println("Assertions:\n");
+    StpJavaApi.vc_printAsserts(stpContextVC, 0);
+    System.out.println("Query:\n");
+    StpJavaApi.vc_printQuery(stpContextVC);
+
+  }
+
   @Ignore
   @Test
   public void testStpSampleFromRepo() throws Exception {
@@ -468,8 +498,8 @@ public class StpNativeApiTest {
     Type type1 = StpJavaApi.vc_getType(stpContextVC, bvFrom_boolVar1);
     type_t type2 = StpJavaApi.getType(bvFrom_notboolVar1);
 
-    System.out.println("TYPE-1 - " + StpJavaApi.typeString(type1));
-    System.out.println("TYPE-2 - " + type2.name());
+//    System.out.println("TYPE-1 - " + StpJavaApi.typeString(type1));
+//    System.out.println("TYPE-2 - " + type2.name());
   }
 
   @Ignore

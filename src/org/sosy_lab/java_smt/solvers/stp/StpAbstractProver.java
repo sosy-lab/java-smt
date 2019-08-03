@@ -19,46 +19,71 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-class StpAbstractProver<T> extends AbstractProver<T> {
+abstract class StpAbstractProver<T> extends AbstractProver<T> {
 
-  protected StpAbstractProver(Set<ProverOptions> pOptions) {
+  private final StpSolverContext context;
+  private final StpFormulaCreator creator;
+  private final ShutdownNotifier shutdownNotifier;
+  // private final long curConfig;
+  protected final VC currVC;
+  protected boolean closed;
+
+  protected StpAbstractProver(
+      StpSolverContext pContext,
+      Set<ProverOptions> pOptions,
+      StpFormulaCreator pCreator,
+      ShutdownNotifier pShutdownNotifier) {
     super(pOptions);
-    // TODO Auto-generated constructor stub
+    context = pContext;
+    creator = pCreator;
+    // curConfig = buildConfig(pOptions); //TODO implement configuration handling
+    currVC = context.createEnvironment(null);// curConfig is to be passed in here
+    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
   public void pop() {
-    // TODO Auto-generated method stub
-
+    Preconditions.checkState(!closed);
+    StpJavaApi.vc_pop(currVC);
   }
 
-  @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void push() {
-    // TODO Auto-generated method stub
-
-  }
+  /*
+   * @Override public @Nullable T addConstraint(BooleanFormula pConstraint) throws
+   * InterruptedException { // TODO Auto-generated method stub return null; }
+   *
+   * @Override public void push() { // TODO Auto-generated method stub
+   *
+   * }
+   */
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
+    // TODO update to use vc_query_with_timeout
+
+//    Preconditions.checkState(!closed);
+//    int result = StpJavaApi.vc_query(curVC, queryExpr)
+//    if (result == 0) {
+//      return true;
+//    } else if (result == 1){
+//      return false;
+//    }  else if (result == 2) {
+//      throw new Exception("An error occured in STP during validation");
+//    }
+//    throw new Exception("An error occured in STP during validation");
+
+    throw new SolverException("NOT MPLEMENTED");
   }
 
   @Override
@@ -90,8 +115,13 @@ class StpAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
+    if (!closed) {
 
+      // TODO check if EXPRDELETE is set via vc_setInterfaceFlags
+      // other we will can delete expression with vc_DeleteExpr
+      StpJavaApi.vc_Destroy(currVC);
+      closed = true;
+    }
   }
 
   @Override

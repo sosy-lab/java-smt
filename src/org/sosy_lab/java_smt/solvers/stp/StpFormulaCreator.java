@@ -28,17 +28,13 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class StpFormulaCreator extends FormulaCreator<Expr, Type, Long, Long> {
+public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
 
   private final VC vc;
 
   protected StpFormulaCreator(VC vc) {
-    super(VC.getCPtr(vc), StpJavaApi.vc_boolType(vc), null, null);
+    super(vc, StpJavaApi.vc_boolType(vc), null, null);
     this.vc = vc;
-  }
-
-  public VC getVC() {
-    return vc;
   }
 
   @Override
