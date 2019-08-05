@@ -153,12 +153,12 @@ struct Type {};
 %nodefaultctor WholeCounterExample;
 struct WholeCounterExample {};
 
-
+/* 
 %inline%{
 
 // typedef void* VC;
 
-/* TODO: hanldle this in Java Code; Remove if confirmed. Envoronment configs
+// TODO: hanldle this in Java Code; Remove if confirmed. Envoronment configs
  struct Flags {
 	const char a;
 	const char c;
@@ -188,10 +188,11 @@ struct WholeCounterExample {};
 	.w = 'w',
 	.y = 'y'
 };
- */
 
 %}
+ */
 
+%inline%{
 
 /////////////////////////////////////////////////////////////////////////////
 /// API INITIALISATION AND CONFIG

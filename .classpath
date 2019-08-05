@@ -27,6 +27,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/lubuntu/SAHEED/gsoc/CODE/java-smt/lib/stpJavaAPI.jar"/>
+	<classpathentry kind="lib" path="lib/stpJavaAPI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -19,7 +19,7 @@ PRJ_NAME=$(basename "$PRJ_DIR")
 
 # confirm expected directory structure 
 # MUST BE like java-smt/../../this_script.sh
-if [[ "$PRJ_NAME"!="java-smt" ]]
+if [[ "$PRJ_NAME" != "java-smt" ]]
  then
 	echo "this script is not place in the proper directory" >&2
 	echo "this script expects to reside in somewhere like\
@@ -29,7 +29,7 @@ fi
 
 # set destination directory for final libraries
 JAR_LIB_DIR="${PRJ_DIR}/lib/"
-SO_LIB_DIR="${JAR_LIB_DIR}/native/x86_64-linux/
+SO_LIB_DIR="${JAR_LIB_DIR}/native/x86_64-linux/"
 
 
 # echo $FILE
