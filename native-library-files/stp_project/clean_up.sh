@@ -1,4 +1,8 @@
 #/usr/bin/env/ bash
+
+# Clean up the build files for StpJavaApi
+# cryptominisat repo is also removed
+
 set -e
 
 # remove STP repo

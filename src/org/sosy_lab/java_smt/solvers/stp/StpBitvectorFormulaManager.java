@@ -85,9 +85,7 @@ class StpBitvectorFormulaManager
 
   @Override
   protected Expr negate(Expr pParam1) {
-    // TODO IntegerFormula is not in STP
-    // return null;
-    throw new UnsupportedOperationException(" not yet implemented yet");
+    return StpJavaApi.vc_bvUMinusExpr(vc, pParam1);
   }
 
   @Override

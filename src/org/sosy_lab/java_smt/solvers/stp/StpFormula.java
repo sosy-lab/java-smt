@@ -29,15 +29,15 @@ import org.sosy_lab.java_smt.api.FormulaType;
 @Immutable
 public abstract class StpFormula implements Formula {
 
-  private final Expr msatTerm;
+  private final Expr stpTerm;
 
   StpFormula(Expr term) {
-    this.msatTerm = term;
+    this.stpTerm = term;
   }
 
   @Override
   public final String toString() {
-    return StpJavaApi.exprString(msatTerm);
+    return StpJavaApi.exprString(stpTerm);
   }
 
   @Override
@@ -48,16 +48,16 @@ public abstract class StpFormula implements Formula {
     if (!(o instanceof StpFormula)) {
       return false;
     }
-    return msatTerm == ((StpFormula) o).msatTerm;
+    return stpTerm == ((StpFormula) o).stpTerm;
   }
 
   @Override
   public final int hashCode() {
-    return (int) Expr.getCPtr(msatTerm);
+    return (int) Expr.getCPtr(stpTerm);
   }
 
   final Expr getTerm() {
-    return msatTerm;
+    return stpTerm;
   }
 
   @Immutable
