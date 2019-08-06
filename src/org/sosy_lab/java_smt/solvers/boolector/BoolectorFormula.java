@@ -68,5 +68,5 @@ abstract class BoolectorFormula implements Formula {
     }
   }
 
-  // TODO: Array, UF
+  // TODO: Array
 }

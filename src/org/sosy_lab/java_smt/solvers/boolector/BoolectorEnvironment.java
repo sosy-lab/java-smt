@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -46,13 +47,24 @@ class BoolectorEnvironment {
       final int pRandomSeed)
       throws InvalidConfigurationException {
 
-    config.inject(this);
-
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
 
+    // Temporarily disabled till configs are available!!
+    // config.inject(this);
+
+
+      try {
+        NativeLibraries.loadLibrary(
+            "boolector");
+      } catch (UnsatisfiedLinkError e) {
+        System.err.println("Boolector library could not be loaded.");
+      }
+
+
     btor = getNewBtor();
+    // set options AFTER HERE OR HERE for btor
   }
 
   /**
@@ -63,7 +75,7 @@ class BoolectorEnvironment {
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       Set<ProverOptions> pOptions) {
-    // create new btor and copy all nodes etc. because clone doesnt work with all sat solvers
+    // clone only works before SAT!!!
     long newBtor = getNewBtor();
 
     // clone Btor for quick test without stack
@@ -81,7 +93,6 @@ class BoolectorEnvironment {
 
   private long getNewBtor() {
     return BtorJNI.boolector_new();
-    // set options HERE for btor
   }
 
   public Long getBtor() {
