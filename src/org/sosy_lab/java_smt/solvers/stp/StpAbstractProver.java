@@ -59,18 +59,17 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
     StpJavaApi.vc_pop(currVC);
   }
 
-  /*
-   * @Override public @Nullable T addConstraint(BooleanFormula pConstraint) throws
-   * InterruptedException { // TODO Auto-generated method stub return null; }
-   *
-   * @Override public void push() { // TODO Auto-generated method stub
-   *
-   * }
-   */
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    StpJavaApi.vc_push(currVC);
+  }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     // TODO update to use vc_query_with_timeout
+
+    // To go this route I will have to implement the Stack for the "Constraints" ?!
 
 //    Preconditions.checkState(!closed);
 //    int result = StpJavaApi.vc_query(curVC, queryExpr)
@@ -94,7 +93,8 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
+      throws InterruptedException, SolverException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -114,6 +114,14 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
+  public Model getModel() throws SolverException {
+    // TODO Auto-generated method stub
+
+    // I don't understand this model stuff.
+    return null;
+  }
+
+  @Override
   public void close() {
     if (!closed) {
 
@@ -122,13 +130,6 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
       StpJavaApi.vc_Destroy(currVC);
       closed = true;
     }
-  }
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
-    return null;
   }
 
 }

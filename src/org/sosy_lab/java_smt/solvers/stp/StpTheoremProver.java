@@ -19,18 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
-import com.google.common.base.Preconditions;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
 
 class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironment {
 
@@ -43,66 +37,10 @@ class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironm
   }
 
   @Override
-  public void pop() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    StpJavaApi.vc_push(currVC);
-  }
-  //
-  // @Override
-  // public boolean isUnsat() throws SolverException, InterruptedException {
-  // // TODO Auto-generated method stub
-  // return false;
-  // }
-
-  // @Override
-  // public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-  // throws SolverException, InterruptedException {
-  // // TODO Auto-generated method stub
-  // return false;
-  // }
-
-  @Override
-  public Model getModel() throws SolverException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void close() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
+    // It seems the only option is to implement the stack
+    // and hence make pop and push work with it
     return null;
   }
 
