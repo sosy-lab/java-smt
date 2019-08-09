@@ -130,7 +130,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new BoolectorModel(BtorJNI.boolector_clone(btor), creator);
+    return new BoolectorModel(btor, creator);
   }
 
   @Override

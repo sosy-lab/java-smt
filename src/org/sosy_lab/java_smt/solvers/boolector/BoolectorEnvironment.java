@@ -51,19 +51,21 @@ class BoolectorEnvironment {
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
 
+    try {
+      NativeLibraries.loadLibrary("boolector");
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println("Boolector library could not be loaded.");
+    }
+
     // Temporarily disabled till configs are available!!
     // config.inject(this);
 
-
-      try {
-        NativeLibraries.loadLibrary(
-            "boolector");
-      } catch (UnsatisfiedLinkError e) {
-        System.err.println("Boolector library could not be loaded.");
-      }
-
-
     btor = getNewBtor();
+
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.swigValue(), 1);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.swigValue(), 1);
+
     // set options AFTER HERE OR HERE for btor
   }
 
@@ -75,18 +77,14 @@ class BoolectorEnvironment {
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       Set<ProverOptions> pOptions) {
-    // clone only works before SAT!!!
-    long newBtor = getNewBtor();
 
-    // clone Btor for quick test without stack
-    newBtor = BtorJNI.boolector_clone(btor);
 
     // Options for prover
     // Atm just enable model gen, later use Options
-    BtorJNI.boolector_set_opt(newBtor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 1);
+    // BtorJNI.boolector_set_opt(newBtor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 1);
 
     BoolectorAbstractProver<Void> prover =
-        new BoolectorTheoremProver(manager, creator, newBtor, shutdownNotifier, pOptions);
+        new BoolectorTheoremProver(manager, creator, btor, shutdownNotifier, pOptions);
     registeredProvers.add(prover);
     return prover;
   }
