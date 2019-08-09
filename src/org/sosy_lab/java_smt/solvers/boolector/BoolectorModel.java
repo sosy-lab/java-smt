@@ -41,6 +41,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   public void close() {
     if (!closed) {
+      System.out.println("Model");
       BtorJNI.boolector_delete(btor);
       closed = true;
     }
@@ -56,6 +57,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
+    // Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     if (BtorJNI.boolector_is_var(btor, pFormula)) {
       String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(assignment);
@@ -77,17 +79,17 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     try {
       return Long.parseLong(assignment);
     } catch (NumberFormatException e) {
-    }
-    char[] charArray = assignment.toCharArray();
-    for (int i = 0; i < charArray.length; i++) {
-      if (charArray[i] == 'x') {
-        charArray[i] = BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT;
-      } else if (charArray[i] != '0' && charArray[i] != '1') {
-        throw new IllegalArgumentException(
-            "Boolector gave back an assignment that is not parseable.");
+      char[] charArray = assignment.toCharArray();
+      for (int i = 0; i < charArray.length; i++) {
+        if (charArray[i] == 'x') {
+          charArray[i] = BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT;
+        } else if (charArray[i] != '0' && charArray[i] != '1') {
+          throw new IllegalArgumentException(
+              "Boolector gave back an assignment that is not parseable.");
+        }
       }
+      return Long.parseLong(charArray.toString());
     }
-    return Long.parseLong(charArray.toString());
   }
 
 }

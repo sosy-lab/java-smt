@@ -65,7 +65,9 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void close() {
     if (!closed) {
-      BtorJNI.boolector_delete(btor);
+      // Problem: Cloning results in not beeing able to access var with old name (string)
+      // NOT Cloning results in murdering btor that is still beeing used
+      // BtorJNI.boolector_delete(btor);
       closed = true;
     }
   }

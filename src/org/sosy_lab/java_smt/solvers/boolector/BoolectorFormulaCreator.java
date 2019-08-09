@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -176,8 +177,12 @@ public class BoolectorFormulaCreator
 
   @Override
   public Object convertValue(Long pF) {
-    // TODO Auto-generated method stub
-    return null;
+    if (pF == null) {
+      return null;
+    }
+    String stringParse = pF.toString();
+    // TODO catch the rest of the possible types
+    return new BigInteger(stringParse);
   }
 
 }
