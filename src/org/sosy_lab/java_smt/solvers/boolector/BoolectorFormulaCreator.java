@@ -119,7 +119,14 @@ public class BoolectorFormulaCreator
     return new BoolectorBitvectorFormula(pTerm);
   }
 
-  // TODO encapsulate remaining types
+  @Override
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE>
+      encapsulateArray(Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    return null;
+    // TODO encapsulate remaining types
+  }
+
+
 
   // In Boolector a type is called a sort
   @Override
