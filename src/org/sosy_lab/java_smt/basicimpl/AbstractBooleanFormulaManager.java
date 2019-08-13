@@ -27,12 +27,12 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,14 +119,17 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula and(Collection<BooleanFormula> pBits) {
-    if (pBits.isEmpty()) {
-      return makeBoolean(true);
+    switch (pBits.size()) {
+      case 0:
+        return makeTrue();
+      case 1:
+        return pBits.iterator().next();
+      case 2:
+        Iterator<BooleanFormula> it = pBits.iterator();
+        return and(it.next(), it.next());
+      default:
+        return wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
     }
-    if (pBits.size() == 1) {
-      return Iterables.getOnlyElement(pBits);
-    }
-    TFormulaInfo result = andImpl(Collections2.transform(pBits, this::extractInfo));
-    return wrap(result);
   }
 
   @Override
@@ -134,6 +137,14 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     return and(Arrays.asList(pBits));
   }
 
+  /**
+   * Create an n-ary conjunction. The default implementation delegates to {@link #and(Object,
+   * Object)} and assumes that all simplifications are done by that method. This method can be
+   * overridden, in which case it should filter out irrelevant operands.
+   *
+   * @param pParams A collection of at least 3 operands.
+   * @return A term that is equivalent to a conjunction of pParams.
+   */
   protected TFormulaInfo andImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(true);
     for (TFormulaInfo formula : pParams) {
@@ -172,16 +183,27 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> pBits) {
-    if (pBits.isEmpty()) {
-      return makeBoolean(false);
+    switch (pBits.size()) {
+      case 0:
+        return makeFalse();
+      case 1:
+        return pBits.iterator().next();
+      case 2:
+        Iterator<BooleanFormula> it = pBits.iterator();
+        return or(it.next(), it.next());
+      default:
+        return wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
     }
-    if (pBits.size() == 1) {
-      return Iterables.getOnlyElement(pBits);
-    }
-    TFormulaInfo result = orImpl(Collections2.transform(pBits, this::extractInfo));
-    return wrap(result);
   }
 
+  /**
+   * Create an n-ary disjunction. The default implementation delegates to {@link #or(Object,
+   * Object)} and assumes that all simplifications are done by that method. This method can be
+   * overridden, in which case it should filter out irrelevant operands.
+   *
+   * @param pParams A collection of at least 3 operands.
+   * @return A term that is equivalent to a disjunction of pParams.
+   */
   protected TFormulaInfo orImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(false);
     for (TFormulaInfo formula : pParams) {

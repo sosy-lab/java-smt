@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -97,10 +96,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long orImpl(Collection<Long> params) {
-    if (params.size() == 2) {
-      Iterator<Long> it = params.iterator();
-      return or(it.next(), it.next());
-    }
     return Native.mkOr(z3context, params.size(), Longs.toArray(params));
   }
 
@@ -111,10 +106,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long andImpl(Collection<Long> params) {
-    if (params.size() == 2) {
-      Iterator<Long> it = params.iterator();
-      return and(it.next(), it.next());
-    }
     return Native.mkAnd(z3context, params.size(), Longs.toArray(params));
   }
 
