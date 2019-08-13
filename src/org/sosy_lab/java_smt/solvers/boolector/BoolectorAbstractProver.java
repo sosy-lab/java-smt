@@ -38,14 +38,14 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   // AF = assertedFormulas; E = ?
 
-  protected final long btor;
-  protected final BoolectorFormulaManager manager;
+  private final long btor;
+  private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
   // protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>(); // all terms on all
   // levels
   // private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
-  protected final ShutdownNotifier shutdownNotifier;
-
+  private final ShutdownNotifier shutdownNotifier;
+  protected boolean closed = false;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   // Used/Built by TheoremProver
@@ -132,7 +132,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new BoolectorModel(btor, creator);
+    return new BoolectorModel(btor, creator, this);
   }
 
   @Override

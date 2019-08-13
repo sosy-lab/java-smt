@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class BoolectorArrayFormulaManager
@@ -50,8 +51,20 @@ public class BoolectorArrayFormulaManager
   @Override
   protected <TI extends Formula, TE extends Formula> Long
       internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    // TODO Auto-generated method stub
-    return null;
+    // Only bitvector types are supported
+    if (!pIndexType.isBitvectorType() || !pElementType.isBitvectorType()) {
+      throw new IllegalArgumentException("Boolector supports bitvector arrays only.");
+    } else if (((BitvectorType) pIndexType).getSize() != ((BitvectorType) pElementType).getSize()) {
+      throw new IllegalArgumentException(
+          "The bitvectors mapping the array index to the array elements must have the same width.");
+    }
+    final long indexSort =
+        BtorJNI.boolector_bitvec_sort(btor, ((BitvectorType) pIndexType).getSize());
+    final long elementSort =
+        BtorJNI.boolector_bitvec_sort(btor, ((BitvectorType) pElementType).getSize());
+    final long arraySort = BtorJNI.boolector_array_sort(btor, indexSort, elementSort);
+    final long array = BtorJNI.boolector_array(btor, arraySort, pName);
+    return array;
   }
 
   @Override

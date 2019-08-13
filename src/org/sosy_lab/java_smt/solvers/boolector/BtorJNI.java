@@ -127,8 +127,12 @@ class BtorJNI {
   public final static native long boolector_apply(long jarg1, long jarg2, long jarg3, long jarg4);
   public final static native long boolector_inc(long jarg1, long jarg2);
   public final static native long boolector_dec(long jarg1, long jarg2);
-  public final static native long boolector_forall(long jarg1, long jarg2, long jarg3, long jarg4);
-  public final static native long boolector_exists(long jarg1, long jarg2, long jarg3, long jarg4);
+
+  public final static native long
+      boolector_forall(long jarg1, long[] jarg2, long jarg3, long jarg4);
+
+  public final static native long
+      boolector_exists(long jarg1, long[] jarg2, long jarg3, long jarg4);
   public final static native long boolector_get_btor(long jarg1);
   public final static native long boolector_get_node_id(long jarg1, long jarg2);
   public final static native long boolector_get_sort(long jarg1, long jarg2);

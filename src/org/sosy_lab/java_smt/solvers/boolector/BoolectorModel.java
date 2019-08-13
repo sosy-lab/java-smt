@@ -29,13 +29,16 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   private final static char BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT = '1';
 
   private final long btor;
+  private final BoolectorAbstractProver<?> prover;
   private boolean closed = false;
 
   BoolectorModel(
       long btor,
-      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator) {
+      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator,
+      BoolectorAbstractProver<?> pProver) {
     super(creator);
     this.btor = btor;
+    this.prover = pProver;
   }
 
   @Override
@@ -50,19 +53,20 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
 
-    return null;
+    // TODO make Collection of all vars used and build List here with it
+
+    return assignments.build();
   }
 
   @Override
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
-    // Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     if (BtorJNI.boolector_is_var(btor, pFormula)) {
       String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(assignment);
-    } else if (false /* do i need uf/array here? */) {
-      return (long) 0;
     } else {
       throw new AssertionError("Unexpected formula: " + pFormula);
     }
