@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import java.util.Collection;
 import java.util.stream.Collector;
@@ -92,7 +91,26 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long orImpl(Collection<Long> params) {
-    return Native.mkOr(z3context, params.size(), Longs.toArray(params));
+    // Z3 does not do any simplifications, so we filter "false" and short-circuit on "true".
+    final long[] operands = new long[params.size()]; // over-approximate size
+    int count = 0;
+    for (final Long operand : params) {
+      if (isTrue(operand)) {
+        return operand;
+      }
+      if (!isFalse(operand)) {
+        operands[count] = operand;
+        count++;
+      }
+    }
+    switch (count) {
+      case 0:
+        return z3false;
+      case 1:
+        return operands[0];
+      default:
+        return Native.mkOr(z3context, count, operands); // we can pass partially filled array to Z3
+    }
   }
 
   @Override
@@ -102,7 +120,26 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long andImpl(Collection<Long> params) {
-    return Native.mkAnd(z3context, params.size(), Longs.toArray(params));
+    // Z3 does not do any simplifications, so we filter "true" and short-circuit on "false".
+    final long[] operands = new long[params.size()]; // over-approximate size
+    int count = 0;
+    for (final Long operand : params) {
+      if (isFalse(operand)) {
+        return operand;
+      }
+      if (!isTrue(operand)) {
+        operands[count] = operand;
+        count++;
+      }
+    }
+    switch (count) {
+      case 0:
+        return z3true;
+      case 1:
+        return operands[0];
+      default:
+        return Native.mkAnd(z3context, count, operands); // we can pass partially filled array to Z3
+    }
   }
 
   @Override
