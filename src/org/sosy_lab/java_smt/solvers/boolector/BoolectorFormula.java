@@ -20,9 +20,11 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.errorprone.annotations.Immutable;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 
 @Immutable
 abstract class BoolectorFormula implements Formula {
@@ -68,5 +70,24 @@ abstract class BoolectorFormula implements Formula {
     }
   }
 
-  // TODO: Array
+  static final class BoolectorArrayFormula<TI extends Formula, TE extends Formula>
+      extends BoolectorFormula implements ArrayFormula<TI, TE> {
+
+    private final FormulaType<TI> indexType;
+    private final FormulaType<TE> elementType;
+
+    BoolectorArrayFormula(long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      super(pTerm);
+      indexType = pIndexType;
+      elementType = pElementType;
+    }
+
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
+    }
+  }
 }

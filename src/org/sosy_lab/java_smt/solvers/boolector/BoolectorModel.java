@@ -21,8 +21,9 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironment> {
 
@@ -30,13 +31,15 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
+  private final BoolectorFormulaCreator creator;
   private boolean closed = false;
 
   BoolectorModel(
       long btor,
-      FormulaCreator<Long, Long, BoolectorEnvironment, ?> creator,
+      BoolectorFormulaCreator creator,
       BoolectorAbstractProver<?> pProver) {
     super(creator);
+    this.creator = creator;
     this.btor = btor;
     this.prover = pProver;
   }
@@ -55,10 +58,57 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
-
-    // TODO make Collection of all vars used and build List here with it
-
+    Iterable<Long> formulas = prover.getAssertedFormulas();
+    for (Long formula : formulas) {
+      if (BtorJNI.boolector_is_array(btor, formula)) {
+        assignments.add(getArrayAssignment(formula));
+      } else if (BtorJNI.boolector_is_fun(btor, formula)) {
+        assignments.add(getUFAssignment(formula));
+      } else {
+        assignments.add(getAssignment(formula));
+      }
+    }
+    System.out.println("toList");
     return assignments.build();
+  }
+
+  private ValueAssignment getAssignment(long key) {
+    List<Object> argumentInterpretation = new ArrayList<>();
+    Long value = evalImpl(key);
+    // TODO revisit equality method!!!
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(key),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
+        creator.getName(key, btor),
+        creator.convertValue(key, value),
+        argumentInterpretation);
+  }
+
+  private ValueAssignment getUFAssignment(long key) {
+    List<Object> argumentInterpretation = new ArrayList<>();
+    Long value = evalImpl(key);
+    // TODO
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(key),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
+        creator.getName(key, btor),
+        creator.convertValue(key, value),
+        argumentInterpretation);
+  }
+
+  private ValueAssignment getArrayAssignment(long key) {
+    List<Object> argumentInterpretation = new ArrayList<>();
+    Long value = evalImpl(key);
+    // TODO
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(key),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
+        creator.getName(key, btor),
+        creator.convertValue(key, value),
+        argumentInterpretation);
   }
 
   @Override
@@ -67,6 +117,12 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     if (BtorJNI.boolector_is_var(btor, pFormula)) {
       String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(assignment);
+    } else if (BtorJNI.boolector_is_const(btor, pFormula)) {
+      String assignment = BtorJNI.boolector_get_bits(btor, pFormula);
+      return parseLong(assignment);
+    } else if (BtorJNI.boolector_is_bitvec_sort(btor, BtorJNI.boolector_get_sort(btor, pFormula))) {
+      BtorJNI.boolector_bv_assignment(btor, pFormula); // geht
+      return parseLong(BtorJNI.boolector_bv_assignment(btor, pFormula));
     } else {
       throw new AssertionError("Unexpected formula: " + pFormula);
     }

@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -31,6 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorArrayFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBooleanFormula;
 
@@ -123,8 +123,8 @@ public class BoolectorFormulaCreator
   @Override
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE>
       encapsulateArray(Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    return null;
-    // TODO encapsulate remaining types
+    assert getFormulaType(pTerm).isArrayType();
+    return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
 
@@ -176,13 +176,31 @@ public class BoolectorFormulaCreator
   }
 
   @Override
-  public Object convertValue(Long pF) {
-    if (pF == null) {
-      return null;
+  public Object convertValue(Long key, Long term) {
+    // To get the correct type, we generate it from the key, not the value.
+    FormulaType<?> type = getFormulaType(key);
+    if (type.isBooleanType()) {
+      if (term == 1) {
+        return true;
+      } else if (term == 0) {
+        return false;
+      } else {
+        throw new IllegalArgumentException("Unexpected type: " + type);
+      }
+    } else if (type.isBitvectorType()) {
+      return parseBitvector(term);
+    } else {
+      throw new IllegalArgumentException("Unexpected type: " + type);
     }
-    String stringParse = pF.toString();
-    // TODO catch the rest of the possible types
-    return new BigInteger(stringParse);
+  }
+
+  private Long parseBitvector(Long bitVec) {
+    // TODO transform binär in dec
+    return bitVec;
+  }
+
+  String getName(long pKey, long btor) {
+    return BtorJNI.boolector_get_symbol(btor, pKey);
   }
 
 }

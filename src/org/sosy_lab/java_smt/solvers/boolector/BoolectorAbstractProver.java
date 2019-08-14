@@ -22,7 +22,11 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,8 +45,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  // protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>(); // all terms on all
-  // levels
+  protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
   // private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
   private final ShutdownNotifier shutdownNotifier;
   protected boolean closed = false;
@@ -95,11 +98,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void pop() {
+    assertedFormulas.pop();
     BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), 1);
   }
 
   @Override
   public void push() {
+    assertedFormulas.push(new ArrayList<>());
     BtorJNI.boolector_push(manager.getEnvironment().getBtor(), 1);
   }
 
@@ -138,13 +143,30 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   @Nullable
   public T addConstraint(BooleanFormula constraint) {
-
     BtorJNI.boolector_assert(
         manager.getEnvironment().getBtor(),
         BoolectorFormulaManager.getBtorTerm(constraint));
+    addAssertedFormula(BoolectorFormulaManager.getBtorTerm(constraint));
     return null;
   }
 
+  /**
+   * Adds a Formula to the stack. (External Stack to know which formulas are to be evaluated later
+   * on)
+   *
+   * @param f formula to be asserted
+   */
+  protected void addAssertedFormula(Long f) {
+    assertedFormulas.peek().add(f);
+  }
 
+  /**
+   * Returns all the asserted formulas of the current stack.
+   *
+   * @return
+   */
+  protected Iterable<Long> getAssertedFormulas() {
+    return Iterables.concat(assertedFormulas);
+  }
 
 }
