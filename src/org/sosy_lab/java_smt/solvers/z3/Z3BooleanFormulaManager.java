@@ -30,8 +30,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
-  private final long z3true;
-  private final long z3false;
+  private final Long z3true;
+  private final Long z3false;
 
   Z3BooleanFormulaManager(Z3FormulaCreator creator) {
     super(creator);
@@ -50,11 +50,7 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long makeBooleanImpl(boolean pValue) {
-    if (pValue) {
-      return Native.mkTrue(z3context);
-    } else {
-      return Native.mkFalse(z3context);
-    }
+    return pValue ? z3true : z3false;
   }
 
   @Override
