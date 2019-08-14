@@ -148,6 +148,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected TFormulaInfo andImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(true);
     for (TFormulaInfo formula : pParams) {
+      if (isFalse(formula)) {
+        return formula;
+      }
       result = and(result, formula);
     }
     return result;
@@ -207,6 +210,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected TFormulaInfo orImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(false);
     for (TFormulaInfo formula : pParams) {
+      if (isTrue(formula)) {
+        return formula;
+      }
       result = or(result, formula);
     }
     return result;
