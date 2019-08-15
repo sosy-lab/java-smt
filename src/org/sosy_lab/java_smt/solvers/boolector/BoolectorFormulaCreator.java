@@ -21,12 +21,14 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.primitives.Longs;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -96,11 +98,10 @@ public class BoolectorFormulaCreator
         .format("Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BoolectorBooleanFormula(
-          pTerm); /*
-                   * } else if (pType.isArrayType()) { ArrayFormulaType<?, ?> arrFt =
-                   * (ArrayFormulaType<?, ?>) pType; return (T) new BoolectorArrayFormula<>(pTerm,
-                   * arrFt.getIndexType(), arrFt.getElementType());
-                   */
+          pTerm);
+    } else if (pType.isArrayType()) {
+      ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
+      return (T) new BoolectorArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType());
     } else if (pType.isBitvectorType()) {
       return (T) new BoolectorBitvectorFormula(pTerm);
     }
@@ -137,8 +138,8 @@ public class BoolectorFormulaCreator
 
   @Override
   public Long getFloatingPointType(FloatingPointType pType) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException(
+        "Boolector does not support floating point operations.");
   }
 
   @Override
@@ -159,20 +160,20 @@ public class BoolectorFormulaCreator
 
   @Override
   public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
-    // TODO Auto-generated method stub
-    return null;
+    return BtorJNI
+        .boolector_apply(getEnv().getBtor(), Longs.toArray(pArgs), pArgs.size(), pDeclaration);
   }
 
   @Override
   public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  protected Long getBooleanVarDeclarationImpl(Long pTFormulaInfo) {
-    // TODO Auto-generated method stub
-    return null;
+    long[] funSorts = Longs.toArray(pArgTypes);
+    long sort;
+    if (pArgTypes.isEmpty()) {
+      sort = pReturnType;
+    } else {
+      sort = BtorJNI.boolector_fun_sort(getEnv().getBtor(), funSorts, funSorts.length, pReturnType);
+    }
+    return BtorJNI.boolector_uf(getEnv().getBtor(), sort, pName);
   }
 
   @Override
@@ -188,19 +189,56 @@ public class BoolectorFormulaCreator
         throw new IllegalArgumentException("Unexpected type: " + type);
       }
     } else if (type.isBitvectorType()) {
-      return parseBitvector(term);
+      return term;
     } else {
       throw new IllegalArgumentException("Unexpected type: " + type);
     }
   }
 
-  private Long parseBitvector(Long bitVec) {
-    // TODO transform binär in dec
-    return bitVec;
+  /**
+   * Transforms String bitvec into Long bitvec
+   *
+   * @param bitVec
+   * @return
+   */
+  private Long parseBitvector(String bitVec) {
+    try {
+      return Long.parseLong(bitVec);
+    } catch (NumberFormatException e) {
+      char[] charArray = bitVec.toCharArray();
+      for (int i = 0; i < charArray.length; i++) {
+        if (charArray[i] == 'x') {
+          charArray[i] = '1';
+        } else if (charArray[i] != '0' && charArray[i] != '1') {
+          throw new IllegalArgumentException(
+              "Boolector gave back an assignment that is not parseable.");
+        }
+      }
+      return Long.parseLong(charArray.toString());
+    }
   }
 
   String getName(long pKey, long btor) {
     return BtorJNI.boolector_get_symbol(btor, pKey);
+  }
+
+  @Override
+  public Object convertValue(Long pF) {
+    throw new UnsupportedOperationException(
+        "Boolector needs a second term to determine a correct type. Please use the other method.");
+  }
+
+  @Override
+  protected Long getBooleanVarDeclarationImpl(Long pTFormulaInfo) {
+    // declaration of constant or fun
+    if(BtorJNI.boolector_is_const(getEnv().getBtor(), pTFormulaInfo)) {
+      return parseBitvector(BtorJNI.boolector_get_bits(getEnv().getBtor(), pTFormulaInfo));
+    } else if (BtorJNI.boolector_is_var(getEnv().getBtor(), pTFormulaInfo)) {
+      return parseBitvector(BtorJNI.boolector_bv_assignment(getEnv().getBtor(), pTFormulaInfo));
+    } else {
+      throw new IllegalArgumentException(
+          "Debug only! getBooleanVarDeclarationImpl in BtorFormulaCreator");
+    }
   }
 
 }
