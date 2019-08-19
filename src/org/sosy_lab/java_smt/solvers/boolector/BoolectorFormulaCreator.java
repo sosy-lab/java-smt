@@ -43,8 +43,6 @@ public class BoolectorFormulaCreator
     super(pEnv, pEnv.getBoolSort(), null, null);
   }
 
-  // sehr unfertig und temporär
-  // TODO gescheit!!!!
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
@@ -56,11 +54,10 @@ public class BoolectorFormulaCreator
           "BitvectorFormula with type missmatch: " + pFormula);
       return (FormulaType<T>) FormulaType
           .getBitvectorTypeWithSize((int) BtorJNI.boolector_get_width(btor, extractInfo(pFormula)));
-
-    } /*
-       * else if (pFormula instanceof ) { // TODO UF? }
-       */ else if (pFormula instanceof ArrayFormula<?, ?>) {
-      // TODO ARRAY
+    } else if (pFormula instanceof ArrayFormula<?, ?>) {
+      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
     return super.getFormulaType(pFormula);
   }
@@ -198,8 +195,8 @@ public class BoolectorFormulaCreator
   /**
    * Transforms String bitvec into Long bitvec
    *
-   * @param bitVec
-   * @return
+   * @param bitVec return value of Boolector
+   * @return gives back the long version of the bitvector
    */
   private Long parseBitvector(String bitVec) {
     try {

@@ -11,9 +11,11 @@ package org.sosy_lab.java_smt.solvers.boolector;
 public final class BtorOption {
   public final static BtorOption BTOR_OPT_MODEL_GEN = new BtorOption("BTOR_OPT_MODEL_GEN");
   public final static BtorOption BTOR_OPT_INCREMENTAL = new BtorOption("BTOR_OPT_INCREMENTAL");
-  public final static BtorOption BTOR_OPT_INCREMENTAL_SMT1 = new BtorOption("BTOR_OPT_INCREMENTAL_SMT1");
+  public final static BtorOption BTOR_OPT_INCREMENTAL_SMT1 =
+      new BtorOption("BTOR_OPT_INCREMENTAL_SMT1");
   public final static BtorOption BTOR_OPT_INPUT_FORMAT = new BtorOption("BTOR_OPT_INPUT_FORMAT");
-  public final static BtorOption BTOR_OPT_OUTPUT_NUMBER_FORMAT = new BtorOption("BTOR_OPT_OUTPUT_NUMBER_FORMAT");
+  public final static BtorOption BTOR_OPT_OUTPUT_NUMBER_FORMAT =
+      new BtorOption("BTOR_OPT_OUTPUT_NUMBER_FORMAT");
   public final static BtorOption BTOR_OPT_OUTPUT_FORMAT = new BtorOption("BTOR_OPT_OUTPUT_FORMAT");
   public final static BtorOption BTOR_OPT_ENGINE = new BtorOption("BTOR_OPT_ENGINE");
   public final static BtorOption BTOR_OPT_SAT_ENGINE = new BtorOption("BTOR_OPT_SAT_ENGINE");
@@ -24,97 +26,154 @@ public final class BtorOption {
   public final static BtorOption BTOR_OPT_VERBOSITY = new BtorOption("BTOR_OPT_VERBOSITY");
   public final static BtorOption BTOR_OPT_LOGLEVEL = new BtorOption("BTOR_OPT_LOGLEVEL");
   public final static BtorOption BTOR_OPT_REWRITE_LEVEL = new BtorOption("BTOR_OPT_REWRITE_LEVEL");
-  public final static BtorOption BTOR_OPT_SKELETON_PREPROC = new BtorOption("BTOR_OPT_SKELETON_PREPROC");
+  public final static BtorOption BTOR_OPT_SKELETON_PREPROC =
+      new BtorOption("BTOR_OPT_SKELETON_PREPROC");
   public final static BtorOption BTOR_OPT_ACKERMANN = new BtorOption("BTOR_OPT_ACKERMANN");
-  public final static BtorOption BTOR_OPT_BETA_REDUCE_ALL = new BtorOption("BTOR_OPT_BETA_REDUCE_ALL");
-  public final static BtorOption BTOR_OPT_ELIMINATE_SLICES = new BtorOption("BTOR_OPT_ELIMINATE_SLICES");
+  public final static BtorOption BTOR_OPT_BETA_REDUCE_ALL =
+      new BtorOption("BTOR_OPT_BETA_REDUCE_ALL");
+  public final static BtorOption BTOR_OPT_ELIMINATE_SLICES =
+      new BtorOption("BTOR_OPT_ELIMINATE_SLICES");
   public final static BtorOption BTOR_OPT_VAR_SUBST = new BtorOption("BTOR_OPT_VAR_SUBST");
   public final static BtorOption BTOR_OPT_UCOPT = new BtorOption("BTOR_OPT_UCOPT");
   public final static BtorOption BTOR_OPT_MERGE_LAMBDAS = new BtorOption("BTOR_OPT_MERGE_LAMBDAS");
-  public final static BtorOption BTOR_OPT_EXTRACT_LAMBDAS = new BtorOption("BTOR_OPT_EXTRACT_LAMBDAS");
+  public final static BtorOption BTOR_OPT_EXTRACT_LAMBDAS =
+      new BtorOption("BTOR_OPT_EXTRACT_LAMBDAS");
   public final static BtorOption BTOR_OPT_NORMALIZE = new BtorOption("BTOR_OPT_NORMALIZE");
   public final static BtorOption BTOR_OPT_NORMALIZE_ADD = new BtorOption("BTOR_OPT_NORMALIZE_ADD");
   public final static BtorOption BTOR_OPT_FUN_PREPROP = new BtorOption("BTOR_OPT_FUN_PREPROP");
   public final static BtorOption BTOR_OPT_FUN_PRESLS = new BtorOption("BTOR_OPT_FUN_PRESLS");
   public final static BtorOption BTOR_OPT_FUN_DUAL_PROP = new BtorOption("BTOR_OPT_FUN_DUAL_PROP");
-  public final static BtorOption BTOR_OPT_FUN_DUAL_PROP_QSORT = new BtorOption("BTOR_OPT_FUN_DUAL_PROP_QSORT");
+  public final static BtorOption BTOR_OPT_FUN_DUAL_PROP_QSORT =
+      new BtorOption("BTOR_OPT_FUN_DUAL_PROP_QSORT");
   public final static BtorOption BTOR_OPT_FUN_JUST = new BtorOption("BTOR_OPT_FUN_JUST");
-  public final static BtorOption BTOR_OPT_FUN_JUST_HEURISTIC = new BtorOption("BTOR_OPT_FUN_JUST_HEURISTIC");
-  public final static BtorOption BTOR_OPT_FUN_LAZY_SYNTHESIZE = new BtorOption("BTOR_OPT_FUN_LAZY_SYNTHESIZE");
-  public final static BtorOption BTOR_OPT_FUN_EAGER_LEMMAS = new BtorOption("BTOR_OPT_FUN_EAGER_LEMMAS");
-  public final static BtorOption BTOR_OPT_FUN_STORE_LAMBDAS = new BtorOption("BTOR_OPT_FUN_STORE_LAMBDAS");
+  public final static BtorOption BTOR_OPT_FUN_JUST_HEURISTIC =
+      new BtorOption("BTOR_OPT_FUN_JUST_HEURISTIC");
+  public final static BtorOption BTOR_OPT_FUN_LAZY_SYNTHESIZE =
+      new BtorOption("BTOR_OPT_FUN_LAZY_SYNTHESIZE");
+  public final static BtorOption BTOR_OPT_FUN_EAGER_LEMMAS =
+      new BtorOption("BTOR_OPT_FUN_EAGER_LEMMAS");
+  public final static BtorOption BTOR_OPT_FUN_STORE_LAMBDAS =
+      new BtorOption("BTOR_OPT_FUN_STORE_LAMBDAS");
   public final static BtorOption BTOR_OPT_SLS_NFLIPS = new BtorOption("BTOR_OPT_SLS_NFLIPS");
   public final static BtorOption BTOR_OPT_SLS_STRATEGY = new BtorOption("BTOR_OPT_SLS_STRATEGY");
   public final static BtorOption BTOR_OPT_SLS_JUST = new BtorOption("BTOR_OPT_SLS_JUST");
   public final static BtorOption BTOR_OPT_SLS_MOVE_GW = new BtorOption("BTOR_OPT_SLS_MOVE_GW");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_RANGE = new BtorOption("BTOR_OPT_SLS_MOVE_RANGE");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_SEGMENT = new BtorOption("BTOR_OPT_SLS_MOVE_SEGMENT");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_RAND_WALK = new BtorOption("BTOR_OPT_SLS_MOVE_RAND_WALK");
-  public final static BtorOption BTOR_OPT_SLS_PROB_MOVE_RAND_WALK = new BtorOption("BTOR_OPT_SLS_PROB_MOVE_RAND_WALK");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_RAND_ALL = new BtorOption("BTOR_OPT_SLS_MOVE_RAND_ALL");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_RAND_RANGE = new BtorOption("BTOR_OPT_SLS_MOVE_RAND_RANGE");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_RANGE =
+      new BtorOption("BTOR_OPT_SLS_MOVE_RANGE");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_SEGMENT =
+      new BtorOption("BTOR_OPT_SLS_MOVE_SEGMENT");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_RAND_WALK =
+      new BtorOption("BTOR_OPT_SLS_MOVE_RAND_WALK");
+  public final static BtorOption BTOR_OPT_SLS_PROB_MOVE_RAND_WALK =
+      new BtorOption("BTOR_OPT_SLS_PROB_MOVE_RAND_WALK");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_RAND_ALL =
+      new BtorOption("BTOR_OPT_SLS_MOVE_RAND_ALL");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_RAND_RANGE =
+      new BtorOption("BTOR_OPT_SLS_MOVE_RAND_RANGE");
   public final static BtorOption BTOR_OPT_SLS_MOVE_PROP = new BtorOption("BTOR_OPT_SLS_MOVE_PROP");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_PROP_N_PROP = new BtorOption("BTOR_OPT_SLS_MOVE_PROP_N_PROP");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_PROP_N_SLS = new BtorOption("BTOR_OPT_SLS_MOVE_PROP_N_SLS");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_PROP_FORCE_RW = new BtorOption("BTOR_OPT_SLS_MOVE_PROP_FORCE_RW");
-  public final static BtorOption BTOR_OPT_SLS_MOVE_INC_MOVE_TEST = new BtorOption("BTOR_OPT_SLS_MOVE_INC_MOVE_TEST");
-  public final static BtorOption BTOR_OPT_SLS_USE_RESTARTS = new BtorOption("BTOR_OPT_SLS_USE_RESTARTS");
-  public final static BtorOption BTOR_OPT_SLS_USE_BANDIT = new BtorOption("BTOR_OPT_SLS_USE_BANDIT");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_PROP_N_PROP =
+      new BtorOption("BTOR_OPT_SLS_MOVE_PROP_N_PROP");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_PROP_N_SLS =
+      new BtorOption("BTOR_OPT_SLS_MOVE_PROP_N_SLS");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_PROP_FORCE_RW =
+      new BtorOption("BTOR_OPT_SLS_MOVE_PROP_FORCE_RW");
+  public final static BtorOption BTOR_OPT_SLS_MOVE_INC_MOVE_TEST =
+      new BtorOption("BTOR_OPT_SLS_MOVE_INC_MOVE_TEST");
+  public final static BtorOption BTOR_OPT_SLS_USE_RESTARTS =
+      new BtorOption("BTOR_OPT_SLS_USE_RESTARTS");
+  public final static BtorOption BTOR_OPT_SLS_USE_BANDIT =
+      new BtorOption("BTOR_OPT_SLS_USE_BANDIT");
   public final static BtorOption BTOR_OPT_PROP_NPROPS = new BtorOption("BTOR_OPT_PROP_NPROPS");
-  public final static BtorOption BTOR_OPT_PROP_USE_RESTARTS = new BtorOption("BTOR_OPT_PROP_USE_RESTARTS");
-  public final static BtorOption BTOR_OPT_PROP_USE_BANDIT = new BtorOption("BTOR_OPT_PROP_USE_BANDIT");
+  public final static BtorOption BTOR_OPT_PROP_USE_RESTARTS =
+      new BtorOption("BTOR_OPT_PROP_USE_RESTARTS");
+  public final static BtorOption BTOR_OPT_PROP_USE_BANDIT =
+      new BtorOption("BTOR_OPT_PROP_USE_BANDIT");
   public final static BtorOption BTOR_OPT_PROP_PATH_SEL = new BtorOption("BTOR_OPT_PROP_PATH_SEL");
-  public final static BtorOption BTOR_OPT_PROP_PROB_USE_INV_VALUE = new BtorOption("BTOR_OPT_PROP_PROB_USE_INV_VALUE");
-  public final static BtorOption BTOR_OPT_PROP_PROB_FLIP_COND = new BtorOption("BTOR_OPT_PROP_PROB_FLIP_COND");
-  public final static BtorOption BTOR_OPT_PROP_PROB_FLIP_COND_CONST = new BtorOption("BTOR_OPT_PROP_PROB_FLIP_COND_CONST");
-  public final static BtorOption BTOR_OPT_PROP_FLIP_COND_CONST_DELTA = new BtorOption("BTOR_OPT_PROP_FLIP_COND_CONST_DELTA");
-  public final static BtorOption BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL = new BtorOption("BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL");
-  public final static BtorOption BTOR_OPT_PROP_PROB_SLICE_KEEP_DC = new BtorOption("BTOR_OPT_PROP_PROB_SLICE_KEEP_DC");
-  public final static BtorOption BTOR_OPT_PROP_PROB_CONC_FLIP = new BtorOption("BTOR_OPT_PROP_PROB_CONC_FLIP");
-  public final static BtorOption BTOR_OPT_PROP_PROB_SLICE_FLIP = new BtorOption("BTOR_OPT_PROP_PROB_SLICE_FLIP");
-  public final static BtorOption BTOR_OPT_PROP_PROB_EQ_FLIP = new BtorOption("BTOR_OPT_PROP_PROB_EQ_FLIP");
-  public final static BtorOption BTOR_OPT_PROP_PROB_AND_FLIP = new BtorOption("BTOR_OPT_PROP_PROB_AND_FLIP");
-  public final static BtorOption BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT = new BtorOption("BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT");
-  public final static BtorOption BTOR_OPT_AIGPROP_USE_RESTARTS = new BtorOption("BTOR_OPT_AIGPROP_USE_RESTARTS");
-  public final static BtorOption BTOR_OPT_AIGPROP_USE_BANDIT = new BtorOption("BTOR_OPT_AIGPROP_USE_BANDIT");
+  public final static BtorOption BTOR_OPT_PROP_PROB_USE_INV_VALUE =
+      new BtorOption("BTOR_OPT_PROP_PROB_USE_INV_VALUE");
+  public final static BtorOption BTOR_OPT_PROP_PROB_FLIP_COND =
+      new BtorOption("BTOR_OPT_PROP_PROB_FLIP_COND");
+  public final static BtorOption BTOR_OPT_PROP_PROB_FLIP_COND_CONST =
+      new BtorOption("BTOR_OPT_PROP_PROB_FLIP_COND_CONST");
+  public final static BtorOption BTOR_OPT_PROP_FLIP_COND_CONST_DELTA =
+      new BtorOption("BTOR_OPT_PROP_FLIP_COND_CONST_DELTA");
+  public final static BtorOption BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL =
+      new BtorOption("BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL");
+  public final static BtorOption BTOR_OPT_PROP_PROB_SLICE_KEEP_DC =
+      new BtorOption("BTOR_OPT_PROP_PROB_SLICE_KEEP_DC");
+  public final static BtorOption BTOR_OPT_PROP_PROB_CONC_FLIP =
+      new BtorOption("BTOR_OPT_PROP_PROB_CONC_FLIP");
+  public final static BtorOption BTOR_OPT_PROP_PROB_SLICE_FLIP =
+      new BtorOption("BTOR_OPT_PROP_PROB_SLICE_FLIP");
+  public final static BtorOption BTOR_OPT_PROP_PROB_EQ_FLIP =
+      new BtorOption("BTOR_OPT_PROP_PROB_EQ_FLIP");
+  public final static BtorOption BTOR_OPT_PROP_PROB_AND_FLIP =
+      new BtorOption("BTOR_OPT_PROP_PROB_AND_FLIP");
+  public final static BtorOption BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT =
+      new BtorOption("BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT");
+  public final static BtorOption BTOR_OPT_AIGPROP_USE_RESTARTS =
+      new BtorOption("BTOR_OPT_AIGPROP_USE_RESTARTS");
+  public final static BtorOption BTOR_OPT_AIGPROP_USE_BANDIT =
+      new BtorOption("BTOR_OPT_AIGPROP_USE_BANDIT");
   public final static BtorOption BTOR_OPT_QUANT_SYNTH = new BtorOption("BTOR_OPT_QUANT_SYNTH");
-  public final static BtorOption BTOR_OPT_QUANT_DUAL_SOLVER = new BtorOption("BTOR_OPT_QUANT_DUAL_SOLVER");
-  public final static BtorOption BTOR_OPT_QUANT_SYNTH_LIMIT = new BtorOption("BTOR_OPT_QUANT_SYNTH_LIMIT");
-  public final static BtorOption BTOR_OPT_QUANT_SYNTH_QI = new BtorOption("BTOR_OPT_QUANT_SYNTH_QI");
+  public final static BtorOption BTOR_OPT_QUANT_DUAL_SOLVER =
+      new BtorOption("BTOR_OPT_QUANT_DUAL_SOLVER");
+  public final static BtorOption BTOR_OPT_QUANT_SYNTH_LIMIT =
+      new BtorOption("BTOR_OPT_QUANT_SYNTH_LIMIT");
+  public final static BtorOption BTOR_OPT_QUANT_SYNTH_QI =
+      new BtorOption("BTOR_OPT_QUANT_SYNTH_QI");
   public final static BtorOption BTOR_OPT_QUANT_DER = new BtorOption("BTOR_OPT_QUANT_DER");
   public final static BtorOption BTOR_OPT_QUANT_CER = new BtorOption("BTOR_OPT_QUANT_CER");
-  public final static BtorOption BTOR_OPT_QUANT_MINISCOPE = new BtorOption("BTOR_OPT_QUANT_MINISCOPE");
-  public final static BtorOption BTOR_OPT_DEFAULT_TO_CADICAL = new BtorOption("BTOR_OPT_DEFAULT_TO_CADICAL");
+  public final static BtorOption BTOR_OPT_QUANT_MINISCOPE =
+      new BtorOption("BTOR_OPT_QUANT_MINISCOPE");
+  public final static BtorOption BTOR_OPT_DEFAULT_TO_CADICAL =
+      new BtorOption("BTOR_OPT_DEFAULT_TO_CADICAL");
   public final static BtorOption BTOR_OPT_SORT_EXP = new BtorOption("BTOR_OPT_SORT_EXP");
   public final static BtorOption BTOR_OPT_SORT_AIG = new BtorOption("BTOR_OPT_SORT_AIG");
   public final static BtorOption BTOR_OPT_SORT_AIGVEC = new BtorOption("BTOR_OPT_SORT_AIGVEC");
-  public final static BtorOption BTOR_OPT_AUTO_CLEANUP_INTERNAL = new BtorOption("BTOR_OPT_AUTO_CLEANUP_INTERNAL");
-  public final static BtorOption BTOR_OPT_SIMPLIFY_CONSTRAINTS = new BtorOption("BTOR_OPT_SIMPLIFY_CONSTRAINTS");
-  public final static BtorOption BTOR_OPT_CHK_FAILED_ASSUMPTIONS = new BtorOption("BTOR_OPT_CHK_FAILED_ASSUMPTIONS");
+  public final static BtorOption BTOR_OPT_AUTO_CLEANUP_INTERNAL =
+      new BtorOption("BTOR_OPT_AUTO_CLEANUP_INTERNAL");
+  public final static BtorOption BTOR_OPT_SIMPLIFY_CONSTRAINTS =
+      new BtorOption("BTOR_OPT_SIMPLIFY_CONSTRAINTS");
+  public final static BtorOption BTOR_OPT_CHK_FAILED_ASSUMPTIONS =
+      new BtorOption("BTOR_OPT_CHK_FAILED_ASSUMPTIONS");
   public final static BtorOption BTOR_OPT_CHK_MODEL = new BtorOption("BTOR_OPT_CHK_MODEL");
-  public final static BtorOption BTOR_OPT_CHK_UNCONSTRAINED = new BtorOption("BTOR_OPT_CHK_UNCONSTRAINED");
-  public final static BtorOption BTOR_OPT_PARSE_INTERACTIVE = new BtorOption("BTOR_OPT_PARSE_INTERACTIVE");
-  public final static BtorOption BTOR_OPT_SAT_ENGINE_LGL_FORK = new BtorOption("BTOR_OPT_SAT_ENGINE_LGL_FORK");
-  public final static BtorOption BTOR_OPT_INCREMENTAL_RW = new BtorOption("BTOR_OPT_INCREMENTAL_RW");
-  public final static BtorOption BTOR_OPT_DECLSORT_BV_WIDTH = new BtorOption("BTOR_OPT_DECLSORT_BV_WIDTH");
-  public final static BtorOption BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE = new BtorOption("BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE");
-  public final static BtorOption BTOR_OPT_QUANT_FIXSYNTH = new BtorOption("BTOR_OPT_QUANT_FIXSYNTH");
+  public final static BtorOption BTOR_OPT_CHK_UNCONSTRAINED =
+      new BtorOption("BTOR_OPT_CHK_UNCONSTRAINED");
+  public final static BtorOption BTOR_OPT_PARSE_INTERACTIVE =
+      new BtorOption("BTOR_OPT_PARSE_INTERACTIVE");
+  public final static BtorOption BTOR_OPT_SAT_ENGINE_LGL_FORK =
+      new BtorOption("BTOR_OPT_SAT_ENGINE_LGL_FORK");
+  public final static BtorOption BTOR_OPT_INCREMENTAL_RW =
+      new BtorOption("BTOR_OPT_INCREMENTAL_RW");
+  public final static BtorOption BTOR_OPT_DECLSORT_BV_WIDTH =
+      new BtorOption("BTOR_OPT_DECLSORT_BV_WIDTH");
+  public final static BtorOption BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE =
+      new BtorOption("BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE");
+  public final static BtorOption BTOR_OPT_QUANT_FIXSYNTH =
+      new BtorOption("BTOR_OPT_QUANT_FIXSYNTH");
   public final static BtorOption BTOR_OPT_NUM_OPTS = new BtorOption("BTOR_OPT_NUM_OPTS");
 
   public final int swigValue() {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
 
   public static BtorOption swigToEnum(int swigValue) {
-    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+    if (swigValue < swigValues.length
+        && swigValue >= 0
+        && swigValues[swigValue].swigValue == swigValue) {
       return swigValues[swigValue];
-    for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue)
+    }
+    for (int i = 0; i < swigValues.length; i++) {
+      if (swigValues[i].swigValue == swigValue) {
         return swigValues[i];
+      }
+    }
     throw new IllegalArgumentException("No enum " + BtorOption.class + " with value " + swigValue);
   }
 
@@ -126,16 +185,417 @@ public final class BtorOption {
   private BtorOption(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
-    swigNext = swigValue+1;
+    swigNext = swigValue + 1;
   }
 
   private BtorOption(String swigName, BtorOption swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue+1;
+    swigNext = this.swigValue + 1;
   }
 
-  private static BtorOption[] swigValues = { BTOR_OPT_MODEL_GEN, BTOR_OPT_INCREMENTAL, BTOR_OPT_INCREMENTAL_SMT1, BTOR_OPT_INPUT_FORMAT, BTOR_OPT_OUTPUT_NUMBER_FORMAT, BTOR_OPT_OUTPUT_FORMAT, BTOR_OPT_ENGINE, BTOR_OPT_SAT_ENGINE, BTOR_OPT_AUTO_CLEANUP, BTOR_OPT_PRETTY_PRINT, BTOR_OPT_EXIT_CODES, BTOR_OPT_SEED, BTOR_OPT_VERBOSITY, BTOR_OPT_LOGLEVEL, BTOR_OPT_REWRITE_LEVEL, BTOR_OPT_SKELETON_PREPROC, BTOR_OPT_ACKERMANN, BTOR_OPT_BETA_REDUCE_ALL, BTOR_OPT_ELIMINATE_SLICES, BTOR_OPT_VAR_SUBST, BTOR_OPT_UCOPT, BTOR_OPT_MERGE_LAMBDAS, BTOR_OPT_EXTRACT_LAMBDAS, BTOR_OPT_NORMALIZE, BTOR_OPT_NORMALIZE_ADD, BTOR_OPT_FUN_PREPROP, BTOR_OPT_FUN_PRESLS, BTOR_OPT_FUN_DUAL_PROP, BTOR_OPT_FUN_DUAL_PROP_QSORT, BTOR_OPT_FUN_JUST, BTOR_OPT_FUN_JUST_HEURISTIC, BTOR_OPT_FUN_LAZY_SYNTHESIZE, BTOR_OPT_FUN_EAGER_LEMMAS, BTOR_OPT_FUN_STORE_LAMBDAS, BTOR_OPT_SLS_NFLIPS, BTOR_OPT_SLS_STRATEGY, BTOR_OPT_SLS_JUST, BTOR_OPT_SLS_MOVE_GW, BTOR_OPT_SLS_MOVE_RANGE, BTOR_OPT_SLS_MOVE_SEGMENT, BTOR_OPT_SLS_MOVE_RAND_WALK, BTOR_OPT_SLS_PROB_MOVE_RAND_WALK, BTOR_OPT_SLS_MOVE_RAND_ALL, BTOR_OPT_SLS_MOVE_RAND_RANGE, BTOR_OPT_SLS_MOVE_PROP, BTOR_OPT_SLS_MOVE_PROP_N_PROP, BTOR_OPT_SLS_MOVE_PROP_N_SLS, BTOR_OPT_SLS_MOVE_PROP_FORCE_RW, BTOR_OPT_SLS_MOVE_INC_MOVE_TEST, BTOR_OPT_SLS_USE_RESTARTS, BTOR_OPT_SLS_USE_BANDIT, BTOR_OPT_PROP_NPROPS, BTOR_OPT_PROP_USE_RESTARTS, BTOR_OPT_PROP_USE_BANDIT, BTOR_OPT_PROP_PATH_SEL, BTOR_OPT_PROP_PROB_USE_INV_VALUE, BTOR_OPT_PROP_PROB_FLIP_COND, BTOR_OPT_PROP_PROB_FLIP_COND_CONST, BTOR_OPT_PROP_FLIP_COND_CONST_DELTA, BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL, BTOR_OPT_PROP_PROB_SLICE_KEEP_DC, BTOR_OPT_PROP_PROB_CONC_FLIP, BTOR_OPT_PROP_PROB_SLICE_FLIP, BTOR_OPT_PROP_PROB_EQ_FLIP, BTOR_OPT_PROP_PROB_AND_FLIP, BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT, BTOR_OPT_AIGPROP_USE_RESTARTS, BTOR_OPT_AIGPROP_USE_BANDIT, BTOR_OPT_QUANT_SYNTH, BTOR_OPT_QUANT_DUAL_SOLVER, BTOR_OPT_QUANT_SYNTH_LIMIT, BTOR_OPT_QUANT_SYNTH_QI, BTOR_OPT_QUANT_DER, BTOR_OPT_QUANT_CER, BTOR_OPT_QUANT_MINISCOPE, BTOR_OPT_DEFAULT_TO_CADICAL, BTOR_OPT_SORT_EXP, BTOR_OPT_SORT_AIG, BTOR_OPT_SORT_AIGVEC, BTOR_OPT_AUTO_CLEANUP_INTERNAL, BTOR_OPT_SIMPLIFY_CONSTRAINTS, BTOR_OPT_CHK_FAILED_ASSUMPTIONS, BTOR_OPT_CHK_MODEL, BTOR_OPT_CHK_UNCONSTRAINED, BTOR_OPT_PARSE_INTERACTIVE, BTOR_OPT_SAT_ENGINE_LGL_FORK, BTOR_OPT_INCREMENTAL_RW, BTOR_OPT_DECLSORT_BV_WIDTH, BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE, BTOR_OPT_QUANT_FIXSYNTH, BTOR_OPT_NUM_OPTS };
+  protected static BtorOption getOption(String optionString) {
+    BtorOption option;
+    switch (optionString) {
+      case "BTOR_OPT_MODEL_GEN":
+        option = BTOR_OPT_MODEL_GEN;
+        break;
+      case "BTOR_OPT_INCREMENTAL":
+        option = BTOR_OPT_INCREMENTAL;
+        break;
+      case "BTOR_OPT_INCREMENTAL_SMT1":
+        option = BTOR_OPT_INCREMENTAL_SMT1;
+        break;
+      case "BTOR_OPT_INPUT_FORMAT":
+        option =
+            BTOR_OPT_INPUT_FORMAT;
+        break;
+      case "BTOR_OPT_OUTPUT_NUMBER_FORMAT":
+        option =
+            BTOR_OPT_OUTPUT_NUMBER_FORMAT;
+        break;
+      case "BTOR_OPT_OUTPUT_FORMAT":
+        option =
+            BTOR_OPT_OUTPUT_FORMAT;
+        break;
+      case "BTOR_OPT_ENGINE":
+        option =
+            BTOR_OPT_ENGINE;
+        break;
+      case "BTOR_OPT_SAT_ENGINE":
+        option =
+            BTOR_OPT_SAT_ENGINE;
+        break;
+      case "BTOR_OPT_AUTO_CLEANUP":
+        option =
+            BTOR_OPT_AUTO_CLEANUP;
+        break;
+      case "BTOR_OPT_PRETTY_PRINT":
+        option =
+            BTOR_OPT_PRETTY_PRINT;
+        break;
+      case "BTOR_OPT_EXIT_CODES":
+        option =
+            BTOR_OPT_EXIT_CODES;
+        break;
+      case "BTOR_OPT_SEED":
+        option =
+            BTOR_OPT_SEED;
+        break;
+      case "BTOR_OPT_VERBOSITY":
+        option =
+            BTOR_OPT_VERBOSITY;
+        break;
+      case "BTOR_OPT_LOGLEVEL":
+        option =
+            BTOR_OPT_LOGLEVEL;
+        break;
+      case "BTOR_OPT_REWRITE_LEVEL":
+        option =
+            BTOR_OPT_REWRITE_LEVEL;
+        break;
+      case "BTOR_OPT_SKELETON_PREPROC":
+        option =
+            BTOR_OPT_SKELETON_PREPROC;
+        break;
+      case "BTOR_OPT_ACKERMANN":
+        option =
+            BTOR_OPT_ACKERMANN;
+        break;
+      case "BTOR_OPT_BETA_REDUCE_ALL":
+        option =
+            BTOR_OPT_BETA_REDUCE_ALL;
+        break;
+      case "BTOR_OPT_ELIMINATE_SLICES":
+        option =
+            BTOR_OPT_ELIMINATE_SLICES;
+        break;
+      case "BTOR_OPT_VAR_SUBST":
+        option =
+            BTOR_OPT_VAR_SUBST;
+        break;
+      case "BTOR_OPT_UCOPT":
+        option =
+            BTOR_OPT_UCOPT;
+        break;
+      case "BTOR_OPT_MERGE_LAMBDAS":
+        option =
+            BTOR_OPT_MERGE_LAMBDAS;
+        break;
+      case "BTOR_OPT_EXTRACT_LAMBDAS":
+        option =
+            BTOR_OPT_EXTRACT_LAMBDAS;
+        break;
+      case "BTOR_OPT_NORMALIZE":
+        option =
+            BTOR_OPT_NORMALIZE;
+        break;
+      case "BTOR_OPT_NORMALIZE_ADD":
+        option =
+            BTOR_OPT_NORMALIZE_ADD;
+        break;
+      case "BTOR_OPT_FUN_PREPROP":
+        option =
+            BTOR_OPT_FUN_PREPROP;
+        break;
+      case "BTOR_OPT_FUN_PRESLS":
+        option =
+            BTOR_OPT_FUN_PRESLS;
+        break;
+      case "BTOR_OPT_FUN_DUAL_PROP":
+        option =
+            BTOR_OPT_FUN_DUAL_PROP;
+        break;
+      case "BTOR_OPT_FUN_DUAL_PROP_QSORT":
+        option =
+            BTOR_OPT_FUN_DUAL_PROP_QSORT;
+        break;
+      case "BTOR_OPT_FUN_JUST":
+        option =
+            BTOR_OPT_FUN_JUST;
+        break;
+      case "BTOR_OPT_FUN_JUST_HEURISTIC":
+        option =
+            BTOR_OPT_FUN_JUST_HEURISTIC;
+        break;
+      case "BTOR_OPT_FUN_LAZY_SYNTHESIZE":
+        option =
+            BTOR_OPT_FUN_LAZY_SYNTHESIZE;
+        break;
+      case "BTOR_OPT_FUN_EAGER_LEMMAS":
+        option =
+            BTOR_OPT_FUN_EAGER_LEMMAS;
+        break;
+      case "BTOR_OPT_FUN_STORE_LAMBDAS":
+        option =
+            BTOR_OPT_FUN_STORE_LAMBDAS;
+        break;
+      case "BTOR_OPT_SLS_NFLIPS":
+        option =
+            BTOR_OPT_SLS_NFLIPS;
+        break;
+      case "BTOR_OPT_SLS_STRATEGY":
+        option =
+            BTOR_OPT_SLS_STRATEGY;
+        break;
+      case "BTOR_OPT_SLS_JUST":
+        option =
+            BTOR_OPT_SLS_JUST;
+        break;
+      case "BTOR_OPT_SLS_MOVE_GW":
+        option =
+            BTOR_OPT_SLS_MOVE_GW;
+        break;
+      case "BTOR_OPT_SLS_MOVE_RANGE":
+        option =
+            BTOR_OPT_SLS_MOVE_RANGE;
+        break;
+      case "BTOR_OPT_SLS_MOVE_SEGMENT":
+        option =
+            BTOR_OPT_SLS_MOVE_SEGMENT;
+        break;
+      case "BTOR_OPT_SLS_MOVE_RAND_WALK":
+        option =
+            BTOR_OPT_SLS_MOVE_RAND_WALK;
+        break;
+      case "BTOR_OPT_SLS_PROB_MOVE_RAND_WALK":
+        option =
+            BTOR_OPT_SLS_PROB_MOVE_RAND_WALK;
+        break;
+      case "BTOR_OPT_SLS_MOVE_RAND_ALL":
+        option =
+            BTOR_OPT_SLS_MOVE_RAND_ALL;
+        break;
+      case "BTOR_OPT_SLS_MOVE_RAND_RANGE":
+        option =
+            BTOR_OPT_SLS_MOVE_RAND_RANGE;
+        break;
+      case "BTOR_OPT_SLS_MOVE_PROP":
+        option =
+            BTOR_OPT_SLS_MOVE_PROP;
+        break;
+      case "BTOR_OPT_SLS_MOVE_PROP_N_PROP":
+        option =
+            BTOR_OPT_SLS_MOVE_PROP_N_PROP;
+        break;
+      case "BTOR_OPT_SLS_MOVE_PROP_N_SLS":
+        option =
+            BTOR_OPT_SLS_MOVE_PROP_N_SLS;
+        break;
+      case "BTOR_OPT_SLS_MOVE_PROP_FORCE_RW":
+        option =
+            BTOR_OPT_SLS_MOVE_PROP_FORCE_RW;
+        break;
+      case "BTOR_OPT_SLS_MOVE_INC_MOVE_TEST":
+        option =
+            BTOR_OPT_SLS_MOVE_INC_MOVE_TEST;
+        break;
+      case "BTOR_OPT_SLS_USE_RESTARTS":
+        option =
+            BTOR_OPT_SLS_USE_RESTARTS;
+        break;
+      case "BTOR_OPT_SLS_USE_BANDIT":
+        option =
+            BTOR_OPT_SLS_USE_BANDIT;
+        break;
+      case "BTOR_OPT_PROP_NPROPS":
+        option =
+            BTOR_OPT_PROP_NPROPS;
+        break;
+      case "BTOR_OPT_PROP_USE_RESTARTS":
+        option =
+            BTOR_OPT_PROP_USE_RESTARTS;
+        break;
+      case "BTOR_OPT_PROP_USE_BANDIT":
+        option =
+            BTOR_OPT_PROP_USE_BANDIT;
+        break;
+      case "BTOR_OPT_PROP_PATH_SEL":
+        option =
+            BTOR_OPT_PROP_PATH_SEL;
+        break;
+      case "BTOR_OPT_PROP_PROB_USE_INV_option":
+        option =
+            BTOR_OPT_PROP_PROB_USE_INV_VALUE;
+        break;
+      case "BTOR_OPT_PROP_PROB_FLIP_COND":
+        option =
+            BTOR_OPT_PROP_PROB_FLIP_COND;
+        break;
+      case "BTOR_OPT_PROP_PROB_FLIP_COND_CONST":
+        option =
+            BTOR_OPT_PROP_PROB_FLIP_COND_CONST;
+        break;
+      case "BTOR_OPT_PROP_FLIP_COND_CONST_DELTA":
+        option =
+            BTOR_OPT_PROP_FLIP_COND_CONST_DELTA;
+        break;
+      case "BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL":
+        option =
+            BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL;
+        break;
+      case "BTOR_OPT_PROP_PROB_SLICE_KEEP_DC":
+        option =
+            BTOR_OPT_PROP_PROB_SLICE_KEEP_DC;
+        break;
+      case "BTOR_OPT_PROP_PROB_CONC_FLIP":
+        option =
+            BTOR_OPT_PROP_PROB_CONC_FLIP;
+        break;
+      case "BTOR_OPT_PROP_PROB_SLICE_FLIP":
+        option =
+            BTOR_OPT_PROP_PROB_SLICE_FLIP;
+        break;
+      case "BTOR_OPT_PROP_PROB_EQ_FLIP":
+        option =
+            BTOR_OPT_PROP_PROB_EQ_FLIP;
+        break;
+      case "BTOR_OPT_PROP_PROB_AND_FLIP":
+        option =
+            BTOR_OPT_PROP_PROB_AND_FLIP;
+        break;
+      case "BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT":
+        option =
+            BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT;
+        break;
+      case "BTOR_OPT_AIGPROP_USE_RESTARTS":
+        option =
+            BTOR_OPT_AIGPROP_USE_RESTARTS;
+        break;
+      case "BTOR_OPT_AIGPROP_USE_BANDIT":
+        option =
+            BTOR_OPT_AIGPROP_USE_BANDIT;
+        break;
+      case "BTOR_OPT_QUANT_SYNTH":
+        option =
+            BTOR_OPT_QUANT_SYNTH;
+        break;
+      case "BTOR_OPT_QUANT_DUAL_SOLVER":
+        option =
+            BTOR_OPT_QUANT_DUAL_SOLVER;
+        break;
+      case "BTOR_OPT_QUANT_SYNTH_LIMIT":
+        option =
+            BTOR_OPT_QUANT_SYNTH_LIMIT;
+        break;
+      case "BTOR_OPT_QUANT_SYNTH_QI":
+        option =
+            BTOR_OPT_QUANT_SYNTH_QI;
+        break;
+      case "BTOR_OPT_QUANT_DER":
+        option =
+            BTOR_OPT_QUANT_DER;
+        break;
+      case "BTOR_OPT_QUANT_CER":
+        option =
+            BTOR_OPT_QUANT_CER;
+        break;
+      case "BTOR_OPT_QUANT_MINISCOPE":
+        option =
+            BTOR_OPT_QUANT_MINISCOPE;
+        break;
+      case "BTOR_OPT_DEFAULT_TO_CADICAL":
+        option =
+            BTOR_OPT_DEFAULT_TO_CADICAL;
+        break;
+      case "BTOR_OPT_SORT_EXP":
+        option =
+            BTOR_OPT_SORT_EXP;
+        break;
+      case "BTOR_OPT_SORT_AIG":
+        option =
+            BTOR_OPT_SORT_AIG;
+        break;
+      case "BTOR_OPT_SORT_AIGVEC":
+        option =
+            BTOR_OPT_SORT_AIGVEC;
+        break;
+      case "BTOR_OPT_AUTO_CLEANUP_INTERNAL":
+        option =
+            BTOR_OPT_AUTO_CLEANUP_INTERNAL;
+        break;
+      case "BTOR_OPT_SIMPLIFY_CONSTRAINTS":
+        option =
+            BTOR_OPT_SIMPLIFY_CONSTRAINTS;
+        break;
+      case "BTOR_OPT_CHK_FAILED_ASSUMPTIONS":
+        option =
+            BTOR_OPT_CHK_FAILED_ASSUMPTIONS;
+        break;
+      case "BTOR_OPT_CHK_MODEL":
+        option =
+            BTOR_OPT_CHK_MODEL;
+        break;
+      case "BTOR_OPT_CHK_UNCONSTRAINED":
+        option =
+            BTOR_OPT_CHK_UNCONSTRAINED;
+        break;
+      case "BTOR_OPT_PARSE_INTERACTIVE":
+        option =
+            BTOR_OPT_PARSE_INTERACTIVE;
+        break;
+      case "BTOR_OPT_SAT_ENGINE_LGL_FORK":
+        option =
+            BTOR_OPT_SAT_ENGINE_LGL_FORK;
+        break;
+      case "BTOR_OPT_INCREMENTAL_RW":
+        option =
+            BTOR_OPT_INCREMENTAL_RW;
+        break;
+      case "BTOR_OPT_DECLSORT_BV_WIDTH":
+        option =
+            BTOR_OPT_DECLSORT_BV_WIDTH;
+        break;
+      case "BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE":
+        option =
+            BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE;
+        break;
+      case "BTOR_OPT_QUANT_FIXSYNTH":
+        option =
+            BTOR_OPT_QUANT_FIXSYNTH;
+        break;
+      case "BTOR_OPT_NUM_OPTS":
+        option =
+            BTOR_OPT_NUM_OPTS;
+        break;
+      default:
+        option = null;
+    }
+    return option;
+  }
+
+  private static BtorOption[] swigValues =
+      {BTOR_OPT_MODEL_GEN, BTOR_OPT_INCREMENTAL, BTOR_OPT_INCREMENTAL_SMT1, BTOR_OPT_INPUT_FORMAT,
+          BTOR_OPT_OUTPUT_NUMBER_FORMAT, BTOR_OPT_OUTPUT_FORMAT, BTOR_OPT_ENGINE,
+          BTOR_OPT_SAT_ENGINE, BTOR_OPT_AUTO_CLEANUP, BTOR_OPT_PRETTY_PRINT, BTOR_OPT_EXIT_CODES,
+          BTOR_OPT_SEED, BTOR_OPT_VERBOSITY, BTOR_OPT_LOGLEVEL, BTOR_OPT_REWRITE_LEVEL,
+          BTOR_OPT_SKELETON_PREPROC, BTOR_OPT_ACKERMANN, BTOR_OPT_BETA_REDUCE_ALL,
+          BTOR_OPT_ELIMINATE_SLICES, BTOR_OPT_VAR_SUBST, BTOR_OPT_UCOPT, BTOR_OPT_MERGE_LAMBDAS,
+          BTOR_OPT_EXTRACT_LAMBDAS, BTOR_OPT_NORMALIZE, BTOR_OPT_NORMALIZE_ADD,
+          BTOR_OPT_FUN_PREPROP, BTOR_OPT_FUN_PRESLS, BTOR_OPT_FUN_DUAL_PROP,
+          BTOR_OPT_FUN_DUAL_PROP_QSORT, BTOR_OPT_FUN_JUST, BTOR_OPT_FUN_JUST_HEURISTIC,
+          BTOR_OPT_FUN_LAZY_SYNTHESIZE, BTOR_OPT_FUN_EAGER_LEMMAS, BTOR_OPT_FUN_STORE_LAMBDAS,
+          BTOR_OPT_SLS_NFLIPS, BTOR_OPT_SLS_STRATEGY, BTOR_OPT_SLS_JUST, BTOR_OPT_SLS_MOVE_GW,
+          BTOR_OPT_SLS_MOVE_RANGE, BTOR_OPT_SLS_MOVE_SEGMENT, BTOR_OPT_SLS_MOVE_RAND_WALK,
+          BTOR_OPT_SLS_PROB_MOVE_RAND_WALK, BTOR_OPT_SLS_MOVE_RAND_ALL,
+          BTOR_OPT_SLS_MOVE_RAND_RANGE, BTOR_OPT_SLS_MOVE_PROP, BTOR_OPT_SLS_MOVE_PROP_N_PROP,
+          BTOR_OPT_SLS_MOVE_PROP_N_SLS, BTOR_OPT_SLS_MOVE_PROP_FORCE_RW,
+          BTOR_OPT_SLS_MOVE_INC_MOVE_TEST, BTOR_OPT_SLS_USE_RESTARTS, BTOR_OPT_SLS_USE_BANDIT,
+          BTOR_OPT_PROP_NPROPS, BTOR_OPT_PROP_USE_RESTARTS, BTOR_OPT_PROP_USE_BANDIT,
+          BTOR_OPT_PROP_PATH_SEL, BTOR_OPT_PROP_PROB_USE_INV_VALUE, BTOR_OPT_PROP_PROB_FLIP_COND,
+          BTOR_OPT_PROP_PROB_FLIP_COND_CONST, BTOR_OPT_PROP_FLIP_COND_CONST_DELTA,
+          BTOR_OPT_PROP_FLIP_COND_CONST_NPATHSEL, BTOR_OPT_PROP_PROB_SLICE_KEEP_DC,
+          BTOR_OPT_PROP_PROB_CONC_FLIP, BTOR_OPT_PROP_PROB_SLICE_FLIP, BTOR_OPT_PROP_PROB_EQ_FLIP,
+          BTOR_OPT_PROP_PROB_AND_FLIP, BTOR_OPT_PROP_NO_MOVE_ON_CONFLICT,
+          BTOR_OPT_AIGPROP_USE_RESTARTS, BTOR_OPT_AIGPROP_USE_BANDIT, BTOR_OPT_QUANT_SYNTH,
+          BTOR_OPT_QUANT_DUAL_SOLVER, BTOR_OPT_QUANT_SYNTH_LIMIT, BTOR_OPT_QUANT_SYNTH_QI,
+          BTOR_OPT_QUANT_DER, BTOR_OPT_QUANT_CER, BTOR_OPT_QUANT_MINISCOPE,
+          BTOR_OPT_DEFAULT_TO_CADICAL, BTOR_OPT_SORT_EXP, BTOR_OPT_SORT_AIG, BTOR_OPT_SORT_AIGVEC,
+          BTOR_OPT_AUTO_CLEANUP_INTERNAL, BTOR_OPT_SIMPLIFY_CONSTRAINTS,
+          BTOR_OPT_CHK_FAILED_ASSUMPTIONS, BTOR_OPT_CHK_MODEL, BTOR_OPT_CHK_UNCONSTRAINED,
+          BTOR_OPT_PARSE_INTERACTIVE, BTOR_OPT_SAT_ENGINE_LGL_FORK, BTOR_OPT_INCREMENTAL_RW,
+          BTOR_OPT_DECLSORT_BV_WIDTH, BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE, BTOR_OPT_QUANT_FIXSYNTH,
+          BTOR_OPT_NUM_OPTS};
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

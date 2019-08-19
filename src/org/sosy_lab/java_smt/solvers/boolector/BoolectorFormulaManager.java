@@ -19,7 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import com.google.common.base.Splitter;
+import java.io.IOException;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -53,8 +56,25 @@ final class BoolectorFormulaManager
 
   @Override
   public Appender dumpFormula(Long pT) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO check if line break is correct!!!!
+    // TODO check if all nodes are parseable (should be according to API)
+    return new Appenders.AbstractAppender() {
+      @Override
+      public void appendTo(Appendable out) throws IOException {
+        String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment().getBtor(), pT);
+        // Adjust line breaks: assert needs to be on last line, so we remove all following breaks.
+        boolean needsLinebreak = true;
+        for (String part : Splitter.on('\n').split(dump)) {
+          out.append(part);
+          if (needsLinebreak && part.startsWith("(assert")) {
+            needsLinebreak = false;
+          }
+          if (needsLinebreak) {
+            out.append('\n');
+          }
+        }
+      }
+    };
   }
 
   static long getBtorTerm(Formula pT) {

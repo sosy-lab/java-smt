@@ -19,17 +19,24 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
+@Options(prefix = "solver.boolector")
 class BoolectorEnvironment {
 
   private final int randomSeed;
@@ -39,6 +46,14 @@ class BoolectorEnvironment {
   private final long btor;
 
   private final List<BoolectorAbstractProver<?>> registeredProvers = new ArrayList<>();
+
+  @Option(
+    secure = true,
+    description = "Further options for Boolector in addition to the default options. "
+        + "Format:  \"Optionname=value\" with ’,’ to seperate options. "
+        + "Optionname and value can be found in BtorOption or Boolector C Api."
+        + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
+  private String furtherOptions = "";
 
   BoolectorEnvironment(
       Configuration config,
@@ -57,16 +72,58 @@ class BoolectorEnvironment {
       System.err.println("Boolector library could not be loaded.");
     }
 
-    // Temporarily disabled till configs are available!!
-    // config.inject(this);
-
     btor = getNewBtor();
 
+    // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.swigValue(), 1);
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.swigValue(), 1);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.swigValue(), randomSeed);
 
-    // set options AFTER HERE OR HERE for btor
+    config.inject(this);
+    setOptions();
+  }
+
+  /**
+   * Tries to split the options string and set the options for boolector.
+   *
+   * @throws InvalidConfigurationException signals that the format for the options string was wrong
+   *         (most likely).
+   */
+  private void setOptions() throws InvalidConfigurationException {
+    if (furtherOptions.isEmpty()) {
+      return;
+    }
+    MapSplitter optionSplitter =
+        Splitter.on(',')
+            .trimResults()
+            .omitEmptyStrings()
+            .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
+    ImmutableMap<String, String> furtherOptionsMap;
+
+    try {
+      furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(furtherOptions));
+    } catch (IllegalArgumentException e) {
+      throw new InvalidConfigurationException(
+          "Invalid Boolector option in \"" + furtherOptions + "\": " + e.getMessage(),
+          e);
+    }
+    for (Entry<String, String> option : furtherOptionsMap.entrySet()) {
+      try {
+        BtorOption btorOption = BtorOption.getOption(option.getKey());
+        long optionValue;
+        if (btorOption == null) {
+          throw new IllegalArgumentException();
+        }
+        optionValue = Long.parseLong(option.getValue());
+        BtorJNI.boolector_set_opt(
+            btor,
+            btorOption.swigValue(),
+            optionValue);
+      } catch (IllegalArgumentException e) {
+        throw new InvalidConfigurationException(e.getMessage(), e);
+      }
+    }
   }
 
   /**
