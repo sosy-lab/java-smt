@@ -79,16 +79,19 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
         int bvTypeSize = StpJavaApi.getBVLength(pFormula);
         return FormulaType.getBitvectorTypeWithSize(bvTypeSize);
       case ARRAY_TYPE:
-        // get the index type
-        // get the element/data type
-        // use it to create new Array Type and return it
 
-        // FormulaType.getArrayType(
-        // getFormulaTypeFromTermType(indexType),
-        // getFormulaTypeFromTermType(elementType));
-        // See here:
-        // TODO https://github.com/stp/stp/issues/333
-        throw new IllegalArgumentException("//TODO implement this for array formula type ");
+        // STP always use BitVector Type
+        int arrayIndexBitWidth = StpJavaApi.getIWidth(pFormula);
+        int arrayValueBitWidth = StpJavaApi.getVWidth(pFormula);
+
+        return FormulaType.getArrayType(
+            FormulaType.getBitvectorTypeWithSize(arrayValueBitWidth),
+            FormulaType.getBitvectorTypeWithSize(arrayIndexBitWidth));
+
+      // TODO Resolve this issue https://github.com/stp/stp/issues/333
+      // STP always use a BitVector Type to recreate the type get the ValueBitWidth
+      // and IndexBitWidth of the Expr i.e getIWidth and getVWidth
+
       case UNKNOWN_TYPE:
         throw new IllegalArgumentException("Unknown formula type ");
     }
@@ -98,23 +101,29 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
 
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Expr pF) {
-    // TODO Auto-generated method stub
+    // TODO I still don't get what this function is trying to do
     // TODO implement this
     // get the Expr kind for the term
     // ...
-    return null;
+    // return null;
+    throw new UnsupportedOperationException("Not yet Implemented");
   }
 
   @Override
   public Expr callFunctionImpl(Long pDeclaration, List<Expr> pArgs) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO what is this function doing
+    // return null;
+    throw new UnsupportedOperationException("Not yet Implemented");
   }
 
   @Override
   public Long declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
-    // TODO Auto-generated method stub
-    return null;
+
+    // if pArgTypes is empty then use pReturnType an pName to create a variable
+    // else ...?!
+    // TODO Find out about UF
+    // return null;
+    throw new UnsupportedOperationException("Not yet Implemented");
   }
 
   @Override
@@ -128,5 +137,14 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
     // TODO Auto-generated method stub
     return null;
   }
+
+  /*
+   * returns true if the Formula is a value and not an expression
+   */
+  public boolean isValue() {
+    //TODO return if the KIND of Expression is not SYMBOL
+    return false;
+  }
+
 
 }

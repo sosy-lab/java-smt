@@ -12,7 +12,7 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
-include_directories(${JNI_INCLUDE_DIRS}) # add jni to includes
+include_directories(${JNI_INCLUDE_DIRS} ./include) # add jni to includes
 
 # variable setups
 set(STP_SWIG_INTERFACE StpJavaApi.i)
@@ -29,7 +29,6 @@ get_target_property(STP_FULL_PATH ${STP_EXECUTABLE} LOCATION)
 message("Full path to STP binary is ${STP_FULL_PATH}")
 
 
-
 # JAVA package
 set(CMAKE_SWIG_FLAGS -package org.sosy_lab.java_smt.solvers.stp)
 set(CMAKE_SWIG_OUTDIR "org/sosy_lab/java_smt/solvers/stp")
@@ -39,23 +38,30 @@ set(JAVA_API_DIR "build/org/sosy_lab/java_smt/solvers/stp")
 ##################### END OF SET UP and VARIABLE SETTINGS ###############
 
 # /JavaSMT/native-library-files/opensmt2/opensmt/src/api
-include_directories(${STP_INCLUDE_DIRS})
+include_directories(${STP_INCLUDE_DIRS}) # ${CMAKE_CURRENT_SOURCE_DIR}/stp/build/include/)
 
 ### USING SWIG: Build the C/C++ code into a library, accessed via our defined interface (in SWIG) 
 
 # we are using C++
-# set_property(SOURCE ${FOOBAR_SWIG_INTERFACE} PROPERTY CPLUSPLUS ON)
+# set_property(SOURCE ${STP_SWIG_INTERFACE} PROPERTY CPLUSPLUS ON)
 
 #using swig : we generate a interface to interact with the earlier created library
 swig_add_library(stpJapi SHARED
 			LANGUAGE Java
-			SOURCES ${STP_SWIG_INTERFACE}
+			SOURCES ${STP_SWIG_INTERFACE} ${CMAKE_CURRENT_SOURCE_DIR}/src/extStpSWIGapi.cpp
 		)
 
 # here we link the library and the api we  created for it together
 swig_link_libraries(stpJapi PUBLIC stp)
 
 set_property(TARGET stpJapi PROPERTY SWIG_COMPILE_OPTIONS -Wall -g)
+
+target_include_directories(stpJapi PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/
+  ${CMAKE_CURRENT_SOURCE_DIR}/stp/build/include/stp/
+)
+message("CURRENT SRC DIR IS  ====>  ${CMAKE_CURRENT_SOURCE_DIR}")
+message("STP_INCLUDE_DIRS IS  ====>  ${STP_INCLUDE_DIRS}")
 
 ### END of Build the Shared Library API
 
@@ -77,6 +83,10 @@ add_jar(
 )
 
 FILE(GLOB_RECURSE ALL_JAVA_FILES ${JAVA_API_DIR}/*.java)
+
+# target_include_directories(stpJavaAPI PUBLIC
+#   ${CMAKE_CURRENT_SOURCE_DIR}/include/>
+# )
 
 #add_jar(
 #    stpJavaAPI

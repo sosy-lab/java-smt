@@ -34,9 +34,17 @@ SO_LIB_DIR="${JAR_LIB_DIR}/native/x86_64-linux/"
 
 # echo $FILE
 echo ---
-if [! -f "$STP_LIB" ]; then
+if [! -f "$STP_LIB" ]
+ then
 	echo "I can't find the STP library file. I am making a new one ..."
-    sh clean_clone_build.sh
+    sh clean_clone_build_stp.sh
+else 
+ echo -n "To rebuild stp press 'y' "
+ read re_bld
+ if [ "$re_bld" != "${re_bld#[Yy]}" ] ;then
+	sh clean_and_build_stp.sh
+ fi
+
 fi
 
 cd ./stpJ

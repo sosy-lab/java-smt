@@ -5,13 +5,39 @@
 
 %{ // Prepocessor code
 
-#ifndef _cvcl__include__c_interface_h_
-#define _cvcl__include__c_interface_h_
-#endif
+// #ifndef _cvcl__include__c_interface_h_
+// #define _cvcl__include__c_interface_h_
+// #endif
 
 #include <stdbool.h>
 
-// #include <stp/c_interface.h>
+#include "extStpSWIGapi.h"
+
+// struct StpEnv;
+// typedef struct StpEnv StpEnv;
+// typedef void* VC;
+// typedef void* Expr;
+// typedef void* Type;
+// typedef void* WholeCounterExample;
+
+int getNumOfAsserts(VC vc);
+
+void addAssertFormula(VC vc, Expr e);
+void push(VC vc);
+void pop(VC vc);
+int checkSAT_old(VC vc);
+int checkSAT(VC vc, Expr e);
+
+//adapted CPP Interface
+StpEnv * createStpEnv(VC vc);
+void destroyStpEnv(StpEnv * env);
+int getCacheSize(StpEnv * env);
+int getSymbolsSize(StpEnv * v);
+void ext_push(StpEnv * env);
+void ext_pop(StpEnv * env);
+void ext_addFormula(StpEnv * env, Expr formula);
+void ext_checkSat(StpEnv * env);
+
 
 %}
 
@@ -129,17 +155,16 @@ void set_exprkind_t(enum exprkind_t h);
 enum exprkind_t get_exprkind_t();
 %}
 
-
 /////////////////////////////////////////////////////////////////////////////
 /// CLASS TYPES
 /////////////////////////////////////////////////////////////////////////////
 
-%{
-typedef void* VC;
-typedef void* Expr;
-typedef void* Type;
-typedef void* WholeCounterExample;
-%}
+// %{
+// typedef void* VC;
+// typedef void* Expr;
+// typedef void* Type;
+// typedef void* WholeCounterExample;
+// %}
 
 %nodefaultctor VC;
 struct VC {};
@@ -153,10 +178,11 @@ struct Type {};
 %nodefaultctor WholeCounterExample;
 struct WholeCounterExample {};
 
+%nodefaultctor StpEnv;
+struct StpEnv {};
+
 /* 
 %inline%{
-
-// typedef void* VC;
 
 // TODO: hanldle this in Java Code; Remove if confirmed. Envoronment configs
  struct Flags {
@@ -193,6 +219,39 @@ struct WholeCounterExample {};
  */
 
 %inline%{
+
+/////////////////////////////////////////////////////////////////////////////
+/// EXTENTION ATTEMPTS
+/////////////////////////////////////////////////////////////////////////////
+
+int extraFunctionSum(int a, int b);
+
+void extraSumUpto(int num);
+
+void ext_AssertFormula(VC vc, Expr e);
+
+int getNumOfAsserts(VC vc);
+
+int getSomePrinting(VC vc);
+
+char* getSomeXter(VC vc);
+
+void addAssertFormula(VC vc, Expr e);
+void push(VC vc);
+void pop(VC vc);
+int checkSAT_old(VC vc);
+
+int checkSAT(VC vc, Expr e);
+
+//CPP
+StpEnv * createStpEnv(VC vc);
+void destroyStpEnv(StpEnv * env);
+int getCacheSize(StpEnv * env);
+int getSymbolsSize(StpEnv * v);
+void ext_push(StpEnv * env);
+void ext_pop(StpEnv * env);
+void ext_addFormula(StpEnv * env, Expr formula);
+void ext_checkSat(StpEnv * env);
 
 /////////////////////////////////////////////////////////////////////////////
 /// API INITIALISATION AND CONFIG

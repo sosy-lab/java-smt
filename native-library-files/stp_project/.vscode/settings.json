@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "cstdlib": "cpp",
+        "extstpswigapi.h": "c",
+        "cassert": "cpp",
+        "iostream": "cpp"
+    }
+}

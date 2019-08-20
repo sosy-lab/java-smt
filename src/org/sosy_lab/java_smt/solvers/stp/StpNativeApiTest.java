@@ -53,6 +53,7 @@ public class StpNativeApiTest {
     StpJavaApi.vc_Destroy(stpContextVC);
   }
 
+
   @Ignore
   @Test
   public void testStpGitVersion() throws Exception {
@@ -76,35 +77,21 @@ public class StpNativeApiTest {
 
   }
 
+  @Ignore // ITS JOB IS DONE; DELETE IT
   @Test
-  public void testingSAT() {
-    int width = 8;
-
-    // Create variable "x"
-    Expr x = StpJavaApi.vc_varExpr(stpContextVC, "x", StpJavaApi.vc_bvType(stpContextVC, width));
-
-    // Create bitvector x + x
-    Expr xPlusx = StpJavaApi.vc_bvPlusExpr(stpContextVC, width, x, x); // Non-Formla can't assert
-
-    // Create bitvector constant 2
-    Expr two = StpJavaApi.vc_bvConstExprFromInt(stpContextVC, width, 20);
-
-    // Create bitvector 2*x
-    Expr xTimes2 = StpJavaApi.vc_bvMultExpr(stpContextVC, width, two, x); // Non-Formla can't assert
-
-    // Create bool expression x + x = 2*x
-    Expr equality = StpJavaApi.vc_eqExpr(stpContextVC, xPlusx, xTimes2);
-
-    StpJavaApi.vc_assertFormula(stpContextVC, StpJavaApi.vc_trueExpr(stpContextVC));
-    StpJavaApi.vc_assertFormula(stpContextVC, equality);
-
-    // Print the assertions
-    System.out.println("Assertions:\n");
-    StpJavaApi.vc_printAsserts(stpContextVC, 0);
-    // System.out.println("Query:\n");
-    // StpJavaApi.vc_printQuery(stpContextVC);
+  public void extendedFunctions() {
+    // int result = StpJavaApi.extraFunctionSum(100, 50);
+    Expr expr = StpJavaApi.vc_trueExpr(stpContextVC);
+    String result = StpJavaApi.getType(expr).name();
+    System.out.println("result is " + result);
+    StpJavaApi.extraSumUpto(10);
+    System.out.println("Number of Assertion " + StpJavaApi.getNumOfAsserts(stpContextVC) + "\n");
+    StpJavaApi.getSomePrinting(stpContextVC);
+    System.out.println("GOOD MORALS: " + StpJavaApi.getSomeXter(stpContextVC) + "\n");
 
   }
+
+
 
   @Ignore
   @Test

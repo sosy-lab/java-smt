@@ -21,7 +21,8 @@ package org.sosy_lab.java_smt.solvers.stp;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -41,6 +42,8 @@ public class StpSolverTest {
   private ShutdownNotifier shutdownNotifier;
   private Solvers solver;
 
+  private SolverContext context = null;
+
   public StpSolverTest() throws InvalidConfigurationException {
     config = Configuration.defaultConfiguration();
     logger = BasicLogManager.create(config);
@@ -49,45 +52,37 @@ public class StpSolverTest {
     solver = Solvers.STP;
   }
 
-  @Ignore
-  @Test
-  public void testSolverContextClass() throws InvalidConfigurationException {
-
-    SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver);
-
-    System.out.println(context.getSolverName() + " ::: " + context.getVersion());
-    context.close();
-
+  @Before
+  public void createSolverContext() throws InvalidConfigurationException {
+    context = SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver);
   }
 
+  @After
+  public void closeSolverContext() {
+    context.close();
+  }
 
   // USING THE CONTEXT:
   // test create bool variable
 
   @Test
-  public void createBooleanVariablesAndcheckEquivalence() throws InvalidConfigurationException {
-    try (SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver)) {
+  public void createBooleanVariablesAndcheckEquivalence() {
 
-      BooleanFormulaManager boolFMgr = context.getFormulaManager().getBooleanFormulaManager();
+    BooleanFormulaManager boolFmgr = context.getFormulaManager().getBooleanFormulaManager();
 
-      // BooleanFormula falseVar = boolFMgr.makeVariable("falseVar");
-      // BooleanFormula trueVar = boolFMgr.equivalence(falseVar, boolFMgr.makeBoolean(false));
+    BooleanFormula p = boolFmgr.makeVariable("p");
+    BooleanFormula q = boolFmgr.makeVariable("q");
 
-      // these would raise a nasty
-      // assertTrue(boolFMgr.isFalse(falseVar));
-      // assertTrue(boolFMgr.isTrue(trueVar));
+    BooleanFormula trueValue = boolFmgr.makeTrue();
+    BooleanFormula falseValue = boolFmgr.makeBoolean(false);
 
-      // test boolean constants
-      BooleanFormula falseValue = boolFMgr.makeFalse();
-      BooleanFormula trueValue = boolFMgr.makeBoolean(true);
+    // these would raise a nasty exception because these are not Values
+    // assertTrue(boolFMgr.isFalse(falseVar));
+    // assertTrue(boolFMgr.isTrue(trueVar));
 
+    assertTrue(boolFmgr.isTrue(trueValue));
+    assertTrue(boolFmgr.isFalse(falseValue));
 
-      assertTrue(boolFMgr.isTrue(trueValue));
-      assertTrue(boolFMgr.isFalse(falseValue));
-
-    }
   }
 
   // test create BV variable

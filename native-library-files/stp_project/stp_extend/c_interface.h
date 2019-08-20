@@ -84,6 +84,28 @@ typedef void* Type;
 typedef void* WholeCounterExample;
 #endif
 
+////////////////////   EXTENSION  ////////////
+
+void addAssertFormula(VC vc, Expr e);
+void push(VC vc);
+void pop(VC vc);
+int checkSAT_old(VC vc);
+int checkSAT(VC vc, Expr e);
+
+//adapted CPP Interface
+struct StpEnv;
+typedef struct StpEnv StpEnv;
+StpEnv * createStpEnv(VC vc);
+void destroyStpEnv(StpEnv * env);
+int getCacheSize(StpEnv * env);
+int getSymbolsSize(StpEnv * v);
+void ext_push(StpEnv * env);
+void ext_pop(StpEnv * env);
+void ext_addFormula(StpEnv * env, Expr formula);
+void ext_checkSat(StpEnv * env);
+
+////////////////////  END OF EXTENSION  ////////////
+
 /////////////////////////////////////////////////////////////////////////////
 /// START API
 /////////////////////////////////////////////////////////////////////////////

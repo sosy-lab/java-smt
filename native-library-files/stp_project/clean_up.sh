@@ -12,6 +12,9 @@ set -e
 # the built STP library should have been copied out 
 [ -d "./stpJ/build" ] && rm -rf ./stpJ/build ||:
 
+DESTN_DIR=$PWD/stpJ/install_include
+[ ! -f "$DESTN_DIR" ] && rm -rf "$DESTN_DIR"/* ||:
+
 #remove cryptominisat repo
 [ -d "./dependencies/cryptominisat" ] && rm -rf ./dependencies/cryptominisat ||:
 
