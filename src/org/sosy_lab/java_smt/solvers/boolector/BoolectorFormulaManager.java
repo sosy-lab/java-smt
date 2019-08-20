@@ -35,6 +35,7 @@ final class BoolectorFormulaManager
       BoolectorUFManager pFunctionManager,
       BoolectorBooleanFormulaManager pBooleanManager,
       BoolectorBitvectorFormulaManager pBitvectorManager,
+      BoolectorQuantifiedFormulaManager pQuantifierManager,
       BoolectorArrayFormulaManager pArrayManager) {
     super(
         pFormulaCreator,
@@ -44,7 +45,7 @@ final class BoolectorFormulaManager
         null,
         pBitvectorManager,
         null,
-        null,
+        pQuantifierManager,
         pArrayManager);
   }
 

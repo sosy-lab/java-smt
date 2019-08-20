@@ -8,6 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.boolector;
 
+/**
+ * Native code for Boolector methods.
+ */
 class BtorJNI {
 
   protected final static native int BOOLECTOR_PARSE_ERROR_get();
