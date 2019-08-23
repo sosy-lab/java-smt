@@ -19,9 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import com.google.common.collect.Collections2;
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public final class StpFormulaManager
@@ -47,8 +50,17 @@ public final class StpFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    // TODO Auto-generated method stub
-    return null;
+    Expr expr = StpJavaApi.vc_parseExpr(getEnvironment(), pS);
+    return getFormulaCreator().encapsulateBoolean(expr);
+  }
+
+  static Expr getStpTerm(Formula pT) {
+    return ((StpFormula) pT).getTerm();
+  }
+
+  static Expr[] getStpTerm(Collection<? extends Formula> pFormulas) {
+
+    return Collections2.transform(pFormulas, StpFormulaManager::getStpTerm).toArray(new Expr[0]);
   }
 
   @Override

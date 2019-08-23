@@ -21,12 +21,19 @@ package org.sosy_lab.java_smt.solvers.stp;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.Arrays;
 import java.util.List;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.stp.StpFormula.StpArrayFormula;
+import org.sosy_lab.java_smt.solvers.stp.StpFormula.StpBitvectorFormula;
+import org.sosy_lab.java_smt.solvers.stp.StpFormula.StpBooleanFormula;
 
 public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
 
@@ -139,12 +146,88 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
   }
 
   /*
-   * returns true if the Formula is a value and not an expression
+   * returns true if the Formula is a named variable and not an expression
    */
-  public boolean isValue() {
-    //TODO return if the KIND of Expression is not SYMBOL
-    return false;
+  public boolean isVariable(Expr expr) {
+    exprkind_t kind = StpJavaApi.getExprKind(expr);
+    return !kind.equals(exprkind_t.SYMBOL);
   }
 
+  @Override
+  protected Expr extractInfo(Formula pT) {
+    return StpFormulaManager.getStpTerm(pT);
+  }
+
+  @Override
+  protected List<Expr> extractInfo(List<? extends Formula> pInput) {
+    return Arrays.asList(StpFormulaManager.getStpTerm(pInput));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  protected <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+
+    Expr term = extractInfo(pFormula);
+    return (FormulaType<T>) getFormulaType(term);
+
+    // VC vc = getEnv();
+    // if (pFormula instanceof BitvectorFormula) {
+    // long type = msat_term_get_type(extractInfo(pFormula));
+    // checkArgument(
+    // msat_is_bv_type(env, type),
+    // "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
+    // return (FormulaType<T>)
+    // FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
+    //
+    // } else if (pFormula instanceof FloatingPointFormula) {
+    // long type = msat_term_get_type(extractInfo(pFormula));
+    // checkArgument(
+    // msat_is_fp_type(env, type),
+    // "FloatingPointFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
+    // return (FormulaType<T>)
+    // FormulaType.getFloatingPointType(
+    // msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
+    // } else if (pFormula instanceof ArrayFormula<?, ?>) {
+    // FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+    // FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
+    // return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    // }
+    // return super.getFormulaType(pFormula);
+
+  }
+
+  @Override
+  public BooleanFormula encapsulateBoolean(Expr pTerm) {
+    assert getFormulaType(pTerm).isBooleanType();
+    return new StpBooleanFormula(pTerm);
+  }
+
+  @Override
+  protected BitvectorFormula encapsulateBitvector(Expr pTerm) {
+    assert getFormulaType(pTerm).isBitvectorType();
+    return new StpBitvectorFormula(pTerm);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE>
+      encapsulateArray(Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
+    return new StpArrayFormula<>(pTerm, pIndexType, pElementType);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI>
+      getArrayFormulaIndexType(ArrayFormula<TI, TE> pArray) {
+
+    return ((StpArrayFormula<TI, TE>) pArray).getIndexType();
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE>
+      getArrayFormulaElementType(ArrayFormula<TI, TE> pArray) {
+
+    return ((StpArrayFormula<TI, TE>) pArray).getElementType();
+  }
 
 }

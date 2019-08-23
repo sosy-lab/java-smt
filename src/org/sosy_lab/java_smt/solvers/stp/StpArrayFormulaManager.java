@@ -60,10 +60,10 @@ class StpArrayFormulaManager
   @Override
   protected <TI extends Formula, TE extends Formula> Expr
       internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
+
+    ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
-    final Type stpArrayType = toSolverType(arrayFormulaType);
-    assert "ARRAY".equals(StpJavaApi.typeString(stpArrayType));
+    Type stpArrayType = toSolverType(arrayFormulaType);
 
     return getFormulaCreator().makeVariable(stpArrayType, pName);
   }

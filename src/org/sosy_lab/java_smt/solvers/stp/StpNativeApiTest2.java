@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -60,6 +62,8 @@ public class StpNativeApiTest2 {
   Expr notx1, notx2, notx3;
   Expr x1ORnotx2, notx1ORx2;
 
+  ////// VARIABLE CREATION TESTS /////////////////////
+
   @Test
   public void createBVvariables() {
     // Create variable "x"
@@ -68,6 +72,33 @@ public class StpNativeApiTest2 {
     // Create bitvector constant 2
     two = StpJavaApi.vc_bvConstExprFromInt(stpContextVC, width, 2);
     twenty = StpJavaApi.vc_bvConstExprFromInt(stpContextVC, width, 20);
+  }
+
+  @Test
+  public void createBOOLvariables() {
+    x1 = StpJavaApi.vc_varExpr(stpContextVC, "x1", StpJavaApi.vc_boolType(stpContextVC));
+    x2 = StpJavaApi.vc_varExpr(stpContextVC, "x2", StpJavaApi.vc_boolType(stpContextVC));
+    x3 = StpJavaApi.vc_varExpr(stpContextVC, "x3", StpJavaApi.vc_boolType(stpContextVC));
+  }
+
+  @Test
+  public void createARRAYvariables() {
+    // x1 = StpJavaApi.vc_varExpr(stpContextVC, "x1", StpJavaApi.vc_boolType(stpContextVC));
+    // x2 = StpJavaApi.vc_varExpr(stpContextVC, "x2", StpJavaApi.vc_boolType(stpContextVC));
+    // x3 = StpJavaApi.vc_varExpr(stpContextVC, "x3", StpJavaApi.vc_boolType(stpContextVC));
+  }
+
+  @Test
+  public void getTypesofVariables() {
+    createBVvariables();
+    createBOOLvariables();
+
+    assertEquals(type_t.BOOLEAN_TYPE, StpJavaApi.getType(x1));
+    assertEquals(type_t.BOOLEAN_TYPE, StpJavaApi.getType(x2));
+    assertEquals(type_t.BOOLEAN_TYPE, StpJavaApi.getType(x3));
+    assertEquals(type_t.BITVECTOR_TYPE, StpJavaApi.getType(bv_x));
+    assertEquals(type_t.BITVECTOR_TYPE, StpJavaApi.getType(two));
+    assertEquals(type_t.BITVECTOR_TYPE, StpJavaApi.getType(twenty));
 
   }
 
@@ -90,14 +121,6 @@ public class StpNativeApiTest2 {
 
     bv_non_equality = StpJavaApi.vc_notExpr(stpContextVC, bv_equality2);
 
-  }
-
-  @Test
-  public void createBOOLvariables() {
-    // Create variable "x"
-    x1 = StpJavaApi.vc_varExpr(stpContextVC, "x1", StpJavaApi.vc_boolType(stpContextVC));
-    x2 = StpJavaApi.vc_varExpr(stpContextVC, "x2", StpJavaApi.vc_boolType(stpContextVC));
-    x3 = StpJavaApi.vc_varExpr(stpContextVC, "x3", StpJavaApi.vc_boolType(stpContextVC));
   }
 
   @Test

@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 @Immutable
-public abstract class StpFormula implements Formula {
+abstract class StpFormula implements Formula {
 
   private final Expr stpTerm;
 
