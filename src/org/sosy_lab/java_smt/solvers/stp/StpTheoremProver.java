@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
+import com.google.common.base.Preconditions;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -38,9 +39,9 @@ class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironm
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    // TODO Auto-generated method stub
-    // It seems the only option is to implement the stack
-    // and hence make pop and push work with it
+    Preconditions.checkState(!closed);
+
+    StpJavaApi.addAssertFormula(currVC, StpFormulaManager.getStpTerm(pConstraint));
     return null;
   }
 

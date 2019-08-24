@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.stp;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
@@ -40,7 +41,10 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public class TestStpSolver {
 
@@ -73,6 +77,7 @@ public class TestStpSolver {
    logger = BasicLogManager.create(config);
    shutdownNotifier = ShutdownNotifier.createDummy();
     solver = Solvers.STP;
+    // solver = Solvers.MATHSAT5;
 
    context = SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver);
    }
@@ -138,8 +143,8 @@ public class TestStpSolver {
     BitvectorType elementType32 = FormulaType.getBitvectorTypeWithSize(32);
 
     // Same bit size is expected by javaSMT otherwise you get "expected Array by got Array"
-    arrayOfBV8 = arrayFmgr.makeArray("array1", indexType8, elementType8);
-    arrayOfBV32 = arrayFmgr.makeArray("hhs", indexType32, elementType32);
+    arrayOfBV8 = arrayFmgr.makeArray("array_8", indexType8, elementType8);
+    arrayOfBV32 = arrayFmgr.makeArray("array_32", indexType32, elementType32);
 
     assertTrue(context.getFormulaManager().getFormulaType(arrayOfBV8).isArrayType());
     assertTrue(context.getFormulaManager().getFormulaType(arrayOfBV32).isArrayType());
@@ -170,40 +175,115 @@ public class TestStpSolver {
     BitvectorFormulaManager bvFmgr = context.getFormulaManager().getBitvectorFormulaManager();
     createBitVectorVariables();
 
-    // x + x
-    BitvectorFormula xPlusx = bvFmgr.add(x, x);
+    BitvectorFormula twoPlusTwo = bvFmgr.add(two, two);
+    BitvectorFormula four = bvFmgr.makeBitvector(4, 4);
 
-    // x + y
-    BitvectorFormula xPlusy = bvFmgr.add(x, y);
+    // BooleanFormula equalityOf4 = bvFmgr.equal(twoPlusTwo, four);
+    // BooleanFormula unEqualityOf4 = bvFmgr.equal(twoPlusTwo, twenty);
 
-    // 2*x
-    BitvectorFormula xTimes2 = bvFmgr.multiply(x, two);
+    // System.out.println("\"twoPlusTwo\" gives: " + twoPlusTwo.toString());
+    // System.out.println("\"four \" gives: " + four.toString());
 
-    // x + x = 2*x
-    BooleanFormula equality = bvFmgr.equal(xPlusx, xTimes2);
-
-    // x + x = 2
-    BooleanFormula badEquality = bvFmgr.equal(xPlusx, two);
-
-    System.out.println("x gives: " + x.toString());
-    System.out.println("y gives: " + y.toString());
-    System.out.println("two gives: " + two.toString());
-    System.out.println("twenty gives: " + twenty.toString());
-
-    System.out.println("xPlusx gives: " + xPlusx.toString());
-    System.out.println("xPlusy gives: " + xPlusy.toString());
-    System.out.println("xTimes2 gives: " + xTimes2.toString());
-
-    System.out.println("equality gives: " + equality.toString());
-    System.out.println("badEquality gives: " + badEquality.toString());
+    // // x + x
+    // BitvectorFormula xPlusx = bvFmgr.add(x, x);
+    // // x + y
+    // BitvectorFormula xPlusy = bvFmgr.add(x, y);
+    // // 2*x
+    // BitvectorFormula xTimes2 = bvFmgr.multiply(x, two);
+    // // x + x = 2*x
+    // BooleanFormula equality = bvFmgr.equal(xPlusx, xTimes2);
+    // // x + x = 2
+    // BooleanFormula badEquality = bvFmgr.equal(xPlusx, two);
+    //
+    // System.out.println("x gives: " + x.toString());
+    // System.out.println("y gives: " + y.toString());
+    // System.out.println("two gives: " + two.toString());
+    // System.out.println("twenty gives: " + twenty.toString());
+    //
+    // System.out.println("xPlusx gives: " + xPlusx.toString());
+    // System.out.println("xPlusy gives: " + xPlusy.toString());
+    // System.out.println("xTimes2 gives: " + xTimes2.toString());
+    //
+    // System.out.println("equality gives: " + equality.toString());
+    // System.out.println("badEquality gives: " + badEquality.toString());
 
   }
 
-  // test simple formulae (Bool, BV, Array)
+  @Test
+  public void BitVectorFormulaHashCode() {
+    BitvectorFormulaManager bvFmgr = context.getFormulaManager().getBitvectorFormulaManager();
+    createBitVectorVariables();
 
-  // test toString() on formulae (Bool, BV, Array)
+    BitvectorFormula anotherTwo = bvFmgr.makeBitvector(8, 2);
+    BitvectorFormula four = bvFmgr.makeBitvector(8, 4);
+    BitvectorFormula anotherFour = bvFmgr.makeBitvector(8, 4);
 
-  // test HashCode on formulae (Bool, BV, Array)
+    assertEquals(two.toString(), anotherTwo.toString());
+    assertEquals(four.toString(), anotherFour.toString());
+    assertFalse("anotherTwo and two are the same objects", anotherTwo.equals(two));
+    assertFalse("anotherFour and four are the same objects", anotherFour.equals(four));
+  }
+
+  // @Ignore
+  // @Test
+  public void ArraySimpleFormulaAndToString() {
+    ArrayFormulaManager arrayFmgr = context.getFormulaManager().getArrayFormulaManager();
+    BitvectorFormulaManager bvFmgr = context.getFormulaManager().getBitvectorFormulaManager();
+
+    createArrayVariables();
+    createBitVectorVariables();
+
+    BitvectorFormula one = bvFmgr.makeBitvector(8, 1);
+    BitvectorFormula three = bvFmgr.makeBitvector(8, 3);
+    BitvectorFormula four = bvFmgr.makeBitvector(8, 4);
+
+    // arrayOfBV32
+
+    arrayFmgr.store(arrayOfBV8, zero, four);// TODO fix Error
+    arrayFmgr.store(arrayOfBV8, one, three);// TODO fix Error
+
+    System.out.println("arrayOfBV8 : " + arrayOfBV8.toString());
+    // assertEquals("p", p.toString().trim());
+    // assertEquals("q", q.toString().trim());
+    // assertEquals(boolFmgr.not(pAndNotq).toString(), notOf_pAndNotq.toString());
+
+    // System.out.println("p gives: " + p.toString());
+    // System.out.println("q gives: " + q.toString());
+    // System.out.println("pAndNotq gives: " + pAndNotq.toString());
+
+  }
+
+  @Test
+  public void ProofBooleanFormula() throws InterruptedException, SolverException {
+    BooleanFormulaManager boolFmgr = context.getFormulaManager().getBooleanFormulaManager();
+
+    // create atoms
+    BooleanFormula xL = boolFmgr.makeVariable("xL");
+    BooleanFormula xH = boolFmgr.makeVariable("xH");
+    BooleanFormula yL = boolFmgr.makeVariable("yL");
+    BooleanFormula yH = boolFmgr.makeVariable("yH");
+
+    // create formula
+    BooleanFormula lowXOR = boolFmgr.xor(xL, yL);
+    BooleanFormula highXOR = boolFmgr.xor(xH, yH);
+    BooleanFormula twoBitAdder = boolFmgr.and(lowXOR, highXOR); // Formula to solve
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+      boolean isUnsat;
+
+      prover.push();
+      prover.addConstraint(twoBitAdder);
+      prover.push();
+
+      isUnsat = prover.isUnsat();
+      assert !isUnsat;
+      // try (Model model = prover.getModel()) {
+      System.out.println("SAT : 2-bit Adder ");
+      // }
+    }
+
+  }
 
   // test getModel on formulae (Bool, BV, Array)
 

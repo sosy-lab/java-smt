@@ -39,6 +39,7 @@ public final class StpSolverContext extends AbstractSolverContext {
   // private StpFormulaManager manager;
   private final StpFormulaCreator formulaCreator;
   private final LogManager logger;
+  private final ShutdownNotifier shutdownNotifier;
 
   // Context is Validity Checker (VC) in STP
   // private final StpVC stpContext;
@@ -57,12 +58,13 @@ public final class StpSolverContext extends AbstractSolverContext {
   private StpSolverContext(
       StpFormulaManager pFormulaMgr,
       StpFormulaCreator pFormulaCreator,
-      LogManager pLogger) {
+      LogManager pLogger,
+      ShutdownNotifier pShutdownNotifier) {
     super(pFormulaMgr);
 
     this.formulaCreator = pFormulaCreator;
     this.logger = pLogger;
-
+    this.shutdownNotifier = pShutdownNotifier;
   }
 
   public static StpSolverContext create(
@@ -102,7 +104,7 @@ public final class StpSolverContext extends AbstractSolverContext {
             arrayFrmMgr);
 
     //Create the SolverContext with the FormulaCreator and main FormulaManager Objects
-    return new StpSolverContext(formulaMgr, formulaCreator, logger);
+    return new StpSolverContext(formulaMgr, formulaCreator, logger, shutdownNotifier);
   }
 
   public StpFormulaCreator getFormulaCreator() {
@@ -129,9 +131,7 @@ public final class StpSolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> proverOptions) {
-    // TODO stub
-    // return new StpTheoremProver(this, shutdownNotifier, creator, proverOptions);
-    throw new UnsupportedOperationException("ProverEnvironment is not implemented yet");
+    return new StpTheoremProver(this, shutdownNotifier, formulaCreator, proverOptions);
   }
 
   @Override

@@ -66,23 +66,30 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  public boolean isUnsat() {
     // TODO update to use vc_query_with_timeout
 
     // To go this route I will have to implement the Stack for the "Constraints" ?!
 
-//    Preconditions.checkState(!closed);
-//    int result = StpJavaApi.vc_query(curVC, queryExpr)
-//    if (result == 0) {
-//      return true;
-//    } else if (result == 1){
-//      return false;
-//    }  else if (result == 2) {
-//      throw new Exception("An error occured in STP during validation");
-//    }
-//    throw new Exception("An error occured in STP during validation");
+    Preconditions.checkState(!closed);
+    int result = StpJavaApi.checkSAT_old(currVC);
+    try {
+      if (result == 0) {
+        return true;
+      } else if (result == 1) {
+        return false;
+      } else if (result == 2) {
+        throw new Exception("An error occured in STP during validation");
+      }
 
-    throw new SolverException("NOT MPLEMENTED");
+      throw new Exception("An error occured in STP during validation");
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return false;
+
+    // throw new SolverException("NOT MPLEMENTED");
   }
 
   @Override
