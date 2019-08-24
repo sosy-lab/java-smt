@@ -253,6 +253,7 @@ public class TestStpSolver {
 
   }
 
+
   @Test
   public void ProofBooleanFormula() throws InterruptedException, SolverException {
     BooleanFormulaManager boolFmgr = context.getFormulaManager().getBooleanFormulaManager();
@@ -268,8 +269,8 @@ public class TestStpSolver {
     BooleanFormula highXOR = boolFmgr.xor(xH, yH);
     BooleanFormula twoBitAdder = boolFmgr.and(lowXOR, highXOR); // Formula to solve
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-
+//    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
       boolean isUnsat;
 
       prover.push();
@@ -281,8 +282,8 @@ public class TestStpSolver {
       // try (Model model = prover.getModel()) {
       System.out.println("SAT : 2-bit Adder ");
       // }
-    }
-
+//    }
+    // prover.close();
   }
 
   // test getModel on formulae (Bool, BV, Array)

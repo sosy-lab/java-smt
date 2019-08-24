@@ -45,4 +45,10 @@ class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironm
     return null;
   }
 
+  @Override
+  public void push() {
+    Preconditions.checkState(!closed);
+    StpJavaApi.vc_push(currVC);
+  }
+
 }

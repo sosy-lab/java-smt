@@ -60,13 +60,7 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    StpJavaApi.vc_push(currVC);
-  }
-
-  @Override
-  public boolean isUnsat() {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     // TODO update to use vc_query_with_timeout
 
     // To go this route I will have to implement the Stack for the "Constraints" ?!
@@ -96,7 +90,8 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     // TODO Auto-generated method stub
-    return false;
+    // return false;
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
@@ -125,7 +120,9 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
     // TODO Auto-generated method stub
 
     // I don't understand this model stuff.
-    return null;
+    // return null;
+
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 
   @Override
