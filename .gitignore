@@ -1,3 +1,8 @@
+
+./native-library-files/opensmt2/opensmt
+./native-library-files/opensmt2/opensmtJ/build
+./native-library-files/opensmt2/opensmtJ/install_include
+
 apt-cyg
 .idea/
 

@@ -10,10 +10,10 @@ set -u
 # ./build/src/bin/CMakeFiles/exec.dir/opensmt.C.o
 # ./build/src/api/libopensmt2.so
 
-# Open_SMT_LIB="$(pwd)"/opensmt/build/src/api/libopensmt2.so
-# Open_SMT_LIB=./opensmt/build/src/api/libopensmt2.so
+# OPENSMT2_LIB="$(pwd)"/opensmt/build/src/api/libopensmt2.so
+# OPENSMT2_LIB=./opensmt/build/src/api/libopensmt2.so
 
-Open_SMT_LIB=./opensmt/build/src/api/libopensmt2.so
+OPENSMT2_LIB=./opensmt/build/src/api/libopensmt2.so
 
 PRJ_DIR="${PWD%/*/*}"
 PRJ_NAME=$(basename "$PRJ_DIR")
@@ -34,10 +34,10 @@ JAR_LIB_DIR="${PRJ_DIR}/lib/"
 SO_LIB_DIR="${JAR_LIB_DIR}/native/x86_64-linux/"
 
 
-# echo $Open_SMT_LIB
+# echo $OPENSMT2_LIB
 
 echo ---
-if [! -f "$STP_LIB" ]
+if [! -f "$OPENSMT2_LIB" ]
  then
 	echo "I can't find the opensmt library file. I am making a new one ..."
     sh clean_clone_build.sh
@@ -50,8 +50,8 @@ else
 
 fi
 
-cp $Open_SMT_LIB ./opensmt2J/lib/
-echo "opensmt library file now copied to ./opensmt2J/lib/ for convinience"
+# cp $OPENSMT2_LIB ./opensmtJ/lib/
+# echo "opensmt library file now copied to ./opensmtJ/lib/ for convinience"
 
 # create or locate the SWIG interface to this project
 # cmake build a new API linking :
@@ -59,7 +59,7 @@ echo "opensmt library file now copied to ./opensmt2J/lib/ for convinience"
 	#- project .so
 	#- source file referenced in the SWIG interface (if any)
 
-cd ./opensmt2J
+cd ./opensmtJ
 [ ! -f ./build ] && mkdir ./build || rm -rf ./build/* ||:
 
 cd ./build
@@ -82,7 +82,7 @@ echo "copying library files into JavaSMT (old files are overwritten) ... ...."
 # cp ./opensmt2JavaAPI.jar /home/lubuntu/SAHEED/gsoc/CODE/java-smt/lib/
 # cp ./libopensmt2api.so /home/lubuntu/SAHEED/gsoc/CODE/java-smt/lib/native/x86_64-linux/
 
-cp ./stpJavaAPI.jar $JAR_LIB_DIR
-cp ./libstpJapi.so $SO_LIB_DIR
+cp ./opensmt2JavaAPI.jar $JAR_LIB_DIR
+cp ./libopensmt2Japi.so $SO_LIB_DIR
 
 echo "SUCCESS"
