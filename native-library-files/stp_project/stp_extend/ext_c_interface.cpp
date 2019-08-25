@@ -147,5 +147,32 @@ void getSTPenv(VC vc)
     ptr->checkSat(assertions);
   }
 
+  const char * getAllModel(VC vc)
+  {
+    stp::STP* stp_i = (stp::STP*)vc;
+    stp::STPMgr* bm = stp_i->bm;
+
+    // if (!bm->UserFlags.construct_counterexample_flag)
+    // {
+    //   // unsupported
+    //   return;
+    // }
+
+    // if (cache.size() ==0 || (cache.back().result != SOLVER_SATISFIABLE))
+    // {
+    //   return;
+    // }
+
+    stp::AbsRefine_CounterExample* Ctr_Example =
+      (stp::AbsRefine_CounterExample*)(stp_i->Ctr_Example);
+
+    std::ostringstream outputStream;
+    outputStream << "(model" << std::endl;
+    Ctr_Example->PrintFullCounterExampleSMTLIB2(outputStream);    
+    outputStream << ")" << std::endl;
+
+    std::string returnStr = outputStream.str();
+    return returnStr.c_str();
+  }
 
 // }

@@ -43,7 +43,8 @@ public final class StpSolverContext extends AbstractSolverContext {
 
   // Context is Validity Checker (VC) in STP
   // private final StpVC stpContext;
-  private final static VC vcStpContext;
+  private static final VC vcStpContext;
+
   static {
     // load the shared library
     try {
@@ -52,7 +53,6 @@ public final class StpSolverContext extends AbstractSolverContext {
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Cannot find at the STP native library", e);
     }
-
   }
 
   private StpSolverContext(
@@ -68,12 +68,11 @@ public final class StpSolverContext extends AbstractSolverContext {
   }
 
   public static StpSolverContext create(
-                                         Configuration config,
-                                         LogManager logger,
-                                         ShutdownNotifier shutdownNotifier,
-                                         @Nullable PathCounterTemplate stpLogfile,
-                                         long randomSeed)
-  {
+      Configuration config,
+      LogManager logger,
+      ShutdownNotifier shutdownNotifier,
+      @Nullable PathCounterTemplate stpLogfile,
+      long randomSeed) {
     //
     // //load the shared library
     // try {
@@ -82,28 +81,24 @@ public final class StpSolverContext extends AbstractSolverContext {
     // throw new AssumptionViolatedException("Cannot find at the STP native library", e);
     // }
 
-    //Create or setup the 'environment' with supplied parameters and other java-smt defaults
+    // Create or setup the 'environment' with supplied parameters and other java-smt defaults
     // vcStpContext // this is the 'env'
 
     // use the 'environment' to create a FormulaCreator object
     StpFormulaCreator formulaCreator = new StpFormulaCreator(vcStpContext);
 
-    //use the FormulaCreator object to create FormulaManager object for all supported Theories
+    // use the FormulaCreator object to create FormulaManager object for all supported Theories
     StpBooleanFormulaManager booleanFrmMgr = new StpBooleanFormulaManager(formulaCreator);
     StpUFManager functionFrmMgr = new StpUFManager(formulaCreator);
     StpArrayFormulaManager arrayFrmMgr = new StpArrayFormulaManager(formulaCreator);
     StpBitvectorFormulaManager bitvectorFrmMgr = new StpBitvectorFormulaManager(formulaCreator);
 
-    //Create the main FormulaManager to manage all supported Formula types
+    // Create the main FormulaManager to manage all supported Formula types
     StpFormulaManager formulaMgr =
         new StpFormulaManager(
-            formulaCreator,
-            functionFrmMgr,
-            booleanFrmMgr,
-            bitvectorFrmMgr,
-            arrayFrmMgr);
+            formulaCreator, functionFrmMgr, booleanFrmMgr, bitvectorFrmMgr, arrayFrmMgr);
 
-    //Create the SolverContext with the FormulaCreator and main FormulaManager Objects
+    // Create the SolverContext with the FormulaCreator and main FormulaManager Objects
     return new StpSolverContext(formulaMgr, formulaCreator, logger, shutdownNotifier);
   }
 
@@ -135,15 +130,15 @@ public final class StpSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?>
-      newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     // TODO stub
     throw new UnsupportedOperationException("Interpolating Prover for STP is not implemented yet");
   }
 
   @Override
-  protected OptimizationProverEnvironment
-      newOptimizationProverEnvironment0(Set<ProverOptions> proverOptions) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> proverOptions) {
 
     // TODO I need to confirm about this
     throw new UnsupportedOperationException("Support for optimization in STP not implemented yet");
@@ -159,5 +154,4 @@ public final class StpSolverContext extends AbstractSolverContext {
     // create a new VC context or reuse existing one
     return formulaCreator.getEnv();
   }
-
 }

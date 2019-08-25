@@ -57,8 +57,7 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
   @Override
   public Type getArrayType(Type pIndexType, Type pElementType) {
     checkArgument(
-        StpJavaApi.typeString(pIndexType).contains("BITVECTOR"),
-        "ElementType must be a BITVECTOR");
+        StpJavaApi.typeString(pIndexType).contains("BITVECTOR"), "ElementType must be a BITVECTOR");
     checkArgument(
         StpJavaApi.typeString(pElementType).contains("BITVECTOR"),
         "ElementType must be a BITVECTOR");
@@ -95,15 +94,14 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
             FormulaType.getBitvectorTypeWithSize(arrayValueBitWidth),
             FormulaType.getBitvectorTypeWithSize(arrayIndexBitWidth));
 
-      // TODO Resolve this issue https://github.com/stp/stp/issues/333
-      // STP always use a BitVector Type to recreate the type get the ValueBitWidth
-      // and IndexBitWidth of the Expr i.e getIWidth and getVWidth
+        // TODO Resolve this issue https://github.com/stp/stp/issues/333
+        // STP always use a BitVector Type to recreate the type get the ValueBitWidth
+        // and IndexBitWidth of the Expr i.e getIWidth and getVWidth
 
       case UNKNOWN_TYPE:
         throw new IllegalArgumentException("Unknown formula type ");
     }
     return null;
-
   }
 
   @Override
@@ -209,25 +207,24 @@ public class StpFormulaCreator extends FormulaCreator<Expr, Type, VC, Long> {
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE>
-      encapsulateArray(Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
     return new StpArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> FormulaType<TI>
-      getArrayFormulaIndexType(ArrayFormula<TI, TE> pArray) {
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
+      ArrayFormula<TI, TE> pArray) {
 
     return ((StpArrayFormula<TI, TE>) pArray).getIndexType();
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> FormulaType<TE>
-      getArrayFormulaElementType(ArrayFormula<TI, TE> pArray) {
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
+      ArrayFormula<TI, TE> pArray) {
 
     return ((StpArrayFormula<TI, TE>) pArray).getElementType();
   }
-
 }

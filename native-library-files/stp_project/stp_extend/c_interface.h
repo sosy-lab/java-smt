@@ -104,6 +104,8 @@ void ext_pop(StpEnv * env);
 void ext_addFormula(StpEnv * env, Expr formula);
 void ext_checkSat(StpEnv * env);
 
+const char * getAllModel(VC vc);
+
 ////////////////////  END OF EXTENSION  ////////////
 
 /////////////////////////////////////////////////////////////////////////////

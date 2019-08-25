@@ -72,22 +72,22 @@ public class TestStpSolver {
   ArrayFormula<BitvectorFormula, BitvectorFormula> arrayOfBV8;
   ArrayFormula<BitvectorFormula, BitvectorFormula> arrayOfBV32;
 
-   public TestStpSolver() throws InvalidConfigurationException {
-   config = Configuration.defaultConfiguration();
-   logger = BasicLogManager.create(config);
-   shutdownNotifier = ShutdownNotifier.createDummy();
+  public TestStpSolver() throws InvalidConfigurationException {
+    config = Configuration.defaultConfiguration();
+    logger = BasicLogManager.create(config);
+    shutdownNotifier = ShutdownNotifier.createDummy();
     solver = Solvers.STP;
     // solver = Solvers.MATHSAT5;
 
-   context = SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver);
-   }
+    context = SolverContextFactory.createSolverContext(config, logger, shutdownNotifier, solver);
+  }
 
-   @AfterClass
-   public static void afterClass() {
-     if (context != null) {
-       context.close();
-     }
-   }
+  @AfterClass
+  public static void afterClass() {
+    if (context != null) {
+      context.close();
+    }
+  }
 
   @Test
   public void createBooleanVariables() {
@@ -130,7 +130,6 @@ public class TestStpSolver {
     assertTrue(context.getFormulaManager().getFormulaType(bv8).isBitvectorType());
     assertTrue(context.getFormulaManager().getFormulaType(bv32).isBitvectorType());
   }
-
 
   @Test
   public void createArrayVariables() {
@@ -239,8 +238,8 @@ public class TestStpSolver {
 
     // arrayOfBV32
 
-    arrayFmgr.store(arrayOfBV8, zero, four);// TODO fix Error
-    arrayFmgr.store(arrayOfBV8, one, three);// TODO fix Error
+    arrayFmgr.store(arrayOfBV8, zero, four); // TODO fix Error
+    arrayFmgr.store(arrayOfBV8, one, three); // TODO fix Error
 
     System.out.println("arrayOfBV8 : " + arrayOfBV8.toString());
     // assertEquals("p", p.toString().trim());
@@ -252,7 +251,6 @@ public class TestStpSolver {
     // System.out.println("pAndNotq gives: " + pAndNotq.toString());
 
   }
-
 
   @Test
   public void ProofBooleanFormula() throws InterruptedException, SolverException {
@@ -269,20 +267,22 @@ public class TestStpSolver {
     BooleanFormula highXOR = boolFmgr.xor(xH, yH);
     BooleanFormula twoBitAdder = boolFmgr.and(lowXOR, highXOR); // Formula to solve
 
-//    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    //    try (ProverEnvironment prover =
+    // context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
     ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-      boolean isUnsat;
+    boolean isUnsat;
 
-      prover.push();
-      prover.addConstraint(twoBitAdder);
-      prover.push();
+    prover.push();
+    prover.addConstraint(twoBitAdder);
+    prover.push();
 
-      isUnsat = prover.isUnsat();
-      assert !isUnsat;
-      // try (Model model = prover.getModel()) {
-      System.out.println("SAT : 2-bit Adder ");
-      // }
-//    }
+    isUnsat = prover.isUnsat();
+    assert !isUnsat;
+    // try (Model model = prover.getModel()) {
+    System.out.println("SAT : 2-bit Adder ");
+    // }
+    //    }
+
     // prover.close();
   }
 

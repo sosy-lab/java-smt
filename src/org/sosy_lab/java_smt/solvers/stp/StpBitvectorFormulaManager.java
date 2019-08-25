@@ -24,8 +24,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-class StpBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Expr, Type, VC, Long> {
+class StpBitvectorFormulaManager extends AbstractBitvectorFormulaManager<Expr, Type, VC, Long> {
 
   private final VC vc;
 
@@ -38,7 +37,6 @@ class StpBitvectorFormulaManager
     return new StpBitvectorFormulaManager(creator);
   }
 
-
   @Override
   protected Expr makeVariableImpl(int pLength, String pVar) {
     Type bvType = getFormulaCreator().getBitvectorType(pLength);
@@ -49,8 +47,8 @@ class StpBitvectorFormulaManager
   public Expr makeBitvectorImpl(int pLength, long pI) {
     int i = (int) pI;
     if (i == pI && i > 0) { // fits into an int
-      return StpJavaApi.vc_bv32ConstExprFromInt(vc, pI);// msat_make_bv_int_number(mathsatEnv, i,
-                                                        // pLength);
+      return StpJavaApi.vc_bv32ConstExprFromInt(vc, pI); // msat_make_bv_int_number(mathsatEnv, i,
+      // pLength);
     }
     return makeBitvectorImpl(pLength, BigInteger.valueOf(pI));
   }
@@ -205,5 +203,4 @@ class StpBitvectorFormulaManager
       return StpJavaApi.vc_bvSignExtend(vc, pNumber, pExtensionBits);
     }
   }
-
 }

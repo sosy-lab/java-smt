@@ -38,7 +38,7 @@ void ext_pop(StpEnv * env);
 void ext_addFormula(StpEnv * env, Expr formula);
 void ext_checkSat(StpEnv * env);
 
-
+const char * getAllModel(VC vc);
 %}
 
 // Necessary extra includes
@@ -242,6 +242,8 @@ void pop(VC vc);
 int checkSAT_old(VC vc);
 
 int checkSAT(VC vc, Expr e);
+
+const char * getAllModel(VC vc);
 
 //CPP
 StpEnv * createStpEnv(VC vc);

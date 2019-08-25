@@ -26,10 +26,10 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
-class StpArrayFormulaManager
-    extends AbstractArrayFormulaManager<Expr, Type, VC, Long> {
+class StpArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Type, VC, Long> {
 
   private final VC vc;
+
   public StpArrayFormulaManager(StpFormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
     this.vc = pFormulaCreator.getEnv();
@@ -58,11 +58,10 @@ class StpArrayFormulaManager
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> Expr
-      internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
-    ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
+    ArrayFormulaType<TI, TE> arrayFormulaType = FormulaType.getArrayType(pIndexType, pElementType);
     Type stpArrayType = toSolverType(arrayFormulaType);
 
     return getFormulaCreator().makeVariable(stpArrayType, pName);
@@ -72,5 +71,4 @@ class StpArrayFormulaManager
   protected Expr equivalence(Expr pArray1, Expr pArray2) {
     return StpJavaApi.vc_eqExpr(vc, pArray1, pArray2);
   }
-
 }

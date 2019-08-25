@@ -99,7 +99,6 @@ public class StpNativeApiTest2 {
     assertEquals(type_t.BITVECTOR_TYPE, StpJavaApi.getType(bv_x));
     assertEquals(type_t.BITVECTOR_TYPE, StpJavaApi.getType(two));
     assertEquals(type_t.BITVECTOR_TYPE, StpJavaApi.getType(twenty));
-
   }
 
   @Test
@@ -108,19 +107,18 @@ public class StpNativeApiTest2 {
 
     // Create bitvector x + x
     bv_xPlusx = StpJavaApi.vc_bvPlusExpr(stpContextVC, width, bv_x, bv_x); // Non-Formla can't
-                                                                           // assert
+    // assert
 
     // Create bitvector 2*x
     xTimes2 = StpJavaApi.vc_bvMultExpr(stpContextVC, width, two, bv_x); // Non-Formla can't assert
     xTimes20 = StpJavaApi.vc_bvMultExpr(stpContextVC, width, twenty, bv_x); // Non-Formla can't
-                                                                            // assert
+    // assert
 
     // Create bool expression x + x = 2*x
     bv_equality = StpJavaApi.vc_eqExpr(stpContextVC, bv_xPlusx, xTimes2);
     bv_equality2 = StpJavaApi.vc_eqExpr(stpContextVC, bv_xPlusx, xTimes20);
 
     bv_non_equality = StpJavaApi.vc_notExpr(stpContextVC, bv_equality2);
-
   }
 
   @Test
@@ -187,9 +185,9 @@ public class StpNativeApiTest2 {
 
     int result = StpJavaApi.vc_query(stpContextVC, StpJavaApi.vc_trueExpr(stpContextVC));
     System.out.println("ASSERT RESULT IS : " + evaluateVCqueryResult(result));
-
   }
 
+  @Ignore
   @Test
   public void invalidBOOLexpr1() {
     createBOOLvariables();
@@ -203,9 +201,9 @@ public class StpNativeApiTest2 {
 
     int result = StpJavaApi.vc_query(stpContextVC, StpJavaApi.vc_trueExpr(stpContextVC));
     System.out.println("INVALID ASSERT RESULT - 1 IS : " + evaluateVCqueryResult(result)); // VALID
-
   }
 
+  @Ignore
   @Test
   public void invalidBOOLexpr2() {
     createBOOLvariables();
@@ -223,9 +221,9 @@ public class StpNativeApiTest2 {
     // print counter example
     System.out.println("Counter example:\n");
     StpJavaApi.vc_printCounterExample(stpContextVC);
-
   }
 
+  @Ignore
   @Test
   public void ext_BOOLexpr2() {
     createBOOLvariables();
@@ -245,6 +243,7 @@ public class StpNativeApiTest2 {
     StpJavaApi.ext_checkSat(env);
   }
 
+  @Ignore
   @Test
   public void validBOOLexpr3() {
     createBOOLvariables();
@@ -262,6 +261,7 @@ public class StpNativeApiTest2 {
     System.out.println("3) INVALID ASSERT RESULT - IS : " + evaluateVCqueryResult(result));
   }
 
+  @Ignore
   @Test
   public void pushAndPop_invalidBOOLexpr2() {
     createBOOLvariables();
@@ -356,6 +356,28 @@ public class StpNativeApiTest2 {
     System.out.println("VC_QUERY RESULT : ===> " + result);
 
     StpJavaApi.ext_AssertFormula(stpContextVC, StpJavaApi.vc_trueExpr(stpContextVC));
+  }
 
+  @Test
+  public void testingUNSAT() {
+    StpJavaApi.push(stpContextVC);
+
+    // create & add Formula
+    createBOOLvariables();
+    createBOOLformulars();
+
+    Expr term1 = StpJavaApi.vc_orExpr(stpContextVC, x1ORnotx2, x3);
+    StpJavaApi.push(stpContextVC);
+    StpJavaApi.addAssertFormula(stpContextVC, term1);
+    StpJavaApi.push(stpContextVC);
+    StpJavaApi.addAssertFormula(stpContextVC, notx1);
+    StpJavaApi.push(stpContextVC);
+    StpJavaApi.addAssertFormula(stpContextVC, x2);
+
+    int result3 = StpJavaApi.vc_query(stpContextVC, StpJavaApi.vc_falseExpr(stpContextVC));
+    System.out.println("2) INVALID ASSERT RESULT - IS : " + evaluateVCqueryResult(result3));
+
+    String result = StpJavaApi.getAllModel(stpContextVC);
+    System.out.println(result);
   }
 }

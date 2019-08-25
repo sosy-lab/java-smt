@@ -29,7 +29,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 
-//TODO VERY IMPRTNT : rid this class off sysout; take them ALL out; better branch out Debug Sessions
+// TODO VERY IMPRTNT : rid this class off sysout; take them ALL out; better branch out Debug
+// Sessions
 public class StpNativeApiTest {
 
   private VC stpContextVC;
@@ -53,7 +54,6 @@ public class StpNativeApiTest {
     StpJavaApi.vc_Destroy(stpContextVC);
   }
 
-
   @Ignore
   @Test
   public void testStpGitVersion() throws Exception {
@@ -64,7 +64,6 @@ public class StpNativeApiTest {
     String version_tag = StpJavaApi.get_git_version_tag();
     System.out.println("\nThis STP version is :");
     System.out.println(version_tag);
-
   }
 
   @Ignore
@@ -74,7 +73,6 @@ public class StpNativeApiTest {
     System.out.println("\nCompilation Environment of this STP version is :");
 
     System.out.println(compile_env);
-
   }
 
   @Ignore // ITS JOB IS DONE; DELETE IT
@@ -88,10 +86,7 @@ public class StpNativeApiTest {
     System.out.println("Number of Assertion " + StpJavaApi.getNumOfAsserts(stpContextVC) + "\n");
     StpJavaApi.getSomePrinting(stpContextVC);
     System.out.println("GOOD MORALS: " + StpJavaApi.getSomeXter(stpContextVC) + "\n");
-
   }
-
-
 
   @Ignore
   @Test
@@ -130,7 +125,6 @@ public class StpNativeApiTest {
     // Create bool expression x + x = 2
     Expr badEquality = StpJavaApi.vc_eqExpr(stpContextVC, xPlusx, two);
     handleQuery(stpContextVC, badEquality);
-
   }
 
   // void handleQuery(VC handle, Expr queryExpr);
@@ -220,7 +214,6 @@ public class StpNativeApiTest {
     // assertEquals(boolType, StpJavaApi.vc_getType(vc, boolVar));
   }
 
-
   @Test
   public void createBooleanVariable() {
 
@@ -308,25 +301,23 @@ public class StpNativeApiTest {
     assertEquals(0, StpJavaApi.vc_query(stpContextVC, falseEQtrue));
   }
 
-
   @Test
   public void validateEqualityOnBooleanFormula2() {
 
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
-    Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar", boolType); //false
+    Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar", boolType); // false
     Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar);
 
     Expr trueExpr = StpJavaApi.vc_trueExpr(stpContextVC);
 
-    Expr expr1 = StpJavaApi.vc_andExpr(stpContextVC, boolVar, trueExpr); //false
-    Expr expr2 = StpJavaApi.vc_andExpr(stpContextVC, notboolVar, notboolVar);// true
+    Expr expr1 = StpJavaApi.vc_andExpr(stpContextVC, boolVar, trueExpr); // false
+    Expr expr2 = StpJavaApi.vc_andExpr(stpContextVC, notboolVar, notboolVar); // true
 
     Expr boolVarEQexpr1 = StpJavaApi.vc_eqExpr(stpContextVC, boolVar, expr1);
     Expr notboolVarEQexpr2 = StpJavaApi.vc_eqExpr(stpContextVC, notboolVar, expr2);
 
     assertEquals(1, StpJavaApi.vc_query(stpContextVC, boolVarEQexpr1));
     assertEquals(1, StpJavaApi.vc_query(stpContextVC, notboolVarEQexpr2));
-
   }
 
   @Ignore // TODO DEBUG THIS
@@ -340,22 +331,20 @@ public class StpNativeApiTest {
     Expr trueExpr = StpJavaApi.vc_trueExpr(stpContextVC);
 
     Expr expr1 = StpJavaApi.vc_andExpr(stpContextVC, boolVar, trueExpr); // false
-    Expr expr2 = StpJavaApi.vc_andExpr(stpContextVC, notboolVar, notboolVar);// <- bug here
+    Expr expr2 = StpJavaApi.vc_andExpr(stpContextVC, notboolVar, notboolVar); // <- bug here
 
     // The two Expression Formulae must have the same type.
     assertEquals(type_t.BOOLEAN_TYPE, StpJavaApi.getType(expr1));
     assertEquals(type_t.BOOLEAN_TYPE, StpJavaApi.getType(expr2));
 
     assertEquals(
-        "BOOLEAN",
-        StpJavaApi.typeString(StpJavaApi.vc_getType(stpContextVC, expr1)).trim());
+        "BOOLEAN", StpJavaApi.typeString(StpJavaApi.vc_getType(stpContextVC, expr1)).trim());
     assertEquals(
-        "BOOLEAN",
-        StpJavaApi.typeString(StpJavaApi.vc_getType(stpContextVC, expr2)).trim());
+        "BOOLEAN", StpJavaApi.typeString(StpJavaApi.vc_getType(stpContextVC, expr2)).trim());
 
     Expr expr1EQexpr2 = StpJavaApi.vc_eqExpr(stpContextVC, expr1, expr2);
 
-    assertEquals(1, StpJavaApi.vc_query(stpContextVC, expr1EQexpr2));// <-exception raised here
+    assertEquals(1, StpJavaApi.vc_query(stpContextVC, expr1EQexpr2)); // <-exception raised here
 
     // STP itself exits (i guess). So no way round it
     /*
@@ -367,8 +356,8 @@ public class StpNativeApiTest {
   public void validateXor() {
 
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
-    Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType);// false
-    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar);// true
+    Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType); // false
+    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar); // true
 
     Expr trueExpr = StpJavaApi.vc_trueExpr(stpContextVC);
     Expr falseExpr = StpJavaApi.vc_falseExpr(stpContextVC);
@@ -382,15 +371,14 @@ public class StpNativeApiTest {
     assertEquals(1, StpJavaApi.vc_query(stpContextVC, shouldBeTrue2));
     assertEquals(0, StpJavaApi.vc_query(stpContextVC, shouldBeFalse1));
     assertEquals(0, StpJavaApi.vc_query(stpContextVC, shouldBeFalse2));
-
   }
 
   @Test
   public void validateIfonlyIf() {
 
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
-    Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType);// false
-    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar);// true
+    Expr boolVar = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType); // false
+    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar); // true
 
     Expr trueExpr = StpJavaApi.vc_trueExpr(stpContextVC);
     Expr falseExpr = StpJavaApi.vc_falseExpr(stpContextVC);
@@ -404,15 +392,14 @@ public class StpNativeApiTest {
     assertEquals(1, StpJavaApi.vc_query(stpContextVC, shouldBeTrue2));
     assertEquals(0, StpJavaApi.vc_query(stpContextVC, shouldBeFalse1));
     assertEquals(0, StpJavaApi.vc_query(stpContextVC, shouldBeFalse2));
-
   }
 
   @Test
   public void validateIfThenElse_BoolOnly() {
 
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
-    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType);// false
-    Expr boolVar2 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType);// false
+    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType); // false
+    Expr boolVar2 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType); // false
     // Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar1);// true
 
     Expr trueExpr = StpJavaApi.vc_trueExpr(stpContextVC);
@@ -436,8 +423,8 @@ public class StpNativeApiTest {
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
     Type bv32Type = StpJavaApi.vc_bv32Type(stpContextVC);
 
-    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType);// false
-    Expr boolVar2 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType);// false
+    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType); // false
+    Expr boolVar2 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar2", boolType); // false
     Expr bv32Var = StpJavaApi.vc_varExpr(stpContextVC, "bv32Var", bv32Type);
 
     Expr shouldBeboolVar1 = StpJavaApi.vc_iteExpr(stpContextVC, bv32Var, boolVar1, boolVar2);
@@ -476,8 +463,8 @@ public class StpNativeApiTest {
   public void convertBoolToBitVector_() {
 
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
-    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType);// false
-    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar1);// true
+    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType); // false
+    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar1); // true
 
     Expr bvFrom_boolVar1 = StpJavaApi.vc_boolToBVExpr(stpContextVC, boolVar1); // 1
     Expr bvFrom_notboolVar1 = StpJavaApi.vc_boolToBVExpr(stpContextVC, notboolVar);
@@ -485,8 +472,8 @@ public class StpNativeApiTest {
     Type type1 = StpJavaApi.vc_getType(stpContextVC, bvFrom_boolVar1);
     type_t type2 = StpJavaApi.getType(bvFrom_notboolVar1);
 
-//    System.out.println("TYPE-1 - " + StpJavaApi.typeString(type1));
-//    System.out.println("TYPE-2 - " + type2.name());
+    //    System.out.println("TYPE-1 - " + StpJavaApi.typeString(type1));
+    //    System.out.println("TYPE-2 - " + type2.name());
   }
 
   @Ignore
@@ -494,8 +481,8 @@ public class StpNativeApiTest {
   public void convertBoolToBitVector() {
 
     Type boolType = StpJavaApi.vc_boolType(stpContextVC);
-    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType);// false
-    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar1);// true
+    Expr boolVar1 = StpJavaApi.vc_varExpr(stpContextVC, "boolVar1", boolType); // false
+    Expr notboolVar = StpJavaApi.vc_notExpr(stpContextVC, boolVar1); // true
 
     Expr bvFrom_boolVar1 = StpJavaApi.vc_boolToBVExpr(stpContextVC, boolVar1);
     Expr bvFrom_notboolVar1 = StpJavaApi.vc_boolToBVExpr(stpContextVC, notboolVar);

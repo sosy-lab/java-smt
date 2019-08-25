@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.stp;
 
-//TODO (LATER) use the class to extend StpJavaApi and override funct and give docs
+// TODO (LATER) use the class to extend StpJavaApi and override funct and give docs
 // remove the annoying vc_isBool() from the API, if such functionality is need implement here
 // 3. if multiple Type objects are allowed - change "get..." to "create.." otw -> private fields
 // 4.

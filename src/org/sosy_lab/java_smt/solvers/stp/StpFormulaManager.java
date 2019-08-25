@@ -27,8 +27,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-public final class StpFormulaManager
-    extends AbstractFormulaManager<Expr, Type, VC, Long> {
+public final class StpFormulaManager extends AbstractFormulaManager<Expr, Type, VC, Long> {
 
   protected StpFormulaManager(
       StpFormulaCreator pFormulaCreator,
@@ -68,5 +67,4 @@ public final class StpFormulaManager
     // TODO Auto-generated method stub
     return null;
   }
-
 }

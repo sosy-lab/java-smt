@@ -50,5 +50,4 @@ class StpTheoremProver extends StpAbstractProver<Void> implements ProverEnvironm
     Preconditions.checkState(!closed);
     StpJavaApi.vc_push(currVC);
   }
-
 }

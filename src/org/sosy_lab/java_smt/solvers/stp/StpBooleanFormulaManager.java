@@ -23,8 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-class StpBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Expr, Type, VC, Long> {
+class StpBooleanFormulaManager extends AbstractBooleanFormulaManager<Expr, Type, VC, Long> {
 
   private final VC vc;
 
@@ -91,7 +90,6 @@ class StpBooleanFormulaManager
         throw new IllegalArgumentException(
             "In STP solver: Formula of type - " + result + "needs to be SAT checked.");
     }
-
   }
 
   @Override
@@ -107,7 +105,6 @@ class StpBooleanFormulaManager
         throw new IllegalArgumentException(
             "In STP solver: Formula of type - " + result + "needs to be SAT checked.");
     }
-
   }
 
   @Override
@@ -126,5 +123,4 @@ class StpBooleanFormulaManager
 
     return StpJavaApi.vc_iteExpr(vc, cond, thenExpr, elseExpr);
   }
-
 }

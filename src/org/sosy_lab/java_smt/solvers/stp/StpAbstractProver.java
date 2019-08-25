@@ -49,7 +49,7 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
     context = pContext;
     creator = pCreator;
     // curConfig = buildConfig(pOptions); //TODO implement configuration handling
-    currVC = context.createEnvironment(null);// curConfig is to be passed in here
+    currVC = context.createEnvironment(null); // curConfig is to be passed in here
     shutdownNotifier = pShutdownNotifier;
   }
 
@@ -108,9 +108,8 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -135,5 +134,4 @@ abstract class StpAbstractProver<T> extends AbstractProver<T> {
       closed = true;
     }
   }
-
 }

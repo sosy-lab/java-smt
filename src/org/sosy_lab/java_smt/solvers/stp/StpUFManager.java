@@ -26,5 +26,4 @@ class StpUFManager extends AbstractUFManager<Expr, Long, Type, VC> {
   protected StpUFManager(StpFormulaCreator pCreator) {
     super(pCreator);
   }
-
 }

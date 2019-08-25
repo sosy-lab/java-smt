@@ -28,12 +28,11 @@ import org.sosy_lab.common.log.LogManager;
 /**
  * TODO use the class to settings or config OR BETTER DELETE IT
  *
- *
- * This class is the actual Wrapper around an STP "context" known over there as Validity Checker All
- * "context" related operations are handled here Flags, SAT solver settings, STP "environment"
+ * <p>This class is the actual Wrapper around an STP "context" known over there as Validity Checker
+ * All "context" related operations are handled here Flags, SAT solver settings, STP "environment"
  * variables are handled here
  *
- * Note the "context" here differs from the 'Context class'
+ * <p>Note the "context" here differs from the 'Context class'
  */
 class StpEnvironment {
 
