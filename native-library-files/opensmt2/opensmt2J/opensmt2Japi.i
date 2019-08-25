@@ -12,17 +12,3 @@
 
 %include "opensmt_c.h"
 
-/*
-
-%pragma(java) jniclassimports=%{
-import foobar.*;
-%}
-
-%pragma(java) moduleimports=%{
-import foobar.*;
-%}
-
-
-//%nspace foobar::FooBar
-
-*/
