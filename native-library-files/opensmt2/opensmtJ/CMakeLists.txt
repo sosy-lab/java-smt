@@ -55,7 +55,7 @@ include_directories("../opensmt/src/api/") #here lies opensmt_c.h
 swig_add_library(opensmt2Japi SHARED
 			LANGUAGE Java
 			SOURCES ${OPENSMT_SWIG_INTERFACE} 
-					#${CMAKE_CURRENT_SOURCE_DIR}/src/extStpSWIGapi.cpp
+					${CMAKE_CURRENT_SOURCE_DIR}/src/extOpemSMTSWIGapi.c
 		)
 
 # here we link the library and the api we  created for it together
@@ -68,7 +68,7 @@ set_property(TARGET opensmt2Japi PROPERTY SWIG_COMPILE_OPTIONS -Wall -g)
 
 target_include_directories(opensmt2Japi 
 PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/install_include/usr/local/include/opensmt/
-#  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/
+PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
 
 # message("CURRENT SRC DIR IS  ====>  ${CMAKE_CURRENT_SOURCE_DIR}")

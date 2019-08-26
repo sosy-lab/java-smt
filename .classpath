@@ -27,6 +27,6 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/lubuntu/SAHEED/gsoc/CODE/java-smt/lib/opensmt2JavaAPI.jar"/>
+	<classpathentry kind="lib" path="lib/opensmt2JavaAPI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

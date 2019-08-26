@@ -17,12 +17,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.opensmt;
+package org.sosy_lab.java_smt.solvers.opensmt2;
 
-import com.google.errorprone.annotations.Immutable;
-import org.sosy_lab.java_smt.api.Formula;
+import java.util.Set;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-@Immutable
-abstract class OpensmtFormula implements Formula {
-  // TODO: 1. IMPLEMENT
+abstract class OpensmtAbstractProver<T> extends AbstractProver<T> {
+  // TODO : 7 IMPELEMENT
+  protected OpensmtAbstractProver(Set<ProverOptions> pOptions) {
+    super(pOptions);
+    // TODO Auto-generated constructor stub
+  }
+
 }

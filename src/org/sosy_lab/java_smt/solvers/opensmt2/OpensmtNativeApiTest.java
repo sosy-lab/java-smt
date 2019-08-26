@@ -17,28 +17,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.opensmt;
+package org.sosy_lab.java_smt.solvers.opensmt2;
 
-import net.saheed.foobar.FooBar;
 import org.junit.Assert;
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
-import org.sosy_lab.java_smt.opensmt2Japi;
-import org.sosy_lab.java_smt.osmt_context;
-import org.sosy_lab.java_smt.osmt_expr;
-import org.sosy_lab.java_smt.osmt_logic;
-import org.sosy_lab.java_smt.osmt_result;
 
 public class OpensmtNativeApiTest {
 
   @BeforeClass
   public static void loadOpensmt2Library() {
     try {
-      NativeLibraries.loadLibrary("opensmt2api");
-      NativeLibraries.loadLibrary("foobarapi");
+      NativeLibraries.loadLibrary("opensmt2Japi");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Cannot find at least one native library", e);
     }
@@ -57,18 +50,6 @@ public class OpensmtNativeApiTest {
 
   osmt_context context = null;
 
-
-  @Test
-  public void getFooBarObject() {
-    FooBar fb = new FooBar();
-    System.out.println(fb.welcome());
-  }
-
-
-  @Test
-  public void getFooBarHelloLevels() {
-    System.out.println(FooBar.hello(1));
-  }
 
   // @Ignore
   @Test(expected = RuntimeException.class)

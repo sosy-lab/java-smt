@@ -11,6 +11,7 @@ DESTN_DIR=$PWD/opensmtJ/install_include
 
 [ -d "./opensmt" ] && rm -rf ./opensmt ||:
 [ -d "./build" ] && rm -rf ./build ||:
+[ -d "./opensmtJ/build" ] && rm -rf ./opensmtJ/build ||:
 
 echo "Build files removed and STP repo deleted."
 echo "Now cloning stp ..."

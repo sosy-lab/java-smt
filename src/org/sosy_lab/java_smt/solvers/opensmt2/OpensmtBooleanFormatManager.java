@@ -17,81 +17,78 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.opensmt;
+package org.sosy_lab.java_smt.solvers.opensmt2;
 
-import java.util.List;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-class OpensmtFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
+class OpensmtBooleanFormatManager
+    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
-  OpensmtFormulaCreator(final Long opensmtEnv) {
-    super( // TODO: 2: IMPLEMENT
-        opensmtEnv,
-        opensmtEnv, // bool
-        opensmtEnv, // int
-        opensmtEnv); // rat
+  // TODO: 4. IMPLEMENT
+  @SuppressWarnings("unused")
+  private final long opensmtEnv;
+
+  protected OpensmtBooleanFormatManager(OpensmtFormulaCreator pCreator) {
+    super(pCreator);
+    this.opensmtEnv = pCreator.getEnv();
   }
 
   @Override
-  public Long getBitvectorType(int pBitwidth) {
+  protected Long makeVariableImpl(String pVar) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long getFloatingPointType(FloatingPointType pType) {
+  protected Long makeBooleanImpl(boolean pValue) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long getArrayType(Long pIndexType, Long pElementType) {
+  protected Long not(Long pParam1) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long makeVariable(Long pType, String pVarName) {
+  protected Long and(Long pParam1, Long pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public FormulaType<?> getFormulaType(Long pFormula) {
+  protected Long or(Long pParam1, Long pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pF) {
+  protected Long xor(Long pParam1, Long pParam2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
+  protected Long equivalence(Long pBits1, Long pBits2) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
+  protected boolean isTrue(Long pBits) {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  protected Long getBooleanVarDeclarationImpl(Long pTFormulaInfo) {
+  protected boolean isFalse(Long pBits) {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  public Object convertValue(Long pF) {
+  protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
     // TODO Auto-generated method stub
     return null;
   }
