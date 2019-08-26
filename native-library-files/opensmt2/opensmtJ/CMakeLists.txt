@@ -43,8 +43,9 @@ set(JAVA_API_DIR "build/org/sosy_lab/java_smt/solvers/opensmt2")
 ##################### END OF SET UP and VARIABLE SETTINGS ###############
 
 # /JavaSMT/native-library-files/opensmt2/opensmt/src/api
-include_directories("../opensmt/src/api/") #here lies opensmt_c.h
+# include_directories("../opensmt/src/api/") #here lies opensmt_c.h
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 ### USING SWIG: Build the C/C++ code into a library, accessed via our defined interface (in SWIG) 
 
@@ -83,6 +84,7 @@ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/
 add_jar(
     opensmt2JavaAPI
     SOURCES    ${JAVA_API_DIR}/opensmt2Japi.java
-    	       ${JAVA_API_DIR}/opensmt2JapiJNI.java
+			   ${JAVA_API_DIR}/opensmt2JapiJNI.java
+			   ${JAVA_API_DIR}/osmt_context.java
 )
 add_dependencies( opensmt2JavaAPI opensmt2Japi )

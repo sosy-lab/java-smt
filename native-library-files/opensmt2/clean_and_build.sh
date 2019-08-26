@@ -9,7 +9,6 @@ DESTN_DIR=$PWD/opensmtJ/install_include
 
 [ ! -f "$DESTN_DIR" ] && mkdir -p "$DESTN_DIR" || rm -rf "$DESTN_DIR"/* ||:
 
-[ -d "./opensmt" ] && rm -rf ./opensmt ||:
 [ -d "./build" ] && rm -rf ./build ||:
 [ -d "./opensmtJ/build" ] && rm -rf ./opensmtJ/build ||:
 
@@ -23,7 +22,7 @@ echo "Raw OpenSMT Build files removed "
 # yes | cp -f $PWD/stp_extend/CMakeLists.txt $STP_INTERFACE_SRC
 
 cd opensmt
-mkdir ./build;cd ./build
+[ -d "./build" ] && rm -rf ./build/*;cd ./build || mkdir ./build;cd ./build ||:
 echo
 echo "Now rebuilding OpenSMT ... "
 

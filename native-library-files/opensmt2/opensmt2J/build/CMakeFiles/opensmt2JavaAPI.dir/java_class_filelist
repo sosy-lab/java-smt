@@ -1,9 +1,0 @@
-org/sosy_lab/java_smt/SWIGTYPE_p_void.class
-org/sosy_lab/java_smt/opensmt2Japi.class
-org/sosy_lab/java_smt/opensmt2JapiJNI.class
-org/sosy_lab/java_smt/osmt_context.class
-org/sosy_lab/java_smt/osmt_expr.class
-org/sosy_lab/java_smt/osmt_logic$SwigNext.class
-org/sosy_lab/java_smt/osmt_logic.class
-org/sosy_lab/java_smt/osmt_result$SwigNext.class
-org/sosy_lab/java_smt/osmt_result.class

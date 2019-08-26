@@ -19,10 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.opensmt2;
 
-import org.junit.Assert;
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 
@@ -58,24 +56,24 @@ public class OpensmtNativeApiTest {
     // Assert.assertEquals("2", opensmt2Japi.osmt_version());
   }
 
-  @Ignore
-  @Test
-  public void createOpensmt2ApiContextForBool() throws Exception {
-    osmt_logic boolQF = osmt_logic.qf_bool; // TODO: osmt_logic
+  // @Ignore
+  // @Test
+  // public void createOpensmt2ApiContextForBool() throws Exception {
+  // osmt_logic boolQF = osmt_logic.qf_bool; // TODO: osmt_logic
+  //
+  // System.out.println(boolQF.swigValue());
+  // context = opensmt2Japi.osmt_mk_context(boolQF);
+  // Assert.assertNotNull(context);
+  // }
 
-    System.out.println(boolQF.swigValue());
-    context = opensmt2Japi.osmt_mk_context(boolQF);
-    Assert.assertNotNull(context);
-  }
-
-  @Ignore
-  @Test
-  public void opensmt2ApiGetBoolValue() throws Exception {
-    createOpensmt2ApiContextForBool();
-    osmt_expr boolVar = opensmt2Japi.osmt_mk_bool_var(context, "a");
-    Assert.assertEquals(osmt_result.l_false, opensmt2Japi.osmt_get_bool(context, boolVar));
-
-  }
+  // @Ignore
+  // @Test
+  // public void opensmt2ApiGetBoolValue() throws Exception {
+  // createOpensmt2ApiContextForBool();
+  // osmt_expr boolVar = opensmt2Japi.osmt_mk_bool_var(context, "a");
+  // Assert.assertEquals(osmt_result.l_false, opensmt2Japi.osmt_get_bool(context, boolVar));
+  //
+  // }
 
   /*
    * @Test public void opensmt2ApiTrue() {assertTrue(false); }//osmt_mk_true

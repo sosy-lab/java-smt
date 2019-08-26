@@ -21,6 +21,7 @@ PRJ_NAME=$(basename "$PRJ_DIR")
 
 # confirm expected directory structure 
 # MUST BE like java-smt/../../this_script.sh
+echo $PRJ_NAME
 if [[ "$PRJ_NAME" != "java-smt" ]]
  then
 	echo "this script is not place in the proper directory" >&2
@@ -37,7 +38,8 @@ SO_LIB_DIR="${JAR_LIB_DIR}/native/x86_64-linux/"
 # echo $OPENSMT2_LIB
 
 echo ---
-if [! -f "$OPENSMT2_LIB" ]
+# if [! -d "$OPENSMT2_LIB" ]
+if [! -d "./opensmt" ]
  then
 	echo "I can't find the opensmt library file. I am making a new one ..."
     sh clean_clone_build.sh
