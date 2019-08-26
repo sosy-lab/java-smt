@@ -20,6 +20,5 @@
 package org.sosy_lab.java_smt.solvers.opensmt2;
 
 public class OpensmtNativeApi {
-  private OpensmtNativeApi() {
-  }
+  private OpensmtNativeApi() {}
 }

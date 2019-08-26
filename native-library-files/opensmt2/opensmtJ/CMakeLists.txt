@@ -50,13 +50,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
 ### USING SWIG: Build the C/C++ code into a library, accessed via our defined interface (in SWIG) 
 
 # we are using C++
-# set_property(SOURCE ${FOOBAR_SWIG_INTERFACE} PROPERTY CPLUSPLUS ON)
+set_property(SOURCE ${OPENSMT_SWIG_INTERFACE} 
+					${CMAKE_CURRENT_SOURCE_DIR}/src/extOpemSMTSWIGapi.cpp
+
+			PROPERTY CPLUSPLUS ON)
 
 #using swig : we generate a interface to interact with the earlier created library
 swig_add_library(opensmt2Japi SHARED
 			LANGUAGE Java
 			SOURCES ${OPENSMT_SWIG_INTERFACE} 
-					${CMAKE_CURRENT_SOURCE_DIR}/src/extOpemSMTSWIGapi.c
+					${CMAKE_CURRENT_SOURCE_DIR}/src/extOpemSMTSWIGapi.cpp
 		)
 
 # here we link the library and the api we  created for it together

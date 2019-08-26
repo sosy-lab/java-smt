@@ -1,9 +1,16 @@
 %module opensmt2Japi
 
 %{
-//#include "opensmt_c.h"
+
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 #include "extOpemSMTSWIGapi.h"
-%}
+
+// #ifdef __cplusplus
+// }
+// #endif
+// %}
 
 //Possibly necessary extra includes
 // %include "std_string.i"
@@ -14,7 +21,5 @@
 %nodefaultctor osmt_context;
 struct osmt_context {};
 
-
-//%include "opensmt_c.h"
 %include extOpemSMTSWIGapi.h
 

@@ -29,5 +29,4 @@ abstract class OpensmtAbstractProver<T> extends AbstractProver<T> {
     super(pOptions);
     // TODO Auto-generated constructor stub
   }
-
 }

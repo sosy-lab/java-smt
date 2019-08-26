@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.solvers.mathsat5;
+package org.sosy_lab.java_smt.solvers.opensmt2;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-//TODO : 9 IMPELEMENT
+// TODO : 9 IMPELEMENT
 class OpensmtTheoremProver extends AbstractProver<Void> implements ProverEnvironment {
 
   protected OpensmtTheoremProver(Set<ProverOptions> pOptions) {
@@ -83,9 +83,8 @@ class OpensmtTheoremProver extends AbstractProver<Void> implements ProverEnviron
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -102,5 +101,4 @@ class OpensmtTheoremProver extends AbstractProver<Void> implements ProverEnviron
     // TODO Auto-generated method stub
     return null;
   }
-
 }

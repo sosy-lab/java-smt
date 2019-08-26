@@ -31,14 +31,16 @@ public final class OpensmtSolverContext extends AbstractSolverContext {
   // TODO: 6. IMPLEMENT
   @SuppressWarnings("unused")
   private OpensmtFormulaManager manager;
+
   @SuppressWarnings("unused")
   private OpensmtFormulaCreator creator;
 
-   private OpensmtSolverContext(OpensmtFormulaManager pFormulaManager, OpensmtFormulaCreator pFormulaCreator) {
-   super(pFormulaManager);
+  private OpensmtSolverContext(
+      OpensmtFormulaManager pFormulaManager, OpensmtFormulaCreator pFormulaCreator) {
+    super(pFormulaManager);
     this.manager = pFormulaManager;
     this.creator = pFormulaCreator;
-   }
+  }
 
   @Override
   public String getVersion() {
@@ -65,15 +67,15 @@ public final class OpensmtSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?>
-      newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  protected OptimizationProverEnvironment
-      newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -83,5 +85,4 @@ public final class OpensmtSolverContext extends AbstractSolverContext {
     // TODO Auto-generated method stub
     return false;
   }
-
 }

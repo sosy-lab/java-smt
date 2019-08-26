@@ -31,8 +31,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-final class OpensmtFormulaManager
-    extends AbstractFormulaManager<Long, Long, Long, Long> {
+final class OpensmtFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
   // TODO: 5. IMPLEMENT
   protected OpensmtFormulaManager(
@@ -69,5 +68,4 @@ final class OpensmtFormulaManager
     // TODO Auto-generated method stub
     return null;
   }
-
 }

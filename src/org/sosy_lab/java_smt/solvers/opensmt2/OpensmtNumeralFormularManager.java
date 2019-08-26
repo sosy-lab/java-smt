@@ -26,14 +26,11 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
-//TODO: 3. IMPLEMENT
-abstract class OpensmtNumeralFormularManager <
-ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-extends AbstractNumeralFormulaManager<
-          Long, Long, Long,
-          ParamFormulaType,
-          ResultFormulaType,
-          Long>{
+// TODO: 3. IMPLEMENT
+abstract class OpensmtNumeralFormularManager<
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<
+        Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
 
   @Override
   public FormulaType<ResultFormulaType> getFormulaType() {
@@ -137,10 +134,10 @@ extends AbstractNumeralFormulaManager<
     return null;
   }
 
-  public OpensmtNumeralFormularManager(OpensmtFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+  public OpensmtNumeralFormularManager(
+      OpensmtFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
 
     // TODO Auto-generated constructor stub
   }
-
 }

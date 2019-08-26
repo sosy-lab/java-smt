@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.opensmt2;
 
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 
 public class OpensmtNativeApiTest {
@@ -46,15 +45,14 @@ public class OpensmtNativeApiTest {
   // }
   // }
 
-  osmt_context context = null;
-
+  // osmt_context context = null;
 
   // @Ignore
-  @Test(expected = RuntimeException.class)
-  public void getOpensmtVersion() throws Exception {
-    System.out.println(opensmt2Japi.osmt_version());
-    // Assert.assertEquals("2", opensmt2Japi.osmt_version());
-  }
+  // @Test(expected = RuntimeException.class)
+  // public void getOpensmtVersion() throws Exception {
+  // System.out.println(opensmt2Japi.osmt_version());
+  // // Assert.assertEquals("2", opensmt2Japi.osmt_version());
+  // }
 
   // @Ignore
   // @Test
@@ -100,6 +98,5 @@ public class OpensmtNativeApiTest {
    * //create bool varialble //create bool AND //create bool OR
    *
    */
-
 
 }

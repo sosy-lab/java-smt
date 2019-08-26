@@ -21,8 +21,7 @@ package org.sosy_lab.java_smt.solvers.opensmt2;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-class OpensmtBooleanFormatManager
-    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
+class OpensmtBooleanFormatManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   // TODO: 4. IMPLEMENT
   @SuppressWarnings("unused")
@@ -92,5 +91,4 @@ class OpensmtBooleanFormatManager
     // TODO Auto-generated method stub
     return null;
   }
-
 }

@@ -95,5 +95,4 @@ class OpensmtFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     // TODO Auto-generated method stub
     return null;
   }
-
 }
