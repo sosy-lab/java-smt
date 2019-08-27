@@ -25,7 +25,8 @@ import static org.junit.Assert.assertTrue;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+//TODO NEw optimathsat method
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
@@ -69,7 +70,8 @@ public class Mathsat5NativeApiTest {
   @Before
   public void createEnvironment() {
     long cfg = msat_create_config();
-    env = msat_create_env(cfg);
+    // TODO NEw optimathsat method
+    env = msat_create_opt_env(cfg);
     msat_destroy_config(cfg);
   }
 

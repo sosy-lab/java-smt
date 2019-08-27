@@ -2,42 +2,96 @@
 
 void throwException(JNIEnv *env, const char *name, const char *msg);
 
-DEFINE_FUNC(jobjective, 1push_1minimize) WITH_FOUR_ARGS(jenv, jterm, string, string)
+DEFINE_FUNC(jenv, 1create_1opt_1env) WITH_ONE_ARG(jconf)
+CONF_ARG(1)
+CALL1(msat_env, create_opt_env)
+ENV_RETURN
+
+/*
+ * msat_env msat_create_shared_opt_env(msat_config cfg, msat_env sibling);
+ */
+DEFINE_FUNC(jenv, 1create_1shared_1opt_1env) WITH_TWO_ARGS(jconf, jenv)
+CONF_ARG(1)
+ENV_ARG(2)
+CALL2(msat_env, create_shared_opt_env)
+ENV_RETURN
+
+DEFINE_FUNC(jobjective, 1make_1minimize) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
 ENV_ARG(1)
 TERM_ARG(2)
-OPTIONAL_STRING_ARG(3)
-OPTIONAL_STRING_ARG(4)
-CALL4(msat_objective, push_minimize)
-FREE_STRING_OPTIONAL_ARG(3)
-FREE_STRING_OPTIONAL_ARG(4)
+ERROR_TERM_ARG(3)
+ERROR_TERM_ARG(4)
+CALL4(msat_objective, make_minimize)
 STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jobjective, 1push_1maximize) WITH_FOUR_ARGS(jenv, jterm, string, string)
+DEFINE_FUNC(jobjective, 1make_1minimize_1signed) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
 ENV_ARG(1)
 TERM_ARG(2)
-OPTIONAL_STRING_ARG(3)
-OPTIONAL_STRING_ARG(4)
-CALL4(msat_objective, push_maximize)
-FREE_STRING_OPTIONAL_ARG(3)
-FREE_STRING_OPTIONAL_ARG(4)
+ERROR_TERM_ARG(3)
+ERROR_TERM_ARG(4)
+CALL4(msat_objective, make_minimize_signed)
 STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jobjective, 1push_1maxmin) WITH_FIVE_ARGS(jenv, int, jtermArray, string, string)
+DEFINE_FUNC(jobjective, 1make_1maximize) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
+ENV_ARG(1)
+TERM_ARG(2)
+ERROR_TERM_ARG(3)
+ERROR_TERM_ARG(4)
+CALL4(msat_objective, make_maximize)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jobjective, 1make_1maximize_1signed) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
+ENV_ARG(1)
+TERM_ARG(2)
+ERROR_TERM_ARG(3)
+ERROR_TERM_ARG(4)
+CALL4(msat_objective, make_maximize_signed)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jobjective, 1make_1minmax) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
 ENV_ARG(1)
 SIMPLE_ARG(size_t, 2)
 TERM_ARRAY_ARG(3)
-OPTIONAL_STRING_ARG(4)
-OPTIONAL_STRING_ARG(5)
-CALL5(msat_objective, push_maxmin)
+ERROR_TERM_ARG(4)
+ERROR_TERM_ARG(5)
+CALL5(msat_objective, make_minmax)
 FREE_TERM_ARRAY_ARG(3)
-FREE_STRING_OPTIONAL_ARG(4)
-FREE_STRING_OPTIONAL_ARG(5)
 STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(int, 1assert_1soft_1formula) WITH_FOUR_ARGS(jenv, jterm, jterm, string)
+DEFINE_FUNC(jobjective, 1make_1minmax_1signed) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
 ENV_ARG(1)
-TERM_ARG(2)
-TERM_ARG(3)
+SIMPLE_ARG(size_t, 2)
+TERM_ARRAY_ARG(3)
+ERROR_TERM_ARG(4)
+ERROR_TERM_ARG(5)
+CALL5(msat_objective, make_minmax_signed)
+FREE_TERM_ARRAY_ARG(3)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jobjective, 1make_1maxmin) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
+ENV_ARG(1)
+SIMPLE_ARG(size_t, 2)
+TERM_ARRAY_ARG(3)
+ERROR_TERM_ARG(4)
+ERROR_TERM_ARG(5)
+CALL5(msat_objective, make_maxmin)
+FREE_TERM_ARRAY_ARG(3)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jobjective, 1make_1maxmin_1signed) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
+ENV_ARG(1)
+SIMPLE_ARG(size_t, 2)
+TERM_ARRAY_ARG(3)
+ERROR_TERM_ARG(4)
+ERROR_TERM_ARG(5)
+CALL5(msat_objective, make_maxmin_signed)
+FREE_TERM_ARRAY_ARG(3)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jfailureCode, 1assert_1soft_1formula) WITH_FOUR_ARGS(jenv, jterm, jterm, string)
+ENV_ARG_VOID(1)
+TERM_ARG_VOID(2)
+TERM_ARG_VOID(3)
 STRING_ARG(4)
 CALL4(int, assert_soft_formula)
 FREE_STRING_ARG(4)
@@ -82,10 +136,10 @@ OBJECTIVE_ARG(2)
 CALL2(msat_objective_type, objective_get_type)
 INT_RETURN
 
-DEFINE_FUNC(int, 1set_1model) WITH_TWO_ARGS(jenv, jobjective)
-ENV_ARG(1)
-OBJECTIVE_ARG(2)
-CALL2(int, set_model)
+DEFINE_FUNC(jfailureCode, 1load_1objective_1model) WITH_TWO_ARGS(jenv, jobjective)
+ENV_ARG_VOID(1)
+OBJECTIVE_ARG_VOID(2)
+CALL2(int, load_objective_model)
 FAILURE_CODE_RETURN
 
 DEFINE_FUNC(string, 1objective_1get_1search_1stats) WITH_TWO_ARGS(jenv, jobjective)
@@ -122,16 +176,17 @@ SIMPLE_ARG(int, 3)
 CALL3(int, objective_value_is_strict)
 INT_RETURN
 
-DEFINE_FUNC(jterm, 1objective_1value_1term) WITH_THREE_ARGS(jenv, jobjective, int)
+DEFINE_FUNC(jterm, 1objective_1value_1term) WITH_FIVE_ARGS(jenv, jobjective, int, jterm, jterm)
 ENV_ARG(1)
 OBJECTIVE_ARG(2)
 SIMPLE_ARG(int, 3)
-CALL3(msat_term, objective_value_term)
+ERROR_TERM_ARG(4)
+ERROR_TERM_ARG(5)
+CALL5(msat_term, objective_value_term)
 TERM_RETURN
 
-DEFINE_FUNC(string, 1objective_1value_1repr) WITH_THREE_ARGS(jenv, jobjective, int)
-ENV_ARG(1)
-OBJECTIVE_ARG(2)
-SIMPLE_ARG(int, 3)
-CALL3(char *, objective_value_repr)
-STRING_RETURN
+DEFINE_FUNC(jfailureCode, 1assert_1objective) WITH_TWO_ARGS(jenv, jobjective)
+ENV_ARG_VOID(1)
+OBJECTIVE_ARG_VOID(2)
+CALL2(int, assert_objective)
+FAILURE_CODE_RETURN

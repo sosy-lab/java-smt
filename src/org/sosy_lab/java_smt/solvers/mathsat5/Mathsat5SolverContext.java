@@ -22,7 +22,10 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+//TODO NEW METHOD FOR OPTIMATHSAT
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_version;
@@ -69,7 +72,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     private String furtherOptions = "";
 
     @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
-    boolean loadOptimathsat5 = false;
+    boolean loadOptimathsat5 = true;
 
     private final @Nullable PathCounterTemplate logfile;
 
@@ -165,6 +168,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     long msatConf = msat_create_config();
     msat_set_option_checked(msatConf, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(msatConf, "random_seed", Long.toString(randomSeed));
+    // TODO set optimath options
+    if (settings.loadOptimathsat5) {
+      msat_set_option_checked(msatConf, "opt.priority", "lex");
+      msat_set_option_checked(msatConf, "model_generation", "true");
+    }
 
     for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       try {
@@ -173,9 +181,13 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         throw new InvalidConfigurationException(e.getMessage(), e);
       }
     }
-
-    final long msatEnv = msat_create_env(msatConf);
-
+    final long msatEnv;
+    // TODO NEw optimathsat method
+    if (settings.loadOptimathsat5) {
+      msatEnv = msat_create_opt_env(msatConf);
+    } else {
+      msatEnv = msat_create_env(msatConf);
+    }
     // Create Mathsat5FormulaCreator
     Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
 
@@ -212,7 +224,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(cfg, "random_seed", Long.toString(randomSeed));
-
+    // TODO set optimath options
+    if (settings.loadOptimathsat5) {
+      msat_set_option_checked(cfg, "opt.priority", "lex");
+      msat_set_option_checked(cfg, "model_generation", "true");
+    }
     for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       msat_set_option_checked(cfg, option.getKey(), option.getValue());
     }
@@ -232,9 +248,19 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     final long env;
     if (USE_SHARED_ENV) {
-      env = msat_create_shared_env(cfg, creator.getEnv());
+      // TODO NEW METHOD for optimathsat
+      if (settings.loadOptimathsat5) {
+        env = msat_create_shared_opt_env(cfg, creator.getEnv());
+      } else {
+        env = msat_create_shared_env(cfg, creator.getEnv());
+      }
     } else {
-      env = msat_create_env(cfg);
+      // TODO NEW METHOD for optimathsat
+      if (settings.loadOptimathsat5) {
+        env = msat_create_opt_env(cfg);
+      } else {
+        env = msat_create_env(cfg);
+      }
     }
 
     return env;
