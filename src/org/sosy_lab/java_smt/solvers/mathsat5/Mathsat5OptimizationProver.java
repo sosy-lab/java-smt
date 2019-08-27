@@ -23,18 +23,21 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_OPTIMUM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_objective;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_objective_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_objective_iterator;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_load_objective_model;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_maximize;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_minimize;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_has_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_repr;
+//import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_repr;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_maximize;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_minimize;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_model;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayDeque;
@@ -98,7 +101,14 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     // todo: code duplication.
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
-    msat_push_maximize(curEnv, getMsatTerm(objective), null, null);
+    // msat_make_maximize(curEnv, getMsatTerm(objective), null, null);
+    // TODO Pass MSAT_ERROR_TERM
+    // long[] termPtr = new long[1];
+    // termPtr[0] = msat_make_number(curEnv, "0");
+    // msat_make_new_error_term(termPtr);
+    // long errorterm = msat_make_number(curEnv, "0");// termPtr[0];
+    long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), 0, 0);
+    msat_assert_objective(curEnv, objectiveId);
     return id;
   }
 
@@ -106,7 +116,15 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   public int minimize(Formula objective) {
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
-    msat_push_minimize(curEnv, getMsatTerm(objective), null, null);
+    // msat_make_minimize(curEnv, getMsatTerm(objective), null, null);
+    // TODO Pass MSAT_ERROR_TERM
+    // long[] termPtr = new long[1];
+    // long[] termPtr = new long[1];
+    // termPtr[0] = msat_make_number(curEnv, "0");
+    // msat_make_new_error_term(termPtr);
+    // long errorterm = termPtr[0];
+    long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), 0, 0);
+    msat_assert_objective(curEnv, objectiveId);
     return id;
   }
 
@@ -117,6 +135,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
       if (!objectiveMap.isEmpty()) {
         objectives = new ArrayList<>();
         long it = msat_create_objective_iterator(curEnv);
+        // TODO no values added to objectives because while is skipped
         while (msat_objective_iterator_has_next(it) != 0) {
           long[] objectivePtr = new long[1];
           int status = msat_objective_iterator_next(it, objectivePtr);
@@ -157,6 +176,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     // todo: use epsilon if the bound is non-strict.
     assert objectiveMap.get(handle) != null;
     assert objectives != null;
+    // TODO Index 0 out of bounds because objectives is empty
     assert objectives.get(objectiveMap.get(handle)) != null;
 
     long objective = objectives.get(objectiveMap.get(handle));
@@ -165,7 +185,15 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
       return Optional.empty();
     }
     assert isUnbounded == 0;
-    String objectiveValue = msat_objective_value_repr(curEnv, objective, MSAT_OPTIMUM);
+    // String objectiveValue = msat_objective_value_repr(curEnv, objective, MSAT_OPTIMUM);
+    // TODO: correct values for infinity/epsilon or MSAT_ERROR_TERM
+    // long[] termPtr = new long[1];
+    // long errorterm = msat_make_number(curEnv, "1");// msat_make_new_error_term(curEnv);
+    // msat_make_new_error_term(errorterm);
+    // long errorterm = termPtr[0];
+    String objectiveValue =
+        msat_term_repr(
+            msat_objective_value_term(curEnv, objective, MSAT_OPTIMUM, 0, 0));
     return Optional.of(Rational.ofString(objectiveValue));
   }
 
@@ -183,7 +211,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     msat_destroy_objective_iterator(it);
     assert objectivePtr[0] != 0;
 
-    msat_set_model(curEnv, objectivePtr[0]);
+    msat_load_objective_model(curEnv, objectivePtr[0]);
     return super.getModel();
   }
 }

@@ -25,9 +25,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
@@ -765,62 +763,82 @@ class Mathsat5NativeApi {
   /* Optimization **/
 
   /*
+   * OptiMathSAT - environment creation
+   */
+
+  public static native long msat_create_opt_env(long cfg);
+
+  public static native long msat_create_shared_opt_env(long cfg, long sibling);
+
+  /*
    * OptiMathSAT - objectives creation
    */
 
   /**
-   * Push on the stack the new objective 'min(term)' with optional optimization local interval
-   * [lower, upper[.
+   * Create new objective 'min(term)' with optional optimization local interval [lower, upper[. Push
+   * onto the stack using assert_objective.
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be minimized.
-   * @param lower The string representing the value of an initial lower bound.
-   * @param upper The string representing the value of an initial upper bound.
+   * @param lower The constant-valued term representing the value of an initial lower bound.
+   * @param upper The constant-valued term representing the value of an initial upper bound. TODO
+   *        change description/error term handling
    */
-  @CanIgnoreReturnValue
-  public static native long msat_push_minimize(
-      long e, long term, @Nullable String lower, @Nullable String upper);
+  public static native long msat_make_minimize(
+      long e, long term, long lower, long upper);
+
+  public static native long msat_make_minimize_signed(
+      long e, long term, long lower, long upper);
 
   /**
-   * Push on the stack the new objective 'max(term)' with optional optimization local interval
-   * ]local, upper].
+   * Create the new objective 'max(term)' with optional optimization local interval ]local, upper].
+   * Push onto the stack using assert_objective .
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be maximized.
-   * @param lower The string representing the value of an initial lower bound.
-   * @param upper The string representing the value of an initial upper bound.
+   * @param lower The constant-valued term representing the value of an initial lower bound.
+   * @param upper The constant-valued term representing the value of an initial upper bound. TODO
+   *        change description/error term handling
    */
-  @CanIgnoreReturnValue
-  public static native long msat_push_maximize(
-      long e, long term, @Nullable String lower, @Nullable String upper);
+  public static native long msat_make_maximize(
+      long e, long term, long lower, long upper);
+
+  public static native long msat_make_maximize_signed(
+      long e, long term, long lower, long upper);
 
   /**
-   * Push on the stack the new objective 'min(max(term0), ..., max(termN))' with optional
-   * optimization local interval ]lower, upper].
+   * Create the new objective 'min(max(term0), ..., max(termN))' with optional optimization local
+   * interval ]lower, upper]. Push onto the stack using assert_objective
    *
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
    * @param terms msat_term[] The array of terms to be optimized.
-   * @param lower The string representing the value of an initial lower bound.
-   * @param upper The string representing the value of an initial upper bound.
+   * @param lower The constant-valued term representing the value of an initial lower bound.
+   * @param upper The constant-valued term representing the value of an initial upper bound. TODO
+   *        change description/error term handling
    */
-  @CanIgnoreReturnValue
-  public static native long msat_push_minmax(
-      long e, int len, long[] terms, @Nullable String lower, @Nullable String upper);
+  public static native long msat_make_minmax(
+      long e, int len, long[] terms, long lower, long upper);
+
+  public static native long msat_make_minmax_signed(
+      long e, int len, long[] terms, long lower, long upper);
 
   /**
-   * Push on the stack the new objective 'max(min(term0), ..., min(termN))' with optional
-   * optimization local interval [lower, upper[.
+   * Create the new objective 'max(min(term0), ..., min(termN))' with optional optimization local
+   * interval [lower, upper[. Push onto the stack using assert_objective
    *
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
    * @param terms msat_term[] The array of terms to be optimized.
-   * @param lower The string representing the value of an initial lower bound.
-   * @param upper The string representing the value of an initial upper bound.
+   * @param lower The constant-valued term representing the value of an initial lower bound.
+   * @param upper The constant-valued term the value of an initial upper bound. TODO change
+   *        description/error term handling
    */
-  @CanIgnoreReturnValue
-  public static native long msat_push_maxmin(
-      long e, int len, long[] terms, @Nullable String lower, @Nullable String upper);
+  public static native long msat_make_maxmin(
+      long e, int len, long[] terms, long lower, long upper);
+
+  public static native long msat_make_maxmin_signed(
+      long e, int len, long[] terms, long lower, long upper);
 
   /**
    * \brief Associate a weight to a term declaration with respect to a MaxSMT group identified by a
@@ -910,8 +928,9 @@ class Mathsat5NativeApi {
    *
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective providing the model.
+   *
    */
-  public static native void msat_set_model(long e, long o);
+  public static native void msat_load_objective_model(long e, long o);
 
   /**
    * Returns optimization search statistics.
@@ -969,33 +988,36 @@ class Mathsat5NativeApi {
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective providing the value.
    * @param i msat_objective_value The objective field to retrieve.
-   * @return msat_term term associated to the objective value, or msat_error_term on error.
+   * @param fin The symbol / positive value representing infinity. If equal to MSAT_ERROR_TERM,
+   *        OptiMathSAT picks his own value.
+   * @param eps The symbol / positive value representing epsilon. If equal to MSAT_ERROR_TERM,
+   *        OptiMathSAT picks his own value.
+   * @return msat_term term associated to the objective value, or msat_error_term on error. TODO
+   *         change description/ Inaccurate when strict ?
    */
-  public static native long msat_objective_value_term(long e, long o, int i);
-
-  /**
-   * Returns a string representation of the given objective value.
-   *
-   * @param e msat_env The environment in which to operate.
-   * @param o msat_objective The objective providing the value.
-   * @param i msat_objective_value The objective field to retrieve.
-   * @return a string representing the objective value. The string must be deallocated by the user
-   *     with ::msat_free().
-   */
-  public static native String msat_objective_value_repr(long e, long o, int i);
+  public static native long msat_objective_value_term(long e, long o, int i, long fin, long eps);
 
   /**
    * Performs garbage collection on the given environment.
    *
-   * <p>This function will perform garbage collection on the given environment. All the internal
-   * caches of the environment will be cleared (including those in the active solvers and
-   * preprocessors). If the environment is not shared, all the terms that are not either in {@code
+   * <p>
+   * This function will perform garbage collection on the given environment. All the internal caches
+   * of the environment will be cleared (including those in the active solvers and preprocessors).
+   * If the environment is not shared, all the terms that are not either in {@code
    * tokeep} or in the current asserted formulas will be deleted.
    *
    * @param env msat_env The environment in which to operate.
    * @param tokeep List of terms to not delete.
    * @param num_tokeep Size of the {@code tokeep} array.
-   * @return zero on success, nonzero on error.
+   * @return zero on success, nonzero on error. TODO Not part of optimathsat. Move to top?
    */
   private static native int msat_gc_env(long env, long[] tokeep, int num_tokeep);
+
+  /**
+   * Push objective on stack.
+   *
+   * @param e msat_env The environment in which to operate.
+   * @param o msat_objective to push on the stack
+   */
+  public static native void msat_assert_objective(long e, long o);
 }

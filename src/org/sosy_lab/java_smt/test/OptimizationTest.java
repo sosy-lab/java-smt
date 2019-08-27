@@ -203,7 +203,8 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(x);
       assertThat(prover.check()).isEqualTo(OptStatus.OPT);
 
-      assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of(1));
+      //assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of(1));
+      assertThat(prover.upper(handle, Rational.of("1/100000000"))).hasValue(Rational.of("99999999/100000000"));
       assertThat(prover.upper(handle, Rational.of("1/10"))).hasValue(Rational.of("9/10"));
     }
   }
