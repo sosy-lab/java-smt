@@ -169,12 +169,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
       return Optional.empty();
     }
     assert isUnbounded == 0;
-    // String objectiveValue = msat_objective_value_repr(curEnv, objective, MSAT_OPTIMUM);
-    // TODO: correct values for infinity/epsilon or MSAT_ERROR_TERM
-    // long[] termPtr = new long[1];
-    // long errorterm = msat_make_number(curEnv, "1");// msat_make_new_error_term(curEnv);
-    // msat_make_new_error_term(errorterm);
-    // long errorterm = termPtr[0];
     String objectiveValue =
         msat_term_repr(msat_objective_value_term(curEnv, objective, MSAT_OPTIMUM, 0, 0));
     return Optional.of(Rational.ofString(objectiveValue));
