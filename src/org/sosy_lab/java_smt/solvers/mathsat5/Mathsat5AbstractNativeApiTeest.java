@@ -46,7 +46,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public abstract class Mathsat5AbstractNativeApiTest {
+public abstract class Mathsat5AbstractNativeApiTeest {
 
   protected long env;
 

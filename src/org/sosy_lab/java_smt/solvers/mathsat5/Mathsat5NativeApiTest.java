@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.sosy_lab.common.NativeLibraries;
 
-public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
+public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTeest {
 
   @BeforeClass
   public static void loadMathsat() {
