@@ -60,6 +60,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     implements OptimizationProverEnvironment {
+
+  private static final int ERROR_TERM = 0;
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
   /** Number of the objective -> objective pointer. */
@@ -98,7 +100,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   public int maximize(Formula objective) {
     int id = idGenerator.getFreshId();
     objectiveMap = objectiveMap.putAndCopy(id, objectiveMap.size());
-    long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), 0, 0);
+    long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), ERROR_TERM, ERROR_TERM);
     msat_assert_objective(curEnv, objectiveId);
     return id;
   }
@@ -107,7 +109,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   public int minimize(Formula objective) {
     int id = idGenerator.getFreshId();
     objectiveMap = objectiveMap.putAndCopy(id, objectiveMap.size());
-    long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), 0, 0);
+    long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), ERROR_TERM, ERROR_TERM);
     msat_assert_objective(curEnv, objectiveId);
     return id;
   }
