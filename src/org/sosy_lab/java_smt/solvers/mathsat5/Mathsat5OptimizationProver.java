@@ -177,8 +177,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
     // msat_make_new_error_term(errorterm);
     // long errorterm = termPtr[0];
     String objectiveValue =
-        msat_term_repr(
-            msat_objective_value_term(curEnv, objective, MSAT_OPTIMUM, 0, 0));
+        msat_term_repr(msat_objective_value_term(curEnv, objective, MSAT_OPTIMUM, 0, 0));
     return Optional.of(Rational.ofString(objectiveValue));
   }
 
