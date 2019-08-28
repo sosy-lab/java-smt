@@ -167,11 +167,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     long msatConf = msat_create_config();
     msat_set_option_checked(msatConf, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(msatConf, "random_seed", Long.toString(randomSeed));
-    // TODO set optimath options
-    if (settings.loadOptimathsat5) {
-      msat_set_option_checked(msatConf, "opt.priority", "lex");
-      msat_set_option_checked(msatConf, "model_generation", "true");
-    }
 
     for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       try {
@@ -246,14 +241,12 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     final long env;
     if (USE_SHARED_ENV) {
-      // TODO NEW METHOD for optimathsat
       if (settings.loadOptimathsat5) {
         env = msat_create_shared_opt_env(cfg, creator.getEnv());
       } else {
         env = msat_create_shared_env(cfg, creator.getEnv());
       }
     } else {
-      // TODO NEW METHOD for optimathsat
       if (settings.loadOptimathsat5) {
         env = msat_create_opt_env(cfg);
       } else {
