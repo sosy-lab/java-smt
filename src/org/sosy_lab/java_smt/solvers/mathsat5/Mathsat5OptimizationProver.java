@@ -25,21 +25,16 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_OPTI
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_objective;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_objective_iterator;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_objective_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_load_objective_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_maximize;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_minimize;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_has_next;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
-import com.google.common.base.Preconditions;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -162,19 +157,9 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Mathsat5Model getModel() throws SolverException {
-
-    // Get to the last objective in the stack.
-    // todo: code duplication.
-    long it = msat_create_objective_iterator(curEnv);
-    long[] objectivePtr = new long[1];
-    while (msat_objective_iterator_has_next(it) != 0) {
-      int status = msat_objective_iterator_next(it, objectivePtr);
-      assert status == 0;
+    if (!objectiveMap.isEmpty()) {
+      msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }
-    msat_destroy_objective_iterator(it);
-    Preconditions.checkState(objectivePtr[0] != 0, "objective not available");
-
-    msat_load_objective_model(curEnv, objectivePtr[0]);
     return super.getModel();
   }
 }
