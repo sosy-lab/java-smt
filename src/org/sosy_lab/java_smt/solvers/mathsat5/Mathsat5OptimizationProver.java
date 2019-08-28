@@ -38,6 +38,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -193,7 +194,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
       assert status == 0;
     }
     msat_destroy_objective_iterator(it);
-    assert objectivePtr[0] != 0;
+    Preconditions.checkState(objectivePtr[0] != 0, "objective not available");
 
     msat_load_objective_model(curEnv, objectivePtr[0]);
     return super.getModel();
