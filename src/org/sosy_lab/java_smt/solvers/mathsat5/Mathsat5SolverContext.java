@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
-//TODO NEW METHOD FOR OPTIMATHSAT
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_opt_env;
@@ -182,7 +181,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       }
     }
     final long msatEnv;
-    // TODO NEw optimathsat method
     if (settings.loadOptimathsat5) {
       msatEnv = msat_create_opt_env(msatConf);
     } else {
