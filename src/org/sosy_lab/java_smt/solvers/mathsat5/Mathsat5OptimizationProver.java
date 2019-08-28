@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_has_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
-//import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
@@ -98,15 +97,8 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int maximize(Formula objective) {
-    // todo: code duplication.
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
-    // msat_make_maximize(curEnv, getMsatTerm(objective), null, null);
-    // TODO Pass MSAT_ERROR_TERM
-    // long[] termPtr = new long[1];
-    // termPtr[0] = msat_make_number(curEnv, "0");
-    // msat_make_new_error_term(termPtr);
-    // long errorterm = msat_make_number(curEnv, "0");// termPtr[0];
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), 0, 0);
     msat_assert_objective(curEnv, objectiveId);
     return id;
@@ -116,13 +108,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   public int minimize(Formula objective) {
     int id = idGenerator.getFreshId();
     objectiveMap.put(id, objectiveMap.size());
-    // msat_make_minimize(curEnv, getMsatTerm(objective), null, null);
-    // TODO Pass MSAT_ERROR_TERM
-    // long[] termPtr = new long[1];
-    // long[] termPtr = new long[1];
-    // termPtr[0] = msat_make_number(curEnv, "0");
-    // msat_make_new_error_term(termPtr);
-    // long errorterm = termPtr[0];
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), 0, 0);
     msat_assert_objective(curEnv, objectiveId);
     return id;

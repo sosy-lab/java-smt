@@ -780,12 +780,12 @@ class Mathsat5NativeApi {
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be minimized.
-   * @param lower The constant-valued term representing the value of an initial lower bound.
-   * @param upper The constant-valued term representing the value of an initial upper bound. TODO
-   *        change description/error term handling
+   * @param lower The constant-valued term representing the value of an initial lower bound. Use
+   *     NULL for negative infinity.
+   * @param upper The constant-valued term representing the value of an initial upper bound. Use
+   *     NULL for positive infinity.
    */
-  public static native long msat_make_minimize(
-      long e, long term, long lower, long upper);
+  public static native long msat_make_minimize(long e, long term, long lower, long upper);
 
   public static native long msat_make_minimize_signed(
       long e, long term, long lower, long upper);
@@ -796,12 +796,12 @@ class Mathsat5NativeApi {
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be maximized.
-   * @param lower The constant-valued term representing the value of an initial lower bound.
-   * @param upper The constant-valued term representing the value of an initial upper bound. TODO
-   *        change description/error term handling
+   * @param lower The constant-valued term representing the value of an initial lower bound. Use
+   *     NULL (MSAT_ERROR_TERM) for negative infinity.
+   * @param upper The constant-valued term representing the value of an initial upper bound. Use
+   *     NULL (MSAT_ERROR_TERM) for positive infinity.
    */
-  public static native long msat_make_maximize(
-      long e, long term, long lower, long upper);
+  public static native long msat_make_maximize(long e, long term, long lower, long upper);
 
   public static native long msat_make_maximize_signed(
       long e, long term, long lower, long upper);
@@ -813,12 +813,12 @@ class Mathsat5NativeApi {
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
    * @param terms msat_term[] The array of terms to be optimized.
-   * @param lower The constant-valued term representing the value of an initial lower bound.
-   * @param upper The constant-valued term representing the value of an initial upper bound. TODO
-   *        change description/error term handling
+   * @param lower The constant-valued term representing the value of an initial lower bound. Use
+   *     NULL (MSAT_ERROR_TERM) for negative infinity.
+   * @param upper The constant-valued term representing the value of an initial upper bound. Use
+   *     NULL (MSAT_ERROR_TERM) for positive infinity.
    */
-  public static native long msat_make_minmax(
-      long e, int len, long[] terms, long lower, long upper);
+  public static native long msat_make_minmax(long e, int len, long[] terms, long lower, long upper);
 
   public static native long msat_make_minmax_signed(
       long e, int len, long[] terms, long lower, long upper);
@@ -830,12 +830,12 @@ class Mathsat5NativeApi {
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
    * @param terms msat_term[] The array of terms to be optimized.
-   * @param lower The constant-valued term representing the value of an initial lower bound.
-   * @param upper The constant-valued term the value of an initial upper bound. TODO change
-   *        description/error term handling
+   * @param lower The constant-valued term representing the value of an initial lower bound. Use
+   *     NULL (MSAT_ERROR_TERM) for negative infinity.
+   * @param upper The constant-valued term representing the value of an initial upper bound. Use
+   *     NULL (MSAT_ERROR_TERM) for positive infinity.
    */
-  public static native long msat_make_maxmin(
-      long e, int len, long[] terms, long lower, long upper);
+  public static native long msat_make_maxmin(long e, int len, long[] terms, long lower, long upper);
 
   public static native long msat_make_maxmin_signed(
       long e, int len, long[] terms, long lower, long upper);
@@ -988,28 +988,26 @@ class Mathsat5NativeApi {
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective providing the value.
    * @param i msat_objective_value The objective field to retrieve.
-   * @param fin The symbol / positive value representing infinity. If equal to MSAT_ERROR_TERM,
-   *        OptiMathSAT picks his own value.
-   * @param eps The symbol / positive value representing epsilon. If equal to MSAT_ERROR_TERM,
-   *        OptiMathSAT picks his own value.
-   * @return msat_term term associated to the objective value, or msat_error_term on error. TODO
-   *         change description/ Inaccurate when strict ?
+   * @param fin The symbol / positive value representing infinity. If equal to NULL
+   *     (MSAT_ERROR_TERM), OptiMathSAT picks his own value.
+   * @param eps The symbol / positive value representing epsilon. If equal to NULL
+   *     (MSAT_ERROR_TERM), OptiMathSAT picks his own value.
+   * @return msat_term term associated to the objective value, or msat_error_term on error.
    */
   public static native long msat_objective_value_term(long e, long o, int i, long fin, long eps);
 
   /**
    * Performs garbage collection on the given environment.
    *
-   * <p>
-   * This function will perform garbage collection on the given environment. All the internal caches
-   * of the environment will be cleared (including those in the active solvers and preprocessors).
-   * If the environment is not shared, all the terms that are not either in {@code
+   * <p>This function will perform garbage collection on the given environment. All the internal
+   * caches of the environment will be cleared (including those in the active solvers and
+   * preprocessors). If the environment is not shared, all the terms that are not either in {@code
    * tokeep} or in the current asserted formulas will be deleted.
    *
    * @param env msat_env The environment in which to operate.
    * @param tokeep List of terms to not delete.
    * @param num_tokeep Size of the {@code tokeep} array.
-   * @return zero on success, nonzero on error. TODO Not part of optimathsat. Move to top?
+   * @return zero on success, nonzero on error.
    */
   private static native int msat_gc_env(long env, long[] tokeep, int num_tokeep);
 
