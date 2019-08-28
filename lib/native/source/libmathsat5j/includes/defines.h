@@ -63,6 +63,10 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   mtype m_arg##num; \
   m_arg##num.repr = (void *)((size_t)arg##num);
 
+#define STRUCT_ARG_MAYBE_NULL(mtype, num) \
+  mtype m_arg##num; \
+  m_arg##num.repr = (void *)((size_t)arg##num);
+
 #define STRING_ARG(num) \
   char * m_arg##num = (char *)(*jenv)->GetStringUTFChars(jenv, arg##num, NULL); \
   if (m_arg##num == NULL) { \
@@ -267,14 +271,7 @@ typedef jlong jjconf;
 
 typedef jlong jjterm;
 #define TERM_ARG(num) STRUCT_ARG(msat_term, num)
-#define ERROR_TERM_ARG(num)  \
-  msat_term m_arg##num; \
-  if (arg##num == 0) { \
-    m_arg##num.repr = NULL; \
-  } else { \
-    m_arg##num.repr = (void *)((size_t)arg##num); \
-  }
-
+#define ERROR_TERM_ARG(num) STRUCT_ARG_MAYBE_NULL(msat_term, num)
 #define TERM_ARG_VOID(num) STRUCT_ARG_VOID(msat_term, num)
 #define TERM_RETURN STRUCT_RETURN_WITH_ENV
 
