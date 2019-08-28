@@ -30,6 +30,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_load_objective_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_maximize;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_minimize;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_has_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_iterator_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
@@ -150,15 +151,15 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    return getValue(handle);
+    return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
-    return getValue(handle);
+    return getValue(handle, epsilon);
   }
 
-  private Optional<Rational> getValue(int handle) {
+  private Optional<Rational> getValue(int handle, Rational epsilon) {
     // todo: use epsilon if the bound is non-strict.
     assert objectiveMap.get(handle) != null;
     assert objectives != null;
@@ -171,9 +172,10 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
       return Optional.empty();
     }
     assert isUnbounded == 0;
-    String objectiveValue =
-        msat_term_repr(msat_objective_value_term(curEnv, objective, MSAT_OPTIMUM, 0, 0));
-    return Optional.of(Rational.ofString(objectiveValue));
+    long epsilonTerm = msat_make_number(curEnv, epsilon.toString());
+    long objectiveValue =
+        msat_objective_value_term(curEnv, objective, MSAT_OPTIMUM, ERROR_TERM, epsilonTerm);
+    return Optional.of(Rational.ofString(msat_term_repr(objectiveValue)));
   }
 
   @Override
