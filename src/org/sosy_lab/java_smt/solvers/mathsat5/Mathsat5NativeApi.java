@@ -787,8 +787,7 @@ class Mathsat5NativeApi {
    */
   public static native long msat_make_minimize(long e, long term, long lower, long upper);
 
-  public static native long msat_make_minimize_signed(
-      long e, long term, long lower, long upper);
+  public static native long msat_make_minimize_signed(long e, long term, long lower, long upper);
 
   /**
    * Create the new objective 'max(term)' with optional optimization local interval ]local, upper].
@@ -803,8 +802,7 @@ class Mathsat5NativeApi {
    */
   public static native long msat_make_maximize(long e, long term, long lower, long upper);
 
-  public static native long msat_make_maximize_signed(
-      long e, long term, long lower, long upper);
+  public static native long msat_make_maximize_signed(long e, long term, long lower, long upper);
 
   /**
    * Create the new objective 'min(max(term0), ..., max(termN))' with optional optimization local
@@ -928,7 +926,6 @@ class Mathsat5NativeApi {
    *
    * @param e msat_env The environment in which to operate.
    * @param o msat_objective The objective providing the model.
-   *
    */
   public static native void msat_load_objective_model(long e, long o);
 
