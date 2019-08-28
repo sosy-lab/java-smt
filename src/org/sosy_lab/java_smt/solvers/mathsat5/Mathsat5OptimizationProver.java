@@ -39,11 +39,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +49,8 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -69,10 +69,10 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
    * ID given to user -> number of the objective. Size corresponds to the number of currently
    * existing objectives.
    */
-  private Map<Integer, Integer> objectiveMap;
+  private PersistentMap<Integer, Integer> objectiveMap = PathCopyingPersistentTreeMap.of();
 
   /** Stack of the objective maps. Some duplication, but shouldn't be too important. */
-  private final Deque<ImmutableMap<Integer, Integer>> stack;
+  private final Deque<PersistentMap<Integer, Integer>> stack = new ArrayDeque<>();
 
   Mathsat5OptimizationProver(
       Mathsat5SolverContext pMgr,
@@ -80,8 +80,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
     super(pMgr, options, creator, pShutdownNotifier);
-    objectiveMap = new HashMap<>();
-    stack = new ArrayDeque<>();
   }
 
   @Override
@@ -99,7 +97,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public int maximize(Formula objective) {
     int id = idGenerator.getFreshId();
-    objectiveMap.put(id, objectiveMap.size());
+    objectiveMap = objectiveMap.putAndCopy(id, objectiveMap.size());
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), 0, 0);
     msat_assert_objective(curEnv, objectiveId);
     return id;
@@ -108,7 +106,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public int minimize(Formula objective) {
     int id = idGenerator.getFreshId();
-    objectiveMap.put(id, objectiveMap.size());
+    objectiveMap = objectiveMap.putAndCopy(id, objectiveMap.size());
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), 0, 0);
     msat_assert_objective(curEnv, objectiveId);
     return id;
@@ -139,13 +137,13 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public void push() {
     msat_push_backtrack_point(curEnv);
-    stack.add(ImmutableMap.copyOf(objectiveMap));
+    stack.add(objectiveMap);
   }
 
   @Override
   public void pop() {
     msat_pop_backtrack_point(curEnv);
-    objectiveMap = new HashMap<>(stack.pop());
+    objectiveMap = stack.pop();
   }
 
   @Override
