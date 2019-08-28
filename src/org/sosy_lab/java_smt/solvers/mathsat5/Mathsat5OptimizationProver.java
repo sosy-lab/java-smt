@@ -41,7 +41,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -72,10 +71,10 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
    * ID given to user -> number of the objective. Size corresponds to the number of currently
    * existing objectives.
    */
-  private PersistentMap<Integer, Integer> objectiveMap = PathCopyingPersistentTreeMap.of();
+  private PersistentMap<Integer, Long> objectiveMap = PathCopyingPersistentTreeMap.of();
 
   /** Stack of the objective maps. Some duplication, but shouldn't be too important. */
-  private final Deque<PersistentMap<Integer, Integer>> stack = new ArrayDeque<>();
+  private final Deque<PersistentMap<Integer, Long>> stack = new ArrayDeque<>();
 
   Mathsat5OptimizationProver(
       Mathsat5SolverContext pMgr,
@@ -99,38 +98,26 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int maximize(Formula objective) {
-    int id = idGenerator.getFreshId();
-    objectiveMap = objectiveMap.putAndCopy(id, objectiveMap.size());
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), ERROR_TERM, ERROR_TERM);
     msat_assert_objective(curEnv, objectiveId);
+    int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
+    objectiveMap = objectiveMap.putAndCopy(id, objectiveId);
     return id;
   }
 
   @Override
   public int minimize(Formula objective) {
-    int id = idGenerator.getFreshId();
-    objectiveMap = objectiveMap.putAndCopy(id, objectiveMap.size());
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), ERROR_TERM, ERROR_TERM);
     msat_assert_objective(curEnv, objectiveId);
+    int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
+    objectiveMap = objectiveMap.putAndCopy(id, objectiveId);
     return id;
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    boolean out = msat_check_sat(curEnv);
-    if (out) {
-      if (!objectiveMap.isEmpty()) {
-        objectives = new ArrayList<>();
-        long it = msat_create_objective_iterator(curEnv);
-        // TODO no values added to objectives because while is skipped
-        while (msat_objective_iterator_has_next(it) != 0) {
-          long[] objectivePtr = new long[1];
-          int status = msat_objective_iterator_next(it, objectivePtr);
-          assert status == 0;
-          objectives.add(objectivePtr[0]);
-        }
-        msat_destroy_objective_iterator(it);
-      }
+    final boolean isSatisfiable = msat_check_sat(curEnv);
+    if (isSatisfiable) {
       return OptStatus.OPT;
     } else {
       return OptStatus.UNSAT;
@@ -160,13 +147,8 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   private Optional<Rational> getValue(int handle, Rational epsilon) {
-    // todo: use epsilon if the bound is non-strict.
-    assert objectiveMap.get(handle) != null;
-    assert objectives != null;
-    // TODO Index 0 out of bounds because objectives is empty
-    assert objectives.get(objectiveMap.get(handle)) != null;
-
-    long objective = objectives.get(objectiveMap.get(handle));
+    assert objectiveMap.containsKey(handle) : "querying an unknown handle";
+    long objective = objectiveMap.get(handle);
     int isUnbounded = msat_objective_value_is_unbounded(curEnv, objective, MSAT_OPTIMUM);
     if (isUnbounded == 1) {
       return Optional.empty();
