@@ -60,6 +60,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorBooleanFormulaManager booleanTheory = new BoolectorBooleanFormulaManager(creator);
     BoolectorBitvectorFormulaManager bitvectorTheory =
         new BoolectorBitvectorFormulaManager(creator);
+    BoolectorQuantifiedFormulaManager quantifierTheory =
+        new BoolectorQuantifiedFormulaManager(creator);
     BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
     BoolectorFormulaManager manager =
         new BoolectorFormulaManager(
@@ -67,6 +69,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
             functionTheory,
             booleanTheory,
             bitvectorTheory,
+            quantifierTheory,
             arrayTheory);
     return new BoolectorSolverContext(manager, creator);
   }

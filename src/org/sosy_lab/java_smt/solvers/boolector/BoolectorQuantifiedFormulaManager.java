@@ -49,6 +49,11 @@ public class BoolectorQuantifiedFormulaManager
       throw new IllegalArgumentException("List of quantified variables can not be empty");
     }
     long[] varsArray = Longs.toArray(pVars);
+    for (long param : varsArray) {
+      if (!BtorJNI.boolector_is_param(btor, param)) {
+        throw new IllegalArgumentException("pVariables need to be parameter nodes in boolector.");
+      }
+    }
     if (pQ == Quantifier.FORALL) {
       return BtorJNI.boolector_forall(btor, varsArray, varsArray.length, pBody);
     }

@@ -58,7 +58,6 @@ final class BoolectorFormulaManager
   @Override
   public Appender dumpFormula(Long pT) {
     // TODO check if line break is correct!!!!
-    // TODO check if all nodes are parseable (should be according to API)
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {

@@ -39,13 +39,10 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 @Options(prefix = "solver.boolector")
 class BoolectorEnvironment {
 
-  private final int randomSeed;
-  private final @Nullable PathCounterTemplate basicLogfile;
-  private final ShutdownNotifier shutdownNotifier;
-
-  private final long btor;
-
-  private final List<BoolectorAbstractProver<?>> registeredProvers = new ArrayList<>();
+  @Option(
+    secure = true,
+    description = "The SAT solver used by Boolector. Available are \"Lingeling\", \"PicoSAT\" and \"MiniSAT \". Please enter the String for the Solver you want (case insensitive).")
+  private String satSolver = "";
 
   @Option(
     secure = true,
@@ -54,6 +51,14 @@ class BoolectorEnvironment {
         + "Optionname and value can be found in BtorOption or Boolector C Api."
         + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
   private String furtherOptions = "";
+
+  private final int randomSeed;
+  private final @Nullable PathCounterTemplate basicLogfile;
+  private final ShutdownNotifier shutdownNotifier;
+
+  private final long btor;
+
+  private final List<BoolectorAbstractProver<?>> registeredProvers = new ArrayList<>();
 
   BoolectorEnvironment(
       Configuration config,
@@ -73,14 +78,20 @@ class BoolectorEnvironment {
     }
 
     btor = getNewBtor();
+    config.inject(this);
+    // Setting SAT Solver
+    if (satSolver.length() > 0) {
+      BtorJNI.boolector_set_sat_solver(btor, satSolver);
+    }
 
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.swigValue(), 1);
+    // Incremental needed for push/pop!
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.swigValue(), 1);
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.swigValue(), randomSeed);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_REWRITE_LEVEL.swigValue(), 0);
 
-    config.inject(this);
     setOptions();
   }
 
@@ -134,12 +145,6 @@ class BoolectorEnvironment {
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       Set<ProverOptions> pOptions) {
-
-
-    // Options for prover
-    // Atm just enable model gen, later use Options
-    // BtorJNI.boolector_set_opt(newBtor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 1);
-
     BoolectorAbstractProver<Void> prover =
         new BoolectorTheoremProver(manager, creator, btor, shutdownNotifier, pOptions);
     registeredProvers.add(prover);

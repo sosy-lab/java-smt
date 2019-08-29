@@ -21,8 +21,11 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironment> {
@@ -34,21 +37,25 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   private final BoolectorFormulaCreator creator;
   private boolean closed = false;
 
+  private final ImmutableList<Long> assertedTerms;
+
   BoolectorModel(
       long btor,
       BoolectorFormulaCreator creator,
-      BoolectorAbstractProver<?> pProver) {
+      BoolectorAbstractProver<?> pProver,
+      Collection<Long> assertedTerms) {
     super(creator);
     this.creator = creator;
     this.btor = btor;
     this.prover = pProver;
+    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
   }
 
   @Override
   public void close() {
     if (!closed) {
-      System.out.println("Model");
-      BtorJNI.boolector_delete(btor);
+      // BtorJNI.boolector_delete(btor);
+      // Technically boolector has no model
       closed = true;
     }
   }
@@ -58,21 +65,39 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
-    Iterable<Long> formulas = prover.getAssertedFormulas();
-    for (Long formula : formulas) {
-      if (BtorJNI.boolector_is_array(btor, formula)) {
-        assignments.add(getArrayAssignment(formula));
-      } else if (BtorJNI.boolector_is_fun(btor, formula)) {
-        assignments.add(getUFAssignment(formula));
-      } else {
-        assignments.add(getAssignment(formula));
+    for (Long formula : assertedTerms) {
+      for (Entry<String, Long> entry : creator.extractVariablesAndUFs(formula, true).entrySet()) {
+        String name = entry.getKey();
+        Long var = entry.getValue();
+        System.out.println("toList with: " + name);
+        System.out.println(BtorJNI.boolector_help_dump_node_smt2(btor, var));
+        /*
+         * if (BtorJNI.boolector_is_array(btor, var)) {
+         * assignments.add(getArrayAssignment(formula)); } else if (BtorJNI.boolector_is_uf(btor,
+         * var)) { assignments.add(getUFAssignment(formula)); } else if
+         * (BtorJNI.boolector_is_var(btor, var)) { if (BtorJNI.boolector_get_width(btor, var) == 1)
+         * { assignments.add(getBoolAssignment(formula)); } else {
+         * assignments.add(getBvAssignment(formula)); } }
+         */
       }
     }
-    System.out.println("toList");
     return assignments.build();
   }
 
-  private ValueAssignment getAssignment(long key) {
+  private ValueAssignment getBoolAssignment(long key) {
+    List<Object> argumentInterpretation = new ArrayList<>();
+    Long value = evalImpl(key);
+    // TODO revisit equality method!!!
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(key),
+        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
+        creator.getName(key, btor),
+        creator.convertValue(key, value),
+        argumentInterpretation);
+  }
+
+  private ValueAssignment getBvAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Long value = evalImpl(key);
     // TODO revisit equality method!!!
@@ -111,21 +136,22 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         argumentInterpretation);
   }
 
+  // check for array/uf/quant
   @Override
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
-    if (BtorJNI.boolector_is_var(btor, pFormula)) {
+    if (BtorJNI.boolector_is_array(btor, pFormula)) {
       String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(assignment);
     } else if (BtorJNI.boolector_is_const(btor, pFormula)) {
       String assignment = BtorJNI.boolector_get_bits(btor, pFormula);
       return parseLong(assignment);
     } else if (BtorJNI.boolector_is_bitvec_sort(btor, BtorJNI.boolector_get_sort(btor, pFormula))) {
-      BtorJNI.boolector_bv_assignment(btor, pFormula); // geht
+      BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(BtorJNI.boolector_bv_assignment(btor, pFormula));
-    } else {
-      throw new AssertionError("Unexpected formula: " + pFormula);
     }
+    String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
+    return parseLong(assignment);
   }
 
   /**
@@ -133,23 +159,26 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
    * values for x, change it in the constant! (BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT)
    *
    * @param assignment String with the assignment of Boolector var.
-   * @return long representation of assignment String.
+   * @return BigInteger in decimal.
    */
   private Long parseLong(String assignment) {
     try {
-      return Long.parseLong(assignment);
+      BigInteger bigInt = new BigInteger(assignment, 2);
+      return bigInt.longValue();
     } catch (NumberFormatException e) {
       char[] charArray = assignment.toCharArray();
       for (int i = 0; i < charArray.length; i++) {
         if (charArray[i] == 'x') {
-          charArray[i] = BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT;
+          charArray[i] = '1';
         } else if (charArray[i] != '0' && charArray[i] != '1') {
           throw new IllegalArgumentException(
               "Boolector gave back an assignment that is not parseable.");
         }
       }
-      return Long.parseLong(charArray.toString());
+      assignment = charArray.toString();
     }
+    BigInteger bigInt = new BigInteger(assignment, 2);
+    return bigInt.longValue();
   }
 
 }

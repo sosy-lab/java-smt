@@ -22,6 +22,8 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.primitives.Longs;
+import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -150,9 +152,29 @@ public class BoolectorFormulaCreator
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Long pF) {
-    // TODO Auto-generated method stub
-    return null;
+  public <R> R visit(FormulaVisitor<R> visitor, Formula pFormula, Long pF) {
+    if (BtorJNI.boolector_is_const(getEnv().getBtor(), pF)) {
+      String f = BtorJNI.boolector_get_bits(getEnv().getBtor(), pF);
+      return visitor.visitConstant(pFormula, convertValue(pF, parseBitvector(f)));
+    } else if (BtorJNI.boolector_is_array(getEnv().getBtor(), pF)) {
+      // array = function?!
+    } else if (BtorJNI.boolector_is_uf(getEnv().getBtor(), pF)) {
+      // TODO
+      String[][] ufAss = BtorJNI.boolector_uf_assignment_helper(getEnv().getBtor(), pF);
+      return visitor.visitFunction(pF, Arrays.asList(ufAss[0]), functionDeclaration);
+    } else if (BtorJNI.boolector_is_param(getEnv().getBtor(), pF)) {
+      // Quantifier var
+      return visitor.visitBoundVariable(pF, deBruijnIdx);
+    } else if () {
+      // Quantifier node
+      // TODO: is that possible in btor?
+      return visitor.visitQuantifier(f, quantifier, boundVariables, body);
+    }
+      else {
+      return visitor
+          .visitFreeVariable(pFormula, BtorJNI.boolector_get_symbol(getEnv().getBtor(), pF));
+      // must be bitvector var at this point
+    }
   }
 
   @Override
@@ -175,32 +197,31 @@ public class BoolectorFormulaCreator
 
   @Override
   public Object convertValue(Long key, Long term) {
-    // To get the correct type, we generate it from the key, not the value.
-    FormulaType<?> type = getFormulaType(key);
-    if (type.isBooleanType()) {
+    // To get the correct type, we check the width of key.
+    int width = (int) BtorJNI.boolector_get_width(getEnv().getBtor(), key);
+    if (width == 1) {
       if (term == 1) {
         return true;
       } else if (term == 0) {
         return false;
       } else {
-        throw new IllegalArgumentException("Unexpected type: " + type);
+        throw new IllegalArgumentException("Unexpected type: " + key + ", with value: " + term);
       }
-    } else if (type.isBitvectorType()) {
-      return term;
-    } else {
-      throw new IllegalArgumentException("Unexpected type: " + type);
     }
-  }
+    return BigInteger.valueOf(term);
+    }
+
 
   /**
-   * Transforms String bitvec into Long bitvec
+   * Transforms String bitvec into Long
    *
    * @param bitVec return value of Boolector
    * @return gives back the long version of the bitvector
    */
   private Long parseBitvector(String bitVec) {
     try {
-      return Long.parseLong(bitVec);
+      BigInteger bigInt = new BigInteger(bitVec, 2);
+      return bigInt.longValue();
     } catch (NumberFormatException e) {
       char[] charArray = bitVec.toCharArray();
       for (int i = 0; i < charArray.length; i++) {
@@ -211,8 +232,10 @@ public class BoolectorFormulaCreator
               "Boolector gave back an assignment that is not parseable.");
         }
       }
-      return Long.parseLong(charArray.toString());
+      bitVec = charArray.toString();
     }
+    BigInteger bigInt = new BigInteger(bitVec, 2);
+    return bigInt.longValue();
   }
 
   String getName(long pKey, long btor) {

@@ -28,6 +28,7 @@ import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_or;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_true;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_xor;
 
+import com.google.common.primitives.Longs;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class BoolectorBooleanFormulaManager
@@ -84,13 +85,35 @@ public class BoolectorBooleanFormulaManager
 
   @Override
   public boolean isTrue(Long pBits) {
-    // TODO Auto-generated method stub
+    if (BtorJNI.boolector_get_width(btor, pBits) == 1) {
+      String assignment;
+      if (BtorJNI.boolector_is_const(btor, pBits)) {
+        assignment = BtorJNI.boolector_get_bits(btor, pBits);
+      } else {
+        assignment = BtorJNI.boolector_bv_assignment(btor, pBits);
+      }
+      Long maybeLong = Longs.tryParse(assignment);
+      if (maybeLong != null && maybeLong == 1) {
+        return true;
+      }
+    }
     return false;
   }
 
   @Override
   public boolean isFalse(Long pBits) {
-    // TODO Auto-generated method stub
+    if (BtorJNI.boolector_get_width(btor, pBits) == 1) {
+      String assignment;
+      if (BtorJNI.boolector_is_const(btor, pBits)) {
+        assignment = BtorJNI.boolector_get_bits(btor, pBits);
+      } else {
+        assignment = BtorJNI.boolector_bv_assignment(btor, pBits);
+      }
+      Long maybeLong = Longs.tryParse(assignment);
+      if (maybeLong != null && maybeLong == 0) {
+        return true;
+      }
+    }
     return false;
   }
 

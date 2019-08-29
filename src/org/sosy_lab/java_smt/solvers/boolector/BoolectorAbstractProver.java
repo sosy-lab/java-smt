@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +45,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
   protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
-  // private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
+
   private final ShutdownNotifier shutdownNotifier;
   protected boolean closed = false;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
@@ -70,7 +69,10 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (!closed) {
       // Problem: Cloning results in not beeing able to access var with old name (string)
       // NOT Cloning results in murdering btor that is still beeing used
+      // closing of assertions only by using boolector_release
       // BtorJNI.boolector_delete(btor);
+      assertedFormulas.clear();
+      // if not able to close, pop all the stack
       closed = true;
     }
   }
@@ -90,7 +92,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       return true;
     } else if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_UNKNOWN) {
       throw new SolverException(
-          "Boolector may have ran out of stack or heap memory, try increasing their sizes.");
+          "Boolector encountered a problem or may have ran out of stack or heap memory, try increasing their sizes.");
     } else {
       throw new SolverException("Boolector sat call returned " + result);
     }
@@ -111,8 +113,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
+    Preconditions.checkState(!closed);
+    for (BooleanFormula assumption : pAssumptions) {
+      BtorJNI.boolector_assume(btor, BoolectorFormulaManager.getBtorTerm(assumption));
+    }
+    return isUnsat();
   }
 
   @Override
@@ -137,7 +142,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new BoolectorModel(btor, creator, this);
+    return new BoolectorModel(btor, creator, this, getAssertedTerms());
   }
 
   @Override
@@ -146,27 +151,14 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     BtorJNI.boolector_assert(
         manager.getEnvironment().getBtor(),
         BoolectorFormulaManager.getBtorTerm(constraint));
-    addAssertedFormula(BoolectorFormulaManager.getBtorTerm(constraint));
+    assertedFormulas.peek().add(BoolectorFormulaManager.getBtorTerm(constraint));
     return null;
   }
 
-  /**
-   * Adds a Formula to the stack. (External Stack to know which formulas are to be evaluated later
-   * on)
-   *
-   * @param f formula to be asserted
-   */
-  protected void addAssertedFormula(Long f) {
-    assertedFormulas.peek().add(f);
-  }
-
-  /**
-   * Returns all the asserted formulas of the current stack.
-   *
-   * @return
-   */
-  protected Iterable<Long> getAssertedFormulas() {
-    return Iterables.concat(assertedFormulas);
+  protected Collection<Long> getAssertedTerms() {
+    List<Long> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
   }
 
 }

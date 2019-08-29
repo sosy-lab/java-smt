@@ -184,10 +184,6 @@ class BoolectorBitvectorFormulaManager
 
   @Override
   public Long makeVariableImpl(int pLength, String pVar) {
-    if (pLength < pVar.length()) {
-      throw new IllegalArgumentException(
-          pVar + " is to small for a bitvector with length " + pLength);
-    }
     long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
     return BtorJNI.boolector_var(btor, sort, pVar);
   }
