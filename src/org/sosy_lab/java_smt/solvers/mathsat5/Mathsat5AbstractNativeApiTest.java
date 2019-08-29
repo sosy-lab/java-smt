@@ -43,10 +43,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public abstract class Mathsat5AbstractNativeApiTeest {
+@Ignore("prevent this abstract class being executed as testcase by ant")
+public abstract class Mathsat5AbstractNativeApiTest {
 
   protected long env;
 
