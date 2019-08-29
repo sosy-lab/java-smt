@@ -205,9 +205,9 @@ public class OptimizationTest extends SolverBasedTest0 {
       assertThat(prover.check()).isEqualTo(OptStatus.OPT);
 
       for (long i : new long[] {1, 10, 100, 1000, 10000, 100000000L, 1000000000000L}) {
-        i = i * 1000000L; // increase precision
-        Rational nearZero = Rational.ofLongs(1, i);
-        Rational nearOne = Rational.ofLongs(i - 1, i);
+        long largeI = i * 1000000L; // increase precision
+        Rational nearZero = Rational.ofLongs(1, largeI);
+        Rational nearOne = Rational.ofLongs(largeI - 1, largeI);
         assertThat(prover.upper(handle, nearZero)).hasValue(nearOne);
       }
 
