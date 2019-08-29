@@ -134,7 +134,7 @@
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.4-sosy0" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.7.1" conf="runtime-z3->solver-z3" />
-        <!--<dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />-->
+        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.6.3" conf="runtime-optimathsat->solver-optimathsat" />
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.2"/>
