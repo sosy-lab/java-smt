@@ -71,7 +71,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     private String furtherOptions = "";
 
     @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
-    boolean loadOptimathsat5 = true;
+    boolean loadOptimathsat5 = false;
 
     private final @Nullable PathCounterTemplate logfile;
 
@@ -217,11 +217,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(cfg, "random_seed", Long.toString(randomSeed));
-    // TODO set optimath options
-    if (settings.loadOptimathsat5) {
-      msat_set_option_checked(cfg, "opt.priority", "lex");
-      msat_set_option_checked(cfg, "model_generation", "true");
-    }
     for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       msat_set_option_checked(cfg, option.getKey(), option.getValue());
     }
