@@ -20,7 +20,9 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.primitives.Longs;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -29,6 +31,7 @@ public class BoolectorQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   private final long btor;
+  private static Map<Long, Long[]> quantifierMap = new HashMap<>();
 
   BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, BoolectorEnvironment, Long>
           pCreator) {
@@ -39,12 +42,13 @@ public class BoolectorQuantifiedFormulaManager
   @Override
   protected Long eliminateQuantifiers(Long pExtractInfo)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
+    // TODO SAT or simplify?
     return null;
   }
 
   @Override
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
+    Long Newquantifier = null;
     if (pVars.size() == 0) {
       throw new IllegalArgumentException("List of quantified variables can not be empty");
     }
@@ -54,10 +58,37 @@ public class BoolectorQuantifiedFormulaManager
         throw new IllegalArgumentException("pVariables need to be parameter nodes in boolector.");
       }
     }
+    // We need the body and variables later and boolector does not give them back!
+    Long[] bodyPlusList = new Long[pVars.size() + 2];
     if (pQ == Quantifier.FORALL) {
-      return BtorJNI.boolector_forall(btor, varsArray, varsArray.length, pBody);
+      Newquantifier = BtorJNI.boolector_forall(btor, varsArray, varsArray.length, pBody);
+      bodyPlusList[1] = (long) 0;
+    } else {
+      Newquantifier = BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
+      bodyPlusList[0] = (long) 1;
     }
-    return BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
+    bodyPlusList[1] = pBody;
+    for (int i = 2; i < pVars.size() + 2; i++) {
+      bodyPlusList[i] = pVars.get(i - 2);
+    }
+    quantifierMap.put(Newquantifier, bodyPlusList);
+    return Newquantifier;
+  }
+
+  /**
+   * Gives back the variables and body of an Quantifier (forall and exists). Since Boolector cant
+   * give back the used variables or the body of an Quantifier we have to save and return them
+   * manually.
+   *
+   * @param key Boolector Node (Formula) you want.
+   * @return Long Array, first item indicates type(0 = forall, 1 = exists), second item is
+   *         Quantifier Body, rest is variables. Null if there is no entry.
+   */
+  protected static Long[] getQuantVars(Long key) {
+    if (quantifierMap.containsKey(key)) {
+      return quantifierMap.get(key);
+    }
+    return null;
   }
 
 }

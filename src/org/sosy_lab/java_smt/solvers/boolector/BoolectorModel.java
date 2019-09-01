@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
@@ -54,8 +55,8 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   public void close() {
     if (!closed) {
-      // BtorJNI.boolector_delete(btor);
       // Technically boolector has no model
+      // but you could release all bindings. Ask!
       closed = true;
     }
   }
@@ -69,51 +70,51 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
       for (Entry<String, Long> entry : creator.extractVariablesAndUFs(formula, true).entrySet()) {
         String name = entry.getKey();
         Long var = entry.getValue();
-        System.out.println("toList with: " + name);
-        System.out.println(BtorJNI.boolector_help_dump_node_smt2(btor, var));
-        /*
-         * if (BtorJNI.boolector_is_array(btor, var)) {
-         * assignments.add(getArrayAssignment(formula)); } else if (BtorJNI.boolector_is_uf(btor,
-         * var)) { assignments.add(getUFAssignment(formula)); } else if
-         * (BtorJNI.boolector_is_var(btor, var)) { if (BtorJNI.boolector_get_width(btor, var) == 1)
-         * { assignments.add(getBoolAssignment(formula)); } else {
-         * assignments.add(getBvAssignment(formula)); } }
-         */
+        System.out.println("toList with: " + name); // debug
+        System.out.println(BtorJNI.boolector_help_dump_node_smt2(btor, var)); // debug
+        if (BtorJNI.boolector_is_array(btor, var)) {
+          assignments.add(getArrayAssignment(formula));
+        } else if (BtorJNI.boolector_is_uf(btor, var)) {
+          assignments.add(getUFAssignment(formula));
+        } else {
+          assignments.add(getConstAssignment(formula));
+        }
       }
     }
     return assignments.build();
   }
 
-  private ValueAssignment getBoolAssignment(long key) {
+  private ValueAssignment getConstAssignment(long key) {
+    // Boolector does not give back a value "node" (formula), just an assignment string.
+    // So we have to build our own, new Object to work with. (Am i allowed to do this?!)
     List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key);
-    // TODO revisit equality method!!!
+    Object value = creator.convertValue(key, evalImpl(key));
+    argumentInterpretation.add(value);
+    Long valueNode = null;
+    if (value.equals(true)) {
+      valueNode = BtorJNI.boolector_true(btor);
+    } else if (value.equals(false)) {
+      valueNode = BtorJNI.boolector_false(btor);
+    } else {
+      long sort = BtorJNI.boolector_bitvec_sort(btor, BtorJNI.boolector_get_width(btor, key));
+      valueNode = BtorJNI.boolector_int(btor, (long) value, sort);
+    }
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
-        creator.encapsulateWithTypeOf(value),
-        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
+        creator.encapsulateWithTypeOf(valueNode),
+        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
         creator.getName(key, btor),
-        creator.convertValue(key, value),
+        value,
         argumentInterpretation);
-  }
-
-  private ValueAssignment getBvAssignment(long key) {
-    List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key);
-    // TODO revisit equality method!!!
-    return new ValueAssignment(
-        creator.encapsulateWithTypeOf(key),
-        creator.encapsulateWithTypeOf(value),
-        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
-        creator.getName(key, btor),
-        creator.convertValue(key, value),
-        argumentInterpretation);
+    // maybe give back String (bitvec) in value?
   }
 
   private ValueAssignment getUFAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Long value = evalImpl(key);
+    Map<Long, Long[]> ufMap = creator.getUfs();
     // TODO
+    // HOW?! I cant get value (nodes) bound to the uf. Only new ones with the same sort.
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(value),
@@ -126,17 +127,18 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   private ValueAssignment getArrayAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Long value = evalImpl(key);
+    Long valueNode = null;
     // TODO
+    // HOW?! I cant get value (nodes) bound to the array. Only new ones with the same sort.
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
-        creator.encapsulateWithTypeOf(value),
+        creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
         creator.getName(key, btor),
         creator.convertValue(key, value),
         argumentInterpretation);
   }
 
-  // check for array/uf/quant
   @Override
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
@@ -149,9 +151,10 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     } else if (BtorJNI.boolector_is_bitvec_sort(btor, BtorJNI.boolector_get_sort(btor, pFormula))) {
       BtorJNI.boolector_bv_assignment(btor, pFormula);
       return parseLong(BtorJNI.boolector_bv_assignment(btor, pFormula));
+    } else {
+      String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
+      return parseLong(assignment);
     }
-    String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
-    return parseLong(assignment);
   }
 
   /**

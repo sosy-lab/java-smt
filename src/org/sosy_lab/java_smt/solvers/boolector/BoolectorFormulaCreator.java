@@ -21,10 +21,13 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,14 +35,19 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorArrayFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBooleanFormula;
 
 public class BoolectorFormulaCreator
     extends FormulaCreator<Long, Long, BoolectorEnvironment, Long> {
+
+  // Boolector can't give back the used args of an uf, just a string, so we save it ourself.
+  private Map<Long, Long[]> ufMap = new HashMap<>();
 
   BoolectorFormulaCreator(BoolectorEnvironment pEnv) {
     super(pEnv, pEnv.getBoolSort(), null, null);
@@ -151,29 +159,61 @@ public class BoolectorFormulaCreator
     return BtorJNI.boolector_var(getEnv().getBtor(), pType, pVarName);
   }
 
+  // This method is a massive problem... you CANT get the value formulas(nodes) of ufs because its
+  // only build and used internally in boolector....
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula pFormula, Long pF) {
+    Long[] bodyVars = BoolectorQuantifiedFormulaManager.getQuantVars(pF);
     if (BtorJNI.boolector_is_const(getEnv().getBtor(), pF)) {
+      // Handles all constants (bitvec, bool)
       String f = BtorJNI.boolector_get_bits(getEnv().getBtor(), pF);
       return visitor.visitConstant(pFormula, convertValue(pF, parseBitvector(f)));
     } else if (BtorJNI.boolector_is_array(getEnv().getBtor(), pF)) {
       // array = function?!
     } else if (BtorJNI.boolector_is_uf(getEnv().getBtor(), pF)) {
-      // TODO
-      String[][] ufAss = BtorJNI.boolector_uf_assignment_helper(getEnv().getBtor(), pF);
-      return visitor.visitFunction(pF, Arrays.asList(ufAss[0]), functionDeclaration);
+      // UF
+      String[][] ufAssignment = BtorJNI.boolector_uf_assignment_helper(getEnv().getBtor(), pF);
+      Long[] ufSorts = ufMap.get(pF);
+      int arity = (int) BtorJNI.boolector_get_fun_arity(getEnv().getBtor(), pF);
+      ImmutableList.Builder<Formula> args = ImmutableList.builder();
+      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+      for (int i = 0; i < arity; i++) {
+        FormulaType<?> argumentType = getFormulaType(arg);
+        args.add(encapsulate(argumentType, arg));
+        argTypes.add(argumentType);
+      }
+      return visitor.visitFunction(pFormula, args.build(), FunctionDeclarationImpl.of());
     } else if (BtorJNI.boolector_is_param(getEnv().getBtor(), pF)) {
-      // Quantifier var
-      return visitor.visitBoundVariable(pF, deBruijnIdx);
-    } else if () {
+      // Quantifier var (param)
+      int deBruijnIdx; // TODO: how?
+      return visitor.visitBoundVariable(pFormula, deBruijnIdx);
+    } else if (bodyVars != null) {
       // Quantifier node
-      // TODO: is that possible in btor?
-      return visitor.visitQuantifier(f, quantifier, boundVariables, body);
+      QuantifiedFormulaManager.Quantifier quantifier = QuantifiedFormulaManager.Quantifier.FORALL;
+      if (bodyVars[0] == 1) {
+        quantifier = QuantifiedFormulaManager.Quantifier.EXISTS;
+      }
+      List<Formula> boundVariables = new ArrayList<>();
+      for (int i = 2; i < bodyVars.length; i++) {
+        Long arg = bodyVars[i];
+        FormulaType<?> argumentType = getFormulaType(arg);
+        boundVariables.add(encapsulate(argumentType, arg));
+      }
+      Long body = bodyVars[1];
+      FormulaType<?> argumentType = getFormulaType(body);
+      // if this isnt working or too much, pass an empty list.
+      // But Boolector simply holds not information at all about the quantifier besides the result.
+      return visitor
+          .visitQuantifier(
+              (BoolectorBooleanFormula) pFormula,
+              quantifier,
+              boundVariables,
+              new BoolectorBooleanFormula(body));
     }
       else {
+      // must be bitvector var at this point
       return visitor
           .visitFreeVariable(pFormula, BtorJNI.boolector_get_symbol(getEnv().getBtor(), pF));
-      // must be bitvector var at this point
     }
   }
 
@@ -187,12 +227,22 @@ public class BoolectorFormulaCreator
   public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
     long[] funSorts = Longs.toArray(pArgTypes);
     long sort;
+    Long[] mapValue;
     if (pArgTypes.isEmpty()) {
       sort = pReturnType;
+      mapValue = new Long[1];
+      mapValue[0] = sort;
     } else {
       sort = BtorJNI.boolector_fun_sort(getEnv().getBtor(), funSorts, funSorts.length, pReturnType);
+      mapValue = new Long[1 + funSorts.length];
+      mapValue[0] = pReturnType;
+      for (int i = 1; i < funSorts.length + 1; i++) {
+        mapValue[i] = funSorts[i - 1];
+      }
     }
-    return BtorJNI.boolector_uf(getEnv().getBtor(), sort, pName);
+    Long uf = BtorJNI.boolector_uf(getEnv().getBtor(), sort, pName);
+    ufMap.put(uf, mapValue);
+    return uf;
   }
 
   @Override
@@ -259,6 +309,16 @@ public class BoolectorFormulaCreator
       throw new IllegalArgumentException(
           "Debug only! getBooleanVarDeclarationImpl in BtorFormulaCreator");
     }
+  }
+
+  /**
+   * Gives you a map of the UFs and applys existing (key). The value is an array with the first item
+   * being the return type (sort), rest is arg types (sorts). Check for null!
+   *
+   * @return ufMap or null
+   */
+  protected Map<Long, Long[]> getUfs() {
+    return ufMap;
   }
 
 }

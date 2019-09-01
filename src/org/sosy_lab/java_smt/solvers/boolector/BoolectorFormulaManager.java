@@ -51,8 +51,7 @@ final class BoolectorFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Boolector can not parse single formulas.");
   }
 
   @Override

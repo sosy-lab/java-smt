@@ -225,6 +225,12 @@ class BoolectorBitvectorFormulaManager
    * Taken from Z3BitvectorFormulaManager
    */
   private static void checkRange(int pLength, BigInteger pI) {
+    // Boolector doesnt have Bitvec length 1 because those are bools.
+    if (pLength == 1) {
+      pLength = 2;
+    } else if (pLength == -1) {
+      pLength = -2;
+    }
     if (pI.signum() > 0) {
       BigInteger max = BigInteger.ONE.shiftLeft(pLength);
       if (pI.compareTo(max) >= 0) {

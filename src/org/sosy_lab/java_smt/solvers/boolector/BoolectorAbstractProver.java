@@ -45,7 +45,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
   protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
-
   private final ShutdownNotifier shutdownNotifier;
   protected boolean closed = false;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
