@@ -49,13 +49,11 @@ public class BoolectorBooleanFormulaManager
 
   @Override
   public Long makeBooleanImpl(boolean pValue) {
-    long rValue;
     if (pValue) {
-      rValue = boolector_true(btor);
+      return boolector_true(btor);
     } else {
-      rValue = boolector_false(btor);
+      return boolector_false(btor);
     }
-    return rValue;
   }
 
   @Override
@@ -85,23 +83,15 @@ public class BoolectorBooleanFormulaManager
 
   @Override
   public boolean isTrue(Long pBits) {
-    if (BtorJNI.boolector_get_width(btor, pBits) == 1) {
-      String assignment;
-      if (BtorJNI.boolector_is_const(btor, pBits)) {
-        assignment = BtorJNI.boolector_get_bits(btor, pBits);
-      } else {
-        assignment = BtorJNI.boolector_bv_assignment(btor, pBits);
-      }
-      Long maybeLong = Longs.tryParse(assignment);
-      if (maybeLong != null && maybeLong == 1) {
-        return true;
-      }
-    }
-    return false;
+    return isConstant(pBits, 1);
   }
 
   @Override
   public boolean isFalse(Long pBits) {
+    return isConstant(pBits, 0);
+  }
+
+  private boolean isConstant(final long pBits, final int constant) {
     if (BtorJNI.boolector_get_width(btor, pBits) == 1) {
       String assignment;
       if (BtorJNI.boolector_is_const(btor, pBits)) {
@@ -110,7 +100,7 @@ public class BoolectorBooleanFormulaManager
         assignment = BtorJNI.boolector_bv_assignment(btor, pBits);
       }
       Long maybeLong = Longs.tryParse(assignment);
-      if (maybeLong != null && maybeLong == 0) {
+      if (maybeLong != null && maybeLong == constant) {
         return true;
       }
     }
