@@ -22,8 +22,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -58,8 +56,6 @@ class BoolectorEnvironment {
 
   private final long btor;
 
-  private final List<BoolectorAbstractProver<?>> registeredProvers = new ArrayList<>();
-
   BoolectorEnvironment(
       Configuration config,
       @Nullable final PathCounterTemplate pBasicLogfile,
@@ -77,7 +73,7 @@ class BoolectorEnvironment {
       System.err.println("Boolector library could not be loaded.");
     }
 
-    btor = getNewBtor();
+    btor = BtorJNI.boolector_new();
     config.inject(this);
     // Setting SAT Solver
     if (satSolver.length() > 0) {
@@ -145,14 +141,7 @@ class BoolectorEnvironment {
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       Set<ProverOptions> pOptions) {
-    BoolectorAbstractProver<Void> prover =
-        new BoolectorTheoremProver(manager, creator, btor, shutdownNotifier, pOptions);
-    registeredProvers.add(prover);
-    return prover;
-  }
-
-  private long getNewBtor() {
-    return BtorJNI.boolector_new();
+    return new BoolectorTheoremProver(manager, creator, btor, shutdownNotifier, pOptions);
   }
 
   public Long getBtor() {

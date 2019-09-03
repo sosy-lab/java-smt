@@ -73,7 +73,7 @@ class BoolectorBitvectorFormulaManager
 
   @Override
   public Long toIntegerFormulaImpl(Long pI, boolean pSigned) {
-    throw new UnsupportedOperationException("Operation not supported.");
+    throw new UnsupportedOperationException("BV to INT conversion is not supported.");
   }
 
   @Override

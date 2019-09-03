@@ -51,17 +51,18 @@ public class BoolectorArrayFormulaManager
   @Override
   protected <TI extends Formula, TE extends Formula> Long
       internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    // Only bitvector types are supported
     if (!pIndexType.isBitvectorType() || !pElementType.isBitvectorType()) {
       throw new IllegalArgumentException("Boolector supports bitvector arrays only.");
-    } else if (((BitvectorType) pIndexType).getSize() != ((BitvectorType) pElementType).getSize()) {
+    }
+    BitvectorType indexType = (BitvectorType) pIndexType;
+    BitvectorType elementType = (BitvectorType) pElementType;
+    if (indexType.getSize() != elementType.getSize()) {
       throw new IllegalArgumentException(
           "The bitvectors mapping the array index to the array elements must have the same width.");
     }
-    final long indexSort =
-        BtorJNI.boolector_bitvec_sort(btor, ((BitvectorType) pIndexType).getSize());
-    final long elementSort =
-        BtorJNI.boolector_bitvec_sort(btor, ((BitvectorType) pElementType).getSize());
+
+    final long indexSort = BtorJNI.boolector_bitvec_sort(btor, indexType.getSize());
+    final long elementSort = BtorJNI.boolector_bitvec_sort(btor, elementType.getSize());
     final long arraySort = BtorJNI.boolector_array_sort(btor, indexSort, elementSort);
     final long array = BtorJNI.boolector_array(btor, arraySort, pName);
     return array;
@@ -71,5 +72,4 @@ public class BoolectorArrayFormulaManager
   protected Long equivalence(Long pArray1, Long pArray2) {
     return BtorJNI.boolector_eq(btor, pArray1, pArray2);
   }
-
 }

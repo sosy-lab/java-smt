@@ -48,31 +48,32 @@ public class BoolectorQuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
-    Long Newquantifier = null;
-    if (pVars.size() == 0) {
+    if (pVars.isEmpty()) {
       throw new IllegalArgumentException("List of quantified variables can not be empty");
     }
-    long[] varsArray = Longs.toArray(pVars);
-    for (long param : varsArray) {
+    for (long param : pVars) {
       if (!BtorJNI.boolector_is_param(btor, param)) {
         throw new IllegalArgumentException("pVariables need to be parameter nodes in boolector.");
       }
     }
+
+    final long[] varsArray = Longs.toArray(pVars);
     // We need the body and variables later and boolector does not give them back!
+    final long newQuantifier;
     Long[] bodyPlusList = new Long[pVars.size() + 2];
     if (pQ == Quantifier.FORALL) {
-      Newquantifier = BtorJNI.boolector_forall(btor, varsArray, varsArray.length, pBody);
+      newQuantifier = BtorJNI.boolector_forall(btor, varsArray, varsArray.length, pBody);
       bodyPlusList[1] = (long) 0;
     } else {
-      Newquantifier = BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
+      newQuantifier = BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
       bodyPlusList[0] = (long) 1;
     }
     bodyPlusList[1] = pBody;
     for (int i = 2; i < pVars.size() + 2; i++) {
       bodyPlusList[i] = pVars.get(i - 2);
     }
-    quantifierMap.put(Newquantifier, bodyPlusList);
-    return Newquantifier;
+    quantifierMap.put(newQuantifier, bodyPlusList);
+    return newQuantifier;
   }
 
   /**
