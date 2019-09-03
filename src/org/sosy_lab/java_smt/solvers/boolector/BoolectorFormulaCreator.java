@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorArrayFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBooleanFormula;
+import org.sosy_lab.java_smt.solvers.boolector.BoolectorQuantifiedFormulaManager.QuantifiedFormula;
 
 public class BoolectorFormulaCreator
     extends FormulaCreator<Long, Long, BoolectorEnvironment, Long> {
@@ -163,7 +164,7 @@ public class BoolectorFormulaCreator
   // only build and used internally in boolector....
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula pFormula, Long pF) {
-    Long[] bodyVars = BoolectorQuantifiedFormulaManager.getQuantVars(pF);
+    QuantifiedFormula bodyVars = BoolectorQuantifiedFormulaManager.getQuantVars(pF);
     if (BtorJNI.boolector_is_const(getEnv().getBtor(), pF)) {
       // Handles all constants (bitvec, bool)
       String f = BtorJNI.boolector_get_bits(getEnv().getBtor(), pF);
@@ -190,16 +191,14 @@ public class BoolectorFormulaCreator
     } else if (bodyVars != null) {
       // Quantifier node
       QuantifiedFormulaManager.Quantifier quantifier = QuantifiedFormulaManager.Quantifier.FORALL;
-      if (bodyVars[0] == 1) {
+      if (bodyVars.isForall()) {
         quantifier = QuantifiedFormulaManager.Quantifier.EXISTS;
       }
       List<Formula> boundVariables = new ArrayList<>();
-      for (int i = 2; i < bodyVars.length; i++) {
-        Long arg = bodyVars[i];
-        FormulaType<?> argumentType = getFormulaType(arg);
-        boundVariables.add(encapsulate(argumentType, arg));
+      for (long arg : bodyVars.getBoundVariables()) {
+        boundVariables.add(encapsulate(getFormulaType(arg), arg));
       }
-      Long body = bodyVars[1];
+      long body = bodyVars.getBody();
       FormulaType<?> argumentType = getFormulaType(body);
       // if this isnt working or too much, pass an empty list.
       // But Boolector simply holds not information at all about the quantifier besides the result.

@@ -19,10 +19,12 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -31,7 +33,7 @@ public class BoolectorQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   private final long btor;
-  private static Map<Long, Long[]> quantifierMap = new HashMap<>();
+  private static Map<Long, QuantifiedFormula> quantifierMap = new HashMap<>();
 
   BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, BoolectorEnvironment, Long>
           pCreator) {
@@ -56,23 +58,15 @@ public class BoolectorQuantifiedFormulaManager
         throw new IllegalArgumentException("pVariables need to be parameter nodes in boolector.");
       }
     }
-
-    final long[] varsArray = Longs.toArray(pVars);
-    // We need the body and variables later and boolector does not give them back!
     final long newQuantifier;
-    Long[] bodyPlusList = new Long[pVars.size() + 2];
+    final long[] varsArray = Longs.toArray(pVars);
     if (pQ == Quantifier.FORALL) {
       newQuantifier = BtorJNI.boolector_forall(btor, varsArray, varsArray.length, pBody);
-      bodyPlusList[1] = (long) 0;
     } else {
       newQuantifier = BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
-      bodyPlusList[0] = (long) 1;
     }
-    bodyPlusList[1] = pBody;
-    for (int i = 2; i < pVars.size() + 2; i++) {
-      bodyPlusList[i] = pVars.get(i - 2);
-    }
-    quantifierMap.put(newQuantifier, bodyPlusList);
+    // We need the body and variables later and boolector does not give them back!
+    quantifierMap.put(newQuantifier, new QuantifiedFormula(pQ == Quantifier.FORALL, pBody, pVars));
     return newQuantifier;
   }
 
@@ -82,14 +76,34 @@ public class BoolectorQuantifiedFormulaManager
    * manually.
    *
    * @param key Boolector Node (Formula) you want.
-   * @return Long Array, first item indicates type(0 = forall, 1 = exists), second item is
-   *         Quantifier Body, rest is variables. Null if there is no entry.
+   * @return QuantifiedFormula with all data of the quantified formula. Null if there is no entry.
    */
-  protected static Long[] getQuantVars(Long key) {
-    if (quantifierMap.containsKey(key)) {
-      return quantifierMap.get(key);
-    }
-    return null;
+  @Nullable
+  protected static QuantifiedFormula getQuantVars(Long key) {
+    return quantifierMap.get(key);
   }
 
+  static class QuantifiedFormula {
+    private final boolean isForall; // false for EXISTS, true for FORALL
+    private final long body;
+    private final ImmutableList<Long> boundVariables;
+
+    QuantifiedFormula(boolean pIsForall, long pBody, List<Long> pVars) {
+      isForall = pIsForall;
+      body = pBody;
+      boundVariables = ImmutableList.copyOf(pVars);
+    }
+
+    public boolean isForall() {
+      return isForall;
+    }
+
+    public long getBody() {
+      return body;
+    }
+
+    public ImmutableList<Long> getBoundVariables() {
+      return boundVariables;
+    }
+  }
 }
