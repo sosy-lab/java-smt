@@ -215,6 +215,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     Truth.assertThat(bmgr.and(x, x)).isEqualTo(x);
 
     Truth.assertThat(bmgr.and(tru, tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(fals, fals, fals)).isEqualTo(fals);
     Truth.assertThat(bmgr.and(fals, x, x)).isEqualTo(fals);
     Truth.assertThat(bmgr.and(tru, x, tru)).isEqualTo(x);
 
