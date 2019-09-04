@@ -80,9 +80,7 @@ public interface FormulaManager {
    *
    * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
-  default SLFormulaManager getSLFormulaManager() {
-    return null;
-  }
+  SLFormulaManager getSLFormulaManager();
 
   /**
    * Returns the interface for handling quantifiers.
