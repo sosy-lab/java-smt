@@ -82,7 +82,7 @@ public interface FormulaManager {
    */
   default SLFormulaManager getSLFormulaManager() {
     return null;
-  };
+  }
 
   /**
    * Returns the interface for handling quantifiers.
