@@ -123,7 +123,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
-  /** directly catch the most common special String constants */
+  /** directly catch the most common special String constants. */
   protected TFormulaInfo makeNumberImpl(
       String n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode) {
     if (n.startsWith("+")) {

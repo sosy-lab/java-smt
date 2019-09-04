@@ -27,7 +27,6 @@ import edu.nyu.acsys.CVC4.FloatingPointConvertSort;
 import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.FloatingPointToFPFloatingPoint;
 import edu.nyu.acsys.CVC4.FloatingPointToSBV;
-import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.RoundingMode;
@@ -123,7 +122,7 @@ public class CVC4FloatingPointFormulaManager
         // then try something like -123/456
         org.sosy_lab.common.rationals.Rational r =
             org.sosy_lab.common.rationals.Rational.ofString(pN);
-        return new Rational(new Integer(r.getNum().toString()), new Integer(r.getDen().toString()));
+        return new Rational(r.getNum().longValueExact(), r.getDen().longValueExact());
 
       } catch (NumberFormatException e2) {
         // we cannot handle the number
