@@ -49,6 +49,8 @@ public class BoolectorFormulaCreator
 
   // Boolector can't give back the used args of an uf, just a string, so we save it ourself.
   private Map<Long, Long[]> ufMap = new HashMap<>();
+  // Mapping the internal unique variable name in boolector to the JavaSMT name
+  private Map<String, String> newNameNameMap = new HashMap<>();
 
   BoolectorFormulaCreator(BoolectorEnvironment pEnv) {
     super(pEnv, pEnv.getBoolSort(), null, null);
@@ -156,8 +158,41 @@ public class BoolectorFormulaCreator
   }
 
   @Override
-  public Long makeVariable(Long pType, String pVarName) {
-    return BtorJNI.boolector_var(getEnv().getBtor(), pType, pVarName);
+  public Long makeVariable(Long pType, String varName) {
+    String newVarName = varName;
+    if (!newNameNameMap.containsKey(varName)) {
+      newVarName = getNewVarName(varName);
+    }
+    newNameNameMap.put(newVarName, varName);
+    return BtorJNI.boolector_var(getEnv().getBtor(), pType, newVarName);
+  }
+
+  /**
+   * Checks whether or not the varName is used and finds a new one. Boolector does not have an
+   * internal variables cache.
+   *
+   * @param javaSMTVarName Variable name used in JavaSmt.
+   * @return new variable name.
+   */
+  private String getNewVarName(String javaSMTVarName) {
+    String btorVarName = javaSMTVarName;
+    int tail = 1;
+    while (!newNameNameMap.containsKey(btorVarName)) {
+      btorVarName = javaSMTVarName;
+      btorVarName.concat(Integer.toString(tail));
+      tail++;
+    }
+    return btorVarName;
+  }
+
+  /**
+   * Gives back the variable name used in JavaSMT from the unique name in boolector.
+   *
+   * @param btorVarName unique variable name used in boolector.
+   * @return variable name used in JavaSMT.
+   */
+  protected String getJavaSMTVarName(String btorVarName) {
+    return newNameNameMap.get(btorVarName);
   }
 
   // This method is a massive problem... you CANT get the value formulas(nodes) of ufs because its
@@ -212,7 +247,7 @@ public class BoolectorFormulaCreator
       else {
       // must be bitvector var at this point
       return visitor
-          .visitFreeVariable(pFormula, BtorJNI.boolector_get_symbol(getEnv().getBtor(), pF));
+          .visitFreeVariable(pFormula, getName(getEnv().getBtor(), pF));
     }
   }
 
@@ -288,7 +323,7 @@ public class BoolectorFormulaCreator
   }
 
   String getName(long pKey, long btor) {
-    return BtorJNI.boolector_get_symbol(btor, pKey);
+    return getJavaSMTVarName(BtorJNI.boolector_get_symbol(btor, pKey));
   }
 
   @Override
