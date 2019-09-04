@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-/*********************                                                        */
+/** ******************* */
 /*! \file SimpleVC.java
  ** \verbatim
  ** Top contributors (to current version):
@@ -67,7 +67,6 @@ public class SimpleVC {
     ExprManager em = new ExprManager();
     SmtEngine smt = new SmtEngine(em);
 
-
     smt.setOption("incremental", new SExpr(false));
     smt.setLogic("QF_ALL_SUPPORTED");
     // UNSAT
@@ -86,16 +85,13 @@ public class SimpleVC {
 
     Expr x_eq_1 = em.mkExpr(Kind.EQUAL, x, val_1); // x = 1
 
-
     Expr emp = em.mkExpr(Kind.SEP_EMP, a, b);
     Expr one_pt_2 = em.mkExpr(Kind.SEP_PTO, x, val_2); // 1 -> 2
-
 
     Expr formula = em.mkExpr(Kind.SEP_STAR, emp, one_pt_2); // emp * (1->2)
     Expr formula1 = em.mkExpr(Kind.SEP_STAR, x_eq_1, one_pt_2); // x=1 /\ emp * (1->2)
 
     System.out.println("Checking validity of formula:\n" + formula1.toString() + " with CVC4.");
     System.out.println("Result from CVC4 is: " + smt.query(formula1));
-
   }
 }
