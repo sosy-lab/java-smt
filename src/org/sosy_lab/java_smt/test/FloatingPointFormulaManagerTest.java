@@ -778,6 +778,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
     fpmgr.makeNumber("a", singlePrecType);

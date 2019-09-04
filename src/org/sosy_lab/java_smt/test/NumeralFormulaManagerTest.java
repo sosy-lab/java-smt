@@ -89,6 +89,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(imgr.distinct(symbols), bmgr.and(constraints))).isUnsatisfiable();
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
     imgr.makeNumber("a");

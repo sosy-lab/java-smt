@@ -216,7 +216,7 @@ public class CVC4BitvectorFormulaManager
       // TODO check what is cheaper for the solver:
       // checking the first BV-bit or computing max-int-value for the given size
 
-      final int size = Math.toIntExact((new BitVectorType(pBv.getType())).getSize());
+      final int size = Math.toIntExact(new BitVectorType(pBv.getType()).getSize());
       final BigInteger modulo = BigInteger.ONE.shiftLeft(size);
       final BigInteger maxInt = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
       final Expr moduloExpr = exprManager.mkConst(new Rational(modulo.toString()));

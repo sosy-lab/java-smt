@@ -33,6 +33,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 @Immutable
 public class CVC4Formula implements Formula {
+
+  @SuppressWarnings("Immutable")
   private final Expr cvc4term;
 
   CVC4Formula(Expr term) {

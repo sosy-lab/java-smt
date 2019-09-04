@@ -158,6 +158,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
     rmgr.makeNumber("a");

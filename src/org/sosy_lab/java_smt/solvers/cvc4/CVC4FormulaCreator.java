@@ -162,7 +162,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (t.isBitVector()) {
       // apparently, we can get a t instanceof Type here for that t instanceof BitVectorType does
       // not hold, hence we use the new BitVectorType(t) here as a workaround:
-      return FormulaType.getBitvectorTypeWithSize((int) (new BitVectorType(t)).getSize());
+      return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
     } else if (t.isFloatingPoint()) {
       edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return FormulaType.getFloatingPointType(
