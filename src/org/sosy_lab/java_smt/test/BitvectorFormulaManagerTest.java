@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import java.math.BigInteger;
@@ -67,10 +68,10 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvType() {
     for (int i : new int[] {1, 2, 4, 32, 64, 1000}) {
       BitvectorType type = FormulaType.getBitvectorTypeWithSize(i);
-      assertThat(type.getSize()).named("bitvector type size").isEqualTo(i);
+      assertWithMessage("bitvector type size").that(type.getSize()).isEqualTo(i);
       BitvectorFormula var = bvmgr.makeVariable(type, "x" + i);
       BitvectorType result = (BitvectorType) mgr.getFormulaType(var);
-      assertThat(result.getSize()).named("bitvector size").isEqualTo(i);
+      assertWithMessage("bitvector size").that(result.getSize()).isEqualTo(i);
     }
   }
 

@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
@@ -236,8 +237,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
-    assertThat(count == 1 || count2 == 1)
-        .named(formDump + " does not contain <= or >= only once.")
+    assertWithMessage(formDump + " does not contain <= or >= only once.")
+        .that(count == 1 || count2 == 1)
         .isTrue();
   }
 
@@ -321,13 +322,13 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
         it.remove();
       }
     }
-    assertThat(funDeclares).named("duplicate function declarations").isEmpty();
+    assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
   private void checkThatAssertIsInLastLine(String lines) {
     lines = lines.trim();
-    assertThat(getLast(Splitter.on('\n').split(lines)))
-        .named("last line of <\n" + lines + ">")
+    assertWithMessage("last line of <\n" + lines + ">")
+        .that(getLast(Splitter.on('\n').split(lines)))
         .startsWith("(assert ");
   }
 

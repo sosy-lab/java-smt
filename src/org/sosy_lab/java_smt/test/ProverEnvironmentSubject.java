@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.StandardSubjectBuilder;
@@ -43,11 +44,13 @@ import org.sosy_lab.java_smt.api.SolverException;
  * #proverEnvironments()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
-public class ProverEnvironmentSubject
-    extends Subject<ProverEnvironmentSubject, BasicProverEnvironment<?>> {
+public class ProverEnvironmentSubject extends Subject {
+
+  private final BasicProverEnvironment<?> stackUnderTest;
 
   private ProverEnvironmentSubject(FailureMetadata pMetadata, BasicProverEnvironment<?> pStack) {
     super(pMetadata, pStack);
+    stackUnderTest = Preconditions.checkNotNull(pStack);
   }
 
   /**
@@ -72,15 +75,15 @@ public class ProverEnvironmentSubject
    * failure.
    */
   public void isUnsatisfiable() throws SolverException, InterruptedException {
-    if (actual().isUnsat()) {
+    if (stackUnderTest.isUnsat()) {
       return; // success
     }
 
     // get model for failure message
-    try (Model model = actual().getModel()) {
+    try (Model model = stackUnderTest.getModel()) {
       failWithoutActual(
           Fact.fact("expected to be", "unsatisfiable"),
-          Fact.fact("but was", actual()),
+          Fact.fact("but was", stackUnderTest),
           Fact.fact("which is", "satisfiable"),
           Fact.fact("which has model", model));
     }
@@ -88,18 +91,18 @@ public class ProverEnvironmentSubject
 
   /** Check that the subject stack is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    if (!actual().isUnsat()) {
+    if (!stackUnderTest.isUnsat()) {
       return; // success
     }
 
     // get unsat core for failure message if possible
-    if (actual() instanceof ProverEnvironment) {
+    if (stackUnderTest instanceof ProverEnvironment) {
       try {
-        final List<BooleanFormula> unsatCore = actual().getUnsatCore();
+        final List<BooleanFormula> unsatCore = stackUnderTest.getUnsatCore();
         if (!unsatCore.isEmpty()) {
           failWithoutActual(
               Fact.fact("expected to be", "satisfiable"),
-              Fact.fact("but was", actual()),
+              Fact.fact("but was", stackUnderTest),
               Fact.fact("which is", "unsatisfiable"),
               Fact.fact("with unsat core", Joiner.on('\n').join(unsatCore)));
           return;

@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -85,7 +86,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
-      assertThat(check).named("formulas must be contradicting").isTrue();
+      assertWithMessage("formulas must be contradicting").that(check).isTrue();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
@@ -210,7 +211,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     assume()
         .withMessage("As of now, Z3 does not fully support bit-vector interpolation")
         .that(solver)
-        .isNotSameAs(Solvers.Z3);
+        .isNotSameInstanceAs(Solvers.Z3);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
