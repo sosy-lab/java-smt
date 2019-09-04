@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager, Expr> {
 
+  @SuppressWarnings("checkstyle:parameternumber")
   CVC4FormulaManager(
       FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator,
       CVC4UFManager pFfmgr,
