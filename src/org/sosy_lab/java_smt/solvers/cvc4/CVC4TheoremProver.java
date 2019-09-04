@@ -21,9 +21,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import edu.nyu.acsys.CVC4.Expr;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -32,7 +29,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-public class CVC4TheoremProver extends CVC4AbstractProver<Void, Expr> implements ProverEnvironment {
+public class CVC4TheoremProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
 
   protected CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
@@ -52,12 +49,5 @@ public class CVC4TheoremProver extends CVC4AbstractProver<Void, Expr> implements
     smtEngine.assertFormula(importExpr(exp));
     assertedFormulas.peek().add(exp);
     return null;
-  }
-
-  @Override
-  protected Collection<Expr> getAssertedExpressions() {
-    List<Expr> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
   }
 }

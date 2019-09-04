@@ -45,7 +45,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-abstract class CVC4AbstractProver<T, AF> extends AbstractProverWithAllSat<T>
+abstract class CVC4AbstractProver<T> extends AbstractProverWithAllSat<T>
     implements BasicProverEnvironment<T> {
 
   protected final CVC4FormulaCreator creator;
@@ -54,7 +54,7 @@ abstract class CVC4AbstractProver<T, AF> extends AbstractProverWithAllSat<T>
   protected final AtomicBoolean interrupted = new AtomicBoolean(false);
 
   /** Tracks formulas on the stack, needed for model generation. */
-  protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
+  protected final Deque<List<Expr>> assertedFormulas = new ArrayDeque<>();
 
   /**
    * Tracks provided models to inform them when the SmtEngine is closed. We can no longer access
@@ -92,7 +92,7 @@ abstract class CVC4AbstractProver<T, AF> extends AbstractProverWithAllSat<T>
   }
 
   private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
-    smtEngine.setOption("incremental", new SExpr(true));
+    setOptionForIncremental();
     if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
       smtEngine.setOption("produce-models", new SExpr(true));
     }
@@ -104,6 +104,10 @@ abstract class CVC4AbstractProver<T, AF> extends AbstractProverWithAllSat<T>
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
+  }
+
+  protected void setOptionForIncremental() {
+    smtEngine.setOption("incremental", new SExpr(true));
   }
 
   // Due to a bug in CVC4, smtEngine.interrupt() has no effect when it is called too soon.
@@ -238,7 +242,11 @@ abstract class CVC4AbstractProver<T, AF> extends AbstractProverWithAllSat<T>
     throw new UnsupportedOperationException();
   }
 
-  protected abstract Collection<Expr> getAssertedExpressions();
+  protected Collection<Expr> getAssertedExpressions() {
+    List<Expr> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
+  }
 
   @Override
   public void close() {

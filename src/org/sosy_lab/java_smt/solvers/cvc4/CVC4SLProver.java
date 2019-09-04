@@ -22,23 +22,24 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Preconditions;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.SExpr;
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Set;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 public class CVC4SLProver extends CVC4AbstractProver<Void> implements ProverEnvironment {
 
-  private final Deque<Expr> assertedFormulas = new ArrayDeque<>();
-
-  protected CVC4SLProver(CVC4FormulaCreator pFormulaCreator) {
-    super(pFormulaCreator);
-    // TODO Auto-generated constructor stub
+  protected CVC4SLProver(
+      CVC4FormulaCreator pFormulaCreator,
+      ShutdownNotifier pShutdownNotifier,
+      int pRandomSeed,
+      Set<ProverOptions> pOptions,
+      BooleanFormulaManager pBmgr) {
+    super(pFormulaCreator, pShutdownNotifier, pRandomSeed, pOptions, pBmgr);
   }
 
   @Override
@@ -50,68 +51,24 @@ public class CVC4SLProver extends CVC4AbstractProver<Void> implements ProverEnvi
   @Override
   public void push() {
     // No actual push() cause CVC4 does not support separation login in incremental mode.
-  }
-
-  @Override
-  public Void push(BooleanFormula pF) {
-    Expr exp = creator.extractInfo(pF);
-    // No actual push() cause CVC4 does not support separation login in incremental mode.
-    assertedFormulas.push(exp);
-    return null;
+    assertedFormulas.push(new ArrayList<>());
   }
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  public Void addConstraint(BooleanFormula pF) {
     Preconditions.checkState(!closed);
-    Expr exp = creator.extractInfo(pConstraint);
-    env.assertFormula(exp);
-    return null;
-  }
-
-
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    // TODO Auto-generated method stub
+    // No actual push() cause CVC4 does not support separation login in incremental mode.
+    closeAllModels();
+    Expr exp = creator.extractInfo(pF);
+    smtEngine.assertFormula(importExpr(exp));
+    assertedFormulas.peek().add(exp);
     return null;
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  protected CVC4Model getCVC4Model() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  protected void createConfig() {
-    env.setOption("incremental", new SExpr(false));
+  protected void setOptionForIncremental() {
+    smtEngine.setOption("incremental", new SExpr(false));
     // smt.setLogic("QF_ALL_SUPPORTED");
-
   }
-
 }
