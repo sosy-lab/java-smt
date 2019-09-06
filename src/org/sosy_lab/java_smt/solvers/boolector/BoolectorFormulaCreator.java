@@ -66,7 +66,7 @@ public class BoolectorFormulaCreator
           BtorJNI.boolector_is_bitvec_sort(btor, sort),
           "BitvectorFormula with type missmatch: " + pFormula);
       return (FormulaType<T>) FormulaType
-          .getBitvectorTypeWithSize((int) BtorJNI.boolector_get_width(btor, extractInfo(pFormula)));
+          .getBitvectorTypeWithSize(BtorJNI.boolector_get_width(btor, extractInfo(pFormula)));
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
       FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
@@ -89,11 +89,11 @@ public class BoolectorFormulaCreator
         return FormulaType.BooleanType;
       } else {
         return FormulaType
-            .getBitvectorTypeWithSize((int) BtorJNI.boolector_get_width(btor, pFormula));
+            .getBitvectorTypeWithSize(BtorJNI.boolector_get_width(btor, pFormula));
       }
     } else if (BtorJNI.boolector_is_array_sort(btor, sort)) {
-      int indexWidth = (int) BtorJNI.boolector_get_index_width(btor, pFormula);
-      int elementWidth = (int) BtorJNI.boolector_get_width(btor, pFormula);
+      int indexWidth = BtorJNI.boolector_get_index_width(btor, pFormula);
+      int elementWidth = BtorJNI.boolector_get_width(btor, pFormula);
       return FormulaType.getArrayType(
           FormulaType.getBitvectorTypeWithSize(indexWidth),
           FormulaType.getBitvectorTypeWithSize(elementWidth));
@@ -210,7 +210,7 @@ public class BoolectorFormulaCreator
       // UF
       String[][] ufAssignment = BtorJNI.boolector_uf_assignment_helper(getEnv().getBtor(), pF);
       Long[] ufSorts = ufMap.get(pF);
-      int arity = (int) BtorJNI.boolector_get_fun_arity(getEnv().getBtor(), pF);
+      int arity = BtorJNI.boolector_get_fun_arity(getEnv().getBtor(), pF);
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
@@ -282,7 +282,7 @@ public class BoolectorFormulaCreator
   @Override
   public Object convertValue(Long key, Long term) {
     // To get the correct type, we check the width of key.
-    int width = (int) BtorJNI.boolector_get_width(getEnv().getBtor(), key);
+    int width = BtorJNI.boolector_get_width(getEnv().getBtor(), key);
     if (width == 1) {
       if (term == 1) {
         return true;

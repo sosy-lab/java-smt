@@ -17,16 +17,20 @@ public final class BtorSolverResult {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
 
   public static BtorSolverResult swigToEnum(int swigValue) {
-    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue) {
       return swigValues[swigValue];
-    for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue)
+    }
+    for (int i = 0; i < swigValues.length; i++) {
+      if (swigValues[i].swigValue == swigValue) {
         return swigValues[i];
+      }
+    }
     throw new IllegalArgumentException("No enum " + BtorSolverResult.class + " with value " + swigValue);
   }
 

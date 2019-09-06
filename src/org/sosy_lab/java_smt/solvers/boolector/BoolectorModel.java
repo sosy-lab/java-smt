@@ -114,7 +114,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     Long value = evalImpl(key);
     Map<Long, Long[]> ufMap = creator.getUfs();
     // TODO
-    // HOW?! I cant get value (nodes) bound to the uf. Only new ones with the same sort.
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(value),

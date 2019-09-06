@@ -25,13 +25,13 @@ class BtorJNI {
 
   protected final static native void boolector_set_term(long jarg1, long jarg2, long jarg3);
 
-  protected final static native long boolector_terminate(long jarg1);
+  protected final static native int boolector_terminate(long jarg1);
 
   protected final static native void boolector_set_abort(long jarg1);
 
   protected final static native void boolector_set_msg_prefix(long jarg1, String jarg2);
 
-  protected final static native long boolector_get_refs(long jarg1);
+  protected final static native int boolector_get_refs(long jarg1);
 
   protected final static native void boolector_reset_time(long jarg1);
 
@@ -59,23 +59,23 @@ class BtorJNI {
 
   protected final static native void boolector_reset_assumptions(long jarg1);
 
-  protected final static native long boolector_sat(long jarg1);
+  protected final static native int boolector_sat(long jarg1);
 
-  protected final static native long boolector_limited_sat(long jarg1, long jarg2, long jarg3);
+  protected final static native int boolector_limited_sat(long jarg1, long jarg2, long jarg3);
 
-  protected final static native long boolector_simplify(long jarg1);
+  protected final static native int boolector_simplify(long jarg1);
 
   protected final static native void boolector_set_sat_solver(long jarg1, String jarg2);
 
   protected final static native void boolector_set_opt(long jarg1, int jarg2, long jarg3);
 
-  protected final static native long boolector_get_opt(long jarg1, int jarg2);
+  protected final static native int boolector_get_opt(long jarg1, int jarg2);
 
-  protected final static native long boolector_get_opt_min(long jarg1, int jarg2);
+  protected final static native int boolector_get_opt_min(long jarg1, int jarg2);
 
-  protected final static native long boolector_get_opt_max(long jarg1, int jarg2);
+  protected final static native int boolector_get_opt_max(long jarg1, int jarg2);
 
-  protected final static native long boolector_get_opt_dflt(long jarg1, int jarg2);
+  protected final static native int boolector_get_opt_dflt(long jarg1, int jarg2);
 
   protected final static native String boolector_get_opt_lng(long jarg1, int jarg2);
 
@@ -258,7 +258,7 @@ class BtorJNI {
 
   protected final static native long boolector_get_btor(long jarg1);
 
-  protected final static native long boolector_get_node_id(long jarg1, long jarg2);
+  protected final static native int boolector_get_node_id(long jarg1, long jarg2);
 
   protected final static native long boolector_get_sort(long jarg1, long jarg2);
 
@@ -276,15 +276,15 @@ class BtorJNI {
 
   protected final static native void boolector_set_symbol(long jarg1, long jarg2, String jarg3);
 
-  protected final static native long boolector_get_width(long jarg1, long jarg2);
+  protected final static native int boolector_get_width(long jarg1, long jarg2);
 
-  protected final static native long boolector_get_index_width(long jarg1, long jarg2);
+  protected final static native int boolector_get_index_width(long jarg1, long jarg2);
 
   protected final static native String boolector_get_bits(long jarg1, long jarg2);
 
   protected final static native void boolector_free_bits(long jarg1, String jarg2);
 
-  protected final static native long boolector_get_fun_arity(long jarg1, long jarg2);
+  protected final static native int boolector_get_fun_arity(long jarg1, long jarg2);
 
   protected final static native boolean boolector_is_const(long jarg1, long jarg2);
 
@@ -302,7 +302,7 @@ class BtorJNI {
 
   protected final static native boolean boolector_is_fun(long jarg1, long jarg2);
 
-  protected final static native long
+  protected final static native int
       boolector_fun_sort_check(long jarg1, long[] jarg2, long jarg3, long jarg4);
 
   protected final static native String boolector_bv_assignment(long jarg1, long jarg2);
@@ -347,7 +347,7 @@ class BtorJNI {
   protected final static native long
       boolector_parse(long jarg1, long jarg2, String jarg3, long jarg4, long jarg5, long jarg6);
 
-  protected final static native long boolector_parse_btor(
+  protected final static native int boolector_parse_btor(
       long jarg1,
       long jarg2,
       String jarg3,
@@ -355,7 +355,7 @@ class BtorJNI {
       long jarg5,
       long jarg6);
 
-  protected final static native long boolector_parse_btor2(
+  protected final static native int boolector_parse_btor2(
       long jarg1,
       long jarg2,
       String jarg3,
@@ -363,7 +363,7 @@ class BtorJNI {
       long jarg5,
       long jarg6);
 
-  protected final static native long boolector_parse_smt1(
+  protected final static native int boolector_parse_smt1(
       long jarg1,
       long jarg2,
       String jarg3,
@@ -371,7 +371,7 @@ class BtorJNI {
       long jarg5,
       long jarg6);
 
-  protected final static native long boolector_parse_smt2(
+  protected final static native int boolector_parse_smt2(
       long jarg1,
       long jarg2,
       String jarg3,

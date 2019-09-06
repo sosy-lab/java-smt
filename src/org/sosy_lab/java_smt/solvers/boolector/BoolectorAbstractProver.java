@@ -83,7 +83,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final int result = (int) BtorJNI.boolector_sat(btor);
+    final int result = BtorJNI.boolector_sat(btor);
     if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_SAT) {
       wasLastSatCheckSat = true;
       return false;
