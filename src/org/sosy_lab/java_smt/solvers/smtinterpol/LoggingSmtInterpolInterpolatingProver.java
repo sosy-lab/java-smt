@@ -22,9 +22,12 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import java.io.PrintWriter;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -56,9 +59,8 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
 
   @Override
   public String addConstraint(BooleanFormula f) {
-    out.print("(assert (" + f + "))");
     String result = super.addConstraint(f);
-    out.println(" ; annotated term: " + result);
+    out.print("(assert (! " + f + " :named " + result + "))");
     return result;
   }
 
@@ -87,10 +89,37 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    // TODO export in correct format
-    out.println(
-        "(get-interpolants " + partitionedTermNames + " " + Arrays.toString(startOfSubTree) + ")");
-    return super.getTreeInterpolants(partitionedTermNames, startOfSubTree);
+    Preconditions.checkArgument(partitionedTermNames.size() == startOfSubTree.length);
+    out.print("(get-interpolants");
+    Deque<Integer> subtrees = new ArrayDeque<>();
+    for (int i = 0; i < startOfSubTree.length; i++) {
+      final Collection<String> names = partitionedTermNames.get(i);
+      final int currentStartOfSubtree = startOfSubTree[i];
+      final String currentTerms;
+      if (names.size() == 1) {
+        currentTerms = names.iterator().next();
+      } else {
+        currentTerms = "(and " + Joiner.on(" ").join(names) + ")";
+      }
+      while (!subtrees.isEmpty() && subtrees.peek() > currentStartOfSubtree) {
+        subtrees.pop();
+        out.print(")");
+      }
+      out.print(" ");
+      if (!subtrees.isEmpty() && subtrees.peek() < currentStartOfSubtree) {
+        subtrees.push(currentStartOfSubtree);
+        out.print("(");
+      }
+      if (subtrees.isEmpty()) {
+        subtrees.push(currentStartOfSubtree);
+      }
+
+      out.print(currentTerms);
+    }
+    out.print(") ; subtrees=" + Arrays.toString(startOfSubTree));
+    List<BooleanFormula> result = super.getTreeInterpolants(partitionedTermNames, startOfSubTree);
+    out.println(" ; interpolants=" + result);
+    return result;
   }
 
   @Override
