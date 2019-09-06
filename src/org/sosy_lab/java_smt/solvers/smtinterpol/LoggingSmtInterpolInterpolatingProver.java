@@ -60,7 +60,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   @Override
   public String addConstraint(BooleanFormula f) {
     String result = super.addConstraint(f);
-    out.print("(assert (! " + f + " :named " + result + "))");
+    out.println("(assert (! " + f + " :named " + result + "))");
     return result;
   }
 
