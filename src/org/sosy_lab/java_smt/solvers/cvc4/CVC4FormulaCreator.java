@@ -293,6 +293,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         argsTypes.add(argType);
       }
 
+      // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
+      // part of the operator itself, thus the arity is one too small and there might be no
+      // possibility to access the information from user side. Should we encode such information as
+      // additional parameters? We do so for some methods of Princess.
+
       return visitor.visitFunction(
           formula,
           args,
@@ -344,7 +349,19 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
+          .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
+          .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
+          .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
+          .put(Kind.FLOATINGPOINT_TO_FP_FLOATINGPOINT, FunctionDeclarationKind.FP_CASTTO_FP)
+          .put(Kind.FLOATINGPOINT_ISNAN, FunctionDeclarationKind.FP_IS_NAN)
+          .put(Kind.FLOATINGPOINT_ISNEG, FunctionDeclarationKind.FP_IS_NEGATIVE)
+          .put(Kind.FLOATINGPOINT_ISINF, FunctionDeclarationKind.FP_IS_INF)
+          .put(Kind.FLOATINGPOINT_ISN, FunctionDeclarationKind.FP_IS_NORMAL)
+          .put(Kind.FLOATINGPOINT_ISSN, FunctionDeclarationKind.FP_IS_SUBNORMAL)
+          .put(Kind.FLOATINGPOINT_ISZ, FunctionDeclarationKind.FP_IS_ZERO)
+          .put(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, FunctionDeclarationKind.FP_AS_IEEEBV)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
