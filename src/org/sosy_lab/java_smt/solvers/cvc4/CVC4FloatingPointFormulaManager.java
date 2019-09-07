@@ -133,7 +133,7 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makeVariableImpl(String varName, FloatingPointType pType) {
-    return exprManager.mkVar(varName, formulaCreator.getFloatingPointType(pType));
+    return formulaCreator.makeVariable(formulaCreator.getFloatingPointType(pType), varName);
   }
 
   @Override
@@ -287,7 +287,8 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr toIeeeBitvectorImpl(Expr pNumber) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
+    final Expr op = exprManager.mkConst(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR);
+    return exprManager.mkExpr(op, pNumber);
   }
 
   @Override
