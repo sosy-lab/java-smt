@@ -24,7 +24,6 @@ import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -52,9 +51,19 @@ public class CVC4IntegerFormulaManager
   }
 
   @Override
+  public Expr divide(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
+  }
+
+  @Override
   protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
+    return modularCongruence(pNumber1, pNumber2, BigInteger.valueOf(pModulo));
+  }
+
+  @Override
+  protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, BigInteger pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
-    if (pModulo > 0) {
+    if (BigInteger.ZERO.compareTo(pModulo) < 0) {
       Expr n = makeNumberImpl(pModulo);
       Expr x = subtract(pNumber1, pNumber2);
       return exprManager.mkExpr(
@@ -63,12 +72,6 @@ public class CVC4IntegerFormulaManager
           exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x, n)));
     }
     return exprManager.mkConst(true);
-  }
-
-  @Override
-  public BooleanFormula modularCongruence(
-      IntegerFormula pNumber1, IntegerFormula pNumber2, BigInteger pN) {
-    return modularCongruence(pNumber1, pNumber2, pN.longValue());
   }
 
   @Override
