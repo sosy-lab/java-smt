@@ -25,6 +25,7 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -103,7 +104,18 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
         }
 
         // now add the final assert
-        out.append("(assert ").append(f.toString()).append(')');
+        out.append("(assert ");
+        // f.toString() does expand all nested sub-expressions and causes exponential overhead.
+        // f.toStream() uses LET-expressions and is exactly what we want.
+        f.toStream(
+            new OutputStream() {
+
+              @Override
+              public void write(int chr) throws IOException {
+                out.append(Character.valueOf((char) chr));
+              }
+            });
+        out.append(')');
       }
     };
   }
