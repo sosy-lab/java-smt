@@ -141,17 +141,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public FormulaType<?> getFormulaType(Expr pFormula) {
-    Type t = pFormula.getType();
-
-    if (t.isArray()) {
-      // it can happen that t is instance of Type but not instance of ArrayType! But this workaround
-      // seems to work:
-      ArrayType arrayType = new ArrayType(t);
-      return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(arrayType.getIndexType()),
-          getFormulaTypeFromTermType(arrayType.getConstituentType()));
-    }
-    return getFormulaTypeFromTermType(t);
+    return getFormulaTypeFromTermType(pFormula.getType());
   }
 
   private FormulaType<?> getFormulaTypeFromTermType(Type t) {
@@ -176,10 +166,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.RationalType;
     } else if (t.isArray()) {
       ArrayType arrayType = new ArrayType(t); // instead of casting, create a new type.
-      Type indexType = arrayType.getIndexType();
-      Type elementType = arrayType.getConstituentType();
-      return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
+      FormulaType<?> indexType = getFormulaTypeFromTermType(arrayType.getIndexType());
+      FormulaType<?> elementType = getFormulaTypeFromTermType(arrayType.getConstituentType());
+      return FormulaType.getArrayType(indexType, elementType);
     } else {
       throw new AssertionError("Unhandled type " + t.getBaseType());
     }
@@ -215,26 +204,32 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public BooleanFormula encapsulateBoolean(Expr pTerm) {
-    assert getFormulaType(pTerm).isBooleanType();
+    assert getFormulaType(pTerm).isBooleanType()
+        : String.format(
+            "%s is not boolean, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BooleanFormula(pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Expr pTerm) {
-    assert getFormulaType(pTerm).isBitvectorType();
+    assert getFormulaType(pTerm).isBitvectorType()
+        : String.format("%s is no BV, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType();
+    assert getFormulaType(pTerm).isFloatingPointType()
+        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4FloatingPointFormula(pTerm);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
+        : String.format(
+            "%s is no array, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
