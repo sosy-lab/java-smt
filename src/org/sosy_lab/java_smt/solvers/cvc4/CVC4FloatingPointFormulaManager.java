@@ -26,13 +26,15 @@ import edu.nyu.acsys.CVC4.FloatingPoint;
 import edu.nyu.acsys.CVC4.FloatingPointConvertSort;
 import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.FloatingPointToFPFloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointToFPSignedBitVector;
+import edu.nyu.acsys.CVC4.FloatingPointToFPUnsignedBitVector;
 import edu.nyu.acsys.CVC4.FloatingPointToSBV;
-import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.RoundingMode;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -103,8 +105,34 @@ public class CVC4FloatingPointFormulaManager
     } catch (NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
     }
-    return exprManager.mkConst(
-        new FloatingPoint(getFPSize(pType), pRoundingMode.getConstRoundingMode(), toRational(pN)));
+
+    final Rational rat = toRational(pN);
+    final BigInteger upperBound =
+        getBiggestNumberBeforeInf(pType.getMantissaSize(), pType.getExponentSize());
+
+    if (rat.greater(Rational.fromDecimal(upperBound.negate().toString()))
+        && rat.less(Rational.fromDecimal(upperBound.toString()))) {
+      return exprManager.mkConst(
+          new FloatingPoint(getFPSize(pType), pRoundingMode.getConstRoundingMode(), rat));
+
+    } else { // out of range
+      if (rat.greater(Rational.fromDecimal("0"))) {
+        return makePlusInfinityImpl(pType);
+      } else {
+        return makeMinusInfinityImpl(pType);
+      }
+    }
+  }
+
+  /** TODO lookup why this number works: <code>2**(2**(exp-1)) - 2**(2**(exp-1)-2-mant)</code> */
+  private static BigInteger getBiggestNumberBeforeInf(int mantissa, int exponent) {
+    int boundExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact();
+    BigInteger upperBoundExponent = BigInteger.valueOf(2).pow(boundExponent);
+    int mantissaExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact() - 2 - mantissa;
+    if (mantissaExponent >= 0) { // ignore negative mantissaExponent
+      upperBoundExponent = upperBoundExponent.subtract(BigInteger.valueOf(2).pow(mantissaExponent));
+    }
+    return upperBoundExponent;
   }
 
   /**
@@ -121,9 +149,12 @@ public class CVC4FloatingPointFormulaManager
     } catch (NumberFormatException e1) {
       try {
         // then try something like -123/456
-        org.sosy_lab.common.rationals.Rational r =
+
+        @SuppressWarnings("unused") // check format before calling CVC4
+        org.sosy_lab.common.rationals.Rational unused =
             org.sosy_lab.common.rationals.Rational.ofString(pN);
-        return new Rational(new Integer(r.getNum().toString()), new Integer(r.getDen().toString()));
+
+        return new Rational(pN);
 
       } catch (NumberFormatException e2) {
         // we cannot handle the number
@@ -134,7 +165,7 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makeVariableImpl(String varName, FloatingPointType pType) {
-    return exprManager.mkVar(varName, formulaCreator.getFloatingPointType(pType));
+    return formulaCreator.makeVariable(formulaCreator.getFloatingPointType(pType), varName);
   }
 
   @Override
@@ -179,6 +210,20 @@ public class CVC4FloatingPointFormulaManager
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
     if (formulaType.isFloatingPointType()) {
       return castToImpl(pNumber, pTargetType, pRoundingMode);
+
+    } else if (formulaType.isBitvectorType()) {
+      long pExponentSize = pTargetType.getExponentSize();
+      long pMantissaSize = pTargetType.getMantissaSize();
+      FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize + 1);
+      FloatingPointConvertSort fpConvert = new FloatingPointConvertSort(fpSize);
+      final Expr op;
+      if (pSigned) {
+        op = exprManager.mkConst(new FloatingPointToFPSignedBitVector(fpConvert));
+      } else {
+        op = exprManager.mkConst(new FloatingPointToFPUnsignedBitVector(fpConvert));
+      }
+      return exprManager.mkExpr(op, pRoundingMode, pNumber);
+
     } else {
       return genericCast(pNumber, pTargetType);
     }
@@ -288,12 +333,13 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr toIeeeBitvectorImpl(Expr pNumber) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
+    // TODO possible work-around: use a tmp-variable "TMP" and add an
+    // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
+    throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
   }
 
   @Override
   protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
   }
 }

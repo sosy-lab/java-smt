@@ -79,9 +79,20 @@ public class CVC4BooleanFormulaManager
   protected Expr andImpl(Collection<Expr> pParams) {
     vectorExpr vExpr = new vectorExpr();
     for (Expr e : pParams) {
-      vExpr.add(e);
+      if (isFalse(e)) {
+        return cvc4False;
+      }
+      if (!isTrue(e)) {
+        vExpr.add(e);
+      }
     }
-    return exprManager.mkExpr(Kind.AND, vExpr);
+    if (vExpr.capacity() == 0) {
+      return cvc4True;
+    } else if (vExpr.capacity() == 1) {
+      return vExpr.get(0);
+    } else {
+      return exprManager.mkExpr(Kind.AND, vExpr);
+    }
   }
 
   @Override
@@ -109,9 +120,20 @@ public class CVC4BooleanFormulaManager
   protected Expr orImpl(Collection<Expr> pParams) {
     vectorExpr vExpr = new vectorExpr();
     for (Expr e : pParams) {
-      vExpr.add(e);
+      if (isTrue(e)) {
+        return cvc4True;
+      }
+      if (!isFalse(e)) {
+        vExpr.add(e);
+      }
     }
-    return exprManager.mkExpr(Kind.OR, vExpr);
+    if (vExpr.capacity() == 0) {
+      return cvc4False;
+    } else if (vExpr.capacity() == 1) {
+      return vExpr.get(0);
+    } else {
+      return exprManager.mkExpr(Kind.OR, vExpr);
+    }
   }
 
   @Override

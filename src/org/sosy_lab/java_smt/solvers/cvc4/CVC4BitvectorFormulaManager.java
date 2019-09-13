@@ -21,7 +21,9 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.nyu.acsys.CVC4.BitVector;
 import edu.nyu.acsys.CVC4.BitVectorExtract;
+import edu.nyu.acsys.CVC4.BitVectorSignExtend;
 import edu.nyu.acsys.CVC4.BitVectorType;
+import edu.nyu.acsys.CVC4.BitVectorZeroExtend;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.IntToBitVector;
@@ -54,12 +56,13 @@ public class CVC4BitvectorFormulaManager
 
   @Override
   protected Expr extend(Expr pParam1, int pExtensionBits, boolean signed) {
-    Expr pParam2 = exprManager.mkConst(new Rational(pExtensionBits));
+    final Expr op;
     if (signed) {
-      return exprManager.mkExpr(Kind.BITVECTOR_SIGN_EXTEND, pParam1, pParam2);
+      op = exprManager.mkConst(new BitVectorSignExtend(pExtensionBits));
     } else {
-      return exprManager.mkExpr(Kind.BITVECTOR_ZERO_EXTEND, pParam1, pParam2);
+      op = exprManager.mkConst(new BitVectorZeroExtend(pExtensionBits));
     }
+    return exprManager.mkExpr(op, pParam1);
   }
 
   @Override

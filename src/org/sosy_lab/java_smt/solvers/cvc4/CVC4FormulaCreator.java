@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2015  Dirk Beyer
+ *  Copyright (C) 2007-2019  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,10 +24,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.UnsignedInteger;
+import com.google.common.primitives.UnsignedLong;
 import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.FloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
@@ -39,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -60,6 +66,9 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+
+  private static final Pattern FLOATING_POINT_PATTERN =
+      Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)\\)$");
 
   private final Map<String, Expr> variablesCache = new HashMap<>();
   private final Map<String, Expr> functionsCache = new HashMap<>();
@@ -141,17 +150,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public FormulaType<?> getFormulaType(Expr pFormula) {
-    Type t = pFormula.getType();
-
-    if (t.isArray()) {
-      // it can happen that t is instance of Type but not instance of ArrayType! But this workaround
-      // seems to work:
-      ArrayType arrayType = new ArrayType(t);
-      return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(arrayType.getIndexType()),
-          getFormulaTypeFromTermType(arrayType.getConstituentType()));
-    }
-    return getFormulaTypeFromTermType(t);
+    return getFormulaTypeFromTermType(pFormula.getType());
   }
 
   private FormulaType<?> getFormulaTypeFromTermType(Type t) {
@@ -176,10 +175,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.RationalType;
     } else if (t.isArray()) {
       ArrayType arrayType = new ArrayType(t); // instead of casting, create a new type.
-      Type indexType = arrayType.getIndexType();
-      Type elementType = arrayType.getConstituentType();
-      return FormulaType.getArrayType(
-          getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
+      FormulaType<?> indexType = getFormulaTypeFromTermType(arrayType.getIndexType());
+      FormulaType<?> elementType = getFormulaTypeFromTermType(arrayType.getConstituentType());
+      return FormulaType.getArrayType(indexType, elementType);
     } else {
       throw new AssertionError("Unhandled type " + t.getBaseType());
     }
@@ -215,26 +213,32 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public BooleanFormula encapsulateBoolean(Expr pTerm) {
-    assert getFormulaType(pTerm).isBooleanType();
+    assert getFormulaType(pTerm).isBooleanType()
+        : String.format(
+            "%s is not boolean, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BooleanFormula(pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Expr pTerm) {
-    assert getFormulaType(pTerm).isBitvectorType();
+    assert getFormulaType(pTerm).isBitvectorType()
+        : String.format("%s is no BV, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType();
+    assert getFormulaType(pTerm).isFloatingPointType()
+        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4FloatingPointFormula(pTerm);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
+    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
+        : String.format(
+            "%s is no array, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
@@ -293,6 +297,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         argsTypes.add(argType);
       }
 
+      // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
+      // part of the operator itself, thus the arity is one too small and there might be no
+      // possibility to access the information from user side. Should we encode such information as
+      // additional parameters? We do so for some methods of Princess.
+
       return visitor.visitFunction(
           formula,
           args,
@@ -344,7 +353,19 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
+          .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
+          .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
+          .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
+          .put(Kind.FLOATINGPOINT_TO_FP_FLOATINGPOINT, FunctionDeclarationKind.FP_CASTTO_FP)
+          .put(Kind.FLOATINGPOINT_ISNAN, FunctionDeclarationKind.FP_IS_NAN)
+          .put(Kind.FLOATINGPOINT_ISNEG, FunctionDeclarationKind.FP_IS_NEGATIVE)
+          .put(Kind.FLOATINGPOINT_ISINF, FunctionDeclarationKind.FP_IS_INF)
+          .put(Kind.FLOATINGPOINT_ISN, FunctionDeclarationKind.FP_IS_NORMAL)
+          .put(Kind.FLOATINGPOINT_ISSN, FunctionDeclarationKind.FP_IS_SUBNORMAL)
+          .put(Kind.FLOATINGPOINT_ISZ, FunctionDeclarationKind.FP_IS_ZERO)
+          .put(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, FunctionDeclarationKind.FP_AS_IEEEBV)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
@@ -428,14 +449,37 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       }
 
     } else if (value.getType().isFloatingPoint()) {
-      Rational rat = value.getConstFloatingPoint().convertToRationalTotal(new Rational(0));
-      return org.sosy_lab.common.rationals.Rational.of(
-          new BigInteger(rat.getNumerator().toString()),
-          new BigInteger(rat.getDenominator().toString()));
+      return parseFloatingPoint(value);
 
     } else {
       // String serialization for unknown terms.
       return value.toString();
     }
+  }
+
+  private Object parseFloatingPoint(Expr fpExpr) {
+    Matcher matcher = FLOATING_POINT_PATTERN.matcher(fpExpr.toString());
+    if (!matcher.matches()) {
+      throw new NumberFormatException("Unknown floating-point format: " + fpExpr);
+    }
+
+    FloatingPoint fp = fpExpr.getConstFloatingPoint();
+    FloatingPointSize fpType = fp.getT();
+    long expWidth = fpType.exponentWidth();
+    long mantWidth = fpType.significandWidth() - 1; // without sign bit
+
+    assert matcher.group("sign").length() == 1;
+    assert matcher.group("exp").length() == expWidth;
+    assert matcher.group("mant").length() == mantWidth;
+
+    String str = matcher.group("sign") + matcher.group("exp") + matcher.group("mant");
+    if (expWidth == 11 && mantWidth == 52) {
+      return Double.longBitsToDouble(UnsignedLong.valueOf(str, 2).longValue());
+    } else if (expWidth == 8 && mantWidth == 23) {
+      return Float.intBitsToFloat(UnsignedInteger.valueOf(str, 2).intValue());
+    }
+
+    // TODO to be fully correct, we would need to interpret this string
+    return fpExpr.toString();
   }
 }

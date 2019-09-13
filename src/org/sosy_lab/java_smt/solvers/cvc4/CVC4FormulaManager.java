@@ -19,23 +19,32 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Splitter;
+import com.google.common.base.Joiner;
+import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Type;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager, Expr> {
 
+  private final CVC4FormulaCreator creator;
+
+  @SuppressWarnings("checkstyle:parameternumber")
   CVC4FormulaManager(
-      FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator,
+      CVC4FormulaCreator pFormulaCreator,
       CVC4UFManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
       CVC4IntegerFormulaManager pIfmgr,
@@ -45,6 +54,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
       CVC4ArrayFormulaManager pAfmgr,
       CVC4SLFormulaManager pSLfmgr) {
     super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, pBvfmgr, pFpfmgr, null, pAfmgr, pSLfmgr);
+    creator = pFormulaCreator;
   }
 
   static Expr getCVC4Expr(Formula pT) {
@@ -65,22 +75,47 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
-    // Lazy invocation of msat_to_smtlib2 wrapped in an Appender.
     return new Appenders.AbstractAppender() {
+
       @Override
       public void appendTo(Appendable out) throws IOException {
-        String cvc4String = f.toString();
-        // Adjust line breaks: assert needs to be on last line, so we remove all following breaks.
-        boolean needsLinebreak = true;
-        for (String part : Splitter.on('\n').split(cvc4String)) {
-          out.append(part);
-          if (needsLinebreak && part.startsWith("(assert")) {
-            needsLinebreak = false;
+
+        // get all symbols
+        final Map<String, Expr> allVars = new LinkedHashMap<>();
+        creator.extractVariablesAndUFs(f, true, allVars::put);
+
+        // print all symbols
+        for (Entry<String, Expr> entry : allVars.entrySet()) {
+          String name = entry.getKey();
+          Expr var = entry.getValue();
+
+          // escaping is stolen from SMTInterpol, lets hope this remains consistent
+          out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+
+          // add function parameters
+          List<Type> childrenTypes = new ArrayList<>();
+          for (int i = 0; i < var.getNumChildren(); i++) {
+            childrenTypes.add(var.getChild(i).getType());
           }
-          if (needsLinebreak) {
-            out.append('\n');
-          }
+          out.append(Joiner.on(" ").join(childrenTypes));
+
+          // and return type
+          out.append(") ").append(var.getType().toString()).append(")\n");
         }
+
+        // now add the final assert
+        out.append("(assert ");
+        // f.toString() does expand all nested sub-expressions and causes exponential overhead.
+        // f.toStream() uses LET-expressions and is exactly what we want.
+        f.toStream(
+            new OutputStream() {
+
+              @Override
+              public void write(int chr) throws IOException {
+                out.append(Character.valueOf((char) chr));
+              }
+            });
+        out.append(')');
       }
     };
   }

@@ -743,9 +743,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     switch (solver) {
       case MATHSAT5:
-        assertThat(valueInMulti.toString())
-            .isEqualTo(
-                "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)");
+        String readWrite =
+            "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)";
+        assertThat(valueInMulti.toString()).isEqualTo(readWrite);
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");

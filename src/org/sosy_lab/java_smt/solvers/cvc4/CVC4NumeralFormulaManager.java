@@ -134,11 +134,6 @@ abstract class CVC4NumeralFormulaManager<
   }
 
   @Override
-  public Expr divide(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
-  }
-
-  @Override
   public Expr multiply(Expr pParam1, Expr pParam2) {
     if (consistsOfNumerals(pParam1) || consistsOfNumerals(pParam2)) {
       return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);

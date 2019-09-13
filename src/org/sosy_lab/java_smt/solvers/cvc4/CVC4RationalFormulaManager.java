@@ -52,6 +52,11 @@ public class CVC4RationalFormulaManager
   }
 
   @Override
+  public Expr divide(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.DIVISION, pParam1, pParam2);
+  }
+
+  @Override
   protected Expr floor(Expr pNumber) {
     return exprManager.mkExpr(Kind.TO_INTEGER, pNumber);
   }
