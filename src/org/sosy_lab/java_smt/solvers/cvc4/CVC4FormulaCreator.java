@@ -24,10 +24,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.UnsignedInteger;
+import com.google.common.primitives.UnsignedLong;
 import edu.nyu.acsys.CVC4.ArrayType;
 import edu.nyu.acsys.CVC4.BitVectorType;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
+import edu.nyu.acsys.CVC4.FloatingPoint;
+import edu.nyu.acsys.CVC4.FloatingPointSize;
 import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
@@ -39,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -60,6 +66,9 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+
+  private static final Pattern FLOATING_POINT_PATTERN =
+      Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)\\)$");
 
   private final Map<String, Expr> variablesCache = new HashMap<>();
   private final Map<String, Expr> functionsCache = new HashMap<>();
@@ -440,14 +449,37 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       }
 
     } else if (value.getType().isFloatingPoint()) {
-      Rational rat = value.getConstFloatingPoint().convertToRationalTotal(new Rational(0));
-      return org.sosy_lab.common.rationals.Rational.of(
-          new BigInteger(rat.getNumerator().toString()),
-          new BigInteger(rat.getDenominator().toString()));
+      return parseFloatingPoint(value);
 
     } else {
       // String serialization for unknown terms.
       return value.toString();
     }
+  }
+
+  private Object parseFloatingPoint(Expr fpExpr) {
+    Matcher matcher = FLOATING_POINT_PATTERN.matcher(fpExpr.toString());
+    if (!matcher.matches()) {
+      throw new NumberFormatException("Unknown floating-point format: " + fpExpr);
+    }
+
+    FloatingPoint fp = fpExpr.getConstFloatingPoint();
+    FloatingPointSize fpType = fp.getT();
+    long expWidth = fpType.exponentWidth();
+    long mantWidth = fpType.significandWidth() - 1; // without sign bit
+
+    assert matcher.group("sign").length() == 1;
+    assert matcher.group("exp").length() == expWidth;
+    assert matcher.group("mant").length() == mantWidth;
+
+    String str = matcher.group("sign") + matcher.group("exp") + matcher.group("mant");
+    if (expWidth == 11 && mantWidth == 52) {
+      return Double.longBitsToDouble(UnsignedLong.valueOf(str, 2).longValue());
+    } else if (expWidth == 8 && mantWidth == 23) {
+      return Float.intBitsToFloat(UnsignedInteger.valueOf(str, 2).intValue());
+    }
+
+    // TODO to be fully correct, we would need to interpret this string
+    return fpExpr.toString();
   }
 }
