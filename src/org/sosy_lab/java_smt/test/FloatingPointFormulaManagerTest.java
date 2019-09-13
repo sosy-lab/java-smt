@@ -658,9 +658,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void fpIeeeConversionTypes() {
     assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .withMessage("FP-to-BV conversion not available for CVC4")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNotEqualTo(Solvers.CVC4);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
@@ -670,9 +670,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .withMessage("FP-to-BV conversion not available for CVC4")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNotEqualTo(Solvers.CVC4);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThatFormula(
@@ -684,9 +684,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .withMessage("FP-to-BV conversion not available for CVC4")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNotEqualTo(Solvers.CVC4);
 
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
@@ -774,6 +774,11 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
   private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
       throws SolverException, InterruptedException {
+    assume()
+        .withMessage("FP-to-BV conversion not available for CVC4")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
+
     BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
 
     Truth.assertThat(mgr.getFormulaType(var))
