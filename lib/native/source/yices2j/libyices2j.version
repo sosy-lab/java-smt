@@ -1,0 +1,4 @@
+YICES2J {
+  global: Java_*;
+  local: *;
+};

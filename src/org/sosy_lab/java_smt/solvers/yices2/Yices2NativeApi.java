@@ -1,0 +1,674 @@
+/*
+ *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  This file is part of JavaSMT.
+ *
+ *  Copyright (C) 2007-2019  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package org.sosy_lab.java_smt.solvers.yices2;
+
+
+@SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
+class Yices2NativeApi {
+  private Yices2NativeApi() {
+  }
+  // Yices2 status codes
+
+  private static final int STATUS_IDLE = 0;
+  private static final int STATUS_SEARCHING = 1;
+  private static final int STATUS_UNKNOWN = 2;
+  private static final int STATUS_SAT = 3;
+  private static final int STATUS_UNSAT = 4;
+  private static final int STATUS_INTERRUPTED = 5;
+  private static final int STATUS_ERROR = 6;
+
+  // Yices2 term constructors
+  public static final int YICES_CONSTRUCTOR_ERROR = -1;
+  public static final int YICES_BOOL_CONST = 0;
+  public static final int YICES_ARITH_CONST = 1;
+  public static final int YICES_BV_CONST = 2;
+  public static final int YICES_SCALAR_CONST = 3; // NOT used in JavaSMT
+  public static final int YICES_VARIABLE = 4;
+  public static final int YICES_UNINTERPRETED_TERM = 5;
+
+  public static final int YICES_ITE_TERM = 6; // if-then-else
+  public static final int YICES_APP_TERM = 7; // application of an uninterpreted function
+  public static final int YICES_UPDATE_TERM = 8; // function update
+  public static final int YICES_TUPLE_TERM = 9; // tuple constructor
+  public static final int YICES_EQ_TERM = 10; // equality
+  public static final int YICES_DISTINCT_TERM = 11; // distinct t_1 ... t_n
+  public static final int YICES_FORALL_TERM = 12; // quantifier
+  public static final int YICES_LAMBDA_TERM = 13; // lambda
+  public static final int YICES_NOT_TERM = 14; // (not t)
+  public static final int YICES_OR_TERM = 15; // n-ary OR
+  public static final int YICES_XOR_TERM = 16; // n-ary XOR
+
+  public static final int YICES_BV_ARRAY = 17; // array of boolean terms
+  public static final int YICES_BV_DIV = 18; // unsigned division
+  public static final int YICES_BV_REM = 19; // unsigned remainder
+  public static final int YICES_BV_SDIV = 20; // signed division
+  public static final int YICES_BV_SREM = 21; // remainder in signed division (rounding to 0)
+  public static final int YICES_BV_SMOD = 22; // remainder in signed division (rounding to
+                                              // -infinity)
+  public static final int YICES_BV_SHL = 23; // shift left (padding with 0)
+  public static final int YICES_BV_LSHR = 24; // logical shift right (padding with 0)
+  public static final int YICES_BV_ASHR = 25; // arithmetic shift right (padding with sign bit)
+  public static final int YICES_BV_GE_ATOM = 26; // unsigned comparison: (t1 >= t2)
+  public static final int YICES_BV_SGE_ATOM = 27; // signed comparison (t1 >= t2)
+  public static final int YICES_ARITH_GE_ATOM = 28; // atom (t1 >= t2) for arithmetic terms: t2 is
+                                                    // always 0
+  public static final int YICES_ARITH_ROOT_ATOM = 29; // atom (0 <= k <= root_count(p)) && (x r
+                                                      // root(p,k)) for r in <, <=, ==, !=, >, >=
+
+  public static final int YICES_ABS = 30; // absolute value
+  public static final int YICES_CEIL = 31; // ceil
+  public static final int YICES_FLOOR = 32; // floor
+  public static final int YICES_RDIV = 33; // real division (as in x/y)
+  public static final int YICES_IDIV = 34; // integer division
+  public static final int YICES_IMOD = 35; // modulo
+  public static final int YICES_IS_INT_ATOM = 36; // integrality test: (is-int t)
+  public static final int YICES_DIVIDES_ATOM = 37; // divisibility test: (divides t1 t2)
+
+  // projections
+  public static final int YICES_SELECT_TERM = 38; // tuple projection
+  public static final int YICES_BIT_TERM = 39; // bit-select: extract the i-th bit of a bitvector
+
+  // sums
+  public static final int YICES_BV_SUM = 40; // sum of pairs a * t where a is a bitvector constant
+                                             // (and t is a bitvector term)
+  public static final int YICES_ARITH_SUM = 41; // sum of pairs a * t where a is a rational (and t
+                                                // is an arithmetic term)
+
+  // products
+  public static final int YICES_POWER_PRODUCT = 42; // power products: (t1^d1 * ... * t_n^d_n)
+  // TODO !!!!Prevent passing negative values to unsigned arguments!!!!
+
+  /*
+   * Yices initialization and exit
+   */
+
+  /**
+   * Initializes Yices data structures. Needs to be called before doing anything else.
+   */
+  public static native void yices_init();
+
+  /**
+   * Call at the end to free memory allocated by Yices
+   */
+  public static native void yices_exit();
+
+  /**
+   * Perform a full reset of Yices
+   *
+   * This function deletes all the terms and types defined in Yices and resets the symbol tables. It
+   * also deletes all contexts, models, configuration descriptors, and other records allocated in
+   * Yices.
+   */
+  public static native void yices_reset();
+
+  /**
+   * Frees the specified String. everal API functions build and return a character string that is
+   * allocated by Yices. To avoid memory leaks, this string must be freed when it is no longer used
+   * by calling this function.
+   *
+   * @param stringPtr The pointer to the String
+   */
+  public static native void free_string(long stringPtr);
+
+  /*
+   * Yices Version checking for test purposes
+   */
+
+  public static native int yices_get_version();
+
+  public static native int yices_get_major_version();
+
+  public static native int yices_get_patch_level();
+
+  /*
+   * Context/ Environment creation
+   */
+
+  public static native long yices_new_config();
+
+  public static native long yices_free_config(long cfg);
+
+  /**
+   * Set option to specified value.
+   *
+   * @param cfg The configuration to set the option in.
+   * @param option The option to set.
+   * @param value The value that the option will be set.
+   * @return 0 if successful , -1 if an error occurred
+   */
+  public static native int yices_set_config(long cfg, String option, String value);
+
+  // TODO Return Value/Name from error_report
+  public static void yices_set_config_checked(long cfg, String option, String value)
+      throws IllegalArgumentException {
+    int retval = yices_set_config(cfg, option, value);
+    if (retval != 0) {
+      throw new IllegalArgumentException(
+          "Could not set Yices option \"" + option + "=" + value + "\", error code " + retval);
+    }
+  }
+  /**
+   * Prepares a context configuration for the specified logic.
+   *
+   * @param cfg The configuration to be prepared
+   * @param logic Name of the logic to prepare for or "NULL"
+   * @return 0 if successful, -1 if an error occurred
+   */
+
+  public static native int yices_default_config_for_logic(long cfg, String logic);
+
+  public static native long yices_new_context(long cfg);
+
+  public static native long yices_free_context(long ctx);
+
+  public static native int yices_context_enable_option(long ctx, String option);
+
+  public static native int yices_context_disable_option(long ctx, String option);
+
+  /*
+   * Yices search params
+   */
+
+  public static native long yices_new_param_record();
+
+  public static native int yices_set_param(long record, String name, String value);
+
+  public static native void yices_default_params_for_context(long ctx, long record);
+
+  public static native void yices_free_param_record(long record);
+
+  /*
+   * Yices type construction
+   */
+  public static native int yices_bool_type();
+
+  public static native int yices_int_type();
+
+  public static native int yices_real_type();
+
+  /**
+   * Constructs a bitvector type.
+   *
+   * @param size is the number of bits. It must be positive and no more than YICES_MAX_BVSIZE
+   * @return bitvector type
+   */
+  public static native int yices_bv_type(int size);
+
+  /**
+   * Creates the function type (-> dom[0] … dom[n-1] range).
+   *
+   * @param n function arity (i.e., size of array dom)
+   * @param dom array of domain types
+   * @param range range type
+   * @return function type of n-arity
+   */
+  public static native int yices_function_type(int n, int[] dom, int range);
+
+  /*
+   * Yices type tests
+   */
+  public static native boolean yices_is_bool(int t);
+
+  public static native boolean yices_is_int(int t);
+
+  public static native boolean yices_is_real(int t);
+
+  /**
+   * Checks if type is arithmetic (i.e., either integer or real)
+   *
+   * @param t Type to check
+   * @return true if arithmetic, false otherwise
+   */
+  public static native boolean yices_is_arithmetic(int t);
+
+  public static native boolean yices_is_bitvector(int t);
+
+  public static native boolean yices_is_function(int t);
+
+  /**
+   * Tests if the first type is a subtype of the second.
+   *
+   * @param t1 The first type
+   * @param t2 The second type
+   * @return true if t1 is a subtype of t2, otherwise false
+   */
+  public static native boolean yices_test_subtype(int t1, int t2);
+
+  /**
+   * Tests if Type1 and Type2 are compatible
+   *
+   * @param t1 The first type
+   * @param t2 The second type
+   * @return true if t1 and t2 are compatible, otherwise false
+   */
+  public static native boolean yices_compatible_types(int t1, int t2);
+
+  /**
+   * Size of bitvector.
+   *
+   * @param t Bitvector to get the size of
+   * @return Number of bits in bitvector or 0 if an error occurred
+   */
+  public static native int yices_bvtype_size(int t);
+
+  public static native int yices_type_num_children(int t);
+
+  public static native int yices_type_child(int t, int index);
+
+  /*
+   * TERM CONSTRUCTION
+   */
+
+  public static native int yices_new_uninterpreted_term(int type);
+
+  public static native int yices_new_variable(int type);
+
+  public static native int yices_constant(int type, int index);
+
+  public static native int yices_ite(int t_if, int t_then, int t_else);
+
+  public static native int yices_eq(int t_1, int t_2);
+
+  public static native int yices_neq(int t_1, int t_2);
+
+  public static native int yices_distinct(int size, int[] terms);
+
+  public static native int yices_application(int t, int size, int[] terms);
+
+  public static native int yices_update(int t1, int size, int[] terms, int t2);
+
+  public static native int yices_forall(int size, int[] terms, int t);
+
+  public static native int yices_exists(int size, int[] terms, int t);
+
+  public static native int yices_lambda(int size, int[] terms, int t);
+
+  /*
+   * Bool Terms
+   */
+
+  public static native int yices_true();
+
+  public static native int yices_false();
+
+  public static native int yices_not(int t);
+
+  public static native int yices_and(int n, int[] arg);
+
+  public static native int yices_and2(int t1, int t2);
+
+  public static native int yices_and3(int t1, int t2, int t3);
+
+  public static native int yices_or(int n, int[] arg);
+
+  public static native int yices_or2(int t1, int t2);
+
+  public static native int yices_or3(int t1, int t2, int t3);
+
+  public static native int yices_xor(int n, int[] arg);
+
+  public static native int yices_xor2(int t1, int t2);
+
+  public static native int yices_xor3(int t1, int t2, int t3);
+
+  public static native int yices_iff(int t1, int t2);
+
+  public static native int yices_implies(int t1, int t2);
+
+  /*
+   * Arithmetic Terms
+   */
+  public static native int yices_zero();
+
+  public static native int yices_int32(int value);
+
+  // TODO 64 bit/ long needed?
+  public static native int yices_int64(long val);
+
+  public static native int yices_rational32(int num, int den);
+
+  // TODO 64bit/ long needed?
+  public static native int yices_rational64(long num, long den);
+
+  public static native int yices_parse_rational(String val);
+
+  public static native int yices_parse_float(String val);
+
+  public static native int yices_add(int t1, int t2);
+
+  public static native int yices_sub(int t1, int t2);
+
+  public static native int yices_neg(int t);
+
+  public static native int yices_mul(int t1, int t2);
+
+  public static native int yices_square(int t);
+
+  public static native int yices_power(int t, int power);
+
+  public static native int yices_division(int t1, int t2);
+
+  public static native int yices_sum(int size, int[] terms);
+
+  public static native int yices_product(int size, int[] terms);
+
+  public static native int yices_poly_int32(int size, int[] coeff, int[] terms);
+
+  // TODO 64bit/long
+  public static native int yices_poly_int64(int size, long[] coeff, int[] terms);
+
+  public static native int yices_poly_rational32(int size, int[] num, int[] den, int[] terms);
+
+  // TODO 64bit/long
+  public static native int yices_poly_rational64(int size, int[] num, int[] den, int[] terms);
+
+  public static native int yices_abs(int t);
+
+  public static native int yices_floor(int t);
+
+  public static native int yices_ceil(int t);
+
+  public static native int yices_idiv(int t1, int t2);
+
+  public static native int yices_imod(int t1, int t2);
+
+  public static native int yices_arith_eq_atom(int t1, int t2);
+
+  public static native int yices_arith_neq_atom(int t1, int t2);
+
+  public static native int yices_arith_geq_atom(int t1, int t2);
+
+  public static native int yices_arith_leq_atom(int t1, int t2);
+
+  public static native int yices_arith_gt_atom(int t1, int t2);
+
+  public static native int yices_arith_lt_atom(int t1, int t2);
+
+  public static native int yices_arith_eq0_atom(int t);
+
+  public static native int yices_arith_neq0_atom(int t);
+
+  public static native int yices_arith_geq0_atom(int t);
+
+  public static native int yices_arith_leq0_atom(int t);
+
+  public static native int yices_arith_gt0_atom(int t);
+
+  public static native int yices_arith_lt0_atom(int t);
+
+  public static native int yices_divides_atom(int t1, int t2);
+
+  public static native int yices_is_int_atom(int t);
+
+  /*
+   * Bitvector Terms
+   */
+  public static native int yices_bvconst_uint32(int size, int value);
+
+  public static native int yices_bvcinst_uint64(int size, long value);
+
+  public static native int yices_bvconst_int32(int size, int value);
+
+  public static native int yices_bvconst_int64(int size, long value);
+
+  public static native int yices_bvconst_zero(int size);
+
+  public static native int yices_bvconst_one(int size);
+
+  public static native int yices_minus_one(int size);
+
+  public static native int yices_bvconst_from_array(int size, int[] values);
+
+  public static native int yices_parse_bvbin(String value);
+
+  public static native int yices_parse_bvhex(String value);
+
+  public static native int yices_bvadd(int t1, int t2);
+
+  public static native int yices_bvsub(int t1, int t2);
+
+  public static native int yices_bvneg(int t);
+
+  public static native int yices_bvmul(int t1, int t2);
+
+  public static native int yices_bvsquare(int t);
+
+  public static native int yices_bvpower(int t, int power);
+
+  public static native int yices_bvsum(int size, int[] terms);
+
+  public static native int yices_bvproduct(int size, int[] terms);
+
+  public static native int yices_bvdiv(int t1, int t2);
+
+  public static native int yices_bvrem(int t1, int t2);
+
+  public static native int yices_bvsdiv(int t1, int t2);
+
+  public static native int yices_bvsrem(int t1, int t2);
+
+  public static native int yices_bvsmod(int t1, int t2);
+
+  public static native int yices_bvnot(int t);
+
+  public static native int yices_bvand(int size, int[] terms);
+
+  public static native int yices_bvand2(int t1, int t2);
+
+  public static native int yices_bvand3(int t1, int t2, int t3);
+
+  public static native int yices_bvor(int size, int[] terms);
+
+  public static native int yices_bvor2(int t1, int t2);
+
+  public static native int yices_bvor3(int t1, int t2, int t3);
+
+  public static native int yices_bvxor(int size, int[] terms);
+
+  public static native int yices_bvxor2(int t1, int t2);
+
+  public static native int yices_bvxor3(int t1, int t2, int t3);
+
+  public static native int yices_bvnand(int t1, int t2);
+
+  public static native int yices_bvnor(int t1, int t2);
+
+  public static native int yices_bvxnor(int t1, int t2);
+
+  public static native int yices_shift_left0(int t, int shift);
+
+  public static native int yices_shift_left1(int t, int shift);
+
+  public static native int yices_shift_right0(int t, int shift);
+
+  public static native int yices_shift_right1(int t, int shift);
+
+  public static native int yices_ashift_right(int t, int shift);
+
+  public static native int yices_rotate_left(int t, int shift);
+
+  public static native int yices_rotate_right(int t, int shift);
+
+  public static native int yices_bvshl(int t1, int t2);
+
+  public static native int yices_bvlshr(int t1, int t2);
+
+  public static native int yices_bvashr(int t1, int t2);
+
+  public static native int yices_bvextract(int t, int limit1, int limit2);
+
+  public static native int yices_bitextract(int t, int pos);
+
+  public static native int yices_bvconcat(int size, int[] terms);
+
+  public static native int yices_bvconcat2(int t1, int t2);
+
+  public static native int yices_bvrepeat(int t, int times);
+
+  public static native int yices_sign_extend(int t, int times);
+
+  public static native int yices_zero_extend(int t, int times);
+
+  public static native int yices_redand(int t);
+
+  public static native int yices_redor(int t);
+
+  public static native int yices_redcomp(int t1, int t2);
+
+  public static native int yices_bvarray(int size, int[] terms);
+
+  public static native int yices_bveq_atom(int t1, int t2);
+
+  public static native int yices_bvneq_atom(int t1, int t2);
+
+  public static native int yices_bvge_atom(int t1, int t2);
+
+  public static native int yices_bvgt_atom(int t1, int t2);
+
+  public static native int yices_bvle_atom(int t1, int t2);
+
+  public static native int yices_bvlt_atom(int t1, int t2);
+
+  public static native int yices_bvsge_atom(int t1, int t2);
+
+  public static native int yices_bvsgt_atom(int t1, int t2);
+
+  public static native int yices_bvsle_atom(int t1, int t2);
+
+  public static native int yices_bvslt_atom(int t1, int t2);
+
+  /*
+   * Term properties
+   */
+  // TODO TERM PROPERTIES
+  public static native int yices_type_of_term(int t);
+
+  public static native boolean yices_term_is_bool(int t);
+
+  public static native boolean yices_term_is_int(int t);
+
+  public static native boolean yices_term_is_real(int t);
+
+  public static native boolean yices_term_is_arithmetic(int t);
+
+  public static native boolean yices_term_is_bitvector(int t);
+
+  public static native boolean yices_term_is_function(int t);
+
+  public static native int yices_term_bitsize(int t);
+
+  public static native boolean yices_term_is_ground(int t);
+
+  public static native boolean yices_term_is_atomic(int t);
+
+  public static native boolean yices_term_is_composite(int t);
+
+  public static native boolean yices_term_is_projection(int t);
+
+  public static native boolean yices_term_is_sum(int t);
+
+  public static native boolean yices_term_is_bvsum(int t);
+
+  public static native boolean yices_term_is_product(int t);
+
+  public static native int yices_term_constructor(int t);
+
+  public static native int yices_term_num_children(int t);
+
+  public static native int yices_term_child(int t, int index);
+
+  public static native int yices_proj_index(int t);
+
+  public static native int yices_proj_arg(int t);
+
+  public static native boolean yices_bool_const_value(int t);
+
+  // TODO Return bool[] instead of int[]?
+  /**
+   * Returns in little endian order.
+   */
+  public static native int[] yices_bv_const_value(int t, int bitsize);
+
+  /*
+   * SAT Checking
+   */
+  public static native int yices_context_status(long ctx);
+
+  public static native int yices_assert_formula(long ctx, int f);
+
+  public static native int yices_assert_formulas(long ctx, int size, int[] formulas);
+
+  // params = 0 for default settings
+  // TODO ZERO if no params?
+  public static native int yices_check_context(long ctx, long params);
+
+  public static native void yices_stop_search(long ctx);
+
+  public static native void yices_reset_context(long ctx);
+
+  public static native int yices_assert_blocking_clause(long ctx);
+
+  public static native int yices_push(long ctx);
+
+  public static native int yices_pop(long ctx);
+
+  // TODO ZERO if no params?
+  public static native int
+      yices_check_context_with_assumptions(long ctx, long params, int size, int[] terms);
+
+  // TODO ZERO if no params?
+  public static boolean yices_check_sat(long ctx, long params) throws IllegalStateException {
+    return check_result(yices_check_context(ctx, params));
+  }
+
+  // TODO ZERO if no params?
+  public static boolean
+      yices_check_sat_with_assumptions(long ctx, long params, int size, int[] assumptions)
+          throws IllegalStateException {
+    int[] array = {1};
+    return check_result(yices_check_context_with_assumptions(1, 1, 1, array));
+  }
+
+  private static boolean check_result(int result) throws IllegalStateException {
+    switch (result) {
+      case STATUS_SAT:
+        return true;
+      case STATUS_UNSAT:
+        return false;
+      default:
+        // TODO Further ERROR CLARIFICATION
+        String code = (result == STATUS_UNKNOWN) ? "\"unknown\"" : result + "";
+        throw new IllegalStateException("Yices check returned:" + code);
+    }
+  }
+
+  /*
+   * TERM NAMING TODO NOT YET IN API
+   */
+  public static native int yices_set_term_name(int t, String name);
+
+  public static native String yices_get_term_name(int t);
+
+  public static int yices_named_variable(int type, String name) {
+    int var = yices_new_uninterpreted_term(type);// yices_new_variable(type);
+    yices_set_term_name(var, name);
+    return var;
+  }
+}
