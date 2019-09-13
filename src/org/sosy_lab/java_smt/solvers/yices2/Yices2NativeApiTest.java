@@ -62,10 +62,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bool;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
 import java.util.Arrays;
@@ -289,15 +287,14 @@ public class Yices2NativeApiTest {
     int Btrue = yices_new_uninterpreted_term(yices_bool_type());// yices_true();
     int Btwo = yices_new_uninterpreted_term(yices_bool_type());
     int and = yices_and2(Btrue, Btwo);
-    if (yices_term_num_children(and) > 0) {
-      int fun = yices_term_child(and, 0);
-      assertEquals(yices_term_constructor(fun), -1);
-    }
     assertEquals(yices_term_constructor(and), -1);
     /*
-     * There is no Value for a YICES_AND_TERM If Btrue and two are both uninterpreted terms
-     * term_constructor is YICES_OR_TERM? If Btrue is yices_true() and Btwo is uninterpreted_term
-     * Result is UNINTERPRETED_TERM --> Likely simplified as Result is only dependent on Btwo
+     * There is no Value for a YICES_AND_TERM
+     * If Btrue and two are both uninterpreted terms
+     * term_constructor is YICES_OR_TERM/YICES_NOT_TERM?
+     * If Btrue is yices_true() and Btwo is uninterpreted_term
+     * Result is UNINTERPRETED_TERM / YICES_NOT_TERM--> Likely simplified as Result is only
+     * dependent on Btwo
      */
 
     // Result is YICES_UNINTERPRETED_TERM. But normal variables are also UNINTERPRETED_TERM
@@ -306,16 +303,14 @@ public class Yices2NativeApiTest {
   @Test
   public void termConstructorOr() {
     int Bfalse = yices_new_uninterpreted_term(yices_bool_type());// yices_false();
+    // yices_set_term_name(Bfalse, "1");
     int two = yices_new_uninterpreted_term(yices_bool_type());
+    // yices_set_term_name(two, "5");
     int[] orArray = {Bfalse, two, Bfalse, Bfalse};
     int or = yices_or(4, orArray);
     assertTrue(yices_term_is_bool(or));
-    if (yices_term_num_children(or) > 0) {
-      // Testing if it is a function with children (or Bfalse two)
-      int fun = yices_term_child(or, 0);
-      assertEquals(yices_term_constructor(fun), -1);
-    }
     assertEquals(yices_term_constructor(or), YICES_OR_TERM);
+    // Works after changing something?
   } // Expecting YICES_OR_TERM as constructor but getting YICES_UNINTERPRETED_TERM
 
 
