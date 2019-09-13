@@ -34,6 +34,7 @@ import edu.nyu.acsys.CVC4.Rational;
 import edu.nyu.acsys.CVC4.RoundingMode;
 import edu.nyu.acsys.CVC4.Type;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -104,8 +105,34 @@ public class CVC4FloatingPointFormulaManager
     } catch (NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
     }
-    return exprManager.mkConst(
-        new FloatingPoint(getFPSize(pType), pRoundingMode.getConstRoundingMode(), toRational(pN)));
+
+    final Rational rat = toRational(pN);
+    final BigInteger upperBound =
+        getBiggestNumberBeforeInf(pType.getMantissaSize(), pType.getExponentSize());
+
+    if (rat.greater(Rational.fromDecimal(upperBound.negate().toString()))
+        && rat.less(Rational.fromDecimal(upperBound.toString()))) {
+      return exprManager.mkConst(
+          new FloatingPoint(getFPSize(pType), pRoundingMode.getConstRoundingMode(), rat));
+
+    } else { // out of range
+      if (rat.greater(Rational.fromDecimal("0"))) {
+        return makePlusInfinityImpl(pType);
+      } else {
+        return makeMinusInfinityImpl(pType);
+      }
+    }
+  }
+
+  /** TODO lookup why this number works: <code>2**(2**(exp-1)) - 2**(2**(exp-1)-2-mant)</code> */
+  private static BigInteger getBiggestNumberBeforeInf(int mantissa, int exponent) {
+    int boundExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact();
+    BigInteger upperBoundExponent = BigInteger.valueOf(2).pow(boundExponent);
+    int mantissaExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact() - 2 - mantissa;
+    if (mantissaExponent >= 0) { // ignore negative mantissaExponent
+      upperBoundExponent = upperBoundExponent.subtract(BigInteger.valueOf(2).pow(mantissaExponent));
+    }
+    return upperBoundExponent;
   }
 
   /**
@@ -122,6 +149,7 @@ public class CVC4FloatingPointFormulaManager
     } catch (NumberFormatException e1) {
       try {
         // then try something like -123/456
+        org.sosy_lab.common.rationals.Rational.ofString(pN); // check format before calling CVC4
         return new Rational(pN);
 
       } catch (NumberFormatException e2) {
