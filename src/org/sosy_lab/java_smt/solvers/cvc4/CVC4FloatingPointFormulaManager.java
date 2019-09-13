@@ -149,7 +149,11 @@ public class CVC4FloatingPointFormulaManager
     } catch (NumberFormatException e1) {
       try {
         // then try something like -123/456
-        org.sosy_lab.common.rationals.Rational.ofString(pN); // check format before calling CVC4
+
+        @SuppressWarnings("unused") // check format before calling CVC4
+        org.sosy_lab.common.rationals.Rational unused =
+            org.sosy_lab.common.rationals.Rational.ofString(pN);
+
         return new Rational(pN);
 
       } catch (NumberFormatException e2) {
