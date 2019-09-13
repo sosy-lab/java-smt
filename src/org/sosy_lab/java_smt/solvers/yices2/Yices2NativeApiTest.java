@@ -293,7 +293,7 @@ public class Yices2NativeApiTest {
      * If Btrue and two are both uninterpreted terms
      * term_constructor is YICES_OR_TERM/YICES_NOT_TERM?
      * If Btrue is yices_true() and Btwo is uninterpreted_term
-     * Result is UNINTERPRETED_TERM / YICES_NOT_TERM--> Likely simplified as Result is only
+     * Result is UNINTERPRETED_TERM --> Likely simplified as Result is only
      * dependent on Btwo
      */
 
