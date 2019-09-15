@@ -65,6 +65,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     yices_set_config(yicesConf, "solver-type", "dpllt");
     yices_set_config(yicesConf, "mode", "push-pop");
     // TODO SET OPTIONS
+    // TODO SET LOGIC
     long yicesEnv = yices_new_context(yicesConf);
     // TODO Might not actually need yicesEnv
     Yices2FormulaCreator creator = new Yices2FormulaCreator(yicesEnv);
@@ -112,7 +113,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     // TODO Auto-generated method stub
-    return new Yices2TheoremProver(this, creator, yicesEnvironment, pOptions);
+    return new Yices2TheoremProver(creator, pOptions);
   }
 
   @Override

@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <jni.h>
-#include "yices.h"
 #include <gmp.h>
+#include "yices.h"
+
 
 #define CHECK_FOR_NULL(var) \
   if (var == NULL) { \
@@ -164,6 +165,10 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   size_t s_arg##num = 0; \
   size_t *m_arg##num = &s_arg##num;
 
+#define MPQ_ARG(num) \
+  mpq_t m_arg##num; \
+  mpq_init(m_arg##num); \
+
 #define CALL0(mreturn, func) mreturn retval = yices_##func();
 #define CALL1(mreturn, func) mreturn retval = yices_##func(m_arg1);
 #define CALL2(mreturn, func) mreturn retval = yices_##func(m_arg1, m_arg2);
@@ -301,6 +306,24 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   } \
   return (jdouble) *m_arg##num; \
  }
+
+#define MPQ_RETURN(num) \
+  if(retval == -1) { \
+    const char *msg = yices_error_string(); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+  } \
+  char * mpqValue = mpq_get_str(NULL, 10, m_arg##num); \
+  if(mpqValue == NULL){ \
+    throwException(jenv, "java/lang/NullPointerException", "Result of mpq_get_str was NULL."); \
+  } \
+  jstring jretval = NULL; \
+  if (!(*jenv)->ExceptionCheck(jenv)) { \
+    jretval = (*jenv)->NewStringUTF(jenv, mpqValue); \
+  } \
+  mpq_clear(m_arg##num); \
+  free(mpqValue); \
+  return jretval; \
+} \
 
 /**
  * This assumes that mathsat allocated an array,

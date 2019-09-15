@@ -57,6 +57,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_uni
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
@@ -64,8 +65,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_ter
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bool;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
@@ -73,6 +76,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.rationals.Rational;
 
 @SuppressWarnings({"unused"})
 public class Yices2NativeApiTest {
@@ -255,6 +259,18 @@ public class Yices2NativeApiTest {
   }
 
   @Test
+  public void rationalValueTest() {
+    int num = 35975;
+    int den = 1234567890;
+    BigInteger largeNumber = BigInteger.valueOf(2).pow(10000);
+    int ratConst = yices_rational32(num, den);
+    int bigConst = yices_parse_rational(largeNumber.toString());
+    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    assertEquals(creator.convertValue(ratConst), Rational.of(num + "/" + den));
+    assertEquals(creator.convertValue(bigConst), largeNumber);
+  }
+
+  @Test
   public void termNaming() {
     int t = yices_parse_bvbin("0100100001100101011011000110110001101111");
     String termName = "Hello";
@@ -285,15 +301,16 @@ public class Yices2NativeApiTest {
   @Test
   public void termConstructorAnd() {
     int Btrue = yices_new_uninterpreted_term(yices_bool_type());// yices_true();
+    yices_set_term_name(Btrue, "Btrue");
     int Btwo = yices_new_uninterpreted_term(yices_bool_type());
+    yices_set_term_name(Btwo, "Btwo");
     int and = yices_and2(Btrue, Btwo);
+    assertEquals(yices_term_to_string(and, 80, 10, 0), "(and Btrue Btwo)");
     assertEquals(yices_term_constructor(and), -1);
     /*
-     * There is no Value for a YICES_AND_TERM
-     * If Btrue and two are both uninterpreted terms
-     * term_constructor is YICES_OR_TERM/YICES_NOT_TERM?
-     * If Btrue is yices_true() and Btwo is uninterpreted_term
-     * Result is UNINTERPRETED_TERM --> Likely simplified as Result is only
+     * There is no Value for a YICES_AND_TERM If Btrue and Btwo are both uninterpreted terms
+     * term_constructor is YICES_OR_TERM/YICES_NOT_TERM? If Btrue is yices_true() and Btwo is
+     * uninterpreted_term Result is UNINTERPRETED_TERM --> Likely simplified as Result is only
      * dependent on Btwo
      */
 

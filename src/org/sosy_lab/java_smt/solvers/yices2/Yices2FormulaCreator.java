@@ -24,13 +24,16 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_C
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BOOL_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UNINTERPRETED_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_VARIABLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
@@ -40,12 +43,15 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_int;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_real;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
+import java.math.BigInteger;
 import java.util.List;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -53,6 +59,10 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2BitvectorFormula;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2BooleanFormula;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2IntegerFormula;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2RationalFormula;
 
 public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
 
@@ -89,7 +99,40 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer extractInfo(Formula pT) {
-    return super.extractInfo(pT);// Yices2FormulaManager.getYicesTerm(pT);
+    return Yices2FormulaManager.getYicesTerm(pT);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Formula> T encapsulate(FormulaType<T> pType, Integer pTerm) {
+    assert pType.equals(getFormulaType(pTerm))
+        || (pType.equals(FormulaType.RationalType)
+            && getFormulaType(pTerm).equals(FormulaType.IntegerType)) : String.format(
+                "Trying to encapsulate formula of type %s as %s",
+                getFormulaType(pTerm),
+                pType);
+    if (pType.isBooleanType()) {
+      return (T) new Yices2BooleanFormula(pTerm);
+    } else if (pType.isIntegerType()) {
+      return (T) new Yices2IntegerFormula(pTerm);
+    } else if (pType.isRationalType()) {
+      return (T) new Yices2RationalFormula(pTerm);
+    } else if (pType.isBitvectorType()) {
+      return (T) new Yices2BitvectorFormula(pTerm);
+    }
+    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in Yices");
+  }
+
+  @Override
+  public BooleanFormula encapsulateBoolean(Integer pTerm) {
+    assert getFormulaType(pTerm).isBooleanType();
+    return new Yices2BooleanFormula(pTerm);
+  }
+
+  @Override
+  public BitvectorFormula encapsulateBitvector(Integer pTerm) {
+    assert getFormulaType(pTerm).isBitvectorType();
+    return new Yices2BitvectorFormula(pTerm);
   }
 
   @SuppressWarnings("unchecked")
@@ -135,7 +178,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           return pVisitor.visitConstant(pFormula, false);
         }
       case YICES_ARITH_CONST:
-        return null;
+        return pVisitor.visitConstant(pFormula, convertValue(pF));
       case YICES_BV_CONST:
         return null;
       case YICES_UNINTERPRETED_TERM:
@@ -180,12 +223,13 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   private FunctionDeclarationKind getDeclarationKind(int pF) {
     // TODO If uninterpreted function
-    List<Integer> constantsAndVariables = new ArrayList<>();
-    constantsAndVariables.add(YICES_BOOL_CONST);
-    constantsAndVariables.add(YICES_ARITH_CONST);
-    constantsAndVariables.add(YICES_BV_CONST);
-    // constantsAndVariables.add(YICES_VARIABLE);
-    constantsAndVariables.add(YICES_UNINTERPRETED_TERM);
+    List<Integer> constantsAndVariables =
+        ImmutableList.of(
+            YICES_BOOL_CONST,
+            YICES_ARITH_CONST,
+            YICES_BV_CONST,
+            YICES_VARIABLE,
+            YICES_UNINTERPRETED_TERM);
     int constructor = yices_term_constructor(pF);
     assert !constantsAndVariables
         .contains(constructor) : "Variables should be handled somewhere else";
@@ -216,10 +260,47 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return null;
   }
 
+  // TODO Pretty print type / term
+  private Object parseNumeralValue(Integer pF, FormulaType<?> type) {
+    if (yices_term_constructor(pF) == YICES_ARITH_CONST) {
+    String value = yices_rational_const_value(pF);
+    if (type.isRationalType() && value.contains("/")) {
+      return Rational.of(value);
+    } else if (type.isIntegerType() && !value.contains("/")) {
+      return new BigInteger(value);
+    } else {
+      throw new IllegalArgumentException("Unexpected type: " + type);
+    }
+    } else {
+      throw new IllegalArgumentException("Term: " + pF + " is not an arithmetic constant");
+    }
+  }
+
+  private BigInteger parseBitvector(Integer pF) {
+    if (yices_term_constructor(pF) == YICES_BV_CONST) {
+      int[] littleEndianBV = yices_bv_const_value(pF, yices_term_bitsize(pF));
+      String littleEndianString = littleEndianBV.toString();
+      String bigEndianString = new StringBuilder(littleEndianString).reverse().toString();
+      return new BigInteger(bigEndianString);
+    } else {
+      throw new IllegalArgumentException("Term: " + pF + " is not a bitvector constant");
+    }
+  }
+
+  // TODO Pretty print type
   @Override
   public Object convertValue(Integer pF) {
     // TODO Auto-generated method stub
-    return null;
+    FormulaType<?> type = getFormulaType(pF);
+    if (type.isBooleanType()) {
+      return pF.equals(yices_true());
+    } else if (type.isRationalType() || type.isIntegerType()) {
+      return parseNumeralValue(pF, type);
+    } else if (type.isBitvectorType()) {
+      return parseBitvector(pF);
+    } else {
+      throw new IllegalArgumentException("Unexpected type: " + type);
+    }
   }
 
 }

@@ -1113,6 +1113,12 @@ EMPTY_INT_ARRAY_ARG(int32_t, 2)
 CALL2(int, bv_const_value)
 INT_ARRAY_RETURN(2)
 
+DEFINE_FUNC(string, 1rational_1const_1value) WITH_ONE_ARG(jterm)
+TERM_ARG(1)
+MPQ_ARG(2)
+CALL2(int, rational_const_value)
+MPQ_RETURN(2)
+
 //skipping scalar const value | rational const value | sum component
 //skipping bvsum component because it has two returns
 //skipping product_component because it has two returns
@@ -1269,6 +1275,7 @@ INT_ARRAY_RETURN(3)
 
 //skipping get_scalar_value
 //use boolean as return?
+
 DEFINE_FUNC(int, 1formula_1true_1in_1model) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)
 TERM_ARG(2)
@@ -1283,7 +1290,9 @@ CALL3(int, formulas_true_in_model)
 FREE_TERM_ARRAY_ARG(3)
 INT_RETURN
 
-//todo add term naming
+/*
+ * TERM NAMING and PRINTING
+ */
 
 DEFINE_FUNC(int, 1set_1term_1name) WITH_TWO_ARGS(jterm, string)
 TERM_ARG(1)
@@ -1296,7 +1305,15 @@ DEFINE_FUNC(string, 1get_1term_1name) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(const char *, get_term_name)
 STRING_RETURN
-// todo add model generation
+
+//Creates String that needs to be freed
+DEFINE_FUNC(string, 1term_1to_1string) WITH_FOUR_ARGS(jterm, int, int ,int)
+TERM_ARG(1)
+UINT32_ARG(2)
+UINT32_ARG(3)
+UINT32_ARG(4)
+CALL4(char *, term_to_string)
+STRING_RETURN
 
 
 /*

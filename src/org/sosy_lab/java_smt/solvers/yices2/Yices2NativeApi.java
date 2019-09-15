@@ -434,6 +434,10 @@ class Yices2NativeApi {
 
   public static native int yices_minus_one(int size);
 
+  /**
+   * Parses the given Array in little endian order values[0] becomes the least significant bit.
+   * values[size-1] becomes the most significant bit.
+   */
   public static native int yices_bvconst_from_array(int size, int[] values);
 
   public static native int yices_parse_bvbin(String value);
@@ -606,6 +610,8 @@ class Yices2NativeApi {
    */
   public static native int[] yices_bv_const_value(int t, int bitsize);
 
+  public static native String yices_rational_const_value(int t);
+
   /*
    * SAT Checking
    */
@@ -633,6 +639,7 @@ class Yices2NativeApi {
   public static native int
       yices_check_context_with_assumptions(long ctx, long params, int size, int[] terms);
 
+  public static native int[] yices_get_unsat_core(long ctx);
   // TODO ZERO if no params?
   public static boolean yices_check_sat(long ctx, long params) throws IllegalStateException {
     return check_result(yices_check_context(ctx, params));
@@ -642,8 +649,7 @@ class Yices2NativeApi {
   public static boolean
       yices_check_sat_with_assumptions(long ctx, long params, int size, int[] assumptions)
           throws IllegalStateException {
-    int[] array = {1};
-    return check_result(yices_check_context_with_assumptions(1, 1, 1, array));
+    return check_result(yices_check_context_with_assumptions(ctx, params, size, assumptions));
   }
 
   private static boolean check_result(int result) throws IllegalStateException {
@@ -660,11 +666,28 @@ class Yices2NativeApi {
   }
 
   /*
+   * Model generation and exploration
+   */
+
+  public static native long yices_get_model(long ctx, int keepSubst);
+
+  public static native void yices_free_model(long model);
+  /*
    * TERM NAMING TODO NOT YET IN API
    */
   public static native int yices_set_term_name(int t, String name);
 
   public static native String yices_get_term_name(int t);
+
+  /**
+   * Use to print a term in a readable format. Result will be truncated if height/width of the
+   * String are too small.
+   *
+   * @param t The term to print
+   * @param width The width of the resulting String
+   * @param height The height/lines of resulting String
+   */
+  public static native String yices_term_to_string(int t, int width, int height, int offset);
 
   public static int yices_named_variable(int type, String name) {
     int var = yices_new_uninterpreted_term(type);// yices_new_variable(type);

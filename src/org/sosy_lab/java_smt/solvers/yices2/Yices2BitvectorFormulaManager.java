@@ -82,9 +82,9 @@ public class Yices2BitvectorFormulaManager
 
   @Override
   protected Integer toIntegerFormulaImpl(Integer bvFormula, boolean pSigned) {
-    // TODO Convert value of bvFormula to int and call yices_intXX or convert to BigInteger and call
-    // yices_parse_rational ?
-    return null;
+    // TODO Check if actually true
+    throw new UnsupportedOperationException(
+        "Yices dows not support making an INT formula from a BV formula.");
   }
 
   @Override
@@ -198,8 +198,9 @@ public class Yices2BitvectorFormulaManager
       BigInteger n = BigInteger.valueOf(2).pow(pLength);
       pI = pI.add(n);
     }
-    // TODO No control what size bv will be?
-    return yices_parse_bvbin(pI.toString(2));
+    String bits = pI.toString(2);
+    // TODO check size of bits against pLength
+    return yices_parse_bvbin(bits);
   }
 
   @Override
@@ -241,11 +242,11 @@ public class Yices2BitvectorFormulaManager
     }
   }
 
-  // TODO From Formula?
   @Override
   protected Integer makeBitvectorImpl(int pLength, Integer pFormula) {
-    // TODO get integer value of pFormula and convert to bv?
-    return null;
+    // TODO Check if actually true
+    throw new UnsupportedOperationException(
+        "Yices does not support making a BV formula from an INT formula.");
   }
 
 }

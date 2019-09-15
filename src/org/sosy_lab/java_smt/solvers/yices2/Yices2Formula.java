@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
+
 import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -44,10 +46,10 @@ abstract class Yices2Formula implements Formula {
     return yicesTerm;
   }
 
-  // TODO Return something meaningful
+  // TODO Check if size is sufficient
   @Override
   public final String toString() {
-    return "Currently not implemented!";
+    return yices_term_to_string(yicesTerm, 80, 10, 0);
   }
 
   @Override
