@@ -1,3 +1,8 @@
+/native-library-files/stp_project/stp
+/native-library-files/stp_project/stpJ/build
+/native-library-files/stp_project/stpJ/files
+/native-library-files/stp_project/stpJ/install_include
+
 .idea/workspace.xml
 .factorypath
 
