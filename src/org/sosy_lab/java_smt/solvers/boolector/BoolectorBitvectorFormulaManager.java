@@ -55,16 +55,16 @@ class BoolectorBitvectorFormulaManager
 
   private final long btor;
 
-  public BoolectorBitvectorFormulaManager(BoolectorFormulaCreator pCreator) {
-    super(pCreator);
-    this.btor = pCreator.getEnv().getBtor();
+  public BoolectorBitvectorFormulaManager(BoolectorFormulaCreator creator) {
+    super(creator);
+    this.btor = creator.getEnv().getBtor();
   }
 
   @Override
   public Long makeBitvectorImpl(int pLength, long pParam1) {
     checkRange(pLength, BigInteger.valueOf(pParam1));
     int i = (int) pParam1;
-    if (i == pParam1 && i > 0) {
+    if (i == pParam1) {
       long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
       return BtorJNI.boolector_int(btor, i, sort);
     }
@@ -185,7 +185,7 @@ class BoolectorBitvectorFormulaManager
   @Override
   public Long makeVariableImpl(int pLength, String pVar) {
     long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
-    return BtorJNI.boolector_var(btor, sort, pVar);
+    return getFormulaCreator().makeVariable(sort, pVar);
   }
 
   @Override
@@ -225,12 +225,7 @@ class BoolectorBitvectorFormulaManager
    * Taken from Z3BitvectorFormulaManager
    */
   private static void checkRange(int pLength, BigInteger pI) {
-    // Boolector doesnt have Bitvec length 1 because those are bools.
-    if (pLength == 1) {
-      pLength = 2;
-    } else if (pLength == -1) {
-      pLength = -2;
-    }
+    // Boolector doesnt have bitvec length 1 because those are bools.
     if (pI.signum() > 0) {
       BigInteger max = BigInteger.ONE.shiftLeft(pLength);
       if (pI.compareTo(max) >= 0) {
@@ -247,14 +242,14 @@ class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  protected Long makeBitvectorImpl(int pLength, Long pParam1) {
-    checkRange(pLength, BigInteger.valueOf(pParam1));
-    int i = (int) pParam1.doubleValue();
-    if (i == pParam1 && i > 0) {
-      long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
+  protected Long makeBitvectorImpl(int length, Long value) {
+    checkRange(length, BigInteger.valueOf(value));
+    int i = (int) value.doubleValue();
+    if (i == value) {
+      long sort = BtorJNI.boolector_bitvec_sort(btor, length);
       return BtorJNI.boolector_int(btor, i, sort);
     }
-    return makeBitvectorImpl(pLength, BigInteger.valueOf(pParam1));
+    return makeBitvectorImpl(length, BigInteger.valueOf(value));
   }
 
 }

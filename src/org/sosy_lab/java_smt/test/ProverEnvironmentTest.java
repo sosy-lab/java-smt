@@ -22,8 +22,10 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -99,6 +101,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTest() throws SolverException, InterruptedException {
+    // Boolector does not support unsat core
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
@@ -112,8 +116,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   public void unsatCoreTestForOptimizationProver() throws SolverException, InterruptedException {
     requireOptimization();
 
-    // Z3 does not implement unsat core for optimization
-    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+    // Z3 and Boolector do not implement unsat core for optimization
+    assume().that(solverToUse()).isNoneOf(Z3, BOOLECTOR);
 
     try (BasicProverEnvironment<?> pe =
         context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
@@ -138,9 +142,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
-        .withMessage("Princess and Mathsat5 do not support unsat core generation over assumptions")
+        .withMessage(
+            "Princess, Mathsat5 and Boolector do not support unsat core generation over assumptions")
         .that(solverToUse())
-        .isNoneOf(PRINCESS, MATHSAT5);
+        .isNoneOf(PRINCESS, MATHSAT5, BOOLECTOR);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

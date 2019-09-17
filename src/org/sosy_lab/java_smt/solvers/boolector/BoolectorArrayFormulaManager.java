@@ -27,11 +27,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 public class BoolectorArrayFormulaManager
     extends AbstractArrayFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
+  private BoolectorVariablesCache cache;
   private final long btor;
 
   BoolectorArrayFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
     this.btor = pCreator.getEnv().getBtor();
+    this.cache = pCreator.getCache();
   }
 
   // pIndex should be a bitVector
@@ -50,7 +52,7 @@ public class BoolectorArrayFormulaManager
 
   @Override
   protected <TI extends Formula, TE extends Formula> Long
-      internalMakeArray(String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      internalMakeArray(String name, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     if (!pIndexType.isBitvectorType() || !pElementType.isBitvectorType()) {
       throw new IllegalArgumentException("Boolector supports bitvector arrays only.");
     }
@@ -60,11 +62,21 @@ public class BoolectorArrayFormulaManager
       throw new IllegalArgumentException(
           "The bitvectors mapping the array index to the array elements must have the same width.");
     }
-
+    String newArrayName = name;
     final long indexSort = BtorJNI.boolector_bitvec_sort(btor, indexType.getSize());
     final long elementSort = BtorJNI.boolector_bitvec_sort(btor, elementType.getSize());
     final long arraySort = BtorJNI.boolector_array_sort(btor, indexSort, elementSort);
-    final long array = BtorJNI.boolector_array(btor, arraySort, pName);
+
+    if (cache.isNameUsed(name)) {
+      Long maybeFormula = cache.getExistingFormula(name, arraySort);
+      if (cache.getExistingFormula(name, arraySort) != null) {
+        return maybeFormula;
+      } else {
+        newArrayName = cache.getNewVarName(name);
+      }
+    }
+    final long array = BtorJNI.boolector_array(btor, arraySort, newArrayName);
+    cache.enterNewFormula(newArrayName, name, array);
     return array;
   }
 

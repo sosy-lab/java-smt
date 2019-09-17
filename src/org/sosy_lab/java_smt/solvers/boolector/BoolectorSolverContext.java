@@ -20,11 +20,13 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import java.util.Set;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -36,24 +38,33 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
+  private LogManager logger;
 
   protected BoolectorSolverContext(
       BoolectorFormulaManager manager,
-      BoolectorFormulaCreator creator) {
+      BoolectorFormulaCreator creator,
+      LogManager logger) {
     super(manager);
     this.manager = manager;
     this.creator = creator;
+    this.logger = logger;
   }
 
   public static BoolectorSolverContext create(
       Configuration config,
+      LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed)
       throws InvalidConfigurationException {
 
     BoolectorEnvironment env =
-        new BoolectorEnvironment(config, solverLogfile, pShutdownNotifier, (int) randomSeed);
+        new BoolectorEnvironment(
+            config,
+            logger,
+            solverLogfile,
+            pShutdownNotifier,
+            (int) randomSeed);
     BoolectorFormulaCreator creator = new BoolectorFormulaCreator(env);
 
     BoolectorUFManager functionTheory = new BoolectorUFManager(creator);
@@ -71,7 +82,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
             bitvectorTheory,
             quantifierTheory,
             arrayTheory);
-    return new BoolectorSolverContext(manager, creator);
+    return new BoolectorSolverContext(manager, creator, logger);
   }
 
   @Override
@@ -86,9 +97,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    // Problem: Cloning results in not beeing able to access var with old name (string)
-    // NOT Cloning results in murdering btor that is still beeing used
-    // BtorJNI.boolector_delete(creator.getEnv().getBtor());
+    logger.log(Level.FINER, "Freeing Boolector context.");
+    BtorJNI.boolector_delete(creator.getEnv().getBtor());
   }
 
   @Override

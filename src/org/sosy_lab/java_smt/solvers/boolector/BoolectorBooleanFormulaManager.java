@@ -96,12 +96,10 @@ public class BoolectorBooleanFormulaManager
       String assignment;
       if (BtorJNI.boolector_is_const(btor, pBits)) {
         assignment = BtorJNI.boolector_get_bits(btor, pBits);
-      } else {
-        assignment = BtorJNI.boolector_bv_assignment(btor, pBits);
-      }
-      Long maybeLong = Longs.tryParse(assignment);
-      if (maybeLong != null && maybeLong == constant) {
-        return true;
+        Long maybeLong = Longs.tryParse(assignment);
+        if (maybeLong != null && maybeLong == constant) {
+          return true;
+        }
       }
     }
     return false;

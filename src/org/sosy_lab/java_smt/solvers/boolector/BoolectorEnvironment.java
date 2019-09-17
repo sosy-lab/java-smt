@@ -19,11 +19,16 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.MoreFiles;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -32,6 +37,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 @Options(prefix = "solver.boolector")
@@ -52,25 +58,34 @@ class BoolectorEnvironment {
 
   private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
+  private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
+  private static boolean loaded = false;
 
   private final long btor;
 
   BoolectorEnvironment(
       Configuration config,
+      LogManager logger,
       @Nullable final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,
       final int pRandomSeed)
       throws InvalidConfigurationException {
 
-    basicLogfile = pBasicLogfile;
-    shutdownNotifier = pShutdownNotifier;
-    randomSeed = pRandomSeed;
+    this.logger = logger;
+    this.basicLogfile = pBasicLogfile;
+    this.shutdownNotifier = pShutdownNotifier;
+    this.randomSeed = pRandomSeed;
 
     try {
       NativeLibraries.loadLibrary("boolector");
     } catch (UnsatisfiedLinkError e) {
       System.err.println("Boolector library could not be loaded.");
+    }
+
+    if (!loaded) { // Avoid logging twice.
+      logger.log(Level.WARNING, "Boolector is only available for research blabla");// TODO: proper
+                                                                                   // text please
     }
 
     btor = BtorJNI.boolector_new();
@@ -89,6 +104,7 @@ class BoolectorEnvironment {
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_REWRITE_LEVEL.swigValue(), 0);
 
     setOptions();
+    loaded = true;
   }
 
   /**
@@ -150,5 +166,18 @@ class BoolectorEnvironment {
 
   public Long getBoolSort() {
     return BtorJNI.boolector_bool_sort(btor);
+  }
+
+  private void startLogging() {
+    if (basicLogfile != null) {
+      Path filename = basicLogfile.getFreshPath();
+      try {
+      MoreFiles.createParentDirectories(filename);
+        BtorJNI.boolector_set_trapi(btor, filename.toAbsolutePath().toString());
+      } catch (IOException e) {
+        logger
+            .logUserException(Level.WARNING, e, "Cannot create directory for Boolector logfile.");
+      }
+    }
   }
 }

@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -64,7 +63,9 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    throw new UnsupportedOperationException(
+        "We wait till the Boolector devs give us methods to do this properly.");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     for (Long formula : assertedTerms) {
       for (Entry<String, Long> entry : creator.extractVariablesAndUFs(formula, true).entrySet()) {
@@ -88,7 +89,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     // Boolector does not give back a value "node" (formula), just an assignment string.
     // So we have to build our own, new Object to work with. (Am i allowed to do this?!)
     List<Object> argumentInterpretation = new ArrayList<>();
-    Object value = creator.convertValue(key, evalImpl(key));
+    Object value = creator.convertValue(key, evalImpl(key));// wrong! use creator.convertValue
     argumentInterpretation.add(value);
     Long valueNode = null;
     if (value.equals(true)) {
@@ -103,7 +104,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
-        creator.getName(key, btor),
+        creator.getName(key),
         value,
         argumentInterpretation);
     // maybe give back String (bitvec) in value?
@@ -111,21 +112,21 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private ValueAssignment getUFAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key);
+    Long value = evalImpl(key);// wrong! use creator.convertValue
     Map<Long, Long[]> ufMap = creator.getUfs();
     // TODO
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(value),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
-        creator.getName(key, btor),
+        creator.getName(key),
         creator.convertValue(key, value),
         argumentInterpretation);
   }
 
   private ValueAssignment getArrayAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key);
+    Long value = evalImpl(key); // wrong! use creator.convertValue
     Long valueNode = null;
     // TODO
     // HOW?! I cant get value (nodes) bound to the array. Only new ones with the same sort.
@@ -133,7 +134,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
-        creator.getName(key, btor),
+        creator.getName(key),
         creator.convertValue(key, value),
         argumentInterpretation);
   }
@@ -141,46 +142,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   @Override
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!closed);
-    if (BtorJNI.boolector_is_array(btor, pFormula)) {
-      String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
-      return parseLong(assignment);
-    } else if (BtorJNI.boolector_is_const(btor, pFormula)) {
-      String assignment = BtorJNI.boolector_get_bits(btor, pFormula);
-      return parseLong(assignment);
-    } else if (BtorJNI.boolector_is_bitvec_sort(btor, BtorJNI.boolector_get_sort(btor, pFormula))) {
-      BtorJNI.boolector_bv_assignment(btor, pFormula);
-      return parseLong(BtorJNI.boolector_bv_assignment(btor, pFormula));
-    } else {
-      String assignment = BtorJNI.boolector_bv_assignment(btor, pFormula);
-      return parseLong(assignment);
-    }
+    return pFormula;
   }
-
-  /**
-   * Boolector puts out Strings containing 1,0 or x that have to be parsed. If you want different
-   * values for x, change it in the constant! (BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT)
-   *
-   * @param assignment String with the assignment of Boolector var.
-   * @return BigInteger in decimal.
-   */
-  private Long parseLong(String assignment) {
-    try {
-      BigInteger bigInt = new BigInteger(assignment, 2);
-      return bigInt.longValue();
-    } catch (NumberFormatException e) {
-      char[] charArray = assignment.toCharArray();
-      for (int i = 0; i < charArray.length; i++) {
-        if (charArray[i] == 'x') {
-          charArray[i] = '1';
-        } else if (charArray[i] != '0' && charArray[i] != '1') {
-          throw new IllegalArgumentException(
-              "Boolector gave back an assignment that is not parseable.");
-        }
-      }
-      assignment = charArray.toString();
-    }
-    BigInteger bigInt = new BigInteger(assignment, 2);
-    return bigInt.longValue();
-  }
-
 }

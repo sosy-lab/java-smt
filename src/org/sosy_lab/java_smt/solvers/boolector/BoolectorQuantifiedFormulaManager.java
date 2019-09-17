@@ -21,10 +21,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -33,7 +30,6 @@ public class BoolectorQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
   private final long btor;
-  private static Map<Long, QuantifiedFormula> quantifierMap = new HashMap<>();
 
   BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, BoolectorEnvironment, Long>
           pCreator) {
@@ -44,10 +40,14 @@ public class BoolectorQuantifiedFormulaManager
   @Override
   protected Long eliminateQuantifiers(Long pExtractInfo)
       throws SolverException, InterruptedException {
-    // TODO SAT or simplify?
-    return null;
+    throw new UnsupportedOperationException("Boolector can not eliminate quantifier.");
   }
 
+  /**
+   * Note: Boolector only supports bitvector quantifier! The vars used MUST be boolector_param (not
+   * boolector_var)! Therefore we have to change every var into param with the visitor! Additionaly
+   * no param may be used twice (Boolector will end if you do!).
+   */
   @Override
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
     if (pVars.isEmpty()) {
@@ -65,23 +65,9 @@ public class BoolectorQuantifiedFormulaManager
     } else {
       newQuantifier = BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
     }
-    // We need the body and variables later and boolector does not give them back!
-    quantifierMap.put(newQuantifier, new QuantifiedFormula(pQ == Quantifier.FORALL, pBody, pVars));
     return newQuantifier;
   }
 
-  /**
-   * Gives back the variables and body of an Quantifier (forall and exists). Since Boolector cant
-   * give back the used variables or the body of an Quantifier we have to save and return them
-   * manually.
-   *
-   * @param key Boolector Node (Formula) you want.
-   * @return QuantifiedFormula with all data of the quantified formula. Null if there is no entry.
-   */
-  @Nullable
-  protected static QuantifiedFormula getQuantVars(Long key) {
-    return quantifierMap.get(key);
-  }
 
   static class QuantifiedFormula {
     private final boolean isForall; // false for EXISTS, true for FORALL

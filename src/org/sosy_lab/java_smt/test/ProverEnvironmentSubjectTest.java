@@ -59,13 +59,23 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
 
   @Before
   public void setupFormulas() {
-    simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
-    contradiction = bmgr.and(simpleFormula, imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2)));
+    if (imgr != null) {
+      simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
+      contradiction =
+          bmgr.and(simpleFormula, imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2)));
+    } else {
+      simpleFormula = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 1));
+      contradiction =
+          bmgr.and(
+              simpleFormula,
+              bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
+    }
+
   }
 
   @Test
   public void testIsSatisfiableYes() throws SolverException, InterruptedException {
-    try (ProverEnvironment env = context.newProverEnvironment()) {
+    try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       env.push(simpleFormula);
       assertThatEnvironment(env).isSatisfiable();
     }
@@ -73,7 +83,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() throws InterruptedException {
-    try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+    try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
       env.push(contradiction);
       AssertionError failure = expectFailure(whenTesting -> whenTesting.that(env).isSatisfiable());
       assertThat(failure).factValue("with unsat core").isNotEmpty();
@@ -82,7 +92,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsUnsatisfiableYes() throws SolverException, InterruptedException {
-    try (ProverEnvironment env = context.newProverEnvironment()) {
+    try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       env.push(contradiction);
       assertThatEnvironment(env).isUnsatisfiable();
     }

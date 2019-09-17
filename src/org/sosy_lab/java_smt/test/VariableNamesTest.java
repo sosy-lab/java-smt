@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -289,6 +290,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testNameInt() throws SolverException, InterruptedException {
+    requireIntegers();
     testName0(imgr::makeVariable, imgr::equal, false);
   }
 
@@ -314,30 +316,61 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameArray() throws SolverException, InterruptedException {
+  public void testNameIntArray() throws SolverException, InterruptedException {
+    requireIntegers();
     requireArrays();
     testName0(s -> amgr.makeArray(s, IntegerType, IntegerType), amgr::equivalence, false);
   }
 
   @Test
+  public void testNameBvArray() throws SolverException, InterruptedException {
+    requireBitvectors();
+    requireArrays();
+    // Someone who knows princess has to debug this!
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+    testName0(
+        s -> amgr.makeArray(
+            s,
+            FormulaType.getBitvectorTypeWithSize(2),
+            FormulaType.getBitvectorTypeWithSize(2)),
+        amgr::equivalence,
+        false);
+  }
+
+  @Test
   public void testNameUF1Bool() throws SolverException, InterruptedException {
+    requireIntegers();
     testName0(
         s -> fmgr.declareAndCallUF(s, BooleanType, imgr.makeNumber(0)), bmgr::equivalence, true);
   }
 
   @Test
   public void testNameUF1Int() throws SolverException, InterruptedException {
+    requireIntegers();
     testName0(s -> fmgr.declareAndCallUF(s, IntegerType, imgr.makeNumber(0)), imgr::equal, true);
   }
 
   @Test
+  public void testNameUFBv() throws SolverException, InterruptedException {
+    requireBitvectors();
+    // Someone who knows princess has to debug this!
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+    testName0(
+        s -> fmgr.declareAndCallUF(s, BooleanType, bvmgr.makeBitvector(2, 0)),
+        bmgr::equivalence,
+        true);
+  }
+
+  @Test
   public void testNameUF2Bool() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     testName0(s -> fmgr.declareAndCallUF(s, BooleanType, zero, zero), bmgr::equivalence, true);
   }
 
   @Test
   public void testNameUF2Int() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     testName0(s -> fmgr.declareAndCallUF(s, IntegerType, zero, zero), imgr::equal, true);
   }
@@ -345,6 +378,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @Test
   public void testNameExists() {
     requireQuantifiers();
+    requireIntegers();
 
     IntegerFormula var = createVariableWith(imgr::makeVariable, getVarname());
     IntegerFormula zero = imgr.makeNumber(0);
@@ -414,6 +448,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testIntVariable() {
+    requireIntegers();
     createVariableWith(imgr::makeVariable, getVarname());
   }
 
@@ -438,9 +473,24 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testArrayVariable() {
+  public void testIntArrayVariable() {
     requireArrays();
+    requireIntegers();
     createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType), getVarname());
+  }
+
+  @Test
+  public void testBvArrayVariable() {
+    requireArrays();
+    requireBitvectors();
+    // Someone who knows princess has to debug this!
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+    createVariableWith(
+        v -> amgr.makeArray(
+            v,
+            FormulaType.getBitvectorTypeWithSize(2),
+            FormulaType.getBitvectorTypeWithSize(2)),
+        getVarname());
   }
 
   @Test

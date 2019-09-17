@@ -39,7 +39,13 @@ class BtorJNI {
 
   protected final static native void boolector_print_stats(long jarg1);
 
-  protected final static native void boolector_set_trapi(long jarg1, long jarg2);
+  /**
+   * See Boolector API. (Enables trace of API to given file).
+   *
+   * @param jarg1 btor
+   * @param jarg2 absolute path to the trace file
+   */
+  protected final static native void boolector_set_trapi(long jarg1, String jarg2);
 
   protected final static native long boolector_get_trapi(long jarg1);
 

@@ -172,6 +172,13 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  /** Skip test if the solver does not support integers. */
+  protected final void requireIntegers() {
+    assume().withMessage("Solver %s does not support the theory of integers", solverToUse())
+        .that(imgr)
+        .isNotNull();
+  }
+
   /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
@@ -187,6 +194,7 @@ public abstract class SolverBasedTest0 {
         .that(bvmgr)
         .isNotNull();
   }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()

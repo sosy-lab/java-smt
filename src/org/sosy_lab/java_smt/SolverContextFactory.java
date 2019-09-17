@@ -219,7 +219,7 @@ public class SolverContextFactory {
 
       case BOOLECTOR:
         return BoolectorSolverContext
-            .create(config, shutdownNotifier, logfile, (int) randomSeed);
+            .create(config, logger, shutdownNotifier, logfile, (int) randomSeed);
 
       default:
         throw new AssertionError("no solver selected");

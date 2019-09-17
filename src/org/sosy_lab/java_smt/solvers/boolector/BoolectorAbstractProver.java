@@ -46,8 +46,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final BoolectorFormulaCreator creator;
   protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
   private final ShutdownNotifier shutdownNotifier;
-  protected boolean closed = false;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
+  private int contextLevel;
 
   // Used/Built by TheoremProver
   protected BoolectorAbstractProver(
@@ -61,6 +61,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     this.creator = creator;
     this.btor = checkNotNull(btor);
     this.shutdownNotifier = checkNotNull(pShutdownNotifier);
+    this.contextLevel = 0;
   }
 
   @Override
@@ -72,6 +73,10 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       // BtorJNI.boolector_delete(btor);
       assertedFormulas.clear();
       // if not able to close, pop all the stack
+      if (contextLevel > 0) {
+        BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), contextLevel);
+        contextLevel = 0;
+      }
       closed = true;
     }
   }
@@ -100,12 +105,14 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void pop() {
     assertedFormulas.pop();
+    contextLevel--;
     BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), 1);
   }
 
   @Override
   public void push() {
     assertedFormulas.push(new ArrayList<>());
+    contextLevel++;
     BtorJNI.boolector_push(manager.getEnvironment().getBtor(), 1);
   }
 
@@ -129,14 +136,15 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException("Unsat core is not supported.");
+    throw new UnsupportedOperationException("Unsat core is not supported by Boolector.");
   }
 
   @Override
   public Optional<List<BooleanFormula>>
       unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
           throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Unsat core with assumptions is not supported.");
+    throw new UnsupportedOperationException(
+        "Unsat core with assumptions is not supported by Boolector.");
   }
 
   @Override
@@ -158,6 +166,15 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     List<Long> result = new ArrayList<>();
     assertedFormulas.forEach(result::addAll);
     return result;
+  }
+
+  /**
+   * Simply returns true if the prover is closed. False otherwise.
+   *
+   * @return bool return value.
+   */
+  protected boolean isClosed() {
+    return closed;
   }
 
 }

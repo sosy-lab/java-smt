@@ -29,6 +29,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.example.FormulaClassifier;
 
 @RunWith(Parameterized.class)
@@ -68,6 +71,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_AUFLIA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     String query = VARS + "(assert (exists ((z Int)) (= (select arr x) (foo z))))";
     classifier.visit(mgr.parse(query));
@@ -76,6 +81,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_AUFLIA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (= (select arr x) (foo 0)))";
     classifier.visit(mgr.parse(query));
     assertEquals("QF_AUFLIA", classifier.toString());
@@ -83,6 +90,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_AUFLIRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
@@ -91,6 +100,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_AUFNIRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireRationals();
     String query = VARS + "(assert (= (select arr (* x x)) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
@@ -99,6 +110,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_LIA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
     String query = VARS + "(assert (exists ((z Int)) (= (+ x 1) 0)))";
     classifier.visit(mgr.parse(query));
@@ -107,6 +120,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_LRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
     requireRationals();
     String query = VARS + "(assert (exists ((zz Real)) (= (+ y y) zz)))";
@@ -116,6 +131,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_ABV() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -127,7 +144,10 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_AUFBV() {
+    // Boolector only supports Bitvectors (bv arrays and ufs) (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireBitvectors();
+    // TODO: can i check this with boolector?!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     String query = VARS + BVS + "(assert (and (= bv bv2) (= arr arr2) (= (foo x) x)))";
     classifier.visit(mgr.parse(query));
@@ -135,16 +155,25 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void test_QF_BV() {
+  public void test_QF_BV() throws SolverException, InterruptedException {
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
-    String query = BVS + "(assert (bvult bv (bvadd bv #x1)))";
-    classifier.visit(mgr.parse(query));
-    assertEquals("QF_BV", classifier.toString());
+    // Boolector can't parse formulas, therefore we test it manually
+    if (solver == Solvers.BOOLECTOR) {
+      BitvectorFormula bv = bvmgr.makeVariable(4, "bv");
+      BooleanFormula bvF = bvmgr.lessThan(bv, bvmgr.add(bv, bvmgr.makeBitvector(4, 1)), false);
+      assertEquals("QF_BV", classifier.toString());
+    } else {
+      String query = BVS + "(assert (bvult bv (bvadd bv #x1)))";
+      classifier.visit(mgr.parse(query));
+      assertEquals("QF_BV", classifier.toString());
+    }
   }
 
   @Test
   public void test_QF_LIA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< xx (* x 2)))";
     classifier.visit(mgr.parse(query));
     assertEquals("QF_LIA", classifier.toString());
@@ -152,6 +181,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_LRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< yy y))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -160,6 +191,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_NIA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< xx (* x x)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -168,6 +201,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_NRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< yy (* y y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -176,6 +211,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_UF() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (= (foo x) x))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -184,6 +221,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_UFBV() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     String query = VARS + BVS + "(assert (and (= bv bv2) (= (foo x) x)))";
@@ -193,6 +232,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_UFLIA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< xx (+ x (foo x))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -201,6 +242,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_UFLRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< yy (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -209,6 +252,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_UFNRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     String query = VARS + "(assert (< (* y yy) (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -217,6 +262,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_UFLRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
     String query = VARS + "(assert (exists ((zz Real)) (< (+ y yy) (bar y))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -226,6 +273,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_UFNRA() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     String query = VARS + "(assert (exists ((zz Real)) (< (* y yy) (bar y))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -235,6 +284,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_FP() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireFloats();
     String query = VARS + "(declare-fun a () Float32) (assert (fp.eq a (fp.add RNE a a)))";
     classifier.visit(mgr.parse(query));
@@ -243,6 +294,8 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_FP() {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireFloats();
     requireQuantifiers();
     String query = VARS + "(declare-fun a () Float32) (assert (exists ((zz Real)) (fp.eq a a)))";

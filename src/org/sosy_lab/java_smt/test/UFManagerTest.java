@@ -51,14 +51,43 @@ public class UFManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testDeclareAndCallUF() {
+  public void testDeclareAndCallUFWithInt() {
+    requireIntegers();
     List<String> names = ImmutableList.of("Func", "|Func|", "(Func)");
     for (String name : names) {
       Formula f;
       try {
         f =
             fmgr.declareAndCallUF(
-                name, FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
+                name,
+                FormulaType.IntegerType,
+                ImmutableList.of(imgr.makeNumber(1)));
+      } catch (RuntimeException e) {
+        if (name.equals("|Func|")) {
+          throw new AssumptionViolatedException("unsupported UF name", e);
+        } else {
+          throw e;
+        }
+      }
+      FunctionDeclaration<?> declaration = getDeclaration(f);
+      Truth.assertThat(declaration.getName()).isEqualTo(name);
+      Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
+      Truth.assertThat(f2).isEqualTo(f);
+    }
+  }
+
+  @Test
+  public void testDeclareAndCallUFWithBv() {
+    requireBitvectors();
+    List<String> names = ImmutableList.of("Func", "|Func|", "(Func)");
+    for (String name : names) {
+      Formula f;
+      try {
+        f =
+            fmgr.declareAndCallUF(
+                name,
+                FormulaType.getBitvectorTypeWithSize(4),
+                ImmutableList.of(bvmgr.makeBitvector(4, 1)));
       } catch (RuntimeException e) {
         if (name.equals("|Func|")) {
           throw new AssumptionViolatedException("unsupported UF name", e);

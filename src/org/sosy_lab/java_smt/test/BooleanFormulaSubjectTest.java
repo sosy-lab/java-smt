@@ -36,6 +36,10 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
+ * bitvectors length 1.
+ */
 @RunWith(Parameterized.class)
 public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
@@ -57,8 +61,17 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Before
   public void setupFormulas() {
-    simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
-    contradiction = bmgr.and(simpleFormula, imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2)));
+    if (imgr != null) {
+      simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
+      contradiction =
+          bmgr.and(simpleFormula, imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2)));
+    } else {
+      simpleFormula = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 1));
+      contradiction =
+          bmgr.and(
+              simpleFormula,
+              bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
+    }
     tautology = bmgr.or(simpleFormula, bmgr.not(simpleFormula));
   }
 
@@ -143,8 +156,16 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsEquivalentToYes() throws SolverException, InterruptedException {
-    BooleanFormula simpleFormula2 =
-        imgr.equal(imgr.makeVariable("a"), imgr.add(imgr.makeNumber(0), imgr.makeNumber(1)));
+    BooleanFormula simpleFormula2;
+    if (imgr != null) {
+      simpleFormula2 =
+          imgr.equal(imgr.makeVariable("a"), imgr.add(imgr.makeNumber(0), imgr.makeNumber(1)));
+    } else {
+      simpleFormula2 =
+          bvmgr.equal(
+              bvmgr.makeVariable(2, "a"),
+              bvmgr.add(bvmgr.makeBitvector(2, 0), bvmgr.makeBitvector(2, 1)));
+    }
     assertThatFormula(simpleFormula).isEquivalentTo(simpleFormula2);
   }
 
@@ -162,7 +183,12 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsEquisatisfiableoNo() {
-    BooleanFormula simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+    BooleanFormula simpleFormula2;
+    if (imgr != null) {
+      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+    } else {
+      simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeVariable(2, "2"));
+    }
     AssertionError failure =
         expectFailure(
             whenTesting -> whenTesting.that(simpleFormula).isEquisatisfiableTo(simpleFormula2));

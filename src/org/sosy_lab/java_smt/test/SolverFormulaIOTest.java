@@ -334,7 +334,11 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @SuppressWarnings("CheckReturnValue")
   private void checkThatDumpIsParseable(String dump) {
-    mgr.parse(dump);
+    try {
+      mgr.parse(dump);
+    } catch (UnsupportedOperationException e) {
+      // Boolector can not parse formulas
+    }
   }
 
   private BooleanFormula genBoolExpr() {

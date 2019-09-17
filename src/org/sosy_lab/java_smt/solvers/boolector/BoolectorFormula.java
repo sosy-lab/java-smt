@@ -30,9 +30,11 @@ import org.sosy_lab.java_smt.api.FormulaType;
 abstract class BoolectorFormula implements Formula {
 
   private final long btorTerm;
+  private final long btor;// We need the boolector instance to calculate the hash
 
-  BoolectorFormula(long term) {
+  BoolectorFormula(long term, long btor) {
     this.btorTerm = term;
+    this.btor = btor;
   }
 
   final long getTerm() {
@@ -52,21 +54,22 @@ abstract class BoolectorFormula implements Formula {
 
   @Override
   public final int hashCode() {
-    return (int) btorTerm;
+    // Boolector uses structural hashing on its nodes (formulas)
+    return BtorJNI.boolector_get_node_id(btor, btorTerm);
   }
 
   @Immutable
   static final class BoolectorBitvectorFormula extends BoolectorFormula
       implements BitvectorFormula {
-    BoolectorBitvectorFormula(long pTerm) {
-      super(pTerm);
+    BoolectorBitvectorFormula(long pTerm, long btor) {
+      super(pTerm, btor);
     }
   }
 
   @Immutable
   static final class BoolectorBooleanFormula extends BoolectorFormula implements BooleanFormula {
-    BoolectorBooleanFormula(long pTerm) {
-      super(pTerm);
+    BoolectorBooleanFormula(long pTerm, long btor) {
+      super(pTerm, btor);
     }
   }
 
@@ -76,8 +79,12 @@ abstract class BoolectorFormula implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    BoolectorArrayFormula(long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-      super(pTerm);
+    BoolectorArrayFormula(
+        long pTerm,
+        FormulaType<TI> pIndexType,
+        FormulaType<TE> pElementType,
+        long btor) {
+      super(pTerm, btor);
       indexType = pIndexType;
       elementType = pElementType;
     }
