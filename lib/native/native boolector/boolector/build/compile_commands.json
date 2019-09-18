@@ -1,0 +1,752 @@
+[
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/btormc.dir/btormcmain.c.o   -c /home/daniel/boolector_build/boolector/src/btormcmain.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btormcmain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/btormbt.dir/btormbt.c.o   -c /home/daniel/boolector_build/boolector/src/btormbt.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btormbt.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/aigprop.c.o   -c /home/daniel/boolector_build/boolector/src/aigprop.c",
+  "file": "/home/daniel/boolector_build/boolector/src/aigprop.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/boolector.c.o   -c /home/daniel/boolector_build/boolector/src/boolector.c",
+  "file": "/home/daniel/boolector_build/boolector/src/boolector.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/interface_wrap.c.o   -c /home/daniel/boolector_build/boolector/src/interface_wrap.c",
+  "file": "/home/daniel/boolector_build/boolector/src/interface_wrap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/boolectormc.c.o   -c /home/daniel/boolector_build/boolector/src/boolectormc.c",
+  "file": "/home/daniel/boolector_build/boolector/src/boolectormc.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorabort.c.o   -c /home/daniel/boolector_build/boolector/src/btorabort.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorabort.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btoraig.c.o   -c /home/daniel/boolector_build/boolector/src/btoraig.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btoraig.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btoraigvec.c.o   -c /home/daniel/boolector_build/boolector/src/btoraigvec.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btoraigvec.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorass.c.o   -c /home/daniel/boolector_build/boolector/src/btorass.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorass.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorbeta.c.o   -c /home/daniel/boolector_build/boolector/src/btorbeta.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorbeta.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorbv.c.o   -c /home/daniel/boolector_build/boolector/src/btorbv.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorbv.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorchkclone.c.o   -c /home/daniel/boolector_build/boolector/src/btorchkclone.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorchkclone.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorclone.c.o   -c /home/daniel/boolector_build/boolector/src/btorclone.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorclone.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorcore.c.o   -c /home/daniel/boolector_build/boolector/src/btorcore.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorcore.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btordbg.c.o   -c /home/daniel/boolector_build/boolector/src/btordbg.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btordbg.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btordcr.c.o   -c /home/daniel/boolector_build/boolector/src/btordcr.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btordcr.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorexp.c.o   -c /home/daniel/boolector_build/boolector/src/btorexp.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorexp.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btormc.c.o   -c /home/daniel/boolector_build/boolector/src/btormc.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btormc.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btormodel.c.o   -c /home/daniel/boolector_build/boolector/src/btormodel.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btormodel.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btormsg.c.o   -c /home/daniel/boolector_build/boolector/src/btormsg.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btormsg.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btornode.c.o   -c /home/daniel/boolector_build/boolector/src/btornode.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btornode.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btoropt.c.o   -c /home/daniel/boolector_build/boolector/src/btoropt.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btoropt.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorparse.c.o   -c /home/daniel/boolector_build/boolector/src/btorparse.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorparse.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorprintmodel.c.o   -c /home/daniel/boolector_build/boolector/src/btorprintmodel.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorprintmodel.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorrewrite.c.o   -c /home/daniel/boolector_build/boolector/src/btorrewrite.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorrewrite.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorrwcache.c.o   -c /home/daniel/boolector_build/boolector/src/btorrwcache.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorrwcache.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorsat.c.o   -c /home/daniel/boolector_build/boolector/src/btorsat.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorsat.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorslvaigprop.c.o   -c /home/daniel/boolector_build/boolector/src/btorslvaigprop.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorslvaigprop.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorslvfun.c.o   -c /home/daniel/boolector_build/boolector/src/btorslvfun.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorslvfun.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorslvprop.c.o   -c /home/daniel/boolector_build/boolector/src/btorslvprop.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorslvprop.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorslvpropsls.c.o   -c /home/daniel/boolector_build/boolector/src/btorslvpropsls.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorslvpropsls.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorslvquant.c.o   -c /home/daniel/boolector_build/boolector/src/btorslvquant.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorslvquant.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorslvsls.c.o   -c /home/daniel/boolector_build/boolector/src/btorslvsls.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorslvsls.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorsort.c.o   -c /home/daniel/boolector_build/boolector/src/btorsort.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorsort.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btorsynth.c.o   -c /home/daniel/boolector_build/boolector/src/btorsynth.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btorsynth.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/btortrapi.c.o   -c /home/daniel/boolector_build/boolector/src/btortrapi.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btortrapi.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/dumper/btordumpaig.c.o   -c /home/daniel/boolector_build/boolector/src/dumper/btordumpaig.c",
+  "file": "/home/daniel/boolector_build/boolector/src/dumper/btordumpaig.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/dumper/btordumpbtor.c.o   -c /home/daniel/boolector_build/boolector/src/dumper/btordumpbtor.c",
+  "file": "/home/daniel/boolector_build/boolector/src/dumper/btordumpbtor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/dumper/btordumpsmt.c.o   -c /home/daniel/boolector_build/boolector/src/dumper/btordumpsmt.c",
+  "file": "/home/daniel/boolector_build/boolector/src/dumper/btordumpsmt.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/normalizer/btornormquant.c.o   -c /home/daniel/boolector_build/boolector/src/normalizer/btornormquant.c",
+  "file": "/home/daniel/boolector_build/boolector/src/normalizer/btornormquant.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/normalizer/btorskolemize.c.o   -c /home/daniel/boolector_build/boolector/src/normalizer/btorskolemize.c",
+  "file": "/home/daniel/boolector_build/boolector/src/normalizer/btorskolemize.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/parser/btorbtor.c.o   -c /home/daniel/boolector_build/boolector/src/parser/btorbtor.c",
+  "file": "/home/daniel/boolector_build/boolector/src/parser/btorbtor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/parser/btorbtor2.c.o   -c /home/daniel/boolector_build/boolector/src/parser/btorbtor2.c",
+  "file": "/home/daniel/boolector_build/boolector/src/parser/btorbtor2.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/parser/btorsmt.c.o   -c /home/daniel/boolector_build/boolector/src/parser/btorsmt.c",
+  "file": "/home/daniel/boolector_build/boolector/src/parser/btorsmt.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/parser/btorsmt2.c.o   -c /home/daniel/boolector_build/boolector/src/parser/btorsmt2.c",
+  "file": "/home/daniel/boolector_build/boolector/src/parser/btorsmt2.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/sat/btorcadical.c.o   -c /home/daniel/boolector_build/boolector/src/sat/btorcadical.c",
+  "file": "/home/daniel/boolector_build/boolector/src/sat/btorcadical.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/sat/btorlgl.c.o   -c /home/daniel/boolector_build/boolector/src/sat/btorlgl.c",
+  "file": "/home/daniel/boolector_build/boolector/src/sat/btorlgl.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/c++  -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu++11 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/sat/btorminisat.cc.o -c /home/daniel/boolector_build/boolector/src/sat/btorminisat.cc",
+  "file": "/home/daniel/boolector_build/boolector/src/sat/btorminisat.cc"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/sat/btorpicosat.c.o   -c /home/daniel/boolector_build/boolector/src/sat/btorpicosat.c",
+  "file": "/home/daniel/boolector_build/boolector/src/sat/btorpicosat.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorack.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorack.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorack.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorder.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorder.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorder.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorelimapplies.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorelimapplies.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorelimapplies.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorelimslices.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorelimslices.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorelimslices.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorextract.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorextract.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorextract.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btormerge.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btormerge.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btormerge.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorminiscope.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorminiscope.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorminiscope.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorskel.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorskel.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorskel.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/simplifier/btorunconstrained.c.o   -c /home/daniel/boolector_build/boolector/src/simplifier/btorunconstrained.c",
+  "file": "/home/daniel/boolector_build/boolector/src/simplifier/btorunconstrained.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/boolectornodemap.c.o   -c /home/daniel/boolector_build/boolector/src/utils/boolectornodemap.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/boolectornodemap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btoraigmap.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btoraigmap.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btoraigmap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btorhashint.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btorhashint.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btorhashint.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btorhashptr.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btorhashptr.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btorhashptr.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btormem.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btormem.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btormem.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btornodeiter.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btornodeiter.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btornodeiter.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btornodemap.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btornodemap.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btornodemap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btoroptparse.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btoroptparse.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btoroptparse.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btorpartgen.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btorpartgen.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btorpartgen.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btorrng.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btorrng.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btorrng.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -Dboolector_EXPORTS -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src -I/home/daniel/boolector_build/boolector/deps/install/include -I/usr/lib/jvm/default/include -I/usr/lib/jvm/default/include/linux   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG -fPIC   -o CMakeFiles/boolector.dir/utils/btorutil.c.o   -c /home/daniel/boolector_build/boolector/src/utils/btorutil.c",
+  "file": "/home/daniel/boolector_build/boolector/src/utils/btorutil.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/boolector-bin.dir/boolectormain.c.o   -c /home/daniel/boolector_build/boolector/src/boolectormain.c",
+  "file": "/home/daniel/boolector_build/boolector/src/boolectormain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/boolector-bin.dir/btormain.c.o   -c /home/daniel/boolector_build/boolector/src/btormain.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btormain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/c++  -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu++11 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/btorimc.dir/btoribv.cc.o -c /home/daniel/boolector_build/boolector/src/btoribv.cc",
+  "file": "/home/daniel/boolector_build/boolector/src/btoribv.cc"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/c++  -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu++11 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/btorimc.dir/btorimc.cc.o -c /home/daniel/boolector_build/boolector/src/btorimc.cc",
+  "file": "/home/daniel/boolector_build/boolector/src/btorimc.cc"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/src",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/btoruntrace.dir/btoruntrace.c.o   -c /home/daniel/boolector_build/boolector/src/btoruntrace.c",
+  "file": "/home/daniel/boolector_build/boolector/src/btoruntrace.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/test.c.o   -c /home/daniel/boolector_build/boolector/test/test.c",
+  "file": "/home/daniel/boolector_build/boolector/test/test.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testaig.c.o   -c /home/daniel/boolector_build/boolector/test/testaig.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testaig.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testaigvec.c.o   -c /home/daniel/boolector_build/boolector/test/testaigvec.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testaigvec.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testarithmetic.c.o   -c /home/daniel/boolector_build/boolector/test/testarithmetic.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testarithmetic.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testboolectornodemap.c.o   -c /home/daniel/boolector_build/boolector/test/testboolectornodemap.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testboolectornodemap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testbv.c.o   -c /home/daniel/boolector_build/boolector/test/testbv.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testbv.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testcomp.c.o   -c /home/daniel/boolector_build/boolector/test/testcomp.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testcomp.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testexp.c.o   -c /home/daniel/boolector_build/boolector/test/testexp.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testexp.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testhash.c.o   -c /home/daniel/boolector_build/boolector/test/testhash.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testhash.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testinc.c.o   -c /home/daniel/boolector_build/boolector/test/testinc.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testinc.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testinthash.c.o   -c /home/daniel/boolector_build/boolector/test/testinthash.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testinthash.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testinthashmap.c.o   -c /home/daniel/boolector_build/boolector/test/testinthashmap.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testinthashmap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testlambda.c.o   -c /home/daniel/boolector_build/boolector/test/testlambda.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testlambda.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testlogic.c.o   -c /home/daniel/boolector_build/boolector/test/testlogic.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testlogic.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testmap.c.o   -c /home/daniel/boolector_build/boolector/test/testmap.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testmap.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testmc.c.o   -c /home/daniel/boolector_build/boolector/test/testmc.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testmc.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testmem.c.o   -c /home/daniel/boolector_build/boolector/test/testmem.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testmem.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testmisc.c.o   -c /home/daniel/boolector_build/boolector/test/testmisc.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testmisc.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testmodelgen.c.o   -c /home/daniel/boolector_build/boolector/test/testmodelgen.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testmodelgen.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testmodelgensmt2.c.o   -c /home/daniel/boolector_build/boolector/test/testmodelgensmt2.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testmodelgensmt2.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testnormquant.c.o   -c /home/daniel/boolector_build/boolector/test/testnormquant.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testnormquant.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testoverflow.c.o   -c /home/daniel/boolector_build/boolector/test/testoverflow.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testoverflow.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testparseerror.c.o   -c /home/daniel/boolector_build/boolector/test/testparseerror.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testparseerror.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testprop.c.o   -c /home/daniel/boolector_build/boolector/test/testprop.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testprop.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testpropinv.c.o   -c /home/daniel/boolector_build/boolector/test/testpropinv.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testpropinv.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testqueue.c.o   -c /home/daniel/boolector_build/boolector/test/testqueue.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testqueue.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testrunner.c.o   -c /home/daniel/boolector_build/boolector/test/testrunner.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testrunner.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testsat.c.o   -c /home/daniel/boolector_build/boolector/test/testsat.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testsat.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testshift.c.o   -c /home/daniel/boolector_build/boolector/test/testshift.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testshift.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testsmtaxioms.c.o   -c /home/daniel/boolector_build/boolector/test/testsmtaxioms.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testsmtaxioms.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testsort.c.o   -c /home/daniel/boolector_build/boolector/test/testsort.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testsort.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testspecial.c.o   -c /home/daniel/boolector_build/boolector/test/testspecial.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testspecial.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/teststack.c.o   -c /home/daniel/boolector_build/boolector/test/teststack.c",
+  "file": "/home/daniel/boolector_build/boolector/test/teststack.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testtestcases.c.o   -c /home/daniel/boolector_build/boolector/test/testtestcases.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testtestcases.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/test",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/testbtor.dir/testutil.c.o   -c /home/daniel/boolector_build/boolector/test/testutil.c",
+  "file": "/home/daniel/boolector_build/boolector/test/testutil.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/c++  -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu++11 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/exception.dir/exception.cpp.o -c /home/daniel/boolector_build/boolector/examples/api/c/exception.cpp",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/exception.cpp"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/swapmem.dir/swapmem/swapmem.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/swapmem/swapmem.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/swapmem/swapmem.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/sudoku.dir/sudoku/sudoku.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/sudoku/sudoku.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/sudoku/sudoku.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/selectionsortmem.dir/selectionsortmem/selectionsortmem.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/selectionsortmem/selectionsortmem.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/selectionsortmem/selectionsortmem.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/selectionsort.dir/selectionsort/selectionsort.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/selectionsort/selectionsort.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/selectionsort/selectionsort.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/memcpy.dir/memcpy/memcpy.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/memcpy/memcpy.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/memcpy/memcpy.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/minand.dir/boundsprop/minand.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minand.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minand.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/minand.dir/boundsprop/minandmain.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minandmain.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minandmain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/maxxor.dir/boundsprop/maxxor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxxor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxxor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/maxxor.dir/boundsprop/maxxormain.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxxormain.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxxormain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/maxand.dir/boundsprop/maxand.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxand.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxand.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/maxand.dir/boundsprop/maxandmain.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxandmain.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxandmain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/array3.dir/array/array3.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/array/array3.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/array/array3.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/binarysearch.dir/binarysearch/binarysearch.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/binarysearch/binarysearch.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/binarysearch/binarysearch.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/ispowerof2.dir/ispowerof2/ispowerof2.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/ispowerof2/ispowerof2.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/ispowerof2/ispowerof2.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/theorems.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/theorems.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/theorems.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/minor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/minand.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minand.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minand.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/maxor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/maxand.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxand.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxand.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/minxor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minxor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minxor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/theorems.dir/boundsprop/maxxor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxxor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxxor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/minor.dir/boundsprop/minor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/minor.dir/boundsprop/minormain.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minormain.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minormain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/matrixmultass.dir/matrixmultass/matrixmultass.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/matrixmultass/matrixmultass.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/matrixmultass/matrixmultass.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/array2.dir/array/array2.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/array/array2.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/array/array2.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/bubblesort.dir/bubblesort/bubblesort.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/bubblesort/bubblesort.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/bubblesort/bubblesort.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/bubblesortmem.dir/bubblesortmem/bubblesortmem.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/bubblesortmem/bubblesortmem.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/bubblesortmem/bubblesortmem.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/array1.dir/array/array1.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/array/array1.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/array/array1.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/minxor.dir/boundsprop/minxor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minxor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minxor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/minxor.dir/boundsprop/minxormain.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minxormain.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/minxormain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/bv2.dir/bv/bv2.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/bv/bv2.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/bv/bv2.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/doublereversearray.dir/doublereversearray/doublereversearray.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/doublereversearray/doublereversearray.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/doublereversearray/doublereversearray.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/maxor.dir/boundsprop/maxor.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxor.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxor.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/maxor.dir/boundsprop/maxormain.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxormain.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/boundsprop/maxormain.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/linearsearch.dir/linearsearch/linearsearch.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/linearsearch/linearsearch.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/linearsearch/linearsearch.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/matrixmultcomm.dir/matrixmultcomm/matrixmultcomm.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/matrixmultcomm/matrixmultcomm.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/matrixmultcomm/matrixmultcomm.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/bv1.dir/bv/bv1.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/bv/bv1.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/bv/bv1.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/max.dir/max/max.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/max/max.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/max/max.c"
+},
+{
+  "directory": "/home/daniel/boolector_build/boolector/build/examples/api/c",
+  "command": "/usr/bin/cc -DBTOR_HAVE_PTHREADS -DBTOR_HAVE_SIGNALS -DBTOR_USE_CADICAL -DBTOR_USE_LINGELING -DBTOR_USE_PICOSAT -DNBTORLOG -DNDEBUG -I/home/daniel/boolector_build/boolector/src -I/home/daniel/boolector_build/boolector/build/src   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -O3 -DNDEBUG   -o CMakeFiles/nextpowerof2.dir/nextpowerof2/nextpowerof2.c.o   -c /home/daniel/boolector_build/boolector/examples/api/c/nextpowerof2/nextpowerof2.c",
+  "file": "/home/daniel/boolector_build/boolector/examples/api/c/nextpowerof2/nextpowerof2.c"
+}
+]

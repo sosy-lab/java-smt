@@ -1,0 +1,96 @@
+#!/bin/bash
+
+die () 
+{
+  echo "*** crosscheckboolector: $*" 1>&2
+  exit 1
+}
+
+trap "exit 2" SIGHUP SIGINT SIGTERM
+
+solver_test=""
+solver_test_opts=""
+solver_ref=""
+solver_ref_opts=""
+
+tmp_ref="/tmp/crosscheckboolector-ref-result-$$"
+tmp_test="/tmp/crosscheckboolector-test-result-$$"
+
+cmp_output=no
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+    -h|--help)
+      echo -n "usage: $(basename $0) [<option>] <test> [<testopts>] <ref> "
+      echo "[<refopts>] <file>"
+      echo
+      echo "  <test>:     the solver instance under test"
+      echo "  <testopts>: options passed to <test>"
+      echo "  <ref>:      the reference solver instance"
+      echo "  <refopts>:  options passed to <ref>"
+      echo
+      echo "  options:"
+      echo "    -h, --help    print this message and exit"
+      echo "    -o            compare output rather than exit code"
+      echo
+      exit
+      ;;
+    -o) cmp_output=yes ;;
+    -*|[0-9]*) 
+      if [ x"$solver_test" = x ]; then
+	die "invalid option: $1"
+      elif [ x"$solver_ref" = x  ]; then
+	solver_test_opts="$solver_test_opts $1"
+      else
+	solver_ref_opts="$solver_ref_opts $1"
+      fi
+      ;;
+    *) 
+      if [ x"$solver_test" = x ]; then
+	solver_test=$1
+      elif [ x"$solver_ref" = x  ]; then
+	solver_ref=$1
+      else
+	break
+      fi
+      ;;
+  esac
+  shift
+done
+
+inputfile="$*"
+
+[ x"$inputfile" = x ] && die "inputfile missing"
+
+$solver_ref $solver_ref_opts $inputfile > $tmp_ref 2>&1
+expected_result=$?
+#echo "$solver_ref"
+#echo "expected result: $expected_result"
+
+# we do not want assertions errors for now
+if [[ $cmp_output != "yes" && $expected_result != 10 && $expected_result != 20 ]]; then
+  exit 0
+fi
+
+$solver_test $solver_test_opts $inputfile > $tmp_test 2>&1
+result=$?
+#echo "$solver_test"
+#echo "result: $result"
+
+if [[ $cmp_output == "yes" ]]
+then
+  diff $tmp_test $tmp_ref > /dev/null 2>&1
+  exit $?
+else
+  # we do not want assertions errors for now
+  if [[ $result != 10 && $result != 20 ]]; then
+    exit 0
+  fi
+
+  if [ $result -eq $expected_result ]; then
+    exit 0
+  else
+    exit 1
+  fi
+fi

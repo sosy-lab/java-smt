@@ -1,0 +1,1641 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_6c0db/fast 
+/usr/bin/make -f CMakeFiles/cmTC_6c0db.dir/build.make CMakeFiles/cmTC_6c0db.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6c0db.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_6c0db.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_6c0db
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6c0db.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_6c0db.dir/CheckSymbolExists.c.o  -o cmTC_6c0db 
+/usr/bin/ld: CMakeFiles/cmTC_6c0db.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_6c0db.dir/build.make:87: cmTC_6c0db] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_6c0db/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_69689/fast 
+/usr/bin/make -f CMakeFiles/cmTC_69689.dir/build.make CMakeFiles/cmTC_69689.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_69689.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_69689.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_69689
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_69689.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_69689.dir/CheckSymbolExists.c.o  -o cmTC_69689 
+/usr/bin/ld: CMakeFiles/cmTC_69689.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_69689.dir/build.make:87: cmTC_69689] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_69689/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_8037d/fast 
+/usr/bin/make -f CMakeFiles/cmTC_8037d.dir/build.make CMakeFiles/cmTC_8037d.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8037d.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_8037d.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_8037d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8037d.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_8037d.dir/CheckSymbolExists.c.o  -o cmTC_8037d 
+/usr/bin/ld: CMakeFiles/cmTC_8037d.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_8037d.dir/build.make:87: cmTC_8037d] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_8037d/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_a09b0/fast 
+/usr/bin/make -f CMakeFiles/cmTC_a09b0.dir/build.make CMakeFiles/cmTC_a09b0.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a09b0.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_a09b0.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_a09b0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a09b0.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_a09b0.dir/CheckSymbolExists.c.o  -o cmTC_a09b0 
+/usr/bin/ld: CMakeFiles/cmTC_a09b0.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_a09b0.dir/build.make:87: cmTC_a09b0] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_a09b0/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ac1f6/fast 
+/usr/bin/make -f CMakeFiles/cmTC_ac1f6.dir/build.make CMakeFiles/cmTC_ac1f6.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ac1f6.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_ac1f6.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_ac1f6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ac1f6.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_ac1f6.dir/CheckSymbolExists.c.o  -o cmTC_ac1f6 
+/usr/bin/ld: CMakeFiles/cmTC_ac1f6.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_ac1f6.dir/build.make:87: cmTC_ac1f6] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_ac1f6/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_588ac/fast 
+/usr/bin/make -f CMakeFiles/cmTC_588ac.dir/build.make CMakeFiles/cmTC_588ac.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_588ac.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_588ac.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_588ac
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_588ac.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_588ac.dir/CheckSymbolExists.c.o  -o cmTC_588ac 
+/usr/bin/ld: CMakeFiles/cmTC_588ac.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_588ac.dir/build.make:87: cmTC_588ac] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_588ac/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ad6da/fast 
+/usr/bin/make -f CMakeFiles/cmTC_ad6da.dir/build.make CMakeFiles/cmTC_ad6da.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ad6da.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_ad6da.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_ad6da
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ad6da.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_ad6da.dir/CheckSymbolExists.c.o  -o cmTC_ad6da 
+/usr/bin/ld: CMakeFiles/cmTC_ad6da.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_ad6da.dir/build.make:87: cmTC_ad6da] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_ad6da/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_d1081/fast 
+/usr/bin/make -f CMakeFiles/cmTC_d1081.dir/build.make CMakeFiles/cmTC_d1081.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d1081.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_d1081.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_d1081
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1081.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_d1081.dir/CheckSymbolExists.c.o  -o cmTC_d1081 
+/usr/bin/ld: CMakeFiles/cmTC_d1081.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_d1081.dir/build.make:87: cmTC_d1081] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_d1081/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_f419d/fast 
+/usr/bin/make -f CMakeFiles/cmTC_f419d.dir/build.make CMakeFiles/cmTC_f419d.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f419d.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_f419d.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_f419d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f419d.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_f419d.dir/CheckSymbolExists.c.o  -o cmTC_f419d 
+/usr/bin/ld: CMakeFiles/cmTC_f419d.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_f419d.dir/build.make:87: cmTC_f419d] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_f419d/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_62841/fast 
+/usr/bin/make -f CMakeFiles/cmTC_62841.dir/build.make CMakeFiles/cmTC_62841.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_62841.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_62841.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_62841
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_62841.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_62841.dir/CheckSymbolExists.c.o  -o cmTC_62841 
+/usr/bin/ld: CMakeFiles/cmTC_62841.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_62841.dir/build.make:87: cmTC_62841] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_62841/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_b1fc4/fast 
+/usr/bin/make -f CMakeFiles/cmTC_b1fc4.dir/build.make CMakeFiles/cmTC_b1fc4.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b1fc4.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_b1fc4.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_b1fc4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b1fc4.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_b1fc4.dir/CheckSymbolExists.c.o  -o cmTC_b1fc4 
+/usr/bin/ld: CMakeFiles/cmTC_b1fc4.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_b1fc4.dir/build.make:87: cmTC_b1fc4] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_b1fc4/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_affcc/fast 
+/usr/bin/make -f CMakeFiles/cmTC_affcc.dir/build.make CMakeFiles/cmTC_affcc.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_affcc.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_affcc.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_affcc
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_affcc.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_affcc.dir/CheckSymbolExists.c.o  -o cmTC_affcc 
+/usr/bin/ld: CMakeFiles/cmTC_affcc.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_affcc.dir/build.make:87: cmTC_affcc] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_affcc/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_e43df/fast 
+/usr/bin/make -f CMakeFiles/cmTC_e43df.dir/build.make CMakeFiles/cmTC_e43df.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e43df.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_e43df.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_e43df
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e43df.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_e43df.dir/CheckSymbolExists.c.o  -o cmTC_e43df 
+/usr/bin/ld: CMakeFiles/cmTC_e43df.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_e43df.dir/build.make:87: cmTC_e43df] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_e43df/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_f9e31/fast 
+/usr/bin/make -f CMakeFiles/cmTC_f9e31.dir/build.make CMakeFiles/cmTC_f9e31.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f9e31.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_f9e31.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_f9e31
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9e31.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_f9e31.dir/CheckSymbolExists.c.o  -o cmTC_f9e31 
+/usr/bin/ld: CMakeFiles/cmTC_f9e31.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_f9e31.dir/build.make:87: cmTC_f9e31] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_f9e31/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_47295/fast 
+/usr/bin/make -f CMakeFiles/cmTC_47295.dir/build.make CMakeFiles/cmTC_47295.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_47295.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_47295.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_47295
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_47295.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_47295.dir/CheckSymbolExists.c.o  -o cmTC_47295 
+/usr/bin/ld: CMakeFiles/cmTC_47295.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_47295.dir/build.make:87: cmTC_47295] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_47295/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_8cdd0/fast 
+/usr/bin/make -f CMakeFiles/cmTC_8cdd0.dir/build.make CMakeFiles/cmTC_8cdd0.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8cdd0.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_8cdd0.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_8cdd0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8cdd0.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_8cdd0.dir/CheckSymbolExists.c.o  -o cmTC_8cdd0 
+/usr/bin/ld: CMakeFiles/cmTC_8cdd0.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_8cdd0.dir/build.make:87: cmTC_8cdd0] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_8cdd0/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_9a655/fast 
+/usr/bin/make -f CMakeFiles/cmTC_9a655.dir/build.make CMakeFiles/cmTC_9a655.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9a655.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3    -o CMakeFiles/cmTC_9a655.dir/CheckSymbolExists.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_9a655
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9a655.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3     -rdynamic CMakeFiles/cmTC_9a655.dir/CheckSymbolExists.c.o  -o cmTC_9a655 
+/usr/bin/ld: CMakeFiles/cmTC_9a655.dir/CheckSymbolExists.c.o: in function `main':
+CheckSymbolExists.c:(.text.startup+0x3): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_9a655.dir/build.make:87: cmTC_9a655] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_9a655/fast] Error 2
+
+File /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ac964/fast && /usr/bin/make -f CMakeFiles/cmTC_ac964.dir/build.make CMakeFiles/cmTC_ac964.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ac964.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_ac964.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_ac964
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ac964.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_ac964.dir/src.c.o  -o cmTC_ac964 
+/usr/bin/ld: CMakeFiles/cmTC_ac964.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_ac964.dir/build.make:87: cmTC_ac964] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_ac964/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_2812b/fast && /usr/bin/make -f CMakeFiles/cmTC_2812b.dir/build.make CMakeFiles/cmTC_2812b.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2812b.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_2812b.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_2812b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2812b.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_2812b.dir/src.c.o  -o cmTC_2812b 
+/usr/bin/ld: CMakeFiles/cmTC_2812b.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_2812b.dir/build.make:87: cmTC_2812b] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_2812b/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_7e2f4/fast && /usr/bin/make -f CMakeFiles/cmTC_7e2f4.dir/build.make CMakeFiles/cmTC_7e2f4.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7e2f4.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_7e2f4.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_7e2f4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7e2f4.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_7e2f4.dir/src.c.o  -o cmTC_7e2f4 
+/usr/bin/ld: CMakeFiles/cmTC_7e2f4.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_7e2f4.dir/build.make:87: cmTC_7e2f4] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_7e2f4/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_88f78/fast && /usr/bin/make -f CMakeFiles/cmTC_88f78.dir/build.make CMakeFiles/cmTC_88f78.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_88f78.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_88f78.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_88f78
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_88f78.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_88f78.dir/src.c.o  -o cmTC_88f78 
+/usr/bin/ld: CMakeFiles/cmTC_88f78.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_88f78.dir/build.make:87: cmTC_88f78] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_88f78/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_3876a/fast && /usr/bin/make -f CMakeFiles/cmTC_3876a.dir/build.make CMakeFiles/cmTC_3876a.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3876a.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_3876a.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_3876a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3876a.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_3876a.dir/src.c.o  -o cmTC_3876a 
+/usr/bin/ld: CMakeFiles/cmTC_3876a.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_3876a.dir/build.make:87: cmTC_3876a] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_3876a/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_12502/fast && /usr/bin/make -f CMakeFiles/cmTC_12502.dir/build.make CMakeFiles/cmTC_12502.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_12502.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_12502.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_12502
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_12502.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_12502.dir/src.c.o  -o cmTC_12502 
+/usr/bin/ld: CMakeFiles/cmTC_12502.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_12502.dir/build.make:87: cmTC_12502] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_12502/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_03a00/fast && /usr/bin/make -f CMakeFiles/cmTC_03a00.dir/build.make CMakeFiles/cmTC_03a00.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_03a00.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_03a00.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_03a00
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_03a00.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_03a00.dir/src.c.o  -o cmTC_03a00 
+/usr/bin/ld: CMakeFiles/cmTC_03a00.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_03a00.dir/build.make:87: cmTC_03a00] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_03a00/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_2b737/fast && /usr/bin/make -f CMakeFiles/cmTC_2b737.dir/build.make CMakeFiles/cmTC_2b737.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2b737.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_2b737.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_2b737
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2b737.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_2b737.dir/src.c.o  -o cmTC_2b737 
+/usr/bin/ld: CMakeFiles/cmTC_2b737.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_2b737.dir/build.make:87: cmTC_2b737] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_2b737/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_3f262/fast && /usr/bin/make -f CMakeFiles/cmTC_3f262.dir/build.make CMakeFiles/cmTC_3f262.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3f262.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_3f262.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_3f262
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3f262.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_3f262.dir/src.c.o  -o cmTC_3f262 
+/usr/bin/ld: CMakeFiles/cmTC_3f262.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_3f262.dir/build.make:87: cmTC_3f262] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_3f262/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_c0cf9/fast && /usr/bin/make -f CMakeFiles/cmTC_c0cf9.dir/build.make CMakeFiles/cmTC_c0cf9.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c0cf9.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_c0cf9.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_c0cf9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c0cf9.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_c0cf9.dir/src.c.o  -o cmTC_c0cf9 
+/usr/bin/ld: CMakeFiles/cmTC_c0cf9.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_c0cf9.dir/build.make:87: cmTC_c0cf9] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_c0cf9/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_aca7d/fast && /usr/bin/make -f CMakeFiles/cmTC_aca7d.dir/build.make CMakeFiles/cmTC_aca7d.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_aca7d.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_aca7d.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_aca7d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aca7d.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_aca7d.dir/src.c.o  -o cmTC_aca7d 
+/usr/bin/ld: CMakeFiles/cmTC_aca7d.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_aca7d.dir/build.make:87: cmTC_aca7d] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_aca7d/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_75be8/fast && /usr/bin/make -f CMakeFiles/cmTC_75be8.dir/build.make CMakeFiles/cmTC_75be8.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_75be8.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_75be8.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_75be8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_75be8.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_75be8.dir/src.c.o  -o cmTC_75be8 
+/usr/bin/ld: CMakeFiles/cmTC_75be8.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_75be8.dir/build.make:87: cmTC_75be8] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_75be8/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_86edb/fast && /usr/bin/make -f CMakeFiles/cmTC_86edb.dir/build.make CMakeFiles/cmTC_86edb.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_86edb.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_86edb.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_86edb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_86edb.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_86edb.dir/src.c.o  -o cmTC_86edb 
+/usr/bin/ld: CMakeFiles/cmTC_86edb.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_86edb.dir/build.make:87: cmTC_86edb] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_86edb/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_e2a80/fast && /usr/bin/make -f CMakeFiles/cmTC_e2a80.dir/build.make CMakeFiles/cmTC_e2a80.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e2a80.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_e2a80.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_e2a80
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e2a80.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_e2a80.dir/src.c.o  -o cmTC_e2a80 
+/usr/bin/ld: CMakeFiles/cmTC_e2a80.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_e2a80.dir/build.make:87: cmTC_e2a80] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_e2a80/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_0974d/fast && /usr/bin/make -f CMakeFiles/cmTC_0974d.dir/build.make CMakeFiles/cmTC_0974d.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0974d.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_0974d.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_0974d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0974d.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_0974d.dir/src.c.o  -o cmTC_0974d 
+/usr/bin/ld: CMakeFiles/cmTC_0974d.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_0974d.dir/build.make:87: cmTC_0974d] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_0974d/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_24db0/fast && /usr/bin/make -f CMakeFiles/cmTC_24db0.dir/build.make CMakeFiles/cmTC_24db0.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_24db0.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_24db0.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_24db0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_24db0.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_24db0.dir/src.c.o  -o cmTC_24db0 
+/usr/bin/ld: CMakeFiles/cmTC_24db0.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_24db0.dir/build.make:87: cmTC_24db0] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_24db0/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_30023/fast && /usr/bin/make -f CMakeFiles/cmTC_30023.dir/build.make CMakeFiles/cmTC_30023.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_30023.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_30023.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_30023
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_30023.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_30023.dir/src.c.o  -o cmTC_30023 
+/usr/bin/ld: CMakeFiles/cmTC_30023.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_30023.dir/build.make:87: cmTC_30023] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_30023/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_5f1db/fast && /usr/bin/make -f CMakeFiles/cmTC_5f1db.dir/build.make CMakeFiles/cmTC_5f1db.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5f1db.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_5f1db.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_5f1db
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5f1db.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_5f1db.dir/src.c.o  -o cmTC_5f1db 
+/usr/bin/ld: CMakeFiles/cmTC_5f1db.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_5f1db.dir/build.make:87: cmTC_5f1db] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_5f1db/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_c432e/fast && /usr/bin/make -f CMakeFiles/cmTC_c432e.dir/build.make CMakeFiles/cmTC_c432e.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c432e.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_c432e.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_c432e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c432e.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_c432e.dir/src.c.o  -o cmTC_c432e 
+/usr/bin/ld: CMakeFiles/cmTC_c432e.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_c432e.dir/build.make:87: cmTC_c432e] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_c432e/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ed76a/fast && /usr/bin/make -f CMakeFiles/cmTC_ed76a.dir/build.make CMakeFiles/cmTC_ed76a.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ed76a.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_ed76a.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_ed76a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ed76a.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_ed76a.dir/src.c.o  -o cmTC_ed76a 
+/usr/bin/ld: CMakeFiles/cmTC_ed76a.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_ed76a.dir/build.make:87: cmTC_ed76a] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_ed76a/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_72b10/fast && /usr/bin/make -f CMakeFiles/cmTC_72b10.dir/build.make CMakeFiles/cmTC_72b10.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_72b10.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_72b10.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_72b10
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72b10.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_72b10.dir/src.c.o  -o cmTC_72b10 
+/usr/bin/ld: CMakeFiles/cmTC_72b10.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_72b10.dir/build.make:87: cmTC_72b10] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_72b10/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_010a5/fast && /usr/bin/make -f CMakeFiles/cmTC_010a5.dir/build.make CMakeFiles/cmTC_010a5.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_010a5.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_010a5.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_010a5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_010a5.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_010a5.dir/src.c.o  -o cmTC_010a5 
+/usr/bin/ld: CMakeFiles/cmTC_010a5.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_010a5.dir/build.make:87: cmTC_010a5] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_010a5/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_b11cd/fast && /usr/bin/make -f CMakeFiles/cmTC_b11cd.dir/build.make CMakeFiles/cmTC_b11cd.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b11cd.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_b11cd.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b11cd
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b11cd.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_b11cd.dir/src.c.o  -o cmTC_b11cd 
+/usr/bin/ld: CMakeFiles/cmTC_b11cd.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_b11cd.dir/build.make:87: cmTC_b11cd] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_b11cd/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_db314/fast && /usr/bin/make -f CMakeFiles/cmTC_db314.dir/build.make CMakeFiles/cmTC_db314.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_db314.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_db314.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_db314
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_db314.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_db314.dir/src.c.o  -o cmTC_db314 
+/usr/bin/ld: CMakeFiles/cmTC_db314.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_db314.dir/build.make:87: cmTC_db314] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_db314/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_bc8ba/fast && /usr/bin/make -f CMakeFiles/cmTC_bc8ba.dir/build.make CMakeFiles/cmTC_bc8ba.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bc8ba.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_bc8ba.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_bc8ba
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bc8ba.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_bc8ba.dir/src.c.o  -o cmTC_bc8ba 
+/usr/bin/ld: CMakeFiles/cmTC_bc8ba.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_bc8ba.dir/build.make:87: cmTC_bc8ba] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_bc8ba/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_b7d61/fast && /usr/bin/make -f CMakeFiles/cmTC_b7d61.dir/build.make CMakeFiles/cmTC_b7d61.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b7d61.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_b7d61.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b7d61
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b7d61.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_b7d61.dir/src.c.o  -o cmTC_b7d61 
+/usr/bin/ld: CMakeFiles/cmTC_b7d61.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_b7d61.dir/build.make:87: cmTC_b7d61] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_b7d61/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_c7097/fast && /usr/bin/make -f CMakeFiles/cmTC_c7097.dir/build.make CMakeFiles/cmTC_c7097.dir/build
+make[1]: Entering directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c7097.dir/src.c.o
+/usr/bin/cc   -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_c7097.dir/src.c.o   -c /home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_c7097
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c7097.dir/link.txt --verbose=1
+/usr/bin/cc  -std=gnu99 -W -Wall -Wextra -Wredundant-decls -fno-strict-aliasing -fpic -O3 -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_c7097.dir/src.c.o  -o cmTC_c7097 
+/usr/bin/ld: CMakeFiles/cmTC_c7097.dir/src.c.o: in function `main':
+src.c:(.text.startup+0x23): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text.startup+0x2c): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text.startup+0x37): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_c7097.dir/build.make:87: cmTC_c7097] Error 1
+make[1]: Leaving directory '/home/daniel/boolector_build/boolector/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_c7097/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+

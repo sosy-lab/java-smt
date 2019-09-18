@@ -1,0 +1,25 @@
+Compiling
+=========
+
+Compilation of the python module can be enabled by adding the flag '-python' to
+the Boolector configure script call.
+
+./configure -python
+
+Note that all SAT solvers linked against Boolector must be compiled as shared
+library, which can achieved as follows:
+
+* Lingeling configure script:
+  ./configure -fPIC
+
+* PicoSAT configure script:
+  ./configure -shared
+
+* MiniSAT already provides a shared library
+
+Using the module
+================
+
+Ensure that the module can be found by the python interpreter, i.e., set path
+with PYTHONPATH="path/to/module". For examples on how to use the module see
+examples/api/python/api_usage_examples.py.

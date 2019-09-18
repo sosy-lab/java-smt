@@ -1,0 +1,54 @@
+In the following the steps to update or change boolector and its JNI are outlined:
+
+There are 2 files, both located in boolector/src/, that need (potential) editing to compile Boolector with JNI:
+
+-interface_wrap.c 	(containing the JNI interface)
+-CMakeLists.c 		(the cmakefile)
+
+
+MakeFile:
+CMakeLists.c needs to include ALL JNI .c files you want in its set(libboolector_src_files ...) list at the beginning. (interface_wrap.c should be there!)
+Additionally it needs to find the JNI libs and set the path for linking.
+Example:
+
+	find_package(JNI)
+	if(JNI_FOUND)
+  		message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
+  		message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
+  		target_include_directories(boolector PRIVATE ${JNI_INCLUDE_DIRS})
+  		target_link_libraries(boolector ${JNI_LIBRARIES})
+	endif()
+	
+(should be set and ready to go in the provided version of the cmakefile but here is a copy that should be working if copied in directly before the linking of the SAT solvers)
+
+JNI (interface_wrap.c):
+To change or update methods just edit this file! (DON'T CHANGE BOOLECTOR NATIVE CODE!)
+The interface is set up with all C API methods (taken from the interfaces via SWIG, see SWIG part at the end of this) of Boolector.
+Important: every pointer in Boolector is returned to Java via a Jlong. Just use this as a pointer once given back, but cast it properly!
+Be careful, method names need the package in them, see JNI for more details!
+There are multiple helper methods at the very end of the file, do not change them unless you know what you are doing!
+Since Boolector sometimes writes to given objects, we need those to get the information back to Java. (Explanation via comments in the code)
+In case you add new methods, remember to add them to the Java code as well. (Should be BtorJNI.java in the Boolector package)
+
+
+To compile you need to follow these steps EVERY time since Boolector does not save your preferences:
+
+1. (Optional) Download new Boolector/Update Boolector and edit/create JNI interface and cmakefile
+2. Open terminal and switch to the boolector folder (java-smt3-boolector/lib/native/native boolector/boolector)
+3. Set up your build (See https://github.com/Boolector/boolector for more information. Important: do not try to include MiniSAT in a shared lib, it won't compile!(October 2019) But check for updates on this!)
+	Example:
+	./contrib/setup-cadical.sh
+	./contrib/setup-lingeling.sh
+	./contrib/setup-picosat.sh
+	./contrib/setup-btor2tools.sh
+
+4. Build Boolector shared lib (you can add more options if you wish):
+	./configure.sh -fno-strict-aliasing -fpic --shared && cd build && make
+
+5. Your shared lib can be found in boolector/build/lib
+6. Copy it to java-smt3-boolector/lib/native/x86_64-linux/ and override the old lib
+7. Update your JNI Java files
+
+
+If you choose to use SWIG:
+(Careful, you need to check your methods later anyway, SWIG tends to make mistakes. Example: it gives pointers back instead of the object, or a Jlong instead of an Jint etc.)

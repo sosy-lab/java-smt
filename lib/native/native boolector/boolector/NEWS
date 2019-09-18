@@ -1,0 +1,394 @@
+ news since 3.0.0
+--------------------------------------------------------------------------------
++ support for custom abort callback function
+  (called on abort instead of actually aborting)
++ Python API now throws Python exceptions on abort conditions
+  (e.g., when underlying C API is misused)
++ command line options that previously expected integer values denoting enum
+  values are now configured with strings denoting the particular modes that
+  can be selected; -<opt>=help and --<opt>=help allow to print detailed help
+  messages for these modes
++ fixed issue in SMT2 parser to correctly print echo commands
+  (thanks to Dominik Klumpp)
++ patches and documentation for building Boolector on Windows
++ new API calls
+  - boolector_copy_sort
+  - boolector_min_signed
+  - boolector_max_signed
+  - boolector_is_bv_const_zero
+  - boolector_is_bv_const_one
+  - boolector_is_bv_const_ones
+  - boolector_is_bv_const_min_signed
+  - boolector_is_bv_const_max_signed
+
+news for release 3.0.0 since 2.4.1
+--------------------------------------------------------------------------------
++ new build system, requires cmake >= 2.8
+  - setup-*.sh scripts for dependencies (btor2parser, SAT solvers) in contrib
++ support for quantified bit-vectors (BV)
++ new bounded model checker BtorMC
++ support for new format BTOR2
++ support for CaDiCaL as SAT back-end
++ name of the Python module changed to pyboolector
++ SMT2 support for:
+  - echo
+  - declare-const
+  - check-sat-assuming
+  - get-unsat-assumptions
+  - set-option :produce-unsat-assumptions
+  - set-option :produce-assertions
+  - set-logic ALL
++ new API calls
+  - boolector_constd
+  - boolector_consth
+  - boolector_copyright
+  - boolector_exists
+  - boolector_forall
+  - boolector_get_failed_assumptions
+  - boolector_repeat
+  - boolector_pop
+  - boolector_push
+  - boolector_version
++ removed obsolete API calls
+  - boolector_set_sat_solver_lingeling
+  - boolector_set_sat_solver_minisat
+  - boolector_set_sat_solver_picosat
++ changes in API calls
+  - boolector_srl, boolector_sll and boolector_sra now supports operands with
+    the same bit-width (SMT-LIB v2 compatible)
++ various improvements and extensions of btormbt
+
+news for release 2.4.1 since 2.4.0
+--------------------------------------------------------------------------------
++ sequential portfolio combination of bit-blasting and SLS engine
+  (option --fun:presls) analogous to combination with PROP engine
+  (option --fun:preprop)
++ fixed: dumping smt2 nodes in incremental mode
+
+news for release 2.4.0 since 2.3.1
+--------------------------------------------------------------------------------
++ refactored, extended and improved btormbt
++ new API functions:
+  - boolector_is_uf
++ dumping smt2 nodes in incremental mode is now also possible if Boolector
+  compiled with assertions
++ fixed another issue with get-value
+  (thanks to Praveen Gundaram)
++ refactored model printing
++ command line option changes:
+  - --incremental-all -> --incremental-smt1
++ optimized lemma generation of function solver
+
+news for release 2.3.1 since 2.3.0
+--------------------------------------------------------------------------------
+* fixed an issue with model printing (get-value)
+  (thanks to Levent Erkok)
+
+news for release 2.3.0 since 2.2.0
+--------------------------------------------------------------------------------
+* new QF_BV engines
+  + SLS engine
+  + PROP engine
+  + AIGPROP engine
+* fixed an issue with model generation and lambda extraction
+  (thanks to Tim Blazytko)
+* fixed an issue in boolector_int
+  (thanks to Niklas)
+* fixed issue with printing BTOR models
+* improved and extended option handling
+  + boolector_get_opt_val -> boolector_get_opt
+* many under-the-hood changes, refactoring, improvements
+* API changes:
+  + boolector_*_opt* now takes enum BtorOption instead of char* as argument
+  + renamed:
+     - boolector_get_opt_val -> boolector_get_opt
+  + the following functions now take BoolectorSort:
+    instead of int as argument:
+     - boolector_zero,
+     - boolector_ones,
+     - boolector_one,
+     - boolector_int,
+     - boolector_array,
+     - boolector_param
+  + the following functions now return uint32_t instead of int:
+     - boolector_get_width
+     - boolector_get_index_width
+     - boolector_get_fun_arity
+     - boolector_get_opt (was boolector_get_opt_val)
+     - boolector_get_opt_min
+     - boolector_get_opt_max
+     - boolector_get_opt_dflt
+  + the following functions now return bool instead of int:
+     - boolector_is_const
+     - boolector_is_var
+     - boolector_is_array
+     - boolector_is_array_var
+     - boolector_is_param
+     - boolector_is_bound_param
+     - boolector_is_fun
+     - boolector_is_equal_sort
+     - boolector_failed
+  + the following options now return BtorOption instead of const char *
+     - boolector_first_opt
+     - boolector_next_opt
+* new API functions:
+  + boolector_unsigned_int
+  + boolector_get_sort
+  + boolector_fun_get_domain_sort
+  + boolector_fun_get_codomain_sort
+  + boolector_match_node_by_symbol
+  + boolector_is_array_sort
+  + boolector_is_bitvec_sort
+  + boolector_is_fun_sort
+  + boolector_has_opt
+* dumping: new behavior:
+  + boolector_dump_* does not simplify the formula before dumping anymore
+    (call boolector_simplify prior to dumping explicitely if necessary)
+  + when dumping via the CL, the observable dumping behavior did not change
+    (formula is simplified prior to dumping)
+
+news for release 2.2.0 since 2.1.1
+--------------------------------------------------------------------------------
+* refactored a lot of code
+  + refactored and extended btormbt
+  + refactored and improved array/lambda engine
+  + refactored and extended lambda extraction
+* removed SMT1 dumper (parsing SMT1 still supported)
+* fixed push/pop support in SMT2 with model generation enabled
+  (thanks to James Bornholt)
+* fixed an issue with model generation (thanks to Mikoláš Janota)
+* fixed issues with failed assumptions
+* API changes:
+    + boolector_get_bits now requires to free returned bit strings via
+      boolector_free_bits (analogous to boolector_bv_assignment)
+    + removed boolector_dump_smt1 and boolector_dump_smt1_node
+    + removed deprecated functions boolector_enable_model_gen,
+      boolector_generate_model_for_all_reads, boolector_enable_inc_usage,
+      boolector_set_rewrite_level, boolector_set_verbosity,
+      boolector_set_loglevel, boolector_get_symbol_of_var
+
+news for release 2.1.1 since 2.0.7
+--------------------------------------------------------------------------------
+* added support for array extensionality
+* added lambda extraction (enabled by default)
+* added model based testing tools btormbt and btoruntrace
+* reduced memory footprint
+* improved performance of cloning
+* added support for push/pop in SMT-LIBv2 parser
+* added support for :print-success in SMT-LIBv2 parser
+* added support for dumping BV formulas in AIGER format (replaces synthebtor)
+* API changes/additions:
+  + added boolector_fixate_assumptions
+  + added boolector_reset_assumptions
+  + added boolector_dump_aiger_ascii
+  + added boolector_dump_aiger_binary
+  + changed boolector_*_sort
+    - now takes BoolectorSort instead of BoolectorSort* as arguments
+* adpated and updated Python API to support new API
+  - Assert(), Assume(), and Failed() now support variable number of arguments
+
+
+news for release 2.0.7 since 2.0.6
+--------------------------------------------------------------------------------
+* added option to (en|di)sable use of Boolector exit codes
+* fixed help message issues
+* fixed option handling issues
+* fixed caching bug in model generation
+* fixed issues with lambda hashing
+* improved SMT dumpers
+
+news for release 2.0.6 since 2.0.5
+--------------------------------------------------------------------------------
+* fixed printing issues in interactive SMT2 mode
+* SMT2 parser now exits immediately after (exit) command was read
+
+news for release 2.0.5 since 2.0.4
+--------------------------------------------------------------------------------
+* add support for termination callbacks (C and python API)
+* smt2 parser: added option :regular-output-channel
+* fixed smt2 interactivity issues
+* fixed issue in Python API with Python 2.7 compatibility (__div__)
+* fixed segmentation fault in SMT2 model printer
+
+news for release 2.0.4 since 2.0.3
+--------------------------------------------------------------------------------
+* fixed bug in compare function for pointer hashing
+* fixed performance issues when computing scores for don't care reasoning
+* added smt2 models (get-value, get-model)
+* fixed some issues in the Python API (thanks to Ryan Goulden)
+* improved dumping of SMT2 formulas
+
+news for release 2.0.3 since 2.0.1
+--------------------------------------------------------------------------------
+* fixed segmentation fault in back annotation for 'synthebtor'
+* reenabled verbosity output for SAT solvers during search
+* removed stale empty lines in triple verbose output
+* fixed compilation issues with gcc/g++ 4.4
+
+news for release 2.0.1 since 2.0.0
+--------------------------------------------------------------------------------
+* fixes bug in model generation
+
+news for release 2.0.0 since 1.6.0
+--------------------------------------------------------------------------------
+* General:
+  + Boolector python API
+  + cloning support
+  + support for uninterpreted functions
+  + new improved model generation, supports two modes now:
+    - --model-gen=1 or -m:
+	generate model for all asserted expressions
+	(same as model generation in previous versions)
+    - --model-gen=2 or -m -m:
+	generate model for all created expressions
+  + fixed several rewriting bugs
+  + refactored a lot of code
+  + new output format for models
+* Optimizations:
+  + re-enabled and fixed unconstrained optimization
+  + don't care reasoning on bit vector skeleton
+    - dual propagation optimization
+    - justification optimization
+* API changes:
+  + API functions return node of type BoolectorNode instead of BtorNode
+  + new option handling
+    + can be set via environment variables
+    + set options via boolector_set_opt
+  + new options
+    - for a complete list of options please refer to the documentation of
+      boolector_set_opt
+  + deprecated functions:
+    - boolector_get_symbol_of_var
+      -> use boolector_get_symbol (...)
+    the following functions are obsolete with boolector_set_opt
+    - boolector_enable_model_gen
+      -> use boolector_set_opt ("model_gen", 1)
+    - boolector_generate_model_for_all_reads
+      -> use boolector_set_opt ("model_gen", 2)
+    - boolector_enable_inc_usage
+      -> use boolector_set_opt ("incremental", 1)
+    - boolector_set_rewrite_level
+      -> use boolector_set_opt ("rewrite_level", ...)
+    - boolector_set_verbosity
+      -> use boolector_set_opt ("verbosity", ...)
+    - boolector_set_loglevel
+      -> use boolector_set_opt ("loglevel", ...)
+  + new API functions to create uninterpreted functions
+    - boolector_uf
+    - boolector_bool_sort
+    - boolector_bitvec_sort
+    - boolector_fun_sort
+  + limited boolector_sat calls
+    - set lemmas on demand limit
+    - set conflict limit for SAT solver
+* Notes:
+  + If uninterpreted functions occur in the formula it is not possible to
+    dump the formula to BTOR 1.2 format (this will be fixed with BTOR 2.0).
+
+news for release 1.6.0 since 1.5.119
+--------------------------------------------------------------------------------
+* extensionality support disabled
+* support for macros and lambdas
+* model based testing 'btormbt'
+* API tracing and untracing with 'btoruntrace'
+* improved quality of SMT2 parse error messages
+* added missing semantic checks in SMT2 parser
+
+news for release 1.5.119 since 1.5.118
+--------------------------------------------------------------------------------
+* fixed '{boolector,btor}_set_sat_solver
+  (if MiniSAT and/or PicoSAT are not not enabled at compile time)
+
+news for release 1.5.118 since 1.5.116
+--------------------------------------------------------------------------------
+* '--solver=...' command line option and 'boolector_set_sat_solver'
+* delayed Lingeling preprocessing using 'simpdelay'
+
+news for release 1.5.116 since 1.5.115
+--------------------------------------------------------------------------------
+* examples compilable again
+* fixed assertions in 'booolector.c'
+* support for new reentrant PicoSAT API (since PicoSAT version 953)
+
+news for release 1.5.115 since 1.5.13
+--------------------------------------------------------------------------------
+* added 'bvcomp'
+* boolean top-level skeleton simplification
+* use of 'lglclone' in incremental mode
+* added some more rewriting
+* removed 3VL code
+* removed PrecoSAT, basicbtor
+* in-depth, look-ahead, interval
+* incremental SMTLIB1 interface
+* added MiniSAT support
+* rebuilding AIGs / Expressions
+* more compact SMTLIB1 parsing
+* symbolic lemmas instead of direct CNF encoding
+* more compact AIG to CNF translation
+* gzip/bzip2/7z compressed input files
+* time out option
+* SMTLIB 2 support
+
+news for release 1.5.13 since 1.4.1
+--------------------------------------------------------------------------------
+* new incremental mode for multiple formulas in SMT benchmarks
+* integration of MiniSAT
+* SMT parser demotes logic if possible
+* better control of best suitable solver in main application
+* generic incremental SAT glue logic
+* integration of Lingeling
+
+news for release 1.4.1 since 1.4
+--------------------------------------------------------------------------------
+* MacOS port
+* disabled unconstrained optimization
+
+news for release 1.4 since 1.3
+--------------------------------------------------------------------------------
+* hid API change in 'picosat_add' for older version of PicoSAT
+* fixed EOF issue reading an empty file from stdin
+* removed old license references
+
+news for release 1.3 since 1.2
+--------------------------------------------------------------------------------
+* first source code release
+* fixed a rewriting bug by uncommenting simplification code
+
+news for release 1.2 since 1.1
+--------------------------------------------------------------------------------
+* improved rewriting
+* PrecoSAT now standard solver for non-incremental usage,
+  PicoSAT used otherwise
+
+news for release 1.1 since 1.0
+--------------------------------------------------------------------------------
+* improved handling of unconstrained variables and arrays
+* improved rewriting engine
+* removed command line switch for refinement limit
+* fixed bug where Boolector could report 'unknown' in regular (non-bmc) mode
+* fixed minor caching problem on AIG layer
+* fixed other bugs
+
+news for release 1.0 since 0.7
+--------------------------------------------------------------------------------
+* public C API
+* documentation and examples
+* improved SMT parser (:formula can now be an fvar).
+
+news for release 0.7 since 0.6
+--------------------------------------------------------------------------------
+* fixed model generation bugs
+* improved under-approximation
+* added support for bvcomp (SMT-LIB)
+
+news for release 0.6 since 0.5
+--------------------------------------------------------------------------------
+* fixed model generation bugs
+* fixed rewriting bug
+* support for new under-approximation techniques
+
+news for release 0.5 since 0.4
+--------------------------------------------------------------------------------
+* faster model generation
+* support for array models
+* support for under-approximation techniques for bit-vector variables and reads
