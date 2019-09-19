@@ -49,7 +49,7 @@ abstract class Yices2Formula implements Formula {
   // TODO Check if size is sufficient
   @Override
   public final String toString() {
-    return yices_term_to_string(yicesTerm, 80, 10, 0);
+    return yices_term_to_string(yicesTerm, 800, 1, 0);
   }
 
   @Override

@@ -19,13 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_leq0_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ceil;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_division;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_floor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -57,8 +54,30 @@ public class Yices2IntegerFormulaManager extends
 
   @Override
   public Integer divide(Integer pParam1, Integer pParam2) {
-    final int div = yices_division(pParam1, pParam2);
-    return yices_ite(yices_arith_leq0_atom(pParam2), yices_ceil(div), yices_floor(div));
+    // final int div = yices_division(pParam1, pParam2);
+    // TODO Check if this retruns correct values
+    return yices_idiv(pParam1, pParam2);// yices_division(pParam1, pParam2); //
+                                        // yices_ite(yices_arith_leq0_atom(pParam2),
+                                             // yices_ceil(div), yices_floor(div));
+  }
+
+  @Override
+  protected Integer modularCongruence(Integer pNumber1, Integer pNumber2, BigInteger pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, pModulo.toString());
+  }
+
+  @Override
+  protected Integer modularCongruence(Integer pNumber1, Integer pNumber2, long pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, Long.toString(pModulo));
+  }
+
+  protected Integer modularCongruence0(Integer pNumber1, Integer pNumber2, String pModulo) {
+    // ((_ divisible n) x) <==> (= x (* n (div x n)))
+    int mod = makeNumberImpl(pModulo);
+    int sub = subtract(pNumber1, pNumber2);
+    int div = divide(sub, mod);
+    int mul = multiply(mod, div);
+    return equal(sub, mul);
   }
 
 }

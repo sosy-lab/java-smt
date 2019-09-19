@@ -20,16 +20,42 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BOOL_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ASHR;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_DIV;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_GE_ATOM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_LSHR;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_REM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SDIV;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SGE_ATOM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SHL;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SREM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_DISTINCT_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_FLOOR;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IDIV;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ITE_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_POWER_PRODUCT;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_RDIV;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_SELECT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UNINTERPRETED_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_VARIABLE;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_XOR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
@@ -43,8 +69,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_int;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_real;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
@@ -65,6 +93,7 @@ import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2IntegerFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2RationalFormula;
 
 public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
+
 
   protected Yices2FormulaCreator(long env) {
     super(
@@ -162,12 +191,14 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       return FormulaType.getBitvectorTypeWithSize(yices_term_bitsize(pFormula));
     }
     // TODO add type info
-    throw new IllegalArgumentException("Unknown formula type ");
+    throw new IllegalArgumentException(
+        "Unknown formula type: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 10, 0));
   }
 
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     // TODO Auto-generated method stub
+    System.out.println(yices_term_to_string(pF, 100, 10, 0));
     int arity = yices_term_num_children(pF);
     int constructor = yices_term_constructor(pF);
     switch (constructor) {
@@ -180,45 +211,49 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_ARITH_CONST:
         return pVisitor.visitConstant(pFormula, convertValue(pF));
       case YICES_BV_CONST:
-        return null;
+        // TODO Implement BV Value
+        return pVisitor.visitConstant(pFormula, convertValue(pF));
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
-        final String name = yices_get_term_name(pF);
-        if (arity == 0 && name.startsWith("'")) {
-          // symbols starting with "'" are missed as constants, but seen as functions of type OTHER
-          return pVisitor.visitFreeVariable(pFormula, name);
+        String name = yices_get_term_name(pF);
+        // TODO
+        FunctionDeclarationKind kind = getDeclarationKind(pF);
+        if (name == null) {
+          if (kind.toString() != null) {
+            name = kind.toString();
+          } else {
+            throw new NullPointerException("FunctionDeclarationKind.toString() was NULL");
+          }
         }
+        System.out.println("Parent: " + name);
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        for (int i = 0; i < arity; i++) {
+        int i = 0;
+        // if(kind == FunctionDeclarationKind.UF) {
+        // int fun = yices_term_child(pF, 0);
+        // name = yices_get_term_name(fun);
+        // i = 1;
+        // }
+        for (; i < arity; i++) {
           int arg = yices_term_child(pF, i);
-          // TODO First child is function?
+          System.out.println("?????????");
+          System.out.println("Child: " + yices_term_to_string(arg, 100, 10, 0));
+          System.out.println("?????????");
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
         }
-        // TODO name is NULL although it should not be
         return pVisitor.visitFunction(
             pFormula,
             args.build(),
             FunctionDeclarationImpl.of(
                 name,
-                getDeclarationKind(pF),
+                kind,
                 argTypes.build(),
                 getFormulaType(pF),
                 yices_term_constructor(pF))); // decl == term_constructor?
     }
-    // if (yices_term_is_arithmetic(pF)) {
-    // return pVisitor.visitConstant(pFormula, convertValue(pF));
-    // // check if pF is bool_const TODO replace 0 with Named variable
-    // } else if (yices_term_constructor(pF) == 0) {
-    // if (yices_bool_const_value(pF)) {
-    // return pVisitor.visitConstant(pFormula, true);
-    // } else {
-    // return pVisitor.visitConstant(pFormula, false);
-    // }
-    // } else if (yices_)
   }
 
   private FunctionDeclarationKind getDeclarationKind(int pF) {
@@ -235,42 +270,115 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         .contains(constructor) : "Variables should be handled somewhere else";
 
     switch (constructor) {
-      case 1:
-        return null;
+      case YICES_ITE_TERM:
+        return FunctionDeclarationKind.ITE;
+      case YICES_APP_TERM:
+        return FunctionDeclarationKind.UF; // TODO correct?
+      case YICES_EQ_TERM:
+        return FunctionDeclarationKind.EQ; // Covers all equivalences
+      case YICES_DISTINCT_TERM:
+        return FunctionDeclarationKind.DISTINCT;
+      case YICES_NOT_TERM:
+        return FunctionDeclarationKind.NOT;
+      case YICES_OR_TERM:
+        return FunctionDeclarationKind.OR;
+      case YICES_XOR_TERM:
+        return FunctionDeclarationKind.XOR;
+      case YICES_BV_DIV:
+        return FunctionDeclarationKind.BV_UDIV;
+      case YICES_BV_REM:
+        return FunctionDeclarationKind.BV_UREM;
+      case YICES_BV_SDIV:
+        return FunctionDeclarationKind.BV_SDIV;
+      case YICES_BV_SREM:
+        return FunctionDeclarationKind.BV_SREM;
+      case YICES_BV_SHL:
+        return FunctionDeclarationKind.BV_SHL;
+      case YICES_BV_LSHR:
+        return FunctionDeclarationKind.BV_LSHR;
+      case YICES_BV_ASHR:
+        return FunctionDeclarationKind.BV_ASHR;
+      case YICES_BV_GE_ATOM:
+        return FunctionDeclarationKind.BV_UGE;
+      case YICES_BV_SGE_ATOM:
+        return FunctionDeclarationKind.BV_SGE;
+      case YICES_ARITH_GE_ATOM:
+        return FunctionDeclarationKind.GTE;
+      case YICES_FLOOR:
+        return FunctionDeclarationKind.FLOOR;
+      case YICES_RDIV:
+        return FunctionDeclarationKind.DIV;
+      case YICES_IDIV:
+        return FunctionDeclarationKind.DIV; // correct?
+      case YICES_SELECT_TERM:
+        return FunctionDeclarationKind.SELECT;
+      case YICES_BV_SUM:
+        return FunctionDeclarationKind.BV_ADD;
+      case YICES_ARITH_SUM:
+        return FunctionDeclarationKind.ADD;
+      case YICES_POWER_PRODUCT:
+        return FunctionDeclarationKind.MUL;
+
       default:
-        return null;
+        System.out.println("Encountered term constructor:" + constructor);
+        return FunctionDeclarationKind.OTHER;
     }
   }
 
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
     // TODO Auto-generated method stub
-    return null;
+    System.out.println("----------");
+    System.out.println(yices_term_to_string(pDeclaration, 100, 10, 0));
+    System.out
+        .println("Type: " + yices_type_to_string(yices_type_of_term(pDeclaration), 100, 10, 0));
+    int size = pArgs.size();
+    int[] argArray = new int[size];
+    for (int i = 0; i < size; i++) {
+      argArray[i] = pArgs.get(i);
+      System.out.println(yices_term_to_string(argArray[i], 100, 10, 0));
+    }
+    System.out.println("----------");
+    int app = yices_application(pDeclaration, size, argArray);
+    System.out.println("APP" + yices_term_to_string(app, 100, 10, 0));
+    return app;
   }
 
   @Override
   public Integer declareUFImpl(String pName, Integer pReturnType, List<Integer> pArgTypes) {
     // TODO Auto-generated method stub
-    return null;
+    int size = pArgTypes.size();
+    int[] argTypeArray = new int[size];
+    for (int i = 0; i < size; i++) {
+      argTypeArray[i] = pArgTypes.get(i);
+    }
+    final int yicesFuncType;
+    if (pArgTypes.isEmpty()) {
+      // a nullary function is a plain symbol (variable)
+      yicesFuncType = pReturnType;
+    } else {
+      yicesFuncType = yices_function_type(size, argTypeArray, pReturnType);
+    }
+    return yices_named_variable(yicesFuncType, pName);
   }
 
   @Override
   protected Integer getBooleanVarDeclarationImpl(Integer pTFormulaInfo) {
-    // TODO Auto-generated method stub
+    // TODO Unsure what to return here
     return null;
   }
 
   // TODO Pretty print type / term
   private Object parseNumeralValue(Integer pF, FormulaType<?> type) {
     if (yices_term_constructor(pF) == YICES_ARITH_CONST) {
-    String value = yices_rational_const_value(pF);
-    if (type.isRationalType() && value.contains("/")) {
-      return Rational.of(value);
-    } else if (type.isIntegerType() && !value.contains("/")) {
-      return new BigInteger(value);
-    } else {
-      throw new IllegalArgumentException("Unexpected type: " + type);
-    }
+      String value = yices_rational_const_value(pF);
+      if (type.isRationalType()) {
+        return Rational.of(value);
+      } else if (type.isIntegerType() && !value.contains("/")) {
+        return new BigInteger(value);
+      } else {
+        throw new IllegalArgumentException("Unexpected type: " + type);
+      }
     } else {
       throw new IllegalArgumentException("Term: " + pF + " is not an arithmetic constant");
     }
@@ -279,9 +387,15 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   private BigInteger parseBitvector(Integer pF) {
     if (yices_term_constructor(pF) == YICES_BV_CONST) {
       int[] littleEndianBV = yices_bv_const_value(pF, yices_term_bitsize(pF));
-      String littleEndianString = littleEndianBV.toString();
-      String bigEndianString = new StringBuilder(littleEndianString).reverse().toString();
-      return new BigInteger(bigEndianString);
+      String bigEndianBV = "";
+      for (int i = littleEndianBV.length - 1; i >= 0; i--) {
+        bigEndianBV = bigEndianBV + littleEndianBV[i];
+      }
+      if (bigEndianBV != "") {
+        return new BigInteger(bigEndianBV, 2);
+      } else {
+        throw new IllegalArgumentException("BV was empty");
+      }
     } else {
       throw new IllegalArgumentException("Term: " + pF + " is not a bitvector constant");
     }
@@ -299,7 +413,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     } else if (type.isBitvectorType()) {
       return parseBitvector(pF);
     } else {
-      throw new IllegalArgumentException("Unexpected type: " + type);
+      throw new IllegalArgumentException(
+          "Unexpected type: " + yices_type_to_string(yices_type_of_term(pF), 100, 1, 0));
     }
   }
 

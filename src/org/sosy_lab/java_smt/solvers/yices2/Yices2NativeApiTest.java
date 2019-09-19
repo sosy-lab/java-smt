@@ -23,53 +23,68 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_eq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_gt_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvand2;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_one;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bveq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_disable_option;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_major_version;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_patch_level;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_model;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_version;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_uninterpreted_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational32;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bool;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Set;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -77,6 +92,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 @SuppressWarnings({"unused"})
 public class Yices2NativeApiTest {
@@ -108,16 +126,6 @@ public class Yices2NativeApiTest {
   public void freeEnvironment() {
     yices_free_context(env);
     yices_exit();
-  }
-
-  @Test
-  public void checkVersion() {
-    int version = yices_get_version();
-    assertEquals(2, version);
-    int majorVersion = yices_get_major_version();
-    assertEquals(6, majorVersion);
-    int patchlevel = yices_get_patch_level();
-    assertEquals(1, patchlevel);
   }
 
   @Test
@@ -262,14 +270,38 @@ public class Yices2NativeApiTest {
   public void rationalValueTest() {
     int num = 35975;
     int den = 1234567890;
+    int negativeNum = -50;
+    int negativeDen = -30000;
     BigInteger largeNumber = BigInteger.valueOf(2).pow(10000);
     int ratConst = yices_rational32(num, den);
+    int negativeNumConst = yices_parse_rational(negativeNum + "/" + den);
+    int negativeDenConst = yices_parse_rational(num + "/" + negativeDen);
+    int negativeNumDenConst = yices_parse_rational(negativeNum + "/" + negativeDen);
     int bigConst = yices_parse_rational(largeNumber.toString());
     Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
     assertEquals(creator.convertValue(ratConst), Rational.of(num + "/" + den));
     assertEquals(creator.convertValue(bigConst), largeNumber);
+    assertEquals(creator.convertValue(negativeNumConst), Rational.of(negativeNum + "/" + den));
+    assertEquals(creator.convertValue(negativeDenConst), Rational.of(num + "/" + negativeDen));
+    assertEquals(
+        creator.convertValue(negativeNumDenConst),
+        Rational.of(negativeNum + "/" + negativeDen));
   }
 
+  @Test
+  public void bvValueTest() {
+    int value = 14;
+    int bv = yices_bvconst_int64(4, value);
+    if (yices_term_constructor(bv) == YICES_BV_CONST) {
+      int[] littleEndianBV = yices_bv_const_value(bv, yices_term_bitsize(bv));
+      String bigEndianBV = "";
+      for (int i = littleEndianBV.length - 1; i >= 0; i--) {
+        bigEndianBV = bigEndianBV + littleEndianBV[i];
+      }
+      BigInteger big = new BigInteger(bigEndianBV, 2);
+      assertEquals(BigInteger.valueOf(value), big);
+    }
+  }
   @Test
   public void termNaming() {
     int t = yices_parse_bvbin("0100100001100101011011000110110001101111");
@@ -300,21 +332,20 @@ public class Yices2NativeApiTest {
 
   @Test
   public void termConstructorAnd() {
+    // and 1 2 is replaced with not (or (not 1) (not 2))
     int Btrue = yices_new_uninterpreted_term(yices_bool_type());// yices_true();
     yices_set_term_name(Btrue, "Btrue");
     int Btwo = yices_new_uninterpreted_term(yices_bool_type());
     yices_set_term_name(Btwo, "Btwo");
     int and = yices_and2(Btrue, Btwo);
+    int children = yices_term_num_children(and);
+    int child = yices_term_child(and, 0);
+    assertEquals(yices_term_constructor(child), YICES_OR_TERM);
+    children = yices_term_num_children(child);
+    assertEquals(children, 2);
+    System.out.println(yices_term_to_string(child, 100, 1, 0));
     assertEquals(yices_term_to_string(and, 80, 10, 0), "(and Btrue Btwo)");
-    assertEquals(yices_term_constructor(and), -1);
-    /*
-     * There is no Value for a YICES_AND_TERM If Btrue and Btwo are both uninterpreted terms
-     * term_constructor is YICES_OR_TERM/YICES_NOT_TERM? If Btrue is yices_true() and Btwo is
-     * uninterpreted_term Result is UNINTERPRETED_TERM --> Likely simplified as Result is only
-     * dependent on Btwo
-     */
-
-    // Result is YICES_UNINTERPRETED_TERM. But normal variables are also UNINTERPRETED_TERM
+    assertEquals(yices_term_constructor(and), YICES_NOT_TERM);
   }
 
   @Test
@@ -330,5 +361,83 @@ public class Yices2NativeApiTest {
     // Works after changing something?
   } // Expecting YICES_OR_TERM as constructor but getting YICES_UNINTERPRETED_TERM
 
+  @Test
+  public void termConstructorNot() {
+    int Btrue = yices_new_uninterpreted_term(yices_bool_type());// yices_true();
+    yices_set_term_name(Btrue, "Btrue");
+    int Btwo = yices_new_uninterpreted_term(yices_bool_type());
+    yices_set_term_name(Btwo, "Btwo");
+    int not = yices_not(Btrue);
+    assertEquals(yices_term_constructor(not), YICES_NOT_TERM);
+  }
 
+  @Test
+  public void modularCongruence() {
+    int pNumber1 = yices_int32(9);
+    int pNumber2 = yices_int32(5);
+    int mod = yices_int32(4);
+    int subTerm = yices_sub(pNumber1, pNumber2);
+    int div = yices_idiv(subTerm, mod);
+    int mul = yices_mul(mod, div);
+    int eq = yices_arith_eq_atom(subTerm, mul);
+    assertTrue(yices_true() == eq);
+  }
+
+  @Test
+  public void orSimplification() {
+    int bTrue = yices_true();
+    int boolType = yices_bool_type();
+    int[] orArray = new int[20];
+    for (int i = 0; i < (orArray.length - 1); i++) {
+      orArray[i] = yices_named_variable(boolType, "x" + i);
+    }
+    orArray[(orArray.length - 1)] = bTrue;
+    int or = yices_or(orArray.length, orArray);
+    assertTrue(yices_true() == or);
+  }
+
+  @Test
+  public void andSimplification() {
+    int bFalse = yices_false();
+    int boolType = yices_bool_type();
+    int[] andArray = new int[20];
+    for (int i = 0; i < (andArray.length - 1); i++) {
+      andArray[i] = yices_named_variable(boolType, "x" + i);
+    }
+    andArray[(andArray.length - 1)] = bFalse;
+    int and = yices_and(andArray.length, andArray);
+    assertTrue(yices_false() == and);
+  }
+
+  @Test
+  public void iffConstructor() {
+    int one = yices_new_uninterpreted_term(yices_bool_type());
+    int two = yices_new_uninterpreted_term(yices_bool_type());
+    int iff = yices_iff(one, two);
+    assertEquals(yices_term_constructor(iff), YICES_EQ_TERM);
+  }
+
+  protected ProverEnvironment
+      newProverEnvironment0(Yices2FormulaCreator creator, Set<ProverOptions> pOptions) {
+    // TODO Auto-generated method stub
+    return new Yices2TheoremProver(creator, pOptions);
+  }
+  @Test
+  public void modelTest() {
+    int varx = yices_named_variable(yices_real_type(), "x");
+    int eq = yices_arith_eq_atom(varx, yices_int32(10));
+    int query = yices_named_variable(yices_real_type(), "x");
+    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    yices_push(env);
+    yices_assert_formula(env, eq);
+    System.out.println("varx: " + varx);
+    System.out.println("query: " + query);
+    if (yices_check_sat(env, 0)) {
+      Model m =
+          new Yices2Model(yices_get_model(env, 1), creator);
+      Object val = m.evaluate(creator.encapsulateWithTypeOf(varx));
+      System.out.println(val);
+      m.close();
+    }
+  }
 }

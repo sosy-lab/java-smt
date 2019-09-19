@@ -1216,7 +1216,9 @@ FREE_TERM_ARRAY_ARG(2)
 FREE_TERM_ARRAY_ARG(3)
 MODEL_RETURN
 
-DEFINE_FUNC(intArray, 1model_1collect_1defined_1terms) WITH_ONE_ARG(jmodel)
+//1model_1collect_1defined_1terms
+
+DEFINE_FUNC(jtermArray, 1def_1terms) WITH_ONE_ARG(jmodel)
 MODEL_ARG(1)
 TERM_VECTOR_ARG(2)
 VOID_CALL2_WITH_RETURN(model_collect_defined_terms)
@@ -1290,6 +1292,19 @@ CALL3(int, formulas_true_in_model)
 FREE_TERM_ARRAY_ARG(3)
 INT_RETURN
 
+DEFINE_FUNC(intArray, 1get_1value) WITH_TWO_ARGS(jmodel, jterm)
+MODEL_ARG(1)
+TERM_ARG(2)
+YVAL_ARG(3)
+CALL3(int, get_value)
+YVAL_RETURN(3)
+
+DEFINE_FUNC(jterm, 1get_1value_1as_1term) WITH_TWO_ARGS(jmodel, jterm)
+MODEL_ARG(1)
+TERM_ARG(2)
+CALL2(term_t, get_value_as_term)
+TERM_RETURN
+
 /*
  * TERM NAMING and PRINTING
  */
@@ -1306,6 +1321,12 @@ TERM_ARG(1)
 CALL1(const char *, get_term_name)
 STRING_RETURN
 
+DEFINE_FUNC(jterm, 1get_1term_1by_1name) WITH_ONE_ARG(string)
+STRING_ARG(1)
+CALL1(term_t, get_term_by_name)
+FREE_STRING_ARG(1)
+TERM_RETURN
+
 //Creates String that needs to be freed
 DEFINE_FUNC(string, 1term_1to_1string) WITH_FOUR_ARGS(jterm, int, int ,int)
 TERM_ARG(1)
@@ -1315,7 +1336,21 @@ UINT32_ARG(4)
 CALL4(char *, term_to_string)
 STRING_RETURN
 
+DEFINE_FUNC(string, 1type_1to_1string) WITH_FOUR_ARGS(jtype, int, int ,int)
+TYPE_ARG(1)
+UINT32_ARG(2)
+UINT32_ARG(3)
+UINT32_ARG(4)
+CALL4(char *, type_to_string)
+STRING_RETURN
 
+DEFINE_FUNC(string, 1model_1to_1string) WITH_FOUR_ARGS(jmodel, int, int ,int)
+MODEL_ARG(1)
+UINT32_ARG(2)
+UINT32_ARG(3)
+UINT32_ARG(4)
+CALL4(char *, model_to_string)
+STRING_RETURN
 /*
  * Functions for version checking
  */

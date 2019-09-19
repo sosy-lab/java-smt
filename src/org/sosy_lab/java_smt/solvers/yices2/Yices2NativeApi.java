@@ -93,6 +93,19 @@ class Yices2NativeApi {
 
   // products
   public static final int YICES_POWER_PRODUCT = 42; // power products: (t1^d1 * ... * t_n^d_n)
+
+  /*
+   * Yices model tags
+   */
+  public static final int YVAL_UNKNOWN = 0;
+  public static final int YVAL_BOOL = 1;
+  public static final int YVAL_RATIONAL = 2;
+  public static final int YVAL_ALGEBRAIC = 3;
+  public static final int YVAL_BV = 4;
+  public static final int YVAL_SCALAR = 5;
+  public static final int YVAL_TUPLE = 6;
+  public static final int YVAL_FUNCTION = 7;
+  public static final int YVAL_MAPPING = 8;
   // TODO !!!!Prevent passing negative values to unsigned arguments!!!!
 
   /*
@@ -671,13 +684,35 @@ class Yices2NativeApi {
 
   public static native long yices_get_model(long ctx, int keepSubst);
 
+  public static native long yices_model_from_map(int size, int[] var, int[] constant);
+
+  /*
+   * renamed collect_defined_terms to def_terms as it caused an UnsatisfiedLinkError for some reason
+   */
+  public static native int[] yices_def_terms(long model);// collect_defined_terms(long model);
+
   public static native void yices_free_model(long model);
+
+  public static native long yices_get_int64_value(long m, int t);
+
+  /**
+   * Value as Array [node_id, node_tag]
+   */
+  public static native int[] yices_get_value(long m, int t);
+
+
+  /**
+   * Value as Yices term
+   */
+  public static native int yices_get_value_as_term(long m, int t);
   /*
    * TERM NAMING TODO NOT YET IN API
    */
   public static native int yices_set_term_name(int t, String name);
 
   public static native String yices_get_term_name(int t);
+
+  public static native int yices_get_term_by_name(String name);
 
   /**
    * Use to print a term in a readable format. Result will be truncated if height/width of the
@@ -689,7 +724,26 @@ class Yices2NativeApi {
    */
   public static native String yices_term_to_string(int t, int width, int height, int offset);
 
+  public static native String yices_type_to_string(int t, int width, int height, int offset);
+
+  public static native String yices_model_to_string(long m, int width, int height, int offset);
+
   public static int yices_named_variable(int type, String name) {
+    int termFromName = yices_get_term_by_name(name);
+    if (termFromName != -1) {
+      int termFromNameType = yices_type_of_term(termFromName);
+      if (type == termFromNameType) {
+        return termFromName;
+      } else {
+        throw new IllegalArgumentException(
+            "Can't create variable with name "
+                + name
+                + "and type"
+                + yices_type_to_string(type, 100, 1, 0)
+                + ".\nAs it would omit a variable with type: "
+                + yices_type_to_string(termFromNameType, 100, 1, 0));
+      }
+    }
     int var = yices_new_uninterpreted_term(type);// yices_new_variable(type);
     yices_set_term_name(var, name);
     return var;

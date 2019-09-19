@@ -161,6 +161,10 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   term_vector_t *m_arg##num = &s_arg##num; \
   yices_init_term_vector(m_arg##num); \
 
+#define YVAL_ARG(num) \
+  yval_t s_arg##num; \
+  yval_t *m_arg##num = &s_arg##num; \
+
 #define STRUCT_ARRAY_OUTPUT_ARG(num) \
   size_t s_arg##num = 0; \
   size_t *m_arg##num = &s_arg##num;
@@ -323,8 +327,25 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   mpq_clear(m_arg##num); \
   free(mpqValue); \
   return jretval; \
-} \
+}
 
+#define YVAL_RETURN(num) \
+  if(retval == -1) { \
+    const char *msg = yices_error_string(); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+  } \
+  int yval[2]; \
+  yval[0] = s_arg##num.node_id; \
+  yval[1] = s_arg##num.node_tag; \
+  jintArray jretval; \
+  if (!(*jenv)->ExceptionCheck(jenv)) { \
+   jretval = (*jenv)->NewIntArray(jenv, 2); \
+   if(jretval != NULL){ \
+     (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, yval); \
+   } \
+  } \
+  return jretval; \
+}
 /**
  * This assumes that mathsat allocated an array,
  * returned the pointer and stored the size in the argument arg_num

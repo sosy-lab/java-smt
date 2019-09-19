@@ -65,10 +65,32 @@ public class Yices2BooleanFormulaManager
     return yices_and2(pParam1, pParam2);
   }
 
+  // @Override
+  // protected Integer andImpl(Collection<Integer> pParams) {
+  // int size = pParams.size();
+  // int[] paramArray = new int[size];
+  // Iterator<Integer> it = pParams.iterator();
+  // for (int i = 0; i < size; i++) {
+  // paramArray[i] = it.next();
+  // }
+  // return yices_and(size, paramArray);
+  // }
+
   @Override
   protected Integer or(Integer pParam1, Integer pParam2) {
     return yices_or2(pParam1, pParam2);
   }
+
+  // @Override
+  // protected Integer orImpl(Collection<Integer> pParams) {
+  // int size = pParams.size();
+  // int[] paramArray = new int[size];
+  // Iterator<Integer> it = pParams.iterator();
+  // for (int i = 0; i < size; i++) {
+  // paramArray[i] = it.next();
+  // }
+  // return yices_or(size, paramArray);
+  // }
 
   @Override
   protected Integer xor(Integer pParam1, Integer pParam2) {

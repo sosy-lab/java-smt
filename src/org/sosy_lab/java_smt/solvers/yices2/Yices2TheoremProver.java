@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
@@ -31,6 +32,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_pop;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -48,6 +50,7 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
   protected final long curCfg;
+  protected boolean closed = false;
 
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
@@ -59,38 +62,38 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
     yices_set_config(curCfg, "solver-type", "dpllt");
     yices_set_config(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
-    // TODO Currently uses parent environment/context --> Create own environment
+    // TODO config options
   }
 
   @Override
   public void pop() {
-    // TODO Auto-generated method stub
+    Preconditions.checkState(!closed);
     yices_pop(curEnv);
   }
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    // TODO Auto-generated method stub
+    yices_assert_formula(curEnv, creator.extractInfo(pConstraint));
     return null;
   }
 
   @Override
   public void push() {
-    // TODO Auto-generated method stub
+    Preconditions.checkState(!closed);
     yices_push(curEnv);
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
     // ZERO if no params?
+    Preconditions.checkState(!closed);
     return !yices_check_sat(curEnv, 0);
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
+    Preconditions.checkState(!closed);
     int size = pAssumptions.size();
     Iterator<BooleanFormula> iterator = pAssumptions.iterator();
     int[] assumptions = new int[size];
@@ -103,6 +106,7 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
   @Override
   public Model getModel() throws SolverException {
     // TODO Auto-generated method stub
+    Preconditions.checkState(!closed);
     checkGenerateModels();
     return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
   }
@@ -118,6 +122,7 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
   @Override
   public List<BooleanFormula> getUnsatCore() {
     // TODO Auto-generated method stub
+    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     int[] terms = yices_get_unsat_core(curEnv);
     return encapsulate(terms);
@@ -134,8 +139,11 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
   @Override
   public void close() {
     // TODO Auto-generated method stub
-    yices_free_context(curEnv);
-    yices_free_config(curCfg);
+    if (!closed) {
+      yices_free_context(curEnv);
+      yices_free_config(curCfg);
+      closed = true;
+    }
   }
 
   @Override

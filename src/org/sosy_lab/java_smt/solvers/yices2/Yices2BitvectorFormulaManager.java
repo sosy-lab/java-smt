@@ -51,6 +51,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_b
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
@@ -65,12 +67,18 @@ public class Yices2BitvectorFormulaManager
   @Override
   protected Integer makeBitvectorImpl(int pLength, long pParam1) {
     // TODO Check size constraints/ Unsure if correct
-    long max = (long) (Math.pow(2, (pLength - 1)));
-    if (Math.abs(pParam1) > max) {
-      throw new IllegalArgumentException(
-          pParam1
-              + " can not be represented as a signed bv of length "
-              + pLength);
+    if (Long.signum(pParam1) < 0) {
+      long max = (long) (Math.pow(2, (pLength - 1)));
+      if (Math.abs(pParam1) > max) {
+        throw new IllegalArgumentException(
+            pParam1 + " can not be represented as a signed bv of length " + pLength);
+      }
+    } else {
+      long max = (long) (Math.pow(2, (pLength)));
+      if (pParam1 >= max) {
+        throw new IllegalArgumentException(
+            pParam1 + " can not be represented as a signed bv of length " + pLength);
+      }
     }
     int i = (int) pParam1;
     if (i == pParam1) {
@@ -199,7 +207,13 @@ public class Yices2BitvectorFormulaManager
       pI = pI.add(n);
     }
     String bits = pI.toString(2);
+    if (bits.length() > pLength) {
+      bits = bits.substring(bits.length() - pLength, bits.length());
+    } else if (bits.length() < pLength) {
+      bits = Strings.padStart(bits, pLength, '0');
+    }
     // TODO check size of bits against pLength
+    Preconditions.checkArgument(bits.length() == pLength, "Bitvector has unexpected size.");
     return yices_parse_bvbin(bits);
   }
 
@@ -230,7 +244,7 @@ public class Yices2BitvectorFormulaManager
 
   @Override
   protected Integer extract(Integer pNumber, int pMsb, int pLsb, boolean pSigned) {
-    return yices_bvextract(pNumber, pMsb, pLsb);
+    return yices_bvextract(pNumber, pLsb, pMsb);
   }
 
   @Override
