@@ -204,27 +204,21 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     int constructor = yices_term_constructor(pF);
     switch (constructor) {
       case YICES_BOOL_CONST:
-        if (yices_bool_const_value(pF)) {
-          return pVisitor.visitConstant(pFormula, true);
-        } else {
-          return pVisitor.visitConstant(pFormula, false);
-        }
+        return pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
       case YICES_ARITH_CONST:
         return pVisitor.visitConstant(pFormula, convertValue(pF));
       case YICES_BV_CONST:
-        // TODO Implement BV Value
         return pVisitor.visitConstant(pFormula, convertValue(pF));
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
         String name = yices_get_term_name(pF);
-        // TODO
         FunctionDeclarationKind kind = getDeclarationKind(pF);
         if (name == null) {
           if (kind.toString() != null) {
             name = kind.toString();
           } else {
-            throw new NullPointerException("FunctionDeclarationKind.toString() was NULL");
+            throw new AssertionError("cannot determine function name for " + pF);
           }
         }
         System.out.println("Parent: " + name);
@@ -267,7 +261,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             YICES_VARIABLE,
             YICES_UNINTERPRETED_TERM);
     int constructor = yices_term_constructor(pF);
-    assert !constantsAndVariables 
+    assert !constantsAndVariables
         .contains(constructor) : "Variables should be handled somewhere else";
 
     switch (constructor) {
