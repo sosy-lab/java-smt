@@ -32,7 +32,9 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_con
 
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -45,20 +47,27 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private final long yicesEnvironment;
   private final long yicesConfig;
   private final Yices2FormulaCreator creator;
+  private final BooleanFormulaManager bfmgr;
+  private final ShutdownNotifier shutdownManager;
 
   public Yices2SolverContext(
       FormulaManager pFmgr,
       long yicesConfig,
       long yicesEnvironment,
-      Yices2FormulaCreator creator) {
+      Yices2FormulaCreator creator,
+      BooleanFormulaManager pBfmgr,
+      ShutdownNotifier pShutdownManager) {
     super(pFmgr);
     // TODO Auto-generated constructor stub
     this.yicesConfig = yicesConfig;
     this.yicesEnvironment = yicesEnvironment;
     this.creator = creator;
+    bfmgr = pBfmgr;
+    shutdownManager = pShutdownManager;
   }
 
-  public static Yices2SolverContext create(NonLinearArithmetic pNonLinearArithmetic) {
+  public static Yices2SolverContext create(
+      NonLinearArithmetic pNonLinearArithmetic, ShutdownNotifier pShutdownManager) {
     NativeLibraries.loadLibrary("yices2j");
     yices_init();
     long yicesConf = yices_new_config();
@@ -86,7 +95,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
             integerTheory,
             rationalTheory,
             bitvectorTheory);
-    return new Yices2SolverContext(manager, yicesConf, yicesEnv, creator);
+    return new Yices2SolverContext(
+        manager, yicesConf, yicesEnv, creator, booleanTheory, pShutdownManager);
   }
   @Override
   public String getVersion() {
@@ -112,8 +122,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    // TODO Auto-generated method stub
-    return new Yices2TheoremProver(creator, pOptions);
+    return new Yices2TheoremProver(creator, pOptions, bfmgr, shutdownManager);
   }
 
   @Override

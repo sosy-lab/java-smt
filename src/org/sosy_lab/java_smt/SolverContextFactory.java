@@ -218,7 +218,7 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
-        return Yices2SolverContext.create(nonLinearArithmetic);
+        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier);
 
       default:
         throw new AssertionError("no solver selected");

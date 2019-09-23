@@ -40,22 +40,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
-class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironment {
+import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+
+class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
   protected final long curCfg;
-  protected boolean closed = false;
 
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
-      Set<ProverOptions> pOptions) {
-    super(pOptions);
+      Set<ProverOptions> pOptions,
+      BooleanFormulaManager pBmgr,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pOptions, pBmgr, pShutdownNotifier);
     this.creator = creator;
     // TODO get settings from SolverContext
     curCfg = yices_new_config();
@@ -63,6 +67,10 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
     yices_set_config(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
     // TODO config options
+  }
+
+  boolean isClosed() {
+    return closed;
   }
 
   @Override
@@ -108,7 +116,7 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
     // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
+    return getModelWithoutChecks();
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
@@ -147,10 +155,7 @@ class Yices2TheoremProver extends AbstractProver<Void> implements ProverEnvironm
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
-    return null;
+  protected Model getModelWithoutChecks() {
+    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
   }
-
 }

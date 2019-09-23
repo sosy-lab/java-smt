@@ -80,7 +80,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   protected ImmutableList<ValueAssignment> toList() {
     // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     List<Integer> complex = ImmutableList.of(YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN);
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int[] termsInModel = yices_def_terms(model);
