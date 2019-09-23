@@ -1351,6 +1351,13 @@ UINT32_ARG(3)
 UINT32_ARG(4)
 CALL4(char *, model_to_string)
 STRING_RETURN
+
+DEFINE_FUNC(jterm, 1parse_1term) WITH_ONE_ARG(string)
+STRING_ARG(1)
+CALL1(term_t, parse_term)
+FREE_STRING_ARG(1)
+TERM_RETURN
+
 /*
  * Functions for version checking
  */

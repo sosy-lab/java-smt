@@ -705,9 +705,7 @@ class Yices2NativeApi {
    * Value as Yices term
    */
   public static native int yices_get_value_as_term(long m, int t);
-  /*
-   * TERM NAMING TODO NOT YET IN API
-   */
+
   public static native int yices_set_term_name(int t, String name);
 
   public static native String yices_get_term_name(int t);
@@ -727,6 +725,11 @@ class Yices2NativeApi {
   public static native String yices_type_to_string(int t, int width, int height, int offset);
 
   public static native String yices_model_to_string(long m, int width, int height, int offset);
+
+  /**
+   * Parse Term in SMT-Lib2 / Yices input language
+   */
+  public static native int yices_parse_term(String t);
 
   public static int yices_named_variable(int type, String name) {
     int termFromName = yices_get_term_by_name(name);

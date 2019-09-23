@@ -113,8 +113,10 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     System.out
         .println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
     Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    // TODO reenable Preconditions.checkState(!prover.closed, "cannot use model after prover is
+    // closed");
     int[] yval = yices_get_value(model, pFormula);
+    System.out.println("Yval id is: " + yval[0]);
     System.out.println("Yval tag is: " + yval[1]);
     int val = yices_get_value_as_term(model, pFormula);
     if (val == -1) {

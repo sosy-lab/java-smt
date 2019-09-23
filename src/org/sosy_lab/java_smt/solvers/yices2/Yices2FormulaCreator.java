@@ -374,7 +374,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       String value = yices_rational_const_value(pF);
       if (type.isRationalType()) {
         return Rational.of(value);
-      } else if (type.isIntegerType() && !value.contains("/")) {
+      } else if (type.isIntegerType()) {
         return new BigInteger(value);
       } else {
         throw new IllegalArgumentException("Unexpected type: " + type);
