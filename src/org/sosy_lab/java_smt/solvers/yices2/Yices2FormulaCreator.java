@@ -59,6 +59,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_functio
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
@@ -201,8 +202,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
-    System.out.println(yices_term_to_string(pF, 100, 10, 0));
-    int arity = yices_term_num_children(pF);
     int constructor = yices_term_constructor(pF);
     switch (constructor) {
       case YICES_BOOL_CONST:
@@ -214,44 +213,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
-        String name = yices_get_term_name(pF);
-        FunctionDeclarationKind kind = getDeclarationKind(pF);
-
-        if (kind == FunctionDeclarationKind.AND) {
-          if (isNestedConjunction(pF)) {
-            ImmutableList.Builder<Formula> args = ImmutableList.builder();
-            ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-            for (int arg : getNestedConjunctionArgs(pF)) {
-              args.add(encapsulateBoolean(arg));
-              argTypes.add(FormulaType.BooleanType);
-            }
-            return pVisitor.visitFunction(
-                pFormula,
-                args.build(),
-                FunctionDeclarationImpl.of(
-                    FunctionDeclarationKind.AND.toString(),
-                    kind,
-                    argTypes.build(),
-                    getFormulaType(pF),
-                    constructor));
-          }
-        }
-
-        if (name == null) {
-          if (kind.toString() != null) {
-            name = kind.toString();
-          } else {
-            throw new AssertionError("cannot determine function name for " + pF);
-          }
-        }
-        ImmutableList.Builder<Formula> args = ImmutableList.builder();
-        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        System.out.println(
-            String.format(
-                kind + "Parent: %s with name '%s'.", yices_term_to_string(pF, 100, 10, 0), name));
-        for (int i = 0; i < arity; i++) {
-          int arg = yices_term_child(pF, i);
-          System.out.println("  Child: " + yices_term_to_string(arg, 100, 10, 0));
+        final FunctionDeclarationKind kind = getDeclarationKind(pF);
+        final ImmutableList.Builder<Formula> args = ImmutableList.builder();
+        final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+        final boolean isAnd = kind == FunctionDeclarationKind.AND && isNestedConjunction(pF);
+        for (int arg : isAnd ? getNestedConjunctionArgs(pF) : getArgs(pF)) {
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
@@ -260,11 +226,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             pFormula,
             args.build(),
             FunctionDeclarationImpl.of(
-                name,
-                kind,
-                argTypes.build(),
-                getFormulaType(pF),
-                constructor)); // decl == term_constructor?
+                kind.toString(), kind, argTypes.build(), getFormulaType(pF), constructor));
     }
   }
 
@@ -278,8 +240,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             YICES_VARIABLE,
             YICES_UNINTERPRETED_TERM);
     int constructor = yices_term_constructor(pF);
-    assert !constantsAndVariables
-        .contains(constructor) : "Variables should be handled somewhere else";
+    assert !constantsAndVariables.contains(constructor)
+        : String.format(
+            "Term %s with constructor %d should be handled somewhere else",
+            yices_term_to_string(pF, 100, 1, 0), constructor);
 
     switch (constructor) {
       case YICES_ITE_TERM:
@@ -336,7 +300,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         return FunctionDeclarationKind.MUL;
 
       default:
-        System.out.println("Encountered term constructor:" + constructor);
         return FunctionDeclarationKind.OTHER;
     }
   }
@@ -352,30 +315,38 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       return false;
     }
 
-    for (int i = 0; i < yices_term_num_children(middleTerm); i++) {
-      int innerTerm = yices_term_child(middleTerm, i);
-      if (yices_term_constructor(innerTerm) != YICES_NOT_TERM) {
-        return false;
-      }
-    }
+    // code commented out --> ignore nested NOTs and just negate all resulting child-terms.
+    // for (int child : getArgs(middleTerm)) {
+    //   if (yices_term_constructor(child) != YICES_NOT_TERM) {
+    //     return false;
+    //   }
+    // }
 
     return true;
   }
 
-  /** Yices transforms <code>AND(x,...)</code> into <code>NOT(OR(NOT(X),NOT(...))</code>. */
+  /**
+   * Yices transforms <code>AND(x,...)</code> into <code>NOT(OR(NOT(X),NOT(...))</code>.
+   *
+   * <p>Only call this method for terms that are nested conjunctions!
+   */
   private static List<Integer> getNestedConjunctionArgs(int outerTerm) {
     Preconditions.checkArgument(yices_term_constructor(outerTerm) == YICES_NOT_TERM);
     int middleTerm = yices_term_child(outerTerm, 0);
     Preconditions.checkArgument(yices_term_constructor(middleTerm) == YICES_OR_TERM);
-
     List<Integer> result = new ArrayList<>();
-    for (int i = 0; i < yices_term_num_children(middleTerm); i++) {
-      int innerTerm = yices_term_child(middleTerm, i);
-      Preconditions.checkArgument(yices_term_constructor(innerTerm) == YICES_NOT_TERM);
-      result.add(yices_term_child(innerTerm, 0));
+    for (int child : getArgs(middleTerm)) {
+      result.add(yices_not(child));
     }
-
     return result;
+  }
+
+  private static List<Integer> getArgs(int parent) {
+    List<Integer> children = new ArrayList<>();
+    for (int i = 0; i < yices_term_num_children(parent); i++) {
+      children.add(yices_term_child(parent, i));
+    }
+    return children;
   }
 
   @Override
