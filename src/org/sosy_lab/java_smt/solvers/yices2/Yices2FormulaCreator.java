@@ -75,6 +75,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
@@ -189,17 +190,15 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     } else if (yices_term_is_bitvector(pFormula)) {
       return FormulaType.getBitvectorTypeWithSize(yices_term_bitsize(pFormula));
     }
-    // TODO add type info
     throw new IllegalArgumentException(
         String.format(
-            "Unknown formula type %s for formula %s",
+            "Unknown formula type '%s' for formula '%s'",
             yices_type_to_string(yices_type_of_term(pFormula), 100, 10, 0),
             yices_term_to_string(pFormula, 100, 10, 0)));
   }
 
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
-    // TODO Auto-generated method stub
     System.out.println(yices_term_to_string(pF, 100, 10, 0));
     int arity = yices_term_num_children(pF);
     int constructor = yices_term_constructor(pF);
@@ -268,7 +267,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             YICES_VARIABLE,
             YICES_UNINTERPRETED_TERM);
     int constructor = yices_term_constructor(pF);
-    assert !constantsAndVariables
+    assert !constantsAndVariables 
         .contains(constructor) : "Variables should be handled somewhere else";
 
     switch (constructor) {
@@ -350,10 +349,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   public Integer declareUFImpl(String pName, Integer pReturnType, List<Integer> pArgTypes) {
     // TODO Auto-generated method stub
     int size = pArgTypes.size();
-    int[] argTypeArray = new int[size];
-    for (int i = 0; i < size; i++) {
-      argTypeArray[i] = pArgTypes.get(i);
-    }
+    int[] argTypeArray = Ints.toArray(pArgTypes);
     final int yicesFuncType;
     if (pArgTypes.isEmpty()) {
       // a nullary function is a plain symbol (variable)

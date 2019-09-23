@@ -89,7 +89,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Set;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -98,8 +97,6 @@ import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 @SuppressWarnings({"unused"})
 public class Yices2NativeApiTest {
@@ -422,11 +419,6 @@ public class Yices2NativeApiTest {
     assertEquals(yices_term_constructor(iff), YICES_EQ_TERM);
   }
 
-  protected ProverEnvironment
-      newProverEnvironment0(Yices2FormulaCreator creator, Set<ProverOptions> pOptions) {
-    // TODO Auto-generated method stub
-    return new Yices2TheoremProver(creator, pOptions);
-  }
   @Test
   public void modelTest() {
     int varx = yices_named_variable(yices_real_type(), "x");

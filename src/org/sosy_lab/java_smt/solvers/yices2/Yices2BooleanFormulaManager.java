@@ -46,13 +46,11 @@ public class Yices2BooleanFormulaManager
 
   @Override
   protected Integer makeBooleanImpl(boolean pValue) {
-    int v;
     if (pValue) {
-      v = yices_true();
+      return yices_true();
     } else {
-      v = yices_false();
+      return yices_false();
     }
-    return v;
   }
 
   @Override
@@ -128,5 +126,4 @@ public class Yices2BooleanFormulaManager
   protected Integer ifThenElse(Integer pCond, Integer pF1, Integer pF2) {
     return yices_ite(pCond, pF1, pF2);
   }
-
 }
