@@ -184,7 +184,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       return FormulaType.BooleanType;
     } else if (yices_term_is_int(pFormula)) {
       return FormulaType.IntegerType;
-      // TODO is_real correct?
     } else if (yices_term_is_real(pFormula)) {
       return FormulaType.RationalType;
     } else if (yices_term_is_bitvector(pFormula)) {
@@ -192,7 +191,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     }
     // TODO add type info
     throw new IllegalArgumentException(
-        "Unknown formula type: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 10, 0));
+        String.format(
+            "Unknown formula type %s for formula %s",
+            yices_type_to_string(yices_type_of_term(pFormula), 100, 10, 0),
+            yices_term_to_string(pFormula, 100, 10, 0)));
   }
 
   @Override

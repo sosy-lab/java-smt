@@ -113,7 +113,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public Model getModel() throws SolverException {
-    // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return getModelWithoutChecks();
@@ -129,7 +128,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     int[] terms = yices_get_unsat_core(curEnv);
@@ -146,7 +144,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
     if (!closed) {
       yices_free_context(curEnv);
       yices_free_config(curCfg);

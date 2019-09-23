@@ -66,6 +66,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
+    requireInterpolation();
     return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
   }
 

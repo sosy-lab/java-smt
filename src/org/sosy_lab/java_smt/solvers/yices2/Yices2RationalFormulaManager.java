@@ -33,24 +33,20 @@ public class Yices2RationalFormulaManager extends
       Yices2FormulaCreator pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
   protected int getNumeralType() {
-    // TODO Auto-generated method stub
     return getFormulaCreator().getRationalType();
   }
 
   @Override
   protected Integer makeNumberImpl(double pNumber) {
-    // TODO Auto-generated method stub
     return makeNumberImpl(Double.toString(pNumber));
   }
 
   @Override
   protected Integer makeNumberImpl(BigDecimal pNumber) {
-    // TODO Auto-generated method stub
     return makeNumberImpl(pNumber.toPlainString());
   }
 
@@ -58,5 +54,4 @@ public class Yices2RationalFormulaManager extends
   public Integer divide(Integer pParam1, Integer pParam2) {
     return yices_division(pParam1, pParam2);
   }
-
 }

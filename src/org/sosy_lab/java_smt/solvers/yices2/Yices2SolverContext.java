@@ -128,20 +128,17 @@ public class Yices2SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?>
       newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Yices does not support interpolation");
   }
 
   @Override
   protected OptimizationProverEnvironment
       newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Yices does not support optimization");
   }
 
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
   }
-
 }

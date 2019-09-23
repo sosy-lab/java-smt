@@ -33,12 +33,10 @@ public class Yices2IntegerFormulaManager extends
       Yices2FormulaCreator pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
   protected int getNumeralType() {
-    // TODO Auto-generated method stub
     return getFormulaCreator().getIntegerType();
   }
 

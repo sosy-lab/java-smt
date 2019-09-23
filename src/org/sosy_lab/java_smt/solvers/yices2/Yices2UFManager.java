@@ -25,7 +25,5 @@ class Yices2UFManager extends AbstractUFManager<Integer, Integer, Integer, Long>
 
   protected Yices2UFManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
   }
-
 }
