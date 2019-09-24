@@ -33,9 +33,12 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -50,9 +53,14 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+
+  private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
+
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
   protected final long curCfg;
+
+  private final Deque<Set<Integer>> constraintStack=new ArrayDeque<>();
 
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
@@ -77,11 +85,14 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public void pop() {
     Preconditions.checkState(!closed);
     yices_pop(curEnv);
+    constraintStack.pop();
   }
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    yices_assert_formula(curEnv, creator.extractInfo(pConstraint));
+    int constraint=creator.extractInfo(pConstraint);
+    yices_assert_formula(curEnv, constraint);
+      constraintStack.peek().add(constraint);
     return null;
   }
 
@@ -89,26 +100,34 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public void push() {
     Preconditions.checkState(!closed);
     yices_push(curEnv);
+    constraintStack.push(new LinkedHashSet<>());
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    // ZERO if no params?
     Preconditions.checkState(!closed);
-    return !yices_check_sat(curEnv, 0);
+    if (generateUnsatCores) {
+      int[] allConstraints = getAllConstraints();
+      return !yices_check_sat_with_assumptions(
+          curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
+    } else {
+      return !yices_check_sat(curEnv, DEFAULT_PARAMS);
+    }
+  }
+
+  private int[] getAllConstraints() {
+    Set<Integer> allConstraints = new LinkedHashSet<>();
+    constraintStack.forEach(allConstraints::addAll);
+    return Ints.toArray(allConstraints);
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    int size = pAssumptions.size();
-    Iterator<BooleanFormula> iterator = pAssumptions.iterator();
-    int[] assumptions = new int[size];
-    for (int i = 0; i < size; i++) {
-      assumptions[i] = creator.extractInfo(iterator.next());
-    } // TODO handle BooleanFormulaCollection / check for literals
-    return !yices_check_sat_with_assumptions(curEnv, 0, size, assumptions);
+    // TODO handle BooleanFormulaCollection / check for literals
+    return !yices_check_sat_with_assumptions(
+        curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
   }
 
   @Override
@@ -126,20 +145,35 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     return result;
   }
 
+  private int[] uncapsulate(Collection<BooleanFormula> terms) {
+    int[] result = new int[terms.size()];
+    int i = 0;
+    for (BooleanFormula t : terms) {
+      result[i++] = creator.extractInfo(t);
+    }
+    return result;
+  }
+
   @Override
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    int[] terms = yices_get_unsat_core(curEnv);
-    return encapsulate(terms);
+    return getUnsatCore0();
+  }
+
+  private List<BooleanFormula> getUnsatCore0() {
+    return encapsulate(yices_get_unsat_core(curEnv));
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+    Preconditions.checkState(!isClosed());
+    checkGenerateUnsatCoresOverAssumptions();
+    boolean sat =
+        yices_check_sat_with_assumptions(
+            curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions));
+    return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
 
   @Override
