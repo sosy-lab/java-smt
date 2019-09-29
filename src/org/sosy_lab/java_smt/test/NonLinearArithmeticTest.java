@@ -47,8 +47,9 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   // SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
   // (though both support some parts)
+  // Boolector does not support it
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolvers() {
@@ -78,6 +79,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   @Before
   public void chooseNumeralFormulaManager() {
     if (formulaType.isIntegerType()) {
+      requireIntegers();
       nmgr = (NumeralFormulaManager<T, T>) imgr;
     } else if (formulaType.isRationalType()) {
       requireRationals();
