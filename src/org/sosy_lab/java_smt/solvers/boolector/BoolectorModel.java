@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
@@ -64,15 +63,20 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    throw new UnsupportedOperationException(
-        "We wait till the Boolector devs give us methods to do this properly.");
+    // We wait till the Boolector devs give us methods to do this properly.
+    // See toList1 for help building this method! (delete toList1 later)
+    ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
+    return assignments.build();
+  }
+
+  private ImmutableList<ValueAssignment> toList1() {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     for (Long formula : assertedTerms) {
       for (Entry<String, Long> entry : creator.extractVariablesAndUFs(formula, true).entrySet()) {
         String name = entry.getKey();
         Long var = entry.getValue();
-        System.out.println("toList with: " + name); // debug
-        System.out.println(BtorJNI.boolector_help_dump_node_smt2(btor, var)); // debug
         if (BtorJNI.boolector_is_array(btor, var)) {
           assignments.add(getArrayAssignment(formula));
         } else if (BtorJNI.boolector_is_uf(btor, var)) {
@@ -87,9 +91,9 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private ValueAssignment getConstAssignment(long key) {
     // Boolector does not give back a value "node" (formula), just an assignment string.
-    // So we have to build our own, new Object to work with. (Am i allowed to do this?!)
+    // We have to wait for the new methods and revisit this method!
     List<Object> argumentInterpretation = new ArrayList<>();
-    Object value = creator.convertValue(key, evalImpl(key));// wrong! use creator.convertValue
+    Object value = creator.convertValue(key, evalImpl(key));
     argumentInterpretation.add(value);
     Long valueNode = null;
     if (value.equals(true)) {
@@ -107,13 +111,11 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         creator.getName(key),
         value,
         argumentInterpretation);
-    // maybe give back String (bitvec) in value?
   }
 
   private ValueAssignment getUFAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Long value = evalImpl(key);// wrong! use creator.convertValue
-    Map<Long, Long[]> ufMap = creator.getUfs();
     // TODO
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
@@ -129,7 +131,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     Long value = evalImpl(key); // wrong! use creator.convertValue
     Long valueNode = null;
     // TODO
-    // HOW?! I cant get value (nodes) bound to the array. Only new ones with the same sort.
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),

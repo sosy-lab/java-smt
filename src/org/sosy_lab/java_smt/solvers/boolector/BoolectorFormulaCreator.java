@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -33,7 +32,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -177,60 +176,58 @@ public class BoolectorFormulaCreator
     return newVar;
   }
 
-  // This method is a massive problem... you CANT get the value formulas(nodes) of ufs because its
-  // only build and used internally in boolector....
+  // This method is a massive problem... you CANT get the value formulas(nodes) because they are
+  // only build and used internally in boolector. (See visit1 for help)
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula pFormula, Long pF) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
     throw new UnsupportedOperationException(
         "We wait till the Boolector devs give us methods to do this.");
-    if (BtorJNI.boolector_is_const(btor, pF)) {
+
+  }
+
+  // Hopefully a helpful template for when visitor gets implemented
+  // Btor only has bitvec arrays and ufs with bitvecs and arrays of bitvecs
+  // (and quantifier with bitvecs only)
+  @SuppressWarnings("unused")
+  private <R> R visit1(FormulaVisitor<R> visitor, Formula formula, Long f) {
+    if (BtorJNI.boolector_is_const(btor, f)) {
       // Handles all constants (bitvec, bool)
-      String f = BtorJNI.boolector_get_bits(btor, pF);
-      return visitor.visitConstant(pFormula, convertValue(pF, parseBitvector(f)));
-    } else if (BtorJNI.boolector_is_array(btor, pF)) {
-      // array = function?!
-    } else if (BtorJNI.boolector_is_uf(btor, pF)) {
-      // UF
-      String[][] ufAssignment = BtorJNI.boolector_uf_assignment_helper(btor, pF);
-      int arity = BtorJNI.boolector_get_fun_arity(btor, pF);
+      String bits = BtorJNI.boolector_get_bits(btor, f);
+      return visitor.visitConstant(formula, convertValue(f, parseBitvector(bits)));
+    } else if (BtorJNI.boolector_is_param(btor, f)) {
+      // Quantifier have their own variables called param.
+      // They can only be bound once! (use them as bitvec)
+      int deBruijnIdx = 0; // TODO: Ask Developers for this because this is WRONG!
+      return visitor.visitBoundVariable(formula, deBruijnIdx);
+    } else if (false) {
+      // Quantifier
+      // there is currently no way to find out if the formula is a quantifier
+      // do we need them separately?
+      /*
+       * return visitor .visitQuantifier( (BoolectorBooleanFormula) formula, quantifier,
+       * boundVariables, new BoolectorBooleanFormula(body, btor));
+       */
+    } else if (BtorJNI.boolector_is_var(btor, f)) {
+      // bitvec var (size 1 is bool!)
+      return visitor
+          .visitFreeVariable(formula, getName(f));
+    } else {
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
+
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-      for (int i = 0; i < arity; i++) {
-        FormulaType<?> argumentType = getFormulaType(arg);
-        args.add(encapsulate(argumentType, arg));
-        argTypes.add(argumentType);
-      }
-      return visitor.visitFunction(pFormula, args.build(), FunctionDeclarationImpl.of());
-    } else if (BtorJNI.boolector_is_param(btor, pF)) {
-      // Quantifier var (param)
-      int deBruijnIdx; // TODO: how?
-      return visitor.visitBoundVariable(pFormula, deBruijnIdx);
-    } else if (bodyVars != null) {
-      // Quantifier node
-      QuantifiedFormulaManager.Quantifier quantifier = QuantifiedFormulaManager.Quantifier.FORALL;
-      if (bodyVars.isForall()) {
-        quantifier = QuantifiedFormulaManager.Quantifier.EXISTS;
-      }
-      List<Formula> boundVariables = new ArrayList<>();
-      for (long arg : bodyVars.getBoundVariables()) {
-        boundVariables.add(encapsulate(getFormulaType(arg), arg));
-      }
-      long body = bodyVars.getBody();
-      FormulaType<?> argumentType = getFormulaType(body);
-      // if this isnt working or too much, pass an empty list.
-      // But Boolector simply holds not information at all about the quantifier besides the result.
-      return visitor
-          .visitQuantifier(
-              (BoolectorBooleanFormula) pFormula,
-              quantifier,
-              boundVariables,
-              new BoolectorBooleanFormula(body, btor));
-    }
-      else {
-      // must be bitvector var at this point
-      return visitor
-          .visitFreeVariable(pFormula, getName(btor, pF));
-    }
+
+      return visitor.visitFunction(
+          formula,
+          args.build(),
+          FunctionDeclarationImpl
+              .of(getName(f), getDeclarationKind(f), argTypes.build(), getFormulaType(f), f));
+    } // TODO: fix declaration in visitFunction
+    return null;
+  }
+
+  // TODO: returns kind of formula (add, uf etc....) once methods are provided
+  private FunctionDeclarationKind getDeclarationKind(long f) {
+    return null;
   }
 
   @Override
@@ -264,7 +261,6 @@ public class BoolectorFormulaCreator
 
   @Override
   public Object convertValue(Long key, Long term) {
-    // TODO: UF / ARRAY
     String value = null;
     if (BtorJNI.boolector_is_array(btor, term)) {
       value = BtorJNI.boolector_bv_assignment(btor, term);
