@@ -207,9 +207,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_BOOL_CONST:
         return pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
       case YICES_ARITH_CONST:
-        return pVisitor.visitConstant(pFormula, convertValue(pF));
+        return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_BV_CONST:
-        return pVisitor.visitConstant(pFormula, convertValue(pF));
+        return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
@@ -217,16 +217,35 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final ImmutableList.Builder<Formula> args = ImmutableList.builder();
         final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         final boolean isAnd = kind == FunctionDeclarationKind.AND && isNestedConjunction(pF);
-        for (int arg : isAnd ? getNestedConjunctionArgs(pF) : getArgs(pF)) {
+        final boolean isFunction = kind == FunctionDeclarationKind.UF;
+        List<Integer> yicesArgs;
+        String name;
+        if (isAnd) {
+          name = FunctionDeclarationKind.AND.toString();
+          yicesArgs = getNestedConjunctionArgs(pF);
+        } else if (isFunction) {
+          yicesArgs = getArgs(pF);
+          name = yices_term_to_string(yicesArgs.get(0), 100, 1, 0);
+          yicesArgs.remove(0);
+        } else {
+          name = kind.toString();
+          yicesArgs = getArgs(pF);
+        }
+        for (int arg : yicesArgs) {
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
         }
+        // TODO For Appliction of UF the first child is the UF
         return pVisitor.visitFunction(
             pFormula,
             args.build(),
             FunctionDeclarationImpl.of(
-                kind.toString(), kind, argTypes.build(), getFormulaType(pF), constructor));
+                name,
+                kind,
+                argTypes.build(),
+                getFormulaType(pF),
+                constructor));
     }
   }
 
@@ -306,6 +325,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   /** Yices transforms <code>AND(x,...)</code> into <code>NOT(OR(NOT(X),NOT(...))</code>. */
   private static boolean isNestedConjunction(int outerTerm) {
+
+    /*
+     * TODO Seems like a term NOT(OR(X1,X2,..)) could cause false positive. Maybe to be safe check
+     * that beginning of term_to_string(outerTerm) is "and("
+     */
     if (yices_term_constructor(outerTerm) != YICES_NOT_TERM) {
       return false;
     }
@@ -353,18 +377,21 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
     // TODO Auto-generated method stub
     System.out.println("----------");
-    System.out.println(yices_term_to_string(pDeclaration, 100, 10, 0));
-    System.out
-        .println("Type: " + yices_type_to_string(yices_type_of_term(pDeclaration), 100, 10, 0));
+    // System.out.println(yices_term_to_string(pDeclaration, 100, 10, 0));
+    System.out.println("Term ID is: " + pDeclaration);
+    // System.out
+    // .println("Type: " + yices_type_to_string(yices_type_of_term(pDeclaration), 100, 10, 0));
     int size = pArgs.size();
     int[] argArray = new int[size];
     for (int i = 0; i < size; i++) {
       argArray[i] = pArgs.get(i);
-      System.out.println(yices_term_to_string(argArray[i], 100, 10, 0));
+      // System.out.println(yices_term_to_string(argArray[i], 100, 10, 0));
+      System.out.println("Arg id is: " + argArray[i]);
     }
     System.out.println("----------");
     int app = yices_application(pDeclaration, size, argArray);
-    System.out.println("APP" + yices_term_to_string(app, 100, 10, 0));
+    // System.out.println("APP" + yices_term_to_string(app, 100, 10, 0));
+    System.out.println("App id is :" + app);
     return app;
   }
 
@@ -422,11 +449,15 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     }
   }
 
-  // TODO Pretty print type
   @Override
-  public Object convertValue(Integer pF) {
-    // TODO Auto-generated method stub
-    FormulaType<?> type = getFormulaType(pF);
+  public Object convertValue(Integer key) {
+    throw new UnsupportedOperationException(
+        "Yices needs a second term to determine a correct type. Please use the other method.");
+  }
+
+  @Override
+  public Object convertValue(Integer typeKey, Integer pF) {
+    FormulaType<?> type = getFormulaType(typeKey);
     if (type.isBooleanType()) {
       return pF.equals(yices_true());
     } else if (type.isRationalType() || type.isIntegerType()) {

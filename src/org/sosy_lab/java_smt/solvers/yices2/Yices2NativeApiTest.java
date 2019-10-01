@@ -27,6 +27,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONS
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
@@ -86,6 +87,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_mpq;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -473,6 +475,10 @@ public class Yices2NativeApiTest {
         int[] yval = yices_get_value(model, terms[i]);
         System.out.println("Node id is: " + yval[0]);
         System.out.println("Node tag is: " + yval[1]);
+        if (yval[1] == YVAL_RATIONAL) {
+          System.out.println("Value is: " + yices_val_get_mpq(model, yval[0], yval[1]));
+        }
+
       }
       m.close();
     } else {
@@ -488,6 +494,10 @@ public class Yices2NativeApiTest {
     // int xbigger4 = yices_parse_term("assert (> x 4)");
     // int ysmaller7 = yices_parse_term("assert (< y 7)");
     // assertEquals(yices_check_context(env, 0), SAT);
-    int x = yices_parse_term("assert (= x 4)");
+    int y = yices_int32(5);
+    yices_set_term_name(y, "y");
+    int x =
+        yices_parse_term(
+            "(/= y 5)");
   }
 }

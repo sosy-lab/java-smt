@@ -60,6 +60,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   @Override
   public Appender dumpFormula(Integer pT) {
     // TODO Auto-generated method stub
+    // VariableCollector
     return null;
   }
 

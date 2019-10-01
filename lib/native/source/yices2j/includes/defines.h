@@ -134,6 +134,14 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
     throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for calling Yices"); \
   } \
 
+#define EMPTY_YVAL_ARRAY_ARG(num) \
+  yval_t *m_arg##num;\
+  size_t sz = (size_t)(arg##num); \
+  m_arg##num = (yval_t *)malloc(sizeof(yval_t) * sz); \
+  if (m_arg##num == NULL) { \
+    throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for calling Yices"); \
+  } \
+
 //may cause memory problems
 #define LONG_ARRAY_ARG(mtype, num) \
   mtype * m_arg##num = (mtype *)((*jenv)->GetLongArrayElements(jenv, arg##num, NULL)); \
@@ -161,9 +169,32 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   term_vector_t *m_arg##num = &s_arg##num; \
   yices_init_term_vector(m_arg##num); \
 
-#define YVAL_ARG(num) \
+#define YVAL_VECTOR_ARG(num) \
+  yval_vector_t s_arg##num; \
+  yval_vector_t *m_arg##num = &s_arg##num; \
+  yices_init_yval_vector(m_arg##num); \
+
+#define EMPTY_YVAL_ARG(num) \
   yval_t s_arg##num; \
   yval_t *m_arg##num = &s_arg##num; \
+
+/*
+ * Builds an yval_t from java input where
+ * num = Position of the yval_t in the c function call
+ * id = Position of the Java arg to use as node_id
+ * tag = Position of the Java arg to use as node_tag
+*/
+#define YVAL_ARG(num, id, tag) \
+  yval_t s_arg##num; \
+  yval_t *m_arg##num = &s_arg##num; \
+  if(arg##id < 0) { \
+    throwException(jenv, "java/lang/IllegalArgumentException", "An yval_id cannot be negative."); \
+  }\
+  if(arg##tag < 0 || arg##tag > 8) { \
+    throwException(jenv, "java/lang/IllegalArgumentException", "Yval_tag is negative or not a valid yval_tag."); \
+  } \
+  m_arg##num->node_id = arg##id; \
+  m_arg##num->node_tag = arg##tag; \
 
 #define STRUCT_ARRAY_OUTPUT_ARG(num) \
   size_t s_arg##num = 0; \
@@ -210,7 +241,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 
 #define PUT_STRUCT_POINTER_ARG(num) \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
-    (*jenv)->SetLongArrayRegion(jenv, arg##num, 0, 1, (jlong *)&(s_arg##num.repr)); \
+    (*jenv)->SetLongArrayRegion(jenv, arg##num, 0, 1, (jlong *)&(s_arg##num)); \
   }
 
 #define STRUCT_RETURN \
@@ -282,6 +313,19 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   } \
   return (long) retval; \
 }
+
+#define POINTER_ARG_RETURN(num) \
+  if(retval == -1 && yices_error_code != 0){ \
+    const char *msg = yices_error_string(); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+    return 0; \
+  } \
+  if(m_arg##num == NULL){ \
+    throwException(jenv, "java/lang/IllegalArgumentException", "Pointer to return was NULL"); \
+    return 0; \
+  } \
+  return (long) m_arg##num; \
+}
 //may cause memory leak through yices_error_string
 #define FROM_INT_POINTER_RETURN(num) \
   if(retval == -1) { \
@@ -339,13 +383,15 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   yval[1] = s_arg##num.node_tag; \
   jintArray jretval; \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
-   jretval = (*jenv)->NewIntArray(jenv, 2); \
-   if(jretval != NULL){ \
-     (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, yval); \
-   } \
+    jretval = (*jenv)->NewIntArray(jenv, 2); \
+    if(jretval != NULL){ \
+      (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, yval); \
+    } \
   } \
   return jretval; \
 }
+
+
 /**
  * This assumes that mathsat allocated an array,
  * returned the pointer and stored the size in the argument arg_num
@@ -389,7 +435,6 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if(retval == -1){ \
     const char *msg = yices_error_string(); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-    return jretval; \
     goto out; \
   } \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
@@ -421,7 +466,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
     goto out; \
   } \
   size_t i; \
-  type_t * data = s_arg##num.data; \
+  term_t * data = s_arg##num.data; \
   for (i = 0; i < sz; ++i) { \
       jarr[i] = (jint)((size_t)data[i]); \
   } \
@@ -522,6 +567,10 @@ typedef jlong jjobjective;
 typedef jlongArray jjobjectiveArray;
 #define OBJECTIVE_POINTER_ARG(num) STRUCT_POINTER_ARG(msat_objective, num)
 #define PUT_OBJECTIVE_POINTER_ARG(num) PUT_STRUCT_POINTER_ARG(num)
+
+typedef jlong jjyval;
+typedef jint jjnodeid;
+typedef jint jjnodetag;
 
 typedef jvoid jjfailureCode;
 

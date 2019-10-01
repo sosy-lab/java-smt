@@ -87,7 +87,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     for (int i = 0; i < termsInModel.length; i++) {
       int[] yvalTag = yices_get_value(model, termsInModel[i]);
       if (!complex.contains(yvalTag[1])) {
-        assignments.add(getSimpleAssignment(termsInModel[i], yvalTag));
+        assignments.add(getSimpleAssignment(termsInModel[i]));
       } else {
         throw new UnsupportedOperationException("Not yet implemented");
       }
@@ -96,7 +96,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     return assignments.build();
   }
 
-  private ValueAssignment getSimpleAssignment(int t, int[] yvalTag) {
+  private ValueAssignment getSimpleAssignment(int t) {
     List<Object> argumentInterpretation = new ArrayList<>();
     int valueTerm = yices_get_value_as_term(model, t);
     return new ValueAssignment(
@@ -104,12 +104,12 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
         creator.encapsulateWithTypeOf(valueTerm),
         creator.encapsulateBoolean(yices_eq(t, valueTerm)),
         yices_get_term_name(t),
-        formulaCreator.convertValue(valueTerm),
+        formulaCreator.convertValue(t, valueTerm),
         argumentInterpretation);
   }
   @Override
   protected @Nullable Integer evalImpl(Integer pFormula) {
-    // TODO Return term does not necessarily have same type as query term
+    // TODO Can Functions appear here??
     System.out
         .println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
     Preconditions.checkState(!closed);

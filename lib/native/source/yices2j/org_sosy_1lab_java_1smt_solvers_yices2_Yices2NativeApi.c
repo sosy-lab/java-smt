@@ -1295,9 +1295,140 @@ INT_RETURN
 DEFINE_FUNC(intArray, 1get_1value) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)
 TERM_ARG(2)
-YVAL_ARG(3)
+EMPTY_YVAL_ARG(3)
 CALL3(int, get_value)
 YVAL_RETURN(3)
+
+/**DEFINE_FUNC(intArray, 1unpack_1value) WITH_ONE_ARG(jyval)
+*YVAL_PTR_ARG(1)
+*yval_t value = *m_arg1;
+*printf("C: Node id is: %d\n", m_arg1->node_id);
+*printf("C: Node tag is: %d\n", value.node_tag);
+*int yval[2];
+*yval[0] = value.node_id;
+*yval[1] = value.node_tag;
+*jintArray jretval;
+*if (!(*jenv)->ExceptionCheck(jenv)) {
+*  jretval = (*jenv)->NewIntArray(jenv, 2);
+*  if(jretval != NULL){
+*    (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, yval);
+*  }
+*}
+*return jretval;
+*}
+*/
+DEFINE_FUNC(int, 1val_1bitsize) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2, 2, 3)
+CALL2(int, val_bitsize)
+INT_RETURN
+
+DEFINE_FUNC(int, 1val_1function_1arity) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2, 2, 3)
+CALL2(int, val_function_arity)
+INT_RETURN
+
+DEFINE_FUNC(int, 1val_1get_1bool) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2, 2, 3)
+INT_POINTER_ARG(3)
+CALL3(int, val_get_bool)
+FROM_INT_POINTER_RETURN(3)
+
+DEFINE_FUNC(string, 1val_1get_1mpq) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2, 2, 3)
+MPQ_ARG(3)
+CALL3(int, val_get_mpq)
+MPQ_RETURN(3)
+
+
+DEFINE_FUNC(intArray, 1val_1get_1bv) WITH_FOUR_ARGS(jmodel, jnodeid, jnodetag, int)
+MODEL_ARG(1)
+YVAL_ARG(2, 2, 3)
+EMPTY_INT_ARRAY_ARG(int32_t, 3)
+CALL3(int, val_get_bv)
+INT_ARRAY_RETURN(3)
+
+DEFINE_FUNC(intArray, 1val_1expand_1function) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2,2,3)//EMPTY_YVAL_ARG(2) // CHANGE
+EMPTY_YVAL_ARG(3)
+YVAL_VECTOR_ARG(4)
+CALL4(int, val_expand_function)
+jlongArray jretval = NULL;
+if(retval == -1){  
+  const char *msg = yices_error_string();
+  throwException(jenv, "java/lang/IllegalArgumentException", msg);
+  goto out;
+}
+if ((*jenv)->ExceptionCheck(jenv)) {
+   goto out;
+}
+size_t sz = (s_arg4.size+1)*2; //Need two values for each yval_t
+jlong *jarr = malloc(sizeof(jint) * sz);
+if (jarr == NULL) {
+    throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
+    goto out;
+}
+yval_t *data = s_arg4.data;
+jarr[0] = m_arg3->node_id;
+jarr[1] = m_arg3->node_tag;
+size_t i;
+for (i = 2; i < sz; i+=2) {
+  jarr[i] = data[i].node_id;
+  jarr[i+1] = data[i+1].node_tag;
+}
+jretval = (*jenv)->NewLongArray(jenv, sz);
+if (jretval != NULL) {
+  (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz, jarr);
+}
+free(jarr);
+out:
+yices_delete_yval_vector(m_arg4);
+return jretval;
+}
+//node_id and nodetag split for retaining argment order for C call
+DEFINE_FUNC(intArray, 1val_1expand_1mapping) WITH_FOUR_ARGS(jmodel, jnodeid, int, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2,2,4) // CHANGE
+EMPTY_YVAL_ARRAY_ARG(3)
+EMPTY_YVAL_ARG(4)
+CALL4(int, val_expand_mapping)
+jlongArray jretval = NULL;
+if(retval == -1){  
+  const char *msg = yices_error_string();
+  throwException(jenv, "java/lang/IllegalArgumentException", msg);
+  goto out;
+}
+if ((*jenv)->ExceptionCheck(jenv)) {
+   goto out;
+}
+sz++; // up size by one for value
+sz = sz*2; //Double size because every yval_t needs two values in the return array
+jlong *jarr = malloc(sizeof(jint) * sz);
+if (jarr == NULL) {
+    throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
+    goto out;
+}
+jarr[0] = m_arg4->node_id;
+jarr[1] = m_arg4->node_tag;
+size_t i;
+for (i = 2; i < sz; i+=2) {
+  jarr[i] = m_arg3[i].node_id;
+  jarr[i+1] = m_arg3[i].node_tag;
+}
+jretval = (*jenv)->NewLongArray(jenv, sz);
+if (jretval != NULL) {
+  (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz, jarr);
+}
+free(jarr);
+out:
+free(m_arg3);
+return jretval;
+}
+
 
 DEFINE_FUNC(jterm, 1get_1value_1as_1term) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)

@@ -695,12 +695,30 @@ class Yices2NativeApi {
 
   public static native long yices_get_int64_value(long m, int t);
 
+  // public static native long yices_get_value(long m, int t);
   /**
    * Value as Array [node_id, node_tag]
    */
   public static native int[] yices_get_value(long m, int t);
 
+  // TODO REMOVE public static native int[] yices_unpack_value(long v);
 
+  public static native int yices_val_get_bitsize(long m, int id, int tag);
+
+  public static native int yices_val_function_arity(long m, int id, int tag);
+
+  public static native boolean yices_val_get_bool(long m, int id, int tag);
+
+  public static native String yices_val_get_mpq(long m, int id, int tag);
+
+  public static native int[] yices_val_get_bv(long m, int id, int tag);
+
+  public static native long[] yices_val_expand_function(long m, int id, int tag);
+
+  /*
+   * node_id / node_tag separated to preserve C call order
+   */
+  public static native long[] yices_val_expand_mapping(long m, int id, int arity, int tag);
   /**
    * Value as Yices term
    */
