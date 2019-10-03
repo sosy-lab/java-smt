@@ -237,11 +237,11 @@ class Yices2NativeApi {
   /*
    * Yices type tests
    */
-  public static native boolean yices_is_bool(int t);
+  public static native boolean yices_type_is_bool(int t);
 
-  public static native boolean yices_is_int(int t);
+  public static native boolean yices_type_is_int(int t);
 
-  public static native boolean yices_is_real(int t);
+  public static native boolean yices_type_is_real(int t);
 
   /**
    * Checks if type is arithmetic (i.e., either integer or real)
@@ -249,11 +249,11 @@ class Yices2NativeApi {
    * @param t Type to check
    * @return true if arithmetic, false otherwise
    */
-  public static native boolean yices_is_arithmetic(int t);
+  public static native boolean yices_type_is_arithmetic(int t);
 
-  public static native boolean yices_is_bitvector(int t);
+  public static native boolean yices_type_is_bitvector(int t);
 
-  public static native boolean yices_is_function(int t);
+  public static native boolean yices_type_is_function(int t);
 
   /**
    * Tests if the first type is a subtype of the second.
@@ -284,6 +284,8 @@ class Yices2NativeApi {
   public static native int yices_type_num_children(int t);
 
   public static native int yices_type_child(int t, int index);
+
+  public static native int[] yices_type_children(int t);
 
   /*
    * TERM CONSTRUCTION
@@ -701,8 +703,6 @@ class Yices2NativeApi {
    */
   public static native int[] yices_get_value(long m, int t);
 
-  // TODO REMOVE public static native int[] yices_unpack_value(long v);
-
   public static native int yices_val_get_bitsize(long m, int id, int tag);
 
   public static native int yices_val_function_arity(long m, int id, int tag);
@@ -711,14 +711,18 @@ class Yices2NativeApi {
 
   public static native String yices_val_get_mpq(long m, int id, int tag);
 
-  public static native int[] yices_val_get_bv(long m, int id, int tag);
+  /*
+   * node_id / node_tag separated to preserve C call order
+   * Returns in little endian order
+   */
+  public static native int[] yices_val_get_bv(long m, int id, int size, int tag);
 
-  public static native long[] yices_val_expand_function(long m, int id, int tag);
+  public static native int[] yices_val_expand_function(long m, int id, int tag);
 
   /*
    * node_id / node_tag separated to preserve C call order
    */
-  public static native long[] yices_val_expand_mapping(long m, int id, int arity, int tag);
+  public static native int[] yices_val_expand_mapping(long m, int id, int arity, int tag);
   /**
    * Value as Yices term
    */

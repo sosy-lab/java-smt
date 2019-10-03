@@ -169,6 +169,11 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   term_vector_t *m_arg##num = &s_arg##num; \
   yices_init_term_vector(m_arg##num); \
 
+#define TYPE_VECTOR_ARG(num) \
+  type_vector_t s_arg##num; \
+  type_vector_t *m_arg##num = &s_arg##num; \
+  yices_init_type_vector(m_arg##num); \
+
 #define YVAL_VECTOR_ARG(num) \
   yval_vector_t s_arg##num; \
   yval_vector_t *m_arg##num = &s_arg##num; \
@@ -480,6 +485,40 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   yices_delete_term_vector(m_arg##num); \
   return jretval; \
 }
+
+#define TYPE_VECTOR_ARG_RETURN(num) \
+  jintArray jretval = NULL; \
+  if ((*jenv)->ExceptionCheck(jenv)) { \
+    goto out; \
+  } \
+  if(retval == -1){ \
+    const char *msg = yices_error_string(); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+    return jretval; \
+    goto out; \
+  } \
+  size_t sz = s_arg##num.size; \
+  jint *jarr = malloc(sizeof(jint) * sz); \
+  if (jarr == NULL) { \
+    throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices"); \
+    goto out; \
+  } \
+  size_t i; \
+  term_t * data = s_arg##num.data; \
+  for (i = 0; i < sz; ++i) { \
+      jarr[i] = (jint)((size_t)data[i]); \
+  } \
+  jretval = (*jenv)->NewIntArray(jenv, sz); \
+  if (jretval != NULL) { \
+    (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, jarr); \
+  } \
+  free(jarr); \
+  \
+  out: \
+  yices_delete_type_vector(m_arg##num); \
+  return jretval; \
+}
+
 
 // Define aliases for Yices types
 typedef jlong jjctx;

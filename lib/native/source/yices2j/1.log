@@ -1,29 +1,29 @@
 Compiling the C wrapper code and creating the "libyices2j.so" library
 In file included from org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:3:0:
 org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c: In function ‘Java_org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi_yices_1poly_1rational32’:
-includes/defines.h:235:52: warning: pointer targets in passing argument 3 of ‘(*jenv)->ReleaseIntArrayElements’ differ in signedness [-Wpointer-sign]
+includes/defines.h:240:52: warning: pointer targets in passing argument 3 of ‘(*jenv)->ReleaseIntArrayElements’ differ in signedness [-Wpointer-sign]
    (*jenv)->ReleaseIntArrayElements(jenv, arg##num, m_arg##num, 0); \
                                                     ^
-org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:538:1: note: in expansion of macro ‘FREE_INT_ARRAY_ARG’
+org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:535:1: note: in expansion of macro ‘FREE_INT_ARRAY_ARG’
  FREE_INT_ARRAY_ARG(3)
  ^~~~~~~~~~~~~~~~~~
-includes/defines.h:235:52: note: expected ‘jint * {aka int *}’ but argument is of type ‘uint32_t * {aka unsigned int *}’
+includes/defines.h:240:52: note: expected ‘jint * {aka int *}’ but argument is of type ‘uint32_t * {aka unsigned int *}’
    (*jenv)->ReleaseIntArrayElements(jenv, arg##num, m_arg##num, 0); \
                                                     ^
-org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:538:1: note: in expansion of macro ‘FREE_INT_ARRAY_ARG’
+org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:535:1: note: in expansion of macro ‘FREE_INT_ARRAY_ARG’
  FREE_INT_ARRAY_ARG(3)
  ^~~~~~~~~~~~~~~~~~
 org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c: In function ‘Java_org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi_yices_1poly_1rational64’:
-includes/defines.h:239:53: warning: pointer targets in passing argument 3 of ‘(*jenv)->ReleaseLongArrayElements’ differ in signedness [-Wpointer-sign]
+includes/defines.h:244:53: warning: pointer targets in passing argument 3 of ‘(*jenv)->ReleaseLongArrayElements’ differ in signedness [-Wpointer-sign]
    (*jenv)->ReleaseLongArrayElements(jenv, arg##num, m_arg##num, 0); \
                                                      ^
-org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:549:1: note: in expansion of macro ‘FREE_LONG_ARRAY_ARG’
+org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:546:1: note: in expansion of macro ‘FREE_LONG_ARRAY_ARG’
  FREE_LONG_ARRAY_ARG(3)
  ^~~~~~~~~~~~~~~~~~~
-includes/defines.h:239:53: note: expected ‘jlong * {aka long int *}’ but argument is of type ‘uint64_t * {aka long unsigned int *}’
+includes/defines.h:244:53: note: expected ‘jlong * {aka long int *}’ but argument is of type ‘uint64_t * {aka long unsigned int *}’
    (*jenv)->ReleaseLongArrayElements(jenv, arg##num, m_arg##num, 0); \
                                                      ^
-org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:549:1: note: in expansion of macro ‘FREE_LONG_ARRAY_ARG’
+org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c:546:1: note: in expansion of macro ‘FREE_LONG_ARRAY_ARG’
  FREE_LONG_ARRAY_ARG(3)
  ^~~~~~~~~~~~~~~~~~~
 Compilation Done

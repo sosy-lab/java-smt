@@ -221,14 +221,11 @@ SIMPLE_ARG(int32_t, 2)
 CALL2(type_t, type_child)
 TYPE_RETURN
 
-/*
- *Left unused as there is no current use case
- *DEFINE_FUNC(int, 1type_1children) WITH_ONE_ARG(jtype)
- *TYPE_ARG(1)
- *TYPE_VECTOR_ARG(2)
- *CALL2(int, type_children)
- *RETURN_TYPE_VECTOR_ARG(2)
- */
+DEFINE_FUNC(intArray, 1type_1children) WITH_ONE_ARG(jtype)
+TYPE_ARG(1)
+TYPE_VECTOR_ARG(2)
+CALL2(int, type_children)
+TYPE_VECTOR_ARG_RETURN(2)
 
 /*
  * Term construction
@@ -1344,9 +1341,9 @@ CALL3(int, val_get_mpq)
 MPQ_RETURN(3)
 
 
-DEFINE_FUNC(intArray, 1val_1get_1bv) WITH_FOUR_ARGS(jmodel, jnodeid, jnodetag, int)
+DEFINE_FUNC(intArray, 1val_1get_1bv) WITH_FOUR_ARGS(jmodel, jnodeid, int, jnodetag)
 MODEL_ARG(1)
-YVAL_ARG(2, 2, 3)
+YVAL_ARG(2, 2, 4)
 EMPTY_INT_ARRAY_ARG(int32_t, 3)
 CALL3(int, val_get_bv)
 INT_ARRAY_RETURN(3)
@@ -1412,13 +1409,13 @@ if (jarr == NULL) {
     throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
     goto out;
 }
-jarr[0] = m_arg4->node_id;
-jarr[1] = m_arg4->node_tag;
 size_t i;
-for (i = 2; i < sz; i+=2) {
+for (i = 0; i < sz-2; i+=2) {
   jarr[i] = m_arg3[i].node_id;
   jarr[i+1] = m_arg3[i].node_tag;
 }
+jarr[sz-2] = m_arg4->node_id;
+jarr[sz-1] = m_arg4->node_tag;
 jretval = (*jenv)->NewLongArray(jenv, sz);
 if (jretval != NULL) {
   (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz, jarr);
