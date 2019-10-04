@@ -74,7 +74,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     SmtEngine smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
-    smtEngine.delete();
+    // smtEngine.delete();
 
     // Create managers
     CVC4UFManager functionTheory = new CVC4UFManager(creator);

@@ -297,7 +297,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       closeAllModels();
       assertedFormulas.clear();
       exportMapping.delete();
-      smtEngine.delete();
+      // smtEngine.delete();
       exprManager.delete();
       closed = true;
     }
