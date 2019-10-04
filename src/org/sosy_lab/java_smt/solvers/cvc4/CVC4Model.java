@@ -39,11 +39,11 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
   private final ImmutableList<Expr> assertedExpressions;
-  private final CVC4AbstractProver<?> prover;
+  private final CVC4TheoremProver prover;
   protected boolean closed = false;
 
   CVC4Model(
-      CVC4AbstractProver<?> pProver,
+      CVC4TheoremProver pProver,
       CVC4FormulaCreator pCreator,
       SmtEngine pSmtEngine,
       Collection<Expr> pAssertedExpressions) {

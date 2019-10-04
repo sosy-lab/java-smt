@@ -61,7 +61,10 @@ public interface SolverContext extends AutoCloseable {
      * Whether the solver should generate an unsat core for unsatisfiable formulas <b>only</b> over
      * the assumptions explicitly passed to the solver.
      */
-    GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS
+    GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
+
+    /** Whether the solver should enable support ofr formulae build in SL theory. */
+    ENABLE_SEPARATION_LOGIC
   }
 
   /**
