@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -143,6 +144,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected static boolean isNegativeZero(Double pN) {
+    Preconditions.checkNotNull(pN);
     return Double.valueOf("-0.0").equals(pN);
   }
 
