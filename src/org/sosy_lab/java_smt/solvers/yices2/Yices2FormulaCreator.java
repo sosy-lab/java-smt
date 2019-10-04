@@ -226,7 +226,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         } else if (isFunction) {
           yicesArgs = getArgs(pF);
           name = yices_term_to_string(yicesArgs.get(0), 100, 1, 0);
-          System.out.println("Fun nam is: " + name);
           constructor = yicesArgs.get(0);
           yicesArgs.remove(0);
         } else {
@@ -238,8 +237,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
         }
-        System.out.println("Constructor is: " + constructor);
-        // TODO For Appliction of UF the first child is the UF
         return pVisitor.visitFunction(
             pFormula,
             args.build(),
@@ -328,11 +325,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   /** Yices transforms <code>AND(x,...)</code> into <code>NOT(OR(NOT(X),NOT(...))</code>. */
   private static boolean isNestedConjunction(int outerTerm) {
-
-    /*
-     * TODO Seems like a term NOT(OR(X1,X2,..)) could cause false positive. Maybe to be safe check
-     * that beginning of term_to_string(outerTerm) is "and("
-     */
     if (yices_term_constructor(outerTerm) != YICES_NOT_TERM) {
       return false;
     }
@@ -378,32 +370,17 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
-    // TODO Auto-generated method stub
-    System.out.println("----------");
-    // System.out.println(yices_term_to_string(pDeclaration, 100, 10, 0));
-    System.out.println("Term ID is: " + pDeclaration);
-    // System.out
-    // .println("Type: " + yices_type_to_string(yices_type_of_term(pDeclaration), 100, 10, 0));
-    if (pDeclaration == 7) {
-      System.out.println(yices_term_to_string(pDeclaration, 100, 1, 0));
-    }
     int size = pArgs.size();
     int[] argArray = new int[size];
     for (int i = 0; i < size; i++) {
       argArray[i] = pArgs.get(i);
-      // System.out.println(yices_term_to_string(argArray[i], 100, 10, 0));
-      System.out.println("Arg id is: " + argArray[i]);
     }
-    System.out.println("----------");
     int app = yices_application(pDeclaration, size, argArray);
-    // System.out.println("APP" + yices_term_to_string(app, 100, 10, 0));
-    System.out.println("App id is :" + app);
     return app;
   }
 
   @Override
   public Integer declareUFImpl(String pName, Integer pReturnType, List<Integer> pArgTypes) {
-    // TODO Auto-generated method stub
     int size = pArgTypes.size();
     int[] argTypeArray = Ints.toArray(pArgTypes);
     final int yicesFuncType;
@@ -434,7 +411,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         throw new IllegalArgumentException("Unexpected type: " + type);
       }
     } else {
-      throw new IllegalArgumentException("Term: " + pF + " is not an arithmetic constant");
+      throw new IllegalArgumentException(
+          "Term: " + yices_term_to_string(pF, 100, 1, 0) + " is not an arithmetic constant");
     }
   }
 

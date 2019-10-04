@@ -1296,24 +1296,6 @@ EMPTY_YVAL_ARG(3)
 CALL3(int, get_value)
 YVAL_RETURN(3)
 
-/**DEFINE_FUNC(intArray, 1unpack_1value) WITH_ONE_ARG(jyval)
-*YVAL_PTR_ARG(1)
-*yval_t value = *m_arg1;
-*printf("C: Node id is: %d\n", m_arg1->node_id);
-*printf("C: Node tag is: %d\n", value.node_tag);
-*int yval[2];
-*yval[0] = value.node_id;
-*yval[1] = value.node_tag;
-*jintArray jretval;
-*if (!(*jenv)->ExceptionCheck(jenv)) {
-*  jretval = (*jenv)->NewIntArray(jenv, 2);
-*  if(jretval != NULL){
-*    (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, yval);
-*  }
-*}
-*return jretval;
-*}
-*/
 DEFINE_FUNC(int, 1val_1bitsize) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
 YVAL_ARG(2, 2, 3)
@@ -1350,7 +1332,7 @@ INT_ARRAY_RETURN(3)
 
 DEFINE_FUNC(intArray, 1val_1expand_1function) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
-YVAL_ARG(2,2,3)//EMPTY_YVAL_ARG(2) // CHANGE
+YVAL_ARG(2,2,3)
 EMPTY_YVAL_ARG(3)
 YVAL_VECTOR_ARG(4)
 CALL4(int, val_expand_function)
@@ -1363,7 +1345,17 @@ if(retval == -1){
 if ((*jenv)->ExceptionCheck(jenv)) {
    goto out;
 }
-size_t sz = (s_arg4.size+1)*2; //Need two values for each yval_t
+printf("Size of yval vector: %d\n", s_arg4.size);
+fflush(stdout);
+size_t sz = s_arg4.size;
+sz++; //increase by one for default value
+sz = sz*2; //Need two values for each yval_t
+sz = sz +0; // Memory should be correctly allocated, but deliberatly increasing size seems to partially alleviate the issue
+/**
+* Memory needed should be (yval_vetctor_t.size + 1 (default value) ) and then times 2 because each yval is represented by two ints.
+*/
+printf("Allocating memory for %lu ints.\n", sz);
+fflush(stdout);
 jlong *jarr = malloc(sizeof(jint) * sz);
 if (jarr == NULL) {
     throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
@@ -1374,20 +1366,29 @@ jarr[0] = m_arg3->node_id;
 jarr[1] = m_arg3->node_tag;
 size_t i;
 for (i = 2; i < sz; i+=2) {
+  printf("position is : %lu\n", i);
   jarr[i] = data[i].node_id;
   jarr[i+1] = data[i+1].node_tag;
 }
+printf("I am a debug message\n");
+fflush(stdout);
 jretval = (*jenv)->NewLongArray(jenv, sz);
 if (jretval != NULL) {
   (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz, jarr);
 }
 free(jarr);
+printf("I am a debug message too\n");
+fflush(stdout);
 out:
 yices_delete_yval_vector(m_arg4);
+printf("I am a debug message also\n");
+fflush(stdout);
 return jretval;
 }
 //node_id and nodetag split for retaining argment order for C call
 DEFINE_FUNC(intArray, 1val_1expand_1mapping) WITH_FOUR_ARGS(jmodel, jnodeid, int, jnodetag)
+printf("Expanding mapping of arity %d.\n", arg3);
+fflush(stdout);
 MODEL_ARG(1)
 YVAL_ARG(2,2,4) // CHANGE
 EMPTY_YVAL_ARRAY_ARG(3)

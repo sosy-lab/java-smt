@@ -717,9 +717,17 @@ class Yices2NativeApi {
    */
   public static native int[] yices_val_get_bv(long m, int id, int size, int tag);
 
+  /*
+   * Returns array of yval_t values built like this: [yval_t.node_id, yval_t.node_tag,
+   * yval_t.node_id, yval_t.node_tag, ...] The first pair of values represent the default value, the
+   * following values should represent mappings, which can be expanded using expand_mapping()
+   */
   public static native int[] yices_val_expand_function(long m, int id, int tag);
 
   /*
+   * Returns array of yval_t values built like this: [yval_t.node_id, yval_t.node_tag,
+   * yval_t.node_id, yval_t.node_tag, ...] The last pair of values represent the function's value,
+   * the other pairs are values for the function's arguments
    * node_id / node_tag separated to preserve C call order
    */
   public static native int[] yices_val_expand_mapping(long m, int id, int arity, int tag);

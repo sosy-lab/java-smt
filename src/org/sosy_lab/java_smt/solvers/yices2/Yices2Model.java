@@ -129,11 +129,16 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     int arity = yices_val_function_arity(model, yval[0], yval[1]);
     int[] types = yices_type_children(yices_type_of_term(t));
     String name = yices_get_term_name(t);
+    // TOOD solve inconsistent memory problems presumably occurring in expand_mapping()
     int[] expandFun = yices_val_expand_function(model, yval[0], yval[1]);
     System.out.println("Expanded Function:");
     for (int i = 0; i < expandFun.length; i++) {
       System.out.println(expandFun[i]);
     }
+    /*
+     * TODO Expand function returns multiple yvals with tag YVAL_UNKNOWN Expected behavior: One yval
+     * of same type as fun return for the default value, YVAL_MAPPING(s) for actual arguments/value
+     */
     int[] defaultValue = {expandFun[0], expandFun[1]};
     if(expandFun.length==2) { //TODO Really required?
       //valueTerm = convert( default Value)
@@ -143,7 +148,12 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     }else {
       for (int i = 2; i < expandFun.length - 1; i += 2) {
         System.out.println("Yval_id: " + expandFun[i] + " Yval tag: " + expandFun[i + 1]);
-        int[] expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
+        int[] expandMap;
+        if (expandFun[i + 1] == YVAL_MAPPING) {
+          expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
+        } else {
+          throw new IllegalArgumentException("Not a mapping!"); // TODO
+        }
         List<Object> argumentInterpretation = new ArrayList<>();
        // TODO convertValue of (expandMap[0], expandMap[1])
         for (int j = 0; i<expandMap.length-3; i+=2) {
@@ -231,7 +241,8 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     System.out
         .println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
     Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    // TODO REENABLE after testing Preconditions.checkState(!prover.isClosed(), "cannot use model
+    // after prover is closed");
     int[] yval = yices_get_value(model, pFormula);
     System.out.println("Yval id is: " + yval[0]);
     System.out.println("Yval tag is: " + yval[1]);
