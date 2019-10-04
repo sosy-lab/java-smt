@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
@@ -352,13 +351,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   private void checkThatDumpIsParseable(String dump) {
     requireParser();
     mgr.parse(dump);
-  }
-
-  private void requireParser() {
-    assume()
-        .withMessage("Solver %s does not support parsing formulae", solverToUse())
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC4);
   }
 
   private BooleanFormula genBoolExpr() {

@@ -457,6 +457,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays2() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
 
     BooleanFormula f =
@@ -482,6 +483,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
@@ -522,6 +524,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays4() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
 
     // create formula for "arr[5]==x && x==123"
@@ -549,6 +552,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
 
     // create formula for "arr[5]==x && x==123"
@@ -573,6 +577,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays5() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
 
     // create formula for "arr[5]==x && x==123"
@@ -1077,6 +1082,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest1() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
 
     for (String query :
@@ -1089,6 +1095,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest2() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireOptimization();
     requireFloats();
@@ -1127,6 +1134,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest3() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
 
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
@@ -1135,6 +1143,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest4() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireBitvectors();
     assume()
