@@ -359,12 +359,24 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
           .put(Kind.FLOATINGPOINT_TO_FP_FLOATINGPOINT, FunctionDeclarationKind.FP_CASTTO_FP)
+          .put(Kind.FLOATINGPOINT_TO_FP_SIGNED_BITVECTOR, FunctionDeclarationKind.BV_SCASTTO_FP)
+          .put(Kind.FLOATINGPOINT_TO_FP_UNSIGNED_BITVECTOR, FunctionDeclarationKind.BV_UCASTTO_FP)
           .put(Kind.FLOATINGPOINT_ISNAN, FunctionDeclarationKind.FP_IS_NAN)
           .put(Kind.FLOATINGPOINT_ISNEG, FunctionDeclarationKind.FP_IS_NEGATIVE)
           .put(Kind.FLOATINGPOINT_ISINF, FunctionDeclarationKind.FP_IS_INF)
           .put(Kind.FLOATINGPOINT_ISN, FunctionDeclarationKind.FP_IS_NORMAL)
           .put(Kind.FLOATINGPOINT_ISSN, FunctionDeclarationKind.FP_IS_SUBNORMAL)
           .put(Kind.FLOATINGPOINT_ISZ, FunctionDeclarationKind.FP_IS_ZERO)
+          .put(Kind.FLOATINGPOINT_EQ, FunctionDeclarationKind.FP_EQ)
+          .put(Kind.FLOATINGPOINT_PLUS, FunctionDeclarationKind.FP_ADD)
+          .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
+          .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
+          .put(Kind.FLOATINGPOINT_DIV, FunctionDeclarationKind.FP_DIV)
+          .put(Kind.FLOATINGPOINT_LT, FunctionDeclarationKind.FP_LT)
+          .put(Kind.FLOATINGPOINT_LEQ, FunctionDeclarationKind.FP_LE)
+          .put(Kind.FLOATINGPOINT_GT, FunctionDeclarationKind.FP_GT)
+          .put(Kind.FLOATINGPOINT_GEQ, FunctionDeclarationKind.FP_GE)
+          .put(Kind.FLOATINGPOINT_RTI, FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL)
           .put(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, FunctionDeclarationKind.FP_AS_IEEEBV)
           .build();
 
@@ -393,7 +405,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
     if (pArgs.size() == 0) {
-      return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration);
+      return exprManager.mkExpr(pDeclaration);
     } else if (pArgs.size() == 1) {
       return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration, pArgs.get(0));
     } else {
