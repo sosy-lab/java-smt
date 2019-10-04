@@ -43,7 +43,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-class SmtInterpolFormulaManager
+public class SmtInterpolFormulaManager
     extends AbstractFormulaManager<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
 
   SmtInterpolFormulaManager(

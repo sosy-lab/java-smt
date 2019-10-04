@@ -77,7 +77,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * set a logfile for all Smt-Queries (default "smtinterpol.smt2").
  */
 @Options(prefix = "solver.smtinterpol")
-class SmtInterpolEnvironment {
+public class SmtInterpolEnvironment {
 
   /** SMTInterpol does not allow to use key-functions as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS =
