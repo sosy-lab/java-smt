@@ -124,7 +124,7 @@ public class CVC4FloatingPointFormulaManager
     }
   }
 
-  /** TODO lookup why this number works: <code>2**(2**(exp-1)) - 2**(2**(exp-1)-2-mant)</code> */
+  // TODO lookup why this number works: <code>2**(2**(exp-1)) - 2**(2**(exp-1)-2-mant)</code>
   private static BigInteger getBiggestNumberBeforeInf(int mantissa, int exponent) {
     int boundExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact();
     BigInteger upperBoundExponent = BigInteger.valueOf(2).pow(boundExponent);

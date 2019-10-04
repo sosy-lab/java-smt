@@ -107,14 +107,16 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
         out.append("(assert ");
         // f.toString() does expand all nested sub-expressions and causes exponential overhead.
         // f.toStream() uses LET-expressions and is exactly what we want.
-        f.toStream(
+        try (OutputStream stream =
             new OutputStream() {
 
               @Override
               public void write(int chr) throws IOException {
                 out.append(Character.valueOf((char) chr));
               }
-            });
+            }) {
+          f.toStream(stream);
+        }
         out.append(')');
       }
     };
