@@ -163,7 +163,9 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    testModelGetters(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true, "x");
+    for (String name : new String[] {"x", "x-x", "x::x"}) {
+      testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
+    }
   }
 
   @Test

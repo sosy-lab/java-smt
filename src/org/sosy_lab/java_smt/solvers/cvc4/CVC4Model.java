@@ -88,6 +88,10 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
       argumentInterpretation.add(evaluateImpl(param));
     }
     Expr name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
+    String nameStr = name.toString();
+    if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
+      nameStr = nameStr.substring(1, nameStr.length() - 1);
+    }
     Expr valueTerm = getValue(pKeyTerm);
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
@@ -95,7 +99,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
         creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, valueTerm));
     Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
-        keyFormula, valueFormula, equation, name.toString(), value, argumentInterpretation);
+        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretation);
   }
 
   @Override
