@@ -467,6 +467,9 @@ public class Yices2NativeApiTest {
       System.out.println(yices_model_to_string(model, 100, 10, 0));
       Object val = m.evaluate(creator.encapsulateWithTypeOf(eq));
       System.out.println(val);
+      int addT = yices_add(z, z2);
+      Object val2 = m.evaluate(creator.encapsulateWithTypeOf(addT));
+      System.out.println(val2);
       System.out.println("DEFINED TERMS");
       int[] terms = yices_def_terms(model);
       for (int i = 0; i < terms.length; i++) {

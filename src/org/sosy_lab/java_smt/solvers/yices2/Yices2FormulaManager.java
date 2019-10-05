@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -53,8 +55,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO Might expect Yices input language instead of smt-lib2 notation
+    return getFormulaCreator().encapsulateBoolean(yices_parse_term(pS));
   }
 
   @Override

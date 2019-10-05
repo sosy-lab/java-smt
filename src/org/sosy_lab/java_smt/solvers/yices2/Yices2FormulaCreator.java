@@ -250,7 +250,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private FunctionDeclarationKind getDeclarationKind(int pF) {
-    // TODO If uninterpreted function
     List<Integer> constantsAndVariables =
         ImmutableList.of(
             YICES_BOOL_CONST,
@@ -268,7 +267,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_ITE_TERM:
         return FunctionDeclarationKind.ITE;
       case YICES_APP_TERM:
-        return FunctionDeclarationKind.UF; // TODO correct?
+        return FunctionDeclarationKind.UF;
       case YICES_EQ_TERM:
         return FunctionDeclarationKind.EQ; // Covers all equivalences
       case YICES_DISTINCT_TERM:
@@ -412,7 +411,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       }
     } else {
       throw new IllegalArgumentException(
-          "Term: " + yices_term_to_string(pF, 100, 1, 0) + " is not an arithmetic constant");
+          String.format(
+              "Term: '%s' with type '%s' is not an arithmetic constant",
+              yices_term_to_string(pF, 100, 10, 0),
+              yices_type_to_string(yices_type_of_term(pF), 100, 10, 0)));
     }
   }
 

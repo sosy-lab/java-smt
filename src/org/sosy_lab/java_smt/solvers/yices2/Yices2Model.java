@@ -236,8 +236,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   @Override
   protected @Nullable Integer evalImpl(Integer pFormula) {
-    // TODO Can Functions appear here?? // Convert yval value returns to term instead of
-    // get_value_as_term
+    // TODO Can UF appear here?? // Built in Functions like "add" seem to be OK
     System.out
         .println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
     Preconditions.checkState(!closed);
