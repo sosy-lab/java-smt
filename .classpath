@@ -18,6 +18,7 @@
 	<classpathentry kind="lib" path="lib/java/runtime/princess-smt-parser_2.12.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/java-cup-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime/CVC4.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/diffutils.jar"/>
@@ -27,6 +28,5 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/java/runtime/CVC4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

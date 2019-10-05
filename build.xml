@@ -57,13 +57,12 @@
 
     <target name="build" depends="build-project, collect-options" description="Build"/>
 
-    <!--<target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>-->
-	<target name="dist" depends="jar, sources" description="Make a distributable release"/>
+    <target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
-    <!--<target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version to Ivy repository"/>-->
-	<target name="publish" depends="dist, publish-artifacts" description="Publish current version to Ivy repository"/>
+    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version to Ivy repository"/>
+
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 
     <target name="all-checks" description="Run all tests and checks">
