@@ -288,12 +288,17 @@ public class Yices2NativeApiTest {
     int negativeNumDenConst = yices_parse_rational(negativeNum + "/" + negativeDen);
     int bigConst = yices_parse_rational(largeNumber.toString());
     Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
-    assertEquals(creator.convertValue(ratConst), Rational.of(num + "/" + den));
-    assertEquals(creator.convertValue(bigConst), largeNumber);
-    assertEquals(creator.convertValue(negativeNumConst), Rational.of(negativeNum + "/" + den));
-    assertEquals(creator.convertValue(negativeDenConst), Rational.of(num + "/" + negativeDen));
+    assertEquals(creator.convertValue(ratConst, ratConst), Rational.of(num + "/" + den));
+    assertEquals(creator.convertValue(bigConst, bigConst), largeNumber);
     assertEquals(
-        creator.convertValue(negativeNumDenConst), Rational.of(negativeNum + "/" + negativeDen));
+        creator.convertValue(negativeNumConst, negativeNumConst),
+        Rational.of(negativeNum + "/" + den));
+    assertEquals(
+        creator.convertValue(negativeDenConst, negativeDenConst),
+        Rational.of(num + "/" + negativeDen));
+    assertEquals(
+        creator.convertValue(negativeNumDenConst, negativeNumDenConst),
+        Rational.of(negativeNum + "/" + negativeDen));
   }
 
   @Test
