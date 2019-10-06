@@ -68,13 +68,13 @@ public class Yices2BitvectorFormulaManager
   protected Integer makeBitvectorImpl(int pLength, long pParam1) {
     // TODO Check size constraints/ Unsure if correct
     if (Long.signum(pParam1) < 0) {
-      long max = (long) (Math.pow(2, (pLength - 1)));
+      long max = (long) Math.pow(2, (pLength - 1));
       if (Math.abs(pParam1) > max) {
         throw new IllegalArgumentException(
             pParam1 + " can not be represented as a signed bv of length " + pLength);
       }
     } else {
-      long max = (long) (Math.pow(2, (pLength)));
+      long max = (long) Math.pow(2, pLength);
       if (pParam1 >= max) {
         throw new IllegalArgumentException(
             pParam1 + " can not be represented as a signed bv of length " + pLength);
