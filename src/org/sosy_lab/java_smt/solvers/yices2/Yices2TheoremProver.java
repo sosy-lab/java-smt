@@ -75,6 +75,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     yices_set_config(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
     // TODO config options
+    constraintStack.push(new LinkedHashSet<>()); // initial level
   }
 
   boolean isClosed() {
@@ -181,6 +182,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     if (!closed) {
       yices_free_context(curEnv);
       yices_free_config(curCfg);
+      constraintStack.clear();
       closed = true;
     }
   }
