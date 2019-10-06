@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -33,9 +32,9 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       Yices2FormulaCreator pFormulaCreator,
       Yices2UFManager pFunctionManager,
       Yices2BooleanFormulaManager pBooleanManager,
-      @Nullable Yices2IntegerFormulaManager pIntegerManager,
-      @Nullable Yices2RationalFormulaManager pRationalManager,
-      @Nullable Yices2BitvectorFormulaManager pBitvectorManager) {
+      Yices2IntegerFormulaManager pIntegerManager,
+      Yices2RationalFormulaManager pRationalManager,
+      Yices2BitvectorFormulaManager pBitvectorManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -46,7 +45,6 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         null,
         null,
         null);
-    // TODO Auto-generated constructor stub
   }
 
   static Integer getYicesTerm(Formula pT) {

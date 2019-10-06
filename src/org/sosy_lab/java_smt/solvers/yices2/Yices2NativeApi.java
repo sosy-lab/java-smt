@@ -113,7 +113,7 @@ class Yices2NativeApi {
   /** Initializes Yices data structures. Needs to be called before doing anything else. */
   public static native void yices_init();
 
-  /** Call at the end to free memory allocated by Yices */
+  /** Call at the end to free memory allocated by Yices. */
   public static native void yices_exit();
 
   /**
@@ -237,7 +237,7 @@ class Yices2NativeApi {
   public static native boolean yices_type_is_real(int t);
 
   /**
-   * Checks if type is arithmetic (i.e., either integer or real)
+   * Checks if type is arithmetic (i.e., either integer or real).
    *
    * @param t Type to check
    * @return true if arithmetic, false otherwise
@@ -258,7 +258,7 @@ class Yices2NativeApi {
   public static native boolean yices_test_subtype(int t1, int t2);
 
   /**
-   * Tests if Type1 and Type2 are compatible
+   * Tests if Type1 and Type2 are compatible.
    *
    * @param t1 The first type
    * @param t2 The second type
@@ -688,7 +688,8 @@ class Yices2NativeApi {
   public static native long yices_get_int64_value(long m, int t);
 
   // public static native long yices_get_value(long m, int t);
-  /** Value as Array [node_id, node_tag] */
+
+  /** get the value of a term as pair [node_id, node_tag]. */
   public static native int[] yices_get_value(long m, int t);
 
   public static native int yices_val_get_bitsize(long m, int id, int tag);
@@ -719,7 +720,8 @@ class Yices2NativeApi {
    * node_id / node_tag separated to preserve C call order
    */
   public static native int[] yices_val_expand_mapping(long m, int id, int arity, int tag);
-  /** Value as Yices term */
+
+  /** get the value of a term as (constant) term. */
   public static native int yices_get_value_as_term(long m, int t);
 
   public static native int yices_set_term_name(int t, String name);
@@ -754,7 +756,7 @@ class Yices2NativeApi {
     return yices_model_to_string(m, Integer.MAX_VALUE, 1, 0);
   }
 
-  /** Parse Term in SMT-Lib2 / Yices input language */
+  /** Parse Term in SMT-Lib2 / Yices input language. */
   public static native int yices_parse_term(String t);
 
   public static int yices_named_variable(int type, String name) {

@@ -70,7 +70,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   private final long model;
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
-  private final boolean DEBUG_MODEL = true;
+  private static final boolean DEBUG_MODEL = true;
   private boolean closed = false;
 
   protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
@@ -218,7 +218,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   private int valueAsTerm(int type, Object value) {
     if (yices_type_is_bool(type)) {
-      if ((boolean) value == true) {
+      if ((boolean) value) {
         return yices_true();
       } else {
         return yices_false();

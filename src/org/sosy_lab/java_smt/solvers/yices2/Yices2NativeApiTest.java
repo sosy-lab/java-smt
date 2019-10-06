@@ -104,7 +104,7 @@ import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Model;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings("unused")
 public class Yices2NativeApiTest {
   private static final int SAT = 3;
   private static final int UNSAT = 4;
@@ -428,6 +428,7 @@ public class Yices2NativeApiTest {
     assertEquals(YICES_EQ_TERM, yices_term_constructor(iff));
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void modelTest() {
     int varx = yices_named_variable(yices_real_type(), "x");
@@ -446,6 +447,7 @@ public class Yices2NativeApiTest {
     }
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void modelExplorationTest() {
     int x = yices_int32(5);
