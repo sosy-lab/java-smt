@@ -75,7 +75,6 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
     this.model = model;
     this.prover = prover;
     this.formulaCreator = pCreator;
@@ -95,7 +94,6 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   @Override
   public void close() {
-    // TODO Auto-generated method stub
     if (!closed) {
       yices_free_model(model);
       closed = true;
@@ -104,7 +102,6 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   @Override
   protected ImmutableList<ValueAssignment> toList() {
-    // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     List<Integer> complex = ImmutableList.of(YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN);

@@ -110,14 +110,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer getFloatingPointType(FloatingPointType pType) {
-    // TODO Yices has no floatingPointType
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Integer getArrayType(Integer pIndexType, Integer pElementType) {
-    // TODO Yices has no arrayType?
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override

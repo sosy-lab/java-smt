@@ -20,10 +20,14 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
+import java.io.IOException;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
@@ -57,10 +61,20 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     return getFormulaCreator().encapsulateBoolean(yices_parse_term(pS));
   }
 
+
   @Override
-  public Appender dumpFormula(Integer pT) {
-    // TODO Auto-generated method stub
-    // VariableCollector
-    return null;
+  public Appender dumpFormula(final Integer formula) {
+    assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
+
+    return new Appenders.AbstractAppender() {
+
+      @Override
+      public void appendTo(Appendable out) throws IOException {
+        // TODO add function declarations
+        // TODO fold formula to avoid exp. overhead
+        out.append("(assert " + yices_term_to_string(formula) + ")");
+      }
+    };
   }
 }
