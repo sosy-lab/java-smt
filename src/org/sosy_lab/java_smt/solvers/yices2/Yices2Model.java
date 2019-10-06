@@ -140,12 +140,12 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
      * of same type as fun return for the default value, YVAL_MAPPING(s) for actual arguments/value
      */
     int[] defaultValue = {expandFun[0], expandFun[1]};
-    if(expandFun.length==2) { //TODO Really required?
-      //valueTerm = convert( default Value)
+    if (expandFun.length == 2) { // TODO Really required?
+      // valueTerm = convert( default Value)
       throw new UnsupportedOperationException("Formula has only default value");
       // assignments.add(new ValueAssignment(keyFormula, valueFormula, formula, name, value,
       // argumentInterpretation))
-    }else {
+    } else {
       for (int i = 2; i < expandFun.length - 1; i += 2) {
         System.out.println("Yval_id: " + expandFun[i] + " Yval tag: " + expandFun[i + 1]);
         int[] expandMap;
@@ -155,23 +155,31 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
           throw new IllegalArgumentException("Not a mapping!"); // TODO
         }
         List<Object> argumentInterpretation = new ArrayList<>();
-       // TODO convertValue of (expandMap[0], expandMap[1])
-        for (int j = 0; i<expandMap.length-3; i+=2) {
-          argumentInterpretation.add(valueFromYval(expandMap[j], expandMap[j++], types[j/2] ));//TODO
+        // TODO convertValue of (expandMap[0], expandMap[1])
+        for (int j = 0; i < expandMap.length - 3; i += 2) {
+          argumentInterpretation.add(
+              valueFromYval(expandMap[j], expandMap[j++], types[j / 2])); // TODO
         }
-        Object value = valueFromYval(expandMap[expandMap.length-2],expandMap[expandMap.length-1], types[types.length-1]);
-        int valueTerm = valueAsTerm(types[types.length-1], value);
-        assignments.add(new ValueAssignment(creator.encapsulateWithTypeOf(t),
-            creator.encapsulateWithTypeOf(valueTerm),
-            creator.encapsulateBoolean(yices_eq(t, valueTerm)),
-            name,
-            value,
-            argumentInterpretation));
+        Object value =
+            valueFromYval(
+                expandMap[expandMap.length - 2],
+                expandMap[expandMap.length - 1],
+                types[types.length - 1]);
+        int valueTerm = valueAsTerm(types[types.length - 1], value);
+        assignments.add(
+            new ValueAssignment(
+                creator.encapsulateWithTypeOf(t),
+                creator.encapsulateWithTypeOf(valueTerm),
+                creator.encapsulateBoolean(yices_eq(t, valueTerm)),
+                name,
+                value,
+                argumentInterpretation));
       }
     }
-    return assignments.build();// new ValueAssignment(keyFormula, valueFormula, formula, name,
-                               // value, argumentInterpretation)
+    return assignments.build(); // new ValueAssignment(keyFormula, valueFormula, formula, name,
+    // value, argumentInterpretation)
   }
+
   private ValueAssignment getSimpleAssignment(int t) {
     List<Object> argumentInterpretation = new ArrayList<>();
     int valueTerm = yices_get_value_as_term(model, t);
@@ -186,7 +194,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   private Object valueFromYval(int id, int tag, int type) {
     if (tag == YVAL_BOOL) {
-      return (boolean) yices_val_get_bool(model, id, tag);
+      return yices_val_get_bool(model, id, tag);
     } else if (tag == YVAL_RATIONAL) {
       String value = yices_val_get_mpq(model, id, tag);
       if (yices_type_is_int(type) && !value.contains("/")) {
@@ -237,8 +245,8 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   @Override
   protected @Nullable Integer evalImpl(Integer pFormula) {
     // TODO Can UF appear here?? // Built in Functions like "add" seem to be OK
-    System.out
-        .println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
+    System.out.println(
+        "Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
     Preconditions.checkState(!closed);
     // TODO REENABLE after testing Preconditions.checkState(!prover.isClosed(), "cannot use model
     // after prover is closed");
@@ -251,6 +259,4 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     }
     return val;
   }
-
 }
-

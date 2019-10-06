@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
@@ -98,13 +97,8 @@ import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2RationalFormula;
 
 public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
 
-
   protected Yices2FormulaCreator(long env) {
-    super(
-        env,
-        yices_bool_type(),
-        yices_int_type(),
-        yices_real_type());
+    super(env, yices_bool_type(), yices_int_type(), yices_real_type());
   }
 
   @Override
@@ -139,11 +133,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Integer pTerm) {
     assert pType.equals(getFormulaType(pTerm))
-        || (pType.equals(FormulaType.RationalType)
-            && getFormulaType(pTerm).equals(FormulaType.IntegerType)) : String.format(
-                "Trying to encapsulate formula of type %s as %s",
-                getFormulaType(pTerm),
-                pType);
+            || (pType.equals(FormulaType.RationalType)
+                && getFormulaType(pTerm).equals(FormulaType.IntegerType))
+        : String.format(
+            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new Yices2BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -241,11 +234,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             pFormula,
             args.build(),
             FunctionDeclarationImpl.of(
-                name,
-                kind,
-                argTypes.build(),
-                getFormulaType(pF),
-                constructor));
+                name, kind, argTypes.build(), getFormulaType(pF), constructor));
     }
   }
 
@@ -455,5 +444,4 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           "Unexpected type: " + yices_type_to_string(yices_type_of_term(pF), 100, 1, 0));
     }
   }
-
 }

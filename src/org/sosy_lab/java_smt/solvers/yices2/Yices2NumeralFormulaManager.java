@@ -40,13 +40,13 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
-abstract class Yices2NumeralFormulaManager<ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-    extends
-    AbstractNumeralFormulaManager<Integer, Integer, Long, ParamFormulaType, ResultFormulaType, Integer> {
+abstract class Yices2NumeralFormulaManager<
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<
+        Integer, Integer, Long, ParamFormulaType, ResultFormulaType, Integer> {
 
   protected Yices2NumeralFormulaManager(
-      Yices2FormulaCreator pCreator,
-      NonLinearArithmetic pNonLinearArithmetic) {
+      Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
 

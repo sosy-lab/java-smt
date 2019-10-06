@@ -89,15 +89,11 @@ public class Yices2SolverContext extends AbstractSolverContext {
         new Yices2RationalFormulaManager(creator, pNonLinearArithmetic);
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
-            creator,
-            functionTheory,
-            booleanTheory,
-            integerTheory,
-            rationalTheory,
-            bitvectorTheory);
+            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
     return new Yices2SolverContext(
         manager, yicesConf, yicesEnv, creator, booleanTheory, pShutdownManager);
   }
+
   @Override
   public String getVersion() {
     String version = String.valueOf(yices_get_version());
@@ -126,14 +122,14 @@ public class Yices2SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?>
-      newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Yices does not support interpolation");
   }
 
   @Override
-  protected OptimizationProverEnvironment
-      newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Yices does not support optimization");
   }
 

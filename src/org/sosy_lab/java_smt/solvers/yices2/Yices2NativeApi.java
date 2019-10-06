@@ -19,11 +19,9 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
 class Yices2NativeApi {
-  private Yices2NativeApi() {
-  }
+  private Yices2NativeApi() {}
   // Yices2 status codes
 
   private static final int STATUS_IDLE = 0;
@@ -61,16 +59,16 @@ class Yices2NativeApi {
   public static final int YICES_BV_SDIV = 20; // signed division
   public static final int YICES_BV_SREM = 21; // remainder in signed division (rounding to 0)
   public static final int YICES_BV_SMOD = 22; // remainder in signed division (rounding to
-                                              // -infinity)
+  // -infinity)
   public static final int YICES_BV_SHL = 23; // shift left (padding with 0)
   public static final int YICES_BV_LSHR = 24; // logical shift right (padding with 0)
   public static final int YICES_BV_ASHR = 25; // arithmetic shift right (padding with sign bit)
   public static final int YICES_BV_GE_ATOM = 26; // unsigned comparison: (t1 >= t2)
   public static final int YICES_BV_SGE_ATOM = 27; // signed comparison (t1 >= t2)
   public static final int YICES_ARITH_GE_ATOM = 28; // atom (t1 >= t2) for arithmetic terms: t2 is
-                                                    // always 0
+  // always 0
   public static final int YICES_ARITH_ROOT_ATOM = 29; // atom (0 <= k <= root_count(p)) && (x r
-                                                      // root(p,k)) for r in <, <=, ==, !=, >, >=
+  // root(p,k)) for r in <, <=, ==, !=, >, >=
 
   public static final int YICES_ABS = 30; // absolute value
   public static final int YICES_CEIL = 31; // ceil
@@ -87,9 +85,9 @@ class Yices2NativeApi {
 
   // sums
   public static final int YICES_BV_SUM = 40; // sum of pairs a * t where a is a bitvector constant
-                                             // (and t is a bitvector term)
+  // (and t is a bitvector term)
   public static final int YICES_ARITH_SUM = 41; // sum of pairs a * t where a is a rational (and t
-                                                // is an arithmetic term)
+  // is an arithmetic term)
 
   // products
   public static final int YICES_POWER_PRODUCT = 42; // power products: (t1^d1 * ... * t_n^d_n)
@@ -112,21 +110,17 @@ class Yices2NativeApi {
    * Yices initialization and exit
    */
 
-  /**
-   * Initializes Yices data structures. Needs to be called before doing anything else.
-   */
+  /** Initializes Yices data structures. Needs to be called before doing anything else. */
   public static native void yices_init();
 
-  /**
-   * Call at the end to free memory allocated by Yices
-   */
+  /** Call at the end to free memory allocated by Yices */
   public static native void yices_exit();
 
   /**
    * Perform a full reset of Yices
    *
-   * This function deletes all the terms and types defined in Yices and resets the symbol tables. It
-   * also deletes all contexts, models, configuration descriptors, and other records allocated in
+   * <p>This function deletes all the terms and types defined in Yices and resets the symbol tables.
+   * It also deletes all contexts, models, configuration descriptors, and other records allocated in
    * Yices.
    */
   public static native void yices_reset();
@@ -184,7 +178,6 @@ class Yices2NativeApi {
    * @param logic Name of the logic to prepare for or "NULL"
    * @return 0 if successful, -1 if an error occurred
    */
-
   public static native int yices_default_config_for_logic(long cfg, String logic);
 
   public static native long yices_new_context(long cfg);
@@ -620,9 +613,7 @@ class Yices2NativeApi {
   public static native boolean yices_bool_const_value(int t);
 
   // TODO Return bool[] instead of int[]?
-  /**
-   * Returns in little endian order.
-   */
+  /** Returns in little endian order. */
   public static native int[] yices_bv_const_value(int t, int bitsize);
 
   public static native String yices_rational_const_value(int t);
@@ -651,8 +642,8 @@ class Yices2NativeApi {
   public static native int yices_pop(long ctx);
 
   // TODO ZERO if no params?
-  public static native int
-      yices_check_context_with_assumptions(long ctx, long params, int size, int[] terms);
+  public static native int yices_check_context_with_assumptions(
+      long ctx, long params, int size, int[] terms);
 
   public static native int[] yices_get_unsat_core(long ctx);
   // TODO ZERO if no params?
@@ -661,9 +652,8 @@ class Yices2NativeApi {
   }
 
   // TODO ZERO if no params?
-  public static boolean
-      yices_check_sat_with_assumptions(long ctx, long params, int size, int[] assumptions)
-          throws IllegalStateException {
+  public static boolean yices_check_sat_with_assumptions(
+      long ctx, long params, int size, int[] assumptions) throws IllegalStateException {
     return check_result(yices_check_context_with_assumptions(ctx, params, size, assumptions));
   }
 
@@ -691,16 +681,14 @@ class Yices2NativeApi {
   /*
    * renamed collect_defined_terms to def_terms as it caused an UnsatisfiedLinkError for some reason
    */
-  public static native int[] yices_def_terms(long model);// collect_defined_terms(long model);
+  public static native int[] yices_def_terms(long model); // collect_defined_terms(long model);
 
   public static native void yices_free_model(long model);
 
   public static native long yices_get_int64_value(long m, int t);
 
   // public static native long yices_get_value(long m, int t);
-  /**
-   * Value as Array [node_id, node_tag]
-   */
+  /** Value as Array [node_id, node_tag] */
   public static native int[] yices_get_value(long m, int t);
 
   public static native int yices_val_get_bitsize(long m, int id, int tag);
@@ -731,9 +719,7 @@ class Yices2NativeApi {
    * node_id / node_tag separated to preserve C call order
    */
   public static native int[] yices_val_expand_mapping(long m, int id, int arity, int tag);
-  /**
-   * Value as Yices term
-   */
+  /** Value as Yices term */
   public static native int yices_get_value_as_term(long m, int t);
 
   public static native int yices_set_term_name(int t, String name);
@@ -756,9 +742,7 @@ class Yices2NativeApi {
 
   public static native String yices_model_to_string(long m, int width, int height, int offset);
 
-  /**
-   * Parse Term in SMT-Lib2 / Yices input language
-   */
+  /** Parse Term in SMT-Lib2 / Yices input language */
   public static native int yices_parse_term(String t);
 
   public static int yices_named_variable(int type, String name) {
@@ -777,7 +761,7 @@ class Yices2NativeApi {
                 + yices_type_to_string(termFromNameType, 100, 1, 0));
       }
     }
-    int var = yices_new_uninterpreted_term(type);// yices_new_variable(type);
+    int var = yices_new_uninterpreted_term(type); // yices_new_variable(type);
     yices_set_term_name(var, name);
     return var;
   }

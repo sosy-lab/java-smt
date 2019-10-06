@@ -104,6 +104,7 @@ import org.sosy_lab.java_smt.api.Model;
 public class Yices2NativeApiTest {
   private static final int SAT = 3;
   private static final int UNSAT = 4;
+
   @BeforeClass
   public static void loadYices() {
     try {
@@ -288,8 +289,7 @@ public class Yices2NativeApiTest {
     assertEquals(creator.convertValue(negativeNumConst), Rational.of(negativeNum + "/" + den));
     assertEquals(creator.convertValue(negativeDenConst), Rational.of(num + "/" + negativeDen));
     assertEquals(
-        creator.convertValue(negativeNumDenConst),
-        Rational.of(negativeNum + "/" + negativeDen));
+        creator.convertValue(negativeNumDenConst), Rational.of(negativeNum + "/" + negativeDen));
   }
 
   @Test
@@ -306,6 +306,7 @@ public class Yices2NativeApiTest {
       assertEquals(BigInteger.valueOf(value), big);
     }
   }
+
   @Test
   public void termNaming() {
     int t = yices_parse_bvbin("0100100001100101011011000110110001101111");
@@ -328,7 +329,7 @@ public class Yices2NativeApiTest {
   @Test
   public void termConstructorAdd() {
     int one = yices_int32(1);
-    int two = yices_new_uninterpreted_term(yices_int_type());// yices_int32(2);
+    int two = yices_new_uninterpreted_term(yices_int_type()); // yices_int32(2);
     int addition = yices_add(one, two);
     assertEquals(41, YICES_ARITH_SUM);
     assertEquals(yices_term_constructor(addition), YICES_ARITH_SUM);
@@ -337,7 +338,7 @@ public class Yices2NativeApiTest {
   @Test
   public void termConstructorAnd() {
     // and 1 2 is replaced with not (or (not 1) (not 2))
-    int Btrue = yices_new_uninterpreted_term(yices_bool_type());// yices_true();
+    int Btrue = yices_new_uninterpreted_term(yices_bool_type()); // yices_true();
     yices_set_term_name(Btrue, "Btrue");
     int Btwo = yices_new_uninterpreted_term(yices_bool_type());
     yices_set_term_name(Btwo, "Btwo");
@@ -354,7 +355,7 @@ public class Yices2NativeApiTest {
 
   @Test
   public void termConstructorOr() {
-    int Bfalse = yices_new_uninterpreted_term(yices_bool_type());// yices_false();
+    int Bfalse = yices_new_uninterpreted_term(yices_bool_type()); // yices_false();
     // yices_set_term_name(Bfalse, "1");
     int two = yices_new_uninterpreted_term(yices_bool_type());
     // yices_set_term_name(two, "5");
@@ -367,7 +368,7 @@ public class Yices2NativeApiTest {
 
   @Test
   public void termConstructorNot() {
-    int Btrue = yices_new_uninterpreted_term(yices_bool_type());// yices_true();
+    int Btrue = yices_new_uninterpreted_term(yices_bool_type()); // yices_true();
     yices_set_term_name(Btrue, "Btrue");
     int Btwo = yices_new_uninterpreted_term(yices_bool_type());
     yices_set_term_name(Btwo, "Btwo");
@@ -432,8 +433,7 @@ public class Yices2NativeApiTest {
     System.out.println("varx: " + varx);
     System.out.println("query: " + query);
     if (yices_check_sat(env, 0)) {
-      Model m =
-          new Yices2Model(yices_get_model(env, 1), creator);
+      Model m = new Yices2Model(yices_get_model(env, 1), creator);
       Object val = m.evaluate(creator.encapsulateWithTypeOf(varx));
       System.out.println(val);
       m.close();
@@ -481,7 +481,6 @@ public class Yices2NativeApiTest {
         if (yval[1] == YVAL_RATIONAL) {
           System.out.println("Value is: " + yices_val_get_mpq(model, yval[0], yval[1]));
         }
-
       }
       m.close();
     } else {
@@ -499,8 +498,6 @@ public class Yices2NativeApiTest {
     // assertEquals(yices_check_context(env, 0), SAT);
     int y = yices_int32(5);
     yices_set_term_name(y, "y");
-    int x =
-        yices_parse_term(
-            "(/= y 5)");
+    int x = yices_parse_term("(/= y 5)");
   }
 }

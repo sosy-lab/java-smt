@@ -99,6 +99,7 @@ public class Yices2BooleanFormulaManager
     // }
     return pBits.equals(yices_true());
   }
+
   @Override
   protected boolean isFalse(Integer pBits) {
     // TODO Better way to get this information? Causes Error when called with variable.

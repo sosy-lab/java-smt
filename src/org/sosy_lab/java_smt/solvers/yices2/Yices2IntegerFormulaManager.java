@@ -26,12 +26,12 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class Yices2IntegerFormulaManager extends
-    Yices2NumeralFormulaManager<IntegerFormula, IntegerFormula> implements IntegerFormulaManager {
+public class Yices2IntegerFormulaManager
+    extends Yices2NumeralFormulaManager<IntegerFormula, IntegerFormula>
+    implements IntegerFormulaManager {
 
   Yices2IntegerFormulaManager(
-      Yices2FormulaCreator pCreator,
-      NonLinearArithmetic pNonLinearArithmetic) {
+      Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
 
@@ -77,6 +77,4 @@ public class Yices2IntegerFormulaManager extends
     int mul = multiply(mod, div);
     return equal(sub, mul);
   }
-
 }
-

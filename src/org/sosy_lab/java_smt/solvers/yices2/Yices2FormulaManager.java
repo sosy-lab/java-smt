@@ -65,5 +65,4 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     // VariableCollector
     return null;
   }
-
 }

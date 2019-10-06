@@ -60,7 +60,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   protected final long curEnv;
   protected final long curCfg;
 
-  private final Deque<Set<Integer>> constraintStack=new ArrayDeque<>();
+  private final Deque<Set<Integer>> constraintStack = new ArrayDeque<>();
 
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
@@ -90,9 +90,9 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    int constraint=creator.extractInfo(pConstraint);
+    int constraint = creator.extractInfo(pConstraint);
     yices_assert_formula(curEnv, constraint);
-      constraintStack.peek().add(constraint);
+    constraintStack.peek().add(constraint);
     return null;
   }
 

@@ -262,5 +262,4 @@ public class Yices2BitvectorFormulaManager
     throw new UnsupportedOperationException(
         "Yices does not support making a BV formula from an INT formula.");
   }
-
 }
