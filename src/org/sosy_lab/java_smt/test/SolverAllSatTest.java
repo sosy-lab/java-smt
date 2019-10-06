@@ -75,6 +75,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
         break;
       case "itp":
+        requireInterpolation();
 
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
