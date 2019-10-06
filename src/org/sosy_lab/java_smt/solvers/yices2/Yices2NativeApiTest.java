@@ -161,7 +161,6 @@ public class Yices2NativeApiTest {
   public void arrayArgSAT() {
     int n = 4;
     int term_true = yices_true();
-    int term_false = yices_false();
     int[] terms = {term_true, term_true, term_true, term_true};
     int formula = yices_and(n, terms);
     yices_assert_formula(env, formula);
