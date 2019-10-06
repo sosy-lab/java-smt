@@ -48,7 +48,7 @@ abstract class Yices2Formula implements Formula {
 
   @Override
   public final String toString() {
-    return yices_term_to_string(yicesTerm, Integer.MAX_VALUE, 1, 0);
+    return yices_term_to_string(yicesTerm);
   }
 
   @Override

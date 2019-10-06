@@ -81,7 +81,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     this.formulaCreator = pCreator;
     if (DEBUG_MODEL) {
       System.out.println("---MODEL_BEGIN---");
-      System.out.println(yices_model_to_string(model, 100, 10, 0));
+      System.out.println(yices_model_to_string(model));
       System.out.println("---MODEL_END---");
     }
   }
@@ -127,7 +127,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   // TODO encapsulate Formula ? convert yval to valueTerm and value(Object)
   private ImmutableList<ValueAssignment> getFunctionAssignment(int t, int[] yval) {
     System.out.println("Exploring function...");
-    System.out.println(yices_term_to_string(t, 300, 1, 0));
+    System.out.println(yices_term_to_string(t));
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int arity = yices_val_function_arity(model, yval[0], yval[1]);
     int[] types = yices_type_children(yices_type_of_term(t));
@@ -234,16 +234,14 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
       BigInteger val = (BigInteger) value;
       return yices_parse_bvbin(val.toString(2));
     } else {
-      throw new IllegalArgumentException(
-          "Unexpected type: " + yices_type_to_string(type, 100, 1, 0));
+      throw new IllegalArgumentException("Unexpected type: " + yices_type_to_string(type));
     }
   }
 
   @Override
   protected @Nullable Integer evalImpl(Integer pFormula) {
     // TODO Can UF appear here?? // Built in Functions like "add" seem to be OK
-    System.out.println(
-        "Query type is: " + yices_type_to_string(yices_type_of_term(pFormula), 100, 1, 0));
+    System.out.println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula)));
     Preconditions.checkState(!closed);
     // TODO REENABLE after testing Preconditions.checkState(!prover.isClosed(), "cannot use model
     // after prover is closed");

@@ -736,11 +736,23 @@ class Yices2NativeApi {
    * @param width The width of the resulting String
    * @param height The height/lines of resulting String
    */
-  public static native String yices_term_to_string(int t, int width, int height, int offset);
+  private static native String yices_term_to_string(int t, int width, int height, int offset);
 
-  public static native String yices_type_to_string(int t, int width, int height, int offset);
+  private static native String yices_type_to_string(int t, int width, int height, int offset);
 
-  public static native String yices_model_to_string(long m, int width, int height, int offset);
+  private static native String yices_model_to_string(long m, int width, int height, int offset);
+
+  public static String yices_term_to_string(int t) {
+    return yices_term_to_string(t, Integer.MAX_VALUE, 1, 0);
+  }
+
+  public static String yices_type_to_string(int t) {
+    return yices_type_to_string(t, Integer.MAX_VALUE, 1, 0);
+  }
+
+  public static String yices_model_to_string(long m) {
+    return yices_model_to_string(m, Integer.MAX_VALUE, 1, 0);
+  }
 
   /** Parse Term in SMT-Lib2 / Yices input language */
   public static native int yices_parse_term(String t);

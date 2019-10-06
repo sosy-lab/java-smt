@@ -191,8 +191,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     throw new IllegalArgumentException(
         String.format(
             "Unknown formula type '%s' for formula '%s'",
-            yices_type_to_string(yices_type_of_term(pFormula), 100, 10, 0),
-            yices_term_to_string(pFormula, 100, 10, 0)));
+            yices_type_to_string(yices_type_of_term(pFormula)), yices_term_to_string(pFormula)));
   }
 
   @Override
@@ -220,7 +219,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           yicesArgs = getNestedConjunctionArgs(pF);
         } else if (isFunction) {
           yicesArgs = getArgs(pF);
-          name = yices_term_to_string(yicesArgs.get(0), 100, 1, 0);
+          name = yices_term_to_string(yicesArgs.get(0));
           constructor = yicesArgs.get(0);
           yicesArgs.remove(0);
         } else {
@@ -252,7 +251,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     assert !constantsAndVariables.contains(constructor)
         : String.format(
             "Term %s with constructor %d should be handled somewhere else",
-            yices_term_to_string(pF, 100, 1, 0), constructor);
+            yices_term_to_string(pF), constructor);
 
     switch (constructor) {
       case YICES_ITE_TERM:
@@ -404,8 +403,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       throw new IllegalArgumentException(
           String.format(
               "Term: '%s' with type '%s' is not an arithmetic constant",
-              yices_term_to_string(pF, 100, 10, 0),
-              yices_type_to_string(yices_type_of_term(pF), 100, 10, 0)));
+              yices_term_to_string(pF), yices_type_to_string(yices_type_of_term(pF))));
     }
   }
 
@@ -437,7 +435,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       return parseBitvector(pF);
     } else {
       throw new IllegalArgumentException(
-          "Unexpected type: " + yices_type_to_string(yices_type_of_term(pF), 100, 1, 0));
+          "Unexpected type: " + yices_type_to_string(yices_type_of_term(pF)));
     }
   }
 }

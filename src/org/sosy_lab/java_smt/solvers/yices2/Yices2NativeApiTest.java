@@ -350,8 +350,7 @@ public class Yices2NativeApiTest {
     assertEquals(YICES_OR_TERM, yices_term_constructor(child));
     children = yices_term_num_children(child);
     assertEquals(2, children);
-    System.out.println(yices_term_to_string(child, 100, 1, 0));
-    assertEquals("(and Btrue Btwo)", yices_term_to_string(and, 80, 10, 0));
+    assertEquals("(and Btrue Btwo)", yices_term_to_string(and));
     assertEquals(YICES_NOT_TERM, yices_term_constructor(and));
   }
 
@@ -466,7 +465,7 @@ public class Yices2NativeApiTest {
     if (yices_check_sat(env, 0)) {
       long model = yices_get_model(env, 1);
       Model m = new Yices2Model(model, creator);
-      System.out.println(yices_model_to_string(model, 100, 10, 0));
+      System.out.println(yices_model_to_string(model));
       Object val = m.evaluate(creator.encapsulateWithTypeOf(eq));
       System.out.println(val);
       int addT = yices_add(z, z2);
@@ -475,7 +474,7 @@ public class Yices2NativeApiTest {
       System.out.println("DEFINED TERMS");
       int[] terms = yices_def_terms(model);
       for (int i = 0; i < terms.length; i++) {
-        System.out.println(yices_term_to_string(terms[i], 100, 10, 0));
+        System.out.println(yices_term_to_string(terms[i]));
         System.out.println("Term id is: " + terms[i]);
         int[] yval = yices_get_value(model, terms[i]);
         System.out.println("Node id is: " + yval[0]);
