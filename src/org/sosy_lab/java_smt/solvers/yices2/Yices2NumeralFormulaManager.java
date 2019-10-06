@@ -98,7 +98,11 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   public Integer multiply(Integer pParam1, Integer pParam2) {
-    return yices_mul(pParam1, pParam2);
+    if (consistsOfNumerals(pParam1) || consistsOfNumerals(pParam2)) {
+      return yices_mul(pParam1, pParam2);
+    } else {
+      return super.multiply(pParam1, pParam2);
+    }
   }
 
   @Override
@@ -140,4 +144,11 @@ abstract class Yices2NumeralFormulaManager<
   protected Integer floor(Integer pNumber) {
     return yices_floor(pNumber);
   }
+
+  protected final boolean consistsOfNumerals(Integer pParam) {
+    // TODO check whether pParam contains a variable or can be simplified into a plain constant.
+    // This check helps with non-linear arithmetics, which is unsupported in default Yices2.
+    return true;
+  }
+
 }

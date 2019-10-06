@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_imod;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -52,11 +53,20 @@ public class Yices2IntegerFormulaManager
 
   @Override
   public Integer divide(Integer pParam1, Integer pParam2) {
-    // final int div = yices_division(pParam1, pParam2);
-    // TODO Check if this retruns correct values
-    return yices_idiv(pParam1, pParam2);// yices_division(pParam1, pParam2); //
-                                        // yices_ite(yices_arith_leq0_atom(pParam2),
-                                             // yices_ceil(div), yices_floor(div));
+    if (consistsOfNumerals(pParam2)) {
+      return yices_idiv(pParam1, pParam2);
+    } else {
+      return super.divide(pParam1, pParam2);
+    }
+  }
+
+  @Override
+  public Integer modulo(Integer pParam1, Integer pParam2) {
+    if (consistsOfNumerals(pParam2)) {
+      return yices_imod(pParam1, pParam2);
+    } else {
+      return super.modulo(pParam1, pParam2);
+    }
   }
 
   @Override
