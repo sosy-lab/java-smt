@@ -28,7 +28,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_ver
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config_checked;
 
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
@@ -71,8 +71,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
     NativeLibraries.loadLibrary("yices2j");
     yices_init();
     long yicesConf = yices_new_config();
-    yices_set_config(yicesConf, "solver-type", "dpllt");
-    yices_set_config(yicesConf, "mode", "push-pop");
+    yices_set_config_checked(yicesConf, "solver-type", "dpllt");
+    yices_set_config_checked(yicesConf, "mode", "push-pop");
     // TODO SET OPTIONS
     // TODO SET LOGIC
     long yicesEnv = yices_new_context(yicesConf);

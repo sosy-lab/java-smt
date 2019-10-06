@@ -150,7 +150,7 @@ class Yices2NativeApi {
 
   public static native long yices_new_config();
 
-  public static native long yices_free_config(long cfg);
+  public static native void yices_free_config(long cfg);
 
   /**
    * Set option to specified value.
@@ -160,7 +160,7 @@ class Yices2NativeApi {
    * @param value The value that the option will be set.
    * @return 0 if successful , -1 if an error occurred
    */
-  public static native int yices_set_config(long cfg, String option, String value);
+  private static native int yices_set_config(long cfg, String option, String value);
 
   // TODO Return Value/Name from error_report
   public static void yices_set_config_checked(long cfg, String option, String value)
@@ -182,11 +182,11 @@ class Yices2NativeApi {
 
   public static native long yices_new_context(long cfg);
 
-  public static native long yices_free_context(long ctx);
+  public static native void yices_free_context(long ctx);
 
-  public static native int yices_context_enable_option(long ctx, String option);
+  public static native void yices_context_enable_option(long ctx, String option);
 
-  public static native int yices_context_disable_option(long ctx, String option);
+  public static native void yices_context_disable_option(long ctx, String option);
 
   /*
    * Yices search params
@@ -623,9 +623,9 @@ class Yices2NativeApi {
    */
   public static native int yices_context_status(long ctx);
 
-  public static native int yices_assert_formula(long ctx, int f);
+  public static native void yices_assert_formula(long ctx, int f);
 
-  public static native int yices_assert_formulas(long ctx, int size, int[] formulas);
+  public static native void yices_assert_formulas(long ctx, int size, int[] formulas);
 
   // params = 0 for default settings
   // TODO ZERO if no params?
@@ -637,9 +637,9 @@ class Yices2NativeApi {
 
   public static native int yices_assert_blocking_clause(long ctx);
 
-  public static native int yices_push(long ctx);
+  public static native void yices_push(long ctx);
 
-  public static native int yices_pop(long ctx);
+  public static native void yices_pop(long ctx);
 
   // TODO ZERO if no params?
   public static native int yices_check_context_with_assumptions(
@@ -724,7 +724,7 @@ class Yices2NativeApi {
   /** get the value of a term as (constant) term. */
   public static native int yices_get_value_as_term(long m, int t);
 
-  public static native int yices_set_term_name(int t, String name);
+  public static native void yices_set_term_name(int t, String name);
 
   public static native String yices_get_term_name(int t);
 
