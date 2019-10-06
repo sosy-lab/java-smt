@@ -150,5 +150,4 @@ abstract class Yices2NumeralFormulaManager<
     // This check helps with non-linear arithmetics, which is unsupported in default Yices2.
     return true;
   }
-
 }
