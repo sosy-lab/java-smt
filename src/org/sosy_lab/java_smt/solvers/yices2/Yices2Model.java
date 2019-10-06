@@ -53,8 +53,11 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_bv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_mpq;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -205,15 +208,9 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     } else if (tag == YVAL_BV) {
       int size = yices_val_get_bitsize(model, id, tag);
       int[] littleEndianBV = yices_val_get_bv(model, id, size, tag);
-      String bigEndianBV = "";
-      for (int i = littleEndianBV.length - 1; i >= 0; i--) {
-        bigEndianBV = bigEndianBV + littleEndianBV[i];
-      }
-      if (bigEndianBV != "") {
-        return new BigInteger(bigEndianBV, 2);
-      } else {
-        throw new IllegalArgumentException("BV was empty");
-      }
+      Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
+      String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
+      return new BigInteger(bigEndianBV, 2);
     } else {
       throw new IllegalArgumentException("Unexpected yval tag: " + tag);
     }

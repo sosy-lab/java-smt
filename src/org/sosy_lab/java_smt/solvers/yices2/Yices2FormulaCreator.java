@@ -74,8 +74,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -407,18 +409,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     }
   }
 
-  private BigInteger parseBitvector(Integer pF) {
+  private BigInteger parseBitvector(int pF) {
     if (yices_term_constructor(pF) == YICES_BV_CONST) {
       int[] littleEndianBV = yices_bv_const_value(pF, yices_term_bitsize(pF));
-      String bigEndianBV = "";
-      for (int i = littleEndianBV.length - 1; i >= 0; i--) {
-        bigEndianBV = bigEndianBV + littleEndianBV[i];
-      }
-      if (bigEndianBV != "") {
-        return new BigInteger(bigEndianBV, 2);
-      } else {
-        throw new IllegalArgumentException("BV was empty");
-      }
+      Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
+      String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
+      return new BigInteger(bigEndianBV, 2);
     } else {
       throw new IllegalArgumentException("Term: " + pF + " is not a bitvector constant");
     }
