@@ -61,7 +61,6 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     return getFormulaCreator().encapsulateBoolean(yices_parse_term(pS));
   }
 
-
   @Override
   public Appender dumpFormula(final Integer formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
