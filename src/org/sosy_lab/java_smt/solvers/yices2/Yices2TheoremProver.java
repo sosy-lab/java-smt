@@ -52,6 +52,19 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
+/**
+ * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
+ * only for additional formulae, not for already asserted ones. Thus, we have two possible
+ * solutions:
+ *
+ * <p>1) Avoid incremental solving and simply provide all formulae as additional ones. Currently
+ * implemented this way.
+ *
+ * <p>2) Add additional boolean symbols 'p', add a constraint 'p=f' for each asserted formula 'f',
+ * compute the unsat core over all 'p's, and match them back to their formula 'f'. This allows
+ * incremental solving, but is more complex to implement. Lets keep this idea is future work for
+ * optimization.
+ */
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
@@ -92,7 +105,9 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     int constraint = creator.extractInfo(pConstraint);
-    yices_assert_formula(curEnv, constraint);
+    if (!generateUnsatCores) { // unsat core does not work with incremental mode
+      yices_assert_formula(curEnv, constraint);
+    }
     constraintStack.peek().add(constraint);
     return null;
   }
@@ -107,7 +122,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    if (generateUnsatCores) {
+    if (generateUnsatCores) { // unsat core does not work with incremental mode
       int[] allConstraints = getAllConstraints();
       return !yices_check_sat_with_assumptions(
           curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
