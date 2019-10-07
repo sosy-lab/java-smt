@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -50,11 +51,26 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
-  private final CVC4FormulaCreator creator;
-  private SmtEngine smtEngine;
-  private boolean changedSinceLastSatQuery = false;
+  private final class ShutdownHook implements ShutdownRequestListener {
+    private final AtomicBoolean interrupted = new AtomicBoolean(false);
 
-  protected final AtomicBoolean interrupted = new AtomicBoolean(false);
+    @Override
+    public void shutdownRequested(String reason) {
+      interrupted.set(true);
+      while (interrupted.get()) { // flag is reset after leaving isUnsat()
+        smtEngine.interrupt();
+        try {
+          Thread.sleep(10);
+        } catch (InterruptedException e) {
+        }
+      }
+    }
+  }
+
+  private final CVC4FormulaCreator creator;
+  private SmtEngine smtEngine; // final except for SL theory
+  private ShutdownHook hook; // final except for SL theory
+  private boolean changedSinceLastSatQuery = false;
 
   /** Tracks formulas on the stack, needed for model generation. */
   protected final Deque<List<Expr>> assertedFormulas = new ArrayDeque<>();
@@ -94,7 +110,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
     setOptions(randomSeed, pOptions);
-    registerShutdownHandler(pShutdownNotifier);
+    hook = registerShutdownHandler(pShutdownNotifier);
   }
 
   private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
@@ -122,18 +138,10 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   // method SmtEngine::check(), which seems to take about 10 ms. When this is fixed in
   // CVC4, we can remove the Thread.sleep(10), the AtomicBoolean interrupted and the while
   // loop surrounding this block.
-  private void registerShutdownHandler(ShutdownNotifier pShutdownNotifier) {
-    pShutdownNotifier.register(
-        (reason) -> {
-          interrupted.set(true);
-          while (interrupted.get()) {
-            smtEngine.interrupt();
-            try {
-              Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-          }
-        });
+  private ShutdownHook registerShutdownHandler(ShutdownNotifier pShutdownNotifier) {
+    ShutdownHook listener = new ShutdownHook();
+    pShutdownNotifier.register(listener);
+    return listener;
   }
 
   /** import an expression from global context into this prover's context. */
@@ -204,8 +212,9 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       closeAllModels();
       if (!incremental) {
         // create a new clean smtEngine
+        shutdownNotifier.unregister(hook);
         smtEngine = new SmtEngine(exprManager);
-        registerShutdownHandler(shutdownNotifier);
+        hook = registerShutdownHandler(shutdownNotifier);
       }
     }
   }
@@ -241,10 +250,18 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
         smtEngine.assertFormula(importExpr(expr));
       }
     }
-    Result result = smtEngine.checkSat();
-    if (interrupted.get()) {
-      interrupted.set(false); // Should we throw InterruptException?
+    shutdownNotifier.shutdownIfNecessary();
+    Result result;
+    try {
+      result = smtEngine.checkSat();
+    } finally {
+      hook.interrupted.set(false);
+      shutdownNotifier.shutdownIfNecessary();
     }
+    return convertSatResult(result);
+  }
+
+  private boolean convertSatResult(Result result) throws InterruptedException, SolverException {
     if (result.isUnknown()) {
       if (result.whyUnknown().equals(Result.UnknownExplanation.INTERRUPTED)) {
         throw new InterruptedException();
@@ -299,6 +316,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();
+      shutdownNotifier.unregister(hook);
       closed = true;
     }
   }
