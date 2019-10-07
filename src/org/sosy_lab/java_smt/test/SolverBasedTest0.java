@@ -228,6 +228,13 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  protected void requireParser() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
+  }
+
   @Deprecated
   protected final void requireFalse(String failureMessage) {
     assume().withMessage(failureMessage).fail();

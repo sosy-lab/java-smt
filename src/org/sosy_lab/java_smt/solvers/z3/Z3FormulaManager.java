@@ -55,7 +55,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pBitpreciseManager,
         pFloatingPointManager,
         pQuantifiedManager,
-        pArrayManager);
+        pArrayManager,
+        null);
     formulaCreator = pFormulaCreator;
   }
 

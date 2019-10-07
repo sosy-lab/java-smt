@@ -51,6 +51,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
@@ -68,7 +69,8 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
-    PRINCESS
+    PRINCESS,
+    CVC4
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -183,6 +185,14 @@ public class SolverContextFactory {
   private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
+      case CVC4:
+        return CVC4SolverContext.create(
+            logger,
+            shutdownNotifier,
+            (int) randomSeed,
+            nonLinearArithmetic,
+            floatingPointRoundingMode);
+
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
             config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);

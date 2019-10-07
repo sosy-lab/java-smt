@@ -30,6 +30,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
+  protected final boolean enableSL;
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
@@ -39,6 +40,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
   }
 
   protected final void checkGenerateModels() {
@@ -58,5 +60,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+  }
+
+  protected final void checkEnableSeparationLogic() {
+    Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
   }
 }
