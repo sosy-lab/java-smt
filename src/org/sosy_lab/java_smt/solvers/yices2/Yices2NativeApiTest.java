@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
@@ -506,5 +507,18 @@ public class Yices2NativeApiTest {
     int y = yices_int32(5);
     yices_set_term_name(y, "y");
     int x = yices_parse_term("(/= y 5)");
+  }
+
+  @Test
+  public void arithSimplification() {
+    int x = yices_int32(6);
+    int y = yices_int32(7);
+    int add = yices_add(x, y);
+    int mul = yices_mul(x, y);
+    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    assertEquals(BigInteger.valueOf(13), creator.convertValue(add, add));
+    assertEquals(YICES_ARITH_CONST, yices_term_constructor(add));
+    assertEquals(BigInteger.valueOf(42), creator.convertValue(mul, mul));
+    assertEquals(YICES_ARITH_CONST, yices_term_constructor(mul));
   }
 }

@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_eq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_geq_atom;
@@ -33,6 +34,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_neg;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_float;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_arithmetic;
 
 import java.math.BigInteger;
@@ -146,8 +148,7 @@ abstract class Yices2NumeralFormulaManager<
   }
 
   protected final boolean consistsOfNumerals(Integer pParam) {
-    // TODO check whether pParam contains a variable or can be simplified into a plain constant.
     // This check helps with non-linear arithmetics, which is unsupported in default Yices2.
-    return true;
+    return yices_term_constructor(pParam) == YICES_ARITH_CONST;
   }
 }

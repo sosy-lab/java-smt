@@ -773,7 +773,7 @@ class Yices2NativeApi {
                 + yices_type_to_string(termFromNameType, 100, 1, 0));
       }
     }
-    int var = yices_new_uninterpreted_term(type); // yices_new_variable(type);
+    int var = yices_new_uninterpreted_term(type);
     yices_set_term_name(var, name);
     return var;
   }
