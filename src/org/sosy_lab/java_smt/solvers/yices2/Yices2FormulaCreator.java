@@ -192,6 +192,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             yices_type_to_string(yices_type_of_term(pFormula)), yices_term_to_string(pFormula)));
   }
 
+  // TODO VISit fails for arith sum and bv sum, need to use (bv)sum component to visit these
+  // May also fail for power products
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
@@ -348,6 +350,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getArgs(int parent) {
+    System.out.println(yices_term_to_string(parent));
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       children.add(yices_term_child(parent, i));
@@ -358,12 +361,16 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
     int size = pArgs.size();
-    int[] argArray = new int[size];
-    for (int i = 0; i < size; i++) {
-      argArray[i] = pArgs.get(i);
+    if (size == 0) {
+      return pDeclaration;
+    } else {
+      int[] argArray = new int[size];
+      for (int i = 0; i < size; i++) {
+        argArray[i] = pArgs.get(i);
+      }
+      int app = yices_application(pDeclaration, size, argArray);
+      return app;
     }
-    int app = yices_application(pDeclaration, size, argArray);
-    return app;
   }
 
   @Override
