@@ -1336,7 +1336,7 @@ YVAL_ARG(2,2,3)
 EMPTY_YVAL_ARG(3)
 YVAL_VECTOR_ARG(4)
 CALL4(int, val_expand_function)
-jlongArray jretval = NULL;
+jintArray jretval = NULL;
 if(retval == -1){  
   const char *msg = yices_error_string();
   throwException(jenv, "java/lang/IllegalArgumentException", msg);
@@ -1356,7 +1356,7 @@ sz = sz +0; // Memory should be correctly allocated, but deliberatly increasing 
 */
 printf("Allocating memory for %lu ints.\n", sz);
 fflush(stdout);
-jlong *jarr = malloc(sizeof(jint) * sz);
+jint *jarr = malloc(sizeof(jint) * sz);
 if (jarr == NULL) {
     throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
     goto out;
@@ -1365,16 +1365,16 @@ yval_t *data = s_arg4.data;
 jarr[0] = m_arg3->node_id;
 jarr[1] = m_arg3->node_tag;
 size_t i;
-for (i = 2; i < sz; i+=2) {
-  printf("position is : %lu\n", i);
-  jarr[i] = data[i].node_id;
-  jarr[i+1] = data[i+1].node_tag;
+for (i = 0; i < s_arg4.size; i++) {
+  printf("position is : %lu %d %d\n", i, data[i].node_id, data[i].node_tag);
+  jarr[2+2*i] = data[i].node_id;
+  jarr[2+2*i+1] = data[i].node_tag;
 }
 printf("I am a debug message\n");
 fflush(stdout);
-jretval = (*jenv)->NewLongArray(jenv, sz);
+jretval = (*jenv)->NewIntArray(jenv, sz);
 if (jretval != NULL) {
-  (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz, jarr);
+  (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, jarr);
 }
 free(jarr);
 printf("I am a debug message too\n");
@@ -1394,7 +1394,7 @@ YVAL_ARG(2,2,4) // CHANGE
 EMPTY_YVAL_ARRAY_ARG(3)
 EMPTY_YVAL_ARG(4)
 CALL4(int, val_expand_mapping)
-jlongArray jretval = NULL;
+jintArray jretval = NULL;
 if(retval == -1){  
   const char *msg = yices_error_string();
   throwException(jenv, "java/lang/IllegalArgumentException", msg);
@@ -1403,23 +1403,21 @@ if(retval == -1){
 if ((*jenv)->ExceptionCheck(jenv)) {
    goto out;
 }
-sz++; // up size by one for value
-sz = sz*2; //Double size because every yval_t needs two values in the return array
-jlong *jarr = malloc(sizeof(jint) * sz);
+jint *jarr = malloc(sizeof(jint) * (sz+1)*2);
 if (jarr == NULL) {
     throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
     goto out;
 }
 size_t i;
-for (i = 0; i < sz-2; i+=2) {
-  jarr[i] = m_arg3[i].node_id;
-  jarr[i+1] = m_arg3[i].node_tag;
+for (i = 0; i < sz; i++) {
+  jarr[2*i] = m_arg3[i].node_id;
+  jarr[2*i+1] = m_arg3[i].node_tag;
 }
-jarr[sz-2] = m_arg4->node_id;
-jarr[sz-1] = m_arg4->node_tag;
-jretval = (*jenv)->NewLongArray(jenv, sz);
+jarr[2*sz] = m_arg4->node_id;
+jarr[2*sz+1] = m_arg4->node_tag;
+jretval = (*jenv)->NewIntArray(jenv, sz);
 if (jretval != NULL) {
-  (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz, jarr);
+  (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, jarr);
 }
 free(jarr);
 out:

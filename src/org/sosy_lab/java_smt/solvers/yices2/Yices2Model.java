@@ -140,6 +140,9 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
      * of same type as fun return for the default value, YVAL_MAPPING(s) for actual arguments/value
      */
     int[] defaultValue = {expandFun[0], expandFun[1]};
+    if (expandFun[1] == YVAL_RATIONAL) {
+      System.out.println("Default value: " + yices_val_get_mpq(model, expandFun[0], expandFun[1]));
+    }
     if (expandFun.length == 2) { // TODO Really required?
       // valueTerm = convert( default Value)
       throw new UnsupportedOperationException("Formula has only default value");
@@ -156,9 +159,9 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
         }
         List<Object> argumentInterpretation = new ArrayList<>();
         // TODO convertValue of (expandMap[0], expandMap[1])
-        for (int j = 0; i < expandMap.length - 3; i += 2) {
+        for (int j = 0; j < expandMap.length - 2; j += 2) {
           argumentInterpretation.add(
-              valueFromYval(expandMap[j], expandMap[j++], types[j / 2])); // TODO
+              valueFromYval(expandMap[j], expandMap[j + 1], types[j / 2])); // TODO
         }
         Object value =
             valueFromYval(
