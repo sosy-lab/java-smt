@@ -25,6 +25,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_FUNCTION
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_MAPPING;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_UNKNOWN;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
@@ -36,7 +37,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_model_t
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_float;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_arithmetic;
@@ -123,64 +123,42 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   // TODO encapsulate Formula ? convert yval to valueTerm and value(Object)
   private ImmutableList<ValueAssignment> getFunctionAssignment(int t, int[] yval) {
-    System.out.println("Exploring function...");
-    System.out.println(yices_term_to_string(t));
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int arity = yices_val_function_arity(model, yval[0], yval[1]);
     int[] types = yices_type_children(yices_type_of_term(t));
+    int[] argTerms = new int[arity];
     String name = yices_get_term_name(t);
-    // TOOD solve inconsistent memory problems presumably occurring in expand_mapping()
     int[] expandFun = yices_val_expand_function(model, yval[0], yval[1]);
-    System.out.println("Expanded Function:");
-    for (int i = 0; i < expandFun.length; i++) {
-      System.out.println(expandFun[i]);
-    }
-    /*
-     * TODO Expand function returns multiple yvals with tag YVAL_UNKNOWN Expected behavior: One yval
-     * of same type as fun return for the default value, YVAL_MAPPING(s) for actual arguments/value
-     */
-    int[] defaultValue = {expandFun[0], expandFun[1]};
-    if (expandFun[1] == YVAL_RATIONAL) {
-      System.out.println("Default value: " + yices_val_get_mpq(model, expandFun[0], expandFun[1]));
-    }
-    if (expandFun.length == 2) { // TODO Really required?
-      // valueTerm = convert( default Value)
-      throw new UnsupportedOperationException("Formula has only default value");
-      // assignments.add(new ValueAssignment(keyFormula, valueFormula, formula, name, value,
-      // argumentInterpretation))
-    } else {
-      for (int i = 2; i < expandFun.length - 1; i += 2) {
-        System.out.println("Yval_id: " + expandFun[i] + " Yval tag: " + expandFun[i + 1]);
-        int[] expandMap;
-        if (expandFun[i + 1] == YVAL_MAPPING) {
-          expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
-        } else {
-          throw new IllegalArgumentException("Not a mapping!"); // TODO
-        }
-        List<Object> argumentInterpretation = new ArrayList<>();
-        // TODO convertValue of (expandMap[0], expandMap[1])
-        for (int j = 0; j < expandMap.length - 2; j += 2) {
-          argumentInterpretation.add(
-              valueFromYval(expandMap[j], expandMap[j + 1], types[j / 2])); // TODO
-        }
-        Object value =
-            valueFromYval(
-                expandMap[expandMap.length - 2],
-                expandMap[expandMap.length - 1],
-                types[types.length - 1]);
-        int valueTerm = valueAsTerm(types[types.length - 1], value);
-        assignments.add(
-            new ValueAssignment(
-                creator.encapsulateWithTypeOf(t),
-                creator.encapsulateWithTypeOf(valueTerm),
-                creator.encapsulateBoolean(yices_eq(t, valueTerm)),
-                name,
-                value,
-                argumentInterpretation));
+    for (int i = 2; i < expandFun.length - 1; i += 2) {
+      int[] expandMap;
+      if (expandFun[i + 1] == YVAL_MAPPING) {
+        expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
+      } else {
+        throw new IllegalArgumentException("Not a mapping!"); // TODO
       }
+      List<Object> argumentInterpretation = new ArrayList<>();
+      for (int j = 0; j < expandMap.length - 2; j += 2) {
+        Object argValue = valueFromYval(expandMap[j], expandMap[j + 1], types[j / 2]);
+        argumentInterpretation.add(argValue); // TODO
+        argTerms[j / 2] = valueAsTerm(types[j / 2], argValue);
+      }
+      Object funValue =
+          valueFromYval(
+              expandMap[expandMap.length - 2],
+              expandMap[expandMap.length - 1],
+              types[types.length - 1]);
+      int valueTerm = valueAsTerm(types[types.length - 1], funValue);
+      int funApp = yices_application(t, arity, argTerms);
+      assignments.add(
+          new ValueAssignment(
+              creator.encapsulateWithTypeOf(funApp),
+              creator.encapsulateWithTypeOf(valueTerm),
+              creator.encapsulateBoolean(yices_eq(funApp, valueTerm)),
+              name,
+              funValue,
+              argumentInterpretation));
     }
-    return assignments.build(); // new ValueAssignment(keyFormula, valueFormula, formula, name,
-    // value, argumentInterpretation)
+    return assignments.build();
   }
 
   private ValueAssignment getSimpleAssignment(int t) {
@@ -224,7 +202,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
         return yices_false();
       }
     } else if (yices_type_is_arithmetic(type)) {
-      String val = (String) value;
+      String val = value.toString();
       if (val.contains("/")) {
         return yices_parse_rational(val);
       } else {
