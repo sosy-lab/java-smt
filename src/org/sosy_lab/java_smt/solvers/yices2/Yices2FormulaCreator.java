@@ -386,7 +386,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return null;
   }
 
-  // TODO Pretty print type / term
   private Object parseNumeralValue(Integer pF, FormulaType<?> type) {
     if (yices_term_constructor(pF) == YICES_ARITH_CONST) {
       String value = yices_rational_const_value(pF);
@@ -412,7 +411,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
       return new BigInteger(bigEndianBV, 2);
     } else {
-      throw new IllegalArgumentException("Term: " + pF + " is not a bitvector constant");
+      throw new IllegalArgumentException(
+          String.format("Term: '%s' is not a bitvector constant", yices_term_to_string(pF)));
     }
   }
 
