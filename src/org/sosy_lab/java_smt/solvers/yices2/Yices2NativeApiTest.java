@@ -203,19 +203,19 @@ public class Yices2NativeApiTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void rationalError() {
-    int error = yices_rational32(1, 0);
+    yices_rational32(1, 0);
   }
 
   @Test
   public void negativeRationalError() {
     // TODO negative unsigned integer causes no error. Need to ensure positive value before
-    int error = yices_rational32(1, -5);
+    yices_rational32(1, -5);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void wrongType() {
     int one = yices_int32(1);
-    int error = yices_term_bitsize(one);
+    yices_term_bitsize(one);
   }
 
   @Test
@@ -262,7 +262,7 @@ public class Yices2NativeApiTest {
   @Test(expected = IllegalArgumentException.class)
   public void boolValueTypeMismatch() {
     int v1 = yices_int32(45);
-    boolean unused = yices_bool_const_value(v1);
+    yices_bool_const_value(v1);
   }
 
   @Test
@@ -507,6 +507,7 @@ public class Yices2NativeApiTest {
     int y = yices_int32(5);
     yices_set_term_name(y, "y");
     int x = yices_parse_term("(/= y 5)");
+    assertEquals("false", yices_term_to_string(x));
   }
 
   @Test

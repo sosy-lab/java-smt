@@ -166,7 +166,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     if (pFormula instanceof BitvectorFormula) {
       int type = yices_type_of_term(extractInfo(pFormula));
-      // checkArgument(
+      // TODO ?checkArgument(
       // yices_is_bitvector(type),
       // "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(yices_bvtype_size(type));
