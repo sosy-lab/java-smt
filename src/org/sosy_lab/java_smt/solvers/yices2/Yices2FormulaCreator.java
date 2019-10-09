@@ -53,6 +53,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_co
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_from_array;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
@@ -83,6 +85,7 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -207,6 +210,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_BV_CONST:
         return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_UNINTERPRETED_TERM:
+        System.out
+            .println("Term name: " + yices_term_to_string(pF) + "|" + yices_get_term_name(pF));
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
         final FunctionDeclarationKind kind = getDeclarationKind(pF);
@@ -215,6 +220,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final boolean isAnd = kind == FunctionDeclarationKind.AND && isNestedConjunction(pF);
         final boolean isFunction = kind == FunctionDeclarationKind.UF;
         final boolean isSum = kind == FunctionDeclarationKind.ADD;
+        final boolean isBvAdd = kind == FunctionDeclarationKind.BV_ADD;
+        final boolean isMultiply = kind == FunctionDeclarationKind.MUL;
         System.out.println("DeclarationKind is: " + kind.toString());
         List<Integer> yicesArgs;
         String name;
@@ -229,6 +236,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         } else if (isSum) {
           name = FunctionDeclarationKind.ADD.toString();
           yicesArgs = getSumArgs(pF);
+        } else if (isBvAdd) {
+          name = FunctionDeclarationKind.BV_ADD.toString();
+          yicesArgs = getBvSumArgs(pF);
+        } else if (isMultiply) {
+          name = FunctionDeclarationKind.MUL.toString();
+          yicesArgs = getMultiplyArgs(pF);
         } else {
           name = kind.toString();
           yicesArgs = getArgs(pF);
@@ -315,6 +328,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         return FunctionDeclarationKind.MUL;
 
       default:
+        System.out.println("Constructor is:" + constructor);
         return FunctionDeclarationKind.OTHER;
     }
   }
@@ -370,14 +384,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       String child = yices_sum_component(parent, i);
       String[] parts = child.split("\\|");
-      for (int j = 0; j < parts.length; j++) {
-        System.out.println("String Nr." + j + " ist: " + parts[j]);
-      }
       if (parts[1].equals("-1")) { // No term just a number
         children.add(yices_parse_rational(parts[0]));
-      } else if (parts[0] == "1") { // Only term is relevant
-        children.add(Integer.parseInt(parts[1]));
-      } else {
+      } else { // return only term / ignores coefficient
         // int coeff = yices_parse_rational(parts[0]);
         // int term = Integer.parseInt(parts[1]);
         // children.add(yices_mul(coeff, term));
@@ -385,6 +394,29 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       }
     }
     return children;
+  }
+
+  private static List<Integer> getBvSumArgs(int parent) {
+    List<Integer> children = new ArrayList<>();
+    int bitsize = yices_term_bitsize(parent);
+    for (int i = 0; i < yices_term_num_children(parent); i++) {
+      int[] component = yices_bvsum_component(parent, i, bitsize);
+      if (component[component.length - 1] == -1) { // No term
+        children.add(yices_bvconst_from_array(bitsize, Arrays.copyOfRange(component, 0, bitsize)));
+      } else { // return only term / ignores coefficient
+        children.add(component[component.length - 1]);
+      }
+    }
+    return children;
+  }
+
+  private static List<Integer> getMultiplyArgs(int parent) {
+    // TODO implement
+    System.out.println(parent);
+    throw new UnsupportedOperationException(
+        "Visiting multiplication terms is currently not implemented");
+    // List<Integer> children = new ArrayList<>();
+    // return children;
   }
 
   @Override

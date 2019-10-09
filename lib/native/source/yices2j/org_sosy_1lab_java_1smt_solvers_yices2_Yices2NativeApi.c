@@ -1116,9 +1116,10 @@ MPQ_ARG(2)
 CALL2(int, rational_const_value)
 MPQ_RETURN(2)
 
+//TODO FREE strings/arrays
 DEFINE_FUNC(string, 1sum_1component) WITH_TWO_ARGS(jterm, int)
 TERM_ARG(1)
-UINT32_ARG(2)
+SIMPLE_ARG(int32_t, 2)
 MPQ_ARG(3)
 term_t s_arg4;
 term_t *m_arg4 = &s_arg4;
@@ -1144,7 +1145,34 @@ jstring jretval = NULL;
   }
 return jretval;
 }
-//skipping scalar const value | rational const value | sum component
+
+//TODO FREE strings/arrays
+DEFINE_FUNC(intArray, 1bvsum_1component) WITH_THREE_ARGS(jterm, int, int)
+TERM_ARG(1)
+SIMPLE_ARG(int32_t, 2)
+arg3++;
+EMPTY_INT_ARRAY_ARG(int32_t, 3)
+term_t s_arg4;
+term_t *m_arg4 = &s_arg4;
+CALL4(int, bvsum_component);
+jintArray jretval = NULL;
+m_arg3[sz-1] = s_arg4;
+if (retval == -1) {
+  const char *msg = yices_error_string();
+  throwException(jenv, "java/lang/IllegalArgumentException", msg);
+}
+if ((*jenv)->ExceptionCheck(jenv)) {
+   goto out;
+}
+jretval = (*jenv)->NewIntArray(jenv, sz);
+if (jretval != NULL) {
+  (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, m_arg3);
+}
+out:
+return jretval;
+}
+
+//skipping scalar const value | rational const value
 //skipping bvsum component because it has two returns
 //skipping product_component because it has two returns
 

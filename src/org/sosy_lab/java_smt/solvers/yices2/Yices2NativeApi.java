@@ -439,7 +439,7 @@ class Yices2NativeApi {
 
   public static native int yices_bvconst_one(int size);
 
-  public static native int yices_minus_one(int size);
+  public static native int yices_bvconst_minus_one(int size);
 
   /**
    * Parses the given Array in little endian order values[0] becomes the least significant bit.
@@ -616,7 +616,10 @@ class Yices2NativeApi {
 
   public static native String yices_rational_const_value(int t);
 
+  /** Returns i-th sum component of term t as String "(coefficient)|(term)" */
   public static native String yices_sum_component(int t, int i);
+
+  public static native int[] yices_bvsum_component(int t, int i, int bitsize);
 
   /*
    * SAT Checking

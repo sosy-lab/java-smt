@@ -39,10 +39,15 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvadd;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvand2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_int64;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_minus_one;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_one;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bveq_atom;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvmul;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
@@ -554,6 +559,28 @@ public class Yices2NativeApiTest {
     for (int i = 0; i < yices_term_num_children(sumRatX); i++) {
       System.out.println(yices_term_to_string(sumRatX));
       System.out.println(yices_sum_component(sumRatX, i));
+    }
+  }
+
+  @Test
+  public void bvSumComponents() {
+    int bv1 = yices_parse_bvbin("00101");
+    int bv5type = yices_bv_type(5);
+    int x = yices_named_variable(bv5type, "x");
+    int negativeX = yices_bvmul(yices_bvconst_minus_one(5), x);
+    int add = yices_bvadd(bv1, negativeX);
+    for (int i = 0; i < yices_term_num_children(add); i++) {
+      System.out.println(yices_term_to_string(add));
+      int[] component = yices_bvsum_component(add, i, yices_term_bitsize(add));
+      String value =
+          Joiner.on("")
+              .join(
+                  Lists.reverse(
+                      Ints.asList(Arrays.copyOfRange(component, 0, component.length - 1))));
+      int term = component[component.length - 1];
+      System.out.println("Value of coefficient: " + value);
+      System.out.println("Coefficient as BigInt: " + new BigInteger(value, 2));
+      System.out.println("Term id: " + term);
     }
   }
 }
