@@ -616,7 +616,7 @@ class Yices2NativeApi {
 
   public static native String yices_rational_const_value(int t);
 
-  /** Returns i-th sum component of term t as String "(coefficient)|(term)." */
+  /** Returns i-th sum component of term t as String "(coefficient)|(term)". */
   public static native String yices_sum_component(int t, int i);
 
   public static native int[] yices_bvsum_component(int t, int i, int bitsize);
@@ -632,7 +632,7 @@ class Yices2NativeApi {
 
   public static native void yices_assert_formulas(long ctx, int size, int[] formulas);
 
-  /** @param params Set to 0 for default search parameters */
+  /** @param params Set to 0 for default search parameters. */
   public static native int yices_check_context(long ctx, long params);
 
   public static native void yices_stop_search(long ctx);
@@ -645,18 +645,18 @@ class Yices2NativeApi {
 
   public static native void yices_pop(long ctx);
 
-  /** @param params Set to 0 for default search parameters */
+  /** @param params Set to 0 for default search parameters. */
   public static native int yices_check_context_with_assumptions(
       long ctx, long params, int size, int[] terms);
 
   public static native int[] yices_get_unsat_core(long ctx);
 
-  /** @param params Set to 0 for default search parameters */
+  /** @param params Set to 0 for default search parameters. */
   public static boolean yices_check_sat(long ctx, long params) throws IllegalStateException {
     return check_result(yices_check_context(ctx, params));
   }
 
-  /** @param params Set to 0 for default search parameters */
+  /** @param params Set to 0 for default search parameters. */
   public static boolean yices_check_sat_with_assumptions(
       long ctx, long params, int size, int[] assumptions) throws IllegalStateException {
     return check_result(yices_check_context_with_assumptions(ctx, params, size, assumptions));
