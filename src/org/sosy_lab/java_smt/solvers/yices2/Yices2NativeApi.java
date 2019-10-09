@@ -616,6 +616,8 @@ class Yices2NativeApi {
 
   public static native String yices_rational_const_value(int t);
 
+  public static native String yices_sum_component(int t, int i);
+
   /*
    * SAT Checking
    */

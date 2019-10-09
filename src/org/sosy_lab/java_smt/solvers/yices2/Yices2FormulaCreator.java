@@ -59,8 +59,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_ter
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
@@ -212,6 +214,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         final boolean isAnd = kind == FunctionDeclarationKind.AND && isNestedConjunction(pF);
         final boolean isFunction = kind == FunctionDeclarationKind.UF;
+        final boolean isSum = kind == FunctionDeclarationKind.ADD;
+        System.out.println("DeclarationKind is: " + kind.toString());
         List<Integer> yicesArgs;
         String name;
         if (isAnd) {
@@ -222,6 +226,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           name = yices_term_to_string(yicesArgs.get(0));
           constructor = yicesArgs.get(0);
           yicesArgs.remove(0);
+        } else if (isSum) {
+          name = FunctionDeclarationKind.ADD.toString();
+          yicesArgs = getSumArgs(pF);
         } else {
           name = kind.toString();
           yicesArgs = getArgs(pF);
@@ -350,10 +357,32 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getArgs(int parent) {
-    System.out.println(yices_term_to_string(parent));
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       children.add(yices_term_child(parent, i));
+    }
+    return children;
+  }
+
+  private static List<Integer> getSumArgs(int parent) {
+    System.out.println(yices_term_to_string(parent));
+    List<Integer> children = new ArrayList<>();
+    for (int i = 0; i < yices_term_num_children(parent); i++) {
+      String child = yices_sum_component(parent, i);
+      String[] parts = child.split("\\|");
+      for (int j = 0; j < parts.length; j++) {
+        System.out.println("String Nr." + j + " ist: " + parts[j]);
+      }
+      if (parts[1].equals("-1")) { // No term just a number
+        children.add(yices_parse_rational(parts[0]));
+      } else if (parts[0] == "1") { // Only term is relevant
+        children.add(Integer.parseInt(parts[1]));
+      } else {
+        // int coeff = yices_parse_rational(parts[0]);
+        // int term = Integer.parseInt(parts[1]);
+        // children.add(yices_mul(coeff, term));
+        children.add(Integer.parseInt(parts[1]));
+      }
     }
     return children;
   }

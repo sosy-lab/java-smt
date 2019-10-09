@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <jni.h>
 #include <gmp.h>
 #include "yices.h"

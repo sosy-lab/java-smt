@@ -1116,6 +1116,34 @@ MPQ_ARG(2)
 CALL2(int, rational_const_value)
 MPQ_RETURN(2)
 
+DEFINE_FUNC(string, 1sum_1component) WITH_TWO_ARGS(jterm, int)
+TERM_ARG(1)
+UINT32_ARG(2)
+MPQ_ARG(3)
+term_t s_arg4;
+term_t *m_arg4 = &s_arg4;
+CALL4(int, sum_component)
+if (retval == -1) {
+  const char *msg = yices_error_string();
+  throwException(jenv, "java/lang/IllegalArgumentException", msg);
+}
+char *mpqString = mpq_get_str(NULL, 10, m_arg3);
+char term[12]; //should be enough for MAX_INT32
+snprintf(term, 12, "|%d", s_arg4);
+size_t retSize = strlen(mpqString) + strlen(term);
+char retString[retSize];
+retString[0] = '\0';
+strcat(retString, mpqString);
+strcat(retString, term); 
+if(retString == NULL){
+  throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
+}
+jstring jretval = NULL;
+  if (!(*jenv)->ExceptionCheck(jenv)) {
+    jretval = (*jenv)->NewStringUTF(jenv, retString);
+  }
+return jretval;
+}
 //skipping scalar const value | rational const value | sum component
 //skipping bvsum component because it has two returns
 //skipping product_component because it has two returns

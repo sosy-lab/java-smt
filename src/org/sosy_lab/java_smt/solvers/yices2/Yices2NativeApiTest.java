@@ -81,6 +81,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config_checked;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
@@ -521,5 +523,37 @@ public class Yices2NativeApiTest {
     assertEquals(YICES_ARITH_CONST, yices_term_constructor(add));
     assertEquals(BigInteger.valueOf(42), creator.convertValue(mul, mul));
     assertEquals(YICES_ARITH_CONST, yices_term_constructor(mul));
+  }
+
+  @Test
+  public void sumComponents() {
+    int three = yices_int32(3);
+    int rat = yices_parse_rational("3/2");
+    int x = yices_named_variable(yices_int_type(), "x");
+    int[] oneX = {three, x};
+    int sumOneX = yices_sum(2, oneX);
+    for (int i = 0; i < yices_term_num_children(sumOneX); i++) {
+      System.out.println(yices_term_to_string(sumOneX));
+      System.out.println(yices_sum_component(sumOneX, i));
+    }
+    int[] twoX = {three, x, x};
+    int sumTwoX = yices_sum(3, twoX);
+    for (int i = 0; i < yices_term_num_children(sumTwoX); i++) {
+      System.out.println(yices_term_to_string(sumTwoX));
+      System.out.println(yices_sum_component(sumTwoX, i));
+    }
+    int[] twoThrees = {three, x, three};
+    int sumTwoThrees = yices_sum(3, twoThrees);
+    for (int i = 0; i < yices_term_num_children(sumTwoThrees); i++) {
+      System.out.println(yices_term_to_string(sumTwoThrees));
+      System.out.println(yices_sum_component(sumTwoThrees, i));
+    }
+    int xTimesRational = yices_mul(rat, x);
+    int[] ratSum = {three, xTimesRational};
+    int sumRatX = yices_sum(2, ratSum);
+    for (int i = 0; i < yices_term_num_children(sumRatX); i++) {
+      System.out.println(yices_term_to_string(sumRatX));
+      System.out.println(yices_sum_component(sumRatX, i));
+    }
   }
 }
