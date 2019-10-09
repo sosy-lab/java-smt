@@ -20,9 +20,13 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -75,5 +79,26 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         out.append("(assert " + yices_term_to_string(formula) + ")");
       }
     };
+  }
+
+  @Override
+  public <T extends Formula> T
+      substitute(final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
+    int[] changeFrom = new int[fromToMapping.size()];
+    int[] changeTo = new int[fromToMapping.size()];
+    int idx = 0;
+    for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+      changeFrom[idx] = extractInfo(e.getKey());
+      changeTo[idx] = extractInfo(e.getValue());
+      idx++;
+    }
+    for (int t : changeFrom) {
+      System.out.println("Term: " + yices_term_to_string(t));
+      System.out.println("Term Constructor: " + yices_term_constructor(t));
+    }
+    FormulaType<T> type = getFormulaType(f);
+    return getFormulaCreator().encapsulate(
+        type,
+        yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
   }
 }

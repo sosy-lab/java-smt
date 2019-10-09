@@ -1501,7 +1501,7 @@ CALL2(term_t, get_value_as_term)
 TERM_RETURN
 
 /*
- * TERM NAMING and PRINTING
+ * TERM NAMING, PRINTING, PARSING and SUBSTITUTION 
  */
 
 DEFINE_FUNC(int, 1set_1term_1name) WITH_TWO_ARGS(jterm, string)
@@ -1553,6 +1553,15 @@ CALL1(term_t, parse_term)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
+DEFINE_FUNC(jterm, 1subst_1term) WITH_FOUR_ARGS(int, jtermArray, jtermArray, jterm)
+UINT32_ARG(1)
+TERM_ARRAY_ARG(2)
+TERM_ARRAY_ARG(3)
+TERM_ARG(4)
+CALL4(term_t, subst_term)
+FREE_TERM_ARRAY_ARG(2)
+FREE_TERM_ARRAY_ARG(3)
+TERM_RETURN
 /*
  * Functions for version checking
  */

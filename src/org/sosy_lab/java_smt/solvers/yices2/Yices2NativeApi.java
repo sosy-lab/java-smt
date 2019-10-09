@@ -764,6 +764,8 @@ class Yices2NativeApi {
   /** Parse Term in SMT-Lib2 / Yices input language. */
   public static native int yices_parse_term(String t);
 
+  public static native int yices_subst_term(int size, int[] from, int[] to, int t);
+
   public static int yices_named_variable(int type, String name) {
     int termFromName = yices_get_term_by_name(name);
     if (termFromName != -1) {
