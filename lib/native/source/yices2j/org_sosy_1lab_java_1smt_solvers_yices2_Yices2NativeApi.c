@@ -1172,10 +1172,39 @@ out:
 return jretval;
 }
 
-//skipping scalar const value | rational const value
-//skipping bvsum component because it has two returns
-//skipping product_component because it has two returns
+//TODO FREE strings/arrays
+DEFINE_FUNC(intArray, 1product_1component) WITH_TWO_ARGS(jterm, int)
+TERM_ARG(1)
+SIMPLE_ARG(int32_t, 2)
+term_t s_arg3;
+term_t *m_arg3 = &s_arg3;
+uint32_t s_arg4 = 0;
+uint32_t *m_arg4 = &s_arg4;
+CALL4(int, product_component)
+jintArray jretval = NULL;
+if (retval == -1) {
+  const char *msg = yices_error_string();
+  throwException(jenv, "java/lang/IllegalArgumentException", msg);
+}
+jint *jarr = malloc(sizeof(jint) * 2);
+if (jarr == NULL) {
+    throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
+    goto out;
+}
+jarr[0] = s_arg3;
+jarr[1] = (jint) *m_arg4;
+if ((*jenv)->ExceptionCheck(jenv)) {
+   goto out;
+}
+jretval = (*jenv)->NewIntArray(jenv, 2);
+if (jretval != NULL) {
+  (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, jarr);
+}
+out:
+return jretval;
+}
 
+//skipping scalar const value | rational const value
 
 //Skipping functions from yices_bool_const_value as need is unclear
 //todo add missing type properties

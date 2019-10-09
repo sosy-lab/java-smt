@@ -621,6 +621,8 @@ class Yices2NativeApi {
 
   public static native int[] yices_bvsum_component(int t, int i, int bitsize);
 
+  // TODO can return up to UINT32_MAX ?
+  public static native int[] yices_product_component(int t, int i);
   /*
    * SAT Checking
    */

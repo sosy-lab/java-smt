@@ -62,6 +62,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_typ
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
@@ -413,12 +414,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getMultiplyArgs(int parent) {
-    // TODO implement
-    System.out.println(parent);
-    throw new UnsupportedOperationException(
-        "Visiting multiplication terms is currently not implemented");
-    // List<Integer> children = new ArrayList<>();
-    // return children;
+    List<Integer> children = new ArrayList<>();
+    for (int i = 0; i < yices_term_num_children(parent); i++) {
+      int[] component = yices_product_component(parent, i);
+      children.add(component[0]); // add term ignore exponent
+    }
+    return children;
   }
 
   @Override
