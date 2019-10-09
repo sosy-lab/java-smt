@@ -63,6 +63,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_v
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_index;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
@@ -72,6 +74,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_co
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bool;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_int;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_projection;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_real;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
@@ -225,6 +228,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final boolean isBvAdd = kind == FunctionDeclarationKind.BV_ADD;
         final boolean isMultiply = kind == FunctionDeclarationKind.MUL;
         System.out.println("DeclarationKind is: " + kind.toString());
+        System.out.println("Term is: " + yices_term_to_string(pF));
         List<Integer> yicesArgs;
         String name;
         if (isAnd) {
@@ -249,6 +253,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           yicesArgs = getArgs(pF);
         }
         for (int arg : yicesArgs) {
+          System.out.println("Arg: " + yices_term_to_string(arg));
+          if (yices_term_is_projection(arg)) {
+            System.out.println("Index: " + yices_proj_index(arg));
+            System.out.println("Child: " + yices_proj_arg(arg));
+          }
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
@@ -454,7 +463,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   protected Integer getBooleanVarDeclarationImpl(Integer pTFormulaInfo) {
     // TODO Unsure what to return here
-    return null;
+    return yices_term_constructor(pTFormulaInfo);
   }
 
   private Object parseNumeralValue(Integer pF, FormulaType<?> type) {
