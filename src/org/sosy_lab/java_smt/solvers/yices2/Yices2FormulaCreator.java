@@ -80,6 +80,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -383,14 +384,15 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       String child = yices_sum_component(parent, i);
-      String[] parts = child.split("\\|");
-      if (parts[1].equals("-1")) { // No term just a number
-        children.add(yices_parse_rational(parts[0]));
+      List<String> parts = Splitter.on('|').splitToList(child);
+      // String[] parts = child.split("\\|");
+      if (parts.get(1).equals("-1")) { // No term just a number
+        children.add(yices_parse_rational(parts.get(0)));
       } else { // return only term / ignores coefficient
         // int coeff = yices_parse_rational(parts[0]);
         // int term = Integer.parseInt(parts[1]);
         // children.add(yices_mul(coeff, term));
-        children.add(Integer.parseInt(parts[1]));
+        children.add(Integer.parseInt(parts.get(1)));
       }
     }
     return children;
