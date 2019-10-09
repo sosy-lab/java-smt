@@ -616,7 +616,7 @@ class Yices2NativeApi {
 
   public static native String yices_rational_const_value(int t);
 
-  /** Returns i-th sum component of term t as String "(coefficient)|(term)" */
+  /** Returns i-th sum component of term t as String "(coefficient)|(term)." */
   public static native String yices_sum_component(int t, int i);
 
   public static native int[] yices_bvsum_component(int t, int i, int bitsize);

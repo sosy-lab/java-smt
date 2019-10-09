@@ -90,9 +90,9 @@ public class Yices2BitvectorFormulaManager
 
   @Override
   protected Integer toIntegerFormulaImpl(Integer bvFormula, boolean pSigned) {
-    // TODO Check if actually true
     throw new UnsupportedOperationException(
-        "Yices dows not support making an INT formula from a BV formula as of Version 2.6.1. Support is planned for a future release.");
+        "Yices dows not support making an INT formula from a BV formula as of Version 2.6.1. "
+            + "Support is planned for a future release.");
   }
 
   @Override
@@ -258,8 +258,8 @@ public class Yices2BitvectorFormulaManager
 
   @Override
   protected Integer makeBitvectorImpl(int pLength, Integer pFormula) {
-    // TODO Check if actually true
     throw new UnsupportedOperationException(
-        "Yices does not support making a BV formula from an INT formula as of Version 2.6.1. Support is planned for a future release.");
+        "Yices does not support making a BV formula from an INT formula as of Version 2.6.1. "
+            + "Support is planned for a future release.");
   }
 }
