@@ -24,6 +24,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_C
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BOOL_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ARRAY;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ASHR;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_DIV;
@@ -56,6 +57,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_from_array;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
@@ -227,6 +229,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final boolean isSum = kind == FunctionDeclarationKind.ADD;
         final boolean isBvAdd = kind == FunctionDeclarationKind.BV_ADD;
         final boolean isMultiply = kind == FunctionDeclarationKind.MUL;
+        final boolean isExtend =
+            (kind == FunctionDeclarationKind.BV_SIGN_EXTENSION)
+                || (kind == FunctionDeclarationKind.BV_ZERO_EXTENSION);
         System.out.println("DeclarationKind is: " + kind.toString());
         System.out.println("Term is: " + yices_term_to_string(pF));
         List<Integer> yicesArgs;
@@ -248,6 +253,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         } else if (isMultiply) {
           name = FunctionDeclarationKind.MUL.toString();
           yicesArgs = getMultiplyArgs(pF);
+        } else if (isExtend) {
+          name = kind.toString();
+          yicesArgs = getExtendArgs(pF);
         } else {
           name = kind.toString();
           yicesArgs = getArgs(pF);
@@ -268,6 +276,20 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             FunctionDeclarationImpl.of(
                 name, kind, argTypes.build(), getFormulaType(pF), constructor));
     }
+  }
+
+  private static FunctionDeclarationKind getExtendKind(Integer pF) {
+    int bv = yices_proj_arg(yices_term_child(pF, 0));
+    int bvSize = yices_term_bitsize(bv);
+    int extendedBy = yices_term_num_children(pF) - bvSize;
+    if (extendedBy != 0) {
+      if (yices_term_child(pF, bvSize) == yices_false()) {
+        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      } else {
+        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      }
+    }
+    throw new IllegalArgumentException("Not a bv extenison term.");
   }
 
   private FunctionDeclarationKind getDeclarationKind(int pF) {
@@ -340,7 +362,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
       default:
         System.out.println("Constructor is:" + constructor);
-        return FunctionDeclarationKind.OTHER;
+        if (constructor == YICES_BV_ARRAY) {
+          return getExtendKind(pF);
+        } else {
+          return FunctionDeclarationKind.OTHER;
+        }
     }
   }
 
@@ -385,6 +411,21 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       children.add(yices_term_child(parent, i));
+    }
+    return children;
+  }
+
+  private static List<Integer> getExtendArgs(int parent) {
+    List<Integer> children = new ArrayList<>();
+    int bv = yices_proj_arg(yices_term_child(parent, 0));
+    int bvSize = yices_term_bitsize(bv);
+    int extendedBy = yices_term_num_children(parent) - bvSize;
+    if (extendedBy > 0) {
+      for (int i = 0; i < yices_term_num_children(parent); i++) {
+        children.add(yices_term_child(parent, i));
+      }
+    } else {
+      throw new IllegalArgumentException("Not a bv extension term.");
     }
     return children;
   }

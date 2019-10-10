@@ -79,12 +79,14 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config_checked;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
@@ -96,13 +98,16 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_nu
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_mpq;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -585,6 +590,36 @@ public class Yices2NativeApiTest {
       System.out.println("Value of coefficient: " + value);
       System.out.println("Coefficient as BigInt: " + new BigInteger(value, 2));
       System.out.println("Term id: " + term);
+    }
+  }
+
+  @Test
+  public void bvExtensionStructureTest() {
+    int extendBy = 5;
+    int x = yices_named_variable(yices_bv_type(5), "x");
+    List<Integer> terms = new ArrayList<Integer>();
+    terms.add(yices_sign_extend(x, extendBy));
+    terms.add(yices_sign_extend(x, extendBy));
+    terms.add(yices_zero_extend(x, extendBy));
+    terms.add(yices_zero_extend(x, extendBy));
+    for (int t : terms) {
+      System.out.println("--------BEGIN-------");
+      System.out.println(yices_term_to_string(t));
+      for (int i = 0; i < yices_term_num_children(t); i++) {
+        System.out.println(yices_term_to_string(yices_term_child(t, i)));
+      }
+      int bv = yices_proj_arg(yices_term_child(t, 0));
+      int bvSize = yices_term_bitsize(bv);
+      int extendedBy = yices_term_num_children(t) - bvSize;
+      System.out.println("Extended by: " + extendedBy);
+      if (extendedBy != 0) {
+        if (yices_term_child(t, bvSize) == yices_false()) {
+          System.out.println("Zero-Extend");
+        } else {
+          System.out.println("Sign-extend");
+        }
+      }
+      System.out.println("--------END-------");
     }
   }
 }
