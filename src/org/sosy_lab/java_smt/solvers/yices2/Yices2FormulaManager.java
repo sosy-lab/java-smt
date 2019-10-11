@@ -110,7 +110,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
               int bitsize = yices_bvtype_size(type);
               out.append("(bitvector " + bitsize + ")");
             }
-            if (++i < types.length - 1) {
+            if (i + 1 < types.length - 1) {
               out.append(' ');
             }
           }
@@ -130,7 +130,6 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           }
           out.append(")\n");
         }
-        String output = out.toString();
         // TODO fold formula to avoid exp. overhead
         out.append("(assert " + yices_term_to_string(formula) + ")");
         System.out.println("Output :" + out);
