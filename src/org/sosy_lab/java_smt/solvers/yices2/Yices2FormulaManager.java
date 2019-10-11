@@ -19,18 +19,13 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_arithmetic;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bool;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import java.io.IOException;
@@ -98,36 +93,14 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           out.append(" (");
           for (int i = 0; i < types.length - 1; i++) {
             int type = types[i];
-            if (yices_type_is_bool(type)) {
-              out.append("bool");
-            } else if (yices_type_is_arithmetic(type)) {
-              if (type == yices_int_type()) {
-                out.append("int");
-              } else if (type == yices_real_type()) {
-                out.append("real");
-              }
-            } else if (yices_term_is_bitvector(type)) {
-              int bitsize = yices_bvtype_size(type);
-              out.append("(bitvector " + bitsize + ")");
-            }
+            out.append(yices_type_to_string(type));
             if (i + 1 < types.length - 1) {
               out.append(' ');
             }
           }
           out.append(") ");
           int retType = types[types.length - 1];
-          if (yices_type_is_bool(retType)) {
-            out.append("bool");
-          } else if (yices_type_is_arithmetic(retType)) {
-            if (retType == yices_int_type()) {
-              out.append("int");
-            } else if (retType == yices_real_type()) {
-              out.append("real");
-            }
-          } else if (yices_term_is_bitvector(retType)) {
-            int bitsize = yices_bvtype_size(retType);
-            out.append("(bitvector " + bitsize + ")");
-          }
+          out.append(yices_type_to_string(retType));
           out.append(")\n");
         }
         // TODO fold formula to avoid exp. overhead
