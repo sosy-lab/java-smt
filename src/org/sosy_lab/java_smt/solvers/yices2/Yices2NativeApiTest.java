@@ -622,4 +622,12 @@ public class Yices2NativeApiTest {
       System.out.println("--------END-------");
     }
   }
+
+  @Test
+  public void booleanParse() {
+    int test = yices_parse_term("false");
+    assertEquals(yices_false(), test);
+    int test2 = yices_parse_term("true");
+    assertEquals(yices_true(), test2);
+  }
 }

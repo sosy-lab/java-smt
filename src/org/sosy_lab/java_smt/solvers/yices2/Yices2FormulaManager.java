@@ -19,12 +19,22 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_arithmetic;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bool;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 
+import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
@@ -69,14 +79,61 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   public Appender dumpFormula(final Integer formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-
+    System.out.println("Term to dump " + yices_term_to_string(formula));
     return new Appenders.AbstractAppender() {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
         // TODO add function declarations
+        Map<String, Formula> varsAndUFs =
+            extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(formula));
+        Iterator<Entry<String, Formula>> it = varsAndUFs.entrySet().iterator();
+        while (it.hasNext()) {
+          Map.Entry<String, Formula> entry = it.next();
+          Yices2Formula yicesForm = (Yices2Formula) entry.getValue();
+          int term = yicesForm.getTerm();
+          int[] types = yices_type_children(yices_type_of_term(term));
+          out.append("(declare-fun ");
+          out.append(PrintTerm.quoteIdentifier(entry.getKey()));
+          out.append(" (");
+          for (int i = 0; i < types.length - 1; i++) {
+            int type = types[i];
+            if (yices_type_is_bool(type)) {
+              out.append("bool");
+            } else if (yices_type_is_arithmetic(type)) {
+              if (type == yices_int_type()) {
+                out.append("int");
+              } else if (type == yices_real_type()) {
+                out.append("real");
+              }
+            } else if (yices_term_is_bitvector(type)) {
+              int bitsize = yices_bvtype_size(type);
+              out.append("(bitvector " + bitsize + ")");
+            }
+            if (++i < types.length - 1) {
+              out.append(' ');
+            }
+          }
+          out.append(") ");
+          int retType = types[types.length - 1];
+          if (yices_type_is_bool(retType)) {
+            out.append("bool");
+          } else if (yices_type_is_arithmetic(retType)) {
+            if (retType == yices_int_type()) {
+              out.append("int");
+            } else if (retType == yices_real_type()) {
+              out.append("real");
+            }
+          } else if (yices_term_is_bitvector(retType)) {
+            int bitsize = yices_bvtype_size(retType);
+            out.append("(bitvector " + bitsize + ")");
+          }
+          out.append(")\n");
+        }
+        String output = out.toString();
         // TODO fold formula to avoid exp. overhead
         out.append("(assert " + yices_term_to_string(formula) + ")");
+        System.out.println("Output :" + out);
       }
     };
   }
