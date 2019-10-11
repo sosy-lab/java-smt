@@ -19,11 +19,14 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
@@ -83,25 +86,54 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         Map<String, Formula> varsAndUFs =
             extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(formula));
         Iterator<Entry<String, Formula>> it = varsAndUFs.entrySet().iterator();
-        while (it.hasNext()) {
-          Map.Entry<String, Formula> entry = it.next();
-          Yices2Formula yicesForm = (Yices2Formula) entry.getValue();
-          int term = yicesForm.getTerm();
-          int[] types = yices_type_children(yices_type_of_term(term));
-          out.append("(declare-fun ");
-          out.append(PrintTerm.quoteIdentifier(entry.getKey()));
-          out.append(" (");
-          for (int i = 0; i < types.length - 1; i++) {
-            int type = types[i];
-            out.append(yices_type_to_string(type));
-            if (i + 1 < types.length - 1) {
-              out.append(' ');
+        if (varsAndUFs.isEmpty()) {
+          // do nothing, formula is simple bool value
+        } else {
+          while (it.hasNext()) {
+            Map.Entry<String, Formula> entry = it.next();
+            Yices2Formula yicesForm = (Yices2Formula) entry.getValue();
+            int term = yicesForm.getTerm();
+            int type;
+            if (yices_term_constructor(term) == YICES_APP_TERM) {
+              // Is UF Correct type is carried by first child
+              System.out.println("Declare UF");
+              type = yices_type_of_term(yices_term_child(term, 0));
+            } else {
+              type = yices_type_of_term(term);
+            }
+            System.out.println("Declaring for term: " + yices_term_to_string(term));
+            System.out.println("Type to declare: " + yices_type_to_string(type));
+            System.out.println("Term constructor is:" + yices_term_constructor(term));
+            int[] types;
+            if (yices_type_num_children(type) == 0) {
+              types = new int[1];
+              types[0] = type;
+            } else {
+              types = yices_type_children(type);
+            }
+            for (int t : types) {
+              System.out.println("Type: " + yices_type_to_string(types[0]));
+            }
+            if (types.length > 0) {
+              System.out.println("Declaring...");
+              out.append("(declare-fun ");
+              out.append(PrintTerm.quoteIdentifier(entry.getKey()));
+              out.append(" (");
+              for (int i = 0; i < types.length - 1; i++) {
+                String typeDecl = yices_type_to_string(types[i]);
+                typeDecl = typeDecl.substring(0, 1).toUpperCase() + typeDecl.substring(1);
+                out.append(typeDecl);
+                if (i + 1 < types.length - 1) {
+                  out.append(' ');
+                }
+              }
+              out.append(") ");
+              String retDecl = yices_type_to_string(types[types.length - 1]);
+              retDecl = retDecl.substring(0, 1).toUpperCase() + retDecl.substring(1);
+              out.append(retDecl);
+              out.append(")\n");
             }
           }
-          out.append(") ");
-          int retType = types[types.length - 1];
-          out.append(yices_type_to_string(retType));
-          out.append(")\n");
         }
         // TODO fold formula to avoid exp. overhead
         out.append("(assert " + yices_term_to_string(formula) + ")");
