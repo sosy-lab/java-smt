@@ -223,8 +223,8 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     // TODO Can UF appear here?? // Built in Functions like "add" seem to be OK
     System.out.println("Query type is: " + yices_type_to_string(yices_type_of_term(pFormula)));
     Preconditions.checkState(!closed);
-    // TODO REENABLE after testing Preconditions.checkState(!prover.isClosed(), "cannot use model
-    // after prover is closed");
+    // TODO REENABLE after testing
+    // Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     int[] yval = yices_get_value(model, pFormula);
     System.out.println("Yval id is: " + yval[0]);
     System.out.println("Yval tag is: " + yval[1]);

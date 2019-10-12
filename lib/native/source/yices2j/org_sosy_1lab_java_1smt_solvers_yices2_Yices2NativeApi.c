@@ -1133,16 +1133,17 @@ char term[12]; //should be enough for MAX_INT32
 snprintf(term, 12, "|%d", s_arg4);
 size_t retSize = strlen(mpqString) + strlen(term);
 char retString[retSize];
-retString[0] = '\0';
-strcat(retString, mpqString);
-strcat(retString, term); 
 if(retString == NULL){
   throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
 }
+retString[0] = '\0';
+strcat(retString, mpqString);
+strcat(retString, term);
 jstring jretval = NULL;
-  if (!(*jenv)->ExceptionCheck(jenv)) {
-    jretval = (*jenv)->NewStringUTF(jenv, retString);
-  }
+if (!(*jenv)->ExceptionCheck(jenv)) {
+  jretval = (*jenv)->NewStringUTF(jenv, retString);
+}
+mpq_clear(m_arg3);
 return jretval;
 }
 
@@ -1169,6 +1170,7 @@ if (jretval != NULL) {
   (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, m_arg3);
 }
 out:
+free(m_arg3);
 return jretval;
 }
 
@@ -1200,6 +1202,7 @@ jretval = (*jenv)->NewIntArray(jenv, 2);
 if (jretval != NULL) {
   (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, jarr);
 }
+free (jarr);
 out:
 return jretval;
 }

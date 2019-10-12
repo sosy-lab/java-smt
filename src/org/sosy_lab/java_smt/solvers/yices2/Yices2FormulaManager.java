@@ -95,8 +95,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
             int term = yicesForm.getTerm();
             int type;
             if (yices_term_constructor(term) == YICES_APP_TERM) {
-              // Is UF Correct type is carried by first child
-              System.out.println("Declare UF");
+              // Is an UF. Correct type is carried by first child.
               type = yices_type_of_term(yices_term_child(term, 0));
             } else {
               type = yices_type_of_term(term);
@@ -111,11 +110,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
             } else {
               types = yices_type_children(type);
             }
-            for (int t : types) {
-              System.out.println("Type: " + yices_type_to_string(types[0]));
-            }
             if (types.length > 0) {
-              System.out.println("Declaring...");
               out.append("(declare-fun ");
               out.append(PrintTerm.quoteIdentifier(entry.getKey()));
               out.append(" (");
@@ -137,7 +132,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         }
         // TODO fold formula to avoid exp. overhead
         out.append("(assert " + yices_term_to_string(formula) + ")");
-        System.out.println("Output :" + out);
+        System.out.println("Output :\n" + out);
       }
     };
   }
