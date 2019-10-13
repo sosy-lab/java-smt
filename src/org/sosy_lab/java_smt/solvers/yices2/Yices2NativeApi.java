@@ -161,7 +161,8 @@ class Yices2NativeApi {
    */
   private static native int yices_set_config(long cfg, String option, String value);
 
-  // TODO Return Value/Name from error_report
+  // TODO Return Value/Name from error_report/
+  // TODO Probably does nothing as C code will throw an Exception
   public static void yices_set_config_checked(long cfg, String option, String value)
       throws IllegalArgumentException {
     int retval = yices_set_config(cfg, option, value);
@@ -346,12 +347,10 @@ class Yices2NativeApi {
 
   public static native int yices_int32(int value);
 
-  // TODO 64 bit/ long needed?
   public static native int yices_int64(long val);
 
   public static native int yices_rational32(int num, int den);
 
-  // TODO 64bit/ long needed?
   public static native int yices_rational64(long num, long den);
 
   public static native int yices_parse_rational(String val);
@@ -378,12 +377,10 @@ class Yices2NativeApi {
 
   public static native int yices_poly_int32(int size, int[] coeff, int[] terms);
 
-  // TODO 64bit/long
   public static native int yices_poly_int64(int size, long[] coeff, int[] terms);
 
   public static native int yices_poly_rational32(int size, int[] num, int[] den, int[] terms);
 
-  // TODO 64bit/long
   public static native int yices_poly_rational64(int size, int[] num, int[] den, int[] terms);
 
   public static native int yices_abs(int t);
@@ -616,12 +613,21 @@ class Yices2NativeApi {
 
   public static native String yices_rational_const_value(int t);
 
-  /** Returns i-th sum component of term t as String "(coefficient)|(term)". */
+  /**
+   * Returns i-th sum component of term t as String "(coefficient)|(term)". If t is in a form like
+   * 3+x, for i = 0 the returned term will be -1/NULL_TERM.
+   */
   public static native String yices_sum_component(int t, int i);
 
+  /**
+   * Returns the i-th component of a bvsum. Returned array has length bitsize+1. array[0] to
+   * array[array.length-2] contain the coefficient, array[array.length-1] the term. If the t is in a
+   * form like [101]+x, for i = 0, the returned term will be -1/NULL_TERM.
+   */
   public static native int[] yices_bvsum_component(int t, int i, int bitsize);
 
   // TODO can return up to UINT32_MAX ?
+  /** Returns an array in the form [term,power]. */
   public static native int[] yices_product_component(int t, int i);
   /*
    * SAT Checking
@@ -690,10 +696,6 @@ class Yices2NativeApi {
 
   public static native void yices_free_model(long model);
 
-  public static native long yices_get_int64_value(long m, int t);
-
-  // public static native long yices_get_value(long m, int t);
-
   /** get the value of a term as pair [node_id, node_tag]. */
   public static native int[] yices_get_value(long m, int t);
 
@@ -711,18 +713,18 @@ class Yices2NativeApi {
    */
   public static native int[] yices_val_get_bv(long m, int id, int size, int tag);
 
-  /*
+  /**
    * Returns array of yval_t values built like this: [yval_t.node_id, yval_t.node_tag,
-   * yval_t.node_id, yval_t.node_tag, ...] The first pair of values represent the default value, the
-   * following values should represent mappings, which can be expanded using expand_mapping()
+   * yval_t.node_id, yval_t.node_tag, ...]. The first pair of values represent the default value,
+   * the following values should represent mappings, which can be expanded using expand_mapping().
    */
   public static native int[] yices_val_expand_function(long m, int id, int tag);
 
-  /*
+  /**
    * Returns array of yval_t values built like this: [yval_t.node_id, yval_t.node_tag,
-   * yval_t.node_id, yval_t.node_tag, ...] The last pair of values represent the function's value,
-   * the other pairs are values for the function's arguments
-   * node_id / node_tag separated to preserve C call order
+   * yval_t.node_id, yval_t.node_tag, ...]. The last pair of values represent the function's value,
+   * the other pairs are values for the function's arguments. node_id / node_tag separated to
+   * preserve C call order
    */
   public static native int[] yices_val_expand_mapping(long m, int id, int arity, int tag);
 
@@ -774,12 +776,11 @@ class Yices2NativeApi {
         return termFromName;
       } else {
         throw new IllegalArgumentException(
-            "Can't create variable with name "
-                + name
-                + "and type"
-                + yices_type_to_string(type, 100, 1, 0)
-                + ".\nAs it would omit a variable with type: "
-                + yices_type_to_string(termFromNameType, 100, 1, 0));
+            String.format(
+                "Can't create variable with name '%s' and type '%s'.\nAs it would omit a variable with type: ",
+                name,
+                yices_type_to_string(type),
+                yices_type_to_string(termFromNameType)));
       }
     }
     int var = yices_new_uninterpreted_term(type);
