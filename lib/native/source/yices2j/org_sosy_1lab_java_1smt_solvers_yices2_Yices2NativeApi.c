@@ -70,18 +70,14 @@ INT_RETURN
  */
 DEFINE_FUNC(jctx, 1new_1context) WITH_ONE_ARG(jconf)
 CONF_ARG(1)
-//ctx_config_t * m_arg1 = (ctx_config_t *) arg1;
 CALL1(context_t *, new_context)
 CTX_RETURN
-//return (long) retval;
-//}
 
 /*
  * Delete specified Yices context.
  */
 DEFINE_FUNC(void, 1free_1context) WITH_ONE_ARG(jctx)
 CTX_ARG_VOID(1)
-//context_t * m_arg1 = (context_t *) arg1;
 VOID_CALL1(free_context)
 
 /*
@@ -155,7 +151,6 @@ TYPE_RETURN
 
 // tuple types skipped
 
-//Might not work because of array handling
 DEFINE_FUNC(jtype, 1function_1type) WITH_THREE_ARGS(int, jtypeArray, jtype)
 UINT32_ARG(1)
 TYPE_ARRAY_ARG(2)
@@ -163,7 +158,6 @@ TYPE_ARG(3)
 CALL3(type_t, function_type)
 FREE_TYPE_ARRAY_ARG(2)
 TYPE_RETURN
-//might not work
 
 //redundant function types skipped
 
@@ -199,9 +193,6 @@ TYPE_ARG(1)
 TYPE_ARG(2)
 CALL2(int, compatible_types)
 BOOLEAN_RETURN
-
-//todo add missing type properties
-// certain type properies return -1 for error, 0 for success needs checking
 
 DEFINE_FUNC(int, 1bvtype_1size) WITH_ONE_ARG(jtype)
 TYPE_ARG(1)
@@ -241,6 +232,7 @@ TYPE_ARG(1)
 CALL1(term_t, new_variable)
 TERM_RETURN
 
+//ONLY for scalar or uninterprted type which are currently not implemented
 DEFINE_FUNC(jterm, 1constant) WITH_TWO_ARGS(jtype, int)
 TYPE_ARG(1)
 SIMPLE_ARG(int32_t, 2)
@@ -579,22 +571,22 @@ TERM_RETURN
 /*
  * Arith operations with two arguments
  */
-yices_arith2(eq)//, atom)
-yices_arith2(neq)//, atom)
-yices_arith2(geq)//, atom)
-yices_arith2(leq)//, atom)
-yices_arith2(gt)//, atom)
-yices_arith2(lt)//, atom)
+yices_arith2(eq)
+yices_arith2(neq)
+yices_arith2(geq)
+yices_arith2(leq)
+yices_arith2(gt)
+yices_arith2(lt)
 
 /*
  * Arith operations with one argument
  */
-yices_arith(eq0) //_atom)
-yices_arith(neq0) //_atom)
-yices_arith(geq0) //_atom)
-yices_arith(leq0) //_atom)
-yices_arith(gt0) //_atom)
-yices_arith(lt0) //_atom)
+yices_arith(eq0)
+yices_arith(neq0)
+yices_arith(geq0)
+yices_arith(leq0)
+yices_arith(gt0)
+yices_arith(lt0)
 
 DEFINE_FUNC(jterm, 1divides_1atom) WITH_TWO_ARGS(jterm, jterm)
 TERM_ARG(1)
@@ -652,7 +644,6 @@ UINT32_ARG(1)
 CALL1(term_t, bvconst_minus_one)
 TERM_RETURN
 
-//int32_t > Integer_MAX_VALUE?
 DEFINE_FUNC(jterm, 1bvconst_1from_1array) WITH_TWO_ARGS(int, intArray)
 UINT32_ARG(1)
 INT_ARRAY_ARG(int32_t, 2)
@@ -1029,7 +1020,6 @@ TERM_ARG(1)
 CALL1(type_t, type_of_term)
 TYPE_RETURN
 
-//SEPERATE ERROR HANDLING NEEDED? 0 is false and error
 yices_term_is(bool)
 
 yices_term_is(int)
@@ -1049,13 +1039,11 @@ TERM_ARG(1)
 CALL1(int, term_bitsize)
 INT_RETURN
 
-//SEPERATE ERROR HANDLING NEEDED? 0 is false and error
 DEFINE_FUNC(jboolean, 1term_1is_1ground) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(int, term_is_ground)
 BOOLEAN_RETURN
 
-//SEPERATE ERROR HANDLING NEEDED? 0 is false and error
 yices_term_is(atomic)
 
 yices_term_is(composite)
@@ -1068,13 +1056,11 @@ yices_term_is(bvsum)
 
 yices_term_is(product)
 
-//Handle naming in Java/ returns -1 if YICES_CONSTRUCTOR_ERROR
 DEFINE_FUNC(int, 1term_1constructor) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(term_constructor_t, term_constructor)
 INT_RETURN
 
-//returns -1 if term not valid
 DEFINE_FUNC(int, 1term_1num_1children) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(int, term_num_children)
@@ -1086,13 +1072,11 @@ SIMPLE_ARG(int32_t, 2)
 CALL2(term_t, term_child)
 TERM_RETURN
 
-//Maybe not needed
 DEFINE_FUNC(int, 1proj_1index) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(int, proj_index)
 INT_RETURN
 
-//Maybe not needed
 DEFINE_FUNC(jterm, 1proj_1arg) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(term_t, proj_arg)
@@ -1109,6 +1093,8 @@ TERM_ARG(1)
 EMPTY_INT_ARRAY_ARG(int32_t, 2)
 CALL2(int, bv_const_value)
 INT_ARRAY_RETURN(2)
+
+//scalar_const_value skipped
 
 DEFINE_FUNC(string, 1rational_1const_1value) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
@@ -1207,12 +1193,6 @@ out:
 return jretval;
 }
 
-//skipping scalar const value | rational const value
-
-//Skipping functions from yices_bool_const_value as need is unclear
-//todo add missing type properties
-// certain return -1 for error, 0 for success needs checking
-
 /*
  * Assertions and SAT Checking
  */
@@ -1236,7 +1216,6 @@ CALL3(int, assert_formulas)
 FREE_TERM_ARRAY_ARG(3)
 INT_RETURN
 
-//todo parameter handling
 DEFINE_FUNC(int, 1check_1context) WITH_TWO_ARGS (jctx, jparam)
 CTX_ARG(1)
 PARAM_ARG(2)
@@ -1275,7 +1254,6 @@ CALL4(smt_status_t, check_context_with_assumptions)
 FREE_TERM_ARRAY_ARG(4)
 INT_RETURN
 
-//untested
 DEFINE_FUNC(jtermArray, 1get_1unsat_1core) WITH_ONE_ARG(jctx)
 CTX_ARG(1)
 TERM_VECTOR_ARG(2)
@@ -1340,7 +1318,7 @@ LONG_POINTER_ARG(3)
 CALL3(int, get_int64_value)
 FROM_LONG_POINTER_RETURN(3)
 
-// skipping get_rational32 | get_rational_64 TWO RETURN_VALUES
+// skipping get_rational32 | get_rational_64
 
 DEFINE_FUNC(double, 1get_1_double_value) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)
@@ -1361,14 +1339,13 @@ CALL3(int, get_bv_value)
 INT_ARRAY_RETURN(3)
 
 //skipping get_scalar_value
-//use boolean as return?
 
 DEFINE_FUNC(int, 1formula_1true_1in_1model) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)
 TERM_ARG(2)
 CALL2(int, formula_true_in_model)
 INT_RETURN
-//use boolean as return?
+
 DEFINE_FUNC(int, 1formulas_1true_1in_1model) WITH_THREE_ARGS(jmodel, int, jtermArray)
 MODEL_ARG(1)
 UINT32_ARG(2)
@@ -1384,17 +1361,23 @@ EMPTY_YVAL_ARG(3)
 CALL3(int, get_value)
 YVAL_RETURN(3)
 
+//skipping val_is_
+
 DEFINE_FUNC(int, 1val_1bitsize) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
 YVAL_ARG(2, 2, 3)
 CALL2(int, val_bitsize)
 INT_RETURN
 
+//skipping val_tuple_arity
+
 DEFINE_FUNC(int, 1val_1function_1arity) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
 YVAL_ARG(2, 2, 3)
 CALL2(int, val_function_arity)
 INT_RETURN
+
+//skipping val_mapping_arity
 
 DEFINE_FUNC(int, 1val_1get_1bool) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
@@ -1403,6 +1386,8 @@ INT_POINTER_ARG(3)
 CALL3(int, val_get_bool)
 FROM_INT_POINTER_RETURN(3)
 
+// skipping val_get_(arith type) functions in favor of val_get_mpq
+
 DEFINE_FUNC(string, 1val_1get_1mpq) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
 YVAL_ARG(2, 2, 3)
@@ -1410,6 +1395,7 @@ MPQ_ARG(3)
 CALL3(int, val_get_mpq)
 MPQ_RETURN(3)
 
+//skipping val_get_algebraic_number
 
 DEFINE_FUNC(intArray, 1val_1get_1bv) WITH_FOUR_ARGS(jmodel, jnodeid, int, jnodetag)
 MODEL_ARG(1)
@@ -1417,6 +1403,9 @@ YVAL_ARG(2, 2, 4)
 EMPTY_INT_ARRAY_ARG(int32_t, 3)
 CALL3(int, val_get_bv)
 INT_ARRAY_RETURN(3)
+
+//skipping val_get_scalar
+//skipping val_expand_tuple
 
 DEFINE_FUNC(intArray, 1val_1expand_1function) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
 MODEL_ARG(1)
@@ -1496,16 +1485,19 @@ free(m_arg3);
 return jretval;
 }
 
-
 DEFINE_FUNC(jterm, 1get_1value_1as_1term) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)
 TERM_ARG(2)
 CALL2(term_t, get_value_as_term)
 TERM_RETURN
 
+//skipping following model functions
+
 /*
  * TERM NAMING, PRINTING, PARSING and SUBSTITUTION 
  */
+
+//skipping type functions
 
 DEFINE_FUNC(int, 1set_1term_1name) WITH_TWO_ARGS(jterm, string)
 TERM_ARG(1)
@@ -1524,6 +1516,30 @@ STRING_ARG(1)
 CALL1(term_t, get_term_by_name)
 FREE_STRING_ARG(1)
 TERM_RETURN
+
+//skipping remove_term_name and clear_term_name
+
+//skipping parse_type
+
+DEFINE_FUNC(jterm, 1parse_1term) WITH_ONE_ARG(string)
+STRING_ARG(1)
+CALL1(term_t, parse_term)
+FREE_STRING_ARG(1)
+TERM_RETURN
+
+DEFINE_FUNC(jterm, 1subst_1term) WITH_FOUR_ARGS(int, jtermArray, jtermArray, jterm)
+UINT32_ARG(1)
+TERM_ARRAY_ARG(2)
+TERM_ARRAY_ARG(3)
+TERM_ARG(4)
+CALL4(term_t, subst_term)
+FREE_TERM_ARRAY_ARG(2)
+FREE_TERM_ARRAY_ARG(3)
+TERM_RETURN
+
+/*
+ * Printing
+ */
 
 //Creates String that needs to be freed
 DEFINE_FUNC(string, 1term_1to_1string) WITH_FOUR_ARGS(jterm, int, int ,int)
@@ -1550,21 +1566,6 @@ UINT32_ARG(4)
 CALL4(char *, model_to_string)
 STRING_RETURN
 
-DEFINE_FUNC(jterm, 1parse_1term) WITH_ONE_ARG(string)
-STRING_ARG(1)
-CALL1(term_t, parse_term)
-FREE_STRING_ARG(1)
-TERM_RETURN
-
-DEFINE_FUNC(jterm, 1subst_1term) WITH_FOUR_ARGS(int, jtermArray, jtermArray, jterm)
-UINT32_ARG(1)
-TERM_ARRAY_ARG(2)
-TERM_ARRAY_ARG(3)
-TERM_ARG(4)
-CALL4(term_t, subst_term)
-FREE_TERM_ARRAY_ARG(2)
-FREE_TERM_ARRAY_ARG(3)
-TERM_RETURN
 /*
  * Functions for version checking
  */
