@@ -58,7 +58,6 @@ public class Yices2SolverContext extends AbstractSolverContext {
       BooleanFormulaManager pBfmgr,
       ShutdownNotifier pShutdownManager) {
     super(pFmgr);
-    // TODO Auto-generated constructor stub
     this.yicesConfig = yicesConfig;
     this.yicesEnvironment = yicesEnvironment;
     this.creator = creator;
@@ -110,7 +109,6 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    // TODO freeing context and config might not be needed
     yices_free_config(yicesConfig);
     yices_free_context(yicesEnvironment);
     yices_exit();

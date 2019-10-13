@@ -35,7 +35,6 @@ public class Yices2BooleanFormulaManager
 
   protected Yices2BooleanFormulaManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
@@ -90,24 +89,11 @@ public class Yices2BooleanFormulaManager
 
   @Override
   protected boolean isTrue(Integer pBits) {
-    // TODO Better way to get this information? Causes Error when called with variable.
-
-    // if (yices_term_constructor(pBits) != 0) {
-    // return false;
-    // }
-    // return (yices_bool_const_value(pBits) == true);
-    // }
     return pBits.equals(yices_true());
   }
 
   @Override
   protected boolean isFalse(Integer pBits) {
-    // TODO Better way to get this information? Causes Error when called with variable.
-
-    // if (yices_term_constructor(pBits) != 0) {
-    // return false;
-    // }
-    // return (yices_bool_const_value(pBits) == false);
     return pBits.equals(yices_false());
   }
 

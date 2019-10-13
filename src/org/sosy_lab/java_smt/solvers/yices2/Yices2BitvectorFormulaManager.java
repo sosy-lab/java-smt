@@ -61,12 +61,10 @@ public class Yices2BitvectorFormulaManager
 
   protected Yices2BitvectorFormulaManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
   protected Integer makeBitvectorImpl(int pLength, long pParam1) {
-    // TODO Check size constraints/ Unsure if correct
     if (Long.signum(pParam1) < 0) {
       long max = (long) Math.pow(2, (pLength - 1));
       if (Math.abs(pParam1) > max) {
@@ -91,7 +89,7 @@ public class Yices2BitvectorFormulaManager
   @Override
   protected Integer toIntegerFormulaImpl(Integer bvFormula, boolean pSigned) {
     throw new UnsupportedOperationException(
-        "Yices dows not support making an INT formula from a BV formula as of Version 2.6.1. "
+        "Yices does not support making an INT formula from a BV formula as of Version 2.6.1. "
             + "Support is planned for a future release.");
   }
 
@@ -212,7 +210,6 @@ public class Yices2BitvectorFormulaManager
     } else if (bits.length() < pLength) {
       bits = Strings.padStart(bits, pLength, '0');
     }
-    // TODO check size of bits against pLength
     Preconditions.checkArgument(bits.length() == pLength, "Bitvector has unexpected size.");
     return yices_parse_bvbin(bits);
   }

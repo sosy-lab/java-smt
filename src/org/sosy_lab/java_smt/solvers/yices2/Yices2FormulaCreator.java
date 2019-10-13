@@ -132,7 +132,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer makeVariable(Integer pType, String pVarName) {
-    // TODO Use yices_uninterpreted_term for variable making?
     return yices_named_variable(pType, pVarName);
   }
 
@@ -178,9 +177,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     if (pFormula instanceof BitvectorFormula) {
       int type = yices_type_of_term(extractInfo(pFormula));
-      // TODO ?checkArgument(
-      // yices_is_bitvector(type),
-      // "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(yices_bvtype_size(type));
     } else {
       return super.getFormulaType(pFormula);
@@ -503,7 +499,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   protected Integer getBooleanVarDeclarationImpl(Integer pTFormulaInfo) {
-    // TODO Unsure what to return here
     return yices_term_constructor(pTFormulaInfo);
   }
 

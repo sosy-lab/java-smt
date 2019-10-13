@@ -111,7 +111,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     int[] termsInModel = yices_def_terms(model);
     for (int i = 0; i < termsInModel.length; i++) {
       int[] yvalTag = yices_get_value(model, termsInModel[i]);
-      if (!complex.contains(yvalTag[1])) {
+      if (!complex.contains(yvalTag[1])) { // TODO Switch with other if for less complex check?
         assignments.add(getSimpleAssignment(termsInModel[i]));
       } else if (yvalTag[1] == YVAL_FUNCTION) {
         assignments.addAll(getFunctionAssignment(termsInModel[i], yvalTag));
@@ -123,7 +123,6 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     return assignments.build();
   }
 
-  // TODO encapsulate Formula ? convert yval to valueTerm and value(Object)
   private ImmutableList<ValueAssignment> getFunctionAssignment(int t, int[] yval) {
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int arity = yices_val_function_arity(model, yval[0], yval[1]);

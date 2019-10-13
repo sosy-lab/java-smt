@@ -125,7 +125,7 @@ class Yices2NativeApi {
   public static native void yices_reset();
 
   /**
-   * Frees the specified String. everal API functions build and return a character string that is
+   * Frees the specified String. Several API functions build and return a character string that is
    * allocated by Yices. To avoid memory leaks, this string must be freed when it is no longer used
    * by calling this function.
    *
