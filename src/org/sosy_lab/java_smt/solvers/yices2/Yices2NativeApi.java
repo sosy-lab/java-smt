@@ -779,9 +779,7 @@ class Yices2NativeApi {
             String.format(
                 "Can't create variable with name '%s' and type '%s'.%n"
                     + "As it would omit a variable with type '%s'",
-                name,
-                yices_type_to_string(type),
-                yices_type_to_string(termFromNameType)));
+                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
       }
     }
     int var = yices_new_uninterpreted_term(type);

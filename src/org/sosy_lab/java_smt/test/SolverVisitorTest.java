@@ -263,7 +263,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     IntegerFormula y = imgr.makeVariable("y");
     IntegerFormula z = imgr.makeVariable("z");
 
-    
     BooleanFormula f = bmgr.or(imgr.equal(z, imgr.add(x, y)), imgr.equal(x, imgr.add(z, y)));
 
     final Set<String> usedVariables = new HashSet<>();

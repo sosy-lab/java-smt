@@ -138,8 +138,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public <T extends Formula> T
-      substitute(final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
+  public <T extends Formula> T substitute(
+      final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
     int[] changeFrom = new int[fromToMapping.size()];
     int[] changeTo = new int[fromToMapping.size()];
     int idx = 0;
@@ -153,8 +153,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       System.out.println("Term Constructor: " + yices_term_constructor(t));
     }
     FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator().encapsulate(
-        type,
-        yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
+    return getFormulaCreator()
+        .encapsulate(
+            type, yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
   }
 }

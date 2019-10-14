@@ -48,7 +48,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   // SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
   // (though both support some parts)
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.YICES2);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolvers() {

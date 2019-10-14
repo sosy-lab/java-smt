@@ -57,6 +57,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_from_array;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
@@ -147,7 +148,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
         : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+            "Trying to encapsulate formula %s of type %s as %s",
+            yices_term_to_string(pTerm), getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new Yices2BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -205,6 +207,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
+    int functionDeclaration = -constructor;
     switch (constructor) {
       case YICES_BOOL_CONST:
         return pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
@@ -213,15 +216,15 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_BV_CONST:
         return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_UNINTERPRETED_TERM:
-        System.out
-            .println("Term name: " + yices_term_to_string(pF) + "|" + yices_get_term_name(pF));
+        System.out.println(
+            "Term name: " + yices_term_to_string(pF) + "|" + yices_get_term_name(pF));
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
         final FunctionDeclarationKind kind = getDeclarationKind(pF);
         final ImmutableList.Builder<Formula> args = ImmutableList.builder();
         final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         final boolean isAnd = kind == FunctionDeclarationKind.AND && isNestedConjunction(pF);
-        final boolean isFunction = kind == FunctionDeclarationKind.UF;
+        final boolean isUF = kind == FunctionDeclarationKind.UF;
         final boolean isSum = kind == FunctionDeclarationKind.ADD;
         final boolean isBvAdd = kind == FunctionDeclarationKind.BV_ADD;
         final boolean isMultiply = kind == FunctionDeclarationKind.MUL;
@@ -235,10 +238,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         if (isAnd) {
           name = FunctionDeclarationKind.AND.toString();
           yicesArgs = getNestedConjunctionArgs(pF);
-        } else if (isFunction) {
+        } else if (isUF) {
           yicesArgs = getArgs(pF);
           name = yices_term_to_string(yicesArgs.get(0));
-          constructor = yicesArgs.get(0);
+          functionDeclaration = yicesArgs.get(0);
           yicesArgs.remove(0);
         } else if (isSum) {
           name = FunctionDeclarationKind.ADD.toString();
@@ -270,11 +273,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             pFormula,
             args.build(),
             FunctionDeclarationImpl.of(
-                name, kind, argTypes.build(), getFormulaType(pF), constructor));
+                name, kind, argTypes.build(), getFormulaType(pF), functionDeclaration));
     }
   }
 
   private static FunctionDeclarationKind getExtendKind(Integer pF) {
+    System.out.println(yices_term_to_string(pF));
     int bv = yices_proj_arg(yices_term_child(pF, 0));
     int bvSize = yices_term_bitsize(bv);
     int extendedBy = yices_term_num_children(pF) - bvSize;
@@ -285,7 +289,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         return FunctionDeclarationKind.BV_SIGN_EXTENSION;
       }
     }
-    throw new IllegalArgumentException("Not a bv extenison term.");
+    return null;
   }
 
   private FunctionDeclarationKind getDeclarationKind(int pF) {
@@ -359,10 +363,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       default:
         System.out.println("Constructor is:" + constructor);
         if (constructor == YICES_BV_ARRAY) {
-          return getExtendKind(pF);
-        } else {
-          return FunctionDeclarationKind.OTHER;
+          FunctionDeclarationKind possibleExtend = getExtendKind(pF);
+          if (possibleExtend != null) {
+            return possibleExtend;
+          }
         }
+        return FunctionDeclarationKind.OTHER;
     }
   }
 
@@ -470,16 +476,30 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
-    int size = pArgs.size();
-    if (size == 0) {
-      return pDeclaration;
-    } else {
-      int[] argArray = new int[size];
-      for (int i = 0; i < size; i++) {
-        argArray[i] = pArgs.get(i);
+    if (pDeclaration < 0) { // is constant function application from API
+      switch (-pDeclaration) {
+        case YICES_EQ_TERM:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_eq(pArgs.get(0), pArgs.get(1));
+          // TODO add more cases
+        default:
+          throw new IllegalArgumentException(
+              "Unknown function declaration with constant value " + -pDeclaration);
       }
-      int app = yices_application(pDeclaration, size, argArray);
-      return app;
+    } else { // is UF Application
+      System.out.println("Input: " + yices_term_to_string(pDeclaration));
+      int size = pArgs.size();
+      if (size == 0) {
+        return pDeclaration;
+      } else {
+        int[] argArray = new int[size];
+        for (int i = 0; i < size; i++) {
+          argArray[i] = pArgs.get(i);
+        }
+        int app = yices_application(pDeclaration, size, argArray);
+        System.out.println("App: " + yices_term_to_string(app));
+        return app;
+      }
     }
   }
 
@@ -494,7 +514,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     } else {
       yicesFuncType = yices_function_type(size, argTypeArray, pReturnType);
     }
-    return yices_named_variable(yicesFuncType, pName);
+    int temp = yices_named_variable(yicesFuncType, pName);
+    System.out.println("Creating UF: " + pName + " with index: " + temp);
+    return temp;
   }
 
   @Override
