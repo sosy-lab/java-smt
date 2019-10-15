@@ -17,8 +17,9 @@ For Maven:
 </dependency>
 ```
 
-Currently, only `SMTInterpol` is automatically fetched from Maven Central,
-and shared object for _other solvers would have to be installed manually_:
+Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
+because they are written in Java and Scala, and thus are available on every machine.
+Shared object for _other solvers, such as `MathSAT5` or `Z3`, would have to be installed manually_:
 see the section "Manual Installation" below.
 
 ### Automatic Installation using Ivy
