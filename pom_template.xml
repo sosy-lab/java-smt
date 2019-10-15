@@ -58,4 +58,15 @@
             </roles>
         </developer>
     </developers>
+
+    <repositories>
+      <repository> <!-- additional repository for Princess -->
+        <id>princess-repo</id>
+        <name>Princess Maven Repository</name>
+        <url>http://logicrunch.it.uu.se:4096/~wv/maven/</url>
+      </repository>
+    </repositories>
+
+    <!-- Dependencies are automatically inserted after this line. Do not change! -->
+
 </project>
