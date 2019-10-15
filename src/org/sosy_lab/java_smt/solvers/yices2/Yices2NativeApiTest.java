@@ -549,26 +549,26 @@ public class Yices2NativeApiTest {
     int sumOneX = yices_sum(2, oneX);
     for (int i = 0; i < yices_term_num_children(sumOneX); i++) {
       System.out.println(yices_term_to_string(sumOneX));
-      System.out.println(yices_sum_component(sumOneX, i));
+      System.out.println(Arrays.toString(yices_sum_component(sumOneX, i)));
     }
     int[] twoX = {three, x, x};
     int sumTwoX = yices_sum(3, twoX);
     for (int i = 0; i < yices_term_num_children(sumTwoX); i++) {
       System.out.println(yices_term_to_string(sumTwoX));
-      System.out.println(yices_sum_component(sumTwoX, i));
+      System.out.println(Arrays.toString(yices_sum_component(sumTwoX, i)));
     }
     int[] twoThrees = {three, x, three};
     int sumTwoThrees = yices_sum(3, twoThrees);
     for (int i = 0; i < yices_term_num_children(sumTwoThrees); i++) {
       System.out.println(yices_term_to_string(sumTwoThrees));
-      System.out.println(yices_sum_component(sumTwoThrees, i));
+      System.out.println(Arrays.toString(yices_sum_component(sumTwoThrees, i)));
     }
     int xTimesRational = yices_mul(rat, x);
     int[] ratSum = {three, xTimesRational};
     int sumRatX = yices_sum(2, ratSum);
     for (int i = 0; i < yices_term_num_children(sumRatX); i++) {
       System.out.println(yices_term_to_string(sumRatX));
-      System.out.println(yices_sum_component(sumRatX, i));
+      System.out.println(Arrays.toString(yices_sum_component(sumRatX, i)));
     }
   }
 
