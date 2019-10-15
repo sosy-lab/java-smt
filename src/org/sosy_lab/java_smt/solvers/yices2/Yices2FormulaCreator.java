@@ -87,7 +87,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -436,16 +435,16 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     System.out.println(yices_term_to_string(parent));
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
-      String child = yices_sum_component(parent, i);
-      List<String> parts = Splitter.on('|').splitToList(child);
-      // String[] parts = child.split("\\|");
-      if (parts.get(1).equals("-1")) { // No term just a number
-        children.add(yices_parse_rational(parts.get(0)));
+      String[] child = yices_sum_component(parent, i);
+      String coeff = child[0];
+      int term = Integer.parseInt(child[1]);
+      if (term == -1) { // No term just a number
+        children.add(yices_parse_rational(coeff));
       } else { // return only term / ignores coefficient
-        // int coeff = yices_parse_rational(parts[0]);
+        // int coeffTerm = yices_parse_rational(coeff);
         // int term = Integer.parseInt(parts[1]);
-        // children.add(yices_mul(coeff, term));
-        children.add(Integer.parseInt(parts.get(1)));
+        // children.add(yices_mul(coeffTerm, term));
+        children.add(term);
       }
     }
     return children;

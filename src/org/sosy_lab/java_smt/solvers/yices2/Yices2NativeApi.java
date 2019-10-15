@@ -614,10 +614,10 @@ class Yices2NativeApi {
   public static native String yices_rational_const_value(int t);
 
   /**
-   * Returns i-th sum component of term t as String "(coefficient)|(term)". If t is in a form like
-   * 3+x, for i = 0 the returned term will be -1/NULL_TERM.
+   * Returns i-th sum component of term t as String-Array [coefficient, term]. If t is in a form
+   * like 3+x, for i = 0 the returned term will be -1/NULL_TERM.
    */
-  public static native String yices_sum_component(int t, int i);
+  public static native String[] yices_sum_component(int t, int i);
 
   /**
    * Returns the i-th component of a bvsum. Returned array has length bitsize+1. array[0] to

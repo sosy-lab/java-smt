@@ -1103,7 +1103,7 @@ CALL2(int, rational_const_value)
 MPQ_RETURN(2)
 
 //TODO FREE strings/arrays // setObjectiveArray
-DEFINE_FUNC(string, 1sum_1component) WITH_TWO_ARGS(jterm, int)
+DEFINE_FUNC(objectArray, 1sum_1component) WITH_THREE_ARGS(jterm, int, object)
 TERM_ARG(1)
 SIMPLE_ARG(int32_t, 2)
 MPQ_ARG(3)
@@ -1116,19 +1116,33 @@ if (retval == -1) {
 }
 char *mpqString = mpq_get_str(NULL, 10, m_arg3);
 char term[12]; //should be enough for MAX_INT32
-snprintf(term, 12, "|%d", s_arg4);
-size_t retSize = strlen(mpqString) + strlen(term);
-char retString[retSize];
-if(retString == NULL){
-  throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
+snprintf(term, 12, "%d", s_arg4);
+/**size_t retSize = strlen(mpqString) + strlen(term);
+ *char retString[retSize];
+ *if(retString == NULL){
+ *  throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Yices");
+ *}
+ *retString[0] = '\0';
+ *strcat(retString, mpqString);
+ *strcat(retString, term);
+ *jstring jretval = NULL;
+ *if (!(*jenv)->ExceptionCheck(jenv)) {
+ *  jretval = (*jenv)->NewStringUTF(jenv, retString);
+ *}
+ */
+if ((*jenv)->ExceptionCheck(jenv)) {
+   goto out;
 }
-retString[0] = '\0';
-strcat(retString, mpqString);
-strcat(retString, term);
-jstring jretval = NULL;
-if (!(*jenv)->ExceptionCheck(jenv)) {
-  jretval = (*jenv)->NewStringUTF(jenv, retString);
+jclass stringClass = (*jenv)->FindClass(jenv,"java/lang/String");
+jobjectArray jretval = NULL;
+//jobjectArray ret;
+jretval = (jobjectArray)(*jenv)->NewObjectArray(jenv, 2,stringClass,(*jenv)->NewStringUTF(jenv, ""));
+//jretval = (*jenv)->NewObjectArray(jenv, 2, (*jenv)->FindClass("java/lang/String"), jenv->NewStringUTF(""));
+if (jretval != NULL) {
+  (*jenv)->SetObjectArrayElement(jenv, jretval, 0, (*jenv)->NewStringUTF(jenv, mpqString));
+  (*jenv)->SetObjectArrayElement(jenv, jretval, 1, (*jenv)->NewStringUTF(jenv, term));
 }
+out:
 mpq_clear(m_arg3);
 return jretval;
 }
