@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ABS;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
@@ -37,10 +38,14 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SHL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SMOD;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SREM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_CEIL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_DISTINCT_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_DIVIDES_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_FLOOR;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IDIV;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IMOD;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IS_INT_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ITE_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
@@ -50,6 +55,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_SELECT_
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UNINTERPRETED_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_VARIABLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_XOR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_abs;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_geq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
@@ -64,24 +70,34 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsdiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsge_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsmod;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ceil;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_distinct;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_divides_atom;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_division;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_floor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_imod;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_is_int_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_index;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
@@ -528,7 +544,36 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         case YICES_ARITH_GE_ATOM:
           Preconditions.checkArgument(pArgs.size() == 2);
           return yices_arith_geq_atom(pArgs.get(0), pArgs.get(1));
-
+        case YICES_ABS:
+          Preconditions.checkArgument(pArgs.size() == 1);
+          return yices_abs(pArgs.get(0));
+        case YICES_CEIL:
+          Preconditions.checkArgument(pArgs.size() == 1);
+          return yices_ceil(pArgs.get(0));
+        case YICES_FLOOR:
+          Preconditions.checkArgument(pArgs.size() == 1);
+          return yices_floor(pArgs.get(0));
+        case YICES_RDIV:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_division(pArgs.get(0), pArgs.get(1));
+        case YICES_IDIV:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_idiv(pArgs.get(0), pArgs.get(1));
+        case YICES_IMOD:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_imod(pArgs.get(0), pArgs.get(1));
+        case YICES_IS_INT_ATOM:
+          Preconditions.checkArgument(pArgs.size() == 1);
+          return yices_is_int_atom(pArgs.get(0));
+        case YICES_DIVIDES_ATOM:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_divides_atom(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_SUM:
+          return yices_bvsum(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_ARITH_SUM:
+          return yices_sum(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_POWER_PRODUCT:
+          return yices_product(pArgs.size(), Ints.toArray(pArgs));
           // TODO add more cases
         default:
           throw new IllegalArgumentException(

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
@@ -629,5 +630,15 @@ public class Yices2NativeApiTest {
     assertEquals(yices_false(), test);
     int test2 = yices_parse_term("true");
     assertEquals(yices_true(), test2);
+  }
+
+  @Test
+  public void bvSum() {
+    int type = yices_bv_type(5);
+    int bv1 = yices_named_variable(type, "x");
+    int bv2 = yices_named_variable(type, "y");
+    int add = yices_bvadd(bv1, bv2);
+    int constructor = yices_term_constructor(add);
+    assertEquals(YICES_BV_SUM, constructor);
   }
 }
