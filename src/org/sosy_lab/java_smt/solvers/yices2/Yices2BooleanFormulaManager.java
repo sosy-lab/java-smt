@@ -19,15 +19,19 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_xor2;
 
+import com.google.common.primitives.Ints;
+import java.util.Collection;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class Yices2BooleanFormulaManager
@@ -62,20 +66,20 @@ public class Yices2BooleanFormulaManager
     return yices_and2(pParam1, pParam2);
   }
 
-  //  @Override
-  //  protected Integer andImpl(Collection<Integer> pParams) {
-  //    return yices_and(pParams.size(), Ints.toArray(pParams));
-  //  }
+  @Override
+  protected Integer andImpl(Collection<Integer> pParams) {
+    return yices_and(pParams.size(), Ints.toArray(pParams));
+  }
 
   @Override
   protected Integer or(Integer pParam1, Integer pParam2) {
     return yices_or2(pParam1, pParam2);
   }
 
-  //  @Override
-  //  protected Integer orImpl(Collection<Integer> pParams) {
-  //    return yices_or(pParams.size(), Ints.toArray(pParams));
-  //  }
+  @Override
+  protected Integer orImpl(Collection<Integer> pParams) {
+    return yices_or(pParams.size(), Ints.toArray(pParams));
+  }
 
   @Override
   protected Integer xor(Integer pParam1, Integer pParam2) {

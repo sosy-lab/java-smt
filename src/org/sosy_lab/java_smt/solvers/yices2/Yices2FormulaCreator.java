@@ -34,6 +34,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_REM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SDIV;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SGE_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SHL;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SMOD;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SREM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_DISTINCT_TERM;
@@ -50,20 +51,31 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UNINTER
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_VARIABLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_XOR_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_geq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_from_array;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvdiv;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvge_atom;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvrem;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsdiv;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsge_atom;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsmod;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_distinct;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
@@ -84,6 +96,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_xor;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -477,9 +490,45 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
     if (pDeclaration < 0) { // is constant function application from API
       switch (-pDeclaration) {
+        case YICES_ITE_TERM:
+          Preconditions.checkArgument(pArgs.size() == 3);
+          return yices_ite(pArgs.get(0), pArgs.get(1), pArgs.get(0));
         case YICES_EQ_TERM:
           Preconditions.checkArgument(pArgs.size() == 2);
           return yices_eq(pArgs.get(0), pArgs.get(1));
+        case YICES_DISTINCT_TERM:
+          return yices_distinct(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_NOT_TERM:
+          Preconditions.checkArgument(pArgs.size() == 1);
+          return yices_not(pArgs.get(0));
+        case YICES_OR_TERM:
+          return yices_or(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_XOR_TERM:
+          return yices_xor(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_BV_DIV:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_bvdiv(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_REM:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_bvrem(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_SDIV:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_bvsdiv(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_SREM:
+          return yices_bvsrem(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_SMOD:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_bvsmod(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_GE_ATOM:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_bvge_atom(pArgs.get(0), pArgs.get(1));
+        case YICES_BV_SGE_ATOM:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_bvsge_atom(pArgs.get(0), pArgs.get(1));
+        case YICES_ARITH_GE_ATOM:
+          Preconditions.checkArgument(pArgs.size() == 2);
+          return yices_arith_geq_atom(pArgs.get(0), pArgs.get(1));
+
           // TODO add more cases
         default:
           throw new IllegalArgumentException(
