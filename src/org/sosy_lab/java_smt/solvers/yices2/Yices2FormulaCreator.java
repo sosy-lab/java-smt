@@ -24,6 +24,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TER
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BIT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BOOL_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ARRAY;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ASHR;
@@ -110,6 +111,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_xor;
@@ -255,6 +257,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final boolean isUF = kind == FunctionDeclarationKind.UF;
         final boolean isSum = kind == FunctionDeclarationKind.ADD;
         final boolean isBvAdd = kind == FunctionDeclarationKind.BV_ADD;
+        final boolean isBvMul = kind == FunctionDeclarationKind.BV_MUL;
         final boolean isMultiply = kind == FunctionDeclarationKind.MUL;
         final boolean isExtend =
             (kind == FunctionDeclarationKind.BV_SIGN_EXTENSION)
@@ -277,6 +280,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         } else if (isBvAdd) {
           name = FunctionDeclarationKind.BV_ADD.toString();
           yicesArgs = getBvSumArgs(pF);
+        } else if (isBvMul) {
+          name = FunctionDeclarationKind.BV_MUL.toString();
+          yicesArgs = getMultiplyArgs(pF);
         } else if (isMultiply) {
           name = FunctionDeclarationKind.MUL.toString();
           yicesArgs = getMultiplyArgs(pF);
@@ -307,14 +313,16 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   private static FunctionDeclarationKind getExtendKind(Integer pF) {
     System.out.println(yices_term_to_string(pF));
-    int bv = yices_proj_arg(yices_term_child(pF, 0));
-    int bvSize = yices_term_bitsize(bv);
-    int extendedBy = yices_term_num_children(pF) - bvSize;
-    if (extendedBy != 0) {
-      if (yices_term_child(pF, bvSize) == yices_false()) {
-        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
-      } else {
-        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
+    if (yices_term_is_projection(yices_term_child(pF, 0))) {
+      int bv = yices_proj_arg(yices_term_child(pF, 0));
+      int bvSize = yices_term_bitsize(bv);
+      int extendedBy = yices_term_num_children(pF) - bvSize;
+      if (extendedBy != 0) {
+        if (yices_term_child(pF, bvSize) == yices_false()) {
+          return FunctionDeclarationKind.BV_ZERO_EXTENSION;
+        } else {
+          return FunctionDeclarationKind.BV_SIGN_EXTENSION;
+        }
       }
     }
     return null;
@@ -386,7 +394,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_ARITH_SUM:
         return FunctionDeclarationKind.ADD;
       case YICES_POWER_PRODUCT:
-        return FunctionDeclarationKind.MUL;
+        System.out.println("Term type: " + yices_type_to_string(yices_type_of_term(pF)));
+        if (yices_type_is_bitvector(yices_type_of_term(pF))) {
+          return FunctionDeclarationKind.BV_MUL;
+        } else {
+          return FunctionDeclarationKind.MUL;
+        }
 
       default:
         System.out.println("Constructor is:" + constructor);
@@ -395,6 +408,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           if (possibleExtend != null) {
             return possibleExtend;
           }
+        } else if (constructor == YICES_BIT_TERM) {
+          // TODO Visit bit(t i) in meaningful way
         }
         return FunctionDeclarationKind.OTHER;
     }
@@ -438,6 +453,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getArgs(int parent) {
+    System.out.println("Getting args of: " + yices_term_to_string(parent));
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       children.add(yices_term_child(parent, i));

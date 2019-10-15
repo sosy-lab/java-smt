@@ -59,5 +59,4 @@ public class Yices2QuantifiedFormulaManager
     }
     return null;
   }
-
 }
