@@ -232,8 +232,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             yices_type_to_string(yices_type_of_term(pFormula)), yices_term_to_string(pFormula)));
   }
 
-  // TODO VISit fails for arith sum and bv sum, need to use (bv)sum component to visit these
-  // May also fail for power products
+  // TODO Visit fails when encountering YICES_BV_ARRAY that is not a bv extend/multiply or
+  // YICES_BIT_TERM
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
@@ -246,8 +246,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_BV_CONST:
         return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_UNINTERPRETED_TERM:
-        System.out.println(
-            "Term name: " + yices_term_to_string(pF) + "|" + yices_get_term_name(pF));
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
         final FunctionDeclarationKind kind = getDeclarationKind(pF);
