@@ -641,5 +641,4 @@ public class Yices2NativeApiTest {
     int constructor = yices_term_constructor(add);
     assertEquals(YICES_BV_SUM, constructor);
   }
-
 }
