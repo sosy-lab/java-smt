@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
 
-# This script builds either libmathsat5j.so (bindings to mathsat5), or
-# liboptimathsat5j.so (bindings to optimathsat5).
-# In future, mathsat5 and optimathsat should merge, making the switching
-# obsolete.
+# This script builds libyices2j.so.
 
-# For building libmathsat5j.so, there are two dependencies:
-# - The static Mathsat5 library as can be downloaded from http://mathsat.fbk.eu/download.html
-# - The static GMP library compiled with the "-fPIC" option.
-#   To create this, download GMP from http://gmplib.org/ and run
+# For building libyices2j.so, you need:
+# - The Yices2 source as can be downloaded from https://yices.csl.sri.com
+# - Download gperf from https://www.gnu.org/software/gperf/
+# - Download GMP from https://gmplib.org
+# - Run for GMP and gperf
 #   ./configure --enable-cxx --with-pic --disable-shared --enable-fat
 #   make
-
-# For building liboptimathsat5.so, OptiMathSat5 can be downloaded from
-# http://optimathsat.disi.unitn.it/.
-
-# To build mathsat bindings: ./compile.sh $MATHSAT_DIR $GMP_DIR
-# To build optimathsat bindings: ./compile.sh $MATHSAT_DIR $GMP_DIR -optimathsat
+#   make install
+# - Compile Yices2 with
+#   ./configure
+#   make
 
 # This script searches for all included libraries in the current directory first.
 # You can use this to override specific libraries installed on your system.
@@ -26,22 +22,6 @@
 # For example, to statically link against libstdc++,
 # compile this library with --with-pic,
 # and put the resulting libstdc++.a file in this directory.
-
-# This script uses a crude hack to produce downwards-compatible binaries.
-# On systems with libc6 >= 2.14, there is a new memcpy function.
-# Binaries which link against this function do not work on older systems (e.g., Ubuntu before 12.04)
-# We force the linker to use memcpy from libc6 2.2.5 with the following trick:
-# 1) Define a wrapper function which just calls memcpy in versions.c.
-# 2) Also in versions.c, set the version of memcpy to GLIBC_2.2.5.
-# 3) Tell the linker that it should wrap all calls to memcpy with the wrapper function.
-# This will need to be extended if there appear other functions in newer a libc
-# which are also not downwards compatible.
-# Always check with ldd -v what the newest required version of libc and libstdc++ are.
-
-#Compiler notes
-# compile gmp as above
-# compile gperf as above?
-# compile yices from source to obtain libyices.a
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -56,7 +36,7 @@ cd ${DIR}
 JNI_HEADERS="$(../get_jni_headers.sh)"
 
 if [ ! -f "$1/build/x86_64-pc-linux-gnu-release/lib/libyices.a" ]; then
-	echo "You need to specify the directory with the downloaded Yices on the command line!"
+	echo "You need to specify the directory with the downloaded and compiled Yices on the command line!"
 	exit 1
 fi
 YICES_SRC_DIR="$1"/src/include
@@ -76,11 +56,11 @@ OUT_FILE="libyices2j.so"
 
 echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library"
 
-# This will compile the JNI wrapper part, given the JNI and the Mathsat header files
+# This will compile the JNI wrapper part, given the JNI and the Yices header files
 gcc -g -std=gnu99 -Wall -Wextra -Wpedantic -Wno-return-type -Wno-unused-parameter $JNI_HEADERS -I$YICES_SRC_DIR -I$GMP_HEADER_DIR $SRC_FILES -fPIC -c
 echo "Compilation Done"
 
-# This will link together the file produced above, the Mathsat library, the GMP library and the standard libraries.
+# This will link together the file produced above, the Yices library, the GMP library and the standard libraries.
 # Everything except the standard libraries is included statically.
 # The result is a shared library.
 if [ `uname -m` = "x86_64" ]; then
