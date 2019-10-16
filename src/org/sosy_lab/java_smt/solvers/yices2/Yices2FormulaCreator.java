@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-
-
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ABS;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
