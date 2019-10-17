@@ -132,8 +132,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public <T extends Formula> T
-      substitute(final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
+  public <T extends Formula> T substitute(
+      final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
     // TODO yices_term_subst can only substitute uninterpreted terms / variables.
     int[] changeFrom = new int[fromToMapping.size()];
     int[] changeTo = new int[fromToMapping.size()];
@@ -144,8 +144,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       idx++;
     }
     FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator().encapsulate(
-        type,
-        yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
+    return getFormulaCreator()
+        .encapsulate(
+            type, yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
   }
 }
