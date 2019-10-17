@@ -29,8 +29,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironment> {
 
-  private final static char BOOLECTOR_VARIABLE_ARBITRARI_REPLACEMENT = '1';
-
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
   private final BoolectorFormulaCreator creator;
@@ -54,7 +52,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
   public void close() {
     if (!closed) {
       // Technically boolector has no model
-      // but you could release all bindings. Ask!
+      // but you could release all bindings.
       closed = true;
     }
   }

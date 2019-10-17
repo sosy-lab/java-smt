@@ -31,7 +31,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.example.FormulaClassifier;
 
 @RunWith(Parameterized.class)
@@ -156,7 +155,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void test_QF_BV() throws SolverException, InterruptedException {
+  public void test_QF_BV() {
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     // Boolector can't parse formulas, therefore we test it manually
