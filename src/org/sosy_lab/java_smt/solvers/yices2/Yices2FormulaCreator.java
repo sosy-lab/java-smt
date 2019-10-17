@@ -98,7 +98,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_r
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_index;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
@@ -263,8 +262,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final boolean isExtend =
             (kind == FunctionDeclarationKind.BV_SIGN_EXTENSION)
                 || (kind == FunctionDeclarationKind.BV_ZERO_EXTENSION);
-        System.out.println("DeclarationKind is: " + kind.toString());
-        System.out.println("Term is: " + yices_term_to_string(pF));
         List<Integer> yicesArgs;
         String name;
         if (isAnd) {
@@ -295,11 +292,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           yicesArgs = getArgs(pF);
         }
         for (int arg : yicesArgs) {
-          System.out.println("Arg: " + yices_term_to_string(arg));
-          if (yices_term_is_projection(arg)) {
-            System.out.println("Index: " + yices_proj_index(arg));
-            System.out.println("Child: " + yices_proj_arg(arg));
-          }
           FormulaType<?> argumentType = getFormulaType(arg);
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
@@ -313,7 +305,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static FunctionDeclarationKind getExtendKind(Integer pF) {
-    System.out.println(yices_term_to_string(pF));
     if (yices_term_is_projection(yices_term_child(pF, 0))) {
       int bv = yices_proj_arg(yices_term_child(pF, 0));
       int bvSize = yices_term_bitsize(bv);
@@ -403,7 +394,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         }
 
       default:
-        System.out.println("Constructor is:" + constructor);
         if (constructor == YICES_BV_ARRAY) {
           FunctionDeclarationKind possibleExtend = getExtendKind(pF);
           if (possibleExtend != null) {
@@ -454,7 +444,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getArgs(int parent) {
-    System.out.println("Getting args of: " + yices_term_to_string(parent));
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       children.add(yices_term_child(parent, i));
@@ -478,7 +467,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getSumArgs(int parent) {
-    System.out.println(yices_term_to_string(parent));
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       String[] child = yices_sum_component(parent, i);
