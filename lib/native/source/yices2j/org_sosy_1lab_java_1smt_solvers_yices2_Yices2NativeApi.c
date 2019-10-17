@@ -517,27 +517,9 @@ FREE_LONG_ARRAY_ARG(2)
 FREE_TERM_ARRAY_ARG(3)
 TERM_RETURN
 
-DEFINE_FUNC(jterm, 1poly_1rational32) WITH_FOUR_ARGS(int, intArray, intArray, jtermArray)
-UINT32_ARG(1)
-INT_ARRAY_ARG(int32_t, 2)
-INT_ARRAY_ARG(uint32_t, 3)
-TERM_ARRAY_ARG(4)
-CALL4(term_t, poly_rational32)
-FREE_INT_ARRAY_ARG(2)
-FREE_INT_ARRAY_ARG(3)
-FREE_TERM_ARRAY_ARG(4)
-TERM_RETURN
+//skipping poly_rational32()
 
-DEFINE_FUNC(jterm, 1poly_1rational64) WITH_FOUR_ARGS(int, longArray, longArray, jtermArray)
-UINT32_ARG(1)
-LONG_ARRAY_ARG(int64_t, 2)
-LONG_ARRAY_ARG(uint64_t, 3)
-TERM_ARRAY_ARG(4)
-CALL4(term_t, poly_rational64)
-FREE_LONG_ARRAY_ARG(2)
-FREE_LONG_ARRAY_ARG(3)
-FREE_TERM_ARRAY_ARG(4)
-TERM_RETURN
+//skipping poly_rational64()
 
 //skipping gmp functions
 

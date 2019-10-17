@@ -379,10 +379,6 @@ class Yices2NativeApi {
 
   public static native int yices_poly_int64(int size, long[] coeff, int[] terms);
 
-  public static native int yices_poly_rational32(int size, int[] num, int[] den, int[] terms);
-
-  public static native int yices_poly_rational64(int size, int[] num, int[] den, int[] terms);
-
   public static native int yices_abs(int t);
 
   public static native int yices_floor(int t);

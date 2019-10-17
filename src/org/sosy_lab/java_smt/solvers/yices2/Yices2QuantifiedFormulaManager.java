@@ -34,7 +34,6 @@ public class Yices2QuantifiedFormulaManager
   protected Yices2QuantifiedFormulaManager(
       FormulaCreator<Integer, Integer, Long, Integer> pCreator) {
     super(pCreator);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
@@ -46,7 +45,11 @@ public class Yices2QuantifiedFormulaManager
 
   @Override
   public Integer mkQuantifier(Quantifier pQ, List<Integer> pVars, Integer pBody) {
-    // TODO Auto-generated method stub
+    /*
+     * TODO Yices needs variables constructed using yices_new_variable(), but variables passed in
+     * pVars are constructed with yices_new uninterpreted_term(). Need to construct the correct
+     * variable type from the variables in pVars and map between them.
+     */
     if (pVars.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for Quantifier.");
     } else {

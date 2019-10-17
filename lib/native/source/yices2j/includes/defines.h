@@ -55,18 +55,6 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
     goto out##num; \
   }
 
-// String argument, possibly null.
-#define OPTIONAL_STRING_ARG(num) \
-  char * m_arg##num; \
-  if (arg##num == NULL) { \
-      m_arg##num = NULL; \
-  } else { \
-      m_arg##num = (char *)(*jenv)->GetStringUTFChars(jenv, arg##num, NULL); \
-      if (m_arg##num == NULL) { \
-        goto out##num; \
-      } \
- }
-
 //may cause memory problems
 #define INT_ARRAY_ARG(mtype, num) \
   mtype * m_arg##num = (mtype *)((*jenv)->GetIntArrayElements(jenv, arg##num, NULL)); \
@@ -182,7 +170,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 
 //may cause memory leak through yices_error_string
 #define INT_RETURN \
-   if (retval <= 0 && yices_error_code() != 0){ \
+  if (retval <= 0 && yices_error_code() != 0){ \
     const char *msg = yices_error_string(); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
     return -1; \
