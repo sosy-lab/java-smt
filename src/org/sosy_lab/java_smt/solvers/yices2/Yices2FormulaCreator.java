@@ -606,7 +606,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
               "Unknown function declaration with constant value " + -pDeclaration);
       }
     } else { // is UF Application
-      System.out.println("Input: " + yices_term_to_string(pDeclaration));
       int size = pArgs.size();
       if (size == 0) {
         return pDeclaration;
@@ -616,7 +615,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           argArray[i] = pArgs.get(i);
         }
         int app = yices_application(pDeclaration, size, argArray);
-        System.out.println("App: " + yices_term_to_string(app));
         return app;
       }
     }
@@ -633,9 +631,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     } else {
       yicesFuncType = yices_function_type(size, argTypeArray, pReturnType);
     }
-    int temp = yices_named_variable(yicesFuncType, pName);
-    System.out.println("Creating UF: " + pName + " with index: " + temp);
-    return temp;
+    int uf = yices_named_variable(yicesFuncType, pName);
+    return uf;
   }
 
   @Override

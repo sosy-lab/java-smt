@@ -77,7 +77,6 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   public Appender dumpFormula(final Integer formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    System.out.println("Term to dump " + yices_term_to_string(formula));
     return new Appenders.AbstractAppender() {
 
       @Override
@@ -99,9 +98,6 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
             } else {
               type = yices_type_of_term(term);
             }
-            System.out.println("Declaring for term: " + yices_term_to_string(term));
-            System.out.println("Type to declare: " + yices_type_to_string(type));
-            System.out.println("Term constructor is:" + yices_term_constructor(term));
             int[] types;
             if (yices_type_num_children(type) == 0) {
               types = new int[1];
@@ -131,7 +127,6 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         }
         // TODO fold formula to avoid exp. overhead
         out.append("(assert " + yices_term_to_string(formula) + ")");
-        System.out.println("Output :\n" + out);
       }
     };
   }
