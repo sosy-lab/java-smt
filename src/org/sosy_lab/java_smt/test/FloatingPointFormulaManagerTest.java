@@ -22,9 +22,11 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import java.math.BigDecimal;
@@ -55,6 +57,9 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
 public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
+
+  // numbers are small enough to be precise with single precision
+  private static final int[] SINGLE_PREC_INTS = new int[] {0, 1, 2, 5, 10, 20, 50, 100, 200, 500};
 
   private static final int NUM_RANDOM_TESTS = 100;
 
@@ -264,7 +269,28 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
         fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.001)), smallType);
     FloatingPointFormula i2 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.002)), smallType);
+    FloatingPointFormula inf = fpmgr.makePlusInfinity(smallType);
     assertThatFormula(fpmgr.equalWithFPSemantics(i1, i2)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(i1, inf)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(i2, inf)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(i1)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(i2)).isTautological();
+
+    // and some negative numbers
+    FloatingPointFormula ni1 =
+        fpmgr.makeNumber(
+            BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.001)).negate(), smallType);
+    FloatingPointFormula ni2 =
+        fpmgr.makeNumber(
+            BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.002)).negate(), smallType);
+    FloatingPointFormula ninf = fpmgr.makeMinusInfinity(smallType);
+    assertThatFormula(fpmgr.equalWithFPSemantics(ni1, ni2)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(ni1, ninf)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(ni2, ninf)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(ni1)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(ni2)).isTautological();
+    assertThatFormula(fpmgr.isNegative(ni1)).isTautological();
+    assertThatFormula(fpmgr.isNegative(ni2)).isTautological();
 
     // check equality for short types
     FloatingPointType smallType2 = FormulaType.getFloatingPointType(4, 4);
@@ -272,10 +298,31 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
         fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.001)), smallType2);
     FloatingPointFormula j2 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.002)), smallType2);
+    FloatingPointFormula jnf = fpmgr.makePlusInfinity(smallType);
     assertThatFormula(fpmgr.equalWithFPSemantics(j1, j2)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(j1, jnf)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(j2, jnf)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(j1)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(j2)).isTautological();
+
+    // and some negative numbers
+    FloatingPointFormula nj1 =
+        fpmgr.makeNumber(
+            BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.001)).negate(), smallType2);
+    FloatingPointFormula nj2 =
+        fpmgr.makeNumber(
+            BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.002)).negate(), smallType2);
+    FloatingPointFormula njnf = fpmgr.makeMinusInfinity(smallType);
+    assertThatFormula(fpmgr.equalWithFPSemantics(nj1, nj2)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(nj1, njnf)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(nj2, njnf)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(nj1)).isTautological();
+    assertThatFormula(fpmgr.isInfinity(nj2)).isTautological();
+    assertThatFormula(fpmgr.isNegative(nj1)).isTautological();
+    assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    if (!solver.equals(Solvers.Z3)) {
+    if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
       // check unequality for very large types
       FloatingPointType largeType = FormulaType.getFloatingPointType(100, 100);
       FloatingPointFormula k1 =
@@ -284,6 +331,76 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
           fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.002)), largeType);
       assertThatFormula(fpmgr.equalWithFPSemantics(k1, k2)).isUnsatisfiable();
     }
+  }
+
+  @Test
+  public void numberConstantsNearInf() throws SolverException, InterruptedException {
+    checkNearInf(4, 4, 252); // 2**(2**(4-1)) - max(0,2**(2**(4-1)-2-4))
+    checkNearInf(5, 4, 254); // 2**(2**(4-1)) - max(0,2**(2**(4-1)-2-5))
+    checkNearInf(6, 4, 255); // 2**(2**(4-1)) - max(0,2**(2**(4-1)-2-6))
+    checkNearInf(7, 4, 256); // 2**(2**(4-1)) - max(0,?)
+    checkNearInf(10, 4, 256); // 2**(2**(4-1)) - max(0,?)
+
+    if (Solvers.CVC4 != solverToUse()) {
+      // It seems as if CVC4/symfpu can not handle numbers with size of mantissa < exponent
+      // TODO check this!
+      checkNearInf(4, 5, 64512); // 2**(2**(5-1)) - max(0,2**(2**(5-1)-2-4))
+      checkNearInf(4, 6, 4227858432L); // 2**(2**(6-1)) - max(0,2**(2**(6-1)-2-4))
+    }
+
+    checkNearInf(5, 5, 65024); // 2**(2**(5-1)) - max(0,2**(2**(5-1)-2-5))
+    checkNearInf(6, 5, 65280); // 2**(2**(5-1)) - max(0,2**(2**(5-1)-2-6))
+    checkNearInf(7, 5, 65408); // 2**(2**(5-1)) - max(0,2**(2**(5-1)-2-7))
+    checkNearInf(10, 5, 65520); // 2**(2**(5-1)) - max(0,2**(2**(5-1)-2-10))
+    checkNearInf(14, 5, 65535); // 2**(2**(5-1)) - max(0,2**(2**(5-1)-2-14))
+    checkNearInf(15, 5, 65536); // 2**(2**(5-1)) - max(0,?)
+
+    checkNearInf(10, 6, 4293918720L); // 2**(2**(6-1)) - max(0,2**(2**(6-1)-2-10))
+    checkNearInf(16, 6, 4294950912L); // 2**(2**(6-1)) - max(0,2**(2**(6-1)-2-16))
+  }
+
+  private void checkNearInf(int mantissa, int exponent, long value)
+      throws SolverException, InterruptedException {
+    FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
+    FloatingPointFormula fp1 = fpmgr.makeNumber(value, type);
+    assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
+    FloatingPointFormula fp2 = fpmgr.makeNumber(value - 1, type);
+    assertThatFormula(fpmgr.isInfinity(fp2)).isUnsatisfiable();
+  }
+
+  @Test
+  public void numberConstantsNearMinusInf() throws SolverException, InterruptedException {
+    checkNearMinusInf(4, 4, -252);
+    checkNearMinusInf(5, 4, -254);
+    checkNearMinusInf(6, 4, -255);
+    checkNearMinusInf(7, 4, -256);
+    checkNearMinusInf(10, 4, -256);
+
+    if (Solvers.CVC4 != solverToUse()) {
+      // It seems as if CVC4/symfpu can not handle numbers with size of mantissa < exponent
+      // TODO check this!
+      checkNearMinusInf(4, 5, -64512);
+      checkNearMinusInf(4, 6, -4227858432L);
+    }
+
+    checkNearMinusInf(5, 5, -65024);
+    checkNearMinusInf(6, 5, -65280);
+    checkNearMinusInf(7, 5, -65408);
+    checkNearMinusInf(10, 5, -65520);
+    checkNearMinusInf(14, 5, -65535);
+    checkNearMinusInf(15, 5, -65536);
+
+    checkNearMinusInf(10, 6, -4293918720L);
+    checkNearMinusInf(16, 6, -4294950912L);
+  }
+
+  private void checkNearMinusInf(int mantissa, int exponent, long value)
+      throws SolverException, InterruptedException {
+    FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
+    FloatingPointFormula fp1 = fpmgr.makeNumber(value, type);
+    assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
+    FloatingPointFormula fp2 = fpmgr.makeNumber(value + 1, type);
+    assertThatFormula(fpmgr.isInfinity(fp2)).isUnsatisfiable();
   }
 
   @Test
@@ -308,17 +425,30 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void bvToFpOne() throws SolverException, InterruptedException {
+  public void bvToFpSinglePrec() throws SolverException, InterruptedException {
     requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      bvToFp(i, singlePrecType);
+    }
+  }
 
-    BitvectorFormula bvOne = bvmgr.makeBitvector(32, 1);
-    FloatingPointFormula fpOne = fpmgr.makeNumber(1.0, singlePrecType);
+  @Test
+  public void bvToFpDoublePrec() throws SolverException, InterruptedException {
+    requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      bvToFp(i, doublePrecType);
+    }
+  }
 
-    FloatingPointFormula signedBvToFpOne = fpmgr.castFrom(bvOne, true, singlePrecType);
-    FloatingPointFormula unsignedBvToFpOne = fpmgr.castFrom(bvOne, false, singlePrecType);
+  private void bvToFp(int i, FloatingPointType prec) throws SolverException, InterruptedException {
+    BitvectorFormula bv = bvmgr.makeBitvector(32, i);
+    FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
 
-    assertThatFormula(fpmgr.equalWithFPSemantics(fpOne, signedBvToFpOne)).isTautological();
-    assertThatFormula(fpmgr.equalWithFPSemantics(fpOne, unsignedBvToFpOne)).isTautological();
+    FloatingPointFormula signedBvToFp = fpmgr.castFrom(bv, true, prec);
+    FloatingPointFormula unsignedBvToFp = fpmgr.castFrom(bv, false, prec);
+
+    assertThatFormula(fpmgr.equalWithFPSemantics(fp, signedBvToFp)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fp, unsignedBvToFp)).isTautological();
   }
 
   /** check whether rounded input is equal to result with rounding-mode. */
@@ -417,26 +547,44 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void fpToBvOne() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNumbersSinglePrec() throws SolverException, InterruptedException {
     requireBitvectors();
-
-    BitvectorFormula bvOne = bvmgr.makeBitvector(32, 1);
-    FloatingPointFormula fpOne = fpmgr.makeNumber(1.0, singlePrecType);
-
-    BitvectorFormula fpToBvOne = fpmgr.castTo(fpOne, FormulaType.getBitvectorTypeWithSize(32));
-
-    assertThatFormula(bvmgr.equal(bvOne, fpToBvOne)).isTautological();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(i, singlePrecType);
+    }
   }
 
   @Test
-  public void fpToBvMinusOne() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNegativeNumbersSinglePrec() throws SolverException, InterruptedException {
     requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(-i, singlePrecType);
+    }
+  }
 
-    BitvectorFormula bvOne = bvmgr.makeBitvector(32, -1);
-    FloatingPointFormula fpOne = fpmgr.makeNumber(-1.0, singlePrecType);
+  @Test
+  public void fpToBvSimpleNumbersDoublePrec() throws SolverException, InterruptedException {
+    requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(i, doublePrecType);
+    }
+  }
 
-    BitvectorFormula fpToBvOne = fpmgr.castTo(fpOne, FormulaType.getBitvectorTypeWithSize(32));
-    assertThatFormula(bvmgr.equal(bvOne, fpToBvOne)).isTautological();
+  @Test
+  public void fpToBvSimpleNegativeNumbersDoublePrec() throws SolverException, InterruptedException {
+    requireBitvectors();
+    for (int i : SINGLE_PREC_INTS) {
+      fpToBv(-i, doublePrecType);
+    }
+  }
+
+  private void fpToBv(int i, FloatingPointType prec) throws SolverException, InterruptedException {
+    BitvectorFormula bv = bvmgr.makeBitvector(prec.getTotalSize(), i);
+    FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
+
+    BitvectorFormula fpToBv =
+        fpmgr.castTo(fp, FormulaType.getBitvectorTypeWithSize(prec.getTotalSize()));
+    assertThatFormula(bvmgr.equal(bv, fpToBv)).isTautological();
   }
 
   @Test
@@ -522,9 +670,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void fpIeeeConversionTypes() {
     assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .withMessage("FP-to-BV conversion not available for CVC4")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNotEqualTo(Solvers.CVC4);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
@@ -534,9 +682,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .withMessage("FP-to-BV conversion not available for CVC4")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNotEqualTo(Solvers.CVC4);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThatFormula(
@@ -548,9 +696,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-BV conversion of Z3 misses sign bit")
+        .withMessage("FP-to-BV conversion not available for CVC4")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNotEqualTo(Solvers.CVC4);
 
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
@@ -638,6 +786,11 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
   private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
       throws SolverException, InterruptedException {
+    assume()
+        .withMessage("FP-to-BV conversion not available for CVC4")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
+
     BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
 
     Truth.assertThat(mgr.getFormulaType(var))
@@ -721,6 +874,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("unchecked")
   public void fpInterpolation() throws SolverException, InterruptedException {
+    requireInterpolation();
     assume()
         .withMessage("MathSAT5 does not support floating-point interpolation")
         .that(solver)
@@ -740,5 +894,12 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       assertThatFormula(f1).implies(itp);
       assertThatFormula(bmgr.and(itp, f2)).isUnsatisfiable();
     }
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  @Test(expected = Exception.class)
+  public void failOnInvalidString() {
+    fpmgr.makeNumber("a", singlePrecType);
+    fail();
   }
 }

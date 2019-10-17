@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
@@ -145,7 +146,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
     assume()
         .withMessage("Princess and Mathsat5 do not support unsat core generation over assumptions")
         .that(solverToUse())
-        .isNoneOf(PRINCESS, MATHSAT5);
+        .isNoneOf(PRINCESS, MATHSAT5, CVC4);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

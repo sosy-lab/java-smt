@@ -51,6 +51,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.logging.LoggingSolverContext;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
@@ -70,6 +71,7 @@ public class SolverContextFactory {
     SMTINTERPOL,
     Z3,
     PRINCESS,
+    CVC4,
     YICES2
   }
 
@@ -166,7 +168,7 @@ public class SolverContextFactory {
     SolverContext context;
     try {
       context = generateContext0(solverToCreate);
-    } catch (UnsatisfiedLinkError e) {
+    } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
           String.format(
               "The SMT solver %s is not available on this machine because of missing libraries "
@@ -185,6 +187,14 @@ public class SolverContextFactory {
   private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
+      case CVC4:
+        return CVC4SolverContext.create(
+            logger,
+            shutdownNotifier,
+            (int) randomSeed,
+            nonLinearArithmetic,
+            floatingPointRoundingMode);
+
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
             config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);

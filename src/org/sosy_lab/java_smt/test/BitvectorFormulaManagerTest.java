@@ -245,7 +245,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException {
-    for (int size : new int[] {1, 2, 4, 10}) {
+    for (int size : new int[] {1, 2, 4, 8}) {
       IntegerFormula var = imgr.makeVariable("x_" + size);
 
       // x == int(bv(x)) is sat for small values

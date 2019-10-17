@@ -75,8 +75,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
-    requireInterpolation();
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -96,7 +94,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
-    requireInterpolation();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -117,8 +114,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
-    requireInterpolation();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -169,8 +164,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
-    requireInterpolation();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     // build formula:  1 = A = B = C = 0
@@ -205,7 +198,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
-    requireInterpolation();
     requireBitvectors();
 
     // Z3 does not fully support interpolation for bit-vectors

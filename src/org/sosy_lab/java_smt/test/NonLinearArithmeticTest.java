@@ -45,10 +45,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 @RunWith(Parameterized.class)
 public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
 
-  // SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
-  // (though both support some parts)
+  // SMTInterpol, MathSAT5, and CVC4 do not fully support non-linear arithmetic
+  // (though all of them support some parts)
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.YICES2);
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4, Solvers.YICES2);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolvers() {
@@ -245,9 +245,9 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
                 nmgr.makeNumber(3),
                 handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
 
-    if (solver == Solvers.MATHSAT5
+    if (ImmutableSet.of(Solvers.MATHSAT5, Solvers.CVC4).contains(solver)
         && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
-      // MathSAT supports non-linear multiplication
+      // some solvers support non-linear multiplication (partially)
       assertThatFormula(f).isUnsatisfiable();
 
     } else {

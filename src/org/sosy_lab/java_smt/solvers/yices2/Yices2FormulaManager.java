@@ -60,6 +60,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         pBitvectorManager,
         null,
         null,
+        null,
         null);
   }
 

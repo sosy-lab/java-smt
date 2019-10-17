@@ -58,7 +58,8 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         pBitpreciseManager,
         pFloatingPointManager,
         null,
-        pArrayManager);
+        pArrayManager,
+        null);
   }
 
   static long getMsatTerm(Formula pT) {

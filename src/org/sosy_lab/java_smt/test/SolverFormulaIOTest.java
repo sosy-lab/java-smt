@@ -165,70 +165,84 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void parseMathSatTestParseFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseMathSatTestExprFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseSmtinterpolTestParseFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseSmtinterpolTestExprFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseZ3TestParseFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseZ3TestExprFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseSmtinterpolSatTestParseFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseSmtinterpolSatTestExprFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseZ3SatTestParseFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseZ3SatTestExprFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
   public void parseMathSatTestParseFirst3() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
@@ -237,6 +251,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
+    // Please avoid exponential overhead when printing a formula.
     assertWithMessage(formDump + " does not contain <= or >= only once.")
         .that(count == 1 || count2 == 1)
         .isTrue();
@@ -334,6 +349,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @SuppressWarnings("CheckReturnValue")
   private void checkThatDumpIsParseable(String dump) {
+    requireParser();
     mgr.parse(dump);
   }
 
