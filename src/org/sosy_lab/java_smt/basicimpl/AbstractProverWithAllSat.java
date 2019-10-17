@@ -37,7 +37,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
-  private final ShutdownNotifier shutdownNotifier;
+  protected final ShutdownNotifier shutdownNotifier;
   private final BooleanFormulaManager bmgr;
 
   protected boolean closed;

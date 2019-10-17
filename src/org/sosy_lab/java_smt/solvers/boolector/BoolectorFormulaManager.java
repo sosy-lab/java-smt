@@ -46,7 +46,8 @@ final class BoolectorFormulaManager
         pBitvectorManager,
         null,
         pQuantifierManager,
-        pArrayManager);
+        pArrayManager,
+        null);
   }
 
   @Override

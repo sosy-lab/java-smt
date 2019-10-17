@@ -175,7 +175,9 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    testModelGetters(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true, "x");
+    for (String name : new String[] {"x", "x-x", "x::x"}) {
+      testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
+    }
   }
 
   @Test
@@ -633,7 +635,8 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetBvArrays() throws SolverException, InterruptedException {
+  public void testGetArrays2() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireBitvectors();
     ArrayFormula<BitvectorFormula, BitvectorFormula> array =
@@ -662,10 +665,9 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays2() throws SolverException, InterruptedException {
+  public void testGetArrays6() throws SolverException, InterruptedException {
     requireArrays();
-    // Boolector can not parse
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireParser();
     BooleanFormula f =
         mgr.parse(
             "(declare-fun |pi@2| () Int)\n"
@@ -689,13 +691,12 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
         .that(solver)
         .isNotSameInstanceAs(Solvers.PRINCESS);
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
@@ -731,6 +732,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays4() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     // Boolector can't parse formulas
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -760,6 +762,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     // Boolector can't parse formulas
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -786,6 +789,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays5() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     // Boolector can't parse formulas
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -1274,14 +1278,14 @@ public class ModelTest extends SolverBasedTest0 {
       "(declare-fun |f@2| () (_ FloatingPoint 8 23))"
           + "(declare-fun |p@3| () (_ BitVec 32))"
           + "(declare-fun *float@1 () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
-          + "(declare-fun |i@3| () (_ BitVec 32))"
+          + "(declare-fun |i@33| () (_ BitVec 32))"
           + "(declare-fun |Ai@| () (_ BitVec 32))"
           + "(declare-fun *unsigned_int@1 () (Array (_ BitVec 32) (_ BitVec 32)))"
           + "(assert (and (bvslt #x00000000 |Ai@|)"
           + "     (bvslt #x00000000 (bvadd |Ai@| #x00000020))"
-          + "     (= |i@3| #x00000000)"
+          + "     (= |i@33| #x00000000)"
           + "     (= |p@3| |Ai@|)"
-          + "     (= (select *unsigned_int@1 |Ai@|) |i@3|)"
+          + "     (= (select *unsigned_int@1 |Ai@|) |i@33|)"
           + "     (= |f@2| (select *float@1 |p@3|))"
           + "     (not (fp.eq ((_ to_fp 11 52) roundNearestTiesToEven |f@2|)"
           + "                 (_ +zero 11 52)))))";
@@ -1293,6 +1297,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest1() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     // Boolector can't parse formulas
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -1307,6 +1312,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest2() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireOptimization();
     requireFloats();
@@ -1345,6 +1351,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest3() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     // Boolector can't parse formulas
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -1355,6 +1362,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest4() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireBitvectors();
     // Boolector can't parse formulas

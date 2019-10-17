@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
@@ -106,6 +107,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
+  }
+
+  @Test
+  public void unsatCoreTestItp() throws SolverException, InterruptedException {
+    requireInterpolation();
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
@@ -145,7 +151,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
         .withMessage(
             "Princess, Mathsat5 and Boolector do not support unsat core generation over assumptions")
         .that(solverToUse())
-        .isNoneOf(PRINCESS, MATHSAT5, BOOLECTOR);
+        .isNoneOf(PRINCESS, MATHSAT5, BOOLECTOR, CVC4);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

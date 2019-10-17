@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Lists;
@@ -50,12 +49,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
-    checkArgument(
-        !pArgTypes.contains(FormulaType.BooleanType),
-        "Uninterpreted functions with boolean arguments are currently not supported in JavaSMT.");
-
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
-
     return FunctionDeclarationImpl.of(
         pName,
         FunctionDeclarationKind.UF,

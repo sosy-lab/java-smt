@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
-import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -83,32 +82,7 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType, Long pRoundingMode) {
-    // Using toString() fails in CPAchecker with parse error for seemingly correct strings like
-    // "3.4028234663852886E+38" and I have no idea why and cannot reproduce it in unit tests,
-    // but toPlainString() seems to work at least.
-    return makeNumberImpl(pN.toPlainString(), pType, pRoundingMode);
-  }
-
-  @Override
-  protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
-    if (pN.startsWith("+")) {
-      pN = pN.substring(1);
-    }
-    switch (pN) {
-      case "NaN":
-      case "-NaN":
-        return makeNaNImpl(pType);
-      case "Infinity":
-        return makePlusInfinityImpl(pType);
-      case "-Infinity":
-        return makeMinusInfinityImpl(pType);
-      default:
-        return makeNumberAndRound(pN, pType, pRoundingMode);
-    }
-  }
-
-  private Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
+  protected Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()

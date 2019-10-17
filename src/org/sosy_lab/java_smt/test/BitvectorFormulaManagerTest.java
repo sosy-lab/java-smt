@@ -288,9 +288,10 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException {
-    if (imgr != null) {
-      for (int size : new int[] {1, 2, 4, 10}) {
-        IntegerFormula var = imgr.makeVariable("x_" + size);
+    requireIntegers();
+    for (int size : new int[] {1, 2, 4, 8}) {
+      IntegerFormula var = imgr.makeVariable("x_" + size);
+
 
         // x == int(bv(x)) is sat for small values
         assertThatFormula(
@@ -310,5 +311,5 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
                 .isTautological();
       }
     }
-  }
+
 }
