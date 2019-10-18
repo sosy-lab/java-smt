@@ -115,6 +115,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConjunctionArgsExtraction() throws SolverException, InterruptedException {
+    requireIntegers();
     BooleanFormula input =
         bmgr.and(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
     Truth.assertThat(bmgr.toConjunctionArgs(input, false))
@@ -279,6 +280,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void simplificationTest() {
+    // Boolector MAY fail (Use internal equals method to check if it does)
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");

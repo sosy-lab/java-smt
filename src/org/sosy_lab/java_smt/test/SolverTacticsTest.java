@@ -156,6 +156,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationSimpleTest() throws SolverException, InterruptedException {
+    requireIntegers();
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -186,6 +187,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException {
+    requireIntegers();
     // f :=uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -221,6 +223,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationNesteQuantifierTest() throws InterruptedException {
+    requireIntegers();
     requireQuantifiers();
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

@@ -76,7 +76,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   @Test
   public void varDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula a = bmgr.makeVariable("main::a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
@@ -93,7 +93,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   @Test
   public void varDumpTest2() {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
     // always true
 
@@ -124,7 +124,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   @Test
   public void valDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula tr1 = bmgr.makeBoolean(true);
     BooleanFormula tr2 = bmgr.makeBoolean(true);
     BooleanFormula fl1 = bmgr.makeBoolean(false);
@@ -142,8 +142,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void intsDumpTest() {
-    // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     IntegerFormula f1 = imgr.makeVariable("a");
     IntegerFormula val = imgr.makeNumber(1);
     BooleanFormula formula = imgr.equal(f1, val);
@@ -158,8 +157,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void funcsDumpTest() {
-    // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula var = imgr.makeVariable("var_a");
     FunctionDeclaration<IntegerFormula> funA =
@@ -262,7 +260,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   @Test
   public void redundancyTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
@@ -317,7 +315,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   private void compareParseWithOrgExprFirst(String textToParse, Supplier<BooleanFormula> fun)
       throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
     checkThatFunOnlyDeclaredOnce(textToParse);
     checkThatAssertIsInLastLine(textToParse);
@@ -331,7 +329,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   private void compareParseWithOrgParseFirst(String textToParse, Supplier<BooleanFormula> fun)
       throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
     checkThatFunOnlyDeclaredOnce(textToParse);
     checkThatAssertIsInLastLine(textToParse);
@@ -344,7 +342,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private void checkThatFunOnlyDeclaredOnce(String formDump) {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     Multiset<String> funDeclares = HashMultiset.create();
 
     for (String line : Splitter.on('\n').split(formDump)) {
@@ -365,7 +363,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private void checkThatAssertIsInLastLine(String lines) {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     lines = lines.trim();
     assertWithMessage("last line of <\n" + lines + ">")
         .that(getLast(Splitter.on('\n').split(lines)))
