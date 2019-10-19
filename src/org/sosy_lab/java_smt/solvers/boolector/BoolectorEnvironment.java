@@ -64,6 +64,27 @@ class BoolectorEnvironment {
 
   private final long btor;
 
+  private static final String copyright =
+      "Copyright (c) 2007-2009 Robert Brummayer\n"
+          + "Copyright (c) 2007-2018 Armin Biere\n"
+          + "Copyright (c) 2012-2018 Aina Niemetz, Mathias Preiner\n"
+          + "\n"
+          + "This software is linked against Lingeling\n"
+          + "Copyright (c) 2010-2018 Armin Biere\n"
+          + "\n"
+          + "This software is linked against PicoSAT\n"
+          + "Copyright (c) 2006-2016 Armin Biere\n"
+          + "\n"
+          + "This software is linked against CaDiCaL\n"
+          + "Copyright (c) 2016-2018 Armin Biere\n";
+  // Copied from the license link on the Boolector website
+  private static final String license =
+      "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n"
+          + "\n"
+          + "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n"
+          + "\n"
+          + "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
+
   BoolectorEnvironment(
       Configuration config,
       LogManager logger,
@@ -84,8 +105,7 @@ class BoolectorEnvironment {
     }
 
     if (!loaded) { // Avoid logging twice.
-      logger.log(Level.WARNING, "Boolector is only available for research blabla");// TODO: proper
-                                                                                   // text please
+      logger.log(Level.WARNING, copyright + license);
     }
 
     btor = BtorJNI.boolector_new();
@@ -97,11 +117,14 @@ class BoolectorEnvironment {
 
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
+    // Auto memory clean after closing
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.swigValue(), 1);
     // Incremental needed for push/pop!
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.swigValue(), 1);
+    // Sets randomseed accordingly
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.swigValue(), randomSeed);
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_REWRITE_LEVEL.swigValue(), 0);
+    // Dump in SMT-LIB2 Format
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.swigValue(), 2);
 
     setOptions();
     loaded = true;
