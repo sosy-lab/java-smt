@@ -80,11 +80,9 @@ fi
 
 MISSING_SYMBOLS="$(readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND)"
 if [ ! -z "$MISSING_SYMBOLS" ]; then
-	echo "Warning: There are the following unresolved dependencies in libmathsat5j.so:"
+	echo "Warning: There are the following unresolved dependencies in libyices2j.so:"
 	readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND
 	exit 1
 fi
 
 echo "All Done"
-echo "Please check in the following output that the library does not depend on any GLIBC version >= 2.11, otherwise it will not work on Ubuntu 10.04:"
-LANG=C objdump -p ${OUT_FILE} |grep -A50 "required from"

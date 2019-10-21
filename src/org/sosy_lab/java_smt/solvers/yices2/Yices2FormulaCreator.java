@@ -120,12 +120,14 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_xor;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -509,18 +511,22 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
+    Collection<String> argStr = Collections2.transform(pArgs, a -> yices_term_to_string(a));
     if (pDeclaration < 0) { // is constant function application from API
       switch (-pDeclaration) {
         case YICES_ITE_TERM:
           Preconditions.checkArgument(pArgs.size() == 3);
-          return yices_ite(pArgs.get(0), pArgs.get(1), pArgs.get(0));
+          return yices_ite(pArgs.get(0), pArgs.get(1), pArgs.get(2));
         case YICES_EQ_TERM:
           Preconditions.checkArgument(pArgs.size() == 2);
           return yices_eq(pArgs.get(0), pArgs.get(1));
         case YICES_DISTINCT_TERM:
           return yices_distinct(pArgs.size(), Ints.toArray(pArgs));
         case YICES_NOT_TERM:
-          Preconditions.checkArgument(pArgs.size() == 1);
+          Preconditions.checkArgument(
+              pArgs.size() == 1,
+              "NOT with unexpected arguments: %s",
+              argStr);
           return yices_not(pArgs.get(0));
         case YICES_OR_TERM:
           return yices_or(pArgs.size(), Ints.toArray(pArgs));

@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
@@ -132,21 +131,21 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     };
   }
 
-  @Override
-  public <T extends Formula> T substitute(
-      final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
-    // TODO yices_term_subst can only substitute uninterpreted terms / variables.
-    int[] changeFrom = new int[fromToMapping.size()];
-    int[] changeTo = new int[fromToMapping.size()];
-    int idx = 0;
-    for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
-      changeFrom[idx] = extractInfo(e.getKey());
-      changeTo[idx] = extractInfo(e.getValue());
-      idx++;
-    }
-    FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator()
-        .encapsulate(
-            type, yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
-  }
+  // @Override
+  // public <T extends Formula> T substitute(
+  // final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
+  // // TODO yices_term_subst can only substitute uninterpreted terms / variables.
+  // int[] changeFrom = new int[fromToMapping.size()];
+  // int[] changeTo = new int[fromToMapping.size()];
+  // int idx = 0;
+  // for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+  // changeFrom[idx] = extractInfo(e.getKey());
+  // changeTo[idx] = extractInfo(e.getValue());
+  // idx++;
+  // }
+  // FormulaType<T> type = getFormulaType(f);
+  // return getFormulaCreator()
+  // .encapsulate(
+  // type, yices_subst_term(changeFrom.length, changeFrom, changeTo, extractInfo(f)));
+  // }
 }
