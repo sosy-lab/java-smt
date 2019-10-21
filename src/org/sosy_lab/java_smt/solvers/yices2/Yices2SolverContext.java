@@ -72,16 +72,12 @@ public class Yices2SolverContext extends AbstractSolverContext {
     long yicesConf = yices_new_config();
     yices_set_config_checked(yicesConf, "solver-type", "dpllt");
     yices_set_config_checked(yicesConf, "mode", "push-pop");
-    // TODO SET OPTIONS
-    // TODO SET LOGIC
     long yicesEnv = yices_new_context(yicesConf);
-    // TODO Might not actually need yicesEnv
     Yices2FormulaCreator creator = new Yices2FormulaCreator(yicesEnv);
 
     Yices2UFManager functionTheory = new Yices2UFManager(creator);
     Yices2BooleanFormulaManager booleanTheory = new Yices2BooleanFormulaManager(creator);
     Yices2BitvectorFormulaManager bitvectorTheory = new Yices2BitvectorFormulaManager(creator);
-    // TODO nonLinearArithmeticParam?
     Yices2IntegerFormulaManager integerTheory =
         new Yices2IntegerFormulaManager(creator, pNonLinearArithmetic);
     Yices2RationalFormulaManager rationalTheory =

@@ -515,10 +515,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     if (pDeclaration < 0) { // is constant function application from API
       switch (-pDeclaration) {
         case YICES_ITE_TERM:
-          Preconditions.checkArgument(pArgs.size() == 3);
+          Preconditions
+              .checkArgument(pArgs.size() == 3, "ITE with unexpected arguments: %s", argStr);
           return yices_ite(pArgs.get(0), pArgs.get(1), pArgs.get(2));
         case YICES_EQ_TERM:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "EQ with unexpected arguments: %s", argStr);
           return yices_eq(pArgs.get(0), pArgs.get(1));
         case YICES_DISTINCT_TERM:
           return yices_distinct(pArgs.size(), Ints.toArray(pArgs));
@@ -533,60 +535,88 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         case YICES_XOR_TERM:
           return yices_xor(pArgs.size(), Ints.toArray(pArgs));
         case YICES_BV_DIV:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_DIV with unexpected arguments: %s", argStr);
           return yices_bvdiv(pArgs.get(0), pArgs.get(1));
         case YICES_BV_REM:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_REM with unexpected arguments: %s", argStr);
           return yices_bvrem(pArgs.get(0), pArgs.get(1));
         case YICES_BV_SDIV:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_SDIV with unexpected arguments: %s", argStr);
           return yices_bvsdiv(pArgs.get(0), pArgs.get(1));
         case YICES_BV_SREM:
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_SREM with unexpected arguments: %s", argStr);
           return yices_bvsrem(pArgs.get(0), pArgs.get(1));
         case YICES_BV_SMOD:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_SMOD with unexpected arguments: %s", argStr);
           return yices_bvsmod(pArgs.get(0), pArgs.get(1));
         case YICES_BV_SHL:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_SHL with unexpected arguments: %s", argStr);
           return yices_bvshl(pArgs.get(0), pArgs.get(1));
         case YICES_BV_LSHR:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_LSHR with unexpected arguments: %s", argStr);
           return yices_bvlshr(pArgs.get(0), pArgs.get(1));
         case YICES_BV_ASHR:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_ASHR with unexpected arguments: %s", argStr);
           return yices_bvashr(pArgs.get(0), pArgs.get(1));
         case YICES_BV_GE_ATOM:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "BV_GE_ATOM with unexpected arguments: %s", argStr);
           return yices_bvge_atom(pArgs.get(0), pArgs.get(1));
         case YICES_BV_SGE_ATOM:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions.checkArgument(
+              pArgs.size() == 2,
+              "BV_SGE_ATOM with unexpected arguments: %s",
+              argStr);
           return yices_bvsge_atom(pArgs.get(0), pArgs.get(1));
         case YICES_ARITH_GE_ATOM:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions.checkArgument(
+              pArgs.size() == 2,
+              "ARITH_GE_ATOM with unexpected arguments: %s",
+              argStr);
           return yices_arith_geq_atom(pArgs.get(0), pArgs.get(1));
         case YICES_ABS:
-          Preconditions.checkArgument(pArgs.size() == 1);
+          Preconditions
+              .checkArgument(pArgs.size() == 1, "ABS with unexpected arguments: %s", argStr);
           return yices_abs(pArgs.get(0));
         case YICES_CEIL:
-          Preconditions.checkArgument(pArgs.size() == 1);
+          Preconditions
+              .checkArgument(pArgs.size() == 1, "CEIL with unexpected arguments: %s", argStr);
           return yices_ceil(pArgs.get(0));
         case YICES_FLOOR:
-          Preconditions.checkArgument(pArgs.size() == 1);
+          Preconditions
+              .checkArgument(pArgs.size() == 1, "FLOOR with unexpected arguments: %s", argStr);
           return yices_floor(pArgs.get(0));
         case YICES_RDIV:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "RDIV with unexpected arguments: %s", argStr);
           return yices_division(pArgs.get(0), pArgs.get(1));
         case YICES_IDIV:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "IDIV with unexpected arguments: %s", argStr);
           return yices_idiv(pArgs.get(0), pArgs.get(1));
         case YICES_IMOD:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions
+              .checkArgument(pArgs.size() == 2, "IMOD with unexpected arguments: %s", argStr);
           return yices_imod(pArgs.get(0), pArgs.get(1));
         case YICES_IS_INT_ATOM:
-          Preconditions.checkArgument(pArgs.size() == 1);
+          Preconditions.checkArgument(
+              pArgs.size() == 1,
+              "IS_INT_ATOM with unexpected arguments: %s",
+              argStr);
           return yices_is_int_atom(pArgs.get(0));
         case YICES_DIVIDES_ATOM:
-          Preconditions.checkArgument(pArgs.size() == 2);
+          Preconditions.checkArgument(
+              pArgs.size() == 2,
+              "DIVIDES_ATOM with unexpected arguments: %s",
+              argStr);
           return yices_divides_atom(pArgs.get(0), pArgs.get(1));
         case YICES_BV_SUM:
           return yices_bvsum(pArgs.size(), Ints.toArray(pArgs));

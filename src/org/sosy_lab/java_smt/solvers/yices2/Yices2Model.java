@@ -38,6 +38,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_model_t
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_float;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_arithmetic;
@@ -116,7 +117,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
       } else if (yvalTag[1] == YVAL_FUNCTION) {
         assignments.addAll(getFunctionAssignment(termsInModel[i], yvalTag));
       } else {
-        throw new UnsupportedOperationException("Not yet implemented");
+        throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
       }
     }
 
@@ -135,7 +136,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
       if (expandFun[i + 1] == YVAL_MAPPING) {
         expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
       } else {
-        throw new IllegalArgumentException("Not a mapping!"); // TODO
+        throw new IllegalArgumentException("Unexpected YVAL tag " + yval[1]);
       }
       List<Object> argumentInterpretation = new ArrayList<>();
       for (int j = 0; j < expandMap.length - 2; j += 2) {
@@ -191,7 +192,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
       String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
       return new BigInteger(bigEndianBV, 2);
     } else {
-      throw new IllegalArgumentException("Unexpected yval tag: " + tag);
+      throw new IllegalArgumentException("Unexpected YVAL tag: " + tag);
     }
   }
 
@@ -225,7 +226,8 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     // Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     int val = yices_get_value_as_term(model, pFormula);
     if (val == -1) {
-      throw new IllegalArgumentException("Term could not be evaluated!");
+      throw new IllegalArgumentException(
+          "Could not evaluate Term: " + yices_term_to_string(pFormula));
     }
     return val;
   }

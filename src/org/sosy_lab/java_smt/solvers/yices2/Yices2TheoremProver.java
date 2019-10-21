@@ -82,12 +82,10 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pBmgr, pShutdownNotifier);
     this.creator = creator;
-    // TODO get settings from SolverContext
     curCfg = yices_new_config();
     yices_set_config_checked(curCfg, "solver-type", "dpllt");
     yices_set_config_checked(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
-    // TODO config options
     constraintStack.push(new LinkedHashSet<>()); // initial level
   }
 
