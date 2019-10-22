@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat_with_assumptions;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_status;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_model;
@@ -68,12 +69,15 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
+  private static final int STATUS_UNSAT = 4;
 
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
   protected final long curCfg;
 
   private final Deque<Set<Integer>> constraintStack = new ArrayDeque<>();
+
+  private boolean canPush = true;
 
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
@@ -98,34 +102,51 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     yices_pop(curEnv);
     constraintStack.pop();
+    canPush = true;
   }
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     int constraint = creator.extractInfo(pConstraint);
-    if (!generateUnsatCores) { // unsat core does not work with incremental mode
-      yices_assert_formula(curEnv, constraint);
+    if (canPush) {
+      if (!generateUnsatCores) { // unsat core does not work with incremental mode
+        yices_assert_formula(curEnv, constraint);
+      }
+      constraintStack.peek().add(constraint);
     }
-    constraintStack.peek().add(constraint);
     return null;
   }
 
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    yices_push(curEnv);
-    constraintStack.push(new LinkedHashSet<>());
+    if (canPush && yices_context_status(curEnv) != STATUS_UNSAT) {
+      yices_push(curEnv);
+      constraintStack.push(new LinkedHashSet<>());
+    } else {
+      canPush = false;
+    }
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    boolean unsat = false;
     if (generateUnsatCores) { // unsat core does not work with incremental mode
       int[] allConstraints = getAllConstraints();
-      return !yices_check_sat_with_assumptions(
-          curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
+      unsat =
+          !yices_check_sat_with_assumptions(
+              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
+      if (unsat) {
+        canPush = false;
+      }
+      return unsat;
     } else {
-      return !yices_check_sat(curEnv, DEFAULT_PARAMS);
+      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS);
+      if (unsat) {
+        canPush = false;
+      }
+      return unsat;
     }
   }
 
@@ -139,9 +160,15 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    boolean unsat = false;
     // TODO handle BooleanFormulaCollection / check for literals
-    return !yices_check_sat_with_assumptions(
-        curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
+    unsat =
+        !yices_check_sat_with_assumptions(
+            curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
+    if (unsat) {
+      canPush = false;
+    }
+    return unsat;
   }
 
   @Override
