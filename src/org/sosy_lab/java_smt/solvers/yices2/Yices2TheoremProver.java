@@ -69,7 +69,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
-  private static final int STATUS_UNSAT = 4;
+  private static final int STATUS_UNSAT = 4; // TODO Maybe fetch this value from Yices2NativeApi in
+  // case it changes in the future?
 
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
@@ -77,7 +78,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   private final Deque<Set<Integer>> constraintStack = new ArrayDeque<>();
 
-  private boolean canPush = true;
+  private int stackSizeToUnsat = Integer.MAX_VALUE;
 
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
@@ -100,32 +101,40 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    yices_pop(curEnv);
-    constraintStack.pop();
-    canPush = true;
+    if (constraintStack.size() <= stackSizeToUnsat) { // constraintStack and Yices stack have same
+      // level.
+      yices_pop(curEnv);
+      stackSizeToUnsat = Integer.MAX_VALUE; // Reset stackSizeToUnsat as this pop() will bring the
+      // stack into a pushable state if it was UNSAT before.
+    }
+    constraintStack.pop(); // Always pop constraintStack since it can get bigger than Yices stack.
   }
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     int constraint = creator.extractInfo(pConstraint);
-    if (canPush) {
-      if (!generateUnsatCores) { // unsat core does not work with incremental mode
-        yices_assert_formula(curEnv, constraint);
-      }
-      constraintStack.peek().add(constraint);
+    if (!generateUnsatCores) { // unsat core does not work with incremental mode
+      yices_assert_formula(curEnv, constraint);
     }
+    constraintStack.peek().add(constraint);
     return null;
   }
 
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    if (canPush && yices_context_status(curEnv) != STATUS_UNSAT) {
+    if (constraintStack.size() <= stackSizeToUnsat
+        && yices_context_status(curEnv) != STATUS_UNSAT) {
+      // Ensure that constraintStack and Yices stack are on the same level and Context is not UNSAT
+      // from assertions since last push.
       yices_push(curEnv);
-      constraintStack.push(new LinkedHashSet<>());
-    } else {
-      canPush = false;
+    } else if (stackSizeToUnsat == Integer.MAX_VALUE) {
+      stackSizeToUnsat = constraintStack.size(); // if previous check fails and stackSizeToUnsat is
+      // not already set, set it to the current stack
+      // size before pushing.
     }
+    constraintStack.push(new LinkedHashSet<>()); // Always push to ensure proper representation of
+    // push actions, even if Yices did not push.
   }
 
   @Override
@@ -137,14 +146,13 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       unsat =
           !yices_check_sat_with_assumptions(
               curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
-      if (unsat) {
-        canPush = false;
-      }
       return unsat;
     } else {
       unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS);
-      if (unsat) {
-        canPush = false;
+      if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
+        stackSizeToUnsat = constraintStack.size(); // If sat check is UNSAT and stackSizeToUnsat was
+        // not already set, set to current
+        // constraintStack size.
       }
       return unsat;
     }
@@ -160,15 +168,9 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    boolean unsat = false;
     // TODO handle BooleanFormulaCollection / check for literals
-    unsat =
-        !yices_check_sat_with_assumptions(
-            curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
-    if (unsat) {
-      canPush = false;
-    }
-    return unsat;
+    return !yices_check_sat_with_assumptions(
+        curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
   }
 
   @Override
