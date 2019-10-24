@@ -19,8 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Preconditions;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -45,9 +43,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
   protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
-  private final ShutdownNotifier shutdownNotifier;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
-  private int contextLevel;
 
   // Used/Built by TheoremProver
   protected BoolectorAbstractProver(
@@ -59,9 +55,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     super(pOptions, manager.getBooleanFormulaManager(), pShutdownNotifier);
     this.manager = manager;
     this.creator = creator;
-    this.btor = checkNotNull(btor);
-    this.shutdownNotifier = checkNotNull(pShutdownNotifier);
-    this.contextLevel = 0;
+    this.btor = btor;
   }
 
   @Override
@@ -71,12 +65,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       // NOT Cloning results in murdering btor that is still beeing used
       // closing of assertions only by using boolector_release
       // BtorJNI.boolector_delete(btor);
+      BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), assertedFormulas.size());
       assertedFormulas.clear();
-      // if not able to close, pop all the stack
-      if (contextLevel > 0) {
-        BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), contextLevel);
-        contextLevel = 0;
-      }
       closed = true;
     }
   }
@@ -105,14 +95,12 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void pop() {
     assertedFormulas.pop();
-    contextLevel--;
     BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), 1);
   }
 
   @Override
   public void push() {
     assertedFormulas.push(new ArrayList<>());
-    contextLevel++;
     BtorJNI.boolector_push(manager.getEnvironment().getBtor(), 1);
   }
 

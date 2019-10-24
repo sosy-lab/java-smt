@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 public class BoolectorArrayFormulaManager
     extends AbstractArrayFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
-  private BoolectorVariablesCache cache;
+  private final BoolectorVariablesCache cache;
   private final long btor;
 
   BoolectorArrayFormulaManager(BoolectorFormulaCreator pCreator) {
@@ -42,9 +42,7 @@ public class BoolectorArrayFormulaManager
     return BtorJNI.boolector_read(btor, pArray, pIndex);
   }
 
-  /*
-   * (non-Javadoc) pINdex and pValue should be bitVectors
-   */
+  // pIndex and pValue should be bitVectors
   @Override
   protected Long store(Long pArray, Long pIndex, Long pValue) {
     return BtorJNI.boolector_write(btor, pArray, pIndex, pValue);
@@ -69,7 +67,7 @@ public class BoolectorArrayFormulaManager
 
     if (cache.isNameUsed(name)) {
       Long maybeFormula = cache.getExistingFormula(name, arraySort);
-      if (cache.getExistingFormula(name, arraySort) != null) {
+      if (maybeFormula != null) {
         return maybeFormula;
       } else {
         newArrayName = cache.getNewVarName(name);

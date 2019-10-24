@@ -19,22 +19,26 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
-// Boolector does not have an internal variables cache.
+/**
+ * Boolector does not have an internal variables cache. Thus we need to check for existing symbols
+ * on our own. This utility class is a wrapper around some caches.
+ */
 public class BoolectorVariablesCache {
 
-  // Mapping of unique Boolector name(key) to JavaSMT name(value)
-  private Map<String, String> newNameNameMap;
-  // Mapping unique Boolector name(key) to formula(value)
-  private Map<String, Long> nameFormulaCacheMap;
+  /** Mapping of unique Boolector name(key) to JavaSMT name(value) */
+  private final Map<String, String> newNameNameMap = new LinkedHashMap<>();
+
+  /** Mapping unique Boolector name(key) to formula(value) */
+  private final Map<String, Long> nameFormulaCacheMap = new LinkedHashMap<>();
+
   private long btor;
 
   BoolectorVariablesCache(long btor) {
     this.btor = btor;
-    newNameNameMap = new HashMap<>();
-    nameFormulaCacheMap = new HashMap<>();
   }
 
   /**
@@ -47,8 +51,7 @@ public class BoolectorVariablesCache {
     String btorVarName = javaSMTVarName;
     int tail = 1;
     while (newNameNameMap.containsKey(btorVarName)) {
-      btorVarName = javaSMTVarName;
-      btorVarName += Integer.toString(tail);
+      btorVarName = javaSMTVarName + tail;
       tail++;
     }
     return btorVarName;
@@ -62,11 +65,11 @@ public class BoolectorVariablesCache {
    * @param formulaSort sort of the new var
    * @return null if there is none in the cache. The complete variable(not sort) else.
    */
+  @Nullable
   protected Long getExistingFormula(String javaSMTVarName, long formulaSort) {
-    if (nameFormulaCacheMap.containsKey(javaSMTVarName)) {
-      long formulaFromMap = nameFormulaCacheMap.get(javaSMTVarName);
-      long mapFormulaSort =
-          BtorJNI.boolector_get_sort(btor, nameFormulaCacheMap.get(javaSMTVarName));
+    Long formulaFromMap = nameFormulaCacheMap.get(javaSMTVarName);
+    if (formulaFromMap != null) {
+      long mapFormulaSort = BtorJNI.boolector_get_sort(btor, formulaFromMap);
       if (formulaSort == mapFormulaSort) {
         return formulaFromMap;
       }

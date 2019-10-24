@@ -31,7 +31,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
-  private final BoolectorFormulaCreator creator;
+  private final BoolectorFormulaCreator bfCreator;
   private boolean closed = false;
 
   private final ImmutableList<Long> assertedTerms;
@@ -42,7 +42,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
       BoolectorAbstractProver<?> pProver,
       Collection<Long> assertedTerms) {
     super(creator);
-    this.creator = creator;
+    this.bfCreator = creator;
     this.btor = btor;
     this.prover = pProver;
     this.assertedTerms = ImmutableList.copyOf(assertedTerms);
@@ -67,6 +67,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
     return assignments.build();
   }
 
+  @SuppressWarnings("unused")
   private ImmutableList<ValueAssignment> toList1() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
@@ -106,7 +107,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
-        creator.getName(key),
+        bfCreator.getName(key),
         value,
         argumentInterpretation);
   }
@@ -119,7 +120,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(value),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
-        creator.getName(key),
+        bfCreator.getName(key),
         creator.convertValue(key, value),
         argumentInterpretation);
   }
@@ -133,7 +134,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
-        creator.getName(key),
+        bfCreator.getName(key),
         creator.convertValue(key, value),
         argumentInterpretation);
   }

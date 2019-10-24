@@ -44,9 +44,9 @@ public class BoolectorFormulaCreator
     extends FormulaCreator<Long, Long, BoolectorEnvironment, Long> {
 
   // Boolector can give back 'x' for a arbitrary value that we change to this
-  private static final char arbitrary_value = '1';
-  BoolectorVariablesCache cache;
-  private long btor;
+  private static final char ARBITRARY_VALUE = '1';
+  private final BoolectorVariablesCache cache;
+  private final long btor;
 
   BoolectorFormulaCreator(BoolectorEnvironment pEnv) {
     super(pEnv, pEnv.getBoolSort(), null, null);
@@ -103,16 +103,11 @@ public class BoolectorFormulaCreator
     assert pType.equals(getFormulaType(pTerm)) : String
         .format("Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
-      return (T) new BoolectorBooleanFormula(
-          pTerm,
-          btor);
+      return (T) new BoolectorBooleanFormula(pTerm, btor);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
-      return (T) new BoolectorArrayFormula<>(
-          pTerm,
-          arrFt.getIndexType(),
-          arrFt.getElementType(),
-          btor);
+      return (T)
+          new BoolectorArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType(), btor);
     } else if (pType.isBitvectorType()) {
       return (T) new BoolectorBitvectorFormula(pTerm, btor);
     }
@@ -138,8 +133,6 @@ public class BoolectorFormulaCreator
     assert getFormulaType(pTerm).isArrayType();
     return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, btor);
   }
-
-
 
   // In Boolector a type is called a sort
   @Override
@@ -168,6 +161,7 @@ public class BoolectorFormulaCreator
       if (cache.getExistingFormula(varName, type) != null) {
         return maybeFormula;
       } else {
+        // TODO throw exception: variable declared twice with different types?
         newName = cache.getNewVarName(varName);
       }
     }
@@ -301,13 +295,13 @@ public class BoolectorFormulaCreator
       char[] charArray = assignment.toCharArray();
       for (int i = 0; i < charArray.length; i++) {
         if (charArray[i] == 'x') {
-          charArray[i] = arbitrary_value;
+          charArray[i] = ARBITRARY_VALUE;
         } else if (charArray[i] != '0' && charArray[i] != '1') {
           throw new IllegalArgumentException(
               "Boolector gave back an assignment that is not parseable.");
         }
       }
-      assignment = charArray.toString();
+      assignment = String.valueOf(charArray);
     }
     return new BigInteger(assignment, 2);
   }
@@ -333,7 +327,7 @@ public class BoolectorFormulaCreator
               "Boolector gave back an assignment that is not parseable.");
         }
       }
-      bitVec = charArray.toString();
+      bitVec = String.valueOf(charArray);
     }
     BigInteger bigInt = new BigInteger(bitVec, 2);
     return bigInt.longValue();
@@ -345,8 +339,7 @@ public class BoolectorFormulaCreator
 
   @Override
   public Object convertValue(Long pF) {
-    throw new UnsupportedOperationException(
-        "Please use the other method.");
+    throw new UnsupportedOperationException("Please use the other method.");
   }
 
   @Override
