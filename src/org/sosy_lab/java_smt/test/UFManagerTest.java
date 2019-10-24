@@ -59,9 +59,7 @@ public class UFManagerTest extends SolverBasedTest0 {
       try {
         f =
             fmgr.declareAndCallUF(
-                name,
-                FormulaType.IntegerType,
-                ImmutableList.of(imgr.makeNumber(1)));
+                name, FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
       } catch (RuntimeException e) {
         if (name.equals("|Func|")) {
           throw new AssumptionViolatedException("unsupported UF name", e);

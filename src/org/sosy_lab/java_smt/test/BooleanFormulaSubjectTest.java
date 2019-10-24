@@ -69,8 +69,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
       simpleFormula = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 1));
       contradiction =
           bmgr.and(
-              simpleFormula,
-              bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
+              simpleFormula, bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
     }
     tautology = bmgr.or(simpleFormula, bmgr.not(simpleFormula));
   }

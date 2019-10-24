@@ -285,9 +285,7 @@ public class ModelTest extends SolverBasedTest0 {
     BitvectorFormula arg2 = bvmgr.makeVariable(8, "arg2");
     FunctionDeclaration<BitvectorFormula> declaration =
         fmgr.declareUF(
-            "UF",
-            FormulaType.getBitvectorTypeWithSize(8),
-            FormulaType.getBitvectorTypeWithSize(8));
+            "UF", FormulaType.getBitvectorTypeWithSize(8), FormulaType.getBitvectorTypeWithSize(8));
     BitvectorFormula app1 = fmgr.callUF(declaration, arg1);
     BitvectorFormula app2 = fmgr.callUF(declaration, arg2);
 
@@ -578,11 +576,11 @@ public class ModelTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         if (imgr != null) {
           assertThat(m.evaluate(imgr.add(imgr.makeNumber(45), imgr.makeNumber(55))))
-            .isEqualTo(BigInteger.valueOf(100));
+              .isEqualTo(BigInteger.valueOf(100));
           assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
-            .isEqualTo(BigInteger.valueOf(100));
+              .isEqualTo(BigInteger.valueOf(100));
           assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
-            .isEqualTo(true);
+              .isEqualTo(true);
         }
         if (bvmgr != null) {
           if (solver == Solvers.BOOLECTOR) {
@@ -651,8 +649,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(amgr.select(updated, bvmgr.makeBitvector(8, 1))))

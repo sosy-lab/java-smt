@@ -329,10 +329,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
     // Someone who knows princess has to debug this!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     testName0(
-        s -> amgr.makeArray(
-            s,
-            FormulaType.getBitvectorTypeWithSize(2),
-            FormulaType.getBitvectorTypeWithSize(2)),
+        s ->
+            amgr.makeArray(
+                s,
+                FormulaType.getBitvectorTypeWithSize(2),
+                FormulaType.getBitvectorTypeWithSize(2)),
         amgr::equivalence,
         false);
   }
@@ -486,10 +487,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
     // Someone who knows princess has to debug this!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     createVariableWith(
-        v -> amgr.makeArray(
-            v,
-            FormulaType.getBitvectorTypeWithSize(2),
-            FormulaType.getBitvectorTypeWithSize(2)),
+        v ->
+            amgr.makeArray(
+                v,
+                FormulaType.getBitvectorTypeWithSize(2),
+                FormulaType.getBitvectorTypeWithSize(2)),
         getVarname());
   }
 

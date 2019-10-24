@@ -174,7 +174,8 @@ public abstract class SolverBasedTest0 {
 
   /** Skip test if the solver does not support integers. */
   protected final void requireIntegers() {
-    assume().withMessage("Solver %s does not support the theory of integers", solverToUse())
+    assume()
+        .withMessage("Solver %s does not support the theory of integers", solverToUse())
         .that(imgr)
         .isNotNull();
   }

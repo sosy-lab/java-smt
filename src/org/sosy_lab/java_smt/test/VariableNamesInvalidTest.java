@@ -98,8 +98,6 @@ public class VariableNamesInvalidTest extends SolverBasedTest0 {
     @SuppressWarnings("unused")
     Formula var =
         amgr.makeArray(
-            "",
-            FormulaType.getBitvectorTypeWithSize(2),
-            FormulaType.getBitvectorTypeWithSize(2));
+            "", FormulaType.getBitvectorTypeWithSize(2), FormulaType.getBitvectorTypeWithSize(2));
   }
 }

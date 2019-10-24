@@ -67,10 +67,8 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
       simpleFormula = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 1));
       contradiction =
           bmgr.and(
-              simpleFormula,
-              bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
+              simpleFormula, bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
     }
-
   }
 
   @Test
@@ -83,7 +81,9 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() throws InterruptedException {
-    try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
+    try (ProverEnvironment env =
+        context.newProverEnvironment(
+            ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
       env.push(contradiction);
       AssertionError failure = expectFailure(whenTesting -> whenTesting.that(env).isSatisfiable());
       assertThat(failure).factValue("with unsat core").isNotEmpty();

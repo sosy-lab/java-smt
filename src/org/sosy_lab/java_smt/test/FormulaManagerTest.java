@@ -211,7 +211,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
             FormulaType.getBitvectorTypeWithSize(8),
             FormulaType.getBitvectorTypeWithSize(8));
 
-    new EqualsTester().addEqualityGroup(bmgr.makeBoolean(true))
+    new EqualsTester()
+        .addEqualityGroup(bmgr.makeBoolean(true))
         .addEqualityGroup(bmgr.makeBoolean(false))
         .addEqualityGroup(bmgr.makeVariable("bool_a"))
         .addEqualityGroup(bvmgr.makeVariable(8, "bv_a"))
@@ -289,13 +290,9 @@ public class FormulaManagerTest extends SolverBasedTest0 {
       BooleanFormula constraint =
           imgr.equal(
               fmgr.declareAndCallUF(
-                  "uf1",
-                  FormulaType.IntegerType,
-                  ImmutableList.of(imgr.makeVariable("x"))),
+                  "uf1", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("x"))),
               fmgr.declareAndCallUF(
-                  "uf2",
-                  FormulaType.IntegerType,
-                  ImmutableList.of(imgr.makeVariable("y"))));
+                  "uf2", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("y"))));
       assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
           .containsExactly("uf1", "uf2", "x", "y");
 
