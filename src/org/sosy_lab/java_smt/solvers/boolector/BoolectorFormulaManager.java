@@ -60,6 +60,12 @@ final class BoolectorFormulaManager
       @Override
       public void appendTo(Appendable out) throws IOException {
         String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment().getBtor(), pT);
+        int length = dump.length();
+        int i = 1;
+        while (dump.charAt(length - i) != ')' && i < length) {
+          dump = dump.substring(0, length - i);
+          i++;
+        }
         out.append(dump);
       }
     };

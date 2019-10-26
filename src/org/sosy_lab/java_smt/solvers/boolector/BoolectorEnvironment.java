@@ -23,9 +23,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.MoreFiles;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
@@ -45,7 +42,10 @@ class BoolectorEnvironment {
 
   @Option(
     secure = true,
-    description = "The SAT solver used by Boolector. Available are \"Lingeling\", \"PicoSAT\" and \"MiniSAT \". Please enter the String for the Solver you want (case insensitive).")
+    description = "The SAT solver used by Boolector. Available are \"Lingeling\", "
+        + "\"PicoSAT\" and \"MiniSAT \". Please enter the String for the Solver you "
+        + "want (case insensitive). Warning: Cadical is most likely not working in "
+        + "JavaSMT at this moment.")
   private String satSolver = "";
 
   @Option(
@@ -104,7 +104,7 @@ class BoolectorEnvironment {
       System.err.println("Boolector library could not be loaded.");
     }
 
-    if (!loaded) { // Avoid logging twice.
+    if (!loaded && logger != null) { // Avoid logging twice.
       logger.log(Level.WARNING, copyright + license);
     }
 
@@ -112,7 +112,12 @@ class BoolectorEnvironment {
     config.inject(this);
     // Setting SAT Solver
     if (satSolver.length() > 0) {
-      BtorJNI.boolector_set_sat_solver(btor, satSolver);
+      if (satSolver.toLowerCase() == "cadical") {
+        // cadical can't be used with incremental mode, maybe this will change in the future
+        System.out.println("CaDiCal is not useable with JavaSMT at this moment.");
+      } else {
+        BtorJNI.boolector_set_sat_solver(btor, satSolver);
+      }
     }
 
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
@@ -127,6 +132,7 @@ class BoolectorEnvironment {
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.swigValue(), 2);
 
     setOptions();
+    startLogging();
     loaded = true;
   }
 
@@ -193,14 +199,8 @@ class BoolectorEnvironment {
 
   private void startLogging() {
     if (basicLogfile != null) {
-      Path filename = basicLogfile.getFreshPath();
-      try {
-      MoreFiles.createParentDirectories(filename);
-        BtorJNI.boolector_set_trapi(btor, filename.toAbsolutePath().toString());
-      } catch (IOException e) {
-        logger
-            .logUserException(Level.WARNING, e, "Cannot create directory for Boolector logfile.");
-      }
+      String filename = basicLogfile.getFreshPath().toAbsolutePath().toString();
+      BtorJNI.boolector_set_trapi(btor, filename);
     }
   }
 }
