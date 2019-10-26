@@ -22,15 +22,15 @@ package org.sosy_lab.java_smt.solvers.yices2;
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
 class Yices2NativeApi {
   private Yices2NativeApi() {}
-  // Yices2 status codes
 
-  private static final int STATUS_IDLE = 0;
-  private static final int STATUS_SEARCHING = 1;
-  private static final int STATUS_UNKNOWN = 2;
-  private static final int STATUS_SAT = 3;
-  private static final int STATUS_UNSAT = 4;
-  private static final int STATUS_INTERRUPTED = 5;
-  private static final int STATUS_ERROR = 6;
+  // Yices2 status codes
+  public static final int YICES_STATUS_IDLE = 0;
+  public static final int YICES_STATUS_SEARCHING = 1;
+  public static final int YICES_STATUS_UNKNOWN = 2;
+  public static final int YICES_STATUS_SAT = 3;
+  public static final int YICES_STATUS_UNSAT = 4;
+  public static final int YICES_STATUS_INTERRUPTED = 5;
+  public static final int YICES_STATUS_ERROR = 6;
 
   // Yices2 term constructors
   public static final int YICES_CONSTRUCTOR_ERROR = -1;
@@ -666,13 +666,13 @@ class Yices2NativeApi {
 
   private static boolean check_result(int result) throws IllegalStateException {
     switch (result) {
-      case STATUS_SAT:
+      case YICES_STATUS_SAT:
         return true;
-      case STATUS_UNSAT:
+      case YICES_STATUS_UNSAT:
         return false;
       default:
         // TODO Further ERROR CLARIFICATION
-        String code = (result == STATUS_UNKNOWN) ? "\"unknown\"" : result + "";
+        String code = (result == YICES_STATUS_UNKNOWN) ? "\"unknown\"" : result + "";
         throw new IllegalStateException("Yices check returned:" + code);
     }
   }

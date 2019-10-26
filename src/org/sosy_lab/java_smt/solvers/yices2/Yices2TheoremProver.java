@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_STATUS_UNSAT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat_with_assumptions;
@@ -69,8 +70,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
-  private static final int STATUS_UNSAT = 4; // TODO Maybe fetch this value from Yices2NativeApi in
-  // case it changes in the future?
 
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
@@ -124,7 +123,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public void push() {
     Preconditions.checkState(!closed);
     if (constraintStack.size() <= stackSizeToUnsat
-        && yices_context_status(curEnv) != STATUS_UNSAT) {
+        && yices_context_status(curEnv) != YICES_STATUS_UNSAT) {
       // Ensure that constraintStack and Yices stack are on the same level and Context is not UNSAT
       // from assertions since last push.
       yices_push(curEnv);
