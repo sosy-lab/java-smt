@@ -92,6 +92,9 @@ class Yices2NativeApi {
   // products
   public static final int YICES_POWER_PRODUCT = 42; // power products: (t1^d1 * ... * t_n^d_n)
 
+  public static final int YICES_AND = Integer.MAX_VALUE; // Workaround as Yices has no AND
+  // constructor. MAX_INT to ensure no
+  // collisions with actual constructors.
   /*
    * Yices model tags
    */

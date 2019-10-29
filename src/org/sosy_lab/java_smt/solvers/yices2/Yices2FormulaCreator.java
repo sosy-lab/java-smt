@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ABS;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_AND;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
@@ -57,6 +58,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UNINTER
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_VARIABLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_XOR_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_abs;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_geq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
@@ -241,7 +243,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
-    int functionDeclaration = -constructor;
+    int functionDeclaration = -constructor; // Map built-in constructors in negative int to avoid
+    // collision with UFs.
     switch (constructor) {
       case YICES_BOOL_CONST:
         return pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
@@ -268,6 +271,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         String name;
         if (isAnd) {
           name = FunctionDeclarationKind.AND.toString();
+          functionDeclaration = -YICES_AND; // Workaround for unavailable Yices_AND constructor.
           yicesArgs = getNestedConjunctionArgs(pF);
         } else if (isUF) {
           yicesArgs = getArgs(pF);
@@ -614,6 +618,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           return yices_sum(pArgs.size(), Ints.toArray(pArgs));
         case YICES_POWER_PRODUCT:
           return yices_product(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_AND: // Workaround for missing and constructor
+          return yices_and(pArgs.size(), Ints.toArray(pArgs));
           // TODO add more cases
         default:
           throw new IllegalArgumentException(
