@@ -94,7 +94,7 @@ public enum BtorOption {
 
   private final int value;
 
-  private BtorOption(int pValue) {
+  BtorOption(int pValue) {
     value = pValue;
   }
 
@@ -107,4 +107,3 @@ public enum BtorOption {
     return name() + "(" + getValue() + ")";
   }
 }
-

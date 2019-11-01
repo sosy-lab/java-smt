@@ -26,5 +26,4 @@ class BoolectorUFManager extends AbstractUFManager<Long, Long, Long, BoolectorEn
   protected BoolectorUFManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
   }
-
 }

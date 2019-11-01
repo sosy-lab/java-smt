@@ -62,8 +62,9 @@ public class BoolectorFormulaCreator
       checkArgument(
           BtorJNI.boolector_is_bitvec_sort(btor, sort),
           "BitvectorFormula with type missmatch: " + pFormula);
-      return (FormulaType<T>) FormulaType
-          .getBitvectorTypeWithSize(BtorJNI.boolector_get_width(btor, extractInfo(pFormula)));
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize(
+              BtorJNI.boolector_get_width(btor, extractInfo(pFormula)));
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
       FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
@@ -84,8 +85,7 @@ public class BoolectorFormulaCreator
       if (sort == 1) {
         return FormulaType.BooleanType;
       } else {
-        return FormulaType
-            .getBitvectorTypeWithSize(BtorJNI.boolector_get_width(btor, pFormula));
+        return FormulaType.getBitvectorTypeWithSize(BtorJNI.boolector_get_width(btor, pFormula));
       }
     } else if (BtorJNI.boolector_is_array_sort(btor, sort)) {
       int indexWidth = BtorJNI.boolector_get_index_width(btor, pFormula);
@@ -100,8 +100,9 @@ public class BoolectorFormulaCreator
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
-    assert pType.equals(getFormulaType(pTerm)) : String
-        .format("Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+    assert pType.equals(getFormulaType(pTerm))
+        : String.format(
+            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BoolectorBooleanFormula(pTerm, btor);
     } else if (pType.isArrayType()) {
@@ -128,8 +129,8 @@ public class BoolectorFormulaCreator
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE>
-      encapsulateArray(Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).isArrayType();
     return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, btor);
   }
@@ -176,7 +177,6 @@ public class BoolectorFormulaCreator
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
     throw new UnsupportedOperationException(
         "We wait till the Boolector devs give us methods to do this.");
-
   }
 
   // Hopefully a helpful template for when visitor gets implemented
@@ -203,8 +203,7 @@ public class BoolectorFormulaCreator
        */
     } else if (BtorJNI.boolector_is_var(btor, f)) {
       // bitvec var (size 1 is bool!)
-      return visitor
-          .visitFreeVariable(formula, getName(f));
+      return visitor.visitFreeVariable(formula, getName(f));
     } else {
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
 
@@ -213,8 +212,8 @@ public class BoolectorFormulaCreator
       return visitor.visitFunction(
           formula,
           args.build(),
-          FunctionDeclarationImpl
-              .of(getName(f), getDeclarationKind(f), argTypes.build(), getFormulaType(f), f));
+          FunctionDeclarationImpl.of(
+              getName(f), getDeclarationKind(f), argTypes.build(), getFormulaType(f), f));
     } // TODO: fix declaration in visitFunction
     return null;
   }
@@ -226,8 +225,7 @@ public class BoolectorFormulaCreator
 
   @Override
   public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
-    return BtorJNI
-        .boolector_apply(btor, Longs.toArray(pArgs), pArgs.size(), pDeclaration);
+    return BtorJNI.boolector_apply(btor, Longs.toArray(pArgs), pArgs.size(), pDeclaration);
   }
 
   @Override
@@ -307,9 +305,8 @@ public class BoolectorFormulaCreator
     return new BigInteger(assignment, 2);
   }
 
-
   /**
-   * Transforms String bitvec into Long
+   * Transforms String bitvec into Long.
    *
    * @param bitVec return value of Boolector
    * @return gives back the long version of the bitvector
@@ -366,15 +363,14 @@ public class BoolectorFormulaCreator
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> FormulaType<TE>
-      getArrayFormulaElementType(ArrayFormula<TI, TE> pArray) {
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
+      ArrayFormula<TI, TE> pArray) {
     return ((BoolectorArrayFormula<TI, TE>) pArray).getElementType();
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> FormulaType<TI>
-      getArrayFormulaIndexType(ArrayFormula<TI, TE> pArray) {
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
+      ArrayFormula<TI, TE> pArray) {
     return ((BoolectorArrayFormula<TI, TE>) pArray).getIndexType();
   }
-
 }

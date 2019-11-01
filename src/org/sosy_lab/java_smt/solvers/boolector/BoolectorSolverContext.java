@@ -52,11 +52,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
 
     BoolectorEnvironment env =
-        new BoolectorEnvironment(
-            config,
-            solverLogfile,
-            pShutdownNotifier,
-            (int) randomSeed);
+        new BoolectorEnvironment(config, solverLogfile, pShutdownNotifier, (int) randomSeed);
     BoolectorFormulaCreator creator = new BoolectorFormulaCreator(env);
 
     BoolectorUFManager functionTheory = new BoolectorUFManager(creator);
@@ -68,12 +64,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
     BoolectorFormulaManager manager =
         new BoolectorFormulaManager(
-            creator,
-            functionTheory,
-            booleanTheory,
-            bitvectorTheory,
-            quantifierTheory,
-            arrayTheory);
+            creator, functionTheory, booleanTheory, bitvectorTheory, quantifierTheory, arrayTheory);
     return new BoolectorSolverContext(manager, creator);
   }
 
@@ -99,14 +90,14 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?>
-      newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Boolector does not support interpolation");
   }
 
   @Override
-  protected OptimizationProverEnvironment
-      newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Boolector does not support optimization");
   }
 

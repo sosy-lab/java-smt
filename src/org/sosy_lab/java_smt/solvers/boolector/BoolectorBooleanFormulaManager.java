@@ -109,5 +109,4 @@ public class BoolectorBooleanFormulaManager
   public Long ifThenElse(Long pCond, Long pF1, Long pF2) {
     return boolector_cond(btor, pCond, pF1, pF2);
   }
-
 }

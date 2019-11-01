@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 abstract class BoolectorFormula implements Formula {
 
   private final long btorTerm;
-  private final long btor;// We need the boolector instance to calculate the hash
+  private final long btor; // We need the boolector instance to calculate the hash
 
   BoolectorFormula(long term, long btor) {
     this.btorTerm = term;
@@ -81,10 +81,7 @@ abstract class BoolectorFormula implements Formula {
     private final FormulaType<TE> elementType;
 
     BoolectorArrayFormula(
-        long pTerm,
-        FormulaType<TI> pIndexType,
-        FormulaType<TE> pElementType,
-        long btor) {
+        long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType, long btor) {
       super(pTerm, btor);
       indexType = pIndexType;
       elementType = pElementType;

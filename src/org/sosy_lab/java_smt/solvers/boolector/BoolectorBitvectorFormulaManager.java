@@ -55,7 +55,7 @@ class BoolectorBitvectorFormulaManager
 
   private final long btor;
 
-  public BoolectorBitvectorFormulaManager(BoolectorFormulaCreator creator) {
+  BoolectorBitvectorFormulaManager(BoolectorFormulaCreator creator) {
     super(creator);
     this.btor = creator.getEnv().getBtor();
   }
@@ -189,7 +189,7 @@ class BoolectorBitvectorFormulaManager
 
   @Override
   public Long shiftRight(Long bitVec, Long toShift, boolean signed) {
-    if(signed) {
+    if (signed) {
       return boolector_sra(btor, bitVec, toShift);
     } else {
       return boolector_srl(btor, bitVec, toShift);
@@ -230,5 +230,4 @@ class BoolectorBitvectorFormulaManager
     }
     return makeBitvectorImpl(length, BigInteger.valueOf(value));
   }
-
 }

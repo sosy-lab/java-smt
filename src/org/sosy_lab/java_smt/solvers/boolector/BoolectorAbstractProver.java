@@ -86,7 +86,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       return true;
     } else if (result == BtorJNI.BTOR_RESULT_UNKNOWN_get()) {
       throw new SolverException(
-          "Boolector encountered a problem or may have ran out of stack or heap memory, try increasing their sizes.");
+          "Boolector encountered a problem or ran out of stack or heap memory, "
+              + "try increasing their sizes.");
     } else {
       throw new SolverException("Boolector sat call returned " + result);
     }
@@ -128,9 +129,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>>
-      unsatCoreOverAssumptions(Collection<BooleanFormula> pAssumptions)
-          throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
         "Unsat core with assumptions is not supported by Boolector.");
   }
@@ -144,8 +144,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Nullable
   public T addConstraint(BooleanFormula constraint) {
     BtorJNI.boolector_assert(
-        manager.getEnvironment().getBtor(),
-        BoolectorFormulaManager.getBtorTerm(constraint));
+        manager.getEnvironment().getBtor(), BoolectorFormulaManager.getBtorTerm(constraint));
     assertedFormulas.peek().add(BoolectorFormulaManager.getBtorTerm(constraint));
     return null;
   }
@@ -164,5 +163,4 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected boolean isClosed() {
     return closed;
   }
-
 }

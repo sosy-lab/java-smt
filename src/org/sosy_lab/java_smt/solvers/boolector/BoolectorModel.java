@@ -114,7 +114,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironme
 
   private ValueAssignment getUFAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key);// wrong! use creator.convertValue
+    Long value = evalImpl(key); // wrong! use creator.convertValue
     // TODO
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),

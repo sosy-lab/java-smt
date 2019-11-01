@@ -49,8 +49,8 @@ public class BoolectorArrayFormulaManager
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> Long
-      internalMakeArray(String name, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
+      String name, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     if (!pIndexType.isBitvectorType() || !pElementType.isBitvectorType()) {
       throw new IllegalArgumentException("Boolector supports bitvector arrays only.");
     }

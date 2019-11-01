@@ -147,9 +147,9 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireParser();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
-      String query = BVS + "(assert (bvult bv (bvadd bv #x1)))";
-      classifier.visit(mgr.parse(query));
-      assertEquals("QF_BV", classifier.toString());
+    String query = BVS + "(assert (bvult bv (bvadd bv #x1)))";
+    classifier.visit(mgr.parse(query));
+    assertEquals("QF_BV", classifier.toString());
   }
 
   @Test

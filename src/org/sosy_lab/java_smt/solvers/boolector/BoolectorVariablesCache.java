@@ -29,10 +29,10 @@ import javax.annotation.Nullable;
  */
 public class BoolectorVariablesCache {
 
-  /** Mapping of unique Boolector name(key) to JavaSMT name(value) */
+  /** Mapping of unique Boolector name(key) to JavaSMT name(value). */
   private final Map<String, String> newNameNameMap = new LinkedHashMap<>();
 
-  /** Mapping unique Boolector name(key) to formula(value) */
+  /** Mapping unique Boolector name(key) to formula(value). */
   private final Map<String, Long> nameFormulaCacheMap = new LinkedHashMap<>();
 
   private long btor;

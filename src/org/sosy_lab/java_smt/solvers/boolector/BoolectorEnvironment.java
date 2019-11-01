@@ -49,11 +49,12 @@ class BoolectorEnvironment {
   private SatSolver satSolver = SatSolver.PICOSAT;
 
   @Option(
-    secure = true,
-    description = "Further options for Boolector in addition to the default options. "
-        + "Format:  \"Optionname=value\" with ’,’ to seperate options. "
-        + "Optionname and value can be found in BtorOption or Boolector C Api."
-        + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
+      secure = true,
+      description =
+          "Further options for Boolector in addition to the default options. "
+              + "Format:  \"Optionname=value\" with ’,’ to seperate options. "
+              + "Optionname and value can be found in BtorOption or Boolector C Api."
+              + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
   private String furtherOptions = "";
 
   private final int randomSeed;
@@ -103,7 +104,7 @@ class BoolectorEnvironment {
    * Tries to split the options string and set the options for boolector.
    *
    * @throws InvalidConfigurationException signals that the format for the options string was wrong
-   *         (most likely).
+   *     (most likely).
    */
   private void setOptions() throws InvalidConfigurationException {
     if (furtherOptions.isEmpty()) {

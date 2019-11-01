@@ -31,8 +31,8 @@ public class BoolectorQuantifiedFormulaManager
 
   private final long btor;
 
-  BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, BoolectorEnvironment, Long>
-          pCreator) {
+  BoolectorQuantifiedFormulaManager(
+      FormulaCreator<Long, Long, BoolectorEnvironment, Long> pCreator) {
     super(pCreator);
     btor = getFormulaCreator().getEnv().getBtor();
   }
@@ -67,7 +67,6 @@ public class BoolectorQuantifiedFormulaManager
     }
     return newQuantifier;
   }
-
 
   static class QuantifiedFormula {
     private final boolean isForall; // false for EXISTS, true for FORALL

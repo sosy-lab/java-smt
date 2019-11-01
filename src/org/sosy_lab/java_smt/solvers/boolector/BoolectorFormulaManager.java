@@ -74,5 +74,4 @@ final class BoolectorFormulaManager
   protected static long getBtorTerm(Formula pT) {
     return ((BoolectorFormula) pT).getTerm();
   }
-
 }
