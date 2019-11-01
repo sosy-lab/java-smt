@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
@@ -40,13 +40,15 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 @Options(prefix = "solver.boolector")
 class BoolectorEnvironment {
 
-  @Option(
-    secure = true,
-    description = "The SAT solver used by Boolector. Available are \"Lingeling\", "
-        + "\"PicoSAT\" and \"MiniSAT \". Please enter the String for the Solver you "
-        + "want (case insensitive). Warning: Cadical is most likely not working in "
-        + "JavaSMT at this moment.")
-  private String satSolver = "";
+  enum SatSolver {
+    LINGELING,
+    PICOSAT,
+    MINISAT,
+    CADICAL
+  }
+
+  @Option(secure = true, description = "The SAT solver used by Boolector.")
+  private SatSolver satSolver = SatSolver.PICOSAT;
 
   @Option(
     secure = true,
@@ -87,22 +89,18 @@ class BoolectorEnvironment {
 
   BoolectorEnvironment(
       Configuration config,
-      LogManager logger,
+      LogManager pLogger,
       @Nullable final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,
       final int pRandomSeed)
       throws InvalidConfigurationException {
 
-    this.logger = logger;
+    this.logger = pLogger;
     this.basicLogfile = pBasicLogfile;
     this.shutdownNotifier = pShutdownNotifier;
     this.randomSeed = pRandomSeed;
 
-    try {
-      NativeLibraries.loadLibrary("boolector");
-    } catch (UnsatisfiedLinkError e) {
-      System.err.println("Boolector library could not be loaded.");
-    }
+    NativeLibraries.loadLibrary("boolector");
 
     if (!loaded && logger != null) { // Avoid logging twice.
       logger.log(Level.WARNING, copyright + license);
@@ -110,15 +108,13 @@ class BoolectorEnvironment {
 
     btor = BtorJNI.boolector_new();
     config.inject(this);
-    // Setting SAT Solver
-    if (satSolver.length() > 0) {
-      if (satSolver.toLowerCase().equals("cadical")) {
-        // cadical can't be used with incremental mode, maybe this will change in the future
-        System.out.println("CaDiCal is not useable with JavaSMT at this moment.");
-      } else {
-        BtorJNI.boolector_set_sat_solver(btor, satSolver);
-      }
-    }
+
+    Preconditions.checkNotNull(satSolver);
+    // TODO implement non-incremental stack-handling in the TheoremProver.
+    Preconditions.checkArgument(
+        satSolver != SatSolver.CADICAL,
+        "CaDiCal is not useable with JavaSMT, because it does not support incremental mode.");
+    BtorJNI.boolector_set_sat_solver(btor, satSolver.name());
 
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
