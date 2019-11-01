@@ -245,6 +245,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeBitvector(int pLength, long i) {
+    checkRange(pLength, BigInteger.valueOf(i));
     return wrap(makeBitvectorImpl(pLength, i));
   }
 
@@ -254,6 +255,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeBitvector(int pLength, BigInteger i) {
+    checkRange(pLength, i);
     return wrap(makeBitvectorImpl(pLength, i));
   }
 
@@ -332,5 +334,22 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public int getLength(BitvectorFormula pNumber) {
     FormulaType<BitvectorFormula> type = getFormulaCreator().getFormulaType(pNumber);
     return ((FormulaType.BitvectorType) type).getSize();
+  }
+
+  /** check whether the integer value is matching into the given bitsize. */
+  protected static void checkRange(int pBitsize, BigInteger pI) {
+    if (pI.signum() > 0) {
+      BigInteger max = BigInteger.ONE.shiftLeft(pBitsize);
+      if (pI.compareTo(max) >= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to big for a bitvector with length " + pBitsize);
+      }
+    } else if (pI.signum() < 0) {
+      BigInteger min = BigInteger.ONE.shiftLeft(pBitsize).negate();
+      if (pI.compareTo(min) <= 0) {
+        throw new IllegalArgumentException(
+            pI + " is to small for a bitvector with length " + pBitsize);
+      }
+    }
   }
 }

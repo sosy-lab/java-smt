@@ -62,7 +62,6 @@ class BoolectorBitvectorFormulaManager
 
   @Override
   public Long makeBitvectorImpl(int pLength, long pParam1) {
-    checkRange(pLength, BigInteger.valueOf(pParam1));
     int i = (int) pParam1;
     if (i == pParam1) {
       long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
@@ -218,26 +217,6 @@ class BoolectorBitvectorFormulaManager
       return boolector_sext(btor, bitVec, extensionBits);
     } else {
       return boolector_uext(btor, bitVec, extensionBits);
-    }
-  }
-
-  /**
-   * Taken from Z3BitvectorFormulaManager
-   */
-  private static void checkRange(int pLength, BigInteger pI) {
-    // Boolector doesnt have bitvec length 1 because those are bools.
-    if (pI.signum() > 0) {
-      BigInteger max = BigInteger.ONE.shiftLeft(pLength);
-      if (pI.compareTo(max) >= 0) {
-        throw new IllegalArgumentException(
-            pI + " is to big for a bitvector with length " + pLength);
-      }
-    } else if (pI.signum() < 0) {
-      BigInteger min = BigInteger.ONE.shiftLeft(pLength).negate();
-      if (pI.compareTo(min) <= 0) {
-        throw new IllegalArgumentException(
-            pI + " is to small for a bitvector with length " + pLength);
-      }
     }
   }
 

@@ -68,22 +68,6 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
     return Native.mkBv2int(z3context, pBVFormula, pSigned);
   }
 
-  private static void checkRange(int pLength, BigInteger pI) {
-    if (pI.signum() > 0) {
-      BigInteger max = BigInteger.ONE.shiftLeft(pLength);
-      if (pI.compareTo(max) >= 0) {
-        throw new IllegalArgumentException(
-            pI + " is to big for a bitvector with length " + pLength);
-      }
-    } else if (pI.signum() < 0) {
-      BigInteger min = BigInteger.ONE.shiftLeft(pLength).negate();
-      if (pI.compareTo(min) <= 0) {
-        throw new IllegalArgumentException(
-            pI + " is to small for a bitvector with length " + pLength);
-      }
-    }
-  }
-
   @Override
   public Long makeVariableImpl(int length, String varName) {
     long type = getFormulaCreator().getBitvectorType(length);
