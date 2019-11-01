@@ -117,15 +117,15 @@ class BoolectorEnvironment {
     BtorJNI.boolector_set_sat_solver(btor, satSolver.name());
 
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.getValue(), 2);
     // Auto memory clean after closing
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.swigValue(), 1);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.getValue(), 1);
     // Incremental needed for push/pop!
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.swigValue(), 1);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.getValue(), 1);
     // Sets randomseed accordingly
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.swigValue(), randomSeed);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.getValue(), randomSeed);
     // Dump in SMT-LIB2 Format
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.swigValue(), 2);
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue(), 2);
 
     setOptions();
     startLogging();
@@ -153,21 +153,13 @@ class BoolectorEnvironment {
       furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(furtherOptions));
     } catch (IllegalArgumentException e) {
       throw new InvalidConfigurationException(
-          "Invalid Boolector option in \"" + furtherOptions + "\": " + e.getMessage(),
-          e);
+          "Invalid Boolector option in \"" + furtherOptions + "\": " + e.getMessage(), e);
     }
     for (Entry<String, String> option : furtherOptionsMap.entrySet()) {
       try {
-        BtorOption btorOption = BtorOption.getOption(option.getKey());
-        long optionValue;
-        if (btorOption == null) {
-          throw new IllegalArgumentException();
-        }
-        optionValue = Long.parseLong(option.getValue());
-        BtorJNI.boolector_set_opt(
-            btor,
-            btorOption.swigValue(),
-            optionValue);
+        BtorOption btorOption = BtorOption.valueOf(option.getKey());
+        long optionValue = Long.parseLong(option.getValue());
+        BtorJNI.boolector_set_opt(btor, btorOption.getValue(), optionValue);
       } catch (IllegalArgumentException e) {
         throw new InvalidConfigurationException(e.getMessage(), e);
       }
