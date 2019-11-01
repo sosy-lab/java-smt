@@ -25,7 +25,6 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -62,30 +61,7 @@ class BoolectorEnvironment {
   private final @Nullable PathCounterTemplate basicLogfile;
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
-  private static boolean loaded = false;
-
   private final long btor;
-
-  private static final String copyright =
-      "Copyright (c) 2007-2009 Robert Brummayer\n"
-          + "Copyright (c) 2007-2018 Armin Biere\n"
-          + "Copyright (c) 2012-2018 Aina Niemetz, Mathias Preiner\n"
-          + "\n"
-          + "This software is linked against Lingeling\n"
-          + "Copyright (c) 2010-2018 Armin Biere\n"
-          + "\n"
-          + "This software is linked against PicoSAT\n"
-          + "Copyright (c) 2006-2016 Armin Biere\n"
-          + "\n"
-          + "This software is linked against CaDiCaL\n"
-          + "Copyright (c) 2016-2018 Armin Biere\n";
-  // Copied from the license link on the Boolector website
-  private static final String license =
-      "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n"
-          + "\n"
-          + "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n"
-          + "\n"
-          + "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 
   BoolectorEnvironment(
       Configuration config,
@@ -101,10 +77,6 @@ class BoolectorEnvironment {
     this.randomSeed = pRandomSeed;
 
     NativeLibraries.loadLibrary("boolector");
-
-    if (!loaded && logger != null) { // Avoid logging twice.
-      logger.log(Level.WARNING, copyright + license);
-    }
 
     btor = BtorJNI.boolector_new();
     config.inject(this);
@@ -129,7 +101,6 @@ class BoolectorEnvironment {
 
     setOptions();
     startLogging();
-    loaded = true;
   }
 
   /**
