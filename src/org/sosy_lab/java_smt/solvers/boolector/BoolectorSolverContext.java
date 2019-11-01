@@ -20,7 +20,6 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import java.util.Set;
-import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -97,7 +96,6 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    logger.log(Level.FINER, "Freeing Boolector context.");
     BtorJNI.boolector_delete(creator.getEnv().getBtor());
   }
 
