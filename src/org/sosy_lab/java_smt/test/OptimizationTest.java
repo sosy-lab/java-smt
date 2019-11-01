@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.math.BigInteger;
 import org.junit.Before;
@@ -203,8 +204,27 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(x);
       assertThat(prover.check()).isEqualTo(OptStatus.OPT);
 
+      for (long i : new long[] {1, 10, 100, 1000, 10000, 100000000L, 1000000000000L}) {
+        long largeI = i * 1000000L; // increase precision
+        Rational nearZero = Rational.ofLongs(1, largeI);
+        Rational nearOne = Rational.ofLongs(largeI - 1, largeI);
+        assertThat(prover.upper(handle, nearZero)).hasValue(nearOne);
+      }
+
+      // OptiMathSAT5 has at least an epsilon of 1/1000000. It does not allow larger values.
+      assume()
+          .withMessage("Solver %s does not support large epsilons", solverToUse())
+          .that(solver)
+          .isNotEqualTo(Solvers.MATHSAT5);
+
+      for (long i : new long[] {1, 10, 100, 1000, 10000, 100000}) {
+        Rational nearZero = Rational.ofLongs(1, i);
+        Rational nearOne = Rational.ofLongs(i - 1, i);
+        assertThat(prover.upper(handle, nearZero)).hasValue(nearOne);
+      }
+
+      // check strict value
       assertThat(prover.upper(handle, Rational.ZERO)).hasValue(Rational.of(1));
-      assertThat(prover.upper(handle, Rational.of("1/10"))).hasValue(Rational.of("9/10"));
     }
   }
 }

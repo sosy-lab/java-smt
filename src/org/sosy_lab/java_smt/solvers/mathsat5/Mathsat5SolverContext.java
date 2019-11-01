@@ -22,7 +22,9 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_version;
@@ -173,9 +175,12 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         throw new InvalidConfigurationException(e.getMessage(), e);
       }
     }
-
-    final long msatEnv = msat_create_env(msatConf);
-
+    final long msatEnv;
+    if (settings.loadOptimathsat5) {
+      msatEnv = msat_create_opt_env(msatConf);
+    } else {
+      msatEnv = msat_create_env(msatConf);
+    }
     // Create Mathsat5FormulaCreator
     Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
 
@@ -212,7 +217,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(cfg, "random_seed", Long.toString(randomSeed));
-
     for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       msat_set_option_checked(cfg, option.getKey(), option.getValue());
     }
@@ -232,9 +236,17 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     final long env;
     if (USE_SHARED_ENV) {
-      env = msat_create_shared_env(cfg, creator.getEnv());
+      if (settings.loadOptimathsat5) {
+        env = msat_create_shared_opt_env(cfg, creator.getEnv());
+      } else {
+        env = msat_create_shared_env(cfg, creator.getEnv());
+      }
     } else {
-      env = msat_create_env(cfg);
+      if (settings.loadOptimathsat5) {
+        env = msat_create_opt_env(cfg);
+      } else {
+        env = msat_create_env(cfg);
+      }
     }
 
     return env;

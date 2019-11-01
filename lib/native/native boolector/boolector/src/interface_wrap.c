@@ -3451,7 +3451,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
      fseek (f, 0, SEEK_END);
       length = ftell (f);
       fseek (f, 0, SEEK_SET);
-     buffer = malloc (length);
+     buffer = malloc (length+1);
      if (buffer)
      {
        fread (buffer, 1, length, f);
@@ -3461,7 +3461,8 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 
     if (buffer)
     {
-     result = buffer;
+	  buffer[length+1] = '\n';
+      result = buffer;
     }
 	
 	

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "mathsat.h"
+#include "optimathsat.h"
 #include <gmp.h>
 
 #define CHECK_FOR_NULL(var) \
@@ -59,6 +60,10 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
     throwException(jenv, "java/lang/IllegalArgumentException", "Null passed to MathSAT"); \
     return; \
   } \
+  mtype m_arg##num; \
+  m_arg##num.repr = (void *)((size_t)arg##num);
+
+#define STRUCT_ARG_MAYBE_NULL(mtype, num) \
   mtype m_arg##num; \
   m_arg##num.repr = (void *)((size_t)arg##num);
 
@@ -266,6 +271,7 @@ typedef jlong jjconf;
 
 typedef jlong jjterm;
 #define TERM_ARG(num) STRUCT_ARG(msat_term, num)
+#define ERROR_TERM_ARG(num) STRUCT_ARG_MAYBE_NULL(msat_term, num)
 #define TERM_ARG_VOID(num) STRUCT_ARG_VOID(msat_term, num)
 #define TERM_RETURN STRUCT_RETURN_WITH_ENV
 
@@ -309,6 +315,7 @@ typedef jlong jjobjective_iterator;
 
 typedef jlong jjobjective;
 #define OBJECTIVE_ARG(num) STRUCT_ARG(msat_objective, num)
+#define OBJECTIVE_ARG_VOID(num) STRUCT_ARG_VOID(msat_objective, num)
 #define OBJECTIVE_RETURN STRUCT_RETURN_WITH_ENV
 
 typedef jlongArray jjobjectiveArray;

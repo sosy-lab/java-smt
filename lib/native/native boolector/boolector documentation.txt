@@ -1,3 +1,5 @@
+NOTICE: This is a bare minimum guide that worked for me. I do not take responsibility in any damage or frustration you may encounter using this!
+
 In the following the steps to update or change boolector and its JNI are outlined:
 
 There are 2 files, both located in boolector/src/, that need (potential) editing to compile Boolector with JNI:
@@ -50,6 +52,24 @@ To compile you need to follow these steps EVERY time since Boolector does not sa
 7. Update your JNI Java files
 
 
-If you choose to use SWIG:
+If you choose to use SWIG (Java/C):
 (Careful, you need to check your methods later anyway, SWIG tends to make mistakes. Example: it gives pointers back instead of the object, or a Jlong instead of an Jint etc.)
+Download: http://www.swig.org/download.html && Install Guide: https://github.com/swig/swig/wiki/Getting-Started
+
+Create an interface file (example: exampleinterface.i)
+Lets say you want the C header file "stuff.h" with the function "int fact(int n)" in Java, enter it in the interface file as seen below. (Names are important, even filenames!)
+/* File: exampleInterface.i */
+  %module test
+  %{
+  #include "stuff.h"
+  %}
+  int fact(int n);
+
+If you want all methods of the header in your interface, just replace the methods and enter %include "stuff.h" where the methods used to be.
+After finishing the interface file, execute SWIG with it and the header(s) you want (all in the same folder).
+See documentation of SWIG for more details. (This will propably do: %swig -java exampleinterface.i )
+Swig has loads of options and customizations, read the doku! (Example: -package <name>    will specify the java package, as it is important for method names)
+Dokumentation, Java Command Line 26.2.2 : http://www.swig.org/Doc4.0/SWIGDocumentation.pdf
+After executing SWIG correctly, there should be some .c and some .java files.
+The .c part has to be bound to the native C code as described above, Java in Java.
 

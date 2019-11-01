@@ -23,9 +23,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.MoreFiles;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
@@ -45,7 +42,10 @@ class BoolectorEnvironment {
 
   @Option(
     secure = true,
-    description = "The SAT solver used by Boolector. Available are \"Lingeling\", \"PicoSAT\" and \"MiniSAT \". Please enter the String for the Solver you want (case insensitive).")
+    description = "The SAT solver used by Boolector. Available are \"Lingeling\", "
+        + "\"PicoSAT\" and \"MiniSAT \". Please enter the String for the Solver you "
+        + "want (case insensitive). Warning: Cadical is most likely not working in "
+        + "JavaSMT at this moment.")
   private String satSolver = "";
 
   @Option(
@@ -63,6 +63,27 @@ class BoolectorEnvironment {
   private static boolean loaded = false;
 
   private final long btor;
+
+  private static final String copyright =
+      "Copyright (c) 2007-2009 Robert Brummayer\n"
+          + "Copyright (c) 2007-2018 Armin Biere\n"
+          + "Copyright (c) 2012-2018 Aina Niemetz, Mathias Preiner\n"
+          + "\n"
+          + "This software is linked against Lingeling\n"
+          + "Copyright (c) 2010-2018 Armin Biere\n"
+          + "\n"
+          + "This software is linked against PicoSAT\n"
+          + "Copyright (c) 2006-2016 Armin Biere\n"
+          + "\n"
+          + "This software is linked against CaDiCaL\n"
+          + "Copyright (c) 2016-2018 Armin Biere\n";
+  // Copied from the license link on the Boolector website
+  private static final String license =
+      "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n"
+          + "\n"
+          + "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n"
+          + "\n"
+          + "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 
   BoolectorEnvironment(
       Configuration config,
@@ -83,27 +104,35 @@ class BoolectorEnvironment {
       System.err.println("Boolector library could not be loaded.");
     }
 
-    if (!loaded) { // Avoid logging twice.
-      logger.log(Level.WARNING, "Boolector is only available for research blabla");// TODO: proper
-                                                                                   // text please
+    if (!loaded && logger != null) { // Avoid logging twice.
+      logger.log(Level.WARNING, copyright + license);
     }
 
     btor = BtorJNI.boolector_new();
     config.inject(this);
     // Setting SAT Solver
     if (satSolver.length() > 0) {
-      BtorJNI.boolector_set_sat_solver(btor, satSolver);
+      if (satSolver.toLowerCase() == "cadical") {
+        // cadical can't be used with incremental mode, maybe this will change in the future
+        System.out.println("CaDiCal is not useable with JavaSMT at this moment.");
+      } else {
+        BtorJNI.boolector_set_sat_solver(btor, satSolver);
+      }
     }
 
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.swigValue(), 2);
+    // Auto memory clean after closing
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_AUTO_CLEANUP.swigValue(), 1);
     // Incremental needed for push/pop!
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_INCREMENTAL.swigValue(), 1);
+    // Sets randomseed accordingly
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.swigValue(), randomSeed);
-    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_REWRITE_LEVEL.swigValue(), 0);
+    // Dump in SMT-LIB2 Format
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.swigValue(), 2);
 
     setOptions();
+    startLogging();
     loaded = true;
   }
 
@@ -170,14 +199,8 @@ class BoolectorEnvironment {
 
   private void startLogging() {
     if (basicLogfile != null) {
-      Path filename = basicLogfile.getFreshPath();
-      try {
-      MoreFiles.createParentDirectories(filename);
-        BtorJNI.boolector_set_trapi(btor, filename.toAbsolutePath().toString());
-      } catch (IOException e) {
-        logger
-            .logUserException(Level.WARNING, e, "Cannot create directory for Boolector logfile.");
-      }
+      String filename = basicLogfile.getFreshPath().toAbsolutePath().toString();
+      BtorJNI.boolector_set_trapi(btor, filename);
     }
   }
 }

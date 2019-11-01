@@ -221,10 +221,6 @@ public abstract class SolverBasedTest0 {
 
   /** Skip test if the solver does not support optimization. */
   protected final void requireOptimization() {
-
-    // TODO: re-enable opti-mathsat, currently it has too many bugs.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
-
     try {
       context.newOptimizationProverEnvironment().close();
     } catch (UnsupportedOperationException e) {
@@ -244,6 +240,13 @@ public abstract class SolverBasedTest0 {
           .that(e)
           .isNull();
     }
+  }
+
+  protected void requireParser() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
   }
 
   @Deprecated

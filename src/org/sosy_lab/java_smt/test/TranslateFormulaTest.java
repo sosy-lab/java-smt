@@ -60,7 +60,7 @@ public class TranslateFormulaTest {
   @Parameter(1)
   public Solvers translateTo;
 
-  @Parameters
+  @Parameters(name = "{index}: {0} --> {1}")
   public static Object[] getSolversProduct() {
     // Every combination: translateFrom and translateTo.
     int len = Solvers.values().length;
@@ -105,8 +105,17 @@ public class TranslateFormulaTest {
     }
   }
 
+  private void requireParser() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", translateTo)
+        .that(translateTo)
+        .isNotEqualTo(Solvers.CVC4);
+  }
+
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
+    requireParser();
+
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
@@ -116,6 +125,8 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
+    requireParser();
+
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
 

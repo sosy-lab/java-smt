@@ -65,28 +65,12 @@ public abstract class BooleanFormulaTransformationVisitor
 
   @Override
   public BooleanFormula visitAnd(List<BooleanFormula> processedOperands) {
-    for (BooleanFormula op : processedOperands) {
-      if (bfmgr.isFalse(op)) {
-        return bfmgr.makeBoolean(false);
-      }
-    }
-    return processedOperands
-        .stream()
-        .filter(input -> !bfmgr.isTrue(input))
-        .collect(bfmgr.toConjunction());
+    return bfmgr.and(processedOperands);
   }
 
   @Override
   public BooleanFormula visitOr(List<BooleanFormula> processedOperands) {
-    for (BooleanFormula op : processedOperands) {
-      if (bfmgr.isTrue(op)) {
-        return bfmgr.makeBoolean(true);
-      }
-    }
-    return processedOperands
-        .stream()
-        .filter(input -> !bfmgr.isFalse(input))
-        .collect(bfmgr.toDisjunction());
+    return bfmgr.or(processedOperands);
   }
 
   @Override

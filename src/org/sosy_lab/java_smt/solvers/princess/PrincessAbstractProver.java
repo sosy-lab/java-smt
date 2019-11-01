@@ -48,7 +48,6 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   protected final PrincessFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
-  protected final ShutdownNotifier shutdownNotifier;
 
   private final PrincessFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
@@ -63,7 +62,6 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
-    this.shutdownNotifier = checkNotNull(pShutdownNotifier);
   }
 
   /**

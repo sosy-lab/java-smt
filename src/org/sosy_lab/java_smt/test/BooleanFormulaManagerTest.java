@@ -115,6 +115,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConjunctionArgsExtraction() throws SolverException, InterruptedException {
+    requireIntegers();
     BooleanFormula input =
         bmgr.and(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
     Truth.assertThat(bmgr.toConjunctionArgs(input, false))
@@ -274,9 +275,11 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void simplificationTest() {
+    // Boolector MAY fail (Use internal equals method to check if it does)
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
 
     // AND
     Truth.assertThat(bmgr.and(tru)).isEqualTo(tru);
@@ -288,6 +291,13 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     Truth.assertThat(bmgr.and(tru, x)).isEqualTo(x);
     Truth.assertThat(bmgr.and(fals, x)).isEqualTo(fals);
     Truth.assertThat(bmgr.and(x, x)).isEqualTo(x);
+
+    Truth.assertThat(bmgr.and(tru, tru, tru)).isEqualTo(tru);
+    Truth.assertThat(bmgr.and(fals, fals, fals)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(fals, x, x)).isEqualTo(fals);
+    Truth.assertThat(bmgr.and(tru, x, tru)).isEqualTo(x);
+
+    Truth.assertThat(bmgr.and(tru, tru, x, fals, y, tru, x, y)).isEqualTo(fals);
 
     // recursive simplification needed
     // Truth.assertThat(bmgr.and(x, x, x, y, y)).isEqualTo(bmgr.and(x, y));
@@ -302,5 +312,11 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     Truth.assertThat(bmgr.or(tru, x)).isEqualTo(tru);
     Truth.assertThat(bmgr.or(fals, x)).isEqualTo(x);
     Truth.assertThat(bmgr.or(x, x)).isEqualTo(x);
+
+    Truth.assertThat(bmgr.or(fals, fals, fals)).isEqualTo(fals);
+    Truth.assertThat(bmgr.or(tru, x, x)).isEqualTo(tru);
+    Truth.assertThat(bmgr.or(fals, x, fals)).isEqualTo(x);
+
+    Truth.assertThat(bmgr.or(fals, fals, x, tru, y, fals, x, y)).isEqualTo(tru);
   }
 }

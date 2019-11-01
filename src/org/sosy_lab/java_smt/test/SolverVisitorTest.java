@@ -188,6 +188,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void floatMoreVisit() {
     requireFloats();
+    requireBitvectors();
     FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
     FloatingPointFormula x = fpmgr.makeVariable("x", fp);
     BitvectorFormula z = bvmgr.makeVariable(32, "z");
@@ -204,7 +205,9 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     checkKind(fpmgr.isNormal(x), FunctionDeclarationKind.FP_IS_NORMAL);
     checkKind(fpmgr.isSubnormal(x), FunctionDeclarationKind.FP_IS_SUBNORMAL);
     checkKind(fpmgr.isZero(x), FunctionDeclarationKind.FP_IS_ZERO);
-    checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
+    if (Solvers.CVC4 != solverToUse()) { // CVC4 does not support this operation
+      checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
+    }
     checkKind(
         fpmgr.castFrom(z, true, FormulaType.getSinglePrecisionFloatingPointType()),
         FunctionDeclarationKind.BV_SCASTTO_FP);
@@ -488,7 +491,19 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
+    Map<String, Formula> mapping2 = mgr.extractVariables(q);
+
+    // all solvers must provide all symbols
+    assertThat(mapping).hasSize(2);
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
+
+    // some solvers distinguish between nullary UFs and variables and do not provide variables
+    if (ImmutableList.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
+      assertThat(mapping2).isEmpty();
+    } else {
+      assertThat(mapping2).hasSize(1);
+      assertThat(mapping2).containsEntry("v", v);
+    }
   }
 }

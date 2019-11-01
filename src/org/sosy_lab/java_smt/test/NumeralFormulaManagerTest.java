@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -85,5 +87,12 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
       constraints.add(imgr.lessThan(symbol, four));
     }
     assertThatFormula(bmgr.and(imgr.distinct(symbols), bmgr.and(constraints))).isUnsatisfiable();
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  @Test(expected = Exception.class)
+  public void failOnInvalidString() {
+    imgr.makeNumber("a");
+    fail();
   }
 }
