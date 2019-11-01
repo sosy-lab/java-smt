@@ -79,12 +79,12 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = BtorJNI.boolector_sat(btor);
-    if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_SAT) {
+    if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
       wasLastSatCheckSat = true;
       return false;
-    } else if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_UNSAT) {
+    } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;
-    } else if (BtorSolverResult.swigToEnum(result) == BtorSolverResult.BTOR_RESULT_UNKNOWN) {
+    } else if (result == BtorJNI.BTOR_RESULT_UNKNOWN_get()) {
       throw new SolverException(
           "Boolector encountered a problem or may have ran out of stack or heap memory, try increasing their sizes.");
     } else {
