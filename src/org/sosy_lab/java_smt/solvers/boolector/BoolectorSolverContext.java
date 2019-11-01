@@ -25,7 +25,6 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -37,21 +36,16 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  private LogManager logger;
 
   protected BoolectorSolverContext(
-      BoolectorFormulaManager manager,
-      BoolectorFormulaCreator creator,
-      LogManager logger) {
+      BoolectorFormulaManager manager, BoolectorFormulaCreator creator) {
     super(manager);
     this.manager = manager;
     this.creator = creator;
-    this.logger = logger;
   }
 
   public static BoolectorSolverContext create(
       Configuration config,
-      LogManager logger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed)
@@ -60,7 +54,6 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorEnvironment env =
         new BoolectorEnvironment(
             config,
-            logger,
             solverLogfile,
             pShutdownNotifier,
             (int) randomSeed);
@@ -81,7 +74,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
             bitvectorTheory,
             quantifierTheory,
             arrayTheory);
-    return new BoolectorSolverContext(manager, creator, logger);
+    return new BoolectorSolverContext(manager, creator);
   }
 
   @Override

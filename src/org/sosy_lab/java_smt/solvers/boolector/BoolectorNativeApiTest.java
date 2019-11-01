@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class BoolectorNativeApiTest {
 
   // some options have a different name in the API that their internal representation.
   // TODO why?
-  private static final Map<String, String> ALLOWED_DIFFS =
+  private static final ImmutableMap<String, String> ALLOWED_DIFFS =
       ImmutableMap.<String, String>builder()
           .put("BTOR_OPT_ACKERMANNIZE", "BTOR_OPT_ACKERMANN")
           .put("BTOR_OPT_QUANT_DUAL", "BTOR_OPT_QUANT_DUAL_SOLVER")

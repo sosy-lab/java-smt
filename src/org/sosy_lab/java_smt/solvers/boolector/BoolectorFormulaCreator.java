@@ -263,7 +263,8 @@ public class BoolectorFormulaCreator
     } else if (BtorJNI.boolector_is_bitvec_sort(btor, BtorJNI.boolector_get_sort(btor, term))) {
       value = BtorJNI.boolector_bv_assignment(btor, term);
     } else {
-      value = BtorJNI.boolector_bv_assignment(btor, term);
+      throw new AssertionError("unknown sort and term");
+      // value = BtorJNI.boolector_bv_assignment(btor, term);
     }
     // To get the correct type, we check the width of the term (== 1 means bool).
     int width = BtorJNI.boolector_get_width(btor, term);

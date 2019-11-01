@@ -33,7 +33,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 @Options(prefix = "solver.boolector")
@@ -59,19 +58,16 @@ class BoolectorEnvironment {
 
   private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
-  private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final long btor;
 
   BoolectorEnvironment(
       Configuration config,
-      LogManager pLogger,
       @Nullable final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,
       final int pRandomSeed)
       throws InvalidConfigurationException {
 
-    this.logger = pLogger;
     this.basicLogfile = pBasicLogfile;
     this.shutdownNotifier = pShutdownNotifier;
     this.randomSeed = pRandomSeed;
