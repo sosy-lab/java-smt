@@ -112,7 +112,7 @@ class BoolectorEnvironment {
     config.inject(this);
     // Setting SAT Solver
     if (satSolver.length() > 0) {
-      if (satSolver.toLowerCase() == "cadical") {
+      if (satSolver.toLowerCase().equals("cadical")) {
         // cadical can't be used with incremental mode, maybe this will change in the future
         System.out.println("CaDiCal is not useable with JavaSMT at this moment.");
       } else {
