@@ -29,13 +29,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.java_smt.solvers.boolector.BoolectorEnvironment.SatSolver;
 
 public class BoolectorNativeApiTest {
 
   private long btor;
 
   @BeforeClass
-  public static void loadMathsat() {
+  public static void load() {
     try {
       NativeLibraries.loadLibrary("boolector");
     } catch (UnsatisfiedLinkError e) {
@@ -73,6 +74,20 @@ public class BoolectorNativeApiTest {
       String optName = BtorJNI.boolector_get_opt_lng(btor, option.getValue());
       String converted = "BTOR_OPT_" + optName.replace("-", "_").replace(":", "_").toUpperCase();
       assertEquals(option.name(), ALLOWED_DIFFS.getOrDefault(converted, converted));
+    }
+  }
+
+  @Test
+  public void satSolverTest() {
+    // check whether all sat solvers are available
+    for (SatSolver satSolver : SatSolver.values()) {
+      long btor1 = BtorJNI.boolector_new();
+      BtorJNI.boolector_set_sat_solver(btor1, satSolver.name());
+      long newVar = BtorJNI.boolector_var(btor1, BtorJNI.boolector_bool_sort(btor1), "x");
+      BtorJNI.boolector_assert(btor1, newVar);
+      int result = BtorJNI.boolector_sat(btor1);
+      assertEquals(BtorJNI.BTOR_RESULT_SAT_get(), result);
+      BtorJNI.boolector_delete(btor1);
     }
   }
 }
