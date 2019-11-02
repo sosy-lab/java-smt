@@ -21,10 +21,13 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -1033,5 +1036,49 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
+  }
+
+  private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4);
+  private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
+
+  @Test
+  public void testVariableWithDifferentSort() {
+    assume().that(solverToUse()).isNotIn(VAR_TRACKING_SOLVERS);
+    bmgr.makeVariable("x");
+    imgr.makeVariable("x");
+  }
+
+  @Test(expected = Exception.class) // complement of above test case
+  public void testFailOnVariableWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_TRACKING_SOLVERS);
+    bmgr.makeVariable("x");
+    imgr.makeVariable("x");
+  }
+
+  @Test
+  public void testVariableAndUFWithDifferentSort() {
+    assume().that(solverToUse()).isNotIn(VAR_AND_UF_TRACKING_SOLVERS);
+    bmgr.makeVariable("y");
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+  }
+
+  @Test(expected = Exception.class) // complement of above test case
+  public void testFailOnVariableAndUFWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
+    bmgr.makeVariable("y");
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+  }
+
+  @Test
+  public void testVariableAndUFWithEqualSort() {
+    BooleanFormula z1 = bmgr.makeVariable("z");
+    BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
+    if (ImmutableSet.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
+      assertNotEquals(z1, z2);
+    } else {
+      assertEquals(z1, z2);
+    }
   }
 }

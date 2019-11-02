@@ -86,7 +86,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Expr makeVariable(Type type, String name) {
     Expr exp = variablesCache.computeIfAbsent(name, n -> exprManager.mkVar(name, type));
-    assert type.equals(exp.getType());
+    Preconditions.checkArgument(
+        type.equals(exp.getType()),
+        "symbol name already in use for different type " + exp.getType());
     return exp;
   }
 
