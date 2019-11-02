@@ -1044,6 +1044,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void testVariableWithDifferentSort() {
     assume().that(solverToUse()).isNotIn(VAR_TRACKING_SOLVERS);
     bmgr.makeVariable("x");
@@ -1051,6 +1052,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test(expected = Exception.class) // complement of above test case
+  @SuppressWarnings("CheckReturnValue")
   public void testFailOnVariableWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_TRACKING_SOLVERS);
     bmgr.makeVariable("x");
@@ -1058,6 +1060,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void testVariableAndUFWithDifferentSort() {
     assume().that(solverToUse()).isNotIn(VAR_AND_UF_TRACKING_SOLVERS);
     bmgr.makeVariable("y");
@@ -1065,6 +1068,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test(expected = Exception.class) // complement of above test case
+  @SuppressWarnings("CheckReturnValue")
   public void testFailOnVariableAndUFWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
     bmgr.makeVariable("y");
