@@ -1009,6 +1009,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void bvOutOfRange() {
     requireBitvectors();
 
@@ -1022,7 +1023,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
       // allowed values
-      bvmgr.makeBitvector(size, 1L << size - 1);
+      bvmgr.makeBitvector(size, (1L << size) - 1);
       bvmgr.makeBitvector(size, -(1L << (size - 1)));
 
       // forbitten values
