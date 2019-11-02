@@ -1011,21 +1011,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   @Test
   public void bvOutOfRange() {
     requireBitvectors();
-    assume()
-        .withMessage("TODO: Z3BitvectorFormulaManager does not correctly implement this")
-        .that(solverToUse())
-        .isNoneOf(Solvers.Z3, Solvers.CVC4);
 
-    try {
-      bvmgr.makeBitvector(4, 32);
-      fail();
-    } catch (IllegalArgumentException expected) {
-    }
-
-    try {
-      bvmgr.makeBitvector(4, -9);
-      fail();
-    } catch (IllegalArgumentException expected) {
+    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
+      try {
+        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
     }
   }
 
