@@ -1019,6 +1019,50 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       } catch (IllegalArgumentException expected) {
       }
     }
+
+    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
+      // allowed values
+      bvmgr.makeBitvector(size, 1L << size - 1);
+      bvmgr.makeBitvector(size, -(1L << (size - 1)));
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, 1L << size);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
+
+    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
+      if (size > 64) {
+        assume()
+            .withMessage("Solver does not support large bitvectors")
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.CVC4);
+      }
+
+      // allowed values
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE));
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(
+            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
   }
 
   @Test
