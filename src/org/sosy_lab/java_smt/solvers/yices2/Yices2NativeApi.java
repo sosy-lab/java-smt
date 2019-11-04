@@ -162,18 +162,8 @@ class Yices2NativeApi {
    * @param value The value that the option will be set.
    * @return 0 if successful , -1 if an error occurred
    */
-  private static native int yices_set_config(long cfg, String option, String value);
+  public static native int yices_set_config(long cfg, String option, String value);
 
-  // TODO Return Value/Name from error_report/
-  // TODO Probably does nothing as C code will throw an Exception
-  public static void yices_set_config_checked(long cfg, String option, String value)
-      throws IllegalArgumentException {
-    int retval = yices_set_config(cfg, option, value);
-    if (retval != 0) {
-      throw new IllegalArgumentException(
-          "Could not set Yices option \"" + option + "=" + value + "\", error code " + retval);
-    }
-  }
   /**
    * Prepares a context configuration for the specified logic.
    *

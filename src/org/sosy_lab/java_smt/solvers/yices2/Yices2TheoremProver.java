@@ -32,7 +32,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_con
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_pop;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config_checked;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
@@ -87,8 +87,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     super(pOptions, pBmgr, pShutdownNotifier);
     this.creator = creator;
     curCfg = yices_new_config();
-    yices_set_config_checked(curCfg, "solver-type", "dpllt");
-    yices_set_config_checked(curCfg, "mode", "push-pop");
+    yices_set_config(curCfg, "solver-type", "dpllt");
+    yices_set_config(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
     constraintStack.push(new LinkedHashSet<>()); // initial level
   }

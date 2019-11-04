@@ -85,7 +85,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config_checked;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
@@ -138,8 +138,8 @@ public class Yices2NativeApiTest {
   public void createEnvironment() {
     yices_init();
     long cfg = yices_new_config();
-    yices_set_config_checked(cfg, "solver-type", "dpllt");
-    yices_set_config_checked(cfg, "mode", "push-pop");
+    yices_set_config(cfg, "solver-type", "dpllt");
+    yices_set_config(cfg, "mode", "push-pop");
     env = yices_new_context(cfg);
     yices_context_disable_option(env, "var-elim");
     yices_free_config(cfg);
