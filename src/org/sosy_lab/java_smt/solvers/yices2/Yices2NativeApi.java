@@ -159,8 +159,7 @@ class Yices2NativeApi {
    *
    * @param cfg The configuration to set the option in.
    * @param option The option to set.
-   * @param value The value that the option will be set.
-   * @return 0 if successful , -1 if an error occurred
+   * @param value The value that the option will be set to.
    */
   public static native void yices_set_config(long cfg, String option, String value);
 
