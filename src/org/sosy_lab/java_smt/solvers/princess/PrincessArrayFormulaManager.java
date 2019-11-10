@@ -57,7 +57,8 @@ class PrincessArrayFormulaManager
 
     // other types in arrays are not supported in princess
     // TODO: check
-    assert pIndexType.isIntegerType() && pElementType.isIntegerType();
+    assert pIndexType.isIntegerType() && pElementType.isIntegerType()
+        : "Princess supports only Integer types in Arrays";
 
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);

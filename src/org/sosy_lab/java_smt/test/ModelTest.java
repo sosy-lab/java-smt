@@ -637,6 +637,13 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
     requireBitvectors();
+    assume()
+        .withMessage(
+            "Solver %s does not support array theory with bitvectors as indices or elements",
+            solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
+
     ArrayFormula<BitvectorFormula, BitvectorFormula> array =
         amgr.makeArray(
             "array",

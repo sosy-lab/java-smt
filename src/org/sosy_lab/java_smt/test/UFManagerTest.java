@@ -97,7 +97,7 @@ public class UFManagerTest extends SolverBasedTest0 {
       }
       FunctionDeclaration<?> declaration = getDeclaration(f);
       Truth.assertThat(declaration.getName()).isEqualTo(name);
-      Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
+      Formula f2 = mgr.makeApplication(declaration, bvmgr.makeBitvector(4, 1));
       Truth.assertThat(f2).isEqualTo(f);
     }
   }
@@ -177,6 +177,10 @@ public class UFManagerTest extends SolverBasedTest0 {
   }
 
   private FunctionDeclaration<?> getDeclaration(Formula pFormula) {
+    assume()
+        .withMessage("Solver %s does not support visiters", solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.BOOLECTOR);
     return mgr.visit(
         pFormula,
         new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
