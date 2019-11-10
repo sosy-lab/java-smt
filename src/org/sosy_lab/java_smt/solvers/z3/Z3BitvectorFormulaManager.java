@@ -53,7 +53,7 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
 
   @Override
   protected Long makeBitvectorImpl(int pLength, BigInteger pI) {
-    checkRange(pLength, pI);
+    pI = transformValueToRange(pLength, pI);
     long sort = Native.mkBvSort(z3context, pLength);
     return Native.mkNumeral(z3context, pI.toString(), sort);
   }

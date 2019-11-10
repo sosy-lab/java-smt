@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
@@ -260,6 +261,25 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   }
 
   protected abstract TFormulaInfo makeBitvectorImpl(int pLength, BigInteger pI);
+
+  /**
+   * transform a negative value into its positive counterpart.
+   *
+   * @throws IllegalArgumentException if the value is out of range for the given size.
+   */
+  protected final BigInteger transformValueToRange(int pLength, BigInteger pI) {
+    final BigInteger max = BigInteger.valueOf(2).pow(pLength);
+    if (pI.signum() < 0) {
+      BigInteger min = BigInteger.valueOf(2).pow(pLength - 1).negate();
+      Preconditions.checkArgument(
+          pI.compareTo(min) >= 0, pI + " is to small for a bitvector with length " + pLength);
+      pI = pI.add(max);
+    } else {
+      Preconditions.checkArgument(
+          pI.compareTo(max) < 0, pI + " is to large for a bitvector with length " + pLength);
+    }
+    return pI;
+  }
 
   @Override
   public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
