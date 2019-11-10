@@ -81,6 +81,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() throws InterruptedException {
+    requireUnsatCore();
     try (ProverEnvironment env =
         context.newProverEnvironment(
             ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
@@ -100,6 +101,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsUnsatisfiableNo() throws InterruptedException {
+    requireModel();
     try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       env.push(simpleFormula);
       AssertionError failure =

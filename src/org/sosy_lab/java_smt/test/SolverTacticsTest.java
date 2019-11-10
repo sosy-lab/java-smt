@@ -63,6 +63,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
+    requireVisitor();
+
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula not_a_b = bmgr.not(bmgr.equivalence(a, b));
@@ -76,6 +78,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void nnfTacticDefaultTest2() throws SolverException, InterruptedException {
+    requireVisitor();
+
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");

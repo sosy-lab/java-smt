@@ -249,6 +249,27 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
   }
 
+  protected void requireModel() {
+    assume()
+        .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireVisitor() {
+    assume()
+        .withMessage("Solver %s does not support formula visitor", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireUnsatCore() {
+    assume()
+        .withMessage("Solver %s does not support unsat core generation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
   @Deprecated
   protected final void requireFalse(String failureMessage) {
     assume().withMessage(failureMessage).fail();

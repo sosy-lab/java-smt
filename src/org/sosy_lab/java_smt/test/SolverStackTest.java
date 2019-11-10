@@ -253,6 +253,8 @@ public class SolverStackTest extends SolverBasedTest0 {
   @SuppressWarnings("unused")
   @Test
   public void symbolsOnStackTest() throws InterruptedException, SolverException {
+    requireModel();
+
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
 
     stack.push();

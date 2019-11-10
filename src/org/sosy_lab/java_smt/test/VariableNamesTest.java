@@ -243,6 +243,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   private <T extends Formula> void testName0(
       Function<String, T> creator, BiFunction<T, T, BooleanFormula> eq, boolean isUF)
       throws SolverException, InterruptedException {
+    requireVisitor();
 
     // create a variable
     T var = createVariableWith(creator, getVarname());
@@ -415,6 +416,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableNameInVisitor() {
+    requireVisitor();
+
     BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
 
     bmgr.visit(

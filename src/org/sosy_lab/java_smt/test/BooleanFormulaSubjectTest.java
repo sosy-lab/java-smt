@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.booleanFormulasOf;
 
 import com.google.common.base.Throwables;
@@ -93,6 +94,11 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() {
+    assume()
+        .withMessage("Solver does not support unsat core generation in a usable way")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());
     assertThat(failure).factValue("which has unsat core").isNotEmpty();
@@ -119,6 +125,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsUnsatisfiableNo() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(simpleFormula).isUnsatisfiable());
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -143,6 +150,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsTautologicalNo1() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(simpleFormula).isTautological());
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -150,6 +158,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsTautologicalNo2() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isTautological());
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -172,6 +181,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsEquivalentToNo() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(simpleFormula).isEquivalentTo(tautology));
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -191,6 +201,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
     AssertionError failure =
         expectFailure(
             whenTesting -> whenTesting.that(simpleFormula).isEquisatisfiableTo(simpleFormula2));
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -203,6 +214,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testImpliesNo() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(tautology).implies(simpleFormula));
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 

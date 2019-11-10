@@ -108,6 +108,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
+    requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(true);
     Truth.assertThat(bmgr.toConjunctionArgs(input, false)).isEmpty();
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
@@ -177,7 +178,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
               bmgr.makeVariable("d"),
               bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
     }
-
+    requireVisitor();
     Truth.assertThat(bmgr.toConjunctionArgs(input, true)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
@@ -185,6 +186,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testDisjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
+    requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(false);
     Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEmpty();
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
@@ -212,6 +214,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
               bmgr.makeVariable("a"),
               bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")));
     }
+    requireVisitor();
     Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.or(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
   }
@@ -268,6 +271,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
               bmgr.makeVariable("d"),
               bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
     }
+    requireVisitor();
     Truth.assertThat(bmgr.toDisjunctionArgs(input, true)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);

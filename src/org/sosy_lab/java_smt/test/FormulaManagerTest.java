@@ -277,6 +277,9 @@ public class FormulaManagerTest extends SolverBasedTest0 {
                       bvmgr.makeBitvector(8, 10)),
                   bvmgr.makeVariable(8, "y")),
               bvmgr.equal(bvmgr.makeVariable(8, "xx"), bvmgr.makeVariable(8, "zz")));
+
+      requireVisitor();
+
       assertThat(mgr.extractVariables(bvConstr).keySet())
           .containsExactly("x", "y", "z", "xx", "zz");
       assertThat(mgr.extractVariablesAndUFs(bvConstr)).isEqualTo(mgr.extractVariables(bvConstr));
@@ -308,6 +311,9 @@ public class FormulaManagerTest extends SolverBasedTest0 {
                   "uf2",
                   FormulaType.getBitvectorTypeWithSize(8),
                   ImmutableList.of(bvmgr.makeVariable(8, "y"))));
+
+      requireVisitor();
+
       assertThat(mgr.extractVariablesAndUFs(bvConstraint).keySet())
           .containsExactly("uf1", "uf2", "x", "y");
 

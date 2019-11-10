@@ -109,7 +109,14 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
+  }
+
+  private void requireIntegers() {
+    assume()
+        .withMessage("Solver %s does not support integer theory", translateFrom)
+        .that(translateFrom)
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   @Test
@@ -134,6 +141,8 @@ public class TranslateFormulaTest {
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {
+    requireIntegers();
+
     BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
     IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
     IntegerFormula x = ifmgr.makeVariable("x");
