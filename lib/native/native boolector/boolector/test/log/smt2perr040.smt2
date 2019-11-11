@@ -1,2 +1,0 @@
-(declare-fun a () (Array (
-;

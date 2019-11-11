@@ -1,6 +1,0 @@
-(set-logic QF_BV)
-(declare-fun x () (_ BitVec 4))
-(declare-fun y () (_ BitVec 4))
-(assert (distinct (bvand (concat #x0 x) (concat y #x0)) #x00))
-(check-sat)
-(exit)

@@ -1,8 +1,0 @@
-(benchmark root5
-:logic QF_BV
-:extrafuns ((a BitVec[1]))
-:extrafuns ((b BitVec[1]))
-:formula
-(let (?e4 (bvurem a b))
-(let (?e5 (bvand b ?e4))
- (not (= ?e5 bv0[1])))))

@@ -1,2 +1,0 @@
-(assert (let (( 
-  #x12
