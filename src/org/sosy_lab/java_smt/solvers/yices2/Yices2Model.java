@@ -72,7 +72,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   private final long model;
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
-  private static final boolean DEBUG_MODEL = true;
+  private static final boolean DEBUG_MODEL = false;
   private boolean closed = false;
 
   protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {

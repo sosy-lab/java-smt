@@ -392,7 +392,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_ARITH_SUM:
         return FunctionDeclarationKind.ADD;
       case YICES_POWER_PRODUCT:
-        System.out.println("Term type: " + yices_type_to_string(yices_type_of_term(pF)));
         if (yices_type_is_bitvector(yices_type_of_term(pF))) {
           return FunctionDeclarationKind.BV_MUL;
         } else {
