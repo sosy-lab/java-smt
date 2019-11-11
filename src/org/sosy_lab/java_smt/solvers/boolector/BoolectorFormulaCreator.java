@@ -123,20 +123,23 @@ public class BoolectorFormulaCreator
 
   @Override
   public BooleanFormula encapsulateBoolean(Long pTerm) {
-    assert getFormulaType(pTerm).isBooleanType();
+    assert getFormulaType(pTerm).isBooleanType()
+        : "Unexpected formula type for Boolean formula: " + getFormulaType(pTerm);
     return new BoolectorBooleanFormula(pTerm, btor);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Long pTerm) {
-    assert getFormulaType(pTerm).isBitvectorType();
+    assert getFormulaType(pTerm).isBitvectorType()
+        : "Unexpected formula type for BV formula: " + getFormulaType(pTerm);
     return new BoolectorBitvectorFormula(pTerm, btor);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    assert getFormulaType(pTerm).isArrayType();
+    assert getFormulaType(pTerm).isArrayType()
+        : "Unexpected formula type for array formula: " + getFormulaType(pTerm);
     return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, btor);
   }
 
