@@ -211,7 +211,7 @@
         <exec executable="patchelf" dir="${boolector.path}/build/lib/">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="--replace-needed"/><arg value="libminisat.so.2"/><arg value="libminisat.so"/>
-            <arg value="libcvc4parser.so"/>
+            <arg value="libboolector.so"/>
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
