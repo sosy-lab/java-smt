@@ -21,7 +21,10 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import java.math.BigInteger;
 import java.util.List;
@@ -45,13 +48,15 @@ public class BoolectorFormulaCreator
 
   // Boolector can give back 'x' for a arbitrary value that we change to this
   private static final char ARBITRARY_VALUE = '1';
-  private final BoolectorVariablesCache cache;
+
+  /** Maps a name and a variable or function type to a concrete formula node. */
+  private final Table<String, Long, Long> nameFormulaCache = HashBasedTable.create();
+
   private final long btor;
 
   BoolectorFormulaCreator(BoolectorEnvironment pEnv) {
     super(pEnv, pEnv.getBoolSort(), null, null);
     this.btor = getEnv().getBtor();
-    cache = new BoolectorVariablesCache(btor);
   }
 
   @SuppressWarnings("unchecked")
@@ -156,18 +161,15 @@ public class BoolectorFormulaCreator
   // one, potentially with a new internal name (see cache).
   @Override
   public Long makeVariable(Long type, String varName) {
-    String newName = varName;
-    if (cache.isNameUsed(varName)) {
-      Long maybeFormula = cache.getExistingFormula(varName, type);
-      if (cache.getExistingFormula(varName, type) != null) {
-        return maybeFormula;
-      } else {
-        // TODO throw exception: variable declared twice with different types?
-        newName = cache.getNewVarName(varName);
-      }
+    Long maybeFormula = nameFormulaCache.get(varName, type);
+    if (maybeFormula != null) {
+      return maybeFormula;
     }
-    long newVar = BtorJNI.boolector_var(btor, type, newName);
-    cache.enterNewFormula(newName, varName, newVar);
+    if (nameFormulaCache.containsRow(varName)) {
+      throw new IllegalArgumentException("Symbol already used: " + varName);
+    }
+    long newVar = BtorJNI.boolector_var(btor, type, varName);
+    nameFormulaCache.put(varName, type, newVar);
     return newVar;
   }
 
@@ -225,29 +227,27 @@ public class BoolectorFormulaCreator
 
   @Override
   public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
+    Preconditions.checkArgument(
+        !pArgs.isEmpty(), "Boolector does not support UFs without arguments.");
     return BtorJNI.boolector_apply(btor, Longs.toArray(pArgs), pArgs.size(), pDeclaration);
   }
 
   @Override
   public Long declareUFImpl(String name, Long pReturnType, List<Long> pArgTypes) {
+    Preconditions.checkArgument(
+        !pArgTypes.isEmpty(), "Boolector does not support UFs without arguments.");
+
     long[] funSorts = Longs.toArray(pArgTypes);
-    long sort;
-    String newUfName = name;
-    if (pArgTypes.isEmpty()) {
-      sort = pReturnType;
-    } else {
-      sort = BtorJNI.boolector_fun_sort(btor, funSorts, funSorts.length, pReturnType);
+    long sort = BtorJNI.boolector_fun_sort(btor, funSorts, funSorts.length, pReturnType);
+    Long maybeFormula = nameFormulaCache.get(name, sort);
+    if (maybeFormula != null) {
+      return maybeFormula;
     }
-    if (cache.isNameUsed(name)) {
-      Long maybeFormula = cache.getExistingFormula(name, sort);
-      if (cache.getExistingFormula(name, sort) != null) {
-        return maybeFormula;
-      } else {
-        newUfName = cache.getNewVarName(name);
-      }
+    if (nameFormulaCache.containsRow(name)) {
+      throw new IllegalArgumentException("Symbol already used: " + name);
     }
-    Long uf = BtorJNI.boolector_uf(btor, sort, newUfName);
-    cache.enterNewFormula(newUfName, name, uf);
+    long uf = BtorJNI.boolector_uf(btor, sort, name);
+    nameFormulaCache.put(name, sort, uf);
     return uf;
   }
 
@@ -332,7 +332,7 @@ public class BoolectorFormulaCreator
   }
 
   String getName(long pKey) {
-    return cache.getJavaSMTVarName(BtorJNI.boolector_get_symbol(btor, pKey));
+    return BtorJNI.boolector_get_symbol(btor, pKey);
   }
 
   @Override
@@ -358,8 +358,8 @@ public class BoolectorFormulaCreator
    *
    * @return variables cache.
    */
-  protected BoolectorVariablesCache getCache() {
-    return cache;
+  protected Table<String, Long, Long> getCache() {
+    return nameFormulaCache;
   }
 
   @Override

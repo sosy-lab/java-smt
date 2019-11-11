@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import com.google.common.collect.Table;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -27,13 +28,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 public class BoolectorArrayFormulaManager
     extends AbstractArrayFormulaManager<Long, Long, BoolectorEnvironment, Long> {
 
-  private final BoolectorVariablesCache cache;
   private final long btor;
+  private final Table<String, Long, Long> nameFormulaCache;
 
   BoolectorArrayFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
     this.btor = pCreator.getEnv().getBtor();
-    this.cache = pCreator.getCache();
+    this.nameFormulaCache = pCreator.getCache();
   }
 
   // pIndex should be a bitVector
@@ -56,25 +57,18 @@ public class BoolectorArrayFormulaManager
     }
     BitvectorType indexType = (BitvectorType) pIndexType;
     BitvectorType elementType = (BitvectorType) pElementType;
-    if (indexType.getSize() != elementType.getSize()) {
-      throw new IllegalArgumentException(
-          "The bitvectors mapping the array index to the array elements must have the same width.");
-    }
-    String newArrayName = name;
     final long indexSort = BtorJNI.boolector_bitvec_sort(btor, indexType.getSize());
     final long elementSort = BtorJNI.boolector_bitvec_sort(btor, elementType.getSize());
     final long arraySort = BtorJNI.boolector_array_sort(btor, indexSort, elementSort);
-
-    if (cache.isNameUsed(name)) {
-      Long maybeFormula = cache.getExistingFormula(name, arraySort);
-      if (maybeFormula != null) {
-        return maybeFormula;
-      } else {
-        newArrayName = cache.getNewVarName(name);
-      }
+    Long maybeFormula = nameFormulaCache.get(name, arraySort);
+    if (maybeFormula != null) {
+      return maybeFormula;
     }
-    final long array = BtorJNI.boolector_array(btor, arraySort, newArrayName);
-    cache.enterNewFormula(newArrayName, name, array);
+    if (nameFormulaCache.containsRow(name)) {
+      throw new IllegalArgumentException("Symbol already used: " + name);
+    }
+    final long array = BtorJNI.boolector_array(btor, arraySort, name);
+    nameFormulaCache.put(name, arraySort, array);
     return array;
   }
 
