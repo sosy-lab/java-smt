@@ -61,13 +61,10 @@ class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  public Long makeBitvectorImpl(int pLength, long pParam1) {
-    int i = (int) pParam1;
-    if (i == pParam1) {
-      long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
-      return BtorJNI.boolector_int(btor, i, sort);
-    }
-    return makeBitvectorImpl(pLength, BigInteger.valueOf(pParam1));
+  public Long makeBitvectorImpl(int pLength, BigInteger pI) {
+    pI = transformValueToRange(pLength, pI);
+    long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
+    return BtorJNI.boolector_constd(btor, sort, pI.toString());
   }
 
   @Override
@@ -172,13 +169,6 @@ class BoolectorBitvectorFormulaManager
   @Override
   public Long xor(Long bitVec1, Long bitVec2) {
     return boolector_xor(btor, bitVec1, bitVec2);
-  }
-
-  @Override
-  public Long makeBitvectorImpl(int pLength, BigInteger pI) {
-    checkRange(pLength, pI);
-    long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
-    return BtorJNI.boolector_constd(btor, sort, pI.toString());
   }
 
   @Override

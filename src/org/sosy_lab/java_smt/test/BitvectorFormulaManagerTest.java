@@ -126,7 +126,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   public void bvSmallNum() {
     if (solver == Solvers.BOOLECTOR) {
-      bvmgr.makeBitvector(2, -3); // value -3 should be possible for size 2
+      bvmgr.makeBitvector(2, -1); // value -1 should be possible for size 2
     } else {
       bvmgr.makeBitvector(1, -1); // value -1 should be possible for size 1
     }
