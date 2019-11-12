@@ -772,7 +772,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   private void checkArgsLength(String kind, List<Integer> pArgs, final int expectedLength) {
     Preconditions.checkArgument(
         pArgs.size() == expectedLength,
-        "%s with %d expected arguments was called with unexpected arguments: %s",
+        "%s with %s expected arguments was called with unexpected arguments: %s",
         kind,
         expectedLength,
         Collections2.transform(pArgs, a -> yices_term_to_string(a)));
