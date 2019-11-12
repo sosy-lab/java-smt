@@ -223,6 +223,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   public void testDivision() throws SolverException, InterruptedException {
     T a = nmgr.makeVariable("a");
 
+    // (a == 2) && (3 == 6 / a)
     BooleanFormula f =
         bmgr.and(
             nmgr.equal(a, nmgr.makeNumber(2)),

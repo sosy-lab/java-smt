@@ -35,7 +35,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_f
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_arithmetic;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -54,7 +53,7 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   protected boolean isNumeral(Integer pVal) {
-    return yices_term_is_arithmetic(pVal);
+    return yices_term_constructor(pVal) == YICES_ARITH_CONST;
   }
 
   @Override
@@ -100,7 +99,7 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   public Integer multiply(Integer pParam1, Integer pParam2) {
-    if (consistsOfNumerals(pParam1) || consistsOfNumerals(pParam2)) {
+    if (isNumeral(pParam1) || isNumeral(pParam2)) {
       return yices_mul(pParam1, pParam2);
     } else {
       return super.multiply(pParam1, pParam2);
@@ -145,10 +144,5 @@ abstract class Yices2NumeralFormulaManager<
   @Override
   protected Integer floor(Integer pNumber) {
     return yices_floor(pNumber);
-  }
-
-  protected final boolean consistsOfNumerals(Integer pParam) {
-    // This check helps with non-linear arithmetics, which is unsupported in default Yices2.
-    return yices_term_constructor(pParam) == YICES_ARITH_CONST;
   }
 }

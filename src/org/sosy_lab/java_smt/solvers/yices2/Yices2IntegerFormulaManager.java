@@ -53,7 +53,7 @@ public class Yices2IntegerFormulaManager
 
   @Override
   public Integer divide(Integer pParam1, Integer pParam2) {
-    if (consistsOfNumerals(pParam2)) {
+    if (isNumeral(pParam2)) {
       return yices_idiv(pParam1, pParam2);
     } else {
       return super.divide(pParam1, pParam2);
@@ -62,7 +62,7 @@ public class Yices2IntegerFormulaManager
 
   @Override
   public Integer modulo(Integer pParam1, Integer pParam2) {
-    if (consistsOfNumerals(pParam2)) {
+    if (isNumeral(pParam2)) {
       return yices_imod(pParam1, pParam2);
     } else {
       return super.modulo(pParam1, pParam2);

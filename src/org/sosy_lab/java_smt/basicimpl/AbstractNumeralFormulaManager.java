@@ -352,7 +352,8 @@ public abstract class AbstractNumeralFormulaManager<
         if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
           result = makeUf(multUfDecl, param1, param2);
         } else {
-          assert nonLinearArithmetic == NonLinearArithmetic.USE;
+          assert nonLinearArithmetic == NonLinearArithmetic.USE
+              : "unexpected handling of nonlinear arithmetics: " + nonLinearArithmetic;
           throw e;
         }
       }
