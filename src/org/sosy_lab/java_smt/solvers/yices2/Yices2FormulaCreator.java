@@ -134,6 +134,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -632,7 +633,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   /** get the "X", "Y", and "Z" from "(concat X Y Z)". */
   private static List<Integer> getConcatArgs(int parent) {
-    LinkedHashSet<Integer> result = new LinkedHashSet<>();
+    Set<Integer> result = new LinkedHashSet<>(); // ordering is important!
     for (int child : getArgs(parent)) {
       result.add(yices_proj_arg(child));
     }
