@@ -129,7 +129,6 @@ import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -306,20 +305,26 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     }
   }
 
-  private static FunctionDeclarationKind getExtendKind(Integer pF) {
-    if (yices_term_is_projection(yices_term_child(pF, 0))) {
-      int bv = yices_proj_arg(yices_term_child(pF, 0));
+  /** get the kind of function from the first (or more) array elements. */
+  private static FunctionDeclarationKind getArrayKind(Integer array) {
+    Preconditions.checkArgument(YICES_BV_ARRAY == yices_term_constructor(array));
+    Preconditions.checkArgument(yices_term_num_children(array) > 0);
+    int firstChild = yices_term_child(array, 0);
+    //    System.out.println(
+    //        yices_term_to_string(firstChild) + " -- " + yices_term_constructor(firstChild));
+    if (yices_term_is_projection(firstChild)) {
+      int bv = yices_proj_arg(firstChild);
       int bvSize = yices_term_bitsize(bv);
-      int extendedBy = yices_term_num_children(pF) - bvSize;
+      int extendedBy = yices_term_num_children(array) - bvSize;
       if (extendedBy != 0) {
-        if (yices_term_child(pF, bvSize) == yices_false()) {
+        if (yices_term_child(array, bvSize) == yices_false()) {
           return FunctionDeclarationKind.BV_ZERO_EXTENSION;
         } else {
           return FunctionDeclarationKind.BV_SIGN_EXTENSION;
         }
       }
     }
-    return null;
+    return FunctionDeclarationKind.OTHER;
   }
 
   private FunctionDeclarationKind getDeclarationKind(int pF) {
@@ -380,7 +385,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_RDIV:
         return FunctionDeclarationKind.DIV;
       case YICES_IDIV:
-        return FunctionDeclarationKind.DIV; // correct?
+        return FunctionDeclarationKind.DIV;
       case YICES_SELECT_TERM:
         return FunctionDeclarationKind.SELECT;
       case YICES_BV_SUM:
@@ -393,14 +398,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         } else {
           return FunctionDeclarationKind.MUL;
         }
+      case YICES_BV_ARRAY:
+        return getArrayKind(pF);
 
       default:
-        if (constructor == YICES_BV_ARRAY) {
-          FunctionDeclarationKind possibleExtend = getExtendKind(pF);
-          if (possibleExtend != null) {
-            return possibleExtend;
-          }
-        } else if (constructor == YICES_BIT_TERM) {
+        if (constructor == YICES_BIT_TERM) {
           // TODO Visit bit(t i) in meaningful way
         }
         return FunctionDeclarationKind.OTHER;
@@ -453,18 +455,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getExtendArgs(int parent) {
-    List<Integer> children = new ArrayList<>();
     int bv = yices_proj_arg(yices_term_child(parent, 0));
     int bvSize = yices_term_bitsize(bv);
-    int extendedBy = yices_term_num_children(parent) - bvSize;
-    if (extendedBy > 0) {
-      for (int i = 0; i < yices_term_num_children(parent); i++) {
-        children.add(yices_term_child(parent, i));
-      }
-    } else {
-      throw new IllegalArgumentException("Not a bv extension term.");
-    }
-    return children;
+    Preconditions.checkArgument(
+        yices_term_num_children(parent) > bvSize, "Not a bv extension term.");
+    return getArgs(parent);
   }
 
   private static List<Integer> getSumArgs(int parent) {
