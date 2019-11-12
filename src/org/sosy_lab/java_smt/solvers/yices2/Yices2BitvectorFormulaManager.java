@@ -23,8 +23,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvadd;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvand2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvashr;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconcat2;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_int32;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvdiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bveq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvextract;
@@ -64,26 +62,16 @@ public class Yices2BitvectorFormulaManager
   }
 
   @Override
-  protected Integer makeBitvectorImpl(int pLength, long pParam1) {
-    if (Long.signum(pParam1) < 0) {
-      long max = (long) Math.pow(2, (pLength - 1));
-      if (Math.abs(pParam1) > max) {
-        throw new IllegalArgumentException(
-            pParam1 + " can not be represented as a signed bv of length " + pLength);
-      }
-    } else {
-      long max = (long) Math.pow(2, pLength);
-      if (pParam1 >= max) {
-        throw new IllegalArgumentException(
-            pParam1 + " can not be represented as a signed bv of length " + pLength);
-      }
+  protected Integer makeBitvectorImpl(int pLength, BigInteger pI) {
+    pI = transformValueToRange(pLength, pI);
+    String bits = pI.toString(2);
+    assert bits.length() <= pLength
+        : "numeral value " + pI + " is out of range for size " + pLength;
+    if (bits.length() < pLength) {
+      bits = Strings.padStart(bits, pLength, '0');
     }
-    int i = (int) pParam1;
-    if (i == pParam1) {
-      return yices_bvconst_int32(pLength, i);
-    } else {
-      return yices_bvconst_int64(pLength, pParam1);
-    }
+    Preconditions.checkArgument(bits.length() == pLength, "Bitvector has unexpected size.");
+    return yices_parse_bvbin(bits);
   }
 
   @Override
@@ -191,27 +179,6 @@ public class Yices2BitvectorFormulaManager
   @Override
   protected Integer xor(Integer pParam1, Integer pParam2) {
     return yices_bvxor2(pParam1, pParam2);
-  }
-
-  @Override
-  protected Integer makeBitvectorImpl(int pLength, BigInteger pI) {
-    if (pI.signum() < 0) {
-      BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
-      if (pI.compareTo(max.negate()) < 0) {
-        throw new IllegalArgumentException(
-            pI + " is to small for a bitvector with length " + pLength);
-      }
-      BigInteger n = BigInteger.valueOf(2).pow(pLength);
-      pI = pI.add(n);
-    }
-    String bits = pI.toString(2);
-    if (bits.length() > pLength) {
-      bits = bits.substring(bits.length() - pLength, bits.length());
-    } else if (bits.length() < pLength) {
-      bits = Strings.padStart(bits, pLength, '0');
-    }
-    Preconditions.checkArgument(bits.length() == pLength, "Bitvector has unexpected size.");
-    return yices_parse_bvbin(bits);
   }
 
   @Override
