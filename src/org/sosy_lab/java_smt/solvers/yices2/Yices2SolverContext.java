@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_major_version;
@@ -107,7 +106,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public void close() {
     yices_free_config(yicesConfig);
     yices_free_context(yicesEnvironment);
-    yices_exit();
+    // yices_exit(); // exit disabled, because it crashes parallel Yices2 instances
   }
 
   @Override
