@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
@@ -248,6 +249,12 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void redundancyTest() {
+    assume()
+        .withMessage(
+            "Solver %s does not remove redundant sub formulae from formula dump.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
