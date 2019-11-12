@@ -31,9 +31,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to
 
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -83,50 +81,43 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       public void appendTo(Appendable out) throws IOException {
         Map<String, Formula> varsAndUFs =
             extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(formula));
-        Iterator<Entry<String, Formula>> it = varsAndUFs.entrySet().iterator();
-        if (varsAndUFs.isEmpty()) {
-          // do nothing, formula is simple bool value
-        } else {
-          while (it.hasNext()) {
-            Map.Entry<String, Formula> entry = it.next();
-            Yices2Formula yicesForm = (Yices2Formula) entry.getValue();
-            int term = yicesForm.getTerm();
-            int type;
-            if (yices_term_constructor(term) == YICES_APP_TERM) {
-              // Is an UF. Correct type is carried by first child.
-              type = yices_type_of_term(yices_term_child(term, 0));
-            } else {
-              type = yices_type_of_term(term);
-            }
-            int[] types;
-            if (yices_type_num_children(type) == 0) {
-              types = new int[1];
-              types[0] = type;
-            } else {
-              types = yices_type_children(type);
-            }
-            if (types.length > 0) {
-              out.append("(declare-fun ");
-              out.append(PrintTerm.quoteIdentifier(entry.getKey()));
-              out.append(" (");
-              for (int i = 0; i < types.length - 1; i++) {
-                String typeDecl = yices_type_to_string(types[i]);
-                typeDecl = typeDecl.substring(0, 1).toUpperCase() + typeDecl.substring(1);
-                out.append(typeDecl);
-                if (i + 1 < types.length - 1) {
-                  out.append(' ');
-                }
+        for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
+          final int term = ((Yices2Formula) entry.getValue()).getTerm();
+          final int type;
+          if (yices_term_constructor(term) == YICES_APP_TERM) {
+            // Is an UF. Correct type is carried by first child.
+            type = yices_type_of_term(yices_term_child(term, 0));
+          } else {
+            type = yices_type_of_term(term);
+          }
+          final int[] types;
+          if (yices_type_num_children(type) == 0) {
+            types = new int[] {type};
+          } else {
+            types = yices_type_children(type); // adds children types and then return type
+          }
+          if (types.length > 0) {
+            out.append("(declare-fun ");
+            out.append(PrintTerm.quoteIdentifier(entry.getKey()));
+            out.append(" (");
+            for (int i = 0; i < types.length - 1; i++) {
+              out.append(getTypeRepr(types[i]));
+              if (i + 1 < types.length - 1) {
+                out.append(' ');
               }
-              out.append(") ");
-              String retDecl = yices_type_to_string(types[types.length - 1]);
-              retDecl = retDecl.substring(0, 1).toUpperCase() + retDecl.substring(1);
-              out.append(retDecl);
-              out.append(")\n");
             }
+            out.append(") ");
+            out.append(getTypeRepr(types[types.length - 1]));
+            out.append(")\n");
           }
         }
         // TODO fold formula to avoid exp. overhead
         out.append("(assert " + yices_term_to_string(formula) + ")");
+      }
+
+      private String getTypeRepr(int type) {
+        String typeRepr = yices_type_to_string(type);
+        return typeRepr.substring(0, 1).toUpperCase() + typeRepr.substring(1);
       }
     };
   }
