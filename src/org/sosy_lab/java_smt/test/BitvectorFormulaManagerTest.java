@@ -155,6 +155,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToInt() throws SolverException, InterruptedException {
+    requireBitvectorToInt();
     for (int size : new int[] {1, 2, 4, 8}) {
       int max = 1 << size;
       // number is in range of bitsize
@@ -178,6 +179,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEquality() throws SolverException, InterruptedException {
+    requireBitvectorToInt();
     for (int size : new int[] {10, 16, 20, 32, 64}) {
       for (int i : new int[] {1, 2, 4, 32, 64, 100}) {
         // number is in range of bitsize
@@ -202,6 +204,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEqualityWithOverflow() throws SolverException, InterruptedException {
+    requireBitvectorToInt();
     for (int size : SOME_SIZES) {
       for (int i : SOME_NUMBERS) {
         // number might be larger than range of bitsize
@@ -223,6 +226,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEqualityWithOverflowNegative() throws SolverException, InterruptedException {
+    requireBitvectorToInt();
     for (int size : SOME_SIZES) {
       for (int i : SOME_NUMBERS) {
         // make number negative
@@ -245,6 +249,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException {
+    requireBitvectorToInt();
     for (int size : new int[] {1, 2, 4, 8}) {
       IntegerFormula var = imgr.makeVariable("x_" + size);
 
