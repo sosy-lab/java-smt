@@ -65,6 +65,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_co
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bv_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvarray;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvashr;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_from_array;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvdiv;
@@ -272,6 +273,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           case BV_ADD:
             yicesArgs = getBvSumArgs(pF);
             break;
+          case BV_AND:
+          case BV_OR:
+            yicesArgs = getBvArgs(pF, kind);
+            break;
           case BV_MUL:
             yicesArgs = getMultiplyArgs(pF);
             break;
@@ -280,7 +285,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             break;
           case BV_SIGN_EXTENSION:
           case BV_ZERO_EXTENSION:
-            yicesArgs = getExtendArgs(pF);
+            int bv = yices_proj_arg(yices_term_child(pF, 0));
+            int bvSize = yices_term_bitsize(bv);
+            Preconditions.checkArgument(
+                yices_term_num_children(pF) > bvSize, "Not a bv extension term.");
+            yicesArgs = getArgs(pF);
             break;
           default:
             // special case for AND
@@ -323,6 +332,21 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           return FunctionDeclarationKind.BV_SIGN_EXTENSION;
         }
       }
+    }
+    int constructor = yices_term_constructor(firstChild);
+    switch (constructor) {
+      case YICES_EQ_TERM:
+        return FunctionDeclarationKind.BV_EQ;
+      case YICES_NOT_TERM:
+        if (isNestedConjunction(firstChild)) {
+          return FunctionDeclarationKind.BV_AND;
+        } else {
+          return FunctionDeclarationKind.BV_NOT;
+        }
+      case YICES_OR_TERM:
+        return FunctionDeclarationKind.BV_OR;
+      case YICES_XOR_TERM:
+        return FunctionDeclarationKind.BV_XOR;
     }
     return FunctionDeclarationKind.OTHER;
   }
@@ -454,14 +478,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return children;
   }
 
-  private static List<Integer> getExtendArgs(int parent) {
-    int bv = yices_proj_arg(yices_term_child(parent, 0));
-    int bvSize = yices_term_bitsize(bv);
-    Preconditions.checkArgument(
-        yices_term_num_children(parent) > bvSize, "Not a bv extension term.");
-    return getArgs(parent);
-  }
-
   private static List<Integer> getSumArgs(int parent) {
     List<Integer> children = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
@@ -501,6 +517,28 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       children.add(component[0]); // add term ignore exponent
     }
     return children;
+  }
+
+  /** convert from [OP(x1,y1),OP(x2,y2),...] to [x1,x2,...] and [y1,y2,...]. */
+  private static List<Integer> getBvArgs(int parent, FunctionDeclarationKind kind) {
+    List<Integer> child1 = new ArrayList<>();
+    List<Integer> child2 = new ArrayList<>();
+    for (int i = 0; i < yices_term_num_children(parent); i++) {
+      int child = yices_term_child(parent, i);
+      List<Integer> args;
+      if (FunctionDeclarationKind.BV_AND == kind) {
+        args = getNestedConjunctionArgs(child);
+      } else {
+        args = getArgs(child);
+      }
+      child1.add(args.get(0));
+      child2.add(args.get(1));
+    }
+    return ImmutableList.of(collapse(child1), collapse(child2));
+  }
+
+  private static Integer collapse(List<Integer> bits) {
+    return yices_bvarray(bits.size(), Ints.toArray(bits));
   }
 
   @Override
