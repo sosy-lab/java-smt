@@ -258,44 +258,40 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         final FunctionDeclarationKind kind = getDeclarationKind(pF);
         final ImmutableList.Builder<Formula> args = ImmutableList.builder();
         final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        final boolean isAnd = kind == FunctionDeclarationKind.AND && isNestedConjunction(pF);
-        final boolean isUF = kind == FunctionDeclarationKind.UF;
-        final boolean isSum = kind == FunctionDeclarationKind.ADD;
-        final boolean isBvAdd = kind == FunctionDeclarationKind.BV_ADD;
-        final boolean isBvMul = kind == FunctionDeclarationKind.BV_MUL;
-        final boolean isMultiply = kind == FunctionDeclarationKind.MUL;
-        final boolean isExtend =
-            (kind == FunctionDeclarationKind.BV_SIGN_EXTENSION)
-                || (kind == FunctionDeclarationKind.BV_ZERO_EXTENSION);
-        List<Integer> yicesArgs;
-        String name;
-        if (isAnd) {
-          name = FunctionDeclarationKind.AND.toString();
-          functionDeclaration = -YICES_AND; // Workaround for unavailable Yices_AND constructor.
-          yicesArgs = getNestedConjunctionArgs(pF);
-        } else if (isUF) {
-          yicesArgs = getArgs(pF);
-          name = yices_term_to_string(yicesArgs.get(0));
-          functionDeclaration = yicesArgs.get(0);
-          yicesArgs.remove(0);
-        } else if (isSum) {
-          name = FunctionDeclarationKind.ADD.toString();
-          yicesArgs = getSumArgs(pF);
-        } else if (isBvAdd) {
-          name = FunctionDeclarationKind.BV_ADD.toString();
-          yicesArgs = getBvSumArgs(pF);
-        } else if (isBvMul) {
-          name = FunctionDeclarationKind.BV_MUL.toString();
-          yicesArgs = getMultiplyArgs(pF);
-        } else if (isMultiply) {
-          name = FunctionDeclarationKind.MUL.toString();
-          yicesArgs = getMultiplyArgs(pF);
-        } else if (isExtend) {
-          name = kind.toString();
-          yicesArgs = getExtendArgs(pF);
-        } else {
-          name = kind.toString();
-          yicesArgs = getArgs(pF);
+        List<Integer> yicesArgs = null;
+        String name = kind.toString();
+        switch (kind) {
+          case UF:
+            yicesArgs = getArgs(pF);
+            name = yices_term_to_string(yicesArgs.get(0));
+            functionDeclaration = yicesArgs.get(0);
+            yicesArgs.remove(0);
+            break;
+          case ADD:
+            yicesArgs = getSumArgs(pF);
+            break;
+          case BV_ADD:
+            yicesArgs = getBvSumArgs(pF);
+            break;
+          case BV_MUL:
+            yicesArgs = getMultiplyArgs(pF);
+            break;
+          case MUL:
+            yicesArgs = getMultiplyArgs(pF);
+            break;
+          case BV_SIGN_EXTENSION:
+          case BV_ZERO_EXTENSION:
+            yicesArgs = getExtendArgs(pF);
+            break;
+          default:
+            // special case for AND
+            if (kind == FunctionDeclarationKind.AND && isNestedConjunction(pF)) {
+              name = FunctionDeclarationKind.AND.toString();
+              functionDeclaration = -YICES_AND; // Workaround for unavailable Yices_AND constructor.
+              yicesArgs = getNestedConjunctionArgs(pF);
+            } else {
+              yicesArgs = getArgs(pF);
+            }
         }
         for (int arg : yicesArgs) {
           FormulaType<?> argumentType = getFormulaType(arg);
