@@ -220,4 +220,58 @@
         </sequential>
     </macrodef>
     <!-- }}} -->
+    <!-- SECTION: Publishing Yices2 {{{1
+         ===============================================================
+    -->
+    <target name="compile-yices2-bindings"
+        description="Compile Yices2 bindings">
+        <sequential>
+           <fail unless="yices2.path">
+               Please specify the path to the Yices2 source folder with the flag -Dyices2.path=/path/to/yices2.
+               The path has to point to the root Yices2 folder.
+           </fail>
+           <fail unless="gmp.path">
+               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
+               The path has to point to the root GMP folder.
+           </fail>
+           <fail unless="gperf.path">
+               Please specify the path to the GPERF source folder with the flag -Dgperf.path=/path/to/gperf.
+               The path has to point to the root GPERF folder.
+           </fail>
+           <exec executable="lib/native/source/yices2j/compile.sh">
+               <arg value="${yices2.path}" />
+               <arg value="${gmp.path}" />
+               <arg value="${gperf.path}" />
+           </exec>
+       </sequential>
+    </target>
+
+    <target name="publish-yices2" depends="compile-yices2-bindings, load-ivy"
+        description="Publish Yices2 binaries to Ivy repo.">
+        <sequential>
+            <fail unless="yices2.version">
+                Please specify the Yices2 version with the flag -Dyices2.version=... .
+            </fail>
+
+            <copy file="lib/native/source/yices2j/libyices2j.so" tofile="libyices2j-${yices2.version}.so"/>
+
+            <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
+            <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+            <fail unless="ivy.hasrepository"
+                message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+            <ivy:publish
+                pubrevision="${yices2.version}"
+                resolver="Sosy-Lab-Publish"
+                artifactspattern="[artifact]-[revision].[ext]"
+                status="release"
+                />
+            <echo>
+                You now want to run
+                svn add repository/${ivy.organisation}/${ivy.module}/*-${yices2.version}*
+                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${yices2.version} of Yices2 Solver"
+                to make the new version publicly available.</echo>
+        </sequential>
+    </target>
+    <!-- }}} -->
 </project>
