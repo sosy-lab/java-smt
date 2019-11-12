@@ -109,7 +109,7 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
   }
 
   @Test
