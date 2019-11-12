@@ -1076,9 +1076,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4);
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4, Solvers.YICES2);
   private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.YICES2);
 
   @Test
   @SuppressWarnings("CheckReturnValue")
