@@ -96,15 +96,7 @@ class Mathsat5BitvectorFormulaManager
 
   @Override
   public Long makeBitvectorImpl(int pLength, BigInteger pI) {
-    if (pI.signum() < 0) {
-      BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
-      if (pI.compareTo(max.negate()) < 0) {
-        throw new IllegalArgumentException(
-            pI + " is to small for a bitvector with length " + pLength);
-      }
-      BigInteger n = BigInteger.valueOf(2).pow(pLength);
-      pI = pI.add(n);
-    }
+    pI = transformValueToRange(pLength, pI);
     return msat_make_bv_number(mathsatEnv, pI.toString(), pLength, 10);
   }
 

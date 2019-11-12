@@ -21,10 +21,13 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -1006,23 +1009,60 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void bvOutOfRange() {
     requireBitvectors();
-    assume()
-        .withMessage("TODO: Z3BitvectorFormulaManager does not correctly implement this")
-        .that(solverToUse())
-        .isNoneOf(Solvers.Z3, Solvers.CVC4);
 
-    try {
-      bvmgr.makeBitvector(4, 32);
-      fail();
-    } catch (IllegalArgumentException expected) {
+    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
+      try {
+        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
     }
 
-    try {
-      bvmgr.makeBitvector(4, -9);
-      fail();
-    } catch (IllegalArgumentException expected) {
+    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
+      // allowed values
+      bvmgr.makeBitvector(size, (1L << size) - 1);
+      bvmgr.makeBitvector(size, -(1L << (size - 1)));
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, 1L << size);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
+
+    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
+      if (size > 64) {
+        assume()
+            .withMessage("Solver does not support large bitvectors")
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.CVC4);
+      }
+
+      // allowed values
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE));
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(
+            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
     }
   }
 
@@ -1033,5 +1073,53 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
+  }
+
+  private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4);
+  private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5);
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void testVariableWithDifferentSort() {
+    assume().that(solverToUse()).isNotIn(VAR_TRACKING_SOLVERS);
+    bmgr.makeVariable("x");
+    imgr.makeVariable("x");
+  }
+
+  @Test(expected = Exception.class) // complement of above test case
+  @SuppressWarnings("CheckReturnValue")
+  public void testFailOnVariableWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_TRACKING_SOLVERS);
+    bmgr.makeVariable("x");
+    imgr.makeVariable("x");
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void testVariableAndUFWithDifferentSort() {
+    assume().that(solverToUse()).isNotIn(VAR_AND_UF_TRACKING_SOLVERS);
+    bmgr.makeVariable("y");
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+  }
+
+  @Test(expected = Exception.class) // complement of above test case
+  @SuppressWarnings("CheckReturnValue")
+  public void testFailOnVariableAndUFWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
+    bmgr.makeVariable("y");
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+  }
+
+  @Test
+  public void testVariableAndUFWithEqualSort() {
+    BooleanFormula z1 = bmgr.makeVariable("z");
+    BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
+    if (ImmutableSet.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
+      assertNotEquals(z1, z2);
+    } else {
+      assertEquals(z1, z2);
+    }
   }
 }
