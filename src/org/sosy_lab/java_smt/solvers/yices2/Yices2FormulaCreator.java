@@ -101,6 +101,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_r
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_index;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
@@ -111,7 +112,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_co
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bool;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_int;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_projection;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_real;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
@@ -125,11 +125,14 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -238,13 +241,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             yices_type_to_string(yices_type_of_term(pFormula)), yices_term_to_string(pFormula)));
   }
 
-  // TODO Visit fails when encountering YICES_BV_ARRAY that is not a bv extend/multiply or
-  // YICES_BIT_TERM
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
-    int functionDeclaration = -constructor; // Map built-in constructors in negative int to avoid
-    // collision with UFs.
     switch (constructor) {
       case YICES_BOOL_CONST:
         return pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
@@ -255,103 +254,185 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       default:
-        final FunctionDeclarationKind kind = getDeclarationKind(pF);
-        final ImmutableList.Builder<Formula> args = ImmutableList.builder();
-        final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        List<Integer> yicesArgs = null;
-        String name = kind.toString();
-        switch (kind) {
-          case UF:
-            yicesArgs = getArgs(pF);
-            name = yices_term_to_string(yicesArgs.get(0));
-            functionDeclaration = yicesArgs.get(0);
-            yicesArgs.remove(0);
-            break;
-          case ADD:
-            yicesArgs = getSumArgs(pF);
-            break;
-          case BV_ADD:
-            yicesArgs = getBvSumArgs(pF);
-            break;
-          case BV_AND:
-          case BV_OR:
-            yicesArgs = getBvArgs(pF, kind);
-            break;
-          case BV_MUL:
-            yicesArgs = getMultiplyArgs(pF);
-            break;
-          case MUL:
-            yicesArgs = getMultiplyArgs(pF);
-            break;
-          case BV_SIGN_EXTENSION:
-          case BV_ZERO_EXTENSION:
-            int bv = yices_proj_arg(yices_term_child(pF, 0));
-            int bvSize = yices_term_bitsize(bv);
-            Preconditions.checkArgument(
-                yices_term_num_children(pF) > bvSize, "Not a bv extension term.");
-            yicesArgs = getArgs(pF);
-            break;
-          default:
-            // special case for AND
-            if (kind == FunctionDeclarationKind.AND && isNestedConjunction(pF)) {
-              name = FunctionDeclarationKind.AND.toString();
-              functionDeclaration = -YICES_AND; // Workaround for unavailable Yices_AND constructor.
-              yicesArgs = getNestedConjunctionArgs(pF);
-            } else {
-              yicesArgs = getArgs(pF);
-            }
-        }
-        for (int arg : yicesArgs) {
-          FormulaType<?> argumentType = getFormulaType(arg);
-          args.add(encapsulate(argumentType, arg));
-          argTypes.add(argumentType);
-        }
-        return pVisitor.visitFunction(
-            pFormula,
-            args.build(),
-            FunctionDeclarationImpl.of(
-                name, kind, argTypes.build(), getFormulaType(pF), functionDeclaration));
+        return visitFunctionApplication(pVisitor, pFormula, pF, constructor);
     }
   }
 
+  private <R> R visitFunctionApplication(
+      FormulaVisitor<R> pVisitor, Formula pFormula, int pF, int constructor) {
+    final FunctionDeclarationKind kind = getDeclarationKind(pF);
+    final ImmutableList.Builder<Formula> args = ImmutableList.builder();
+    final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+
+    // Map built-in constructors in negative int to avoid collision with UFs.
+    int functionDeclaration = -constructor;
+
+    List<Integer> yicesArgs = null;
+    String name = kind.toString();
+    switch (kind) {
+      case UF:
+        yicesArgs = getArgs(pF);
+        name = yices_term_to_string(yicesArgs.get(0));
+        functionDeclaration = yicesArgs.get(0);
+        yicesArgs.remove(0);
+        break;
+      case ADD:
+        yicesArgs = getSumArgs(pF);
+        break;
+      case BV_ADD:
+        yicesArgs = getBvSumArgs(pF);
+        break;
+      case BV_NOT:
+        yicesArgs = getBvArgs(pF, kind, 1);
+        break;
+      case BV_EQ:
+      case BV_AND:
+      case BV_OR:
+      case BV_XOR:
+        yicesArgs = getBvArgs(pF, kind, 2);
+        break;
+      case BV_MUL:
+        yicesArgs = getMultiplyArgs(pF);
+        break;
+      case MUL:
+        yicesArgs = getMultiplyArgs(pF);
+        break;
+      case BV_SIGN_EXTENSION:
+      case BV_ZERO_EXTENSION:
+        yicesArgs = ImmutableList.of(getExtendArg(pF));
+        break;
+      case BV_EXTRACT:
+        yicesArgs = ImmutableList.of(getExtractArg(pF));
+        break;
+      case BV_CONCAT:
+        yicesArgs = getConcatArgs(pF);
+        break;
+      default:
+        // special case for AND
+        if (kind == FunctionDeclarationKind.AND && isNestedConjunction(pF)) {
+          name = FunctionDeclarationKind.AND.toString();
+          functionDeclaration = -YICES_AND; // Workaround for unavailable Yices_AND constructor.
+          yicesArgs = getNestedConjunctionArgs(pF);
+        } else if (kind != FunctionDeclarationKind.OTHER) {
+          yicesArgs = getArgs(pF);
+        } else {
+          throw new AssertionError(
+              "unexpected function " + kind + " for term " + yices_term_to_string(pF));
+          // yicesArgs = ImmutableList.of(pF);
+        }
+    }
+    for (int arg : yicesArgs) {
+      FormulaType<?> argumentType = getFormulaType(arg);
+      args.add(encapsulate(argumentType, arg));
+      argTypes.add(argumentType);
+    }
+    return pVisitor.visitFunction(
+        pFormula,
+        args.build(),
+        FunctionDeclarationImpl.of(
+            name, kind, argTypes.build(), getFormulaType(pF), functionDeclaration));
+  }
+
   /** get the kind of function from the first (or more) array elements. */
-  private static FunctionDeclarationKind getArrayKind(Integer array) {
+  private static FunctionDeclarationKind getArrayKind(int array) {
     Preconditions.checkArgument(YICES_BV_ARRAY == yices_term_constructor(array));
     Preconditions.checkArgument(yices_term_num_children(array) > 0);
-    int firstChild = yices_term_child(array, 0);
-    //    System.out.println(
-    //        yices_term_to_string(firstChild) + " -- " + yices_term_constructor(firstChild));
-    if (yices_term_is_projection(firstChild)) {
-      int bv = yices_proj_arg(firstChild);
-      int bvSize = yices_term_bitsize(bv);
-      int extendedBy = yices_term_num_children(array) - bvSize;
-      if (extendedBy != 0) {
-        if (yices_term_child(array, bvSize) == yices_false()) {
+
+    // get all constructors
+    List<Integer> constructors = new ArrayList<>();
+    for (int child : getArgs(array)) {
+      constructors.add(yices_term_constructor(child));
+    }
+
+    // if all constructors are equal, we can use them directly
+    if (ImmutableSet.copyOf(constructors).size() == 1) {
+      int constructor = constructors.get(0);
+      switch (constructor) {
+        case YICES_EQ_TERM:
+          return FunctionDeclarationKind.BV_EQ;
+        case YICES_NOT_TERM:
+          if (Iterables.all(getArgs(array), Yices2FormulaCreator::isNestedConjunction)) {
+            return FunctionDeclarationKind.BV_AND;
+          } else {
+            return FunctionDeclarationKind.BV_NOT;
+          }
+        case YICES_OR_TERM:
+          return FunctionDeclarationKind.BV_OR;
+        case YICES_XOR_TERM:
+          return FunctionDeclarationKind.BV_XOR;
+      }
+    }
+
+    // check for EXTRACT: incrementing sequence of indices
+    if (isExtractOperation(array)) {
+      return FunctionDeclarationKind.BV_EXTRACT;
+    }
+
+    // check for CONCAT: several ARGs in sequence
+    if (isConcatOperation(array)) {
+      return FunctionDeclarationKind.BV_CONCAT;
+    }
+
+    { // check for EXPAND: initial bits are identical, either FALSE or HIGHEST_BIT
+      int highestChild = yices_term_child(array, yices_term_num_children(array) - 1);
+      int equalPrefix = 0;
+      for (int i = yices_term_num_children(array) - 2; i >= 0; i--) {
+        equalPrefix++;
+        if (highestChild != yices_term_child(array, i)) {
+          break;
+        }
+      }
+      // if we found a sequence of equal terms, if original size is smaller than current term
+      if (equalPrefix > 1) {
+        if (highestChild == yices_false()) {
           return FunctionDeclarationKind.BV_ZERO_EXTENSION;
         } else {
           return FunctionDeclarationKind.BV_SIGN_EXTENSION;
         }
       }
     }
-    int constructor = yices_term_constructor(firstChild);
-    switch (constructor) {
-      case YICES_EQ_TERM:
-        return FunctionDeclarationKind.BV_EQ;
-      case YICES_NOT_TERM:
-        if (isNestedConjunction(firstChild)) {
-          return FunctionDeclarationKind.BV_AND;
-        } else {
-          return FunctionDeclarationKind.BV_NOT;
-        }
-      case YICES_OR_TERM:
-        return FunctionDeclarationKind.BV_OR;
-      case YICES_XOR_TERM:
-        return FunctionDeclarationKind.BV_XOR;
-    }
+
+    // otherwise we do not know
     return FunctionDeclarationKind.OTHER;
   }
 
-  private FunctionDeclarationKind getDeclarationKind(int pF) {
+  private static boolean isExtractOperation(final int array) {
+    List<Integer> indizes = new ArrayList<>();
+    final int arg = yices_proj_arg(yices_term_child(array, 0));
+    for (int child : getArgs(array)) {
+      if (yices_term_constructor(child) == YICES_BIT_TERM) {
+        int index = yices_proj_index(child);
+        if (arg == yices_proj_arg(child)
+            && (indizes.isEmpty() || Iterables.getLast(indizes) == index - 1)) {
+          indizes.add(index);
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean isConcatOperation(final int array) {
+    List<Integer> args = new ArrayList<>();
+    for (int child : getArgs(array)) {
+      if (yices_term_constructor(child) == YICES_BIT_TERM) {
+        int arg = yices_proj_arg(child);
+        if (args.isEmpty() || Iterables.getLast(args) != arg) {
+          args.add(arg);
+        } else {
+          continue;
+        }
+      } else {
+        return false;
+      }
+    }
+    return args.size() > 1; // concat needs more than one element
+  }
+
+  private static FunctionDeclarationKind getDeclarationKind(int pF) {
     List<Integer> constantsAndVariables =
         ImmutableList.of(
             YICES_BOOL_CONST,
@@ -519,25 +600,68 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return children;
   }
 
-  /** convert from [OP(x1,y1),OP(x2,y2),...] to [x1,x2,...] and [y1,y2,...]. */
-  private static List<Integer> getBvArgs(int parent, FunctionDeclarationKind kind) {
-    List<Integer> child1 = new ArrayList<>();
-    List<Integer> child2 = new ArrayList<>();
-    for (int i = 0; i < yices_term_num_children(parent); i++) {
-      int child = yices_term_child(parent, i);
-      List<Integer> args;
-      if (FunctionDeclarationKind.BV_AND == kind) {
-        args = getNestedConjunctionArgs(child);
-      } else {
-        args = getArgs(child);
+  /** remove the identical prefix from the given bitvector. */
+  private static Integer getExtendArg(int parent) {
+    List<Integer> result = new ArrayList<>();
+    boolean takeRest = false;
+    Integer highestBit = null;
+    for (int child : Lists.reverse(getArgs(parent))) {
+      if (highestBit == null) {
+        highestBit = child;
       }
-      child1.add(args.get(0));
-      child2.add(args.get(1));
+      if (takeRest) {
+        result.add(child);
+      } else if (highestBit == child) {
+        continue;
+      } else {
+        takeRest = true;
+        if (highestBit != yices_false()) {
+          result.add(highestBit);
+        }
+        result.add(child);
+      }
     }
-    return ImmutableList.of(collapse(child1), collapse(child2));
+    return collapse(Lists.reverse(result));
   }
 
-  private static Integer collapse(List<Integer> bits) {
+  /** get the "X" from "(extract fromHigh toLow X)". */
+  private static int getExtractArg(int parent) {
+    int firstChild = yices_term_child(parent, 0);
+    return yices_proj_arg(firstChild);
+  }
+
+  /** get the "X", "Y", and "Z" from "(concat X Y Z)". */
+  private static List<Integer> getConcatArgs(int parent) {
+    LinkedHashSet<Integer> result = new LinkedHashSet<>();
+    for (int child : getArgs(parent)) {
+      result.add(yices_proj_arg(child));
+    }
+    return ImmutableList.copyOf(result);
+  }
+
+  /** convert from [OP(x1,y1),OP(x2,y2),...] to [x1,x2,...] and [y1,y2,...]. */
+  private static List<Integer> getBvArgs(
+      int parent, FunctionDeclarationKind kind, int numberOfArgs) {
+    List<List<Integer>> args = new ArrayList<>();
+    for (int ai = 0; ai < numberOfArgs; ai++) {
+      args.add(new ArrayList<>());
+    }
+    for (int i = 0; i < yices_term_num_children(parent); i++) {
+      int child = yices_term_child(parent, i);
+      List<Integer> children;
+      if (FunctionDeclarationKind.BV_AND == kind) {
+        children = getNestedConjunctionArgs(child);
+      } else {
+        children = getArgs(child);
+      }
+      for (int ai = 0; ai < numberOfArgs; ai++) {
+        args.get(ai).add(children.get(ai));
+      }
+    }
+    return Lists.transform(args, Yices2FormulaCreator::collapse);
+  }
+
+  private static int collapse(List<Integer> bits) {
     return yices_bvarray(bits.size(), Ints.toArray(bits));
   }
 
