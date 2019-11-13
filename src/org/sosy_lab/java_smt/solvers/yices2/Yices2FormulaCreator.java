@@ -94,6 +94,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_imod;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_is_int_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
@@ -260,8 +261,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private <R> R visitFunctionApplication(
-      FormulaVisitor<R> pVisitor, Formula pFormula, int pF, int constructor) {
-    final FunctionDeclarationKind kind = getDeclarationKind(pF);
+      FormulaVisitor<R> pVisitor, Formula pFormula, int pF, final int constructor) {
+    final FunctionDeclarationKind kind = getDeclarationKind(pF, constructor);
     final ImmutableList.Builder<Formula> args = ImmutableList.builder();
     final ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
@@ -292,11 +293,19 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case BV_XOR:
         yicesArgs = getBvArgs(pF, kind, 2);
         break;
-      case BV_MUL:
-        yicesArgs = getMultiplyArgs(pF);
-        break;
       case MUL:
-        yicesArgs = getMultiplyArgs(pF);
+      case BV_MUL:
+        switch (constructor) {
+          case YICES_ARITH_SUM:
+            yicesArgs = getMultiplySumArgsFromSum(pF);
+            functionDeclaration = -YICES_POWER_PRODUCT;
+            break;
+          case YICES_POWER_PRODUCT:
+            yicesArgs = getMultiplyArgs(pF);
+            break;
+          default:
+            throw new AssertionError("unhandled multiplication: " + yices_term_to_string(pF));
+        }
         break;
       case BV_SIGN_EXTENSION:
       case BV_ZERO_EXTENSION:
@@ -327,6 +336,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       args.add(encapsulate(argumentType, arg));
       argTypes.add(argumentType);
     }
+
     return pVisitor.visitFunction(
         pFormula,
         args.build(),
@@ -433,7 +443,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return args.size() > 1; // concat needs more than one element
   }
 
-  private static FunctionDeclarationKind getDeclarationKind(int pF) {
+  private static FunctionDeclarationKind getDeclarationKind(int pF, final int constructor) {
     List<Integer> constantsAndVariables =
         ImmutableList.of(
             YICES_BOOL_CONST,
@@ -441,7 +451,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             YICES_BV_CONST,
             YICES_VARIABLE,
             YICES_UNINTERPRETED_TERM);
-    int constructor = yices_term_constructor(pF);
     assert !constantsAndVariables.contains(constructor)
         : String.format(
             "Term %s with constructor %d should be handled somewhere else",
@@ -497,6 +506,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_BV_SUM:
         return FunctionDeclarationKind.BV_ADD;
       case YICES_ARITH_SUM:
+        if (yices_term_num_children(pF) == 1) {
+          return FunctionDeclarationKind.MUL;
+        }
         return FunctionDeclarationKind.ADD;
       case YICES_POWER_PRODUCT:
         if (yices_type_is_bitvector(yices_type_of_term(pF))) {
@@ -569,10 +581,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       if (term == -1) { // No term just a number
         children.add(yices_parse_rational(coeff));
       } else { // return only term / ignores coefficient
-        // int coeffTerm = yices_parse_rational(coeff);
-        // int term = Integer.parseInt(parts[1]);
-        // children.add(yices_mul(coeffTerm, term));
-        children.add(term);
+        int coeffTerm = yices_parse_rational(coeff);
+        children.add(yices_mul(coeffTerm, term));
       }
     }
     return children;
@@ -592,13 +602,23 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return children;
   }
 
+  /** extract -1 and X from the sum of one element [-1*x]. */
+  private static List<Integer> getMultiplySumArgsFromSum(int parent) {
+    Preconditions.checkArgument(yices_term_num_children(parent) == 1);
+    String[] child = yices_sum_component(parent, 0);
+    int term = Integer.parseInt(child[1]);
+    Preconditions.checkArgument(term != -1, "unexpected constant coeff without variable");
+    int coeffTerm = yices_parse_rational(child[0]);
+    return ImmutableList.of(coeffTerm, term);
+  }
+
   private static List<Integer> getMultiplyArgs(int parent) {
-    List<Integer> children = new ArrayList<>();
+    List<Integer> result = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       int[] component = yices_product_component(parent, i);
-      children.add(component[0]); // add term ignore exponent
+      result.add(component[0]); // add term ignore exponent
     }
-    return children;
+    return result;
   }
 
   /** remove the identical prefix from the given bitvector. */

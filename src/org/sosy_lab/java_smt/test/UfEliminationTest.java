@@ -176,6 +176,32 @@ public class UfEliminationTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void nestedUfs3() throws SolverException, InterruptedException {
+    // f := uf(v1) < uf(v2)
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+
+    FunctionDeclaration<IntegerFormula> ufDecl = fmgr.declareUF("uf", IntegerType, IntegerType);
+    IntegerFormula f1 = fmgr.callUF(ufDecl, variable1);
+    IntegerFormula f2 = fmgr.callUF(ufDecl, variable2);
+    BooleanFormula f = imgr.lessThan(f1, f2);
+    BooleanFormula argsEqual = imgr.equal(variable1, variable2);
+
+    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f);
+    assertThatFormula(f).isSatisfiable(); // sanity check
+    assertThatFormula(withOutUfs).isSatisfiable();
+    assertThatFormula(bmgr.and(argsEqual, f)).isUnsatisfiable(); // sanity check
+    assertThatFormula(bmgr.and(argsEqual, withOutUfs)).isUnsatisfiable();
+
+    // check that UFs were really eliminated
+    Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
+    Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf2");
+    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+  }
+
+  @Test
   public void twoFormulasTest() throws SolverException, InterruptedException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
