@@ -69,64 +69,64 @@ abstract class Z3NumeralFormulaManager<
   }
 
   @Override
-  public Long negate(Long pNumber) {
+  protected Long negate(Long pNumber) {
     long sort = Native.getSort(z3context, pNumber);
     long minusOne = Native.mkInt(z3context, -1, sort);
     return Native.mkMul(z3context, 2, new long[] {minusOne, pNumber});
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2) {
+  protected Long add(Long pNumber1, Long pNumber2) {
     return Native.mkAdd(z3context, 2, new long[] {pNumber1, pNumber2});
   }
 
   @Override
-  public Long sumImpl(List<Long> operands) {
+  protected Long sumImpl(List<Long> operands) {
     return Native.mkAdd(z3context, operands.size(), Longs.toArray(operands));
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2) {
+  protected Long subtract(Long pNumber1, Long pNumber2) {
     return Native.mkSub(z3context, 2, new long[] {pNumber1, pNumber2});
   }
 
   @Override
-  public Long divide(Long pNumber1, Long pNumber2) {
+  protected Long divide(Long pNumber1, Long pNumber2) {
     return Native.mkDiv(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2) {
+  protected Long multiply(Long pNumber1, Long pNumber2) {
     return Native.mkMul(z3context, 2, new long[] {pNumber1, pNumber2});
   }
 
   @Override
-  public Long equal(Long pNumber1, Long pNumber2) {
+  protected Long equal(Long pNumber1, Long pNumber2) {
     return Native.mkEq(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long distinctImpl(List<Long> pNumbers) {
+  protected Long distinctImpl(List<Long> pNumbers) {
     return Native.mkDistinct(z3context, pNumbers.size(), Longs.toArray(pNumbers));
   }
 
   @Override
-  public Long greaterThan(Long pNumber1, Long pNumber2) {
+  protected Long greaterThan(Long pNumber1, Long pNumber2) {
     return Native.mkGt(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long greaterOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkGe(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessThan(Long pNumber1, Long pNumber2) {
+  protected Long lessThan(Long pNumber1, Long pNumber2) {
     return Native.mkLt(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkLe(z3context, pNumber1, pNumber2);
   }
 }

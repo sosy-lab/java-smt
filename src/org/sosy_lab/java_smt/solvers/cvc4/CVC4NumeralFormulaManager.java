@@ -71,7 +71,7 @@ abstract class CVC4NumeralFormulaManager<
   protected abstract Type getNumeralType();
 
   @Override
-  public boolean isNumeral(Expr pVal) {
+  protected boolean isNumeral(Expr pVal) {
     return (pVal.getType().isInteger() || pVal.getType().isReal()) && pVal.isConst();
   }
 
@@ -134,7 +134,7 @@ abstract class CVC4NumeralFormulaManager<
   }
 
   @Override
-  public Expr multiply(Expr pParam1, Expr pParam2) {
+  protected Expr multiply(Expr pParam1, Expr pParam2) {
     if (consistsOfNumerals(pParam1) || consistsOfNumerals(pParam2)) {
       return exprManager.mkExpr(Kind.MULT, pParam1, pParam2);
     } else {
@@ -143,47 +143,47 @@ abstract class CVC4NumeralFormulaManager<
   }
 
   @Override
-  public Expr modulo(Expr pParam1, Expr pParam2) {
+  protected Expr modulo(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.INTS_MODULUS, pParam1, pParam2);
   }
 
   @Override
-  public Expr negate(Expr pParam1) {
+  protected Expr negate(Expr pParam1) {
     return exprManager.mkExpr(Kind.UMINUS, pParam1);
   }
 
   @Override
-  public Expr add(Expr pParam1, Expr pParam2) {
+  protected Expr add(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.PLUS, pParam1, pParam2);
   }
 
   @Override
-  public Expr subtract(Expr pParam1, Expr pParam2) {
+  protected Expr subtract(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.MINUS, pParam1, pParam2);
   }
 
   @Override
-  public Expr equal(Expr pParam1, Expr pParam2) {
+  protected Expr equal(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
 
   @Override
-  public Expr greaterThan(Expr pParam1, Expr pParam2) {
+  protected Expr greaterThan(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.GT, pParam1, pParam2);
   }
 
   @Override
-  public Expr greaterOrEquals(Expr pParam1, Expr pParam2) {
+  protected Expr greaterOrEquals(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.GEQ, pParam1, pParam2);
   }
 
   @Override
-  public Expr lessThan(Expr pParam1, Expr pParam2) {
+  protected Expr lessThan(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.LT, pParam1, pParam2);
   }
 
   @Override
-  public Expr lessOrEquals(Expr pParam1, Expr pParam2) {
+  protected Expr lessOrEquals(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.LEQ, pParam1, pParam2);
   }
 
