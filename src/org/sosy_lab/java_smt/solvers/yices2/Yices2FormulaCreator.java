@@ -323,12 +323,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           name = FunctionDeclarationKind.AND.toString();
           functionDeclaration = -YICES_AND; // Workaround for unavailable Yices_AND constructor.
           yicesArgs = getNestedConjunctionArgs(pF);
-        } else if (kind != FunctionDeclarationKind.OTHER) {
-          yicesArgs = getArgs(pF);
         } else {
-          throw new AssertionError(
-              "unexpected function " + kind + " for term " + yices_term_to_string(pF));
-          // yicesArgs = ImmutableList.of(pF);
+          yicesArgs = getArgs(pF);
         }
     }
     for (int arg : yicesArgs) {
@@ -408,8 +404,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static boolean isExtractOperation(final int array) {
+    int firstChild = yices_term_child(array, 0);
+    if (yices_term_constructor(firstChild) != YICES_BIT_TERM) {
+      return false;
+    }
     List<Integer> indizes = new ArrayList<>();
-    final int arg = yices_proj_arg(yices_term_child(array, 0));
+    final int arg = yices_proj_arg(firstChild);
     for (int child : getArgs(array)) {
       if (yices_term_constructor(child) == YICES_BIT_TERM) {
         int index = yices_proj_index(child);
