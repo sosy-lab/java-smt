@@ -48,6 +48,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ZEXT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ABS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ADD;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_AS_IEEEBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_CAST;
@@ -432,6 +433,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
       case MSAT_TAG_FP_NEG:
         return FunctionDeclarationKind.FP_NEG;
+      case MSAT_TAG_FP_ABS:
+        return FunctionDeclarationKind.FP_ABS;
       case MSAT_TAG_FP_ADD:
         return FunctionDeclarationKind.FP_ADD;
       case MSAT_TAG_FP_SUB:

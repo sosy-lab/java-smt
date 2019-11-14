@@ -370,6 +370,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_ISSN, FunctionDeclarationKind.FP_IS_SUBNORMAL)
           .put(Kind.FLOATINGPOINT_ISZ, FunctionDeclarationKind.FP_IS_ZERO)
           .put(Kind.FLOATINGPOINT_EQ, FunctionDeclarationKind.FP_EQ)
+          .put(Kind.FLOATINGPOINT_ABS, FunctionDeclarationKind.FP_ABS)
           .put(Kind.FLOATINGPOINT_PLUS, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)

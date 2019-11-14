@@ -197,6 +197,9 @@ public enum FunctionDeclarationKind {
   /** Negation of a floating point. */
   FP_NEG,
 
+  /** Absolute value of a floating point. */
+  FP_ABS,
+
   /** Subtraction over floating points. */
   FP_SUB,
 

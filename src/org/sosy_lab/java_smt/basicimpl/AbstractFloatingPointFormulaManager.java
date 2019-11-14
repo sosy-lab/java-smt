@@ -251,6 +251,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
 
   @Override
+  public FloatingPointFormula abs(FloatingPointFormula pNumber) {
+    TFormulaInfo param1 = extractInfo(pNumber);
+    return wrap(abs(param1));
+  }
+
+  protected abstract TFormulaInfo abs(TFormulaInfo pParam1);
+
+  @Override
   public FloatingPointFormula add(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);

@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_abs;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_cast;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_div;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_equal;
@@ -212,6 +213,11 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long negate(Long pNumber) {
     return msat_make_fp_neg(mathsatEnv, pNumber);
+  }
+
+  @Override
+  protected Long abs(Long pNumber) {
+    return msat_make_fp_abs(mathsatEnv, pNumber);
   }
 
   @Override

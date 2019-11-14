@@ -187,6 +187,11 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
+  protected Long abs(Long pNumber) {
+    return Native.mkFpaAbs(z3context, pNumber);
+  }
+
+  @Override
   protected Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaAdd(z3context, pRoundingMode, pNumber1, pNumber2);
   }

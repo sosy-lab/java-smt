@@ -117,11 +117,14 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+      assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.negate(formula), fpmgr.abs(formula)))
+          .isTautological();
     }
     for (double d : new double[] {1, 2, 0.0, Double.POSITIVE_INFINITY}) {
       FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+      assertThatFormula(fpmgr.equalWithFPSemantics(formula, fpmgr.abs(formula))).isTautological();
     }
   }
 
@@ -131,16 +134,20 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+      assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.negate(formula), fpmgr.abs(formula)))
+          .isTautological();
     }
     for (String s : new String[] {"1", "Infinity", "0", "0.0", "0.000"}) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+      assertThatFormula(fpmgr.equalWithFPSemantics(formula, fpmgr.abs(formula))).isTautological();
     }
     for (String s : new String[] {"+1", "+Infinity", "+0", "+0.0", "+0.000"}) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+      assertThatFormula(fpmgr.equalWithFPSemantics(formula, fpmgr.abs(formula))).isTautological();
     }
     // NaN is not positive and not negative.
     for (String s : new String[] {"NaN", "-NaN", "+NaN"}) {

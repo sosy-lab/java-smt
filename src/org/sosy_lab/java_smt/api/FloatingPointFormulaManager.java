@@ -140,6 +140,8 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula negate(FloatingPointFormula number);
 
+  FloatingPointFormula abs(FloatingPointFormula number);
+
   FloatingPointFormula add(FloatingPointFormula number1, FloatingPointFormula number2);
 
   FloatingPointFormula add(

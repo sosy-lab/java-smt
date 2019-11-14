@@ -205,6 +205,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     checkKind(fpmgr.isNormal(x), FunctionDeclarationKind.FP_IS_NORMAL);
     checkKind(fpmgr.isSubnormal(x), FunctionDeclarationKind.FP_IS_SUBNORMAL);
     checkKind(fpmgr.isZero(x), FunctionDeclarationKind.FP_IS_ZERO);
+    checkKind(fpmgr.abs(x), FunctionDeclarationKind.FP_ABS);
     if (Solvers.CVC4 != solverToUse()) { // CVC4 does not support this operation
       checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
     }
