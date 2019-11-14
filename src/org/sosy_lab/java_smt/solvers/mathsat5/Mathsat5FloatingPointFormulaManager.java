@@ -96,7 +96,7 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
+  protected Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
@@ -117,7 +117,7 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeVariableImpl(String var, FloatingPointType type) {
+  protected Long makeVariableImpl(String var, FloatingPointType type) {
     return getFormulaCreator().makeVariable(getFormulaCreator().getFloatingPointType(type), var);
   }
 
@@ -210,22 +210,22 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  public Long negate(Long pNumber) {
+  protected Long negate(Long pNumber) {
     return msat_make_fp_neg(mathsatEnv, pNumber);
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return msat_make_fp_plus(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return msat_make_fp_minus(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return msat_make_fp_times(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }
 
@@ -240,27 +240,27 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  public Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
+  protected Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
     return msat_make_fp_equal(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterThan(Long pNumber1, Long pNumber2) {
+  protected Long greaterThan(Long pNumber1, Long pNumber2) {
     return lessThan(pNumber2, pNumber1);
   }
 
   @Override
-  public Long greaterOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long greaterOrEquals(Long pNumber1, Long pNumber2) {
     return lessOrEquals(pNumber2, pNumber1);
   }
 
   @Override
-  public Long lessThan(Long pNumber1, Long pNumber2) {
+  protected Long lessThan(Long pNumber1, Long pNumber2) {
     return msat_make_fp_lt(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return msat_make_fp_leq(mathsatEnv, pNumber1, pNumber2);
   }
 
