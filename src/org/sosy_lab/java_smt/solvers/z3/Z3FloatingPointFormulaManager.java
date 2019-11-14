@@ -192,6 +192,21 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
+  protected Long max(Long pNumber1, Long pNumber2) {
+    return Native.mkFpaMax(z3context, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long min(Long pNumber1, Long pNumber2) {
+    return Native.mkFpaMin(z3context, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long sqrt(Long pNumber, Long pRoundingMode) {
+    return Native.mkFpaSqrt(z3context, pRoundingMode, pNumber);
+  }
+
+  @Override
   protected Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaAdd(z3context, pRoundingMode, pNumber1, pNumber2);
   }

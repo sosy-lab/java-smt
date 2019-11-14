@@ -200,6 +200,15 @@ public enum FunctionDeclarationKind {
   /** Absolute value of a floating point. */
   FP_ABS,
 
+  /** Maximum of two floating points. */
+  FP_MAX,
+
+  /** Minimum of two floating points. */
+  FP_MIN,
+
+  /** Square root of a floating point. */
+  FP_SQRT,
+
   /** Subtraction over floating points. */
   FP_SUB,
 

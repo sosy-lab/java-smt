@@ -34,6 +34,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_iszero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_lt;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_max;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_min;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_minus;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_minus_inf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_nan;
@@ -46,6 +48,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_nearest_even;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_plus_inf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_roundingmode_zero;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_sqrt;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_times;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_to_bv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_uf;
@@ -218,6 +221,21 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long abs(Long pNumber) {
     return msat_make_fp_abs(mathsatEnv, pNumber);
+  }
+
+  @Override
+  protected Long max(Long pNumber1, Long pNumber2) {
+    return msat_make_fp_max(mathsatEnv, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long min(Long pNumber1, Long pNumber2) {
+    return msat_make_fp_min(mathsatEnv, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long sqrt(Long pNumber, Long pRoundingMode) {
+    return msat_make_fp_sqrt(mathsatEnv, pRoundingMode, pNumber);
   }
 
   @Override

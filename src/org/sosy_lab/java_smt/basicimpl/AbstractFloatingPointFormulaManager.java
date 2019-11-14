@@ -259,6 +259,33 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected abstract TFormulaInfo abs(TFormulaInfo pParam1);
 
   @Override
+  public FloatingPointFormula max(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+    return wrap(max(extractInfo(pNumber1), extractInfo(pNumber2)));
+  }
+
+  protected abstract TFormulaInfo max(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public FloatingPointFormula min(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+    return wrap(min(extractInfo(pNumber1), extractInfo(pNumber2)));
+  }
+
+  protected abstract TFormulaInfo min(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public FloatingPointFormula sqrt(FloatingPointFormula pNumber) {
+    return wrap(sqrt(extractInfo(pNumber), getDefaultRoundingMode()));
+  }
+
+  @Override
+  public FloatingPointFormula sqrt(
+      FloatingPointFormula number, FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(sqrt(extractInfo(number), getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo sqrt(TFormulaInfo pNumber, TFormulaInfo pRoundingMode);
+
+  @Override
   public FloatingPointFormula add(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);

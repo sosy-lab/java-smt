@@ -185,6 +185,16 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula order3 = fpmgr.greaterThan(posInf, negInf);
 
     assertThatFormula(bmgr.and(order1, order2, order3)).isTautological();
+
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.max(posInf, zero), posInf)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.max(posInf, negInf), posInf))
+        .isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.max(negInf, zero), zero)).isTautological();
+
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.min(posInf, zero), zero)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.min(posInf, negInf), negInf))
+        .isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.min(negInf, zero), negInf)).isTautological();
   }
 
   @Test
@@ -196,6 +206,24 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula order2 = fpmgr.lessOrEquals(negInf, var);
 
     assertThatFormula(bmgr.or(varIsNan, bmgr.and(order1, order2))).isTautological();
+  }
+
+  @Test
+  public void sqrt() throws SolverException, InterruptedException {
+    for (double d : new double[] {0.25, 1, 2, 4, 9, 15, 1234, 1000000}) {
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(
+                  fpmgr.sqrt(fpmgr.makeNumber(d * d, doublePrecType)),
+                  fpmgr.makeNumber(d, doublePrecType)))
+          .isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(
+                  fpmgr.sqrt(fpmgr.makeNumber(d, doublePrecType)),
+                  fpmgr.makeNumber(Math.sqrt(d), doublePrecType)))
+          .isTautological();
+      assertThatFormula(fpmgr.isNaN(fpmgr.sqrt(fpmgr.makeNumber(-d, doublePrecType))))
+          .isTautological();
+    }
   }
 
   @Test

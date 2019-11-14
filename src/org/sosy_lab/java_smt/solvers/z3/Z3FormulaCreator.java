@@ -565,6 +565,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_NEG;
       case Z3_OP_FPA_ABS:
         return FunctionDeclarationKind.FP_ABS;
+      case Z3_OP_FPA_MAX:
+        return FunctionDeclarationKind.FP_MAX;
+      case Z3_OP_FPA_MIN:
+        return FunctionDeclarationKind.FP_MIN;
+      case Z3_OP_FPA_SQRT:
+        return FunctionDeclarationKind.FP_SQRT;
       case Z3_OP_FPA_SUB:
         return FunctionDeclarationKind.FP_SUB;
       case Z3_OP_FPA_ADD:
