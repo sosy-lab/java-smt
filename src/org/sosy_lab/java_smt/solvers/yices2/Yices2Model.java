@@ -231,4 +231,9 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     }
     return val;
   }
+
+  @Override
+  public String toString() {
+    return yices_model_to_string(model);
+  }
 }
