@@ -687,7 +687,7 @@ class Yices2NativeApi {
   /** get the value of a term as pair [node_id, node_tag]. */
   public static native int[] yices_get_value(long m, int t);
 
-  public static native int yices_val_get_bitsize(long m, int id, int tag);
+  public static native int yices_val_bitsize(long m, int id, int tag);
 
   public static native int yices_val_function_arity(long m, int id, int tag);
 

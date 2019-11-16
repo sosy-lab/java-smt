@@ -47,10 +47,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_int;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_expand_function;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_expand_mapping;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_function_arity;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_bool;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_bv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_mpq;
@@ -186,7 +186,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
         return Rational.of(value);
       }
     } else if (tag == YVAL_BV) {
-      int size = yices_val_get_bitsize(model, id, tag);
+      int size = yices_val_bitsize(model, id, tag);
       int[] littleEndianBV = yices_val_get_bv(model, id, size, tag);
       Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
       String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
