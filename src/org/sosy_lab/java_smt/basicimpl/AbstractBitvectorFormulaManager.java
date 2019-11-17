@@ -270,13 +270,11 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     if (pI.signum() < 0) {
       BigInteger min = BigInteger.valueOf(2).pow(pLength - 1).negate();
       Preconditions.checkArgument(
-          pI.compareTo(min) >= 0,
-          pI + " is too small for a bitvector with length " + pLength);
+          pI.compareTo(min) >= 0, pI + " is too small for a bitvector with length " + pLength);
       pI = pI.add(max);
     } else {
       Preconditions.checkArgument(
-          pI.compareTo(max) < 0,
-          pI + " is too large for a bitvector with length " + pLength);
+          pI.compareTo(max) < 0, pI + " is too large for a bitvector with length " + pLength);
     }
     return pI;
   }

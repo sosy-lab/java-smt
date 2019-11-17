@@ -216,10 +216,8 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
       BigInteger val = (BigInteger) value;
       int bvSize = yices_bvtype_size(type);
       String bits = val.toString(2);
-      assert bits.length() <= bvSize : "numeral value "
-          + val
-          + " is out of range for size "
-          + bvSize;
+      assert bits.length() <= bvSize
+          : "numeral value " + val + " is out of range for size " + bvSize;
       if (bits.length() < bvSize) {
         bits = Strings.padStart(bits, bvSize, '0');
       }
