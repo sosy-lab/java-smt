@@ -27,6 +27,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_SCALAR;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
@@ -57,6 +58,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -212,7 +214,17 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
       }
     } else if (yices_type_is_bitvector(type)) {
       BigInteger val = (BigInteger) value;
-      return yices_parse_bvbin(val.toString(2));
+      int bvSize = yices_bvtype_size(type);
+      String bits = val.toString(2);
+      assert bits.length() <= bvSize : "numeral value "
+          + val
+          + " is out of range for size "
+          + bvSize;
+      if (bits.length() < bvSize) {
+        bits = Strings.padStart(bits, bvSize, '0');
+      }
+      Preconditions.checkArgument(bits.length() == bvSize, "Bitvector has unexpected size.");
+      return yices_parse_bvbin(bits);
     } else {
       throw new IllegalArgumentException("Unexpected type: " + yices_type_to_string(type));
     }
