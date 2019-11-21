@@ -149,7 +149,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     assume()
         .withMessage(
-            "Princess, Mathsat5 and Boolector do not support unsat core generation over assumptions")
+            "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
         .isNoneOf(PRINCESS, MATHSAT5, BOOLECTOR, CVC4);
     try (ProverEnvironment pe =

@@ -224,7 +224,7 @@ public class BoolectorFormulaCreator
   }
 
   // TODO: returns kind of formula (add, uf etc....) once methods are provided
-  private FunctionDeclarationKind getDeclarationKind(long f) {
+  private FunctionDeclarationKind getDeclarationKind(@SuppressWarnings("unused") long f) {
     return null;
   }
 
