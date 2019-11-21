@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
-import org.sosy_lab.java_smt.solvers.boolector.BoolectorEnvironment.SatSolver;
+import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext.SatSolver;
 
 public class BoolectorNativeApiTest {
 

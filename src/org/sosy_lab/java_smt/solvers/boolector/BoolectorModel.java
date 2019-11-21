@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
-class BoolectorModel extends CachingAbstractModel<Long, Long, BoolectorEnvironment> {
+class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
 
   private final long btor;
   private final BoolectorAbstractProver<?> prover;

@@ -26,8 +26,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-final class BoolectorFormulaManager
-    extends AbstractFormulaManager<Long, Long, BoolectorEnvironment, Long> {
+final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
   protected BoolectorFormulaManager(
       BoolectorFormulaCreator pFormulaCreator,
@@ -59,7 +58,7 @@ final class BoolectorFormulaManager
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
-        String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment().getBtor(), pT);
+        String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment(), pT);
         int length = dump.length();
         int i = 1;
         while (dump.charAt(length - i) != ')' && i < length) {

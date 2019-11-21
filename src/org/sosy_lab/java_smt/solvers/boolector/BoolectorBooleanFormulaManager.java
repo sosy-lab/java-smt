@@ -32,13 +32,13 @@ import com.google.common.primitives.Longs;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class BoolectorBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Long, Long, BoolectorEnvironment, Long> {
+    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
 
   BoolectorBooleanFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
-    this.btor = pCreator.getEnv().getBtor();
+    this.btor = pCreator.getEnv();
   }
 
   @Override

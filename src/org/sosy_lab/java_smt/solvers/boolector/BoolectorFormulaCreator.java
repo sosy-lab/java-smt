@@ -43,8 +43,7 @@ import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorArrayFo
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBooleanFormula;
 
-public class BoolectorFormulaCreator
-    extends FormulaCreator<Long, Long, BoolectorEnvironment, Long> {
+public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // Boolector can give back 'x' for a arbitrary value that we change to this
   private static final char ARBITRARY_VALUE = '1';
@@ -52,24 +51,21 @@ public class BoolectorFormulaCreator
   /** Maps a name and a variable or function type to a concrete formula node. */
   private final Table<String, Long, Long> nameFormulaCache = HashBasedTable.create();
 
-  private final long btor;
-
-  BoolectorFormulaCreator(BoolectorEnvironment pEnv) {
-    super(pEnv, pEnv.getBoolSort(), null, null);
-    this.btor = getEnv().getBtor();
+  BoolectorFormulaCreator(Long btor) {
+    super(btor, BtorJNI.boolector_bool_sort(btor), null, null);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     if (pFormula instanceof BitvectorFormula) {
-      long sort = BtorJNI.boolector_get_sort(btor, extractInfo(pFormula));
+      long sort = BtorJNI.boolector_get_sort(getEnv(), extractInfo(pFormula));
       checkArgument(
-          BtorJNI.boolector_is_bitvec_sort(btor, sort),
+          BtorJNI.boolector_is_bitvec_sort(getEnv(), sort),
           "BitvectorFormula with type missmatch: " + pFormula);
       return (FormulaType<T>)
           FormulaType.getBitvectorTypeWithSize(
-              BtorJNI.boolector_get_width(btor, extractInfo(pFormula)));
+              BtorJNI.boolector_get_width(getEnv(), extractInfo(pFormula)));
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
       FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
@@ -85,16 +81,17 @@ public class BoolectorFormulaCreator
 
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
-    long sort = BtorJNI.boolector_get_sort(btor, pFormula);
-    if (BtorJNI.boolector_is_bitvec_sort(btor, sort)) {
+    long sort = BtorJNI.boolector_get_sort(getEnv(), pFormula);
+    if (BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)) {
       if (sort == 1) {
         return FormulaType.BooleanType;
       } else {
-        return FormulaType.getBitvectorTypeWithSize(BtorJNI.boolector_get_width(btor, pFormula));
+        return FormulaType.getBitvectorTypeWithSize(
+            BtorJNI.boolector_get_width(getEnv(), pFormula));
       }
-    } else if (BtorJNI.boolector_is_array_sort(btor, sort)) {
-      int indexWidth = BtorJNI.boolector_get_index_width(btor, pFormula);
-      int elementWidth = BtorJNI.boolector_get_width(btor, pFormula);
+    } else if (BtorJNI.boolector_is_array_sort(getEnv(), sort)) {
+      int indexWidth = BtorJNI.boolector_get_index_width(getEnv(), pFormula);
+      int elementWidth = BtorJNI.boolector_get_width(getEnv(), pFormula);
       return FormulaType.getArrayType(
           FormulaType.getBitvectorTypeWithSize(indexWidth),
           FormulaType.getBitvectorTypeWithSize(elementWidth));
@@ -109,13 +106,14 @@ public class BoolectorFormulaCreator
         : String.format(
             "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
-      return (T) new BoolectorBooleanFormula(pTerm, btor);
+      return (T) new BoolectorBooleanFormula(pTerm, getEnv());
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)
-          new BoolectorArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType(), btor);
+          new BoolectorArrayFormula<>(
+              pTerm, arrFt.getIndexType(), arrFt.getElementType(), getEnv());
     } else if (pType.isBitvectorType()) {
-      return (T) new BoolectorBitvectorFormula(pTerm, btor);
+      return (T) new BoolectorBitvectorFormula(pTerm, getEnv());
     }
     throw new IllegalArgumentException(
         "Cannot create formulas of type " + pType + " in Boolector.");
@@ -125,14 +123,14 @@ public class BoolectorFormulaCreator
   public BooleanFormula encapsulateBoolean(Long pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
         : "Unexpected formula type for Boolean formula: " + getFormulaType(pTerm);
-    return new BoolectorBooleanFormula(pTerm, btor);
+    return new BoolectorBooleanFormula(pTerm, getEnv());
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Long pTerm) {
     assert getFormulaType(pTerm).isBitvectorType()
         : "Unexpected formula type for BV formula: " + getFormulaType(pTerm);
-    return new BoolectorBitvectorFormula(pTerm, btor);
+    return new BoolectorBitvectorFormula(pTerm, getEnv());
   }
 
   @Override
@@ -140,13 +138,12 @@ public class BoolectorFormulaCreator
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).isArrayType()
         : "Unexpected formula type for array formula: " + getFormulaType(pTerm);
-    return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, btor);
+    return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, getEnv());
   }
 
-  // In Boolector a type is called a sort
   @Override
   public Long getBitvectorType(int pBitwidth) {
-    return BtorJNI.boolector_bitvec_sort(btor, pBitwidth);
+    return BtorJNI.boolector_bitvec_sort(getEnv(), pBitwidth);
   }
 
   @Override
@@ -157,7 +154,7 @@ public class BoolectorFormulaCreator
 
   @Override
   public Long getArrayType(Long pIndexType, Long pElementType) {
-    return BtorJNI.boolector_array_sort(btor, pIndexType, pElementType);
+    return BtorJNI.boolector_array_sort(getEnv(), pIndexType, pElementType);
   }
 
   // Checks if there is a variable with the exact same name and type and gives that back, or a new
@@ -171,7 +168,7 @@ public class BoolectorFormulaCreator
     if (nameFormulaCache.containsRow(varName)) {
       throw new IllegalArgumentException("Symbol already used: " + varName);
     }
-    long newVar = BtorJNI.boolector_var(btor, type, varName);
+    long newVar = BtorJNI.boolector_var(getEnv(), type, varName);
     nameFormulaCache.put(varName, type, newVar);
     return newVar;
   }
@@ -189,11 +186,11 @@ public class BoolectorFormulaCreator
   // (and quantifier with bitvecs only)
   @SuppressWarnings("unused")
   private <R> R visit1(FormulaVisitor<R> visitor, Formula formula, Long f) {
-    if (BtorJNI.boolector_is_const(btor, f)) {
+    if (BtorJNI.boolector_is_const(getEnv(), f)) {
       // Handles all constants (bitvec, bool)
-      String bits = BtorJNI.boolector_get_bits(btor, f);
+      String bits = BtorJNI.boolector_get_bits(getEnv(), f);
       return visitor.visitConstant(formula, convertValue(f, parseBitvector(bits)));
-    } else if (BtorJNI.boolector_is_param(btor, f)) {
+    } else if (BtorJNI.boolector_is_param(getEnv(), f)) {
       // Quantifier have their own variables called param.
       // They can only be bound once! (use them as bitvec)
       int deBruijnIdx = 0; // TODO: Ask Developers for this because this is WRONG!
@@ -204,9 +201,9 @@ public class BoolectorFormulaCreator
       // do we need them separately?
       /*
        * return visitor .visitQuantifier( (BoolectorBooleanFormula) formula, quantifier,
-       * boundVariables, new BoolectorBooleanFormula(body, btor));
+       * boundVariables, new BoolectorBooleanFormula(body, getEnv()));
        */
-    } else if (BtorJNI.boolector_is_var(btor, f)) {
+    } else if (BtorJNI.boolector_is_var(getEnv(), f)) {
       // bitvec var (size 1 is bool!)
       return visitor.visitFreeVariable(formula, getName(f));
     } else {
@@ -232,7 +229,7 @@ public class BoolectorFormulaCreator
   public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
     Preconditions.checkArgument(
         !pArgs.isEmpty(), "Boolector does not support UFs without arguments.");
-    return BtorJNI.boolector_apply(btor, Longs.toArray(pArgs), pArgs.size(), pDeclaration);
+    return BtorJNI.boolector_apply(getEnv(), Longs.toArray(pArgs), pArgs.size(), pDeclaration);
   }
 
   @Override
@@ -241,7 +238,7 @@ public class BoolectorFormulaCreator
         !pArgTypes.isEmpty(), "Boolector does not support UFs without arguments.");
 
     long[] funSorts = Longs.toArray(pArgTypes);
-    long sort = BtorJNI.boolector_fun_sort(btor, funSorts, funSorts.length, pReturnType);
+    long sort = BtorJNI.boolector_fun_sort(getEnv(), funSorts, funSorts.length, pReturnType);
     Long maybeFormula = nameFormulaCache.get(name, sort);
     if (maybeFormula != null) {
       return maybeFormula;
@@ -249,7 +246,7 @@ public class BoolectorFormulaCreator
     if (nameFormulaCache.containsRow(name)) {
       throw new IllegalArgumentException("Symbol already used: " + name);
     }
-    long uf = BtorJNI.boolector_uf(btor, sort, name);
+    long uf = BtorJNI.boolector_uf(getEnv(), sort, name);
     nameFormulaCache.put(name, sort, uf);
     return uf;
   }
@@ -257,18 +254,19 @@ public class BoolectorFormulaCreator
   @Override
   public Object convertValue(Long key, Long term) {
     String value = null;
-    if (BtorJNI.boolector_is_array(btor, term)) {
-      value = BtorJNI.boolector_bv_assignment(btor, term);
-    } else if (BtorJNI.boolector_is_const(btor, term)) {
-      value = BtorJNI.boolector_get_bits(btor, term);
-    } else if (BtorJNI.boolector_is_bitvec_sort(btor, BtorJNI.boolector_get_sort(btor, term))) {
-      value = BtorJNI.boolector_bv_assignment(btor, term);
+    if (BtorJNI.boolector_is_array(getEnv(), term)) {
+      value = BtorJNI.boolector_bv_assignment(getEnv(), term);
+    } else if (BtorJNI.boolector_is_const(getEnv(), term)) {
+      value = BtorJNI.boolector_get_bits(getEnv(), term);
+    } else if (BtorJNI.boolector_is_bitvec_sort(
+        getEnv(), BtorJNI.boolector_get_sort(getEnv(), term))) {
+      value = BtorJNI.boolector_bv_assignment(getEnv(), term);
     } else {
       throw new AssertionError("unknown sort and term");
-      // value = BtorJNI.boolector_bv_assignment(btor, term);
+      // value = BtorJNI.boolector_bv_assignment(getEnv(), term);
     }
     // To get the correct type, we check the width of the term (== 1 means bool).
-    int width = BtorJNI.boolector_get_width(btor, term);
+    int width = BtorJNI.boolector_get_width(getEnv(), term);
     if (width == 1) {
       Long longValue = parseBigInt(value).longValue();
       if (longValue == 1) {
@@ -335,7 +333,7 @@ public class BoolectorFormulaCreator
   }
 
   String getName(long pKey) {
-    return BtorJNI.boolector_get_symbol(btor, pKey);
+    return BtorJNI.boolector_get_symbol(getEnv(), pKey);
   }
 
   @Override
@@ -346,10 +344,10 @@ public class BoolectorFormulaCreator
   @Override
   protected Long getBooleanVarDeclarationImpl(Long pTFormulaInfo) {
     // declaration of constant or fun
-    if (BtorJNI.boolector_is_const(btor, pTFormulaInfo)) {
-      return parseBitvector(BtorJNI.boolector_get_bits(btor, pTFormulaInfo));
-    } else if (BtorJNI.boolector_is_var(btor, pTFormulaInfo)) {
-      return parseBitvector(BtorJNI.boolector_bv_assignment(btor, pTFormulaInfo));
+    if (BtorJNI.boolector_is_const(getEnv(), pTFormulaInfo)) {
+      return parseBitvector(BtorJNI.boolector_get_bits(getEnv(), pTFormulaInfo));
+    } else if (BtorJNI.boolector_is_var(getEnv(), pTFormulaInfo)) {
+      return parseBitvector(BtorJNI.boolector_bv_assignment(getEnv(), pTFormulaInfo));
     } else {
       throw new IllegalArgumentException(
           "Debug only! getBooleanVarDeclarationImpl in BtorFormulaCreator");

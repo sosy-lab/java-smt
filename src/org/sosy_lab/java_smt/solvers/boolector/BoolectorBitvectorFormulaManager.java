@@ -51,13 +51,13 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 class BoolectorBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Long, Long, BoolectorEnvironment, Long> {
+    extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
 
   BoolectorBitvectorFormulaManager(BoolectorFormulaCreator creator) {
     super(creator);
-    this.btor = creator.getEnv().getBtor();
+    this.btor = creator.getEnv();
   }
 
   @Override
@@ -65,6 +65,12 @@ class BoolectorBitvectorFormulaManager
     pI = transformValueToRange(pLength, pI);
     long sort = BtorJNI.boolector_bitvec_sort(btor, pLength);
     return BtorJNI.boolector_constd(btor, sort, pI.toString());
+  }
+
+  @Override
+  protected Long makeBitvectorImpl(int length, Long value) {
+    // The value is a pointer to an expression. Do not use the plain numberal value.
+    throw new UnsupportedOperationException("Boolector does not support INT theory");
   }
 
   @Override
@@ -208,16 +214,5 @@ class BoolectorBitvectorFormulaManager
     } else {
       return boolector_uext(btor, bitVec, extensionBits);
     }
-  }
-
-  @Override
-  protected Long makeBitvectorImpl(int length, Long value) {
-    checkRange(length, BigInteger.valueOf(value));
-    int i = (int) value.doubleValue();
-    if (i == value) {
-      long sort = BtorJNI.boolector_bitvec_sort(btor, length);
-      return BtorJNI.boolector_int(btor, i, sort);
-    }
-    return makeBitvectorImpl(length, BigInteger.valueOf(value));
   }
 }

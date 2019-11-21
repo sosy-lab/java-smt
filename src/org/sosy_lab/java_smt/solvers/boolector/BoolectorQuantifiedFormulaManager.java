@@ -27,14 +27,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BoolectorQuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<Long, Long, BoolectorEnvironment, Long> {
+    extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
 
-  BoolectorQuantifiedFormulaManager(
-      FormulaCreator<Long, Long, BoolectorEnvironment, Long> pCreator) {
+  BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
     super(pCreator);
-    btor = getFormulaCreator().getEnv().getBtor();
+    btor = getFormulaCreator().getEnv();
   }
 
   @Override

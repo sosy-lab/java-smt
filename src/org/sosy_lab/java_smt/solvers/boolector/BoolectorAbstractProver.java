@@ -65,7 +65,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       // NOT Cloning results in murdering btor that is still beeing used
       // closing of assertions only by using boolector_release
       // BtorJNI.boolector_delete(btor);
-      BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), assertedFormulas.size());
+      BtorJNI.boolector_pop(manager.getEnvironment(), assertedFormulas.size());
       assertedFormulas.clear();
       closed = true;
     }
@@ -96,13 +96,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void pop() {
     assertedFormulas.pop();
-    BtorJNI.boolector_pop(manager.getEnvironment().getBtor(), 1);
+    BtorJNI.boolector_pop(manager.getEnvironment(), 1);
   }
 
   @Override
   public void push() {
     assertedFormulas.push(new ArrayList<>());
-    BtorJNI.boolector_push(manager.getEnvironment().getBtor(), 1);
+    BtorJNI.boolector_push(manager.getEnvironment(), 1);
   }
 
   @Override
@@ -144,7 +144,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Nullable
   public T addConstraint(BooleanFormula constraint) {
     BtorJNI.boolector_assert(
-        manager.getEnvironment().getBtor(), BoolectorFormulaManager.getBtorTerm(constraint));
+        manager.getEnvironment(), BoolectorFormulaManager.getBtorTerm(constraint));
     assertedFormulas.peek().add(BoolectorFormulaManager.getBtorTerm(constraint));
     return null;
   }

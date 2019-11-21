@@ -26,14 +26,14 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class BoolectorArrayFormulaManager
-    extends AbstractArrayFormulaManager<Long, Long, BoolectorEnvironment, Long> {
+    extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
   private final Table<String, Long, Long> nameFormulaCache;
 
   BoolectorArrayFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
-    this.btor = pCreator.getEnv().getBtor();
+    this.btor = pCreator.getEnv();
     this.nameFormulaCache = pCreator.getCache();
   }
 
