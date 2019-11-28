@@ -3,3 +3,8 @@ include: /build/gitlab-ci.yml
 variables:
   PROJECT_PATH: "sosy-lab/software/java-smt"
   GH_REF: "github.com/sosy-lab/java-smt"
+
+build:jdk-13:
+  variables:
+    # https://github.com/google/error-prone/issues/1106
+    ANT_PROPS_BUILD: "-Divy.disable=true -Derrorprone.disable=true"
