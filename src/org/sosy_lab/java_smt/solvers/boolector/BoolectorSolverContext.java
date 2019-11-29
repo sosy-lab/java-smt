@@ -147,7 +147,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     return true;
   }
 
-  /** set basic options for running Boolector */
+  /** set basic options for running Boolector. */
   private static void setOptions(
       Configuration config, PathCounterTemplate solverLogfile, long randomSeed, long btor)
       throws InvalidConfigurationException {
