@@ -159,8 +159,6 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
         settings.satSolver != SatSolver.CADICAL,
         "CaDiCal is not usable with JavaSMT, because it does not support incremental mode.");
     BtorJNI.boolector_set_sat_solver(btor, settings.satSolver.name());
-
-    BtorJNI.boolector_set_sat_solver(btor, settings.satSolver.name());
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.getValue(), 2);
     // Auto memory clean after closing
