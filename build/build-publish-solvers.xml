@@ -177,8 +177,12 @@
         <!-- add JNI wrapper before compiling Boolector -->
         <exec executable="cp">
             <arg value="lib/native/source/libboolector/interface_wrap.c"/>
-            <arg value="lib/native/source/libboolector/CMakeLists.txt"/>
+            <arg value="lib/native/source/libboolector/include_interface_and_jni.patch"/>
             <arg value="${boolector.path}/src/"/>
+        </exec>
+        <exec executable="git" dir="${boolector.path}">
+            <arg value="apply"/>
+            <arg value="src/include_interface_and_jni.patch"/>
         </exec>
 
         <!-- build Boolector -->
