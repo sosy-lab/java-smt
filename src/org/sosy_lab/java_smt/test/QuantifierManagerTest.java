@@ -79,6 +79,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Before
   public void setUp() {
+    requireIntegers();
     requireArrays();
     requireQuantifiers();
 
@@ -231,6 +232,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testExistsArrayConjunct2() throws SolverException, InterruptedException {
     // (exists x . b[x] = 1) AND  (forall x . b[x] = 0) is UNSAT
+
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_1), forall_x_a_at_x_eq_0);
     assertThatFormula(f).isUnsatisfiable();
@@ -239,6 +243,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testExistsArrayConjunct3() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) AND  (forall x . b[x] = 0) is SAT
+
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0), forall_x_a_at_x_eq_0);
     try {
@@ -251,6 +258,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testExistsArrayDisjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) OR  (forall x . b[x] = 1) is SAT
+
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.or(
             qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
@@ -261,6 +271,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testExistsArrayDisjunct2() throws SolverException, InterruptedException {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
+
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.or(
             qmgr.exists(ImmutableList.of(x), a_at_x_eq_1),
@@ -271,6 +284,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testContradiction() throws SolverException, InterruptedException {
     // forall x . x = x+1  is UNSAT
+
+    requireIntegers();
     BooleanFormula f =
         qmgr.forall(ImmutableList.of(x), imgr.equal(x, imgr.add(x, imgr.makeNumber(1))));
     assertThatFormula(f).isUnsatisfiable();
@@ -279,6 +294,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testSimple() throws SolverException, InterruptedException {
     // forall x . x+2 = x+1+1  is SAT
+    requireIntegers();
     BooleanFormula f =
         qmgr.forall(
             ImmutableList.of(x),
@@ -290,6 +306,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testBlah() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula z = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f =
@@ -299,6 +316,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEquals() {
+    requireIntegers();
     BooleanFormula f1 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
     BooleanFormula f2 = qmgr.exists(ImmutableList.of(imgr.makeVariable("x")), a_at_x_eq_1);
 
@@ -307,6 +325,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testQELight() throws InterruptedException {
+    requireIntegers();
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
@@ -320,6 +339,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionForall() {
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
 
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -351,6 +372,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testIntrospectionExists() {
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
     final AtomicBoolean isForall = new AtomicBoolean(false);
@@ -390,6 +413,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test(expected = IllegalArgumentException.class)
   public void testEmpty() {
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
         .that(solverToUse())
@@ -404,6 +429,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   public void checkQuantifierElimination() throws InterruptedException, SolverException {
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
+    requireIntegers();
     IntegerFormula xx = imgr.makeVariable("x");
     IntegerFormula yy = imgr.makeVariable("y");
     BooleanFormula f =
@@ -424,6 +450,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // quantifier-free equivalent: x = 1 | x = 3
     //                      or     extract_0_0 x = 1
 
+    // Boolector has no working quantifier at the moment. They will be implemented later
+    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     int i = index.getFreshId();
     int width = 2;
 

@@ -122,6 +122,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_ABV() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula

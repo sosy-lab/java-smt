@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-boolector">
+      <license name="MIT License" url="https://github.com/Boolector/boolector/blob/master/COPYING"/>
+        <description>
+            Boolector solver and JavaSMT JNI wrapper.
+            Boolector is provided under the MIT License.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="solver-boolector" />
+    </configurations>
+
+    <publications defaultconf="solver-boolector">
+        <artifact name="libpicosat" conf="solver-boolector" type="shared-object" ext="so"/>
+        <artifact name="libminisat" conf="solver-boolector" type="shared-object" ext="so"/>
+        <artifact name="libboolector" conf="solver-boolector" type="shared-object" ext="so"/>
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>

@@ -34,6 +34,10 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
+ * bitvectors length 1.
+ */
 @RunWith(Parameterized.class)
 public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
@@ -104,6 +108,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
+    requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(true);
     Truth.assertThat(bmgr.toConjunctionArgs(input, false)).isEmpty();
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
@@ -111,6 +116,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConjunctionArgsExtraction() throws SolverException, InterruptedException {
+    requireIntegers();
     BooleanFormula input =
         bmgr.and(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
     Truth.assertThat(bmgr.toConjunctionArgs(input, false))
@@ -123,34 +129,64 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void testConjunctionArgsExtractionRecursive()
       throws SolverException, InterruptedException {
-    BooleanFormula input =
-        bmgr.and(
-            bmgr.makeVariable("a"),
-            bmgr.makeBoolean(true),
-            bmgr.and(
-                bmgr.makeVariable("b"),
-                bmgr.makeVariable("c"),
-                bmgr.and(
-                    imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
-                    bmgr.makeVariable("d"),
-                    bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")))),
-            imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
-    Truth.assertThat(bmgr.toConjunctionArgs(input, true))
-        .isEqualTo(
-            ImmutableSet.of(
-                bmgr.makeVariable("a"),
-                bmgr.makeVariable("b"),
-                bmgr.makeVariable("c"),
-                imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")),
-                imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
-                bmgr.makeVariable("d"),
-                bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f"))));
+    BooleanFormula input;
+    ImmutableSet<BooleanFormula> comparisonSet;
+    if (imgr != null) {
+      input =
+          bmgr.and(
+              bmgr.makeVariable("a"),
+              bmgr.makeBoolean(true),
+              bmgr.and(
+                  bmgr.makeVariable("b"),
+                  bmgr.makeVariable("c"),
+                  bmgr.and(
+                      imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
+                      bmgr.makeVariable("d"),
+                      bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")))),
+              imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
+
+      comparisonSet =
+          ImmutableSet.of(
+              bmgr.makeVariable("a"),
+              bmgr.makeVariable("b"),
+              bmgr.makeVariable("c"),
+              imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")),
+              imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
+              bmgr.makeVariable("d"),
+              bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
+    } else {
+      input =
+          bmgr.and(
+              bmgr.makeVariable("a"),
+              bmgr.makeBoolean(true),
+              bmgr.and(
+                  bmgr.makeVariable("b"),
+                  bmgr.makeVariable("c"),
+                  bmgr.and(
+                      bvmgr.equal(bvmgr.makeBitvector(2, 2), bvmgr.makeVariable(2, "y")),
+                      bmgr.makeVariable("d"),
+                      bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")))),
+              bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")));
+
+      comparisonSet =
+          ImmutableSet.of(
+              bmgr.makeVariable("a"),
+              bmgr.makeVariable("b"),
+              bmgr.makeVariable("c"),
+              bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")),
+              bvmgr.equal(bvmgr.makeBitvector(2, 2), bvmgr.makeVariable(2, "y")),
+              bmgr.makeVariable("d"),
+              bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
+    }
+    requireVisitor();
+    Truth.assertThat(bmgr.toConjunctionArgs(input, true)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
   }
 
   @Test
   public void testDisjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
+    requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(false);
     Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEmpty();
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
@@ -158,46 +194,92 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testDisjunctionArgsExtraction() throws SolverException, InterruptedException {
-    BooleanFormula input =
-        bmgr.or(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
-    Truth.assertThat(bmgr.toDisjunctionArgs(input, false))
-        .isEqualTo(
-            ImmutableSet.of(
-                bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x"))));
+    BooleanFormula input;
+    ImmutableSet<BooleanFormula> comparisonSet;
+    if (imgr != null) {
+      input =
+          bmgr.or(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
+
+      comparisonSet =
+          ImmutableSet.of(
+              bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
+    } else {
+      input =
+          bmgr.or(
+              bmgr.makeVariable("a"),
+              bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")));
+
+      comparisonSet =
+          ImmutableSet.of(
+              bmgr.makeVariable("a"),
+              bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")));
+    }
+    requireVisitor();
+    Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.or(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
   }
 
   @Test
   public void testDisjunctionArgsExtractionRecursive()
       throws SolverException, InterruptedException {
-    BooleanFormula input =
-        bmgr.or(
-            bmgr.makeVariable("a"),
-            bmgr.makeBoolean(false),
-            bmgr.or(
-                bmgr.makeVariable("b"),
-                bmgr.makeVariable("c"),
-                bmgr.or(
-                    imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
-                    bmgr.makeVariable("d"),
-                    bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")))),
-            imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
-    Truth.assertThat(bmgr.toDisjunctionArgs(input, true))
-        .isEqualTo(
-            ImmutableSet.of(
-                bmgr.makeVariable("a"),
-                bmgr.makeVariable("b"),
-                bmgr.makeVariable("c"),
-                imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")),
-                imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
-                bmgr.makeVariable("d"),
-                bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f"))));
+    BooleanFormula input;
+    ImmutableSet<BooleanFormula> comparisonSet;
+    if (imgr != null) {
+      input =
+          bmgr.or(
+              bmgr.makeVariable("a"),
+              bmgr.makeBoolean(false),
+              bmgr.or(
+                  bmgr.makeVariable("b"),
+                  bmgr.makeVariable("c"),
+                  bmgr.or(
+                      imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
+                      bmgr.makeVariable("d"),
+                      bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")))),
+              imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
+
+      comparisonSet =
+          ImmutableSet.of(
+              bmgr.makeVariable("a"),
+              bmgr.makeVariable("b"),
+              bmgr.makeVariable("c"),
+              imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")),
+              imgr.equal(imgr.makeNumber(2), imgr.makeVariable("y")),
+              bmgr.makeVariable("d"),
+              bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
+    } else {
+      input =
+          bmgr.or(
+              bmgr.makeVariable("a"),
+              bmgr.makeBoolean(false),
+              bmgr.or(
+                  bmgr.makeVariable("b"),
+                  bmgr.makeVariable("c"),
+                  bmgr.or(
+                      bvmgr.equal(bvmgr.makeBitvector(2, 2), bvmgr.makeVariable(2, "y")),
+                      bmgr.makeVariable("d"),
+                      bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")))),
+              bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")));
+
+      comparisonSet =
+          ImmutableSet.of(
+              bmgr.makeVariable("a"),
+              bmgr.makeVariable("b"),
+              bmgr.makeVariable("c"),
+              bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")),
+              bvmgr.equal(bvmgr.makeBitvector(2, 2), bvmgr.makeVariable(2, "y")),
+              bmgr.makeVariable("d"),
+              bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
+    }
+    requireVisitor();
+    Truth.assertThat(bmgr.toDisjunctionArgs(input, true)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
   }
 
   @Test
   public void simplificationTest() {
+    // Boolector MAY fail (Use internal equals method to check if it does)
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");

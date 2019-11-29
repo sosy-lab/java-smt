@@ -29,6 +29,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.truth.TruthJUnit;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -265,6 +266,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireIntegers();
 
     int i = index.getFreshId();
 
@@ -319,6 +321,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
+    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
@@ -333,6 +336,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireIntegers();
 
     int i = index.getFreshId();
 
@@ -361,6 +365,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireIntegers();
 
     int i = index.getFreshId();
 
@@ -393,6 +398,8 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
+    // Boolector does not support Interpolation
+    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();

@@ -36,6 +36,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -60,6 +61,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
+    // Boolector does not support substitution
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -79,6 +82,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
+    // Boolector does not support substitution
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -104,6 +109,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testSubstitution() throws SolverException, InterruptedException {
+    // Boolector does not support substitution
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
@@ -124,6 +131,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testSubstitutionTwice() throws SolverException, InterruptedException {
+    // Boolector does not support substitution
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
@@ -146,6 +155,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void formulaEqualsAndHashCode() {
+    // Solvers without integers (Boolector) get their own test below
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     FunctionDeclaration<IntegerFormula> f_b =
         fmgr.declareUF("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
 
@@ -191,30 +202,122 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void bitvectorFormulaEqualsAndHashCode() {
+    // Boolector does not support integers and its easier to make a new test with bvs
+    assume().that(solverToUse()).isEqualTo(Solvers.BOOLECTOR);
+    FunctionDeclaration<BitvectorFormula> f_b =
+        fmgr.declareUF(
+            "f_bv",
+            FormulaType.getBitvectorTypeWithSize(8),
+            FormulaType.getBitvectorTypeWithSize(8));
+
+    new EqualsTester()
+        .addEqualityGroup(bmgr.makeBoolean(true))
+        .addEqualityGroup(bmgr.makeBoolean(false))
+        .addEqualityGroup(bmgr.makeVariable("bool_a"))
+        .addEqualityGroup(bvmgr.makeVariable(8, "bv_a"))
+
+        // Way of creating numbers should not make a difference.
+        .addEqualityGroup(
+            bvmgr.makeBitvector(8, 0L),
+            bvmgr.makeBitvector(8, 0),
+            bvmgr.makeBitvector(8, BigInteger.ZERO))
+        .addEqualityGroup(
+            bvmgr.makeBitvector(8, 1L),
+            bvmgr.makeBitvector(8, 1),
+            bvmgr.makeBitvector(8, BigInteger.ONE))
+        // The same formula when created twice should compare equal.
+        .addEqualityGroup(bmgr.makeVariable("bool_b"), bmgr.makeVariable("bool_b"))
+        .addEqualityGroup(
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")),
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")))
+        .addEqualityGroup(
+            bvmgr.equal(bvmgr.makeBitvector(8, 0), bvmgr.makeVariable(8, "int_a")),
+            bvmgr.equal(bvmgr.makeBitvector(8, 0), bvmgr.makeVariable(8, "int_a")))
+
+        // UninterpretedFunctionDeclarations should not compare equal to Formulas,
+        // but declaring one twice needs to return the same UIF.
+        .addEqualityGroup(
+            fmgr.declareUF(
+                "f_a",
+                FormulaType.getBitvectorTypeWithSize(8),
+                FormulaType.getBitvectorTypeWithSize(8)),
+            fmgr.declareUF(
+                "f_a",
+                FormulaType.getBitvectorTypeWithSize(8),
+                FormulaType.getBitvectorTypeWithSize(8)))
+        .addEqualityGroup(f_b)
+        .addEqualityGroup(fmgr.callUF(f_b, bvmgr.makeBitvector(8, 0)))
+        .addEqualityGroup(
+            fmgr.callUF(f_b, bvmgr.makeBitvector(8, 1)), // why not equal?!
+            fmgr.callUF(f_b, bvmgr.makeBitvector(8, 1)))
+        .testEquals();
+  }
+
+  @Test
   public void variableNameExtractorTest() {
-    BooleanFormula constr =
-        bmgr.or(
-            imgr.equal(
-                imgr.subtract(
-                    imgr.add(imgr.makeVariable("x"), imgr.makeVariable("z")), imgr.makeNumber(10)),
-                imgr.makeVariable("y")),
-            imgr.equal(imgr.makeVariable("xx"), imgr.makeVariable("zz")));
-    assertThat(mgr.extractVariables(constr).keySet()).containsExactly("x", "y", "z", "xx", "zz");
-    assertThat(mgr.extractVariablesAndUFs(constr)).isEqualTo(mgr.extractVariables(constr));
+    // Since Boolector does not support integers we use bitvectors
+    if (imgr != null) {
+      BooleanFormula constr =
+          bmgr.or(
+              imgr.equal(
+                  imgr.subtract(
+                      imgr.add(imgr.makeVariable("x"), imgr.makeVariable("z")),
+                      imgr.makeNumber(10)),
+                  imgr.makeVariable("y")),
+              imgr.equal(imgr.makeVariable("xx"), imgr.makeVariable("zz")));
+      assertThat(mgr.extractVariables(constr).keySet()).containsExactly("x", "y", "z", "xx", "zz");
+      assertThat(mgr.extractVariablesAndUFs(constr)).isEqualTo(mgr.extractVariables(constr));
+    } else {
+      BooleanFormula bvConstr =
+          bmgr.or(
+              bvmgr.equal(
+                  bvmgr.subtract(
+                      bvmgr.add(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "z")),
+                      bvmgr.makeBitvector(8, 10)),
+                  bvmgr.makeVariable(8, "y")),
+              bvmgr.equal(bvmgr.makeVariable(8, "xx"), bvmgr.makeVariable(8, "zz")));
+
+      requireVisitor();
+
+      assertThat(mgr.extractVariables(bvConstr).keySet())
+          .containsExactly("x", "y", "z", "xx", "zz");
+      assertThat(mgr.extractVariablesAndUFs(bvConstr)).isEqualTo(mgr.extractVariables(bvConstr));
+    }
   }
 
   @Test
   public void ufNameExtractorTest() {
-    BooleanFormula constraint =
-        imgr.equal(
-            fmgr.declareAndCallUF(
-                "uf1", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("x"))),
-            fmgr.declareAndCallUF(
-                "uf2", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("y"))));
+    // Since Boolector does not support integers we use bitvectors for constraints
+    if (imgr != null) {
+      BooleanFormula constraint =
+          imgr.equal(
+              fmgr.declareAndCallUF(
+                  "uf1", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("x"))),
+              fmgr.declareAndCallUF(
+                  "uf2", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("y"))));
+      assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
+          .containsExactly("uf1", "uf2", "x", "y");
 
-    assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
-        .containsExactly("uf1", "uf2", "x", "y");
+      assertThat(mgr.extractVariables(constraint).keySet()).containsExactly("x", "y");
+    } else {
+      BooleanFormula bvConstraint =
+          bvmgr.equal(
+              fmgr.declareAndCallUF(
+                  "uf1",
+                  FormulaType.getBitvectorTypeWithSize(8),
+                  ImmutableList.of(bvmgr.makeVariable(8, "x"))),
+              fmgr.declareAndCallUF(
+                  "uf2",
+                  FormulaType.getBitvectorTypeWithSize(8),
+                  ImmutableList.of(bvmgr.makeVariable(8, "y"))));
 
-    assertThat(mgr.extractVariables(constraint).keySet()).containsExactly("x", "y");
+      requireVisitor();
+
+      assertThat(mgr.extractVariablesAndUFs(bvConstraint).keySet())
+          .containsExactly("uf1", "uf2", "x", "y");
+
+      assertThat(mgr.extractVariables(bvConstraint).keySet()).containsExactly("x", "y");
+    }
   }
 }

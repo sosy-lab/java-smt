@@ -78,6 +78,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void intToIntTest() throws SolverException, InterruptedException {
+    requireIntegers();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       assertEquals(mgr.getFormulaType(i), FormulaType.IntegerType);
