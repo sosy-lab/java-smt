@@ -106,6 +106,6 @@ public class SmtInterpolSolverContext extends AbstractSolverContext {
 
   @Override
   protected boolean supportsAssumptionSolving() {
-    return false;
+    return true;
   }
 }

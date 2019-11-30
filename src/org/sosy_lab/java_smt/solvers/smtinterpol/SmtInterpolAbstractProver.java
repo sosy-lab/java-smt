@@ -149,7 +149,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    return env.checkSatWithAssumptions(
+    return !env.checkSatWithAssumptions(
         pAssumptions.stream().map(mgr::extractInfo).toArray(Term[]::new));
   }
 

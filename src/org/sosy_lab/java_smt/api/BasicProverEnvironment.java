@@ -65,6 +65,9 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Check whether the conjunction of all formulas on the stack together with the list of
    * assumptions is satisfiable.
    *
+   * <p>Note that some solvers support full formulas as assumptions and others do only allow plain
+   * boolean literals (and their negation).
+   *
    * @param assumptions A list of literals.
    */
   boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)

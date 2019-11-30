@@ -203,4 +203,24 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
       assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(a))).isTrue();
     }
   }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void assumptionsTest2() throws SolverException, InterruptedException {
+    /*
+    (declare-fun A () Bool)
+    (push 1)
+    (check-sat-assumptions (not A))
+    (assert (A))
+    (check-sat-assumptions (not  A))
+    */
+
+    BooleanFormula a = bmgr.makeVariable("a");
+    try (ProverEnvironment pe = context.newProverEnvironment()) {
+      pe.push();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(bmgr.not(a)))).isFalse();
+      pe.addConstraint(a);
+      assertThat(pe.isUnsatWithAssumptions(ImmutableSet.of(bmgr.not(a)))).isTrue();
+    }
+  }
 }
