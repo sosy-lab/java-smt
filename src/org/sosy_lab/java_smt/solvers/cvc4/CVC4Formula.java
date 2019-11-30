@@ -59,7 +59,8 @@ public class CVC4Formula implements Formula {
 
   @Override
   public final int hashCode() {
-    return (int) cvc4term.getId(); // ID should work like a hashCode, TODO test this
+    // termId works like a hashCode
+    return cvc4term.getId().intValue();
   }
 
   final Expr getTerm() {
