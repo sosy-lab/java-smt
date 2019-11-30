@@ -110,7 +110,10 @@ public abstract class SolverBasedTest0 {
   }
 
   protected ConfigurationBuilder createTestConfigBuilder() {
-    return Configuration.builder().setOption("solver.solver", solverToUse().toString());
+    return Configuration.builder()
+        .setOption("solver.solver", solverToUse().toString())
+        .setOption("solver.useLogger", "true")
+        .setOption("solver.logAllQueries", "true");
   }
 
   @Before
