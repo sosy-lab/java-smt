@@ -22,7 +22,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
 import ap.parser.ITerm;
-import ap.theories.ModuloArithmetic$;
+import ap.theories.bitvectors.ModuloArithmetic$;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.base.Preconditions;

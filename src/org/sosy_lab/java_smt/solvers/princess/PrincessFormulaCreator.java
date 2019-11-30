@@ -47,9 +47,8 @@ import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
-import ap.theories.ModuloArithmetic;
-import ap.theories.ModuloArithmetic$;
 import ap.theories.SimpleArray;
+import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
@@ -84,34 +83,33 @@ class PrincessFormulaCreator
   private static final Map<Predicate, FunctionDeclarationKind> theoryPredKind = new HashMap<>();
 
   static {
-    final ModuloArithmetic$ modmod = ModuloArithmetic$.MODULE$;
-    theoryFunctionKind.put(modmod.bv_concat(), FunctionDeclarationKind.BV_CONCAT);
-    theoryFunctionKind.put(modmod.bv_extract(), FunctionDeclarationKind.BV_EXTRACT);
-    theoryFunctionKind.put(modmod.bv_not(), FunctionDeclarationKind.BV_NOT);
-    theoryFunctionKind.put(modmod.bv_neg(), FunctionDeclarationKind.BV_NEG);
-    theoryFunctionKind.put(modmod.bv_and(), FunctionDeclarationKind.BV_AND);
-    theoryFunctionKind.put(modmod.bv_or(), FunctionDeclarationKind.BV_OR);
-    theoryFunctionKind.put(modmod.bv_add(), FunctionDeclarationKind.BV_ADD);
-    theoryFunctionKind.put(modmod.bv_sub(), FunctionDeclarationKind.BV_SUB);
-    theoryFunctionKind.put(modmod.bv_mul(), FunctionDeclarationKind.BV_MUL);
-    theoryFunctionKind.put(modmod.bv_udiv(), FunctionDeclarationKind.BV_UDIV);
-    theoryFunctionKind.put(modmod.bv_sdiv(), FunctionDeclarationKind.BV_SDIV);
-    theoryFunctionKind.put(modmod.bv_urem(), FunctionDeclarationKind.BV_UREM);
-    theoryFunctionKind.put(modmod.bv_srem(), FunctionDeclarationKind.BV_SREM);
+    theoryFunctionKind.put(ModuloArithmetic.bv_concat(), FunctionDeclarationKind.BV_CONCAT);
+    theoryFunctionKind.put(ModuloArithmetic.bv_extract(), FunctionDeclarationKind.BV_EXTRACT);
+    theoryFunctionKind.put(ModuloArithmetic.bv_not(), FunctionDeclarationKind.BV_NOT);
+    theoryFunctionKind.put(ModuloArithmetic.bv_neg(), FunctionDeclarationKind.BV_NEG);
+    theoryFunctionKind.put(ModuloArithmetic.bv_and(), FunctionDeclarationKind.BV_AND);
+    theoryFunctionKind.put(ModuloArithmetic.bv_or(), FunctionDeclarationKind.BV_OR);
+    theoryFunctionKind.put(ModuloArithmetic.bv_add(), FunctionDeclarationKind.BV_ADD);
+    theoryFunctionKind.put(ModuloArithmetic.bv_sub(), FunctionDeclarationKind.BV_SUB);
+    theoryFunctionKind.put(ModuloArithmetic.bv_mul(), FunctionDeclarationKind.BV_MUL);
+    theoryFunctionKind.put(ModuloArithmetic.bv_udiv(), FunctionDeclarationKind.BV_UDIV);
+    theoryFunctionKind.put(ModuloArithmetic.bv_sdiv(), FunctionDeclarationKind.BV_SDIV);
+    theoryFunctionKind.put(ModuloArithmetic.bv_urem(), FunctionDeclarationKind.BV_UREM);
+    theoryFunctionKind.put(ModuloArithmetic.bv_srem(), FunctionDeclarationKind.BV_SREM);
     // modmod.bv_smod()?
-    theoryFunctionKind.put(modmod.bv_shl(), FunctionDeclarationKind.BV_SHL);
-    theoryFunctionKind.put(modmod.bv_lshr(), FunctionDeclarationKind.BV_LSHR);
-    theoryFunctionKind.put(modmod.bv_ashr(), FunctionDeclarationKind.BV_ASHR);
-    theoryFunctionKind.put(modmod.bv_xor(), FunctionDeclarationKind.BV_XOR);
+    theoryFunctionKind.put(ModuloArithmetic.bv_shl(), FunctionDeclarationKind.BV_SHL);
+    theoryFunctionKind.put(ModuloArithmetic.bv_lshr(), FunctionDeclarationKind.BV_LSHR);
+    theoryFunctionKind.put(ModuloArithmetic.bv_ashr(), FunctionDeclarationKind.BV_ASHR);
+    theoryFunctionKind.put(ModuloArithmetic.bv_xor(), FunctionDeclarationKind.BV_XOR);
     // modmod.bv_xnor()?
     // modmod.bv_comp()?
 
     // casts to integer, sign/zero-extension?
 
-    theoryPredKind.put(modmod.bv_ult(), FunctionDeclarationKind.BV_ULT);
-    theoryPredKind.put(modmod.bv_ule(), FunctionDeclarationKind.BV_ULE);
-    theoryPredKind.put(modmod.bv_slt(), FunctionDeclarationKind.BV_SLT);
-    theoryPredKind.put(modmod.bv_sle(), FunctionDeclarationKind.BV_SLE);
+    theoryPredKind.put(ModuloArithmetic.bv_ult(), FunctionDeclarationKind.BV_ULT);
+    theoryPredKind.put(ModuloArithmetic.bv_ule(), FunctionDeclarationKind.BV_ULE);
+    theoryPredKind.put(ModuloArithmetic.bv_slt(), FunctionDeclarationKind.BV_SLT);
+    theoryPredKind.put(ModuloArithmetic.bv_sle(), FunctionDeclarationKind.BV_SLE);
 
     theoryFunctionKind.put(GroebnerMultiplication$.MODULE$.mul(), FunctionDeclarationKind.MUL);
   }
