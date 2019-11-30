@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
  * This interface represents the Numeral Theory.
@@ -84,6 +85,9 @@ public interface NumeralFormulaManager<
 
   BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2);
 
+  /** all given numbers are pairwise unequal. */
+  BooleanFormula distinct(List<ParamFormulaType> pNumbers);
+
   BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2);
 
   BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2);
@@ -91,4 +95,12 @@ public interface NumeralFormulaManager<
   BooleanFormula lessThan(ParamFormulaType number1, ParamFormulaType number2);
 
   BooleanFormula lessOrEquals(ParamFormulaType number1, ParamFormulaType number2);
+
+  /**
+   * The {@code floor} operation returns the nearest integer formula that is less or equal to the
+   * given argument formula.
+   *
+   * <p>For rational formulae, SMTlib2 denotes this operation as {@code to_int}.
+   */
+  IntegerFormula floor(ParamFormulaType formula);
 }

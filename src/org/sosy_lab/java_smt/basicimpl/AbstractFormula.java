@@ -55,7 +55,8 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     if (!(o instanceof AbstractFormula)) {
       return false;
     }
-    return formulaInfo.equals(((AbstractFormula<?>) o).formulaInfo);
+    Object otherFormulaInfo = ((AbstractFormula<?>) o).formulaInfo;
+    return formulaInfo == otherFormulaInfo || formulaInfo.equals(otherFormulaInfo);
   }
 
   final TFormulaInfo getFormulaInfo() {

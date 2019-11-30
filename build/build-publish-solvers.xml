@@ -62,46 +62,69 @@
         description="Copy CVC4 binaries to the root folder along with the version postfix.">
         <fail unless="cvc4.path">
             Please specify the path to CVC4 with the flag -Dcvc4.path=/path/to/cvc4.
-            The path has to point to the root CVC4 folder.
+            The path has to point to the root CVC4 folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/CVC4/CVC4.git'.
             Note that shell substitutions do not work and a full absolute
             path has to be specified.
         </fail>
         <fail unless="cvc4.customRev">
             Please specify a custom revision with the flag -Dcvc4.customRev=XXX.
             The custom revision has to be unique amongst the already known version
-            numbers from the ivy repository.
+            numbers from the ivy repository. The script will append the git revision.
         </fail>
-        <exec executable="sed" dir="${cvc4.path}/builds" outputproperty="cvc4.version">
-            <arg value="-n" />
-            <arg value="-e" />
-            <arg value="s/distdir = cvc4-/${cvc4.customRev}/p" />
-            <arg value="Makefile" />
+
+        <!-- get a nive version -->
+        <exec executable="git" dir="${cvc4.path}" outputproperty="cvc4.revision">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
         </exec>
-        <exec executable="strip" dir="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/bindings/java/.libs">
+        <property name="cvc4.version" value="${cvc4.customRev}-g${cvc4.revision}"/>
+        <echo message="Building CVC4 in version '${cvc4.version}'"/>
+
+        <!-- build CVC4 -->
+        <exec executable="rm" dir="${cvc4.path}">
+            <arg value="-rf"/>
+            <arg value="symfpu-CVC4"/>
+        </exec>
+        <exec executable="./contrib/get-symfpu" dir="${cvc4.path}"/>
+        <exec executable="./configure.sh" dir="${cvc4.path}">
+            <arg value="--symfpu"/>
+            <arg value="--language-bindings=java"/>
+        </exec>
+        <exec executable="make" dir="${cvc4.path}/build/">
+            <arg value="-j4" />
+        </exec>
+
+        <!-- remove unneeded symbols -->
+        <exec executable="strip" dir="${cvc4.path}/build/src/bindings/java/">
             <arg value="libcvc4jni.so" />
         </exec>
-        <exec executable="strip" dir="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/.libs">
+        <exec executable="strip" dir="${cvc4.path}/build/src/">
             <arg value="libcvc4.so" />
         </exec>
-        <exec executable="strip" dir="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/parser/.libs">
+        <exec executable="strip" dir="${cvc4.path}/build/src/parser/">
             <arg value="libcvc4parser.so" />
         </exec>
 
-        <exec executable="chrpath" dir="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/bindings/java/.libs">
-            <arg value="-r" />
-            <arg value="$ORIGIN" />
-            <arg value="libcvc4jni.so" />
+        <!-- fix RPATH and library dependencies -->
+        <exec executable="patchelf" dir="${cvc4.path}/build/src/parser/">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libcvc4.so.6"/><arg value="libcvc4.so"/>
+            <arg value="libcvc4parser.so"/>
         </exec>
-        <exec executable="chrpath" dir="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/parser/.libs">
-            <arg value="-r" />
-            <arg value="$ORIGIN" />
-            <arg value="libcvc4parser.so" />
+        <exec executable="patchelf" dir="${cvc4.path}/build/src/bindings/java/">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libcvc4.so.6"/><arg value="libcvc4.so"/>
+            <arg value="--replace-needed"/><arg value="libcvc4parser.so.6"/><arg value="libcvc4parser.so"/>
+            <arg value="libcvc4jni.so"/>
         </exec>
 
-        <copy file="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/bindings/java/.libs/libcvc4jni.so" tofile="libcvc4jni-${cvc4.version}.so"/>
-        <copy file="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/.libs/libcvc4.so" tofile="libcvc4.so-${cvc4.version}.3"/>
-        <copy file="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/parser/.libs/libcvc4parser.so" tofile="libcvc4parser.so-${cvc4.version}.3"/>
-        <copy file="${cvc4.path}/builds/x86_64-unknown-linux-gnu/production/src/bindings/CVC4.jar" tofile="CVC4-${cvc4.version}.jar"/>
+        <!-- copy library files into directory to be published for IVY -->
+        <copy file="${cvc4.path}/build/src/libcvc4.so" tofile="libcvc4-${cvc4.version}.so"/>
+        <copy file="${cvc4.path}/build/src/parser/libcvc4parser.so" tofile="libcvc4parser-${cvc4.version}.so"/>
+        <copy file="${cvc4.path}/build/src/bindings/java/libcvc4jni.so" tofile="libcvc4jni-${cvc4.version}.so"/>
+        <copy file="${cvc4.path}/build/src/bindings/java/CVC4.jar" tofile="CVC4-${cvc4.version}.jar"/>
     </target>
 
     <target name="publish-cvc4" depends="package-cvc4, load-ivy"
@@ -124,6 +147,104 @@
             svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${cvc4.version} of CVC4 Solver"
             to make the new version publicly available.</echo>
     </target>
+
+    <!-- SECTION: Publishing Boolector {{{1
+         ==================================================================
+    -->
+    <target name="package-boolector" depends=""
+        description="Copy Boolector repository to the root folder along with the version postfix.">
+        <fail unless="boolector.path">
+            Please specify the path to Boolector with the flag -Dboolector.path=/path/to/boolector.
+            The path has to point to the root Boolector folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/boolector/boolector'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="boolector.customRev">
+            Please specify a custom revision with the flag -Dboolector.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+
+        <!-- get a nive version -->
+        <exec executable="git" dir="${boolector.path}" outputproperty="boolector.revision">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="boolector.version" value="${boolector.customRev}-g${boolector.revision}"/>
+        <echo message="Building Boolector in version '${boolector.version}'"/>
+
+        <!-- add JNI wrapper before compiling Boolector -->
+        <exec executable="cp">
+            <arg value="lib/native/source/libboolector/interface_wrap.c"/>
+            <arg value="lib/native/source/libboolector/include_interface_and_jni.patch"/>
+            <arg value="${boolector.path}/src/"/>
+        </exec>
+        <exec executable="git" dir="${boolector.path}">
+            <arg value="apply"/>
+            <arg value="src/include_interface_and_jni.patch"/>
+        </exec>
+
+        <!-- build Boolector -->
+        <exec executable="./contrib/setup-picosat.sh"    dir="${boolector.path}"/>
+        <exec executable="./contrib/setup-minisat.sh"    dir="${boolector.path}"/>
+        <exec executable="./contrib/setup-lingeling.sh"  dir="${boolector.path}"/>
+        <exec executable="./contrib/setup-cadical.sh"    dir="${boolector.path}"/>
+        <exec executable="./contrib/setup-btor2tools.sh" dir="${boolector.path}"/>
+        <exec executable="./configure.sh" dir="${boolector.path}">
+            <arg value="-fno-strict-aliasing"/>
+            <arg value="-fpic"/>
+            <arg value="--shared"/>
+        </exec>
+        <exec executable="make" dir="${boolector.path}/build/">
+            <arg value="-j4" />
+        </exec>
+
+        <!-- remove unneeded symbols -->
+        <exec executable="strip" dir="${boolector.path}/deps/install/lib/">
+            <arg value="libpicosat.so" />
+        </exec>
+        <exec executable="strip" dir="${boolector.path}/deps/install/lib/">
+            <arg value="libminisat.so" />
+        </exec>
+        <exec executable="strip" dir="${boolector.path}/build/lib/">
+            <arg value="libboolector.so" />
+        </exec>
+
+        <!-- fix RPATH and library dependencies -->
+        <exec executable="patchelf" dir="${boolector.path}/build/lib/">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libminisat.so.2"/><arg value="libminisat.so"/>
+            <arg value="libboolector.so"/>
+        </exec>
+
+        <!-- copy library files into directory to be published for IVY -->
+        <copy file="${boolector.path}/deps/install/lib/libminisat.so" tofile="libminisat-${boolector.version}.so"/>
+        <copy file="${boolector.path}/deps/install/lib/libpicosat.so" tofile="libpicosat-${boolector.version}.so"/>
+        <copy file="${boolector.path}/build/lib/libboolector.so"      tofile="libboolector-${boolector.version}.so"/>
+    </target>
+
+    <target name="publish-boolector" depends="package-boolector, load-ivy"
+        description="Publish Boolector binaries to Ivy repository.">
+
+        <ivy:resolve conf="solver-boolector" file="solvers_ivy_conf/ivy_boolector.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${boolector.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${boolector.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${boolector.version} of Boolector Solver"
+            to make the new version publicly available.</echo>
+    </target>
+
     <!-- SECTION: Publishing [Opti-]MathSAT {{{1
          ===============================================================
     -->

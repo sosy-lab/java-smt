@@ -76,6 +76,11 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   }
 
   @Override
+  public T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+    return delegate.addConstraint(pConstraint);
+  }
+
+  @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(size >= 1);
     return delegate.getModel();

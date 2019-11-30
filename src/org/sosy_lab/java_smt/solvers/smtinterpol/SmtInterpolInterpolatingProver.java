@@ -20,9 +20,9 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     return Iterables.getOnlyElement(
-        getSeqInterpolants(Lists.newArrayList(termNamesOfA, termNamesOfB)));
+        getSeqInterpolants(ImmutableList.of(termNamesOfA, termNamesOfB)));
   }
 
   @Override

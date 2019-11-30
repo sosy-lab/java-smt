@@ -19,12 +19,12 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +63,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
+    requireVisitor();
+
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula not_a_b = bmgr.not(bmgr.equivalence(a, b));
@@ -76,6 +78,8 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void nnfTacticDefaultTest2() throws SolverException, InterruptedException {
+    requireVisitor();
+
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
@@ -156,6 +160,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationSimpleTest() throws SolverException, InterruptedException {
+    requireIntegers();
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -186,6 +191,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException {
+    requireIntegers();
     // f :=uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -221,6 +227,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Test
   public void ufEliminationNesteQuantifierTest() throws InterruptedException {
+    requireIntegers();
     requireQuantifiers();
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -234,7 +241,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula f =
         qmgr.exists(
-            newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
+            ImmutableList.of(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
 
     try {
       mgr.applyTactic(f, Tactic.ACKERMANNIZATION);

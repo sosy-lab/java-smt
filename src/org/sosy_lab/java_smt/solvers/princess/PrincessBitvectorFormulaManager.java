@@ -24,8 +24,11 @@ import ap.parser.IExpression;
 import ap.parser.ITerm;
 import ap.theories.ModuloArithmetic$;
 import ap.types.Sort;
+import ap.types.Sort$;
+import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
+import scala.Option;
 
 class PrincessBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<
@@ -128,19 +131,40 @@ class PrincessBitvectorFormulaManager
 
   @Override
   protected IExpression makeBitvectorImpl(int pLength, BigInteger pI) {
-    BigInteger n = BigInteger.valueOf(2).pow(pLength);
-    if (pI.signum() < 0) {
-      BigInteger max = BigInteger.valueOf(2).pow(pLength - 1);
-      if (pI.compareTo(max.negate()) < 0) {
-        throw new IllegalArgumentException(
-            pI + " is too small for a bitvector with length " + pLength);
-      }
-      pI = pI.add(n);
-    }
-    if (pI.compareTo(n) >= 0) {
-      throw new IllegalArgumentException(pI + " is too big for a bitvector with length " + pLength);
-    }
+    pI = transformValueToRange(pLength, pI);
     return ModuloArithmetic$.MODULE$.bv(pLength, IdealInt.apply(pI));
+  }
+
+  @Override
+  protected IExpression makeBitvectorImpl(int pLength, IExpression pIntegerFormula) {
+    return ModuloArithmetic$.MODULE$.cast2UnsignedBV(pLength, (ITerm) pIntegerFormula);
+  }
+
+  @Override
+  protected IExpression toIntegerFormulaImpl(IExpression pBVFormula, boolean signed) {
+    final Sort sort = Sort$.MODULE$.sortOf((ITerm) pBVFormula);
+    final Option<Object> bitWidth = PrincessFormulaCreator.getBitWidth(sort);
+    Preconditions.checkArgument(bitWidth.isDefined());
+    final int size = (Integer) bitWidth.get();
+
+    // compute range for integer value,
+    // example: bitWidth=4 => signed_range=[-8;7] and unsigned_range=[0;15]
+    final BigInteger min;
+    final BigInteger max;
+    if (signed) {
+      min = BigInteger.ONE.shiftLeft(size - 1).negate();
+      max = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
+    } else {
+      min = BigInteger.ZERO;
+      max = BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE);
+    }
+
+    ITerm bvInRange =
+        ModuloArithmetic$.MODULE$.cast2Interval(
+            IdealInt.apply(min), IdealInt.apply(max), (ITerm) pBVFormula);
+
+    // Princess can not directly convert from BV to INT. However, adding zero helps. Ugly.
+    return IExpression.i(0).$plus(bvInRange);
   }
 
   @Override

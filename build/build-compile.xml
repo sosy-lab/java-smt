@@ -67,7 +67,7 @@
     </target>
 
     <path id="ecj">
-        <fileset dir="${ivy.lib.dir}/build" includes="ecj.jar guava.jar auto-common.jar auto-service.jar"/>
+        <fileset dir="${ivy.lib.dir}/build" includes="ecj.jar"/>
     </path>
 
     <target name="build-project-ecj" depends="build-dependencies" description="Build project with the Eclipse JDT compiler">

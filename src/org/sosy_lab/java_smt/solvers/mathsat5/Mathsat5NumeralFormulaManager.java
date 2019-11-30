@@ -19,16 +19,20 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_floor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_plus;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
@@ -51,7 +55,7 @@ abstract class Mathsat5NumeralFormulaManager<
   }
 
   @Override
-  public Long makeNumberImpl(long pNumber) {
+  protected Long makeNumberImpl(long pNumber) {
     int i = (int) pNumber;
     if (i == pNumber) { // fits in an int
       return msat_make_int_number(mathsatEnv, i);
@@ -60,54 +64,66 @@ abstract class Mathsat5NumeralFormulaManager<
   }
 
   @Override
-  public Long makeNumberImpl(BigInteger pI) {
+  protected Long makeNumberImpl(BigInteger pI) {
     return msat_make_number(mathsatEnv, pI.toString());
   }
 
   @Override
-  public Long makeNumberImpl(String pI) {
+  protected Long makeNumberImpl(String pI) {
     return msat_make_number(mathsatEnv, pI);
   }
 
   protected abstract long getNumeralType();
 
   @Override
-  public Long makeVariableImpl(String var) {
+  protected Long makeVariableImpl(String var) {
     return getFormulaCreator().makeVariable(getNumeralType(), var);
   }
 
   @Override
-  public Long negate(Long pNumber) {
+  protected Long negate(Long pNumber) {
     return msat_make_times(mathsatEnv, pNumber, msat_make_number(mathsatEnv, "-1"));
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2) {
+  protected Long add(Long pNumber1, Long pNumber2) {
     return msat_make_plus(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2) {
+  protected Long subtract(Long pNumber1, Long pNumber2) {
     return msat_make_plus(mathsatEnv, pNumber1, negate(pNumber2));
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2) {
+  protected Long multiply(Long pNumber1, Long pNumber2) {
     return msat_make_times(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
-  public Long equal(Long pNumber1, Long pNumber2) {
+  protected Long equal(Long pNumber1, Long pNumber2) {
     return msat_make_equal(mathsatEnv, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterThan(Long pNumber1, Long pNumber2) {
+  protected Long distinctImpl(List<Long> pNumbers) {
+    // MathSat does not directly support this method, we need to build the whole term.
+    long r = msat_make_true(mathsatEnv);
+    for (int i = 0; i < pNumbers.size(); i++) {
+      for (int j = 0; j < i; j++) {
+        r = msat_make_and(mathsatEnv, r, makeNot(equal(pNumbers.get(i), pNumbers.get(j))));
+      }
+    }
+    return r;
+  }
+
+  @Override
+  protected Long greaterThan(Long pNumber1, Long pNumber2) {
     return makeNot(lessOrEquals(pNumber1, pNumber2));
   }
 
   @Override
-  public Long greaterOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long greaterOrEquals(Long pNumber1, Long pNumber2) {
     return lessOrEquals(pNumber2, pNumber1);
   }
 
@@ -116,12 +132,17 @@ abstract class Mathsat5NumeralFormulaManager<
   }
 
   @Override
-  public Long lessThan(Long pNumber1, Long pNumber2) {
+  protected Long lessThan(Long pNumber1, Long pNumber2) {
     return makeNot(lessOrEquals(pNumber2, pNumber1));
   }
 
   @Override
-  public Long lessOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return msat_make_leq(mathsatEnv, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long floor(Long pNumber) {
+    return msat_make_floor(mathsatEnv, pNumber);
   }
 }

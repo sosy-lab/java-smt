@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
-import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -78,29 +77,16 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
-    if (Double.isNaN(pN) || Double.isInfinite(pN)) {
-      return Native.mkFpaNumeralDouble(z3context, pN, mkFpaSort(pType));
-    }
-    // Z3 has problems with rounding when giving a double value, so we go via Strings
+  protected Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
   @Override
-  public Long makeNumberImpl(BigDecimal pN, FloatingPointType pType, Long pRoundingMode) {
-    // Using toString() fails in CPAchecker with parse error for seemingly correct strings like
-    // "3.4028234663852886E+38" and I have no idea why and cannot reproduce it in unit tests,
-    // but toPlainString() seems to work at least.
-    return makeNumberImpl(pN.toPlainString(), pType, pRoundingMode);
-  }
-
-  @Override
-  protected Long makeNumberImpl(String pN, FloatingPointType pType, Long pRoundingMode) {
+  protected Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
         || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
-
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
       long smallPrecNumber = castToImpl(highPrecNumber, pType, pRoundingMode);
@@ -114,7 +100,7 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeVariableImpl(String var, FloatingPointType pType) {
+  protected Long makeVariableImpl(String var, FloatingPointType pType) {
     return getFormulaCreator().makeVariable(mkFpaSort(pType), var);
   }
 
@@ -196,22 +182,42 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long negate(Long pNumber) {
+  protected Long negate(Long pNumber) {
     return Native.mkFpaNeg(z3context, pNumber);
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long abs(Long pNumber) {
+    return Native.mkFpaAbs(z3context, pNumber);
+  }
+
+  @Override
+  protected Long max(Long pNumber1, Long pNumber2) {
+    return Native.mkFpaMax(z3context, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long min(Long pNumber1, Long pNumber2) {
+    return Native.mkFpaMin(z3context, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long sqrt(Long pNumber, Long pRoundingMode) {
+    return Native.mkFpaSqrt(z3context, pRoundingMode, pNumber);
+  }
+
+  @Override
+  protected Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaAdd(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaSub(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaMul(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
@@ -226,27 +232,27 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
+  protected Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
     return Native.mkFpaEq(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterThan(Long pNumber1, Long pNumber2) {
+  protected Long greaterThan(Long pNumber1, Long pNumber2) {
     return Native.mkFpaGt(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long greaterOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkFpaGeq(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessThan(Long pNumber1, Long pNumber2) {
+  protected Long lessThan(Long pNumber1, Long pNumber2) {
     return Native.mkFpaLt(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkFpaLeq(z3context, pNumber1, pNumber2);
   }
 
@@ -268,6 +274,16 @@ class Z3FloatingPointFormulaManager
   @Override
   protected Long isSubnormal(Long pParam) {
     return Native.mkFpaIsSubnormal(z3context, pParam);
+  }
+
+  @Override
+  protected Long isNormal(Long pParam) {
+    return Native.mkFpaIsNormal(z3context, pParam);
+  }
+
+  @Override
+  protected Long isNegative(Long pParam) {
+    return Native.mkFpaIsNegative(z3context, pParam);
   }
 
   @Override

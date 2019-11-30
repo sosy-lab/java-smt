@@ -35,6 +35,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SDIV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SEXT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SREM;
@@ -44,22 +45,40 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ZEXT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ABS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ADD;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_AS_IEEEBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_CAST;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_DIV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_EQ;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_FROM_SBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_FROM_UBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISINF;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISNAN;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISNEG;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISNORMAL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISSUBNORMAL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISZERO;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MAX;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MIN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MUL;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_NEG;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ROUND_TO_INT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SQRT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SUB;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_BV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -355,6 +374,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case MSAT_TAG_ITE:
         return FunctionDeclarationKind.ITE;
 
+      case MSAT_TAG_TIMES:
+        return FunctionDeclarationKind.MUL;
       case MSAT_TAG_PLUS:
         return FunctionDeclarationKind.ADD;
       case MSAT_TAG_LEQ:
@@ -408,9 +429,21 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_LSHR;
       case MSAT_TAG_BV_ASHR:
         return FunctionDeclarationKind.BV_ASHR;
+      case MSAT_TAG_BV_SEXT:
+        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      case MSAT_TAG_BV_ZEXT:
+        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
 
       case MSAT_TAG_FP_NEG:
         return FunctionDeclarationKind.FP_NEG;
+      case MSAT_TAG_FP_ABS:
+        return FunctionDeclarationKind.FP_ABS;
+      case MSAT_TAG_FP_MAX:
+        return FunctionDeclarationKind.FP_MAX;
+      case MSAT_TAG_FP_MIN:
+        return FunctionDeclarationKind.FP_MIN;
+      case MSAT_TAG_FP_SQRT:
+        return FunctionDeclarationKind.FP_SQRT;
       case MSAT_TAG_FP_ADD:
         return FunctionDeclarationKind.FP_ADD;
       case MSAT_TAG_FP_SUB:
@@ -427,6 +460,28 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_EQ;
       case MSAT_TAG_FP_ROUND_TO_INT:
         return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
+      case MSAT_TAG_FP_FROM_SBV:
+        return FunctionDeclarationKind.BV_SCASTTO_FP;
+      case MSAT_TAG_FP_FROM_UBV:
+        return FunctionDeclarationKind.BV_UCASTTO_FP;
+      case MSAT_TAG_FP_TO_BV:
+        return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case MSAT_TAG_FP_AS_IEEEBV:
+        return FunctionDeclarationKind.FP_AS_IEEEBV;
+      case MSAT_TAG_FP_CAST:
+        return FunctionDeclarationKind.FP_CASTTO_FP;
+      case MSAT_TAG_FP_ISNAN:
+        return FunctionDeclarationKind.FP_IS_NAN;
+      case MSAT_TAG_FP_ISINF:
+        return FunctionDeclarationKind.FP_IS_INF;
+      case MSAT_TAG_FP_ISZERO:
+        return FunctionDeclarationKind.FP_IS_ZERO;
+      case MSAT_TAG_FP_ISNEG:
+        return FunctionDeclarationKind.FP_IS_NEGATIVE;
+      case MSAT_TAG_FP_ISSUBNORMAL:
+        return FunctionDeclarationKind.FP_IS_SUBNORMAL;
+      case MSAT_TAG_FP_ISNORMAL:
+        return FunctionDeclarationKind.FP_IS_NORMAL;
 
       case MSAT_TAG_UNKNOWN:
         switch (msat_decl_get_name(decl)) {
@@ -442,6 +497,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           default:
             return FunctionDeclarationKind.OTHER;
         }
+
+      case MSAT_TAG_FLOOR:
+        return FunctionDeclarationKind.FLOOR;
 
       default:
         return FunctionDeclarationKind.OTHER;

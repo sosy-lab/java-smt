@@ -23,7 +23,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -60,10 +60,15 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 @RunWith(Parameterized.class)
 public class SolverVisitorTest extends SolverBasedTest0 {
 
+  /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   private final class FunctionDeclarationVisitor extends DefaultFormulaVisitor<Formula> {
+
+    private final List<FunctionDeclarationKind> found = new ArrayList<>();
+
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      found.add(functionDeclaration.getKind());
       Truth.assert_()
           .withMessage(
               "unexpected declaration kind '%s' in function '%s' with args '%s'.",
@@ -92,6 +97,11 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  @Before
+  public void setup() {
+    requireVisitor();
   }
 
   @Test
@@ -182,6 +192,63 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void floatMoreVisit() {
+    requireFloats();
+    requireBitvectors();
+    FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
+    FloatingPointFormula x = fpmgr.makeVariable("x", fp);
+    FloatingPointFormula y = fpmgr.makeVariable("x", fp);
+    BitvectorFormula z = bvmgr.makeVariable(32, "z");
+
+    checkKind(
+        fpmgr.castTo(x, FormulaType.getBitvectorTypeWithSize(32)),
+        FunctionDeclarationKind.FP_CASTTO_SBV);
+    checkKind(
+        fpmgr.castTo(x, FormulaType.getDoublePrecisionFloatingPointType()),
+        FunctionDeclarationKind.FP_CASTTO_FP);
+    checkKind(fpmgr.isNaN(x), FunctionDeclarationKind.FP_IS_NAN);
+    checkKind(fpmgr.isNegative(x), FunctionDeclarationKind.FP_IS_NEGATIVE);
+    checkKind(fpmgr.isInfinity(x), FunctionDeclarationKind.FP_IS_INF);
+    checkKind(fpmgr.isNormal(x), FunctionDeclarationKind.FP_IS_NORMAL);
+    checkKind(fpmgr.isSubnormal(x), FunctionDeclarationKind.FP_IS_SUBNORMAL);
+    checkKind(fpmgr.isZero(x), FunctionDeclarationKind.FP_IS_ZERO);
+    checkKind(fpmgr.abs(x), FunctionDeclarationKind.FP_ABS);
+    checkKind(fpmgr.max(x, y), FunctionDeclarationKind.FP_MAX);
+    checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
+    checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
+    if (Solvers.CVC4 != solverToUse()) { // CVC4 does not support this operation
+      checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
+    }
+    checkKind(
+        fpmgr.castFrom(z, true, FormulaType.getSinglePrecisionFloatingPointType()),
+        FunctionDeclarationKind.BV_SCASTTO_FP);
+    checkKind(
+        fpmgr.castFrom(z, false, FormulaType.getSinglePrecisionFloatingPointType()),
+        FunctionDeclarationKind.BV_UCASTTO_FP);
+  }
+
+  @Test
+  public void bvVisit() {
+    requireBitvectors();
+    BitvectorFormula x = bvmgr.makeVariable(5, "x");
+
+    for (Formula f : ImmutableList.of(bvmgr.extend(x, 10, true), bvmgr.extend(x, 10, false))) {
+      mgr.visit(f, new FunctionDeclarationVisitor());
+    }
+  }
+
+  private void checkKind(Formula f, FunctionDeclarationKind expected) {
+    FunctionDeclarationVisitor visitor = new FunctionDeclarationVisitor();
+    mgr.visit(f, visitor);
+    Truth.assert_()
+        .withMessage(
+            "declaration kind '%s' in function '%s' not available, only found '%s'.",
+            expected, f, visitor.found)
+        .that(visitor.found)
+        .contains(expected);
+  }
+
+  @Test
   public void booleanIdVisitWithAtoms() {
     IntegerFormula n12 = imgr.makeNumber(12);
     IntegerFormula a = imgr.makeVariable("a");
@@ -228,7 +295,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
           }
         };
     mgr.visitRecursively(f, nameExtractor);
-    assertThat(usedVariables).isEqualTo(Sets.newHashSet("x", "y", "z"));
+    assertThat(usedVariables).containsExactly("x", "y", "z");
   }
 
   @Test
@@ -305,7 +372,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
           }
         });
 
-    assertThat(found).containsAllOf("a", "b");
+    assertThat(found).containsAtLeast("a", "b");
     assertThat(found).hasSize(3); // all of the above plus the boolean "and" function
     assertThat(found).doesNotContain(ab.toString());
   }
@@ -435,7 +502,19 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
+    Map<String, Formula> mapping2 = mgr.extractVariables(q);
+
+    // all solvers must provide all symbols
+    assertThat(mapping).hasSize(2);
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
+
+    // some solvers distinguish between nullary UFs and variables and do not provide variables
+    if (ImmutableList.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
+      assertThat(mapping2).isEmpty();
+    } else {
+      assertThat(mapping2).hasSize(1);
+      assertThat(mapping2).containsEntry("v", v);
+    }
   }
 }

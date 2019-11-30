@@ -21,7 +21,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -30,7 +29,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
@@ -55,7 +53,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
       if (symbol.getParameterSorts().length == 0) { // simple variable or array
         Term variable = creator.getEnv().term(name);
         if (symbol.getReturnSort().isArraySort()) {
-          assignments.addAll(getArrayAssignment(name, variable, variable, Collections.emptyList()));
+          assignments.addAll(getArrayAssignment(name, variable, variable, ImmutableList.of()));
         } else {
           assignments.add(getAssignment(name, (ApplicationTerm) variable));
         }
@@ -94,7 +92,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
         Term index = params[1];
         Term content = params[2];
 
-        List<Object> innerIndices = Lists.newArrayList(upperIndices);
+        List<Object> innerIndices = new ArrayList<>(upperIndices);
         innerIndices.add(evaluateImpl(index));
 
         Term select = creator.getEnv().term("select", key, index);

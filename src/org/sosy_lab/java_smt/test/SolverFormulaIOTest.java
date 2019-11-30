@@ -21,12 +21,14 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
+import com.google.common.truth.TruthJUnit;
 import java.util.Iterator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +75,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void varDumpTest() {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula a = bmgr.makeVariable("main::a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
@@ -88,7 +92,11 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void varDumpTest2() {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
     // always true
+
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
@@ -115,6 +123,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void valDumpTest() {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula tr1 = bmgr.makeBoolean(true);
     BooleanFormula tr2 = bmgr.makeBoolean(true);
     BooleanFormula fl1 = bmgr.makeBoolean(false);
@@ -132,6 +142,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void intsDumpTest() {
+    requireIntegers();
     IntegerFormula f1 = imgr.makeVariable("a");
     IntegerFormula val = imgr.makeNumber(1);
     BooleanFormula formula = imgr.equal(f1, val);
@@ -146,6 +157,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void funcsDumpTest() {
+    requireIntegers();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula var = imgr.makeVariable("var_a");
     FunctionDeclaration<IntegerFormula> funA =
@@ -164,85 +176,103 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void parseMathSatTestParseFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseMathSatTestExprFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseSmtinterpolTestParseFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseSmtinterpolTestExprFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseZ3TestParseFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseZ3TestExprFirst1() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseSmtinterpolSatTestParseFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseSmtinterpolSatTestExprFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseZ3SatTestParseFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseZ3SatTestExprFirst2() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
   @Test
   public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
   public void parseMathSatTestParseFirst3() throws SolverException, InterruptedException {
+    requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
   @Test
   public void redundancyTest() {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
-    assertThat(count == 1 || count2 == 1)
-        .named(formDump + " does not contain <= or >= only once.")
+    // Please avoid exponential overhead when printing a formula.
+    assertWithMessage(formDump + " does not contain <= or >= only once.")
+        .that(count == 1 || count2 == 1)
         .isTrue();
   }
 
   @Test
   public void funDeclareTest() {
+    requireIntegers();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
@@ -264,6 +294,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void funDeclareTest2() {
+    requireIntegers();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
@@ -283,6 +314,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private void compareParseWithOrgExprFirst(String textToParse, Supplier<BooleanFormula> fun)
       throws SolverException, InterruptedException {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
     checkThatFunOnlyDeclaredOnce(textToParse);
     checkThatAssertIsInLastLine(textToParse);
@@ -295,6 +328,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   private void compareParseWithOrgParseFirst(String textToParse, Supplier<BooleanFormula> fun)
       throws SolverException, InterruptedException {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
     checkThatFunOnlyDeclaredOnce(textToParse);
     checkThatAssertIsInLastLine(textToParse);
@@ -306,6 +341,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
   }
 
   private void checkThatFunOnlyDeclaredOnce(String formDump) {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     Multiset<String> funDeclares = HashMultiset.create();
 
     for (String line : Splitter.on('\n').split(formDump)) {
@@ -321,18 +358,21 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
         it.remove();
       }
     }
-    assertThat(funDeclares).named("duplicate function declarations").isEmpty();
+    assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
   private void checkThatAssertIsInLastLine(String lines) {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     lines = lines.trim();
-    assertThat(getLast(Splitter.on('\n').split(lines)))
-        .named("last line of <\n" + lines + ">")
+    assertWithMessage("last line of <\n" + lines + ">")
+        .that(getLast(Splitter.on('\n').split(lines)))
         .startsWith("(assert ");
   }
 
   @SuppressWarnings("CheckReturnValue")
   private void checkThatDumpIsParseable(String dump) {
+    requireParser();
     mgr.parse(dump);
   }
 

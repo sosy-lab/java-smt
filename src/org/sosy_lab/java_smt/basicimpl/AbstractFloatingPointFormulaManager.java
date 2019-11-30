@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,8 +108,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(
-      BigDecimal n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
+  protected TFormulaInfo makeNumberImpl(
+      BigDecimal n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode) {
+    return makeNumberImpl(n.toPlainString(), type, pFloatingPointRoundingMode);
+  }
 
   @Override
   public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type) {
@@ -121,8 +124,32 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
   }
 
-  protected abstract TFormulaInfo makeNumberImpl(
-      String n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode);
+  /** directly catch the most common special String constants. */
+  protected TFormulaInfo makeNumberImpl(
+      String n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode) {
+    if (n.startsWith("+")) {
+      n = n.substring(1);
+    }
+    switch (n) {
+      case "NaN":
+      case "-NaN":
+        return makeNaNImpl(type);
+      case "Infinity":
+        return makePlusInfinityImpl(type);
+      case "-Infinity":
+        return makeMinusInfinityImpl(type);
+      default:
+        return makeNumberAndRound(n, type, pFloatingPointRoundingMode);
+    }
+  }
+
+  protected static boolean isNegativeZero(Double pN) {
+    Preconditions.checkNotNull(pN);
+    return Double.valueOf("-0.0").equals(pN);
+  }
+
+  protected abstract TFormulaInfo makeNumberAndRound(
+      String pN, FloatingPointType pType, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {
@@ -222,6 +249,41 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
+
+  @Override
+  public FloatingPointFormula abs(FloatingPointFormula pNumber) {
+    TFormulaInfo param1 = extractInfo(pNumber);
+    return wrap(abs(param1));
+  }
+
+  protected abstract TFormulaInfo abs(TFormulaInfo pParam1);
+
+  @Override
+  public FloatingPointFormula max(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+    return wrap(max(extractInfo(pNumber1), extractInfo(pNumber2)));
+  }
+
+  protected abstract TFormulaInfo max(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public FloatingPointFormula min(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+    return wrap(min(extractInfo(pNumber1), extractInfo(pNumber2)));
+  }
+
+  protected abstract TFormulaInfo min(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public FloatingPointFormula sqrt(FloatingPointFormula pNumber) {
+    return wrap(sqrt(extractInfo(pNumber), getDefaultRoundingMode()));
+  }
+
+  @Override
+  public FloatingPointFormula sqrt(
+      FloatingPointFormula number, FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return wrap(sqrt(extractInfo(number), getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  protected abstract TFormulaInfo sqrt(TFormulaInfo pNumber, TFormulaInfo pRoundingMode);
 
   @Override
   public FloatingPointFormula add(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
@@ -402,6 +464,20 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   protected abstract TFormulaInfo isSubnormal(TFormulaInfo pParam);
+
+  @Override
+  public BooleanFormula isNormal(FloatingPointFormula pNumber) {
+    return wrapBool(isNormal(extractInfo(pNumber)));
+  }
+
+  protected abstract TFormulaInfo isNormal(TFormulaInfo pParam);
+
+  @Override
+  public BooleanFormula isNegative(FloatingPointFormula pNumber) {
+    return wrapBool(isNegative(extractInfo(pNumber)));
+  }
+
+  protected abstract TFormulaInfo isNegative(TFormulaInfo pParam);
 
   @Override
   public FloatingPointFormula round(

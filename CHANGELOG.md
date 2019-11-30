@@ -1,5 +1,18 @@
 # JavaSMT ChangeLog
 
+## JavaSMT 3.0.0
+
+### Changes in the API
+ - New methods to cast different theories, e.g., BV to INT, REAL to INT, and vice versa.
+ - More function declaration kinds, especially for FP theory.
+
+### Improvements and Fixes
+ - New solver versions:
+    - MathSAT: 5.5.4 (Feb 2019)
+    - SMTInterpol: 2.5-66-g453d36e
+    - other solvers were not updated since the last release
+ - Improve loading of Jar file for Z3 on Java 9 (and later).
+
 ## JavaSMT 2.0.0
 
 ### Changes in the API

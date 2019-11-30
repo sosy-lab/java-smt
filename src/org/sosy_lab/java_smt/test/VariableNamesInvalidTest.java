@@ -57,6 +57,7 @@ public class VariableNamesInvalidTest extends SolverBasedTest0 {
 
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidIntVariable() {
+    requireIntegers();
     @SuppressWarnings("unused")
     Formula var = imgr.makeVariable("");
   }
@@ -83,9 +84,20 @@ public class VariableNamesInvalidTest extends SolverBasedTest0 {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidArrayVariable() {
+  public void testInvalidIntArrayVariable() {
+    requireIntegers();
     requireArrays();
     @SuppressWarnings("unused")
     Formula var = amgr.makeArray("", FormulaType.IntegerType, FormulaType.IntegerType);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidBvArrayVariable() {
+    requireBitvectors();
+    requireArrays();
+    @SuppressWarnings("unused")
+    Formula var =
+        amgr.makeArray(
+            "", FormulaType.getBitvectorTypeWithSize(2), FormulaType.getBitvectorTypeWithSize(2));
   }
 }

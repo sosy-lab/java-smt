@@ -55,7 +55,8 @@ final class PrincessFormulaManager
         pBitpreciseManager,
         null,
         pQuantifierManager,
-        pArrayManager);
+        pArrayManager,
+        null);
     creator = pCreator;
   }
 

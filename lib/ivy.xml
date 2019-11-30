@@ -7,7 +7,7 @@
       <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 
       <description homepage="https://github.com/sosy-lab/java-smt">
-          Java wrapper for Z3, MathSAT5, SMTInterpol, Princess SMT solvers.
+          Java wrapper for Z3, MathSAT5, SMTInterpol, Princess, CVC4 SMT solvers.
       </description>
     </info>
 
@@ -24,9 +24,11 @@
         <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
         <conf name="runtime-princess" extends="core" description="only one solver included"/>
         <conf name="runtime-z3" extends="core" description="only one solver included"/>
+        <conf name="runtime-cvc4" extends="core" description="only one solver included"/>
+        <conf name="runtime-boolector" extends="core" description="only one solver included"/>
 
         <!-- The normal dependencies with all solvers included. -->
-        <conf name="runtime" extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3" description="all solvers included"/>
+        <conf name="runtime" extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-boolector" description="all solvers included"/>
 
         <!-- Dependencies needed for building or running tests. -->
         <conf name="test" visibility="private" description="for developing and testing"/>
@@ -58,14 +60,14 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-323-ge8e29f7" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-357-gc47b29f" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="27.0.1-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="28.0-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="27.0.1-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="28.0-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -94,8 +96,8 @@
 
         <!-- Truth
              Library for writing literal assertions. -->
-        <dependency org="com.google.truth" name="truth" rev="0.42" conf="test->default; contrib->sources"/>
-        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="0.42" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth" name="truth" rev="0.46" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="0.46" conf="test->default; contrib->sources"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
@@ -104,7 +106,7 @@
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
-        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.9" conf="build->default"/>
+        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.11" conf="build->default"/>
 
         <!-- google-java-format
              A source-code formatter for Java -->
@@ -114,13 +116,13 @@
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.32.0" conf="checkstyle->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.9" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.12" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.9" conf="runtime->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.12" conf="runtime->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-66-g453d36e" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-533-ga4ba1513" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
         <dependency org="uuverifiers" name="princess_2.12" rev="2018-12-06-assertionless" conf="runtime-princess->default; contrib->sources">
@@ -132,9 +134,11 @@
         <dependency org="edu.tum.cs" name="java-cup" rev="11a" conf="runtime->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.3" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.4-sosy0" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.7.1" conf="runtime-z3->solver-z3" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.4.0.10" conf="runtime-optimathsat->solver-optimathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.6.3" conf="runtime-optimathsat->solver-optimathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2019-10-05-g6972cfa" conf="runtime-cvc4->solver-cvc4" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.0.0-2019-11-11-g9d06cc0" conf="runtime-boolector->solver-boolector" />
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.2"/>

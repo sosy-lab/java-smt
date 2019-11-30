@@ -23,7 +23,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -41,7 +40,6 @@ import java.util.stream.Collectors;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -100,13 +98,6 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return new SmtInterpolModel(env.getModel(), creator);
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (SmtInterpolModel model = getModel()) {
-      return model.toList();
-    }
   }
 
   protected static String generateTermName() {

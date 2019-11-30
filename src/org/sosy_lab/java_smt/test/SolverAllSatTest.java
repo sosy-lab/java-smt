@@ -79,6 +79,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
+        // CVC4 and Boolector do not support interpolation
+        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
+
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
         break;
 
@@ -117,6 +120,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Test
   public void allSatTest_unsat() throws SolverException, InterruptedException {
+    requireIntegers();
+
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);
@@ -146,6 +151,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Test
   public void allSatTest_xor() throws SolverException, InterruptedException {
+    requireIntegers();
+
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);

@@ -54,7 +54,12 @@ class SmtInterpolRationalFormulaManager
 
   @Override
   protected Term makeNumberImpl(Rational pI) {
-    return getFormulaCreator().getEnv().getTheory().rational(pI.getNum(), pI.getDen());
+    return getFormulaCreator()
+        .getEnv()
+        .getTheory()
+        .rational(
+            de.uni_freiburg.informatik.ultimate.logic.Rational.valueOf(pI.getNum(), pI.getDen()),
+            getFormulaCreator().getEnv().getTheory().getRealSort());
   }
 
   @Override
@@ -84,5 +89,10 @@ class SmtInterpolRationalFormulaManager
     } else {
       return super.divide(pNumber1, pNumber2);
     }
+  }
+
+  @Override
+  protected Term floor(Term pNumber) {
+    return getFormulaCreator().getEnv().term("to_int", pNumber);
   }
 }

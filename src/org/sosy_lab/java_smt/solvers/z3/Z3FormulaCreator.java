@@ -25,7 +25,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
@@ -39,6 +38,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -114,7 +114,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
   private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
-      Maps.newIdentityHashMap();
+      new IdentityHashMap<>();
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -149,7 +149,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long extractInfo(Formula pT) {
-    return Z3FormulaManager.getZ3Expr(pT);
+    if (pT instanceof Z3Formula) {
+      return ((Z3Formula) pT).getFormulaInfo();
+    }
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
   @SuppressWarnings("unchecked")
@@ -463,6 +467,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.MUL;
       case Z3_OP_MOD:
         return FunctionDeclarationKind.MODULO;
+      case Z3_OP_TO_INT:
+        return FunctionDeclarationKind.FLOOR;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -550,9 +556,21 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_LSHR;
       case Z3_OP_BASHR:
         return FunctionDeclarationKind.BV_ASHR;
+      case Z3_OP_SIGN_EXT:
+        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      case Z3_OP_ZERO_EXT:
+        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
+      case Z3_OP_FPA_ABS:
+        return FunctionDeclarationKind.FP_ABS;
+      case Z3_OP_FPA_MAX:
+        return FunctionDeclarationKind.FP_MAX;
+      case Z3_OP_FPA_MIN:
+        return FunctionDeclarationKind.FP_MIN;
+      case Z3_OP_FPA_SQRT:
+        return FunctionDeclarationKind.FP_SQRT;
       case Z3_OP_FPA_SUB:
         return FunctionDeclarationKind.FP_SUB;
       case Z3_OP_FPA_ADD:
@@ -583,7 +601,34 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_ROUND_ZERO;
       case Z3_OP_FPA_ROUND_TO_INTEGRAL:
         return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
-
+      case Z3_OP_FPA_TO_FP_UNSIGNED:
+        return FunctionDeclarationKind.BV_UCASTTO_FP;
+      case Z3_OP_FPA_TO_SBV:
+        return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case Z3_OP_FPA_TO_IEEE_BV:
+        return FunctionDeclarationKind.FP_AS_IEEEBV;
+      case Z3_OP_FPA_TO_FP:
+        Z3_sort_kind sortKind =
+            Z3_sort_kind.fromInt(
+                Native.getSortKind(
+                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 1))));
+        if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
+          return FunctionDeclarationKind.BV_SCASTTO_FP;
+        } else {
+          return FunctionDeclarationKind.FP_CASTTO_FP;
+        }
+      case Z3_OP_FPA_IS_NAN:
+        return FunctionDeclarationKind.FP_IS_NAN;
+      case Z3_OP_FPA_IS_INF:
+        return FunctionDeclarationKind.FP_IS_INF;
+      case Z3_OP_FPA_IS_ZERO:
+        return FunctionDeclarationKind.FP_IS_ZERO;
+      case Z3_OP_FPA_IS_NEGATIVE:
+        return FunctionDeclarationKind.FP_IS_NEGATIVE;
+      case Z3_OP_FPA_IS_SUBNORMAL:
+        return FunctionDeclarationKind.FP_IS_SUBNORMAL;
+      case Z3_OP_FPA_IS_NORMAL:
+        return FunctionDeclarationKind.FP_IS_NORMAL;
       default:
         return FunctionDeclarationKind.OTHER;
     }

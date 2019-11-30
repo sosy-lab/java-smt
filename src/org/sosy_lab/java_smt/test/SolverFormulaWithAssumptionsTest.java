@@ -27,7 +27,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,13 +111,13 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
               env.isUnsatWithAssumptions(
                   ImmutableList.of(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
           .isTrue();
-      assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
+      assertThat(env.getInterpolant(ImmutableList.of(firstPartForInterpolant)).toString())
           .doesNotContain("suffix");
       assertThat(
               env.isUnsatWithAssumptions(
                   ImmutableList.of(bmgr.not(suffix1), bmgr.not(suffix3), suffix2)))
           .isTrue();
-      assertThat(env.getInterpolant(Collections.singletonList(firstPartForInterpolant)).toString())
+      assertThat(env.getInterpolant(ImmutableList.of(firstPartForInterpolant)).toString())
           .doesNotContain("suffix");
     }
   }
@@ -160,7 +159,7 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
             .isTrue();
 
         for (int j = 0; j < i; j++) {
-          BooleanFormula itp = env.getInterpolant(Collections.singletonList(ids.get(j)));
+          BooleanFormula itp = env.getInterpolant(ImmutableList.of(ids.get(j)));
           for (String var : mgr.extractVariables(itp).keySet()) {
             assertThat(var).doesNotContain("suffix");
           }

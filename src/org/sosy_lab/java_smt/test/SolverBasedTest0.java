@@ -132,7 +132,12 @@ public abstract class SolverBasedTest0 {
 
     fmgr = mgr.getUFManager();
     bmgr = mgr.getBooleanFormulaManager();
-    imgr = mgr.getIntegerFormulaManager();
+    // Needed for Boolector tests (Doesnt support Integer Formulas)
+    try {
+      imgr = mgr.getIntegerFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      imgr = null;
+    }
     try {
       rmgr = mgr.getRationalFormulaManager();
     } catch (UnsupportedOperationException e) {
@@ -167,6 +172,14 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  /** Skip test if the solver does not support integers. */
+  protected final void requireIntegers() {
+    assume()
+        .withMessage("Solver %s does not support the theory of integers", solverToUse())
+        .that(imgr)
+        .isNotNull();
+  }
+
   /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
@@ -182,6 +195,7 @@ public abstract class SolverBasedTest0 {
         .that(bvmgr)
         .isNotNull();
   }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
@@ -207,10 +221,6 @@ public abstract class SolverBasedTest0 {
 
   /** Skip test if the solver does not support optimization. */
   protected final void requireOptimization() {
-
-    // TODO: re-enable opti-mathsat, currently it has too many bugs.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
-
     try {
       context.newOptimizationProverEnvironment().close();
     } catch (UnsupportedOperationException e) {
@@ -230,6 +240,34 @@ public abstract class SolverBasedTest0 {
           .that(e)
           .isNull();
     }
+  }
+
+  protected void requireParser() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
+  }
+
+  protected void requireModel() {
+    assume()
+        .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireVisitor() {
+    assume()
+        .withMessage("Solver %s does not support formula visitor", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireUnsatCore() {
+    assume()
+        .withMessage("Solver %s does not support unsat core generation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   @Deprecated

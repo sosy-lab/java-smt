@@ -107,7 +107,12 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * BasicProverEnvironment#getModelAssignments()} instead in this case.
    */
   @Override
-  Iterator<ValueAssignment> iterator();
+  default Iterator<ValueAssignment> iterator() {
+    return asList().iterator();
+  }
+
+  /** Build a list of assignments that stays valid after closing the model. */
+  ImmutableList<ValueAssignment> asList();
 
   /** Pretty-printing of the model values. */
   @Override

@@ -157,7 +157,7 @@ class PrincessFormulaCreator
       } else if (sort instanceof SimpleArray.ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
       } else {
-        scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+        scala.Option<Object> bitWidth = getBitWidth(sort);
         if (bitWidth.isDefined()) {
           return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
         }
@@ -166,6 +166,14 @@ class PrincessFormulaCreator
     throw new IllegalArgumentException(
         String.format(
             "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+  }
+
+  static scala.Option<Object> getBitWidth(final Sort sort) {
+    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+    if (!bitWidth.isDefined()) {
+      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
+    }
+    return bitWidth;
   }
 
   @Override
@@ -196,7 +204,7 @@ class PrincessFormulaCreator
     if (pFormula instanceof BitvectorFormula) {
       ITerm input = (ITerm) extractInfo(pFormula);
       Sort sort = Sort$.MODULE$.sortOf(input);
-      scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+      scala.Option<Object> bitWidth = getBitWidth(sort);
       checkArgument(
           bitWidth.isDefined(), "BitvectorFormula with actual type " + sort + ": " + pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());

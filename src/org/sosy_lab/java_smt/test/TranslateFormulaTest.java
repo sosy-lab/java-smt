@@ -60,7 +60,7 @@ public class TranslateFormulaTest {
   @Parameter(1)
   public Solvers translateTo;
 
-  @Parameters
+  @Parameters(name = "{index}: {0} --> {1}")
   public static Object[] getSolversProduct() {
     // Every combination: translateFrom and translateTo.
     int len = Solvers.values().length;
@@ -105,8 +105,24 @@ public class TranslateFormulaTest {
     }
   }
 
+  private void requireParser() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", translateTo)
+        .that(translateTo)
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
+  }
+
+  private void requireIntegers() {
+    assume()
+        .withMessage("Solver %s does not support integer theory", translateFrom)
+        .that(translateFrom)
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
+    requireParser();
+
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
@@ -116,6 +132,8 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
+    requireParser();
+
     BooleanFormula input = createTestFormula(managerFrom);
     BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
 
@@ -123,6 +141,8 @@ public class TranslateFormulaTest {
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {
+    requireIntegers();
+
     BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
     IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
     IntegerFormula x = ifmgr.makeVariable("x");

@@ -32,6 +32,12 @@ JavaSMT can express formulas in the following theories:
  - Array
  - Uninterpreted Function
 
+Currently JavaSMT support several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
+ - [MathSAT5](http://mathsat.fbk.eu/)
+ - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
+ - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
+ - [Z3](https://github.com/Z3Prover/z3)
+
 The following features are supported:
 
  - Satisfiability checking
@@ -73,7 +79,7 @@ Currently we do not support performing garbage collection for MathSAT5.
 
 
 ## Getting started
-Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](Getting-started.md)
+Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](doc/Getting-started.md)
 
 #### Usage
 ``` java

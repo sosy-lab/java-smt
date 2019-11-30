@@ -87,6 +87,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegersEvaluation1() throws SolverException, InterruptedException {
+    requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.add(imgr.makeVariable("y"), imgr.makeVariable("z")),
@@ -96,6 +97,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegersEvaluation2() throws SolverException, InterruptedException {
+    requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.add(imgr.makeVariable("y"), imgr.makeNumber(1)),
@@ -105,6 +107,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testGetNegativeIntegersEvaluation() throws SolverException, InterruptedException {
+    requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
         imgr.add(imgr.makeVariable("y"), imgr.makeNumber(1)),

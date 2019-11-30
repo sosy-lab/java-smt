@@ -55,7 +55,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pBitpreciseManager,
         pFloatingPointManager,
         pQuantifiedManager,
-        pArrayManager);
+        pArrayManager,
+        null);
     formulaCreator = pFormulaCreator;
   }
 
@@ -81,14 +82,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
             decls);
 
     return getFormulaCreator().encapsulateBoolean(e);
-  }
-
-  static long getZ3Expr(Formula pT) {
-    if (pT instanceof Z3Formula) {
-      return ((Z3Formula) pT).getFormulaInfo();
-    }
-    throw new IllegalArgumentException(
-        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
   }
 
   @Override

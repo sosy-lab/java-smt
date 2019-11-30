@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 /**
@@ -381,6 +382,13 @@ public abstract class AbstractNumeralFormulaManager<
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
+  public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
+    return wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+  }
+
+  protected abstract TFormulaInfo distinctImpl(List<TFormulaInfo> pNumbers);
+
+  @Override
   public BooleanFormula greaterThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -419,4 +427,20 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public IntegerFormula floor(ParamFormulaType number) {
+    if (getFormulaCreator().getFormulaType(number) == FormulaType.IntegerType) {
+      return (IntegerFormula) number;
+    } else {
+      return getFormulaCreator().encapsulate(FormulaType.IntegerType, floor(extractInfo(number)));
+    }
+  }
+
+  protected TFormulaInfo floor(TFormulaInfo number) {
+    // identity function for integers, method is overridden for rationals
+    throw new AssertionError(
+        "method should only be called for RationalFormulae, but type is "
+            + getFormulaCreator().getFormulaType(number));
+  }
 }

@@ -13,12 +13,13 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>2.0.0</version>
+  <version>3.2.0</version>
 </dependency>
 ```
 
-Currently, only SMTInterpol is automatically fetched from Maven Central,
-and shared object for other solvers would have to be installed manually:
+Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
+because they are written in Java and Scala, and thus are available on every machine.
+Shared object for _other solvers, such as `MathSAT5` or `Z3`, would have to be installed manually_:
 see the section "Manual Installation" below.
 
 ### Automatic Installation using Ivy
@@ -28,7 +29,7 @@ If your build tool supports fetching packages from [Apache Ivy](https://ant.apac
 After the repository URL is configured, you only need to add the following dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="java-smt" rev="2.0.0" />
+<dependency org="org.sosy_lab" name="java-smt" rev="3.2.0"/>
 ```
 
 ### Manual Installation
@@ -37,12 +38,14 @@ JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository
 
  - The desired version has to be chosen.
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
- - Suppose the version `2.0.0` was chosen.
-   Ivy description file [`ivy-2.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-2.0.0.xml) can
+   **JavaSMT might not yet support the latest version on the solver's webpage,
+   but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).**
+ - Suppose the version `3.2.0` was chosen.
+   Ivy description file [`ivy-3.2.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-3.2.0.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `java-smt-2.0.0.jar` and (optionally)
-   `java-smt-2.0.0-sources.jar`, located in the same directory.
+   In the example case, those are `java-smt-3.2.0.jar` and (optionally)
+   `java-smt-3.2.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
    E.g. in the example, Z3 version `z3-4.7.1` is specified,
    which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.7.1.xml)
@@ -64,7 +67,7 @@ For [Z3](https://github.com/Z3Prover/z3), download either the [official binaries
 or build it with the flags `--java --git-describe` according to its documentation.
 Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
 In order to compile MathSAT binaries,
-see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](lib/native/source/libmathsat5j/compile.sh)
+see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](../lib/native/source/libmathsat5j/compile.sh)
 script.
 
 Solvers which run directly on JDK (currently Princess and SMTInterpol)

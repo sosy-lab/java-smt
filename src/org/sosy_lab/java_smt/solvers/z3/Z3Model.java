@@ -22,14 +22,12 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.google.common.base.Preconditions;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -112,7 +110,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     try {
       long symbol = Native.getDeclName(z3context, keyDecl);
       if (z3creator.isConstant(value)) {
-        return Collections.singletonList(
+        return ImmutableList.of(
             new ValueAssignment(
                 z3creator.encapsulateWithTypeOf(var),
                 z3creator.encapsulateWithTypeOf(value),
@@ -124,7 +122,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       } else if (Native.isAsArray(z3context, value)) {
         long arrayFormula = Native.mkConst(z3context, symbol, Native.getSort(z3context, value));
         Native.incRef(z3context, arrayFormula);
-        return getArrayAssignments(symbol, arrayFormula, value, Collections.emptyList());
+        return getArrayAssignments(symbol, arrayFormula, value, ImmutableList.of());
 
       } else if (Native.isApp(z3context, value)) {
         long decl = Native.getAppDecl(z3context, value);
@@ -240,7 +238,7 @@ class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       long select = Native.mkSelect(z3context, arrayFormula, arrayIndex);
       Native.incRef(z3context, select);
 
-      List<Object> innerIndices = Lists.newArrayList(upperIndices);
+      List<Object> innerIndices = new ArrayList<>(upperIndices);
       innerIndices.add(evaluateImpl(arrayIndex));
 
       if (z3creator.isConstant(arrayValue)) {

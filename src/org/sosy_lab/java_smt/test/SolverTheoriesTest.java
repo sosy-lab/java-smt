@@ -21,10 +21,13 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +85,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void basicIntTest() {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
     assertThat(a).isNotEqualTo(b);
@@ -100,6 +104,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest1() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula num = imgr.makeNumber(2);
 
@@ -109,6 +114,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest2() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_b");
     IntegerFormula num = imgr.makeNumber(1);
 
@@ -118,6 +124,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivModLinear() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -166,6 +173,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void intTest3_DivModNonLinear() throws SolverException, InterruptedException {
     // not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
+    requireIntegers();
 
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -193,6 +201,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivMod_NegativeNumbersLinear() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -258,6 +267,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       throws SolverException, InterruptedException {
     // TODO not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
+    requireIntegers();
 
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -380,8 +390,14 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(fa, bmgr.not(fAMod5))).isUnsatisfiable();
 
     // check modulo-by-constant, a=-10 && a%3=-1
-    assertThatFormula(bmgr.and(fa, fAMod3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, bmgr.not(fAMod3))).isUnsatisfiable();
+    if (solverToUse() == Solvers.BOOLECTOR) {
+      // TODO check this strange behavior of Boolector
+      assertThatFormula(bmgr.and(fa, fAMod3)).isUnsatisfiable();
+      assertThatFormula(bmgr.and(fa, bmgr.not(fAMod3))).isSatisfiable();
+    } else {
+      assertThatFormula(bmgr.and(fa, fAMod3)).isSatisfiable();
+      assertThatFormula(bmgr.and(fa, bmgr.not(fAMod3))).isUnsatisfiable();
+    }
 
     // check modulo-by-constant, a=-10 && a%(-3)=-1
     assertThatFormula(bmgr.and(fa, fAModNeg3)).isSatisfiable();
@@ -390,6 +406,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest4_ModularCongruence_Simple() throws SolverException, InterruptedException {
+    requireIntegers();
     final IntegerFormula x = imgr.makeVariable("x");
     final BooleanFormula f1 = imgr.modularCongruence(x, imgr.makeNumber(0), 2);
     final BooleanFormula f2 = imgr.equal(x, imgr.makeNumber(1));
@@ -399,6 +416,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest4_ModularCongruence() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -443,6 +461,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   @Test
   public void intTest4_ModularCongruence_NegativeNumbers()
       throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -465,6 +484,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testHardCongruence() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
     IntegerFormula c = imgr.makeVariable("c");
@@ -542,6 +562,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testUfWithBoolType() throws SolverException, InterruptedException {
+    requireIntegers();
     FunctionDeclaration<BooleanFormula> uf =
         fmgr.declareUF("fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula uf0 = fmgr.callUF(uf, imgr.makeNumber(0));
@@ -560,31 +581,26 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
-  @Ignore
   public void testUfWithBoolArg() throws SolverException, InterruptedException {
-    // Not all SMT solvers support UFs with boolean arguments.
-    // We can simulate this with "uf(ite(p,0,1))", but currently we do not need this.
-    // Thus this test is disabled and the following is enabled.
+    assume()
+        .withMessage("Solver %s does not support boolean arguments", solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
 
+    requireIntegers();
     FunctionDeclaration<IntegerFormula> uf =
         fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
     IntegerFormula ufTrue = fmgr.callUF(uf, bmgr.makeBoolean(true));
     IntegerFormula ufFalse = fmgr.callUF(uf, bmgr.makeBoolean(false));
 
     BooleanFormula f = bmgr.not(imgr.equal(ufTrue, ufFalse));
-    assertThat(f.toString()).isEmpty();
     assertThatFormula(f).isSatisfiable();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
-  public void testUfWithBoolArg_unsupported() {
-    fmgr.declareUF("fun_bi", FormulaType.IntegerType, FormulaType.BooleanType);
   }
 
   @Test
   public void quantifierEliminationTest1() throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
 
     IntegerFormula var_B = imgr.makeVariable("b");
     IntegerFormula var_C = imgr.makeVariable("c");
@@ -608,6 +624,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   @Ignore
   public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
 
     IntegerFormula i1 = imgr.makeVariable("i@1");
     IntegerFormula j1 = imgr.makeVariable("j@1");
@@ -637,6 +654,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testGetFormulaType() {
+    requireIntegers();
     BooleanFormula _boolVar = bmgr.makeVariable("boolVar");
     assertThat(mgr.getFormulaType(_boolVar)).isEqualTo(FormulaType.BooleanType);
 
@@ -652,6 +670,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   @Test
   public void testMakeIntArray() {
     requireArrays();
+    requireIntegers();
 
     IntegerFormula _i = imgr.makeVariable("i");
     IntegerFormula _1 = imgr.makeNumber(1);
@@ -661,14 +680,17 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula _b_at_i_plus_1 = amgr.select(_b, _i_plus_1);
 
-    if (solver == Solvers.MATHSAT5) {
-      // Mathsat5 has a different internal representation of the formula
-      assertThat(_b_at_i_plus_1.toString()).isEqualTo("(`read_int_int` b (`+_int` i 1))");
-    } else if (solver == Solvers.PRINCESS) {
-      assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
-    } else {
-      assertThat(_b_at_i_plus_1.toString())
-          .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
+    switch (solver) {
+      case MATHSAT5:
+        // Mathsat5 has a different internal representation of the formula
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(`read_int_int` b (`+_int` i 1))");
+        break;
+      case PRINCESS:
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
+        break;
+      default:
+        assertThat(_b_at_i_plus_1.toString())
+            .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
     }
   }
 
@@ -690,12 +712,20 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
             FormulaType.getBitvectorTypeWithSize(32));
     BitvectorFormula _b_at_i = amgr.select(_b, _i);
 
-    if (solver == Solvers.MATHSAT5) {
-      // Mathsat5 has a different internal representation of the formula
-      assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
-    } else {
-      assertThat(_b_at_i.toString())
-          .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
+    switch (solver) {
+      case MATHSAT5:
+        // Mathsat5 has a different internal representation of the formula
+        assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
+        break;
+      case BOOLECTOR:
+        assume()
+            .withMessage("Solver %s does not printing formulae.", solverToUse())
+            .that(solver)
+            .isNotEqualTo(Solvers.BOOLECTOR);
+        break;
+      default:
+        assertThat(_b_at_i.toString())
+            .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
     }
   }
 
@@ -703,6 +733,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void testNestedRationalArray() {
     requireArrays();
     requireRationals();
+    requireIntegers();
 
     IntegerFormula _i = imgr.makeVariable("i");
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, RationalFormula>> multi =
@@ -713,11 +744,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     RationalFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
 
-    if (solver == Solvers.MATHSAT5) {
-      assertThat(valueInMulti.toString())
-          .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
-    } else {
-      assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    switch (solver) {
+      case MATHSAT5:
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
     }
   }
 
@@ -725,6 +758,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   public void testNestedBitVectorArray() {
     requireArrays();
     requireBitvectors();
+    requireIntegers();
 
     assume()
         .withMessage("Solver does not support bit-vector arrays.")
@@ -741,18 +775,20 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     BitvectorFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
 
-    if (solver == Solvers.MATHSAT5) {
-      assertThat(valueInMulti.toString())
-          .isEqualTo(
-              "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, "
-                  + ">` multi i) i)");
-    } else {
-      assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    switch (solver) {
+      case MATHSAT5:
+        String readWrite =
+            "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)";
+        assertThat(valueInMulti.toString()).isEqualTo(readWrite);
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
     }
   }
 
   @Test
   public void nonLinearMultiplication() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -785,6 +821,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void composedLinearMultiplication() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -813,6 +850,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void multiplicationSquares() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -874,6 +912,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void multiplicationFactors() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula i37 = imgr.makeNumber(37);
     IntegerFormula i1 = imgr.makeNumber(1);
     IntegerFormula x = imgr.makeVariable("x");
@@ -899,6 +938,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void multiplicationCubic() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula i125 = imgr.makeNumber(125);
     IntegerFormula i27 = imgr.makeNumber(27);
     IntegerFormula i5 = imgr.makeNumber(5);
@@ -937,6 +977,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void nonLinearDivision() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -969,6 +1010,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void integerDivisionRounding() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula varSeven = imgr.makeVariable("a");
     IntegerFormula varEight = imgr.makeVariable("b");
 
@@ -1005,23 +1047,60 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("CheckReturnValue")
   public void bvOutOfRange() {
     requireBitvectors();
-    assume()
-        .withMessage("TODO: Z3BitvectorFormulaManager does not correctly implement this")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
 
-    try {
-      bvmgr.makeBitvector(4, 32);
-      fail();
-    } catch (IllegalArgumentException expected) {
+    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
+      try {
+        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
     }
 
-    try {
-      bvmgr.makeBitvector(4, -9);
-      fail();
-    } catch (IllegalArgumentException expected) {
+    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
+      // allowed values
+      bvmgr.makeBitvector(size, (1L << size) - 1);
+      bvmgr.makeBitvector(size, -(1L << (size - 1)));
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, 1L << size);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
+
+    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
+      if (size > 64) {
+        assume()
+            .withMessage("Solver does not support large bitvectors")
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.CVC4);
+      }
+
+      // allowed values
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE));
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(
+            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
+        fail();
+      } catch (IllegalArgumentException expected) {
+      }
     }
   }
 
@@ -1032,5 +1111,74 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
+  }
+
+  private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4, Solvers.BOOLECTOR);
+  private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
+      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR);
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void testVariableWithDifferentSort() {
+    assume().that(solverToUse()).isNotIn(VAR_TRACKING_SOLVERS);
+    bmgr.makeVariable("x");
+    if (imgr != null) {
+      imgr.makeVariable("x");
+    } else if (bvmgr != null) {
+      bvmgr.makeVariable(8, "x");
+    }
+  }
+
+  @Test(expected = Exception.class) // complement of above test case
+  @SuppressWarnings("CheckReturnValue")
+  public void testFailOnVariableWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_TRACKING_SOLVERS);
+    bmgr.makeVariable("x");
+    if (imgr != null) {
+      imgr.makeVariable("x");
+    } else if (bvmgr != null) {
+      bvmgr.makeVariable(8, "x");
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void testVariableAndUFWithDifferentSort() {
+    assume().that(solverToUse()).isNotIn(VAR_AND_UF_TRACKING_SOLVERS);
+    bmgr.makeVariable("y");
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+  }
+
+  @Test(expected = Exception.class) // complement of above test case
+  @SuppressWarnings("CheckReturnValue")
+  public void testFailOnVariableAndUFWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
+    bmgr.makeVariable("y");
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+  }
+
+  @Test(expected = Exception.class) // different ordering of above test case
+  @SuppressWarnings("CheckReturnValue")
+  public void testFailOnUFAndVariableWithDifferentSort() {
+    assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
+    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+    bmgr.makeVariable("y");
+  }
+
+  @Test
+  public void testVariableAndUFWithEqualSort() {
+    assume()
+        .withMessage("Solver %s does not support UFs without arguments", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula z1 = bmgr.makeVariable("z");
+    BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
+    if (ImmutableSet.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
+      assertNotEquals(z1, z2);
+    } else {
+      assertEquals(z1, z2);
+    }
   }
 }

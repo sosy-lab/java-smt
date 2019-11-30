@@ -21,13 +21,35 @@ package org.sosy_lab.java_smt.api;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /** Manager for dealing with formulas of the bitvector sort. */
 public interface BitvectorFormulaManager {
 
+  /**
+   * Convert a number into a bitvector with given size.
+   *
+   * @throws IllegalArgumentException if the number is out of range for the given length.
+   */
   BitvectorFormula makeBitvector(int length, long pI);
 
+  /**
+   * Convert a number into a bitvector with given size.
+   *
+   * @throws IllegalArgumentException if the number is out of range for the given length.
+   */
   BitvectorFormula makeBitvector(int length, BigInteger pI);
+
+  /**
+   * Convert/Cast a numeral formula into a bitvector with given size.
+   *
+   * <p>If the numeral formula is too large for the given length, we cut off the largest bits and
+   * only use the smallest bits.
+   */
+  BitvectorFormula makeBitvector(int length, IntegerFormula pI);
+
+  /** Interpret a signed/unsigned bitvector formula as an integer formula. */
+  IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed);
 
   /**
    * Creates a variable with exactly the given name and bitwidth.

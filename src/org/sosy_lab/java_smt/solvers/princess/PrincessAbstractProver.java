@@ -23,16 +23,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConversions.iterableAsScalaIterable;
 
 import ap.SimpleAPI;
-import ap.parser.IBinFormula;
-import ap.parser.IBinJunctor;
-import ap.parser.IBoolLit;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
-import ap.parser.INot;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,23 +37,19 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import scala.Enumeration.Value;
-import scala.Option;
 
-abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
+abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E> {
 
   protected final SimpleAPI api;
   protected final PrincessFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
   private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
-  protected final ShutdownNotifier shutdownNotifier;
 
   private final PrincessFormulaCreator creator;
-  protected boolean closed = false;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected PrincessAbstractProver(
@@ -67,11 +58,10 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pOptions);
+    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
-    this.shutdownNotifier = checkNotNull(pShutdownNotifier);
   }
 
   /**
@@ -146,14 +136,12 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return new PrincessModel(api.partialModel(), creator);
+    return getModelWithoutChecks();
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    try (PrincessModel model = getModel()) {
-      return model.toList();
-    }
+  protected PrincessModel getModelWithoutChecks() {
+    return new PrincessModel(api.partialModel(), creator);
   }
 
   @Override
@@ -213,42 +201,9 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProver<E> {
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    checkGenerateAllSat();
-
-    // unpack formulas to terms
-    List<IFormula> importantFormulas = new ArrayList<>(important.size());
-    for (BooleanFormula impF : important) {
-      importantFormulas.add((IFormula) mgr.extractInfo(impF));
-    }
-
-    api.push();
-    while (!isUnsat()) {
-      shutdownNotifier.shutdownIfNecessary();
-
-      IFormula newFormula = new IBoolLit(true); // neutral element for AND
-      List<BooleanFormula> wrappedPartialModel = new ArrayList<>(important.size());
-      for (final IFormula f : importantFormulas) {
-        final Option<Object> value = api.evalPartial(f);
-        if (value.isDefined()) {
-          final boolean isTrueValue = (boolean) value.get();
-          final IFormula newElement = isTrueValue ? f : new INot(f);
-
-          wrappedPartialModel.add(mgr.encapsulateBooleanFormula(newElement));
-          newFormula = new IBinFormula(IBinJunctor.And(), newFormula, newElement);
-        }
-      }
-      callback.apply(wrappedPartialModel);
-
-      // add negation of current formula to get a new model in next iteration
-      addConstraint0(new INot(newFormula));
-    }
-    shutdownNotifier.shutdownIfNecessary();
-    api.pop();
-
+    T result = super.allSat(callback, important);
     wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
-
-    return callback.getResult();
+    return result;
   }
 
   /** add external definition: boolean variable. */

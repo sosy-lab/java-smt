@@ -27,11 +27,11 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -76,6 +76,11 @@ public class ModelTest extends SolverBasedTest0 {
     return solver;
   }
 
+  @Before
+  public void setup() {
+    requireModel();
+  }
+
   @Test
   public void testEmpty() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -105,6 +110,8 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegers() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.makeVariable("x"),
@@ -114,6 +121,8 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetNegativeIntegers() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
         imgr.makeVariable("x"),
@@ -123,6 +132,8 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetLargeIntegers() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(large)),
@@ -133,6 +144,8 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireRationals();
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
@@ -143,6 +156,8 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireRationals();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
@@ -154,6 +169,8 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetRationals() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireRationals();
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
@@ -164,28 +181,51 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    testModelGetters(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true, "x");
+    for (String name : new String[] {"x", "x-x", "x::x"}) {
+      testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
+    }
   }
 
   @Test
   public void testGetUFs() throws SolverException, InterruptedException {
-    IntegerFormula x =
-        fmgr.declareAndCallUF("UF", IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
-    testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+    // Boolector does not support integers
+    if (imgr != null) {
+      IntegerFormula x =
+          fmgr.declareAndCallUF("UF", IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
+      testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+    } else {
+      BitvectorFormula x =
+          fmgr.declareAndCallUF(
+              "UF",
+              FormulaType.getBitvectorTypeWithSize(8),
+              ImmutableList.of(bvmgr.makeVariable(8, "arg")));
+      testModelGetters(bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF");
+    }
   }
 
   @Test
   public void testGetUFwithMoreParams() throws Exception {
-    IntegerFormula x =
-        fmgr.declareAndCallUF(
-            "UF",
-            IntegerType,
-            ImmutableList.of(imgr.makeVariable("arg1"), imgr.makeVariable("arg2")));
-    testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+    // Boolector does not support integers
+    if (imgr != null) {
+      IntegerFormula x =
+          fmgr.declareAndCallUF(
+              "UF",
+              IntegerType,
+              ImmutableList.of(imgr.makeVariable("arg1"), imgr.makeVariable("arg2")));
+      testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+    } else {
+      BitvectorFormula x =
+          fmgr.declareAndCallUF(
+              "UF",
+              FormulaType.getBitvectorTypeWithSize(8),
+              ImmutableList.of(bvmgr.makeVariable(8, "arg1"), bvmgr.makeVariable(8, "arg2")));
+      testModelGetters(bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF");
+    }
   }
 
   @Test
-  public void testGetMultipleUFs() throws Exception {
+  public void testGetMultipleUFsWithInts() throws Exception {
+    requireIntegers();
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
     FunctionDeclaration<IntegerFormula> declaration =
@@ -247,8 +287,76 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testGetMultipleUFsWithBvs() throws Exception {
+    requireBitvectors();
+    BitvectorFormula arg1 = bvmgr.makeVariable(8, "arg1");
+    BitvectorFormula arg2 = bvmgr.makeVariable(8, "arg2");
+    FunctionDeclaration<BitvectorFormula> declaration =
+        fmgr.declareUF(
+            "UF", FormulaType.getBitvectorTypeWithSize(8), FormulaType.getBitvectorTypeWithSize(8));
+    BitvectorFormula app1 = fmgr.callUF(declaration, arg1);
+    BitvectorFormula app2 = fmgr.callUF(declaration, arg2);
+
+    BitvectorFormula one = bvmgr.makeBitvector(8, 1);
+    BitvectorFormula two = bvmgr.makeBitvector(8, 2);
+    BitvectorFormula three = bvmgr.makeBitvector(8, 3);
+    BitvectorFormula four = bvmgr.makeBitvector(8, 4);
+
+    ImmutableList<ValueAssignment> expectedModel =
+        ImmutableList.of(
+            new ValueAssignment(
+                arg1,
+                three,
+                bvmgr.equal(arg1, three),
+                "arg1",
+                BigInteger.valueOf(3),
+                ImmutableList.of()),
+            new ValueAssignment(
+                arg2,
+                four,
+                bvmgr.equal(arg2, four),
+                "arg2",
+                BigInteger.valueOf(4),
+                ImmutableList.of()),
+            new ValueAssignment(
+                fmgr.callUF(declaration, three),
+                one,
+                bvmgr.equal(fmgr.callUF(declaration, three), one),
+                "UF",
+                BigInteger.valueOf(1),
+                ImmutableList.of(BigInteger.valueOf(3))),
+            new ValueAssignment(
+                fmgr.callUF(declaration, four),
+                bvmgr.makeBitvector(8, 2),
+                bvmgr.equal(fmgr.callUF(declaration, four), two),
+                "UF",
+                BigInteger.valueOf(2),
+                ImmutableList.of(BigInteger.valueOf(4))));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(
+          bmgr.and(
+              bvmgr.equal(app1, bvmgr.makeBitvector(8, 1)),
+              bvmgr.equal(app2, bvmgr.makeBitvector(8, 2))));
+      prover.push(bvmgr.equal(arg1, bvmgr.makeBitvector(8, 3)));
+      prover.push(bvmgr.equal(arg2, bvmgr.makeBitvector(8, 4)));
+
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
+        assertThat(m).containsExactlyElementsIn(expectedModel);
+      }
+      assertThat(prover.getModelAssignments()).containsExactlyElementsIn(expectedModel);
+    }
+  }
+
+  @Test
   public void testQuantifiedUF() throws SolverException, InterruptedException {
     requireQuantifiers();
+    // Boolector only supports bitvector quantifier
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
@@ -296,25 +404,49 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetModelAssignments() throws SolverException, InterruptedException {
-    testModelIterator(
-        bmgr.and(
-            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)),
-            imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"))));
+    if (imgr != null) {
+      testModelIterator(
+          bmgr.and(
+              imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)),
+              imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"))));
+    } else {
+      testModelIterator(
+          bmgr.and(
+              bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 1)),
+              bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "y"))));
+    }
   }
 
   @Test
   public void testEmptyStackModel() throws SolverException, InterruptedException {
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      assertThat(prover).isSatisfiable();
-      try (Model m = prover.getModel()) {
-        assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
-        assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
-        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
-        if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
-          // partial model should not return an evaluation
-          assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
-        } else {
-          assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+    if (imgr != null) {
+      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        assertThat(prover).isSatisfiable();
+        try (Model m = prover.getModel()) {
+          assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+          assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+            // partial model should not return an evaluation
+            assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
+          } else {
+            assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+          }
+        }
+      }
+    } else {
+      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        assertThat(prover).isSatisfiable();
+        try (Model m = prover.getModel()) {
+          assertThat(m.evaluate(bvmgr.makeBitvector(8, 123))).isEqualTo(BigInteger.valueOf(123));
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+          assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+            // partial model should not return an evaluation
+            assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNull();
+          } else {
+            assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNotNull();
+          }
         }
       }
     }
@@ -322,16 +454,32 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testNonExistantSymbol() throws SolverException, InterruptedException {
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(bmgr.makeBoolean(true));
-      assertThat(prover).isSatisfiable();
+    if (imgr != null) {
+      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        prover.push(bmgr.makeBoolean(true));
+        assertThat(prover).isSatisfiable();
 
-      try (Model m = prover.getModel()) {
-        if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
-          // partial model should not return an evaluation
-          assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
-        } else {
-          assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+        try (Model m = prover.getModel()) {
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+            // partial model should not return an evaluation
+            assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
+          } else {
+            assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
+          }
+        }
+      }
+    } else {
+      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        prover.push(bmgr.makeBoolean(true));
+        assertThat(prover).isSatisfiable();
+
+        try (Model m = prover.getModel()) {
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+            // partial model should not return an evaluation
+            assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNull();
+          } else {
+            assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNotNull();
+          }
         }
       }
     }
@@ -357,13 +505,24 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testPartialModels2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      IntegerFormula x = imgr.makeVariable("x");
-      prover.push(imgr.greaterThan(x, imgr.makeNumber(0)));
-      assertThat(prover).isSatisfiable();
-      try (Model m = prover.getModel()) {
-        assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
-        // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
-        // solvers.
+      if (imgr != null) {
+        IntegerFormula x = imgr.makeVariable("x");
+        prover.push(imgr.greaterThan(x, imgr.makeNumber(0)));
+        assertThat(prover).isSatisfiable();
+        try (Model m = prover.getModel()) {
+          assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+          // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
+          // solvers.
+        }
+      } else {
+        BitvectorFormula x = bvmgr.makeVariable(8, "x");
+        prover.push(bvmgr.greaterThan(x, bvmgr.makeBitvector(8, 0), true));
+        assertThat(prover).isSatisfiable();
+        try (Model m = prover.getModel()) {
+          assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+          // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
+          // solvers.
+        }
       }
     }
   }
@@ -393,15 +552,24 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
-        assertThat(m.evaluate(imgr.makeNumber(0))).isEqualTo(BigInteger.ZERO);
-        assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
-        assertThat(m.evaluate(imgr.makeNumber(100))).isEqualTo(BigInteger.valueOf(100));
-        assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
-        assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        if (imgr != null) {
+          assertThat(m.evaluate(imgr.makeNumber(0))).isEqualTo(BigInteger.ZERO);
+          assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
+          assertThat(m.evaluate(imgr.makeNumber(100))).isEqualTo(BigInteger.valueOf(100));
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
+          assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+        }
         if (bvmgr != null) {
-          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
-            assertThat(m.evaluate(bvmgr.makeBitvector(i, 0))).isEqualTo(BigInteger.ZERO);
-            assertThat(m.evaluate(bvmgr.makeBitvector(i, 1))).isEqualTo(BigInteger.ONE);
+          if (solver == Solvers.BOOLECTOR) {
+            for (int i : new int[] {2, 4, 8, 32, 64, 1000}) {
+              assertThat(m.evaluate(bvmgr.makeBitvector(i, 0))).isEqualTo(BigInteger.ZERO);
+              assertThat(m.evaluate(bvmgr.makeBitvector(i, 1))).isEqualTo(BigInteger.ONE);
+            }
+          } else {
+            for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+              assertThat(m.evaluate(bvmgr.makeBitvector(i, 0))).isEqualTo(BigInteger.ZERO);
+              assertThat(m.evaluate(bvmgr.makeBitvector(i, 1))).isEqualTo(BigInteger.ONE);
+            }
           }
         }
       }
@@ -414,20 +582,33 @@ public class ModelTest extends SolverBasedTest0 {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
-        assertThat(m.evaluate(imgr.add(imgr.makeNumber(45), imgr.makeNumber(55))))
-            .isEqualTo(BigInteger.valueOf(100));
-        assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
-            .isEqualTo(BigInteger.valueOf(100));
-        assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
-            .isEqualTo(true);
+        if (imgr != null) {
+          assertThat(m.evaluate(imgr.add(imgr.makeNumber(45), imgr.makeNumber(55))))
+              .isEqualTo(BigInteger.valueOf(100));
+          assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
+              .isEqualTo(BigInteger.valueOf(100));
+          assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
+              .isEqualTo(true);
+        }
         if (bvmgr != null) {
-          for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
-            BitvectorFormula zero = bvmgr.makeBitvector(i, 0);
-            BitvectorFormula one = bvmgr.makeBitvector(i, 1);
-            assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
-            assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
-            assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
-            assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
+          if (solver == Solvers.BOOLECTOR) {
+            for (int i : new int[] {2, 4, 8, 32, 64, 1000}) {
+              BitvectorFormula zero = bvmgr.makeBitvector(i, 0);
+              BitvectorFormula one = bvmgr.makeBitvector(i, 1);
+              assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
+              assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
+              assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
+              assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
+            }
+          } else {
+            for (int i : new int[] {1, 2, 4, 8, 32, 64, 1000}) {
+              BitvectorFormula zero = bvmgr.makeBitvector(i, 0);
+              BitvectorFormula one = bvmgr.makeBitvector(i, 1);
+              assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
+              assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
+              assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
+              assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
+            }
           }
         }
       }
@@ -435,8 +616,9 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays() throws SolverException, InterruptedException {
+  public void testGetIntArrays() throws SolverException, InterruptedException {
     requireArrays();
+    requireIntegers();
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", IntegerType, IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
@@ -458,8 +640,44 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays2() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
+    requireBitvectors();
+    assume()
+        .withMessage(
+            "Solver %s does not support array theory with bitvectors as indices or elements",
+            solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
 
+    ArrayFormula<BitvectorFormula, BitvectorFormula> array =
+        amgr.makeArray(
+            "array",
+            FormulaType.getBitvectorTypeWithSize(8),
+            FormulaType.getBitvectorTypeWithSize(8));
+    ArrayFormula<BitvectorFormula, BitvectorFormula> updated =
+        amgr.store(array, bvmgr.makeBitvector(8, 1), bvmgr.makeBitvector(8, 1));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(
+          bvmgr.equal(amgr.select(updated, bvmgr.makeBitvector(8, 1)), bvmgr.makeBitvector(8, 1)));
+
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m.evaluate(amgr.select(updated, bvmgr.makeBitvector(8, 1))))
+            .isEqualTo(BigInteger.ONE);
+      }
+    }
+  }
+
+  @Test
+  public void testGetArrays6() throws SolverException, InterruptedException {
+    requireArrays();
+    requireParser();
     BooleanFormula f =
         mgr.parse(
             "(declare-fun |pi@2| () Int)\n"
@@ -483,11 +701,12 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
         .that(solver)
-        .isNotSameAs(Solvers.PRINCESS);
+        .isNotSameInstanceAs(Solvers.PRINCESS);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
@@ -523,7 +742,10 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays4() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -550,7 +772,10 @@ public class ModelTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -574,7 +799,10 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetArrays5() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -785,6 +1013,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void quantifierTestShort() throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
 
     IntegerFormula ctr = imgr.makeVariable("x");
     BooleanFormula body = imgr.equal(ctr, imgr.makeNumber(0));
@@ -1059,14 +1288,14 @@ public class ModelTest extends SolverBasedTest0 {
       "(declare-fun |f@2| () (_ FloatingPoint 8 23))"
           + "(declare-fun |p@3| () (_ BitVec 32))"
           + "(declare-fun *float@1 () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
-          + "(declare-fun |i@3| () (_ BitVec 32))"
+          + "(declare-fun |i@33| () (_ BitVec 32))"
           + "(declare-fun |Ai@| () (_ BitVec 32))"
           + "(declare-fun *unsigned_int@1 () (Array (_ BitVec 32) (_ BitVec 32)))"
           + "(assert (and (bvslt #x00000000 |Ai@|)"
           + "     (bvslt #x00000000 (bvadd |Ai@| #x00000020))"
-          + "     (= |i@3| #x00000000)"
+          + "     (= |i@33| #x00000000)"
           + "     (= |p@3| |Ai@|)"
-          + "     (= (select *unsigned_int@1 |Ai@|) |i@3|)"
+          + "     (= (select *unsigned_int@1 |Ai@|) |i@33|)"
           + "     (= |f@2| (select *float@1 |p@3|))"
           + "     (not (fp.eq ((_ to_fp 11 52) roundNearestTiesToEven |f@2|)"
           + "                 (_ +zero 11 52)))))";
@@ -1078,10 +1307,13 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest1() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     for (String query :
-        Lists.newArrayList(
+        ImmutableList.of(
             SMALL_ARRAY_QUERY, MEDIUM_ARRAY_QUERY, UGLY_ARRAY_QUERY, UGLY_ARRAY_QUERY_2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, false);
@@ -1090,6 +1322,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest2() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireOptimization();
     requireFloats();
@@ -1097,7 +1330,7 @@ public class ModelTest extends SolverBasedTest0 {
     // only Z3 fulfills these requirements
 
     for (String query :
-        Lists.newArrayList(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
+        ImmutableList.of(BIG_ARRAY_QUERY, SMALL_BV_FLOAT_QUERY, SMALL_BV_FLOAT_QUERY2)) {
       BooleanFormula formula = context.getFormulaManager().parse(query);
       checkModelIteration(formula, true);
       checkModelIteration(formula, false);
@@ -1128,39 +1361,51 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void arrayTest3() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
-    for (String query : Lists.newArrayList(ARRAY_QUERY_INT)) {
-      BooleanFormula formula = context.getFormulaManager().parse(query);
-      checkModelIteration(formula, false);
-    }
+    BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
+    checkModelIteration(formula, false);
   }
 
   @Test
   public void arrayTest4() throws SolverException, InterruptedException {
+    requireParser();
     requireArrays();
     requireBitvectors();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("solver does not fully support arrays over bitvectors")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
-    for (String query : Lists.newArrayList(ARRAY_QUERY_BV)) {
-      BooleanFormula formula = context.getFormulaManager().parse(query);
-      checkModelIteration(formula, false);
-    }
+    BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
+    checkModelIteration(formula, false);
   }
 
   @Test
   @SuppressWarnings("resource")
   public void multiCloseTest() throws SolverException, InterruptedException {
+    Formula x;
+    BooleanFormula eq;
+    if (imgr != null) {
+      x = imgr.makeVariable("x");
+      eq = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1));
+    } else {
+      // Boolector only has bitvectors
+      x = bvmgr.makeVariable(8, "x");
+      eq = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 1));
+    }
     ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
     try {
-      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+      prover.push(eq);
       assertThat(prover).isSatisfiable();
       Model m = prover.getModel();
       try {
-        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
         // close the model several times
       } finally {
         for (int i = 0; i < 10; i++) {
@@ -1179,7 +1424,11 @@ public class ModelTest extends SolverBasedTest0 {
   @SuppressWarnings("resource")
   public void modelAfterSolverCloseTest() throws SolverException, InterruptedException {
     ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-    prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+    if (imgr != null) {
+      prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+    } else {
+      prover.push(bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 1)));
+    }
     assertThat(prover).isSatisfiable();
     Model m = prover.getModel();
 
@@ -1188,7 +1437,11 @@ public class ModelTest extends SolverBasedTest0 {
 
     // try to access model, this should either fail fast or succeed
     try {
-      assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(BigInteger.ONE);
+      }
     } catch (IllegalStateException e) {
       // ignore
     } finally {
@@ -1216,6 +1469,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegers1() throws SolverException, InterruptedException {
+    requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.add(imgr.makeVariable("x"), imgr.makeVariable("x")),
@@ -1224,6 +1478,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegers2() throws SolverException, InterruptedException {
+    requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),
@@ -1232,6 +1487,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetNegativeIntegers1() throws SolverException, InterruptedException {
+    requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
         imgr.add(imgr.makeVariable("x"), imgr.makeNumber(1)),

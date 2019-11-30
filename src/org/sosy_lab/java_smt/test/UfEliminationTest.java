@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
@@ -27,6 +26,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Map;
 import org.junit.Before;
@@ -71,6 +71,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void simpleTest() throws SolverException, InterruptedException {
     // f := uf(v1, v3) XOR uf(v2, v4)
+    requireIntegers();
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -101,6 +102,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void nestedUfs() throws SolverException, InterruptedException {
     // f := uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
+    requireIntegers();
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -136,6 +138,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void nestedUfs2() throws SolverException, InterruptedException {
     // f := uf2(uf1(v1, uf2(v3, v6)), v3) < uf2(uf1(v2, uf2(v4, v5)), v4)
+    requireIntegers();
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -178,6 +181,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void twoFormulasTest() throws SolverException, InterruptedException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
+    requireIntegers();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     // f := uf(v1, v3) XOR uf(v2, v4)
@@ -216,6 +220,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void quantifierTest() {
     requireQuantifiers();
+    requireIntegers();
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -228,7 +233,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
     BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
     BooleanFormula f =
         qmgr.exists(
-            newArrayList(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
+            ImmutableList.of(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
 
     try {
       ackermannization.eliminateUfs(f);
@@ -240,6 +245,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   @Test
   public void substitutionTest() throws SolverException, InterruptedException {
     // f := uf(v1, v3) \/ NOT(uf(v2, v4)))
+    requireIntegers();
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");

@@ -14,8 +14,8 @@
     <target name="gen-pom" depends="load-ivy, determine-version" description="Generate a POM file from Ivy metadata">
         <property name="ivy.pom.version" value="${version}"/>
 
-        <ivy:makepom ivyfile="${ivy.dep.file}" conf="core,runtime-z3,runtime-smtinterpol" pomfile="pom.xml" templatefile="pom_template.xml">
-            <mapping conf="core,runtime-smtinterpol" scope="compile"/>
+        <ivy:makepom ivyfile="${ivy.dep.file}" conf="core,runtime-smtinterpol,runtime-princess" pomfile="pom.xml" templatefile="pom_template.xml">
+            <mapping conf="core,runtime-smtinterpol,runtime-princess" scope="compile"/>
         </ivy:makepom>
 
         <!-- Maven group is "sosy-lab", not "sosy_lab"-->

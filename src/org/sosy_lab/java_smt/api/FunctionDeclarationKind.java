@@ -36,9 +36,13 @@ public enum FunctionDeclarationKind {
   /** If-then-else operator. */
   ITE,
 
-  /** Exclusive OR over two variables. */
+  /** Exclusive OR over two formulas. */
   XOR,
+
+  /** Implication between two boolean formulas. */
   IMPLIES,
+
+  /** Distinct operator for a set of numeric formulas. */
   DISTINCT,
 
   /** Store and select on arrays. */
@@ -93,6 +97,9 @@ public enum FunctionDeclarationKind {
   /** Unary comparison with zero. */
   GTE_ZERO,
 
+  /** Floor operation, converts from rationals to integers, also known as {@code to_int}. */
+  FLOOR,
+
   // Simple bitvector operations
 
   /** Extraction over bitvectors. */
@@ -100,6 +107,12 @@ public enum FunctionDeclarationKind {
 
   /** Concatenation over bitvectors. */
   BV_CONCAT,
+
+  /** Extend bitvectors according to their sign. */
+  BV_SIGN_EXTENSION,
+
+  /** Extend bitvectors with zeros. */
+  BV_ZERO_EXTENSION,
 
   /** Bitwise negation of a bitvector. */
   BV_NOT,
@@ -173,10 +186,28 @@ public enum FunctionDeclarationKind {
   /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
   BV_ASHR,
 
+  /** Cast an unsigned bitvector to a floating-point number. */
+  BV_UCASTTO_FP,
+
+  /** Cast a signed bitvector to a floating-point number. */
+  BV_SCASTTO_FP,
+
   // Simple floating point operations
 
   /** Negation of a floating point. */
   FP_NEG,
+
+  /** Absolute value of a floating point. */
+  FP_ABS,
+
+  /** Maximum of two floating points. */
+  FP_MAX,
+
+  /** Minimum of two floating points. */
+  FP_MIN,
+
+  /** Square root of a floating point. */
+  FP_SQRT,
 
   /** Subtraction over floating points. */
   FP_SUB,
@@ -222,6 +253,20 @@ public enum FunctionDeclarationKind {
 
   /** Rounding over floating points. */
   FP_ROUND_TO_INTEGRAL,
+
+  /** Further FP queries. */
+  FP_IS_NAN,
+  FP_IS_INF,
+  FP_IS_ZERO,
+  FP_IS_NEGATIVE,
+  FP_IS_SUBNORMAL,
+  FP_IS_NORMAL,
+
+  FP_CASTTO_FP,
+  FP_CASTTO_SBV,
+  FP_CASTTO_UBV,
+  FP_AS_IEEEBV,
+  FP_FROM_IEEEBV,
 
   // default case
 

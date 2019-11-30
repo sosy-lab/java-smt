@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -92,6 +93,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Test
   public void testModuloConstant() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =
@@ -106,6 +108,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Test
   public void testModuloConstantUnsatisfiable() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =
@@ -115,9 +118,9 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
                 imgr.makeNumber(1),
                 handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(3)))));
 
-    if (solver == Solvers.SMTINTERPOL
+    if (ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.CVC4).contains(solver)
         && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
-      // SMTInterpol supports modulo with constants
+      // some solvers support modulo with constants
       assertThatFormula(f).isUnsatisfiable();
 
     } else {
@@ -127,6 +130,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Test
   public void testModulo() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =
@@ -141,6 +145,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Test
   public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =
@@ -150,6 +155,12 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
                 imgr.makeNumber(1),
                 handleExpectedException(() -> imgr.modulo(imgr.makeNumber(5), a))));
 
-    assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+    if (Solvers.CVC4 == solver && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+      // some solvers support non-linear multiplication (partially)
+      assertThatFormula(f).isUnsatisfiable();
+
+    } else {
+      assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+    }
   }
 }
