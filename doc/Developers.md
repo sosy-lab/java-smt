@@ -16,7 +16,7 @@ for more information.
 ## Continuous Integration
 
 We rely on [GitLab-CI][] for continuous integration, which picks up code style violations,
-compile warnings for both ECJ and javac (for several versions of Java), 
+compile warnings for both ECJ and javac (for several versions of Java),
 [SpotBugs](https://github.com/spotbugs/spotbugs) errors,...
 
 ## Releasing JavaSMT
@@ -57,6 +57,10 @@ For publishing to Maven Central, we use the [Nexus Repository Manager](https://o
 
 #### Requirements
 
+Please make sure that all necessary libraries are already released on Maven Central,
+before (or at least while) publishing a new version of JavaSMT.
+Maven does not check for existing dependencies automatically.
+
 Please make sure that you have a valid user account and configured your local settings accordingly.
 For example, insert the following content into `~/.m2/settings.xml`:
 ```xml
@@ -87,15 +91,20 @@ The following steps are required:
  - Run the `stage` ANT target.
    (There is currently no need to change any label from `SNAPSHOT` to `RELEASE` or vice versa,
    as written somewhere in the documentation, because we only produce `RELEASE` versions.)
- - Login to [Nexus Repository Manager](https://oss.sonatype.org/) 
+ - Login to [Nexus Repository Manager](https://oss.sonatype.org/)
    and open the [list of staging repositories](https://oss.sonatype.org/#stagingRepositories).
- - Run `close` and `release` tasks on your pushed bundle 
+ - Run `close` and `release` tasks on your pushed bundle
    (see [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html) for details).
  - After some delay (a few hours or days) the release is automatically synced to Maven Central.
 
 Additional instructions are available at the official [OSSRH][] page.
 
 ## Releasing Solvers
+
+Before actually releasing a new version of a solver into the public world,
+make sure, it is tested sufficiently.
+This is one of the most critical steps in JavaSMT development.
+
 
 ### Publishing Z3
 
@@ -131,6 +140,43 @@ ant publish-z3 -Dz3.path=$Z3_DIR/build
 ```
 Finally follow the instructions shown in the message at the end.
 
+
+### Publishing CVC4
+
+We prefer to use our own CVC4 binaries and Java bindings.
+
+To publish CVC4, checkout the [CVC4 repository](https://github.com/kfriedberger/CVC4).
+Then execute the following command in the JavaSMT directory,
+where `$CVC4_DIR` is the path to the CVC4 directory
+and `$CVC4_VERSION` is the version number:
+```
+ant publish-cvc4 -Dcvc4.path=$CVC4_DIR -Dcvc4.customRev=$CVC4_VERSION
+```
+Example:
+```
+ant publish-cvc4 -Dcvc4.path=../CVC4 -Dcvc4.customRev=1.8-prerelease-2019-10-05
+```
+Finally follow the instructions shown in the message at the end.
+
+
+### Publishing Boolector
+
+We prefer to use our own Boolector binaries and Java bindings.
+
+To publish Boolector, checkout the [CVC4 repository](https://github.com/kfriedberger/CVC4).
+Then execute the following command in the JavaSMT directory,
+where `$BTOR_DIR` is the path to the CVC4 directory
+and `$BTOR_VERSION` is the version number:
+```
+ant publish-boolector -Dboolector.path=$BTOR_DIR -Dboolector.customRev=$BTOR_VERSION
+```
+Example:
+```
+ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.0.0-2019-11-29
+```
+Finally follow the instructions shown in the message at the end.
+
+
 ### Publishing (Opti)-MathSAT5
 
 For publishing MathSAT5, you need to use a machine with at least GCC 4.9.
@@ -153,6 +199,7 @@ ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dgmp.path=$GMP_PATH -D
 
 The scripts for publishing Princess and SMTInterpol are available
 at the root of the [Ivy Repository](https://svn.sosy-lab.org/software/ivy).
+
 
 ## Writing Solver Backends
 

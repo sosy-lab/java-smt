@@ -37,8 +37,10 @@ Currently JavaSMT support several SMT solvers (see [Getting Started](doc/Getting
  - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
  - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
  - [Z3](https://github.com/Z3Prover/z3)
+ - [CVC4](https://cvc4.github.io/)
+ - [Boolector](https://boolector.github.io/)
 
-The following features are supported:
+The following features are supported (depending on the used SMT solver):
 
  - Satisfiability checking
  - Quantifiers and quantifier elimination
@@ -46,12 +48,12 @@ The following features are supported:
  - Incremental solving with push/pop
  - Multiple independent contexts
  - Model generation
- - Interpolation, including tree and sequential
+ - Interpolation, including tree and sequential structure
  - Formula transformation using built-in tactics
  - Formula introspection using visitors
 
 #### Multithreading Support
-All solvers support multithreading (MathSAT only since JavaSMT 1.0.1-164-gd14ed28),
+Most solvers support multithreading,
 provided that different threads use different contexts,
 and _all_ operations on a single context are performed from a single thread.
 Interruption using [ShutdownNotifier][] may be used to interrupt a
@@ -79,7 +81,9 @@ Currently we do not support performing garbage collection for MathSAT5.
 
 
 ## Getting started
-Installation is possible via [Maven][Maven repository], [Ivy][Ivy repository], or [manually][Manual Installation].  Please see our [Getting Started Guide](doc/Getting-started.md)
+Installation is possible via [Maven][Maven repository],
+[Ivy][Ivy repository], or [manually][Manual Installation].
+Please see our [Getting Started Guide](doc/Getting-started.md).
 
 #### Usage
 ``` java
@@ -110,8 +114,8 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Project maintainers: [Karlheinz Friedberger][] and [Philipp Wendler][]
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions: [Thomas Stieglmaier][] and others.
- 
+ - Contributions: Daniel Baier, [Thomas Stieglmaier][] and several others.
+
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Manual Installation]: doc/Getting-started.md#manual-installation
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
