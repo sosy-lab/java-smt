@@ -1490,7 +1490,7 @@ INT_RETURN
 DEFINE_FUNC(string, 1get_1term_1name) WITH_ONE_ARG(jterm)
 TERM_ARG(1)
 CALL1(const char *, get_term_name)
-STRING_RETURN
+CONST_STRING_RETURN
 
 DEFINE_FUNC(jterm, 1get_1term_1by_1name) WITH_ONE_ARG(string)
 STRING_ARG(1)

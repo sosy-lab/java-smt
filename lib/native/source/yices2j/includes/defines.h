@@ -183,6 +183,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewStringUTF(jenv, retval); \
   } \
+  yices_free_string(retval); \
   return jretval; \
 }
 
@@ -193,6 +194,19 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
     return NULL; \
   } \
   PLAIN_STRING_RETURN
+
+#define CONST_STRING_RETURN \
+   if (retval == NULL && yices_error_code()!=0) { \
+    const char *msg = yices_error_string(); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+    return NULL; \
+  } \
+  jstring jretval = NULL; \
+  if (!(*jenv)->ExceptionCheck(jenv)) { \
+    jretval = (*jenv)->NewStringUTF(jenv, retval); \
+  } \
+  return jretval; \
+}
 
 //may cause memory leak through yices_error_string
 #define POINTER_RETURN \
