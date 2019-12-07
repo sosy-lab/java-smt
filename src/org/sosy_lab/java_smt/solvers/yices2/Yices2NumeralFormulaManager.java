@@ -36,6 +36,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_r
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 
+import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -113,12 +114,8 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   public Integer distinctImpl(List<Integer> pNumbers) {
-    int size = pNumbers.size();
-    int[] numberTerms = new int[size];
-    for (int i = 0; i < size; i++) {
-      numberTerms[i] = pNumbers.get(i);
-    }
-    return yices_distinct(size, numberTerms);
+    int[] numberTerms = Ints.toArray(pNumbers);
+    return yices_distinct(numberTerms.length, numberTerms);
   }
 
   @Override

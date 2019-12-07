@@ -780,10 +780,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       if (size == 0) {
         return pDeclaration;
       } else {
-        int[] argArray = new int[size];
-        for (int i = 0; i < size; i++) {
-          argArray[i] = pArgs.get(i);
-        }
+        int[] argArray = Ints.toArray(pArgs);
         int app = yices_application(pDeclaration, size, argArray);
         return app;
       }
