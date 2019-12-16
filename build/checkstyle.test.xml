@@ -29,7 +29,6 @@
       <property name="allowMissingParamTags" value="true"/>
       <property name="allowMissingThrowsTags" value="true"/>
       <property name="allowMissingReturnTag" value="true"/>
-      <property name="allowMissingJavadoc" value="true"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
     <module name="ClassTypeParameterName">
@@ -40,7 +39,7 @@
     </module>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName">
-      <property name="format" value="^[a-zA-Z0-9_]*$"/>
+      <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
     </module>
     <module name="MemberName"/>
     <module name="MethodName">
@@ -53,7 +52,13 @@
     <module name="ParameterName"/>
     <module name="StaticVariableName"/>
     <module name="TypeName"/>
-    <module name="IllegalImport"/>
+    <module name="IllegalImport">
+      <property name="illegalPkgs" value="sun"/>
+    </module>
+    <module name="IllegalImport">
+      <property name="illegalClasses" value=".*\.(Builder|of|copyOf)|org\.junit\.Assert(\..*)?|com\.google\.common\.base\.Objects(\..*)?"/>
+      <property name="regexp" value="true"/>
+    </module>
     <module name="ImportOrder">
       <property name="option" value="top"/>
       <property name="separated" value="true"/>
@@ -64,11 +69,6 @@
       <property name="processJavadoc" value="true"/>
     </module>
     <module name="OuterTypeNumber"/>
-    <module name="LineLength">
-      <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see"/>
-      <property name="max" value="100"/>
-      <property name="tabWidth" value="2"/>
-    </module>
     <module name="ParameterNumber"/>
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
@@ -117,11 +117,10 @@
       <property name="reliefPattern" value="\$FALL-THROUGH\$"/>
     </module>
     <module name="IllegalInstantiation">
-      <property name="classes" value="Boolean,Character,Integer,Long,Double,Float,String"/>
+      <property name="classes" value="Boolean, Character, Integer, Long, Double, Float, String, java.io.PrintStream, java.io.PrintWriter, java.util.Date, java.text.SimpleDateFormat"/>
     </module>
     <module name="IllegalType">
-      <property name="tokens" value="METHOD_DEF,PARAMETER_DEF,VARIABLE_DEF"/>
-      <property name="illegalClassNames" value="java.util.GregorianCalendar, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap,  java.util.Stack, java.util.Vector, javax.annotation.Nullable, javax.annotation.CheckReturnValue, javax.annotation.concurrent.GuardedBy, javax.annotation.concurrent.Immutable"/>
+      <property name="illegalClassNames" value="java.util.Date, java.util.GregorianCalendar, java.text.DateFormat, java.text.SimpleDateFormat, java.util.Hashtable, java.util.HashSet, java.util.HashMap, java.util.ArrayList, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.Stack, java.util.Vector, com.google.common.collect.ArrayListMultimap, com.google.common.collect.HashMultimap, com.google.common.collect.HashMultiset, com.google.common.collect.LinkedHashMultimap, com.google.common.collect.LinkedHashMultiset, com.google.common.collect.LinkedListMultimap, com.google.common.collect.TreeMultiset, javax.annotation.Nullable, javax.annotation.CheckReturnValue, javax.annotation.concurrent.GuardedBy, javax.annotation.concurrent.Immutable"/>
       <property name="legalAbstractClassNames" value="AbstractConfigurationBuilderFactory, AbstractPathFactory"/>
     </module>
     <module name="InnerAssignment"/>
@@ -171,6 +170,11 @@
     <module name="com.github.sevntu.checkstyle.checks.design.AvoidConditionInversionCheck"/>
     <module name="com.github.sevntu.checkstyle.checks.design.PublicReferenceToPrivateTypeCheck"/>
     <module name="JavadocParagraph"/>
+  </module>
+  <module name="LineLength">
+    <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see"/>
+    <property name="max" value="100"/>
+    <property name="tabWidth" value="2"/>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>

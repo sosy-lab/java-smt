@@ -75,8 +75,8 @@
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.6.2" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.6.2" conf="build->default; contrib->sources"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.7" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="2.5.2" conf="core->default; contrib->sources"/>
@@ -87,7 +87,7 @@
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.2" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.5" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
@@ -119,7 +119,8 @@
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.32.0" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.36.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.26" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-533-ga4ba1513" conf="runtime-smtinterpol->master; contrib->sources"/>
