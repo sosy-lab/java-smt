@@ -48,6 +48,7 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     // throw new UnsupportedOperationException("Please implement me!");

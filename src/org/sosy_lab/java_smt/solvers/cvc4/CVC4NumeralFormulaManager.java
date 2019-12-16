@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
+@SuppressWarnings("ClassTypeParameterName")
 abstract class CVC4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<

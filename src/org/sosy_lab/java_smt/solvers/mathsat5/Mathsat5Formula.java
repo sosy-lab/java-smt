@@ -65,6 +65,7 @@ abstract class Mathsat5Formula implements Formula {
   }
 
   @Immutable
+  @SuppressWarnings("ClassTypeParameterName")
   static final class Mathsat5ArrayFormula<TI extends Formula, TE extends Formula>
       extends Mathsat5Formula implements ArrayFormula<TI, TE> {
 

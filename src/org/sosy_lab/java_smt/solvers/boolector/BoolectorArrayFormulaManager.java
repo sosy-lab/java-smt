@@ -50,6 +50,7 @@ public class BoolectorArrayFormulaManager
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String name, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     if (!pIndexType.isBitvectorType() || !pElementType.isBitvectorType()) {

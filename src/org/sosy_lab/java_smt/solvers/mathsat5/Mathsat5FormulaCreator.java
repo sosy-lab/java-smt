@@ -283,6 +283,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
@@ -290,12 +291,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
       ArrayFormula<TI, TE> pArray) {
     return ((Mathsat5ArrayFormula<TI, TE>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
       ArrayFormula<TI, TE> pArray) {
     return ((Mathsat5ArrayFormula<TI, TE>) pArray).getIndexType();

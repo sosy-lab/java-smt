@@ -114,12 +114,14 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
       ArrayFormula<TD, TR> pArray) {
     return ((CVC4ArrayFormula<TD, TR>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
       ArrayFormula<TD, TR> pArray) {
     return ((CVC4ArrayFormula<TD, TR>) pArray).getIndexType();
@@ -236,6 +238,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))

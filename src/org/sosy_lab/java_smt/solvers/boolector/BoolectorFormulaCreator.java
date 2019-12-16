@@ -134,6 +134,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).isArrayType()
@@ -364,12 +365,14 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
       ArrayFormula<TI, TE> pArray) {
     return ((BoolectorArrayFormula<TI, TE>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
       ArrayFormula<TI, TE> pArray) {
     return ((BoolectorArrayFormula<TI, TE>) pArray).getIndexType();

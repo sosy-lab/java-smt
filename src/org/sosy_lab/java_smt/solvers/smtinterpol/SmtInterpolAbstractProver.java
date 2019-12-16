@@ -44,6 +44,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
+@SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   private boolean closed = false;

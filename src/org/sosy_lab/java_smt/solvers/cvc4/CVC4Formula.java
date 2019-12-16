@@ -68,6 +68,7 @@ public class CVC4Formula implements Formula {
   }
 
   @Immutable
+  @SuppressWarnings("ClassTypeParameterName")
   static final class CVC4ArrayFormula<TI extends Formula, TE extends Formula> extends CVC4Formula
       implements ArrayFormula<TI, TE> {
 

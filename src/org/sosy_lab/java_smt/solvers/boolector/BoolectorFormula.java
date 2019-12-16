@@ -74,6 +74,7 @@ abstract class BoolectorFormula implements Formula {
     }
   }
 
+  @SuppressWarnings("ClassTypeParameterName")
   static final class BoolectorArrayFormula<TI extends Formula, TE extends Formula>
       extends BoolectorFormula implements ArrayFormula<TI, TE> {
 

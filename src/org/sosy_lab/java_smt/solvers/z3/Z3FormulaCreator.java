@@ -210,18 +210,21 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
       ArrayFormula<TD, TR> pArray) {
     return ((Z3ArrayFormula<TD, TR>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
       ArrayFormula<TD, TR> pArray) {
     return ((Z3ArrayFormula<TD, TR>) pArray).getIndexType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> ArrayFormula<TD, TR> encapsulateArray(
       Long pTerm, FormulaType<TD> pIndexType, FormulaType<TR> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
