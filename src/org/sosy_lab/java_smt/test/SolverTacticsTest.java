@@ -20,7 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -246,7 +246,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
     try {
       mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
     }
   }

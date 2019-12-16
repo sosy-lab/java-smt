@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     String query = VARS + "(assert (exists ((z Int)) (= (select arr x) (foo z))))";
     classifier.visit(mgr.parse(query));
-    assertEquals("AUFLIA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("AUFLIA");
   }
 
   @Test
@@ -80,7 +80,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireParser();
     String query = VARS + "(assert (= (select arr x) (foo 0)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_AUFLIA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_AUFLIA");
   }
 
   @Test
@@ -89,7 +89,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_AUFLIRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_AUFLIRA");
   }
 
   @Test
@@ -98,7 +98,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireRationals();
     String query = VARS + "(assert (= (select arr (* x x)) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_AUFNIRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_AUFNIRA");
   }
 
   @Test
@@ -107,7 +107,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireQuantifiers();
     String query = VARS + "(assert (exists ((z Int)) (= (+ x 1) 0)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("LIA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("LIA");
   }
 
   @Test
@@ -117,7 +117,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireRationals();
     String query = VARS + "(assert (exists ((zz Real)) (= (+ y y) zz)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("LRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("LRA");
   }
 
   @Test
@@ -129,7 +129,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query =
         VARS + BVS + "(assert (and (exists ((bv2 (_ BitVec 4))) (= bv bv2)) (= arr arr2)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("ABV", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("ABV");
   }
 
   @Test
@@ -139,7 +139,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     String query = VARS + BVS + "(assert (and (= bv bv2) (= arr arr2) (= (foo x) x)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_AUFBV", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_AUFBV");
   }
 
   @Test
@@ -149,7 +149,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     String query = BVS + "(assert (bvult bv (bvadd bv #x1)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_BV", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_BV");
   }
 
   @Test
@@ -157,7 +157,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireParser();
     String query = VARS + "(assert (< xx (* x 2)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_LIA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_LIA");
   }
 
   @Test
@@ -166,7 +166,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (< yy y))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_LRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_LRA");
   }
 
   @Test
@@ -175,7 +175,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (< xx (* x x)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_NIA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_NIA");
   }
 
   @Test
@@ -184,7 +184,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (< yy (* y y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_NRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_NRA");
   }
 
   @Test
@@ -193,7 +193,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (= (foo x) x))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_UF", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_UF");
   }
 
   @Test
@@ -203,7 +203,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     String query = VARS + BVS + "(assert (and (= bv bv2) (= (foo x) x)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_UFBV", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_UFBV");
   }
 
   @Test
@@ -212,7 +212,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (< xx (+ x (foo x))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_UFLIA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_UFLIA");
   }
 
   @Test
@@ -221,7 +221,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (< yy (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_UFLRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_UFLRA");
   }
 
   @Test
@@ -230,7 +230,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (< (* y yy) (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_UFNRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_UFNRA");
   }
 
   @Test
@@ -240,7 +240,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (exists ((zz Real)) (< (+ y yy) (bar y))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("UFLRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("UFLRA");
   }
 
   @Test
@@ -250,7 +250,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     String query = VARS + "(assert (exists ((zz Real)) (< (* y yy) (bar y))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
-    assertEquals("UFNRA", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("UFNRA");
   }
 
   @Test
@@ -259,7 +259,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireFloats();
     String query = VARS + "(declare-fun a () Float32) (assert (fp.eq a (fp.add RNE a a)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("QF_FP", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("QF_FP");
   }
 
   @Test
@@ -269,6 +269,6 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     requireQuantifiers();
     String query = VARS + "(declare-fun a () Float32) (assert (exists ((zz Real)) (fp.eq a a)))";
     classifier.visit(mgr.parse(query));
-    assertEquals("FP", classifier.toString());
+    assertThat(classifier.toString()).isEqualTo("FP");
   }
 }

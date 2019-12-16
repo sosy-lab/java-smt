@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +97,6 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
   public void failOnInvalidString() {
     requireIntegers();
     imgr.makeNumber("a");
-    fail();
+    assert_().fail();
   }
 }

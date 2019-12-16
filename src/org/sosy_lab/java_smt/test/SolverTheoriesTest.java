@@ -20,10 +20,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -1055,7 +1053,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
       try {
         bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException expected) {
       }
     }
@@ -1068,12 +1066,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       // forbitten values
       try {
         bvmgr.makeBitvector(size, 1L << size);
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException expected) {
       }
       try {
         bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException expected) {
       }
     }
@@ -1093,13 +1091,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       // forbitten values
       try {
         bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException expected) {
       }
       try {
         bvmgr.makeBitvector(
             size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException expected) {
       }
     }
@@ -1177,9 +1175,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
     if (ImmutableSet.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
-      assertNotEquals(z1, z2);
+      assertThat(z1).isNotEqualTo(z2);
     } else {
-      assertEquals(z1, z2);
+      assertThat(z1).isEqualTo(z2);
     }
   }
 }

@@ -20,8 +20,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -1451,7 +1451,7 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModel();
-      fail();
+      assert_().fail();
     }
   }
 
@@ -1460,7 +1460,7 @@ public class ModelTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModelAssignments();
-      fail();
+      assert_().fail();
     }
   }
 

@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.After;
@@ -72,7 +72,7 @@ public class BoolectorNativeApiTest {
     for (BtorOption option : BtorOption.values()) {
       String optName = BtorJNI.boolector_get_opt_lng(btor, option.getValue());
       String converted = "BTOR_OPT_" + optName.replace("-", "_").replace(":", "_").toUpperCase();
-      assertEquals(option.name(), ALLOWED_DIFFS.getOrDefault(converted, converted));
+      assertThat(option.name()).isEqualTo(ALLOWED_DIFFS.getOrDefault(converted, converted));
     }
   }
 
@@ -85,7 +85,7 @@ public class BoolectorNativeApiTest {
       long newVar = BtorJNI.boolector_var(btor1, BtorJNI.boolector_bool_sort(btor1), "x");
       BtorJNI.boolector_assert(btor1, newVar);
       int result = BtorJNI.boolector_sat(btor1);
-      assertEquals(BtorJNI.BTOR_RESULT_SAT_get(), result);
+      assertThat(result).isEqualTo(BtorJNI.BTOR_RESULT_SAT_get());
       BtorJNI.boolector_delete(btor1);
     }
   }

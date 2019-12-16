@@ -21,8 +21,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -935,6 +935,6 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
     fpmgr.makeNumber("a", singlePrecType);
-    fail();
+    assert_().fail();
   }
 }

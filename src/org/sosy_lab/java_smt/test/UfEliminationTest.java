@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -237,7 +237,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
     try {
       ackermannization.eliminateUfs(f);
-      fail();
+      assert_().fail();
     } catch (IllegalArgumentException expected) {
     }
   }

@@ -21,8 +21,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -225,7 +225,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     if (allowInvalidNames() && !mgr.isValidName(name)) {
       try {
         result = creator.apply(name);
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException e) {
         throw new AssumptionViolatedException("unsupported variable name", e);
       }
@@ -280,7 +280,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
       // try to create a new (!) variable with a different name, the escaped previous name.
       @SuppressWarnings("unused")
       T var3 = createVariableWith(creator, "|" + getVarname() + "|");
-      fail();
+      assert_().fail();
     }
   }
 

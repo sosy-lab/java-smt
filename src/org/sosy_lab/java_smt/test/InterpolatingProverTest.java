@@ -22,8 +22,8 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -329,7 +329,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     // empty list of partition
     stack.getSeqInterpolants(ImmutableList.of());
-    fail();
+    assert_().fail();
   }
 
   @Test
@@ -926,7 +926,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
     // empty list of partition
     stack.getTreeInterpolants(ImmutableList.of(), new int[] {});
-    fail();
+    assert_().fail();
   }
 
   @Test

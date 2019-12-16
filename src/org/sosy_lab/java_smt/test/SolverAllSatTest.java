@@ -20,8 +20,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -142,7 +142,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         new TestAllSatCallback() {
           @Override
           public void apply(List<BooleanFormula> pModel) {
-            fail("Formula is unsat, but all-sat callback called with model " + pModel);
+            assert_()
+                .withMessage("Formula is unsat, but all-sat callback called with model " + pModel)
+                .fail();
           }
         };
 

@@ -196,9 +196,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
             fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
         .addEqualityGroup(fb)
         .addEqualityGroup(fmgr.callUF(fb, imgr.makeNumber(0)))
-        .addEqualityGroup(
-            fmgr.callUF(fb, imgr.makeNumber(1)),
-            fmgr.callUF(fb, imgr.makeNumber(1)))
+        .addEqualityGroup(fmgr.callUF(fb, imgr.makeNumber(1)), fmgr.callUF(fb, imgr.makeNumber(1)))
         .testEquals();
   }
 

@@ -20,7 +20,8 @@
 
 package org.sosy_lab.java_smt.test;
 
-import org.junit.Assert;
+import static com.google.common.truth.Truth.assertThat;
+
 import org.junit.Test;
 
 /** inherits many tests from {@link VariableNamesTest}. */
@@ -39,14 +40,14 @@ public class VariableNamesEscaperTest extends VariableNamesTest {
   @Test
   public void testEscapeUnescape() {
     String var = super.getVarname();
-    Assert.assertEquals(var, mgr.unescape(mgr.escape(var)));
-    Assert.assertEquals(var, mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var)))));
+    assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
+    assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
   }
 
   @Test
   public void testDoubleEscapeUnescape() {
     String var = getVarname();
-    Assert.assertEquals(var, mgr.unescape(mgr.escape(var)));
-    Assert.assertEquals(var, mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var)))));
+    assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
+    assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
   }
 }
