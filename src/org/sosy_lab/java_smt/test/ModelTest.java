@@ -869,17 +869,14 @@ public class ModelTest extends SolverBasedTest0 {
         }
 
         List<ValueAssignment> relevantAssignments =
-            prover
-                .getModelAssignments()
-                .stream()
+            prover.getModelAssignments().stream()
                 .filter(assignment -> assignment.getName().equals(varName))
                 .collect(Collectors.toList());
         assertThat(relevantAssignments).isNotEmpty();
 
         if (isArray) {
           List<ValueAssignment> arrayAssignments =
-              relevantAssignments
-                  .stream()
+              relevantAssignments.stream()
                   .filter(assignment -> expectedValue.equals(assignment.getValue()))
                   .collect(Collectors.toList());
           assertThat(arrayAssignments)

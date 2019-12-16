@@ -480,9 +480,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               }
             });
     assertThat(
-            mgr.extractVariables(transformed)
-                .keySet()
-                .stream()
+            mgr.extractVariables(transformed).keySet().stream()
                 .allMatch(pS -> pS.equals(pS.toUpperCase())))
         .isTrue();
   }

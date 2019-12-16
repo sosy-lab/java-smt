@@ -60,14 +60,14 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-357-gc47b29f" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-380-gd4e86457" conf="runtime->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="28.0-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="28.1-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="28.0-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="28.1-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -96,13 +96,13 @@
 
         <!-- Truth
              Library for writing literal assertions. -->
-        <dependency org="com.google.truth" name="truth" rev="0.46" conf="test->default; contrib->sources"/>
-        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="0.46" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth" name="truth" rev="1.0" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.0" conf="test->default; contrib->sources"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.3.2" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.3.2" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.3.4" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.3.4" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -110,16 +110,16 @@
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.6" conf="format-source->default"/>
-
-        <!-- Checkstyle -->
-        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.32.0" conf="checkstyle->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.7" conf="format-source->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.12" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
         <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.12" conf="runtime->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
+
+        <!-- Checkstyle -->
+        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.36.0" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-533-ga4ba1513" conf="runtime-smtinterpol->master; contrib->sources"/>
@@ -141,6 +141,7 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.0.0-2019-11-11-g9d06cc0" conf="runtime-boolector->solver-boolector" />
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.2"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.4"/>
+
     </dependencies>
 </ivy-module>

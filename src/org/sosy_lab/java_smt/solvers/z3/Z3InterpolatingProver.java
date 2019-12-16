@@ -103,8 +103,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     Set<Long> formulasOfB =
-        assertedFormulas
-            .stream()
+        assertedFormulas.stream()
             .flatMap(List::stream)
             .filter(f -> !formulasOfA.contains(f))
             .collect(ImmutableSet.toImmutableSet());

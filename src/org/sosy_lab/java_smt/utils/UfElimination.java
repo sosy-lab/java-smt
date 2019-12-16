@@ -26,6 +26,7 @@ import static com.google.common.collect.Maps.difference;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -335,12 +336,12 @@ public class UfElimination {
     static UninterpretedFunctionApplication create(
         Formula pF, List<Formula> pArguments, Formula pSubstitution) {
       return new AutoValue_UfElimination_UninterpretedFunctionApplication(
-          pF, pArguments, pSubstitution);
+          pF, ImmutableList.copyOf(pArguments), pSubstitution);
     }
 
     abstract Formula getFormula();
 
-    abstract List<Formula> getArguments();
+    abstract ImmutableList<Formula> getArguments();
 
     abstract Formula getSubstitution();
   }

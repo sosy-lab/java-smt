@@ -227,10 +227,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return Lists.transform(input, this::extractInfo);
   }
 
-  private final Predicate<Formula> alwaysTrue = t -> true;
-
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
-    visitRecursively(pFormulaVisitor, pF, alwaysTrue);
+    visitRecursively(pFormulaVisitor, pF, t -> true);
   }
 
   public void visitRecursively(
@@ -241,8 +239,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     recVisitor.addToQueue(pF);
     while (!recVisitor.isQueueEmpty()) {
       Formula tt = recVisitor.pop();
-      if (shouldProcess == alwaysTrue || shouldProcess.test(tt)) {
-
+      if (shouldProcess.test(tt)) {
         TraversalProcess process = visit(tt, recVisitor);
         if (process == TraversalProcess.ABORT) {
           return;
