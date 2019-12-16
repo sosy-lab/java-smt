@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 
 @RunWith(Parameterized.class)
+@SuppressWarnings("LocalVariableName")
 public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")

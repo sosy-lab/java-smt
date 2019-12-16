@@ -48,7 +48,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @RunWith(Parameterized.class)
-@SuppressWarnings("resource")
+@SuppressWarnings({"resource", "LocalVariableName"})
 public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")

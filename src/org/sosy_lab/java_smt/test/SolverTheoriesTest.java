@@ -54,6 +54,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
+@SuppressWarnings("LocalVariableName")
 public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")

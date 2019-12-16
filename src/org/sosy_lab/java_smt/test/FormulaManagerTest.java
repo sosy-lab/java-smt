@@ -157,7 +157,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   public void formulaEqualsAndHashCode() {
     // Solvers without integers (Boolector) get their own test below
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
-    FunctionDeclaration<IntegerFormula> f_b =
+    FunctionDeclaration<IntegerFormula> fb =
         fmgr.declareUF("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
 
     new EqualsTester()
@@ -194,10 +194,11 @@ public class FormulaManagerTest extends SolverBasedTest0 {
         .addEqualityGroup(
             fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType),
             fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
-        .addEqualityGroup(f_b)
-        .addEqualityGroup(fmgr.callUF(f_b, imgr.makeNumber(0)))
+        .addEqualityGroup(fb)
+        .addEqualityGroup(fmgr.callUF(fb, imgr.makeNumber(0)))
         .addEqualityGroup(
-            fmgr.callUF(f_b, imgr.makeNumber(1)), fmgr.callUF(f_b, imgr.makeNumber(1)))
+            fmgr.callUF(fb, imgr.makeNumber(1)),
+            fmgr.callUF(fb, imgr.makeNumber(1)))
         .testEquals();
   }
 
@@ -205,7 +206,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   public void bitvectorFormulaEqualsAndHashCode() {
     // Boolector does not support integers and its easier to make a new test with bvs
     assume().that(solverToUse()).isEqualTo(Solvers.BOOLECTOR);
-    FunctionDeclaration<BitvectorFormula> f_b =
+    FunctionDeclaration<BitvectorFormula> fb =
         fmgr.declareUF(
             "f_bv",
             FormulaType.getBitvectorTypeWithSize(8),
@@ -246,11 +247,11 @@ public class FormulaManagerTest extends SolverBasedTest0 {
                 "f_a",
                 FormulaType.getBitvectorTypeWithSize(8),
                 FormulaType.getBitvectorTypeWithSize(8)))
-        .addEqualityGroup(f_b)
-        .addEqualityGroup(fmgr.callUF(f_b, bvmgr.makeBitvector(8, 0)))
+        .addEqualityGroup(fb)
+        .addEqualityGroup(fmgr.callUF(fb, bvmgr.makeBitvector(8, 0)))
         .addEqualityGroup(
-            fmgr.callUF(f_b, bvmgr.makeBitvector(8, 1)), // why not equal?!
-            fmgr.callUF(f_b, bvmgr.makeBitvector(8, 1)))
+            fmgr.callUF(fb, bvmgr.makeBitvector(8, 1)), // why not equal?!
+            fmgr.callUF(fb, bvmgr.makeBitvector(8, 1)))
         .testEquals();
   }
 
