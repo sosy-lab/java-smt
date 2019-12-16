@@ -46,6 +46,7 @@ import org.sosy_lab.java_smt.api.NumeralFormulaManager;
  *     (the default implementations of {@link org.sosy_lab.java_smt.api.IntegerFormulaManager} and
  *     {@link org.sosy_lab.java_smt.api.RationalFormulaManager} satisfy this).
  */
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractNumeralFormulaManager<
         TFormulaInfo,
         TType,

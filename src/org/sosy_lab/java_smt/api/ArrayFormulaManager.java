@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
  * This interface represents the theory of (arbitrarily nested) arrays. (as defined in the SMTLib2
  * standard)
  */
+@SuppressWarnings("MethodTypeParameterName")
 public interface ArrayFormulaManager {
 
   /**

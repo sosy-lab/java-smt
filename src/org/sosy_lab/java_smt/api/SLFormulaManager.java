@@ -27,6 +27,7 @@ package org.sosy_lab.java_smt.api;
  * ValueFormulae. The user has to take care of this, otherwise the {@link ProverEnvironment}
  * complains at runtime!
  */
+@SuppressWarnings("MethodTypeParameterName")
 public interface SLFormulaManager {
 
   BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2);

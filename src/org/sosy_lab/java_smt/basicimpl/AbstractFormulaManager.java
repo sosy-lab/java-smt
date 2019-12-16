@@ -59,6 +59,7 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
  *
  * @param <TFormulaInfo> The solver specific type.
  */
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FormulaManager {
 

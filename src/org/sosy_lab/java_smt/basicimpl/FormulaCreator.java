@@ -66,6 +66,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RationalFormulaImpl;
  * @param <TType> the solver specific type for formula types.
  * @param <TEnv> the solver specific type for the environment/context.
  */
+@SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   private final TType boolType;

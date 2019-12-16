@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
  * more precisely (for example multiplication with constants should be supported by all solvers and
  * implemented by all sub-classes).
  */
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FloatingPointFormulaManager {
