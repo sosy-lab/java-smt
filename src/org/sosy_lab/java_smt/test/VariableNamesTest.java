@@ -507,7 +507,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
       try {
         // should throw exception
         AbstractFormulaManager.checkVariableName(getVarname());
-        fail();
+        assert_().fail();
       } catch (IllegalArgumentException e) {
       }
     }
