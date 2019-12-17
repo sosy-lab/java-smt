@@ -185,6 +185,7 @@ public class SmtInterpolEnvironment {
       Path logfile = smtLogfile.getFreshPath();
 
       try {
+        @SuppressWarnings("IllegalInstantiation")
         PrintWriter out = new PrintWriter(IO.openOutputFile(logfile, Charset.defaultCharset()));
 
         out.println("(set-option :global-declarations true)");

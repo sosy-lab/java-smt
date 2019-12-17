@@ -19,7 +19,7 @@
  */
 package org.sosy_lab.java_smt.test;
 
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +51,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void distinctTest() throws SolverException, InterruptedException {
+    requireIntegers();
     List<IntegerFormula> symbols = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
       IntegerFormula symbol = imgr.makeVariable("x" + i);
@@ -61,6 +62,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void distinctTest2() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula four = imgr.makeNumber(4);
     List<IntegerFormula> symbols = new ArrayList<>();
@@ -76,6 +78,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void distinctTest3() throws SolverException, InterruptedException {
+    requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula four = imgr.makeNumber(4);
     List<IntegerFormula> symbols = new ArrayList<>();
@@ -92,7 +95,8 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
+    requireIntegers();
     imgr.makeNumber("a");
-    fail();
+    assert_().fail();
   }
 }

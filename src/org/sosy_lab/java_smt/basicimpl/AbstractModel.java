@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
 

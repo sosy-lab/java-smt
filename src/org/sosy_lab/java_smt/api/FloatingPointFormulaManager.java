@@ -140,6 +140,16 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula negate(FloatingPointFormula number);
 
+  FloatingPointFormula abs(FloatingPointFormula number);
+
+  FloatingPointFormula max(FloatingPointFormula number1, FloatingPointFormula number2);
+
+  FloatingPointFormula min(FloatingPointFormula number1, FloatingPointFormula number2);
+
+  FloatingPointFormula sqrt(FloatingPointFormula number);
+
+  FloatingPointFormula sqrt(FloatingPointFormula number, FloatingPointRoundingMode roundingMode);
+
   FloatingPointFormula add(FloatingPointFormula number1, FloatingPointFormula number2);
 
   FloatingPointFormula add(

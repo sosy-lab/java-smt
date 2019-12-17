@@ -255,11 +255,13 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
+  @SuppressWarnings("MethodTypeParameterName")
   public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
       FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
     return new ArrayFormulaType<>(pDomainSort, pRangeSort);
   }
 
+  @SuppressWarnings("ClassTypeParameterName")
   public static final class ArrayFormulaType<TI extends Formula, TE extends Formula>
       extends FormulaType<ArrayFormula<TI, TE>> {
 

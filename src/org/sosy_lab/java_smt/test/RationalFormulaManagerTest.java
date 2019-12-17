@@ -20,9 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.Iterables;
 import java.util.HashSet;
@@ -70,18 +68,19 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       RationalFormula r = rmgr.makeNumber(v);
-      assertEquals(mgr.getFormulaType(i), FormulaType.IntegerType);
-      assertEquals(mgr.getFormulaType(rmgr.floor(r)), FormulaType.IntegerType);
+      assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
+      assertThat(mgr.getFormulaType(rmgr.floor(r))).isEqualTo(FormulaType.IntegerType);
       assertThatFormula(imgr.equal(i, rmgr.floor(r))).isSatisfiable();
     }
   }
 
   @Test
   public void intToIntTest() throws SolverException, InterruptedException {
+    requireIntegers();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
-      assertEquals(mgr.getFormulaType(i), FormulaType.IntegerType);
-      assertEquals(mgr.getFormulaType(imgr.floor(i)), FormulaType.IntegerType);
+      assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
+      assertThat(mgr.getFormulaType(imgr.floor(i))).isEqualTo(FormulaType.IntegerType);
       assertThatFormula(imgr.equal(i, imgr.floor(i))).isTautological();
     }
   }
@@ -91,8 +90,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
     requireRationals();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
-      assertEquals(mgr.getFormulaType(i), FormulaType.IntegerType);
-      assertEquals(mgr.getFormulaType(rmgr.floor(i)), FormulaType.IntegerType);
+      assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
+      assertThat(mgr.getFormulaType(imgr.floor(i))).isEqualTo(FormulaType.IntegerType);
       assertThatFormula(imgr.equal(i, rmgr.floor(i))).isTautological();
     }
   }
@@ -136,9 +135,9 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
     FunctionCollector collector = new FunctionCollector();
-    assertTrue(mgr.visit(f, collector));
-    assertEquals(
-        FunctionDeclarationKind.FLOOR, Iterables.getOnlyElement(collector.functions).getKind());
+    assertThat(mgr.visit(f, collector)).isTrue();
+    assertThat(Iterables.getOnlyElement(collector.functions).getKind())
+        .isEqualTo(FunctionDeclarationKind.FLOOR);
   }
 
   private static final class FunctionCollector extends DefaultFormulaVisitor<Boolean> {
@@ -162,6 +161,6 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
     rmgr.makeNumber("a");
-    fail();
+    assert_().fail();
   }
 }

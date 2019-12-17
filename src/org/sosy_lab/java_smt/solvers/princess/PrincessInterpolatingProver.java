@@ -103,9 +103,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
     Set<Integer> indexesOfB =
-        annotatedTerms
-            .keySet()
-            .stream()
+        annotatedTerms.keySet().stream()
             .filter(f -> !indexesOfA.contains(f))
             .collect(ImmutableSet.toImmutableSet());
 

@@ -210,18 +210,21 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
       ArrayFormula<TD, TR> pArray) {
     return ((Z3ArrayFormula<TD, TR>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
       ArrayFormula<TD, TR> pArray) {
     return ((Z3ArrayFormula<TD, TR>) pArray).getIndexType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> ArrayFormula<TD, TR> encapsulateArray(
       Long pTerm, FormulaType<TD> pIndexType, FormulaType<TR> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
@@ -563,6 +566,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
+      case Z3_OP_FPA_ABS:
+        return FunctionDeclarationKind.FP_ABS;
+      case Z3_OP_FPA_MAX:
+        return FunctionDeclarationKind.FP_MAX;
+      case Z3_OP_FPA_MIN:
+        return FunctionDeclarationKind.FP_MIN;
+      case Z3_OP_FPA_SQRT:
+        return FunctionDeclarationKind.FP_SQRT;
       case Z3_OP_FPA_SUB:
         return FunctionDeclarationKind.FP_SUB;
       case Z3_OP_FPA_ADD:

@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
@@ -62,27 +60,27 @@ public abstract class Mathsat5AbstractNativeApiTest {
     long number = msat_make_bv_number(env, "42", 32, 10);
     long type = msat_term_get_type(number);
 
-    assertTrue(msat_is_bv_type(env, type));
-    assertEquals(32, msat_get_bv_type_size(env, type));
+    assertThat(msat_is_bv_type(env, type)).isTrue();
+    assertThat(msat_get_bv_type_size(env, type)).isEqualTo(32);
 
     long funcDecl = msat_declare_function(env, "testVar", type);
     long var = msat_make_constant(env, funcDecl);
     type = msat_term_get_type(var);
 
-    assertTrue(msat_is_bv_type(env, type));
-    assertEquals(32, msat_get_bv_type_size(env, type));
+    assertThat(msat_is_bv_type(env, type)).isTrue();
+    assertThat(msat_get_bv_type_size(env, type)).isEqualTo(32);
   }
 
   @Test
   public void fpExpWidth() {
     long type = msat_get_fp_type(env, 8, 23);
-    assertEquals(8, msat_get_fp_type_exp_width(env, type));
+    assertThat(msat_get_fp_type_exp_width(env, type)).isEqualTo(8);
   }
 
   @Test
   public void fpMantWidth() {
     long type = msat_get_fp_type(env, 8, 23);
-    assertEquals(23, msat_get_fp_type_mant_width(env, type));
+    assertThat(msat_get_fp_type_mant_width(env, type)).isEqualTo(23);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -104,32 +102,32 @@ public abstract class Mathsat5AbstractNativeApiTest {
 
     long t = msat_make_int_modular_congruence(env, "42", t1, t2);
 
-    assertEquals("(`int_mod_congr_42` (`+_int` v1 (`*_int` -1 v2)) 0)", msat_term_repr(t));
+    assertThat(msat_term_repr(t)).isEqualTo("(`int_mod_congr_42` (`+_int` v1 (`*_int` -1 v2)) 0)");
 
     msat_assert_formula(env, t);
 
     msat_push_backtrack_point(env);
     msat_assert_formula(env, msat_make_equal(env, t1, msat_make_number(env, "3")));
     msat_assert_formula(env, msat_make_equal(env, t2, msat_make_number(env, "45")));
-    assertTrue(msat_check_sat(env)); // 3 == 45 mod 42
+    assertThat(msat_check_sat(env)).isTrue(); // 3 == 45 mod 42
     msat_pop_backtrack_point(env);
 
     msat_push_backtrack_point(env);
     msat_assert_formula(env, msat_make_equal(env, t1, msat_make_number(env, "45")));
     msat_assert_formula(env, msat_make_equal(env, t2, msat_make_number(env, "45")));
-    assertTrue(msat_check_sat(env)); // 45 == 45 mod 42 according to Mathsat
+    assertThat(msat_check_sat(env)).isTrue(); // 45 == 45 mod 42 according to Mathsat
     msat_pop_backtrack_point(env);
 
     msat_push_backtrack_point(env);
     msat_assert_formula(env, msat_make_equal(env, t1, msat_make_number(env, "87")));
     msat_assert_formula(env, msat_make_equal(env, t2, msat_make_number(env, "45")));
-    assertTrue(msat_check_sat(env)); // 87 == 45 mod 42 according to Mathsat
+    assertThat(msat_check_sat(env)).isTrue(); // 87 == 45 mod 42 according to Mathsat
     msat_pop_backtrack_point(env);
 
     msat_push_backtrack_point(env);
     msat_assert_formula(env, msat_make_equal(env, t1, msat_make_number(env, "4")));
     msat_assert_formula(env, msat_make_equal(env, t2, msat_make_number(env, "45")));
-    assertFalse(msat_check_sat(env)); // 4 != 45 mod 42
+    assertThat(msat_check_sat(env)).isFalse(); // 4 != 45 mod 42
     msat_pop_backtrack_point(env);
   }
 }

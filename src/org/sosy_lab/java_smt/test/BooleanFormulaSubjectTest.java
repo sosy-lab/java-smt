@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.booleanFormulasOf;
 
 import com.google.common.base.Throwables;
@@ -36,6 +37,10 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
+ * bitvectors length 1.
+ */
 @RunWith(Parameterized.class)
 public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
@@ -57,8 +62,16 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Before
   public void setupFormulas() {
-    simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
-    contradiction = bmgr.and(simpleFormula, imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2)));
+    if (imgr != null) {
+      simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
+      contradiction =
+          bmgr.and(simpleFormula, imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2)));
+    } else {
+      simpleFormula = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 1));
+      contradiction =
+          bmgr.and(
+              simpleFormula, bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2)));
+    }
     tautology = bmgr.or(simpleFormula, bmgr.not(simpleFormula));
   }
 
@@ -81,6 +94,11 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() {
+    assume()
+        .withMessage("Solver does not support unsat core generation in a usable way")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());
     assertThat(failure).factValue("which has unsat core").isNotEmpty();
@@ -107,6 +125,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsUnsatisfiableNo() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(simpleFormula).isUnsatisfiable());
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -131,6 +150,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsTautologicalNo1() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(simpleFormula).isTautological());
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -138,13 +158,22 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsTautologicalNo2() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isTautological());
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
   @Test
   public void testIsEquivalentToYes() throws SolverException, InterruptedException {
-    BooleanFormula simpleFormula2 =
-        imgr.equal(imgr.makeVariable("a"), imgr.add(imgr.makeNumber(0), imgr.makeNumber(1)));
+    BooleanFormula simpleFormula2;
+    if (imgr != null) {
+      simpleFormula2 =
+          imgr.equal(imgr.makeVariable("a"), imgr.add(imgr.makeNumber(0), imgr.makeNumber(1)));
+    } else {
+      simpleFormula2 =
+          bvmgr.equal(
+              bvmgr.makeVariable(2, "a"),
+              bvmgr.add(bvmgr.makeBitvector(2, 0), bvmgr.makeBitvector(2, 1)));
+    }
     assertThatFormula(simpleFormula).isEquivalentTo(simpleFormula2);
   }
 
@@ -152,6 +181,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testIsEquivalentToNo() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(simpleFormula).isEquivalentTo(tautology));
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -162,10 +192,16 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsEquisatisfiableoNo() {
-    BooleanFormula simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+    BooleanFormula simpleFormula2;
+    if (imgr != null) {
+      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+    } else {
+      simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeVariable(2, "2"));
+    }
     AssertionError failure =
         expectFailure(
             whenTesting -> whenTesting.that(simpleFormula).isEquisatisfiableTo(simpleFormula2));
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 
@@ -178,6 +214,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   public void testImpliesNo() {
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(tautology).implies(simpleFormula));
+    requireModel();
     assertThat(failure).factValue("which has model").isNotEmpty();
   }
 

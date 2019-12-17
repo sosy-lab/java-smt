@@ -48,6 +48,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ZEXT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ABS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ADD;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_AS_IEEEBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_CAST;
@@ -63,9 +64,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISZERO;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MAX;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MIN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MUL;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_NEG;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ROUND_TO_INT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SQRT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SUB;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_BV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
@@ -279,6 +283,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
@@ -286,12 +291,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
       ArrayFormula<TI, TE> pArray) {
     return ((Mathsat5ArrayFormula<TI, TE>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
       ArrayFormula<TI, TE> pArray) {
     return ((Mathsat5ArrayFormula<TI, TE>) pArray).getIndexType();
@@ -432,6 +439,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
       case MSAT_TAG_FP_NEG:
         return FunctionDeclarationKind.FP_NEG;
+      case MSAT_TAG_FP_ABS:
+        return FunctionDeclarationKind.FP_ABS;
+      case MSAT_TAG_FP_MAX:
+        return FunctionDeclarationKind.FP_MAX;
+      case MSAT_TAG_FP_MIN:
+        return FunctionDeclarationKind.FP_MIN;
+      case MSAT_TAG_FP_SQRT:
+        return FunctionDeclarationKind.FP_SQRT;
       case MSAT_TAG_FP_ADD:
         return FunctionDeclarationKind.FP_ADD;
       case MSAT_TAG_FP_SUB:

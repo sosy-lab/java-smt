@@ -132,7 +132,12 @@ public abstract class SolverBasedTest0 {
 
     fmgr = mgr.getUFManager();
     bmgr = mgr.getBooleanFormulaManager();
-    imgr = mgr.getIntegerFormulaManager();
+    // Needed for Boolector tests (Doesnt support Integer Formulas)
+    try {
+      imgr = mgr.getIntegerFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      imgr = null;
+    }
     try {
       rmgr = mgr.getRationalFormulaManager();
     } catch (UnsupportedOperationException e) {
@@ -165,6 +170,14 @@ public abstract class SolverBasedTest0 {
     if (context != null) {
       context.close();
     }
+  }
+
+  /** Skip test if the solver does not support integers. */
+  protected final void requireIntegers() {
+    assume()
+        .withMessage("Solver %s does not support the theory of integers", solverToUse())
+        .that(imgr)
+        .isNotNull();
   }
 
   /** Skip test if the solver does not support rationals. */
@@ -242,7 +255,28 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+  }
+
+  protected void requireModel() {
+    assume()
+        .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireVisitor() {
+    assume()
+        .withMessage("Solver %s does not support formula visitor", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireUnsatCore() {
+    assume()
+        .withMessage("Solver %s does not support unsat core generation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   @Deprecated

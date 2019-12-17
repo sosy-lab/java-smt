@@ -247,6 +247,26 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
+  protected Expr abs(Expr pParam1) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_ABS, pParam1);
+  }
+
+  @Override
+  protected Expr max(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_MAX, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr min(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_MIN, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr sqrt(Expr pParam1, Expr pRoundingMode) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_SQRT, pRoundingMode, pParam1);
+  }
+
+  @Override
   protected Expr add(Expr pParam1, Expr pParam2, Expr pRoundingMode) {
     return exprManager.mkExpr(Kind.FLOATINGPOINT_PLUS, pRoundingMode, pParam1, pParam2);
   }

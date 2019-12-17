@@ -20,8 +20,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -80,8 +80,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
-        // CVC4 does not support interpolation
-        assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
+        // CVC4 and Boolector do not support interpolation
+        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
 
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
         break;
@@ -121,6 +121,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Test
   public void allSatTest_unsat() throws SolverException, InterruptedException {
+    requireIntegers();
+
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);
@@ -141,7 +143,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         new TestAllSatCallback() {
           @Override
           public void apply(List<BooleanFormula> pModel) {
-            fail("Formula is unsat, but all-sat callback called with model " + pModel);
+            assert_()
+                .withMessage("Formula is unsat, but all-sat callback called with model " + pModel)
+                .fail();
           }
         };
 
@@ -150,6 +154,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Test
   public void allSatTest_xor() throws SolverException, InterruptedException {
+    requireIntegers();
+
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);

@@ -21,8 +21,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -117,11 +117,14 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+      assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.negate(formula), fpmgr.abs(formula)))
+          .isTautological();
     }
     for (double d : new double[] {1, 2, 0.0, Double.POSITIVE_INFINITY}) {
       FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+      assertThatFormula(fpmgr.equalWithFPSemantics(formula, fpmgr.abs(formula))).isTautological();
     }
   }
 
@@ -131,16 +134,20 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
+      assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.negate(formula), fpmgr.abs(formula)))
+          .isTautological();
     }
     for (String s : new String[] {"1", "Infinity", "0", "0.0", "0.000"}) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+      assertThatFormula(fpmgr.equalWithFPSemantics(formula, fpmgr.abs(formula))).isTautological();
     }
     for (String s : new String[] {"+1", "+Infinity", "+0", "+0.0", "+0.000"}) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
+      assertThatFormula(fpmgr.equalWithFPSemantics(formula, fpmgr.abs(formula))).isTautological();
     }
     // NaN is not positive and not negative.
     for (String s : new String[] {"NaN", "-NaN", "+NaN"}) {
@@ -178,6 +185,16 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula order3 = fpmgr.greaterThan(posInf, negInf);
 
     assertThatFormula(bmgr.and(order1, order2, order3)).isTautological();
+
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.max(posInf, zero), posInf)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.max(posInf, negInf), posInf))
+        .isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.max(negInf, zero), zero)).isTautological();
+
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.min(posInf, zero), zero)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.min(posInf, negInf), negInf))
+        .isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(fpmgr.min(negInf, zero), negInf)).isTautological();
   }
 
   @Test
@@ -189,6 +206,24 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula order2 = fpmgr.lessOrEquals(negInf, var);
 
     assertThatFormula(bmgr.or(varIsNan, bmgr.and(order1, order2))).isTautological();
+  }
+
+  @Test
+  public void sqrt() throws SolverException, InterruptedException {
+    for (double d : new double[] {0.25, 1, 2, 4, 9, 15, 1234, 1000000}) {
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(
+                  fpmgr.sqrt(fpmgr.makeNumber(d * d, doublePrecType)),
+                  fpmgr.makeNumber(d, doublePrecType)))
+          .isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(
+                  fpmgr.sqrt(fpmgr.makeNumber(d, doublePrecType)),
+                  fpmgr.makeNumber(Math.sqrt(d), doublePrecType)))
+          .isTautological();
+      assertThatFormula(fpmgr.isNaN(fpmgr.sqrt(fpmgr.makeNumber(-d, doublePrecType))))
+          .isTautological();
+    }
   }
 
   @Test
@@ -900,6 +935,6 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test(expected = Exception.class)
   public void failOnInvalidString() {
     fpmgr.makeNumber("a", singlePrecType);
-    fail();
+    assert_().fail();
   }
 }

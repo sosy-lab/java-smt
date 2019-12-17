@@ -90,7 +90,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
-        .isNotEqualTo(Solvers.SMTINTERPOL);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR);
   }
 
   protected final void requireUfValuesInModel() {
@@ -149,6 +149,8 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void singleStackTestInteger() throws SolverException, InterruptedException {
+    requireIntegers();
+
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(imgr, env);
   }
@@ -288,6 +290,8 @@ public class SolverStackTest extends SolverBasedTest0 {
   @SuppressWarnings("unused")
   @Test
   public void symbolsOnStackTest() throws InterruptedException, SolverException {
+    requireModel();
+
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
 
     stack.push();
@@ -460,6 +464,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula() throws SolverException, InterruptedException {
+    requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -473,6 +478,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula2() throws SolverException, InterruptedException {
+    requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       assertThat(stack).isSatisfiable();
@@ -486,6 +492,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void modelForSatFormula() throws SolverException, InterruptedException {
+    requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula a = imgr.makeVariable("a");
       stack.push(imgr.greaterThan(a, imgr.makeNumber(0)));
@@ -499,6 +506,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
+    requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       BigInteger val = BigInteger.TEN.pow(1000);
       IntegerFormula a = imgr.makeVariable("a");
@@ -512,6 +520,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
+    requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
       IntegerFormula varA = imgr.makeVariable("a");
@@ -545,7 +554,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       // do something on the stack
       stack.push();
       stack.pop();
-      stack.push(imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(0)));
+      stack.push(bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeTrue()));
       assertThat(stack).isSatisfiable();
       stack.push();
 

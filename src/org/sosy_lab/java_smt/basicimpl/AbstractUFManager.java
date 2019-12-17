@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.UFManager;
  * @param <TFunctionDecl> The solver specific type of declarations of any function application
  * @param <TType> The solver specific type of formula-types.
  */
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFunctionDecl>
     implements UFManager {

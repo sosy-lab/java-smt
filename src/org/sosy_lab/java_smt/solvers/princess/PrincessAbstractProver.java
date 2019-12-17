@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import scala.Enumeration.Value;
 
+@SuppressWarnings("ClassTypeParameterName")
 abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E> {
 
   protected final SimpleAPI api;

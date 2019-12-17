@@ -77,7 +77,7 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
+  protected Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
   }
 
@@ -100,7 +100,7 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long makeVariableImpl(String var, FloatingPointType pType) {
+  protected Long makeVariableImpl(String var, FloatingPointType pType) {
     return getFormulaCreator().makeVariable(mkFpaSort(pType), var);
   }
 
@@ -182,22 +182,42 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long negate(Long pNumber) {
+  protected Long negate(Long pNumber) {
     return Native.mkFpaNeg(z3context, pNumber);
   }
 
   @Override
-  public Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long abs(Long pNumber) {
+    return Native.mkFpaAbs(z3context, pNumber);
+  }
+
+  @Override
+  protected Long max(Long pNumber1, Long pNumber2) {
+    return Native.mkFpaMax(z3context, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long min(Long pNumber1, Long pNumber2) {
+    return Native.mkFpaMin(z3context, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long sqrt(Long pNumber, Long pRoundingMode) {
+    return Native.mkFpaSqrt(z3context, pRoundingMode, pNumber);
+  }
+
+  @Override
+  protected Long add(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaAdd(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long subtract(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaSub(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
   @Override
-  public Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
+  protected Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaMul(z3context, pRoundingMode, pNumber1, pNumber2);
   }
 
@@ -212,27 +232,27 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  public Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
+  protected Long equalWithFPSemantics(Long pNumber1, Long pNumber2) {
     return Native.mkFpaEq(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterThan(Long pNumber1, Long pNumber2) {
+  protected Long greaterThan(Long pNumber1, Long pNumber2) {
     return Native.mkFpaGt(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long greaterOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long greaterOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkFpaGeq(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessThan(Long pNumber1, Long pNumber2) {
+  protected Long lessThan(Long pNumber1, Long pNumber2) {
     return Native.mkFpaLt(z3context, pNumber1, pNumber2);
   }
 
   @Override
-  public Long lessOrEquals(Long pNumber1, Long pNumber2) {
+  protected Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkFpaLeq(z3context, pNumber1, pNumber2);
   }
 

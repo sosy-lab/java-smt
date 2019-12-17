@@ -39,6 +39,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
  * @param <TFormulaInfo> the solver specific type.
  */
 @Immutable(containerOf = "TFormulaInfo")
+@SuppressWarnings("ClassTypeParameterName")
 abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
   private final TFormulaInfo formulaInfo;

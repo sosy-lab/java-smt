@@ -48,6 +48,7 @@ class SmtInterpolArrayFormulaManager
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 

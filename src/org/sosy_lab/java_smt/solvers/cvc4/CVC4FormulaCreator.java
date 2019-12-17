@@ -114,12 +114,14 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
       ArrayFormula<TD, TR> pArray) {
     return ((CVC4ArrayFormula<TD, TR>) pArray).getElementType();
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
       ArrayFormula<TD, TR> pArray) {
     return ((CVC4ArrayFormula<TD, TR>) pArray).getIndexType();
@@ -236,6 +238,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
@@ -370,6 +373,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_ISSN, FunctionDeclarationKind.FP_IS_SUBNORMAL)
           .put(Kind.FLOATINGPOINT_ISZ, FunctionDeclarationKind.FP_IS_ZERO)
           .put(Kind.FLOATINGPOINT_EQ, FunctionDeclarationKind.FP_EQ)
+          .put(Kind.FLOATINGPOINT_ABS, FunctionDeclarationKind.FP_ABS)
+          .put(Kind.FLOATINGPOINT_MAX, FunctionDeclarationKind.FP_MAX)
+          .put(Kind.FLOATINGPOINT_MIN, FunctionDeclarationKind.FP_MIN)
+          .put(Kind.FLOATINGPOINT_SQRT, FunctionDeclarationKind.FP_SQRT)
           .put(Kind.FLOATINGPOINT_PLUS, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)

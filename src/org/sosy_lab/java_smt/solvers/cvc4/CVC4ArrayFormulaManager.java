@@ -49,6 +49,7 @@ public class CVC4ArrayFormulaManager
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     final ArrayFormulaType<TI, TE> arrayFormulaType =

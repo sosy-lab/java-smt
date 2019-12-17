@@ -37,7 +37,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -58,9 +57,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   private static final int ERROR_TERM = 0;
   private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
-
-  /** Number of the objective -> objective pointer. */
-  private @Nullable List<Long> objectives = null;
 
   /**
    * ID given to user -> number of the objective. Size corresponds to the number of currently

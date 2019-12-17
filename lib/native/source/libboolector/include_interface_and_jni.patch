@@ -1,0 +1,27 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index e2781eb..b838d8e 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -1,6 +1,7 @@
+ set(libboolector_src_files
+   aigprop.c
+   boolector.c
++  interface_wrap.c
+   boolectormc.c
+   btorabort.c
+   btoraig.c
+@@ -96,6 +97,14 @@ target_include_directories(boolector
+ target_include_directories(boolector PRIVATE ${Btor2Tools_INCLUDE_DIR})
+ target_link_libraries(boolector ${Btor2Tools_LIBRARIES})
+ 
++find_package(JNI)
++if(JNI_FOUND)
++  message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
++  message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
++  target_include_directories(boolector PRIVATE ${JNI_INCLUDE_DIRS})
++  target_link_libraries(boolector ${JNI_LIBRARIES})
++endif()
++
+ if(GMP_FOUND)
+   target_include_directories(boolector PRIVATE ${GMP_INCLUDE_DIR})
+   target_link_libraries(boolector ${GMP_LIBRARIES})

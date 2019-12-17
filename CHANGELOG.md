@@ -1,5 +1,33 @@
 # JavaSMT ChangeLog
 
+## JavaSMT 3.3.0
+
+### Changes in the API:
+ - FloatingPointManager supports more arithmetic methods, such as `min`, `max`, `abs`, `sqrt`.
+
+### Improvements and Fixes:
+ - More consistency checks on bitvector constants
+ - The Maven release contains the bindings for Princess
+ - New or updated solver versions:
+    - Boolector 3.0.0-2019-11-11-g9d06cc0 was added (#174).
+    - CVC4: 1.8-prerelease-2019-11-30-gae93e65
+    - Princess: 2.12-2019-11-20
+    - SMTInterpol: 2.5-533-ga4ba1513
+    - other solvers were not updated since the last release
+
+## JavaSMT 3.2.0
+
+The biggest change is the integration of the CVC4 SMT solver (CVC4 1.8-prerelease).
+
+## JavaSMT 3.1.0
+
+This is mostly a cleanup release that contains several smaller changes and optimizations.
+
+We included new solver versions:
+
+- OptiMathSAT: 1.6.3
+- SMTInterpol: 2.5-515-g2765bdd
+
 ## JavaSMT 3.0.0
 
 ### Changes in the API

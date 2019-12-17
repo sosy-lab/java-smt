@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 
+@SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements SLFormulaManager {

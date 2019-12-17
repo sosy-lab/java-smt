@@ -73,9 +73,9 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Test
   public void testProverTimeout() throws SolverException, InterruptedException {
     TruthJUnit.assume()
-        .withMessage("Princess does not support interruption")
+        .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.YICES2);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.YICES2);
     testBasicProverTimeout(() -> context.newProverEnvironment());
   }
 
@@ -83,9 +83,9 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void testInterpolationProverTimeout() throws SolverException, InterruptedException {
     requireInterpolation();
     TruthJUnit.assume()
-        .withMessage("Princess does not support interruption")
+        .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.YICES2);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.YICES2);
     testBasicProverTimeout(() -> context.newProverEnvironmentWithInterpolation());
   }
 

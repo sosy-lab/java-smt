@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -96,6 +97,11 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  @Before
+  public void setup() {
+    requireVisitor();
   }
 
   @Test
@@ -191,6 +197,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireBitvectors();
     FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
     FloatingPointFormula x = fpmgr.makeVariable("x", fp);
+    FloatingPointFormula y = fpmgr.makeVariable("x", fp);
     BitvectorFormula z = bvmgr.makeVariable(32, "z");
 
     checkKind(
@@ -205,6 +212,10 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     checkKind(fpmgr.isNormal(x), FunctionDeclarationKind.FP_IS_NORMAL);
     checkKind(fpmgr.isSubnormal(x), FunctionDeclarationKind.FP_IS_SUBNORMAL);
     checkKind(fpmgr.isZero(x), FunctionDeclarationKind.FP_IS_ZERO);
+    checkKind(fpmgr.abs(x), FunctionDeclarationKind.FP_ABS);
+    checkKind(fpmgr.max(x, y), FunctionDeclarationKind.FP_MAX);
+    checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
+    checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
     if (Solvers.CVC4 != solverToUse()) { // CVC4 does not support this operation
       checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
     }
@@ -469,9 +480,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               }
             });
     assertThat(
-            mgr.extractVariables(transformed)
-                .keySet()
-                .stream()
+            mgr.extractVariables(transformed).keySet().stream()
                 .allMatch(pS -> pS.equals(pS.toUpperCase())))
         .isTrue();
   }

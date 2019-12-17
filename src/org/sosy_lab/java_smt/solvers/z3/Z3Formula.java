@@ -81,6 +81,7 @@ abstract class Z3Formula implements Formula {
     return z3expr;
   }
 
+  @SuppressWarnings("ClassTypeParameterName")
   static final class Z3ArrayFormula<TI extends Formula, TE extends Formula> extends Z3Formula
       implements ArrayFormula<TI, TE> {
 

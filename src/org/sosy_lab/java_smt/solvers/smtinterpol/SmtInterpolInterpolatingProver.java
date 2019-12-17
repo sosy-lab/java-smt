@@ -78,9 +78,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
     Set<String> termNamesOfB =
-        annotatedTerms
-            .keySet()
-            .stream()
+        annotatedTerms.keySet().stream()
             .filter(n -> !termNamesOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
 
