@@ -364,8 +364,7 @@ public class Yices2NativeApiTest {
 
     int child = yices_term_child(and, 0);
     assertThat(yices_term_constructor(child)).isEqualTo(YICES_OR_TERM);
-    int children = yices_term_num_children(child);
-    assertThat(children).isEqualTo(YICES_NOT_TERM);
+    assertThat(yices_term_num_children(child)).isEqualTo(2);
     assertThat(yices_term_to_string(and)).isEqualTo("(and termTrue termTwo)");
     assertThat(yices_term_constructor(and)).isEqualTo(YICES_NOT_TERM);
   }
