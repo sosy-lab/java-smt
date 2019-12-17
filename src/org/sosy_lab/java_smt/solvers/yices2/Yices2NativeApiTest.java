@@ -19,9 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
@@ -153,19 +151,19 @@ public class Yices2NativeApiTest {
 
   @Test
   public void simpleUNSAT() {
-    int term_true = yices_true();
-    int term_false = yices_false();
-    int formula = yices_and2(term_true, term_false);
+    int termTrue = yices_true();
+    int termFalse = yices_false();
+    int formula = yices_and2(termTrue, termFalse);
     yices_assert_formula(env, formula);
-    assertEquals(UNSAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(UNSAT);
   }
 
   @Test
   public void simpleSAT() {
-    int term_true = yices_true();
-    int formula = yices_and2(term_true, term_true);
+    int termTrue = yices_true();
+    int formula = yices_and2(termTrue, termTrue);
     yices_assert_formula(env, formula);
-    assertEquals(SAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(SAT);
   }
 
   /*
@@ -174,22 +172,22 @@ public class Yices2NativeApiTest {
   @Test
   public void arrayArgSAT() {
     int n = 4;
-    int term_true = yices_true();
-    int[] terms = {term_true, term_true, term_true, term_true};
+    int termTrue = yices_true();
+    int[] terms = {termTrue, termTrue, termTrue, termTrue};
     int formula = yices_and(n, terms);
     yices_assert_formula(env, formula);
-    assertEquals(SAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(SAT);
   }
 
   @Test
   public void arrayArgUNSAT() {
     int n = 4;
-    int term_true = yices_true();
-    int term_false = yices_false();
-    int[] terms = {term_false, term_true, term_true, term_true};
+    int termTrue = yices_true();
+    int termFalse = yices_false();
+    int[] terms = {termFalse, termTrue, termTrue, termTrue};
     int formula = yices_and(n, terms);
     yices_assert_formula(env, formula);
-    assertEquals(UNSAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(UNSAT);
   }
 
   @Test
@@ -200,7 +198,7 @@ public class Yices2NativeApiTest {
     int add = yices_add(one, two);
     int equal = yices_eq(three, add);
     yices_assert_formula(env, equal);
-    assertEquals(SAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(SAT);
   }
 
   @Test
@@ -211,7 +209,7 @@ public class Yices2NativeApiTest {
     int add = yices_add(one, two);
     int equal = yices_eq(three, add);
     yices_assert_formula(env, equal);
-    assertEquals(UNSAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(UNSAT);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -240,7 +238,7 @@ public class Yices2NativeApiTest {
     int longmax = yices_int64(Long.MAX_VALUE);
     int gt = yices_arith_gt_atom(longmax, intmax);
     yices_assert_formula(env, gt);
-    assertEquals(SAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(SAT);
   }
 
   @Test
@@ -252,7 +250,7 @@ public class Yices2NativeApiTest {
     int f2 = yices_redand(f1);
     int f3 = yices_bveq_atom(f2, v3);
     yices_assert_formula(env, f3);
-    assertEquals(SAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(SAT);
   }
 
   @Test
@@ -264,15 +262,15 @@ public class Yices2NativeApiTest {
     int f2 = yices_redand(f1);
     int f3 = yices_bveq_atom(f2, v3);
     yices_assert_formula(env, f3);
-    assertEquals(UNSAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(UNSAT);
   }
 
   @Test
   public void boolValueQuery() {
     int v1 = yices_true();
     int v2 = yices_false();
-    assertTrue(yices_bool_const_value(v1));
-    assertFalse(yices_bool_const_value(v2));
+    assertThat(yices_bool_const_value(v1)).isTrue();
+    assertThat(yices_bool_const_value(v2)).isFalse();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -287,9 +285,9 @@ public class Yices2NativeApiTest {
     int bv1 = yices_parse_bvbin("111000");
     int[] bvComp = {0, 0, 0, 1, 1, 1};
     int bvsize = yices_term_bitsize(bv1);
-    assertEquals(6, bvsize);
+    assertThat(bvsize).isEqualTo(6);
     int[] bvReturn = yices_bv_const_value(bv1, bvsize);
-    assertTrue(Arrays.equals(bvComp, bvReturn));
+    assertThat(bvComp).isEqualTo(bvReturn);
   }
 
   @Test
@@ -305,16 +303,13 @@ public class Yices2NativeApiTest {
     int negativeNumDenConst = yices_parse_rational(negativeNum + "/" + negativeDen);
     int bigConst = yices_parse_rational(largeNumber.toString());
     Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
-    assertEquals(creator.convertValue(ratConst, ratConst), Rational.of(num + "/" + den));
-    assertEquals(creator.convertValue(bigConst, bigConst), largeNumber);
-    assertEquals(
-        creator.convertValue(negativeNumConst, negativeNumConst),
+    assertThat(creator.convertValue(ratConst, ratConst)).isEqualTo(Rational.of(num + "/" + den));
+    assertThat(creator.convertValue(bigConst, bigConst)).isEqualTo(largeNumber);
+    assertThat(creator.convertValue(negativeNumConst, negativeNumConst)).isEqualTo(
         Rational.of(negativeNum + "/" + den));
-    assertEquals(
-        creator.convertValue(negativeDenConst, negativeDenConst),
+    assertThat(creator.convertValue(negativeDenConst, negativeDenConst)).isEqualTo(
         Rational.of(num + "/" + negativeDen));
-    assertEquals(
-        creator.convertValue(negativeNumDenConst, negativeNumDenConst),
+    assertThat(creator.convertValue(negativeNumDenConst, negativeNumDenConst)).isEqualTo(
         Rational.of(negativeNum + "/" + negativeDen));
   }
 
@@ -327,7 +322,7 @@ public class Yices2NativeApiTest {
       Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
       String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
       BigInteger big = new BigInteger(bigEndianBV, 2);
-      assertEquals(BigInteger.valueOf(value), big);
+      assertThat(big).isEqualTo(BigInteger.valueOf(value));
     }
   }
 
@@ -336,16 +331,16 @@ public class Yices2NativeApiTest {
     int t = yices_parse_bvbin("0100100001100101011011000110110001101111");
     String termName = "Hello";
     yices_set_term_name(t, termName);
-    assertEquals(yices_get_term_name(t), termName);
+    assertThat(yices_get_term_name(t)).isEqualTo(termName);
   }
 
   @Test
   public void satWithVariable() {
-    int term_false = yices_false();
+    int termFalse = yices_false();
     int var = yices_new_uninterpreted_term(yices_bool_type());
-    int formula = yices_or2(term_false, var);
+    int formula = yices_or2(termFalse, var);
     yices_assert_formula(env, formula);
-    assertEquals(SAT, yices_check_context(env, 0));
+    assertThat(yices_check_context(env, 0)).isEqualTo(SAT);
   }
 
   // Yices converts add(YICES_ARITH_CONST, YICES_ARITH_CONST) to an YICES_ARITH_CONST
@@ -355,48 +350,47 @@ public class Yices2NativeApiTest {
     int one = yices_int32(1);
     int two = yices_new_uninterpreted_term(yices_int_type()); // yices_int32(2);
     int addition = yices_add(one, two);
-    assertEquals(41, YICES_ARITH_SUM);
-    assertEquals(YICES_ARITH_SUM, yices_term_constructor(addition));
+    assertThat(yices_term_constructor(addition)).isEqualTo(YICES_ARITH_SUM);
   }
 
   @Test
   public void termConstructorAnd() {
     // and 1 2 is replaced with not (or (not 1) (not 2))
-    int Btrue = yices_new_uninterpreted_term(yices_bool_type()); // yices_true();
-    yices_set_term_name(Btrue, "Btrue");
-    int Btwo = yices_new_uninterpreted_term(yices_bool_type());
-    yices_set_term_name(Btwo, "Btwo");
-    int and = yices_and2(Btrue, Btwo);
-    int children = yices_term_num_children(and);
+    int termTrue = yices_new_uninterpreted_term(yices_bool_type()); // yices_true();
+    yices_set_term_name(termTrue, "termTrue");
+    int termTwo = yices_new_uninterpreted_term(yices_bool_type());
+    yices_set_term_name(termTwo, "termTwo");
+    int and = yices_and2(termTrue, termTwo);
+
     int child = yices_term_child(and, 0);
-    assertEquals(YICES_OR_TERM, yices_term_constructor(child));
-    children = yices_term_num_children(child);
-    assertEquals(2, children);
-    assertEquals("(and Btrue Btwo)", yices_term_to_string(and));
-    assertEquals(YICES_NOT_TERM, yices_term_constructor(and));
+    assertThat(yices_term_constructor(child)).isEqualTo(YICES_OR_TERM);
+    int children = yices_term_num_children(child);
+    assertThat(children).isEqualTo(YICES_NOT_TERM);
+    assertThat(yices_term_to_string(and)).isEqualTo("(and termTrue termTwo)");
+    assertThat(yices_term_constructor(and)).isEqualTo(YICES_NOT_TERM);
   }
 
   @Test
   public void termConstructorOr() {
-    int Bfalse = yices_new_uninterpreted_term(yices_bool_type()); // yices_false();
-    // yices_set_term_name(Bfalse, "1");
+    int termFalse = yices_new_uninterpreted_term(yices_bool_type()); // yices_false();
+    // yices_set_term_name(termFalse, "1");
     int two = yices_new_uninterpreted_term(yices_bool_type());
     // yices_set_term_name(two, "5");
-    int[] orArray = {Bfalse, two, Bfalse, Bfalse};
+    int[] orArray = {termFalse, two, termFalse, termFalse};
     int or = yices_or(4, orArray);
-    assertTrue(yices_term_is_bool(or));
-    assertEquals(YICES_OR_TERM, yices_term_constructor(or));
+    assertThat(yices_term_is_bool(or)).isTrue();
+    assertThat(yices_term_constructor(or)).isEqualTo(YICES_OR_TERM);
     // Works after changing something?
   } // Expecting YICES_OR_TERM as constructor but getting YICES_UNINTERPRETED_TERM
 
   @Test
   public void termConstructorNot() {
-    int Btrue = yices_new_uninterpreted_term(yices_bool_type()); // yices_true();
-    yices_set_term_name(Btrue, "Btrue");
-    int Btwo = yices_new_uninterpreted_term(yices_bool_type());
-    yices_set_term_name(Btwo, "Btwo");
-    int not = yices_not(Btrue);
-    assertEquals(YICES_NOT_TERM, yices_term_constructor(not));
+    int termTrue = yices_new_uninterpreted_term(yices_bool_type()); // yices_true();
+    yices_set_term_name(termTrue, "termTrue");
+    int termTwo = yices_new_uninterpreted_term(yices_bool_type());
+    yices_set_term_name(termTwo, "termTwo");
+    int not = yices_not(termTrue);
+    assertThat(yices_term_constructor(not)).isEqualTo(YICES_NOT_TERM);
   }
 
   @Test
@@ -408,33 +402,33 @@ public class Yices2NativeApiTest {
     int div = yices_idiv(subTerm, mod);
     int mul = yices_mul(mod, div);
     int eq = yices_arith_eq_atom(subTerm, mul);
-    assertEquals(yices_true(), eq);
+    assertThat(eq).isEqualTo(yices_true());
   }
 
   @Test
   public void orSimplification() {
-    int bTrue = yices_true();
+    int termTrue = yices_true();
     int boolType = yices_bool_type();
     int[] orArray = new int[20];
     for (int i = 0; i < (orArray.length - 1); i++) {
       orArray[i] = yices_named_variable(boolType, "x" + i);
     }
-    orArray[(orArray.length - 1)] = bTrue;
+    orArray[(orArray.length - 1)] = termTrue;
     int or = yices_or(orArray.length, orArray);
-    assertEquals(yices_true(), or);
+    assertThat(or).isEqualTo(yices_true());
   }
 
   @Test
   public void andSimplification() {
-    int bFalse = yices_false();
+    int termFalse = yices_false();
     int boolType = yices_bool_type();
     int[] andArray = new int[20];
     for (int i = 0; i < (andArray.length - 1); i++) {
       andArray[i] = yices_named_variable(boolType, "x" + i);
     }
-    andArray[(andArray.length - 1)] = bFalse;
+    andArray[(andArray.length - 1)] = termFalse;
     int and = yices_and(andArray.length, andArray);
-    assertEquals(yices_false(), and);
+    assertThat(and).isEqualTo(yices_false());
   }
 
   @Test
@@ -442,7 +436,7 @@ public class Yices2NativeApiTest {
     int one = yices_new_uninterpreted_term(yices_bool_type());
     int two = yices_new_uninterpreted_term(yices_bool_type());
     int iff = yices_iff(one, two);
-    assertEquals(YICES_EQ_TERM, yices_term_constructor(iff));
+    assertThat(yices_term_constructor(iff)).isEqualTo(YICES_EQ_TERM);
   }
 
   @SuppressWarnings("resource")
@@ -520,11 +514,11 @@ public class Yices2NativeApiTest {
     // int xsmallery = yices_parse_term("assert (< x y)");
     // int xbigger4 = yices_parse_term("assert (> x 4)");
     // int ysmaller7 = yices_parse_term("assert (< y 7)");
-    // assertEquals(yices_check_context(env, 0), SAT);
+    // assertThat(yices_check_context(env, 0), SAT);
     int y = yices_int32(5);
     yices_set_term_name(y, "y");
     int x = yices_parse_term("(/= y 5)");
-    assertEquals("false", yices_term_to_string(x));
+    assertThat(yices_term_to_string(x)).isEqualTo("false");
   }
 
   @Test
@@ -534,10 +528,10 @@ public class Yices2NativeApiTest {
     int add = yices_add(x, y);
     int mul = yices_mul(x, y);
     Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
-    assertEquals(BigInteger.valueOf(13), creator.convertValue(add, add));
-    assertEquals(YICES_ARITH_CONST, yices_term_constructor(add));
-    assertEquals(BigInteger.valueOf(42), creator.convertValue(mul, mul));
-    assertEquals(YICES_ARITH_CONST, yices_term_constructor(mul));
+    assertThat(creator.convertValue(add, add)).isEqualTo(BigInteger.valueOf(13));
+    assertThat(yices_term_constructor(add)).isEqualTo(YICES_ARITH_CONST);
+    assertThat(creator.convertValue(mul, mul)).isEqualTo(BigInteger.valueOf(42));
+    assertThat(yices_term_constructor(mul)).isEqualTo(YICES_ARITH_CONST);
   }
 
   @Test
@@ -627,9 +621,9 @@ public class Yices2NativeApiTest {
   @Test
   public void booleanParse() {
     int test = yices_parse_term("false");
-    assertEquals(yices_false(), test);
+    assertThat(yices_false()).isEqualTo(test);
     int test2 = yices_parse_term("true");
-    assertEquals(yices_true(), test2);
+    assertThat(yices_true()).isEqualTo(test2);
   }
 
   @Test
@@ -639,6 +633,6 @@ public class Yices2NativeApiTest {
     int bv2 = yices_named_variable(type, "y");
     int add = yices_bvadd(bv1, bv2);
     int constructor = yices_term_constructor(add);
-    assertEquals(YICES_BV_SUM, constructor);
+    assertThat(constructor).isEqualTo(YICES_BV_SUM);
   }
 }
