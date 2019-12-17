@@ -305,12 +305,12 @@ public class Yices2NativeApiTest {
     Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
     assertThat(creator.convertValue(ratConst, ratConst)).isEqualTo(Rational.of(num + "/" + den));
     assertThat(creator.convertValue(bigConst, bigConst)).isEqualTo(largeNumber);
-    assertThat(creator.convertValue(negativeNumConst, negativeNumConst)).isEqualTo(
-        Rational.of(negativeNum + "/" + den));
-    assertThat(creator.convertValue(negativeDenConst, negativeDenConst)).isEqualTo(
-        Rational.of(num + "/" + negativeDen));
-    assertThat(creator.convertValue(negativeNumDenConst, negativeNumDenConst)).isEqualTo(
-        Rational.of(negativeNum + "/" + negativeDen));
+    assertThat(creator.convertValue(negativeNumConst, negativeNumConst))
+        .isEqualTo(Rational.of(negativeNum + "/" + den));
+    assertThat(creator.convertValue(negativeDenConst, negativeDenConst))
+        .isEqualTo(Rational.of(num + "/" + negativeDen));
+    assertThat(creator.convertValue(negativeNumDenConst, negativeNumDenConst))
+        .isEqualTo(Rational.of(negativeNum + "/" + negativeDen));
   }
 
   @Test
