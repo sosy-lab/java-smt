@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
@@ -31,6 +32,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_eq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_gt_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_lt_atom;
@@ -57,6 +59,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_model;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_value;
@@ -277,7 +280,6 @@ public class Yices2NativeApiTest {
   public void boolValueTypeMismatch() {
     int v1 = yices_int32(45);
     boolean constTerm = yices_bool_const_value(v1);
-    System.out.println(constTerm);
   }
 
   @Test
@@ -436,6 +438,25 @@ public class Yices2NativeApiTest {
     int two = yices_new_uninterpreted_term(yices_bool_type());
     int iff = yices_iff(one, two);
     assertThat(yices_term_constructor(iff)).isEqualTo(YICES_EQ_TERM);
+  }
+
+  @Test
+  public void ufConstructor() {
+    int funType = yices_function_type(1, new int[] {yices_int_type()}, yices_bool_type());
+    int uf = yices_named_variable(funType, "uf");
+    int[] argArray = new int[] {yices_int32(123)};
+    int app = yices_application(uf, argArray.length, argArray);
+    assertThat(yices_term_constructor(app)).isEqualTo(YICES_APP_TERM);
+  }
+
+  @Test
+  public void uf2Constructor() {
+    int funType =
+        yices_function_type(2, new int[] {yices_int_type(), yices_int_type()}, yices_int_type());
+    int uf = yices_named_variable(funType, "uf");
+    int[] argArray = new int[] {yices_int32(123), yices_int32(456)};
+    int app = yices_application(uf, argArray.length, argArray);
+    assertThat(yices_term_constructor(app)).isEqualTo(YICES_APP_TERM);
   }
 
   @SuppressWarnings("resource")
