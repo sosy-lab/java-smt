@@ -298,7 +298,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       List<FormulaType<?>> argsTypes = new ArrayList<>();
       for (Expr arg : f) {
         FormulaType<?> argType = getFormulaType(arg);
-        args.add(encapsulateWithTypeOf(arg));
+        args.add(encapsulate(argType, arg));
         argsTypes.add(argType);
       }
 
@@ -415,14 +415,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
     if (pArgs.size() == 0) {
       return exprManager.mkExpr(pDeclaration);
-    } else if (pArgs.size() == 1) {
-      return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration, pArgs.get(0));
     } else {
       vectorExpr args = new vectorExpr();
       for (Expr expr : pArgs) {
         args.add(expr);
       }
-      return exprManager.mkExpr(Kind.APPLY_UF, pDeclaration, args);
+      return exprManager.mkExpr(pDeclaration, args);
     }
   }
 
