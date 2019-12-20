@@ -133,10 +133,12 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     BitvectorFormula y = bvmgr.makeVariable(bv8, "y");
+    BitvectorFormula z = bvmgr.add(y, bvmgr.makeBitvector(8, 13));
 
     for (Formula f :
         ImmutableList.of(
             bvmgr.equal(x, y),
+            bmgr.not(bvmgr.equal(x, z)),
             bvmgr.add(x, y),
             bvmgr.subtract(x, y),
             bvmgr.multiply(x, y),
@@ -161,6 +163,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             bvmgr.extract(x, 7, 5, false),
             bvmgr.concat(x, y))) {
       mgr.visit(f, new FunctionDeclarationVisitor());
+      Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
     }
   }
 
