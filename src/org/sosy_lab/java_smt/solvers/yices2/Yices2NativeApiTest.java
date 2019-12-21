@@ -471,7 +471,7 @@ public class Yices2NativeApiTest {
     System.out.println("varx: " + varx);
     System.out.println("query: " + query);
     if (yices_check_sat(env, 0)) {
-      Model m = new Yices2Model(yices_get_model(env, 1), creator);
+      Model m = new Yices2Model(yices_get_model(env, 1), null, creator);
       Object val = m.evaluate(creator.encapsulateWithTypeOf(varx));
       System.out.println(val);
       m.close();
@@ -502,7 +502,7 @@ public class Yices2NativeApiTest {
     yices_assert_formula(env, eq);
     if (yices_check_sat(env, 0)) {
       long model = yices_get_model(env, 1);
-      Model m = new Yices2Model(model, creator);
+      Model m = new Yices2Model(model, null, creator);
       System.out.println(yices_model_to_string(model));
       Object val = m.evaluate(creator.encapsulateWithTypeOf(eq));
       System.out.println(val);

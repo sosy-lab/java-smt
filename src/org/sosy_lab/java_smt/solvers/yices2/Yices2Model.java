@@ -74,26 +74,13 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   private final long model;
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
-  private static final boolean DEBUG_MODEL = false;
   private boolean closed = false;
 
   protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
     super(pCreator);
     this.model = model;
-    this.prover = prover;
-    this.formulaCreator = pCreator;
-    if (DEBUG_MODEL) {
-      System.out.println("---MODEL_BEGIN---");
-      System.out.println(yices_model_to_string(model));
-      System.out.println("---MODEL_END---");
-    }
-  }
-
-  protected Yices2Model(long model, Yices2FormulaCreator creator) {
-    super(creator);
-    this.model = model;
-    this.prover = null;
-    this.formulaCreator = creator;
+    this.prover = prover; // can be NULL for testing
+    this.formulaCreator = Preconditions.checkNotNull(pCreator);
   }
 
   @Override
