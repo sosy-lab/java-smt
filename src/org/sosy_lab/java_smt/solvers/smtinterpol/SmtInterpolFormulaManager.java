@@ -38,9 +38,7 @@ import java.util.Set;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public class SmtInterpolFormulaManager
@@ -145,11 +143,6 @@ public class SmtInterpolFormulaManager
         out.append(")");
       }
     };
-  }
-
-  @Override
-  public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
-    return getFormulaCreator().visit(f, rFormulaVisitor);
   }
 
   /** This method returns a 'shared' environment or a complete new environment. */
