@@ -276,11 +276,11 @@ public class Yices2NativeApiTest {
     assertThat(yices_bool_const_value(v2)).isFalse();
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = IllegalArgumentException.class)
   public void boolValueTypeMismatch() {
     int v1 = yices_int32(45);
-    @SuppressWarnings("unused")
-    boolean constTerm = yices_bool_const_value(v1);
+    yices_bool_const_value(v1);
   }
 
   @Test
