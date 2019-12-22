@@ -279,6 +279,7 @@ public class Yices2NativeApiTest {
   @Test(expected = IllegalArgumentException.class)
   public void boolValueTypeMismatch() {
     int v1 = yices_int32(45);
+    @SuppressWarnings("unused")
     boolean constTerm = yices_bool_const_value(v1);
   }
 
@@ -304,7 +305,7 @@ public class Yices2NativeApiTest {
     int negativeDenConst = yices_parse_rational(num + "/" + negativeDen);
     int negativeNumDenConst = yices_parse_rational(negativeNum + "/" + negativeDen);
     int bigConst = yices_parse_rational(largeNumber.toString());
-    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    Yices2FormulaCreator creator = new Yices2FormulaCreator();
     assertThat(creator.convertValue(ratConst, ratConst)).isEqualTo(Rational.of(num + "/" + den));
     assertThat(creator.convertValue(bigConst, bigConst)).isEqualTo(largeNumber);
     assertThat(creator.convertValue(negativeNumConst, negativeNumConst))
@@ -465,7 +466,7 @@ public class Yices2NativeApiTest {
     int varx = yices_named_variable(yices_real_type(), "x");
     int eq = yices_arith_eq_atom(varx, yices_int32(10));
     int query = yices_named_variable(yices_real_type(), "x");
-    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    Yices2FormulaCreator creator = new Yices2FormulaCreator();
     yices_push(env);
     yices_assert_formula(env, eq);
     System.out.println("varx: " + varx);
@@ -493,7 +494,7 @@ public class Yices2NativeApiTest {
     int lt2 = yices_arith_lt_atom(z2, y2);
     int sub = yices_sub(z2, z);
     int eq = yices_arith_eq_atom(sub, yices_int32(328));
-    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    Yices2FormulaCreator creator = new Yices2FormulaCreator();
     yices_push(env);
     yices_assert_formula(env, gt);
     yices_assert_formula(env, lt);
@@ -547,7 +548,7 @@ public class Yices2NativeApiTest {
     int y = yices_int32(7);
     int add = yices_add(x, y);
     int mul = yices_mul(x, y);
-    Yices2FormulaCreator creator = new Yices2FormulaCreator(env);
+    Yices2FormulaCreator creator = new Yices2FormulaCreator();
     assertThat(creator.convertValue(add, add)).isEqualTo(BigInteger.valueOf(13));
     assertThat(yices_term_constructor(add)).isEqualTo(YICES_ARITH_CONST);
     assertThat(creator.convertValue(mul, mul)).isEqualTo(BigInteger.valueOf(42));
