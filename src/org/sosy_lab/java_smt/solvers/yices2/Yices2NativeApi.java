@@ -767,8 +767,8 @@ class Yices2NativeApi {
       } else {
         throw new IllegalArgumentException(
             String.format(
-                "Can't create variable with name '%s' and type '%s'.%n"
-                    + "As it would omit a variable with type '%s'",
+                "Can't create variable with name '%s' and type '%s' "
+                + "as it would omit a variable with type '%s'",
                 name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
       }
     }
