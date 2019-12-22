@@ -83,11 +83,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    String version = String.valueOf(yices_get_version());
-    String majorVersion = String.valueOf(yices_get_major_version());
-    String patchLevel = String.valueOf(yices_get_patch_level());
-    String yicesVersion = version + "." + majorVersion + "." + patchLevel;
-    return yicesVersion;
+    return String.format(
+        "%d.%d.%d", yices_get_version(), yices_get_major_version(), yices_get_patch_level());
   }
 
   @Override
