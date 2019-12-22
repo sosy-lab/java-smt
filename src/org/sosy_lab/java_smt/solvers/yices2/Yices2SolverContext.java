@@ -49,6 +49,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
 
+  private static boolean loaded = false;
+
   public Yices2SolverContext(
       FormulaManager pFmgr,
       long yicesConfig,
@@ -66,8 +68,16 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic, ShutdownNotifier pShutdownManager) {
-    NativeLibraries.loadLibrary("yices2j");
-    yices_init();
+
+    if (!loaded) {
+      // Avoid loading and initializing twice,
+      // because this would make all existing terms and types unavailable,
+      // which is bad behavior and a potential memory leak.
+      NativeLibraries.loadLibrary("yices2j");
+      yices_init();
+    }
+    loaded = true;
+
     long yicesConf = yices_new_config();
     yices_set_config(yicesConf, "solver-type", "dpllt");
     yices_set_config(yicesConf, "mode", "push-pop");
