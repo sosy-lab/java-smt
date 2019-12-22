@@ -161,8 +161,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           YICES_VARIABLE,
           YICES_UNINTERPRETED_TERM);
 
-  protected Yices2FormulaCreator(long env) {
-    super(env, yices_bool_type(), yices_int_type(), yices_real_type());
+  protected Yices2FormulaCreator() {
+    super(null, yices_bool_type(), yices_int_type(), yices_real_type());
   }
 
   @Override

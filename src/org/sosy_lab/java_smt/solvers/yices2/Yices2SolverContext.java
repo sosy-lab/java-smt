@@ -19,15 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_major_version;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_patch_level;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_version;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
@@ -43,8 +38,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public class Yices2SolverContext extends AbstractSolverContext {
 
-  private final long yicesEnvironment;
-  private final long yicesConfig;
   private final Yices2FormulaCreator creator;
   private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
@@ -53,14 +46,10 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   public Yices2SolverContext(
       FormulaManager pFmgr,
-      long yicesConfig,
-      long yicesEnvironment,
       Yices2FormulaCreator creator,
       BooleanFormulaManager pBfmgr,
       ShutdownNotifier pShutdownManager) {
     super(pFmgr);
-    this.yicesConfig = yicesConfig;
-    this.yicesEnvironment = yicesEnvironment;
     this.creator = creator;
     bfmgr = pBfmgr;
     shutdownManager = pShutdownManager;
@@ -78,12 +67,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     }
     loaded = true;
 
-    long yicesConf = yices_new_config();
-    yices_set_config(yicesConf, "solver-type", "dpllt");
-    yices_set_config(yicesConf, "mode", "push-pop");
-    long yicesEnv = yices_new_context(yicesConf);
-    Yices2FormulaCreator creator = new Yices2FormulaCreator(yicesEnv);
-
+    Yices2FormulaCreator creator = new Yices2FormulaCreator();
     Yices2UFManager functionTheory = new Yices2UFManager(creator);
     Yices2BooleanFormulaManager booleanTheory = new Yices2BooleanFormulaManager(creator);
     Yices2BitvectorFormulaManager bitvectorTheory = new Yices2BitvectorFormulaManager(creator);
@@ -94,8 +78,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
-    return new Yices2SolverContext(
-        manager, yicesConf, yicesEnv, creator, booleanTheory, pShutdownManager);
+    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
   }
 
   @Override
@@ -114,9 +97,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    yices_free_config(yicesConfig);
-    yices_free_context(yicesEnvironment);
-    // yices_exit(); // exit disabled, because it crashes parallel Yices2 instances
+    // exit disabled, because it crashes parallel Yices2 instances, see yices_init() above.
+    // yices_exit();
   }
 
   @Override
