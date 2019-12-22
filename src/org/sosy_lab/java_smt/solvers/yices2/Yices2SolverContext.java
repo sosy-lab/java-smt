@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_major_version;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_patch_level;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_version;
@@ -42,7 +43,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
 
-  private static boolean loaded = false;
+  private static int numLoadedInstances = 0;
 
   public Yices2SolverContext(
       FormulaManager pFmgr,
@@ -58,14 +59,14 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic, ShutdownNotifier pShutdownManager) {
 
-    if (!loaded) {
+    if (numLoadedInstances == 0) {
       // Avoid loading and initializing twice,
       // because this would make all existing terms and types unavailable,
       // which is bad behavior and a potential memory leak.
       NativeLibraries.loadLibrary("yices2j");
       yices_init();
     }
-    loaded = true;
+    numLoadedInstances++;
 
     Yices2FormulaCreator creator = new Yices2FormulaCreator();
     Yices2UFManager functionTheory = new Yices2UFManager(creator);
@@ -94,8 +95,10 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    // exit disabled, because it crashes parallel Yices2 instances, see yices_init() above.
-    // yices_exit();
+    numLoadedInstances--;
+    if (numLoadedInstances == 0) {
+      yices_exit();
+    }
   }
 
   @Override
