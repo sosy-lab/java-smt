@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Assignments;
+import de.uni_freiburg.informatik.ultimate.logic.DataType;
+import de.uni_freiburg.informatik.ultimate.logic.DataType.Constructor;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -131,7 +133,7 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Sort sort(String sortname, BigInteger[] indices, Sort... params) throws SMTLIBException {
+  public Sort sort(String sortname, String[] indices, Sort... params) throws SMTLIBException {
     return script.sort(sortname, indices, params);
   }
 
@@ -142,7 +144,7 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Term term(String funcname, BigInteger[] indices, Sort returnSort, Term... params)
+  public Term term(String funcname, String[] indices, Sort returnSort, Term... params)
       throws SMTLIBException {
     Term result = script.term(funcname, indices, returnSort, params);
     return replaceWithDefinition(result);
@@ -353,6 +355,41 @@ class FormulaCollectionScript implements Script {
 
   @Override
   public QuotedObject echo(QuotedObject pMsg) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public FunctionSymbol getFunctionSymbol(String pConstructor) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Constructor constructor(String pName, String[] pSelectors, Sort[] pArgumentSorts)
+      throws SMTLIBException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public DataType datatype(String pTypename, int pNumParams) throws SMTLIBException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void declareDatatype(DataType pDatatype, Constructor[] pConstrs) throws SMTLIBException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void declareDatatypes(
+      DataType[] pDatatypes, Constructor[][] pConstrs, Sort[][] pSortParams)
+      throws SMTLIBException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Term match(
+      Term pDataArg, TermVariable[][] pVars, Term[] pCases, Constructor[] pConstructors)
+      throws SMTLIBException {
     throw new UnsupportedOperationException();
   }
 }

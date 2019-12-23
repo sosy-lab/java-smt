@@ -384,8 +384,7 @@ public class SmtInterpolEnvironment {
     return script.term(funcname, params);
   }
 
-  public Term term(
-      String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
+  public Term term(String funcname, String[] indices, @Nullable Sort returnSort, Term... params) {
     return script.term(funcname, indices, returnSort, params);
   }
 
