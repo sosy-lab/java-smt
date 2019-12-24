@@ -1,5 +1,16 @@
 # JavaSMT ChangeLog
 
+## JavaSMT 3.4.0
+
+### Changes in the API:
+ - With the update of SMTInterpol some partially visible classes were touched.
+
+### Improvements and Fixes:
+ - fix for visiting uninterpreted function with CVC4
+ - New or updated solver versions:
+    - SMTInterpol: 2.5-604-g71e72f93, including a small change in the API of SMTInterpol
+ - Several updates for dependencies.
+
 ## JavaSMT 3.3.0
 
 ### Changes in the API:
