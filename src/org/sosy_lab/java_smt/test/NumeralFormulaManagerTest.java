@@ -22,7 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -115,7 +115,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
     IntegerFormula a = imgr.makeVariable("a");
     RationalFormula r = rmgr.makeVariable("r");
     List<FormulaType<?>> argTypes =
-        Lists.newArrayList(FormulaType.RationalType, FormulaType.RationalType);
+        ImmutableList.of(FormulaType.RationalType, FormulaType.RationalType);
     FunctionDeclaration<IntegerFormula> ufDecl =
         fmgr.declareUF("uf", FormulaType.IntegerType, argTypes);
     IntegerFormula uf = fmgr.callUF(ufDecl, a, r);
@@ -146,7 +146,8 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
 
           private void checkIntEq(FunctionDeclaration<?> pDeclaration) {
             assertThat(pDeclaration.getArgumentTypes())
-                .isEqualTo(Lists.newArrayList(FormulaType.IntegerType, FormulaType.IntegerType));
+                .containsExactly(FormulaType.IntegerType, FormulaType.IntegerType)
+                .inOrder();
           }
 
           @Override
