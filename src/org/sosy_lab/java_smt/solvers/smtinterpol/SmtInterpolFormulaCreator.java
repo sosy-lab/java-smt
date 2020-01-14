@@ -191,7 +191,14 @@ class SmtInterpolFormulaCreator
         List<Formula> args =
             transformedImmutableListCopy(
                 app.getParameters(), term -> encapsulate(getFormulaType(term), term));
-        List<FormulaType<?>> argTypes = transformedImmutableListCopy(args, this::getFormulaType);
+        final List<FormulaType<?>> argTypes;
+        final Term definition = func.getDefinition();
+        if (definition == null) { // generic function application, e.g., EQUALS
+          argTypes = transformedImmutableListCopy(args, this::getFormulaType);
+        } else {
+          Sort[] paramSorts = ((ApplicationTerm) definition).getFunction().getParameterSorts();
+          argTypes = transformedImmutableListCopy(paramSorts, this::getFormulaTypeOfSort);
+        }
 
         // Any function application.
         return visitor.visitFunction(

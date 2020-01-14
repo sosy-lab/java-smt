@@ -20,7 +20,9 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -30,8 +32,13 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 @RunWith(Parameterized.class)
 public class NumeralFormulaManagerTest extends SolverBasedTest0 {
@@ -98,5 +105,55 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
     requireIntegers();
     imgr.makeNumber("a");
     assert_().fail();
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void testSubTypes() {
+    requireIntegers();
+    requireRationals();
+    IntegerFormula a = imgr.makeVariable("a");
+    RationalFormula r = rmgr.makeVariable("r");
+    List<FormulaType<?>> argTypes =
+        Lists.newArrayList(FormulaType.RationalType, FormulaType.RationalType);
+    FunctionDeclaration<IntegerFormula> ufDecl =
+        fmgr.declareUF("uf", FormulaType.IntegerType, argTypes);
+    IntegerFormula uf = fmgr.callUF(ufDecl, a, r);
+
+    mgr.visit(
+        bmgr.and(rmgr.equal(uf, imgr.makeNumber(0))),
+        new DefaultFormulaVisitor<Void>() {
+
+          @Override
+          public Void visitFunction(
+              Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pDeclaration) {
+            if ("uf".equals(pDeclaration.getName())) {
+              checkUf(pDeclaration);
+            } else {
+              checkIntEq(pDeclaration);
+            }
+            return null;
+          }
+
+          private void checkUf(FunctionDeclaration<?> pDeclaration) {
+            assertEquals(argTypes, pDeclaration.getArgumentTypes());
+            FunctionDeclaration<?> ufDecl2 =
+                fmgr.declareUF("uf", pDeclaration.getType(), pDeclaration.getArgumentTypes());
+            Formula uf2 = fmgr.callUF(ufDecl2, a, r);
+            assertEquals(uf, uf2);
+            fmgr.callUF(ufDecl2, r, r);
+          }
+
+          private void checkIntEq(FunctionDeclaration<?> pDeclaration) {
+            assertEquals(
+                Lists.newArrayList(FormulaType.IntegerType, FormulaType.IntegerType),
+                pDeclaration.getArgumentTypes());
+          }
+
+          @Override
+          protected Void visitDefault(Formula pF) {
+            return null;
+          }
+        });
   }
 }

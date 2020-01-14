@@ -32,6 +32,7 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.FloatingPoint;
 import edu.nyu.acsys.CVC4.FloatingPointSize;
+import edu.nyu.acsys.CVC4.FunctionType;
 import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
@@ -299,8 +300,20 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       for (Expr arg : f) {
         FormulaType<?> argType = getFormulaType(arg);
         args.add(encapsulate(argType, arg));
-        argsTypes.add(argType);
       }
+      Expr operator = f.getOperator();
+      if (operator.getType().isFunction()) {
+        vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
+        for (int i = 0; i < argTypes.size(); i++) {
+          argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
+        }
+      } else {
+        for (Expr arg : f) {
+          argsTypes.add(getFormulaType(arg));
+        }
+      }
+
+      Preconditions.checkState(args.size() == argsTypes.size());
 
       // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
       // part of the operator itself, thus the arity is one too small and there might be no
