@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
-import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
@@ -136,18 +136,17 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
           }
 
           private void checkUf(FunctionDeclaration<?> pDeclaration) {
-            assertEquals(argTypes, pDeclaration.getArgumentTypes());
+            assertThat(pDeclaration.getArgumentTypes()).isEqualTo(argTypes);
             FunctionDeclaration<?> ufDecl2 =
                 fmgr.declareUF("uf", pDeclaration.getType(), pDeclaration.getArgumentTypes());
             Formula uf2 = fmgr.callUF(ufDecl2, a, r);
-            assertEquals(uf, uf2);
+            assertThat(uf2).isEqualTo(uf);
             fmgr.callUF(ufDecl2, r, r);
           }
 
           private void checkIntEq(FunctionDeclaration<?> pDeclaration) {
-            assertEquals(
-                Lists.newArrayList(FormulaType.IntegerType, FormulaType.IntegerType),
-                pDeclaration.getArgumentTypes());
+            assertThat(pDeclaration.getArgumentTypes())
+                .isEqualTo(Lists.newArrayList(FormulaType.IntegerType, FormulaType.IntegerType));
           }
 
           @Override
