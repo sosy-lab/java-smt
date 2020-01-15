@@ -132,7 +132,7 @@
                because the latter does not provide a separate JAR for java-cup-runtime. -->
           <exclude org="net.sf.squirrel-sql.thirdparty-non-maven" name="java-cup"/>
         </dependency>
-        <dependency org="edu.tum.cs" name="java-cup" rev="11a" conf="runtime->runtime"/>
+        <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime->runtime"/>
 
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.4-sosy0" conf="runtime-mathsat->solver-mathsat" />
