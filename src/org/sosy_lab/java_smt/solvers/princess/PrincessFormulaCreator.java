@@ -306,7 +306,7 @@ class PrincessFormulaCreator
       final FunctionDeclarationKind kind = getDeclarationKind(input);
 
       if (kind == FunctionDeclarationKind.EQ) {
-        scala.Option<scala.Tuple2<ap.parser.ITerm, ap.parser.ITerm>> maybeArgs =
+        scala.Option<scala.Tuple2<ITerm, ITerm>> maybeArgs =
             IExpression.Eq$.MODULE$.unapply((IFormula) input);
 
         assert maybeArgs.isDefined();

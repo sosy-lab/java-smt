@@ -28,7 +28,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.truth.Truth;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
@@ -828,9 +827,8 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
 
     BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
 
-    Truth.assertThat(mgr.getFormulaType(var))
-        .isEqualTo(mgr.getFormulaType(fpmgr.toIeeeBitvector(flt)));
-    Truth.assertThat(mgr.getFormulaType(flt))
+    assertThat(mgr.getFormulaType(var)).isEqualTo(mgr.getFormulaType(fpmgr.toIeeeBitvector(flt)));
+    assertThat(mgr.getFormulaType(flt))
         .isEqualTo(mgr.getFormulaType(fpmgr.fromIeeeBitvector(bv, type)));
 
     assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, fpmgr.toIeeeBitvector(flt))))

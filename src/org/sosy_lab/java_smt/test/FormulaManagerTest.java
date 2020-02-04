@@ -157,8 +157,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
   public void formulaEqualsAndHashCode() {
     // Solvers without integers (Boolector) get their own test below
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
-    FunctionDeclaration<IntegerFormula> fb =
-        fmgr.declareUF("f_b", FormulaType.IntegerType, FormulaType.IntegerType);
+    FunctionDeclaration<IntegerFormula> fb = fmgr.declareUF("f_b", IntegerType, IntegerType);
 
     new EqualsTester()
         .addEqualityGroup(bmgr.makeBoolean(true))
@@ -192,8 +191,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
         // UninterpretedFunctionDeclarations should not compare equal to Formulas,
         // but declaring one twice needs to return the same UIF.
         .addEqualityGroup(
-            fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType),
-            fmgr.declareUF("f_a", FormulaType.IntegerType, FormulaType.IntegerType))
+            fmgr.declareUF("f_a", IntegerType, IntegerType),
+            fmgr.declareUF("f_a", IntegerType, IntegerType))
         .addEqualityGroup(fb)
         .addEqualityGroup(fmgr.callUF(fb, imgr.makeNumber(0)))
         .addEqualityGroup(fmgr.callUF(fb, imgr.makeNumber(1)), fmgr.callUF(fb, imgr.makeNumber(1)))
@@ -291,10 +290,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     if (imgr != null) {
       BooleanFormula constraint =
           imgr.equal(
-              fmgr.declareAndCallUF(
-                  "uf1", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("x"))),
-              fmgr.declareAndCallUF(
-                  "uf2", FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("y"))));
+              fmgr.declareAndCallUF("uf1", IntegerType, ImmutableList.of(imgr.makeVariable("x"))),
+              fmgr.declareAndCallUF("uf2", IntegerType, ImmutableList.of(imgr.makeVariable("y"))));
       assertThat(mgr.extractVariablesAndUFs(constraint).keySet())
           .containsExactly("uf1", "uf2", "x", "y");
 

@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -75,27 +74,27 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public void push() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     assertedFormulas.push(new ArrayList<>());
     env.push(1);
   }
 
   @Override
   public void pop() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     assertedFormulas.pop();
     env.pop(1);
   }
 
   @Override
   public boolean isUnsat() throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     return !env.checkSat();
   }
 
   @Override
   public SmtInterpolModel getModel() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     checkGenerateModels();
     return new SmtInterpolModel(env.getModel(), creator);
   }
@@ -106,7 +105,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!isClosed());
+    checkState(!isClosed());
     checkGenerateUnsatCores();
     return getUnsatCore0();
   }
@@ -125,10 +124,10 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException {
-    Preconditions.checkState(!isClosed());
+    checkState(!isClosed());
     checkGenerateUnsatCoresOverAssumptions();
     push();
-    Preconditions.checkState(
+    checkState(
         annotatedTerms.isEmpty(),
         "Empty environment required for UNSAT core over assumptions: %s",
         annotatedTerms);
@@ -149,7 +148,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     assertedFormulas.clear();
     annotatedTerms.clear();
     env.pop(env.getStackDepth());
@@ -165,7 +164,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!isClosed());
+    checkState(!isClosed());
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];

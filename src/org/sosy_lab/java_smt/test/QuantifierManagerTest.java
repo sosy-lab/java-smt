@@ -23,7 +23,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.truth.TruthJUnit;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +96,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // We do not ignore all SolverExceptions in order to not hide bugs,
     // but only for Princess which is known to not be able to solve all tests here.
     if (solverUnderTest == Solvers.PRINCESS) {
-      TruthJUnit.assume().withMessage(e.getMessage()).fail();
+      assume().withMessage(e.getMessage()).fail();
     }
     throw e;
   }
@@ -234,7 +233,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 1) AND  (forall x . b[x] = 0) is UNSAT
 
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_1), forall_x_a_at_x_eq_0);
     assertThatFormula(f).isUnsatisfiable();
@@ -245,7 +244,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 0) AND  (forall x . b[x] = 0) is SAT
 
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0), forall_x_a_at_x_eq_0);
     try {
@@ -260,7 +259,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 0) OR  (forall x . b[x] = 1) is SAT
 
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.or(
             qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
@@ -273,7 +272,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
 
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula f =
         bmgr.or(
             qmgr.exists(ImmutableList.of(x), a_at_x_eq_1),
@@ -340,7 +339,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testIntrospectionForall() {
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
 
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -373,7 +372,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testIntrospectionExists() {
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
     final AtomicBoolean isForall = new AtomicBoolean(false);
@@ -414,7 +413,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   public void testEmpty() {
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
         .that(solverToUse())
@@ -451,7 +450,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     //                      or     extract_0_0 x = 1
 
     // Boolector has no working quantifier at the moment. They will be implemented later
-    TruthJUnit.assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverUnderTest).isEqualTo(Solvers.BOOLECTOR);
     int i = index.getFreshId();
     int width = 2;
 

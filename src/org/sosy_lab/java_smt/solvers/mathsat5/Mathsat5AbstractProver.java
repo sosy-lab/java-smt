@@ -111,13 +111,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    return !msat_check_sat_with_assumptions(
-        curEnv, Mathsat5FormulaManager.getMsatTerm(pAssumptions));
+    return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
   }
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {
     for (BooleanFormula f : formulas) {
-      long t = Mathsat5FormulaManager.getMsatTerm(f);
+      long t = getMsatTerm(f);
       if (msat_term_is_boolean_constant(curEnv, t)) {
         // boolean constant is valid
       } else if (msat_term_is_not(curEnv, t)
