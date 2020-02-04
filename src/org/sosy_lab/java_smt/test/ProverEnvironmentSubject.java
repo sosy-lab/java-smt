@@ -66,7 +66,7 @@ public final class ProverEnvironmentSubject extends Subject {
    * Use this for checking assertions about ProverEnvironments with Truth: <code>
    * assertThat(stack).is...()</code>.
    */
-  public static final ProverEnvironmentSubject assertThat(BasicProverEnvironment<?> prover) {
+  public static ProverEnvironmentSubject assertThat(BasicProverEnvironment<?> prover) {
     return assert_().about(proverEnvironments()).that(prover);
   }
 
