@@ -30,7 +30,6 @@ on_finish:
   - ps: |
       $wc = New-Object 'System.Net.WebClient'
       $files = Get-ChildItem -Path .\junit\" -Filter *.xml
-      echo "$files"
       foreach($file in $files){
         $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
         $wc.UploadFile($url, $file.FullName)
