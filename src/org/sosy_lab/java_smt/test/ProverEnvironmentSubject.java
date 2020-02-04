@@ -44,7 +44,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * #proverEnvironments()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
-public class ProverEnvironmentSubject extends Subject {
+public final class ProverEnvironmentSubject extends Subject {
 
   private final BasicProverEnvironment<?> stackUnderTest;
 

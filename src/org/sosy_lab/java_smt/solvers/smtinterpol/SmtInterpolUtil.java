@@ -23,7 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 /** Collection of utilities for working with SmtInterpol. */
-class SmtInterpolUtil {
+final class SmtInterpolUtil {
   private SmtInterpolUtil() {}
 
   /** this function can be used to print a bigger term. */

@@ -22,7 +22,7 @@ package org.sosy_lab.java_smt.utils;
 import org.sosy_lab.java_smt.api.FormulaManager;
 
 /** Central entry point for all utility classes. */
-public class SolverUtils {
+public final class SolverUtils {
 
   private SolverUtils() {}
 
