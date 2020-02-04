@@ -89,7 +89,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     Expr exp = variablesCache.computeIfAbsent(name, n -> exprManager.mkVar(name, type));
     Preconditions.checkArgument(
         type.equals(exp.getType()),
-        "symbol name already in use for different type " + exp.getType());
+        "symbol name already in use for different type %s",
+        exp.getType());
     return exp;
   }
 
@@ -133,12 +134,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     Type t = extractInfo(pFormula).getType();
     if (pFormula instanceof BitvectorFormula) {
-      checkArgument(t.isBitVector(), "BitvectorFormula with actual type " + t + ": " + pFormula);
+      checkArgument(t.isBitVector(), "BitvectorFormula with actual type %s: %s", t, pFormula);
       return (FormulaType<T>) getFormulaType(extractInfo(pFormula));
 
     } else if (pFormula instanceof FloatingPointFormula) {
       checkArgument(
-          t.isFloatingPoint(), "FloatingPointFormula with actual type " + t + ": " + pFormula);
+          t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
       edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
           FormulaType.getFloatingPointType(

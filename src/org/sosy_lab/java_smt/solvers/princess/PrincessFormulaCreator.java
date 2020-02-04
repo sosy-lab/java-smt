@@ -204,7 +204,7 @@ class PrincessFormulaCreator
       Sort sort = Sort$.MODULE$.sortOf(input);
       scala.Option<Object> bitWidth = getBitWidth(sort);
       checkArgument(
-          bitWidth.isDefined(), "BitvectorFormula with actual type " + sort + ": " + pFormula);
+          bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
