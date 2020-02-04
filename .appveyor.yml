@@ -27,10 +27,12 @@ test_script:
   - ant unit-tests
 
 on_finish:
-  - ps: |
-      $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      $file = '.\junit\TESTS-TestSuites.xml'
-      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
+  - ps: >-
+      $wc = New-Object 'System.Net.WebClient'
+      foreach ($file in Get-ChildItem -Path .\junit\" -Filter *.xml) {
+        $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+        $wc.UploadFile($url, $file.FullName)
+      }
   - ps: |
       Push-AppveyorArtifact JUnit.html -DeploymentName "JUnit Report"
 
