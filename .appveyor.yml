@@ -28,13 +28,15 @@ test_script:
 
 on_finish:
   - ps: |
+      $wc = New-Object 'System.Net.WebClient'
+      $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "*VariableNames*"
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      $file = '.\junit\TESTS-TestSuites.xml'
-      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
+      foreach($file in $files){
+        echo $file.FullName
+        $wc.UploadFile($url, $file.FullName)
+      }
   - ps: |
       Push-AppveyorArtifact JUnit.html -DeploymentName "JUnit Report"
-  - ps: |
-      Push-AppveyorArtifact junit\TESTS-TestSuites.xml -DeploymentName "JUnit TestSuites"
 
 cache:
   - C:\ant
