@@ -38,7 +38,7 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> pVariables, Long pBody) {
-    if (pVariables.size() == 0) {
+    if (pVariables.isEmpty()) {
       throw new IllegalArgumentException("List of quantified variables can not be empty");
     }
     return Native.mkQuantifierConst(

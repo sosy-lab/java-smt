@@ -53,7 +53,7 @@ class PrincessQuantifiedFormulaManager
   public IExpression mkQuantifier(Quantifier q, List<IExpression> vars, IExpression body) {
     checkArgument(body instanceof IFormula);
     ap.terfor.conjunctions.Quantifier pq = (q == Quantifier.FORALL) ? ALL$.MODULE$ : EX$.MODULE$;
-    if (vars.size() == 0) {
+    if (vars.isEmpty()) {
 
       // Body already contains bound variables.
       return new IQuantified(pq, (IFormula) body);
