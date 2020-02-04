@@ -33,8 +33,6 @@ on_finish:
       (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
   - ps: |
       Push-AppveyorArtifact JUnit.html -DeploymentName "JUnit Report"
-  - ps: |
-      Push-AppveyorArtifact junit\TESTS-TestSuites.xml -DeploymentName "JUnit TestSuites"
 
 cache:
   - C:\ant
