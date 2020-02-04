@@ -29,7 +29,7 @@ test_script:
 on_finish:
   - ps: |
       $wc = New-Object 'System.Net.WebClient'
-      $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "VariableNames*"
+      $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "*VariableNames*"
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       foreach($file in $files){
         echo $file.FullName
