@@ -27,9 +27,11 @@ test_script:
   - ant unit-tests
 
 on_finish:
-  - ps: >-
+  - ps: |
       $wc = New-Object 'System.Net.WebClient'
-      foreach ($file in Get-ChildItem -Path .\junit\" -Filter *.xml) {
+      $files = Get-ChildItem -Path .\junit\" -Filter *.xml
+      echo $files
+      foreach($file in $files){
         $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
         $wc.UploadFile($url, $file.FullName)
       }
