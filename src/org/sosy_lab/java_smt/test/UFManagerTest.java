@@ -185,7 +185,7 @@ public class UFManagerTest extends SolverBasedTest0 {
         .isNotEqualTo(Solvers.BOOLECTOR);
     return mgr.visit(
         pFormula,
-        new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
+        new ExpectedFormulaVisitor<>() {
           @Override
           public FunctionDeclaration<?> visitFunction(
               Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {

@@ -244,7 +244,7 @@ public class UfElimination {
     AtomicBoolean result = new AtomicBoolean();
     fmgr.visitRecursively(
         f,
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
 
           @Override
           protected TraversalProcess visitDefault(Formula pF) {
@@ -268,7 +268,7 @@ public class UfElimination {
   private int getNestingDepthOfUfs(Formula pFormula) {
     return fmgr.visit(
         pFormula,
-        new DefaultFormulaVisitor<Integer>() {
+        new DefaultFormulaVisitor<>() {
 
           @Override
           protected Integer visitDefault(Formula pF) {
@@ -305,7 +305,7 @@ public class UfElimination {
 
     fmgr.visitRecursively(
         pFormula,
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
 
           @Override
           protected TraversalProcess visitDefault(Formula f) {

@@ -38,7 +38,7 @@ public class LongArrayBackedListTest extends TestCase {
           for (int i = 0; i < backingArray.length; i++) {
             backingArray[i] = i;
           }
-          return new LongArrayBackedList<String>(backingArray) {
+          return new LongArrayBackedList<>(backingArray) {
             @Override
             protected String convert(long pE) {
               return pElements[(int) pE];

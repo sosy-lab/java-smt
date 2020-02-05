@@ -219,7 +219,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     public void callback(long[] model) throws InterruptedException {
       shutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(
-          new LongArrayBackedList<BooleanFormula>(model) {
+          new LongArrayBackedList<>(model) {
             @Override
             protected BooleanFormula convert(long pE) {
               return creator.encapsulateBoolean(pE);
