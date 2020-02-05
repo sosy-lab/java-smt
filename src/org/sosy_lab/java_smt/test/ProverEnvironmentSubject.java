@@ -59,7 +59,7 @@ public final class ProverEnvironmentSubject extends Subject {
    */
   public static Subject.Factory<ProverEnvironmentSubject, BasicProverEnvironment<?>>
       proverEnvironments() {
-    return (metadata, formula) -> new ProverEnvironmentSubject(metadata, formula);
+    return ProverEnvironmentSubject::new;
   }
 
   /**

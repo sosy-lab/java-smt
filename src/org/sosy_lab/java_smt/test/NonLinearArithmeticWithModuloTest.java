@@ -24,6 +24,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
     return Lists.cartesianProduct(
             Arrays.asList(Solvers.values()), Arrays.asList(NonLinearArithmetic.values()))
         .stream()
-        .map(e -> e.toArray())
+        .map(List::toArray)
         .collect(toImmutableList());
   }
 

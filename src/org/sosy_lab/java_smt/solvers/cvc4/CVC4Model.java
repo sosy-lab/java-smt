@@ -72,12 +72,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     for (Expr expr : assertedExpressions) {
-      creator.extractVariablesAndUFs(
-          expr,
-          true,
-          (name, f) -> {
-            builder.add(getAssignment(f));
-          });
+      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
     }
     return builder.build().asList();
   }
