@@ -266,7 +266,7 @@ class Z3InterpolatingProver extends Z3AbstractProver<Long>
       throws SolverException {
     List<Formula> unboundVariables = new ArrayList<>(1);
     final DefaultFormulaVisitor<TraversalProcess> unboundVariablesCollector =
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
           @Override
           public TraversalProcess visitBoundVariable(Formula f, int deBruijnIdx) {
             unboundVariables.add(f);

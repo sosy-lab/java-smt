@@ -476,7 +476,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   private final FormulaVisitor<Set<BooleanFormula>> conjunctionFinder =
-      new DefaultFormulaVisitor<Set<BooleanFormula>>() {
+      new DefaultFormulaVisitor<>() {
         @Override
         protected Set<BooleanFormula> visitDefault(Formula f) {
           assert f instanceof BooleanFormula;
@@ -502,7 +502,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
    * Optimized, but ugly, implementation of argument extraction. Avoids extra visitor instantiation.
    */
   private final FormulaVisitor<Set<BooleanFormula>> disjunctionFinder =
-      new DefaultFormulaVisitor<Set<BooleanFormula>>() {
+      new DefaultFormulaVisitor<>() {
         @Override
         protected Set<BooleanFormula> visitDefault(Formula f) {
           assert f instanceof BooleanFormula;

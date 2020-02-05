@@ -286,7 +286,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     final Set<String> usedVariables = new HashSet<>();
 
     FormulaVisitor<TraversalProcess> nameExtractor =
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
           @Override
           protected TraversalProcess visitDefault(Formula formula) {
             return TraversalProcess.CONTINUE;
@@ -327,7 +327,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     final List<Boolean> containsTrue = new ArrayList<>();
     mgr.visitRecursively(
         t,
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
           @Override
           protected TraversalProcess visitDefault(Formula f) {
             return TraversalProcess.CONTINUE;
@@ -353,7 +353,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     final Set<String> found = new HashSet<>();
     mgr.visitRecursively(
         ab,
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
 
           @Override
           protected TraversalProcess visitDefault(Formula f) {
@@ -433,7 +433,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     final Set<String> foundVars = new HashSet<>();
     bmgr.visitRecursively(
         f,
-        new DefaultBooleanFormulaVisitor<TraversalProcess>() {
+        new DefaultBooleanFormulaVisitor<>() {
           @Override
           protected TraversalProcess visitDefault() {
             return TraversalProcess.CONTINUE;

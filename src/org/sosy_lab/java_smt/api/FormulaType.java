@@ -86,7 +86,7 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   public static final FormulaType<RationalFormula> RationalType =
-      new NumeralType<RationalFormula>() {
+      new NumeralType<>() {
 
         @Override
         public boolean isRationalType() {
@@ -100,7 +100,7 @@ public abstract class FormulaType<T extends Formula> {
       };
 
   public static final FormulaType<IntegerFormula> IntegerType =
-      new NumeralType<IntegerFormula>() {
+      new NumeralType<>() {
 
         @Override
         public boolean isIntegerType() {
@@ -114,7 +114,7 @@ public abstract class FormulaType<T extends Formula> {
       };
 
   public static final FormulaType<BooleanFormula> BooleanType =
-      new FormulaType<BooleanFormula>() {
+      new FormulaType<>() {
 
         @Override
         public boolean isBooleanType() {
