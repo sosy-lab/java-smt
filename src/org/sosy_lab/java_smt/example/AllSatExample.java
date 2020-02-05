@@ -64,6 +64,8 @@ public class AllSatExample {
         prover.push();
         System.out.println(ase.allSatIntegers2());
         prover.pop();
+      } catch (UnsupportedOperationException e) {
+        System.out.println("    " + e.getMessage());
       }
     }
   }
