@@ -7,3 +7,5 @@
 # docker push registry.gitlab.com/sosy-lab/software/java-smt/test
 
 FROM registry.gitlab.com/sosy-lab/software/java-project-template/test:jdk-13
+RUN apt-get update && apt-get install -y \
+  libgomp1
