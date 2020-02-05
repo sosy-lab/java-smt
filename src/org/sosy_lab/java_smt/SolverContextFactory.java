@@ -152,7 +152,7 @@ public class SolverContextFactory {
   }
 
   private static String getFileExtension(String path) {
-    int lastIndexOf = path.indexOf('.');
+    int lastIndexOf = path.lastIndexOf('.');
     return (lastIndexOf == -1) ? "" : path.substring(lastIndexOf);
   }
 
