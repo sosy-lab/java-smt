@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -159,13 +160,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     this.slManager = slManager;
     this.formulaCreator = pFormulaCreator;
 
-    if (booleanManager.getFormulaCreator() != formulaCreator
-        || functionManager.getFormulaCreator() != formulaCreator
-        || (bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
-        || (floatingPointManager != null
-            && floatingPointManager.getFormulaCreator() != formulaCreator)) {
-      throw new IllegalArgumentException("The creator instances must match across the managers!");
-    }
+    checkArgument(
+        booleanManager.getFormulaCreator() == formulaCreator
+            && functionManager.getFormulaCreator() == formulaCreator
+            && !(bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
+            && !(floatingPointManager != null
+                && floatingPointManager.getFormulaCreator() != formulaCreator),
+        "The creator instances must match across the managers!");
   }
 
   public final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> getFormulaCreator() {

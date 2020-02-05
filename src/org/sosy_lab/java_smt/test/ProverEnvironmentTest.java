@@ -161,7 +161,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
       Optional<List<BooleanFormula>> res =
           pe.unsatCoreOverAssumptions(ImmutableList.of(bmgr.not(selector)));
       assertThat(res).isPresent();
-      List<BooleanFormula> unsatCore = res.get();
+      List<BooleanFormula> unsatCore = res.orElseThrow();
       assertThat(unsatCore).containsExactly(bmgr.not(selector));
     }
   }

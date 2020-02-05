@@ -424,8 +424,8 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
           assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
-          assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
-          assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+          assertThat(m.evaluate(bmgr.makeBoolean(false))).isFalse();
           if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
             // partial model should not return an evaluation
             assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
@@ -439,8 +439,8 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
           assertThat(m.evaluate(bvmgr.makeBitvector(8, 123))).isEqualTo(BigInteger.valueOf(123));
-          assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
-          assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+          assertThat(m.evaluate(bmgr.makeBoolean(false))).isFalse();
           if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
             // partial model should not return an evaluation
             assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNull();
@@ -556,8 +556,8 @@ public class ModelTest extends SolverBasedTest0 {
           assertThat(m.evaluate(imgr.makeNumber(0))).isEqualTo(BigInteger.ZERO);
           assertThat(m.evaluate(imgr.makeNumber(1))).isEqualTo(BigInteger.ONE);
           assertThat(m.evaluate(imgr.makeNumber(100))).isEqualTo(BigInteger.valueOf(100));
-          assertThat(m.evaluate(bmgr.makeBoolean(true))).isEqualTo(true);
-          assertThat(m.evaluate(bmgr.makeBoolean(false))).isEqualTo(false);
+          assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
+          assertThat(m.evaluate(bmgr.makeBoolean(false))).isFalse();
         }
         if (bvmgr != null) {
           if (solver == Solvers.BOOLECTOR) {
@@ -587,8 +587,7 @@ public class ModelTest extends SolverBasedTest0 {
               .isEqualTo(BigInteger.valueOf(100));
           assertThat(m.evaluate(imgr.subtract(imgr.makeNumber(123), imgr.makeNumber(23))))
               .isEqualTo(BigInteger.valueOf(100));
-          assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true))))
-              .isEqualTo(true);
+          assertThat(m.evaluate(bmgr.and(bmgr.makeBoolean(true), bmgr.makeBoolean(true)))).isTrue();
         }
         if (bvmgr != null) {
           if (solver == Solvers.BOOLECTOR) {
