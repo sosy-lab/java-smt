@@ -25,11 +25,8 @@
     <module name="SuppressWarnings"/>
     <module name="JavadocStyle"/>
     <module name="JavadocMethod">
-      <property name="allowUndeclaredRTE" value="true"/>
       <property name="allowMissingParamTags" value="true"/>
-      <property name="allowMissingThrowsTags" value="true"/>
       <property name="allowMissingReturnTag" value="true"/>
-      <property name="suppressLoadErrors" value="true"/>
     </module>
     <module name="AbstractClassName">
       <property name="format" value="^(Abstract|Forwarding).*$"/>
@@ -58,7 +55,7 @@
       <property name="illegalPkgs" value="sun, com.google.common.testing, com.google.common.truth, org.junit, junit"/>
     </module>
     <module name="IllegalImport">
-      <property name="illegalClasses" value=".*\.(Builder|of|copyOf)|org\.junit\.Assert(\..*)?|com\.google\.common\.base\.Objects(\..*)?"/>
+      <property name="illegalClasses" value=".*\.(Builder|of|copyOf)|org\.junit\.Assert(\..*)?|com\.google\.common\.base\.Objects(\..*)?|javax\.annotation\.(Nonnull|Nullable|CheckReturnValue|concurrent\.GuardedBy|concurrent\.Immutable)|edu\.umd\.cs\.findbugs\.annotations\.(NonNull|Nullable)"/>
       <property name="regexp" value="true"/>
     </module>
     <module name="ImportOrder">
