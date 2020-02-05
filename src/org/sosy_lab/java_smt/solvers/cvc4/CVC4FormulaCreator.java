@@ -427,7 +427,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
-    if (pArgs.size() == 0) {
+    if (pArgs.isEmpty()) {
       return exprManager.mkExpr(pDeclaration);
     } else {
       vectorExpr args = new vectorExpr();

@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.Table;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -53,9 +55,9 @@ public class BoolectorArrayFormulaManager
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String name, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    if (!pIndexType.isBitvectorType() || !pElementType.isBitvectorType()) {
-      throw new IllegalArgumentException("Boolector supports bitvector arrays only.");
-    }
+    checkArgument(
+        pIndexType.isBitvectorType() && pElementType.isBitvectorType(),
+        "Boolector supports bitvector arrays only.");
     BitvectorType indexType = (BitvectorType) pIndexType;
     BitvectorType elementType = (BitvectorType) pElementType;
     final long indexSort = BtorJNI.boolector_bitvec_sort(btor, indexType.getSize());

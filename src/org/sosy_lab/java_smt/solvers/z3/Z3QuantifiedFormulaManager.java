@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import java.util.List;
@@ -38,9 +40,7 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> pVariables, Long pBody) {
-    if (pVariables.isEmpty()) {
-      throw new IllegalArgumentException("List of quantified variables can not be empty");
-    }
+    checkArgument(!pVariables.isEmpty(), "List of quantified variables can not be empty");
     return Native.mkQuantifierConst(
         z3context,
         q == Quantifier.FORALL,

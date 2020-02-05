@@ -27,6 +27,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
@@ -111,9 +112,7 @@ abstract class SmtInterpolNumeralFormulaManager<
         if (params.length == 0) {
           return false;
         } else if (NUMERIC_FUNCTIONS.contains(func.getName())) {
-          for (Term param : params) {
-            waitlist.add(param);
-          }
+          waitlist.addAll(Arrays.asList(params));
         } else if ("ite".equals(func.getName())) {
           // ignore condition, just use the if- and then-case
           waitlist.add(params[1]);

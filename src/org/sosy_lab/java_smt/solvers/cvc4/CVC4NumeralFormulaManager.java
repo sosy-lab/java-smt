@@ -28,6 +28,7 @@ import static edu.nyu.acsys.CVC4.Kind.MULT;
 import static edu.nyu.acsys.CVC4.Kind.PLUS;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.Kind;
@@ -95,9 +96,7 @@ abstract class CVC4NumeralFormulaManager<
       if (isNumeral(e)) {
         // true, skip and check others
       } else if (NUMERIC_FUNCTIONS.contains(e.getKind())) {
-        for (Expr param : e) {
-          waitlist.add(param);
-        }
+        Iterables.addAll(waitlist, e);
       } else if (ITE.equals(e.getKind())) {
         // ignore condition, just use the if- and then-case
         waitlist.add(e.getChild(1));

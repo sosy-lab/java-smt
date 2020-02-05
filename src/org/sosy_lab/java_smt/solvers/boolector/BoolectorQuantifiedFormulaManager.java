@@ -19,6 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import java.util.List;
@@ -49,13 +51,11 @@ public class BoolectorQuantifiedFormulaManager
    */
   @Override
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
-    if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("List of quantified variables can not be empty");
-    }
+    checkArgument(!pVars.isEmpty(), "List of quantified variables can not be empty");
     for (long param : pVars) {
-      if (!BtorJNI.boolector_is_param(btor, param)) {
-        throw new IllegalArgumentException("pVariables need to be parameter nodes in boolector.");
-      }
+      checkArgument(
+          BtorJNI.boolector_is_param(btor, param),
+          "pVariables need to be parameter nodes in boolector.");
     }
     final long newQuantifier;
     final long[] varsArray = Longs.toArray(pVars);
