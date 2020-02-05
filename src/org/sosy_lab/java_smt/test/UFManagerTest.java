@@ -20,8 +20,8 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
@@ -74,7 +74,7 @@ public class UFManagerTest extends SolverBasedTest0 {
   public void testDeclareAndCallUFWithIntWithUnsupportedName() {
     requireIntegers();
     fmgr.declareAndCallUF("|Func|", FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
-    fail();
+    assert_().fail();
   }
 
   @Test
@@ -101,7 +101,7 @@ public class UFManagerTest extends SolverBasedTest0 {
         "|Func|",
         FormulaType.getBitvectorTypeWithSize(4),
         ImmutableList.of(bvmgr.makeBitvector(4, 1)));
-    fail();
+    assert_().fail();
   }
 
   @Test
