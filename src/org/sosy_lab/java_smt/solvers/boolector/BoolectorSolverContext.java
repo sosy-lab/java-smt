@@ -47,14 +47,14 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     PICOSAT,
     MINISAT,
     CADICAL,
-
+    CryptoMiniSat
   }
 
   @Options(prefix = "solver.boolector")
   private static class BoolectorSettings {
 
     @Option(secure = true, description = "The SAT solver used by Boolector.")
-    private SatSolver satSolver = SatSolver.PICOSAT;
+    private SatSolver satSolver = SatSolver.CADICAL;
 
     @Option(
         secure = true,
