@@ -3331,6 +3331,24 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   return jresult;
 }	
 
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1bitvec_1sort_1get_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorSort arg2 = (BoolectorSort) 0 ;
+  int32_t  result = 0;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorSort *)&jarg2; 
+ 
+  result = boolector_bitvec_sort_get_width(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+} 
+
+
+
 //helpmethods
 	
 	//dumps complete model into new file and reads it to give it back
