@@ -407,6 +407,12 @@ class BtorJNI {
 
   protected static final native long btor_abort_callback_get();
 
+  protected static final native int boolector_bitvec_sort_get_width(long jarg1, long jarg2);
+
+  protected static final native long boolector_roli(long btor, long node, int nbits);
+
+  protected static final native long boolector_rori(long btor, long node, int nbits);
+
   /**
    * Returns string dump in smt2 format of the entire formula. No guarantee that that string is
    * useful.

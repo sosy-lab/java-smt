@@ -155,6 +155,7 @@
 #include <jni.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 
 /* Support for throwing Java exceptions */
@@ -2945,6 +2946,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   FILE *arg4 = (FILE *) 0 ;
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
+  bool *parsedFlag;
   jint result;
   
   (void)jenv;
@@ -2959,7 +2961,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   arg4 = *(FILE **)&jarg4; 
   arg5 = *(char ***)&jarg5; 
   arg6 = *(int32_t **)&jarg6; 
-  result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6);
+  result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6,parsedFlag);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
 }
@@ -3331,6 +3333,58 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   return jresult;
 }	
 
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1bitvec_1sort_1get_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorSort arg2 = (BoolectorSort) 0 ;
+  int32_t  result = 0;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorSort *)&jarg2; 
+ 
+  result = boolector_bitvec_sort_get_width(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+} 
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  uint32_t arg3 = 0 ;
+  BoolectorNode *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorNode **)&jarg2; 
+  arg3 = (uint32_t)jarg3;  
+  result = (BoolectorNode *)boolector_ror(arg1,arg2,arg3);
+  *(BoolectorNode **)&jresult = result; 
+  return jresult;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1roli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  uint32_t arg3 = 0 ;
+  BoolectorNode *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorNode **)&jarg2; 
+  arg3 = (uint32_t)jarg3; 
+  result = (BoolectorNode *)boolector_ror(arg1,arg2,arg3);
+  *(BoolectorNode **)&jresult = result; 
+  return jresult;
+}
+
+
 //helpmethods
 	
 	//dumps complete model into new file and reads it to give it back
@@ -3387,6 +3441,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     jint jresult = 0 ;
     int32_t *status = (int32_t *) 0 ;
 	char **errormsg = (char **) 0 ;
+	bool *parsedFlag;
 	
 	(void)jenv;
     (void)jcls;
@@ -3413,7 +3468,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     fclose (fout);
 		
     //"read" (parse)
-    result = boolector_parse(arg1, f, "temp", fout, errormsg, status);
+    result = boolector_parse(arg1, f, "temp", fout, errormsg, status, parsedFlag);
     jresult = (jint)result;
     
     return jresult;
