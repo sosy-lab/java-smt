@@ -114,6 +114,11 @@ public interface SolverContext extends AutoCloseable {
   /**
    * Close the solver context.
    *
+   * <p>After calling this method, further access to any object that had been returned from this
+   * context is not wanted, i.e., it is depending on the solver. Java-based solvers might wait for
+   * the next garbage collection with any cleanup operation. Native solvers might even reference
+   * invalid memory and cause segmentation faults.
+   *
    * <p>Necessary for the solvers implemented in native code, frees the associated memory.
    */
   @Override
