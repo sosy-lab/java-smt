@@ -72,6 +72,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
+  private boolean closed = false;
 
   protected BoolectorSolverContext(
       BoolectorFormulaManager pManager,
@@ -120,12 +121,16 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    BtorJNI.boolector_delete(creator.getEnv());
+    if (!closed) {
+      closed = true;
+      BtorJNI.boolector_delete(creator.getEnv());
+    }
   }
 
   @SuppressWarnings("resource")
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     return new ReusableStackTheoremProver(
         new BoolectorTheoremProver(manager, creator, creator.getEnv(), shutdownNotifier, pOptions));
   }

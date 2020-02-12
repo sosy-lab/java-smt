@@ -65,7 +65,7 @@ public class SolverContextTest extends SolverBasedTest0 {
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.MATHSAT5, Solvers.Z3);
+        .isNoneOf(Solvers.MATHSAT5, Solvers.Z3, Solvers.BOOLECTOR);
 
     // try to access some data about formulae and managers
     assertThat(term.toString()).isEqualTo("variable");
