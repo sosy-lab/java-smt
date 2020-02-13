@@ -55,20 +55,58 @@ public class SolverContextTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testFormulaAccessAfterClose() {
+  public void testFormulaAccessAfterClose() throws InterruptedException {
     BooleanFormula term = bmgr.makeVariable("variable");
+    BooleanFormula term2 = bmgr.makeVariable("variable");
+    int hash = term.hashCode();
     context.close();
 
-    // after calling 'close()', it depends on the solver whether we can further access any formula.
+    // After calling 'close()', it depends on the solver whether we can further access any formula.
+    // It would be nice to check for SegFault in a Junit test, but I do not know how to do that.
+
+    // MathSAT5 and Boolector allow nothing, lets abort here.
     assume()
         .withMessage(
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.MATHSAT5, Solvers.Z3, Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.MATHSAT5, Solvers.BOOLECTOR);
+
+    assertThat(bmgr.isTrue(term)).isFalse();
+    assertThat(bmgr.isFalse(term)).isFalse();
+
+    // Z3 allows simple checks (comparison against constants like TRUE/FALSE), lets abort here.
+    assume()
+        .withMessage(
+            "Solver %s does not support to access formulae after closing the context",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
 
     // try to access some data about formulae and managers
     assertThat(term.toString()).isEqualTo("variable");
-    assertThat(bmgr.isTrue(term)).isFalse();
+    assertThat(term.hashCode()).isEqualTo(hash);
+    assertThat(term).isEqualTo(term2);
+
+    // For CVC4, we close the solver, however do not finalize and cleanup the terms,
+    // thus direct access is possible, operations are forbidden.
+    // See https://github.com/sosy-lab/java-smt/issues/169
+    assume()
+        .withMessage(
+            "Solver %s does not support to access formulae after closing the context",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
+
+    // Java-based solvers allow more, i.e. they wait for GC, which is nice.
+
+    // try to access some managers
+    BooleanFormula notTerm = bmgr.not(term);
+    assertThat(bmgr.isTrue(notTerm)).isFalse();
+    assertThat(bmgr.isFalse(notTerm)).isFalse();
+
+    BooleanFormula opTerm = bmgr.and(notTerm, term2);
+    assertThat(bmgr.isTrue(opTerm)).isFalse();
+    assertThat(bmgr.isFalse(opTerm)).isFalse();
   }
 }
