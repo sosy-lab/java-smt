@@ -64,6 +64,7 @@ public class BoolectorNativeApiTest {
           .put("BTOR_OPT_QUANT_MS", "BTOR_OPT_QUANT_MINISCOPE")
           .put("BTOR_OPT_DEFAULT_CADICAL", "BTOR_OPT_DEFAULT_TO_CADICAL")
           .put("BTOR_OPT_QUANT_SYNTHCOMPLETE", "BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE")
+          .put("BTOR_OPT_BETA_REDUCE", "BTOR_OPT_BETA_REDUCE_ALL")
           .build();
 
   @Test
@@ -72,6 +73,7 @@ public class BoolectorNativeApiTest {
     for (BtorOption option : BtorOption.values()) {
       String optName = BtorJNI.boolector_get_opt_lng(btor, option.getValue());
       String converted = "BTOR_OPT_" + optName.replace("-", "_").replace(":", "_").toUpperCase();
+      // System.out.println("our option: " + option + " -- their option: " + optName);
       assertThat(option.name()).isEqualTo(ALLOWED_DIFFS.getOrDefault(converted, converted));
     }
   }

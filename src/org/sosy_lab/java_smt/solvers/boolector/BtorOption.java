@@ -1,5 +1,6 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
+/** We keep this synchronized with "btortypes.h". */
 public enum BtorOption {
   BTOR_OPT_MODEL_GEN,
   BTOR_OPT_INCREMENTAL,
@@ -35,6 +36,7 @@ public enum BtorOption {
   BTOR_OPT_FUN_LAZY_SYNTHESIZE,
   BTOR_OPT_FUN_EAGER_LEMMAS,
   BTOR_OPT_FUN_STORE_LAMBDAS,
+  BTOR_OPT_DUMP_DIMACS,
   BTOR_OPT_SLS_NFLIPS,
   BTOR_OPT_SLS_STRATEGY,
   BTOR_OPT_SLS_JUST,
@@ -76,7 +78,6 @@ public enum BtorOption {
   BTOR_OPT_QUANT_DER,
   BTOR_OPT_QUANT_CER,
   BTOR_OPT_QUANT_MINISCOPE,
-  BTOR_OPT_DEFAULT_TO_CADICAL,
   BTOR_OPT_SORT_EXP,
   BTOR_OPT_SORT_AIG,
   BTOR_OPT_SORT_AIGVEC,
@@ -87,10 +88,14 @@ public enum BtorOption {
   BTOR_OPT_CHK_UNCONSTRAINED,
   BTOR_OPT_PARSE_INTERACTIVE,
   BTOR_OPT_SAT_ENGINE_LGL_FORK,
-  BTOR_OPT_INCREMENTAL_RW,
+  BTOR_OPT_SAT_ENGINE_CADICAL_FREEZE,
+  BTOR_OPT_SAT_ENGINE_N_THREADS,
+  BTOR_OPT_SIMP_NORM_ADDS,
   BTOR_OPT_DECLSORT_BV_WIDTH,
   BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE,
-  BTOR_OPT_QUANT_FIXSYNTH;
+  BTOR_OPT_QUANT_FIXSYNTH,
+  BTOR_OPT_RW_ZERO_LOWER_SLICE,
+  BTOR_OPT_NONDESTR_SUBST;
 
   private static class EnumIndexCounter {
     private static int nextValue = 0;
@@ -98,7 +103,7 @@ public enum BtorOption {
 
   private final int value;
 
-  BtorOption() {
+  private BtorOption() {
     value = EnumIndexCounter.nextValue++;
   }
 
