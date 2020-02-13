@@ -46,6 +46,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     LINGELING,
     PICOSAT,
     MINISAT,
+    CMS,
     CADICAL
   }
 
