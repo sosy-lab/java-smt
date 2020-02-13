@@ -81,7 +81,7 @@ public class BoolectorNativeApiTest {
     // check whether all sat solvers are available
     for (SatSolver satSolver : SatSolver.values()) {
       long btor1 = BtorJNI.boolector_new();
-      BtorJNI.boolector_set_sat_solver(btor1, satSolver.name());
+      BtorJNI.boolector_set_sat_solver(btor1, satSolver.name().toLowerCase());
       long newVar = BtorJNI.boolector_var(btor1, BtorJNI.boolector_bool_sort(btor1), "x");
       BtorJNI.boolector_assert(btor1, newVar);
       int result = BtorJNI.boolector_sat(btor1);
