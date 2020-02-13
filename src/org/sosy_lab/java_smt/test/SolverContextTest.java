@@ -59,6 +59,8 @@ public class SolverContextTest extends SolverBasedTest0 {
     BooleanFormula term = bmgr.makeVariable("variable");
     BooleanFormula term2 = bmgr.makeVariable("variable");
     BooleanFormula term3 = bmgr.makeVariable("test");
+    BooleanFormula termTrue = bmgr.makeBoolean(true);
+    BooleanFormula termFalse = bmgr.makeBoolean(false);
     int hash = term.hashCode();
     context.close();
 
@@ -69,6 +71,8 @@ public class SolverContextTest extends SolverBasedTest0 {
 
     assertThat(term).isEqualTo(term2);
     assertThat(term).isNotEqualTo(term3);
+    assertThat(term).isNotEqualTo(termTrue);
+    assertThat(termFalse).isNotEqualTo(termTrue);
 
     // Boolector allows nothing, lets abort here.
     assume()
@@ -90,6 +94,8 @@ public class SolverContextTest extends SolverBasedTest0 {
 
     assertThat(bmgr.isTrue(term)).isFalse();
     assertThat(bmgr.isFalse(term)).isFalse();
+    assertThat(bmgr.isTrue(termTrue)).isTrue();
+    assertThat(bmgr.isFalse(termFalse)).isTrue();
 
     // Z3 allows simple checks (comparison against constants like TRUE/FALSE), lets abort here.
     assume()
