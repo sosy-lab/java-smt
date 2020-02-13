@@ -55,22 +55,38 @@ public class SolverContextTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testFormulaAccessAfterClose() throws InterruptedException {
+  public void testFormulaAccessAfterClose() {
     BooleanFormula term = bmgr.makeVariable("variable");
     BooleanFormula term2 = bmgr.makeVariable("variable");
+    BooleanFormula term3 = bmgr.makeVariable("test");
     int hash = term.hashCode();
     context.close();
 
     // After calling 'close()', it depends on the solver whether we can further access any formula.
     // It would be nice to check for SegFault in a Junit test, but I do not know how to do that.
 
-    // MathSAT5 and Boolector allow nothing, lets abort here.
+    // For the remaining test, we try to execute as much as possible after closing the context.
+
+    assertThat(term).isEqualTo(term2);
+    assertThat(term).isNotEqualTo(term3);
+
+    // Boolector allows nothing, lets abort here.
     assume()
         .withMessage(
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.MATHSAT5, Solvers.BOOLECTOR);
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assertThat(term.hashCode()).isEqualTo(hash);
+
+    // MathSAT5 allow nothing, lets abort here.
+    assume()
+        .withMessage(
+            "Solver %s does not support to access formulae after closing the context",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     assertThat(bmgr.isTrue(term)).isFalse();
     assertThat(bmgr.isFalse(term)).isFalse();
