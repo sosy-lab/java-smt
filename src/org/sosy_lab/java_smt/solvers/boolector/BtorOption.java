@@ -103,7 +103,7 @@ public enum BtorOption {
 
   private final int value;
 
-  private BtorOption() {
+  BtorOption() {
     value = EnumIndexCounter.nextValue++;
   }
 
