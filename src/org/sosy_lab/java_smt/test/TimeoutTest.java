@@ -76,6 +76,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
+    // TODO: make new timeout test for Boolector as it doesn't support integers
     testBasicProverTimeout(() -> context.newProverEnvironment());
   }
 

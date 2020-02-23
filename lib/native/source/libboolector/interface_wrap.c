@@ -2278,10 +2278,8 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1node_1id(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  int32_t result;
   
   (void)jenv;
   (void)jcls;
@@ -2493,7 +2491,6 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1fun_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  uint32_t result;
   
   (void)jenv;
   (void)jcls;
@@ -2969,7 +2966,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   FILE *arg4 = (FILE *) 0 ;
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
-  bool *parsedFlag;
+  bool parsedFlag = (bool) 0;
   jint result;
   
   (void)jenv;
@@ -2984,7 +2981,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   arg4 = *(FILE **)&jarg4; 
   arg5 = *(char ***)&jarg5; 
   arg6 = *(int32_t **)&jarg6; 
-  result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6,parsedFlag);
+  result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6,&parsedFlag);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
 }
@@ -3373,7 +3370,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 } 
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
@@ -3385,12 +3382,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   arg1 = *(Btor **)&jarg1; 
   arg2 = *(BoolectorNode **)&jarg2; 
   arg3 = (uint32_t)jarg3;  
-  result = (BoolectorNode *)boolector_ror(arg1,arg2,arg3);
+  result = (BoolectorNode *)boolector_rori(arg1,arg2,arg3);
   *(BoolectorNode **)&jresult = result; 
   return jresult;
 }
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1roli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1roli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
@@ -3402,7 +3399,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   arg1 = *(Btor **)&jarg1; 
   arg2 = *(BoolectorNode **)&jarg2; 
   arg3 = (uint32_t)jarg3; 
-  result = (BoolectorNode *)boolector_ror(arg1,arg2,arg3);
+  result = (BoolectorNode *)boolector_roli(arg1,arg2,arg3);
   *(BoolectorNode **)&jresult = result; 
   return jresult;
 }
@@ -3415,6 +3412,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	jstring jresult = 0;
 	Btor *arg1 = (Btor *) 0 ;
     char *result = 0 ;
+	char *filename = "tempdumpsmt2.txt";
 	
 	(void)jenv;
     (void)jcls;
@@ -3423,12 +3421,12 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	char * buffer = 0;
     long length;
     FILE *f = 0;
-    f = fopen("temp", "w+");
+    f = fopen(filename, "w+");
 	if(f==NULL) {
 	  perror("ERROR");	
 	}
 
-	//fclose (f);
+	fclose (f);
     
     //write
     boolector_dump_smt2(arg1, f);
@@ -3442,7 +3440,9 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
      buffer = malloc (length);
      if (buffer)
      {
-       fread (buffer, 1, length, f);
+      if(fread (buffer, 1, length, f) != (unsigned long)length) {
+		  perror("ERROR READING FILE INTO BUFFER");
+	  }
       }
       fclose (f);
     }
@@ -3451,6 +3451,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     {
      result = buffer;
     }
+	
+	int delIn = remove(filename);
+	if(delIn != 0) {
+	  perror("Error deleting temporary text file");	
+	}
 	
 	
 	if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
@@ -3465,6 +3470,8 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     int32_t status = (int32_t) 0 ;
 	char *errormsg = (char *) 0 ;
 	bool parsedFlag = (bool) 0;
+	char filenameIn[] = "tempparse.txt";
+	char filenameOut[] = "tempout.txt";
 	
 	(void)jenv;
     (void)jcls;
@@ -3476,7 +3483,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     }
 	
     FILE *fparse = 0;
-    fparse = fopen("tempparse", "w+");
+    fparse = fopen(filenameIn, "w+");
 	if(fparse==NULL) {
 	  perror("ERROR_INPUTFILE");	
 	}
@@ -3484,16 +3491,26 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	fclose (fparse);
 		
 	FILE *fout = 0;
-    fout = fopen("tempout", "w+");
+    fout = fopen(filenameOut, "w+");
 	if(fout==NULL) {
 	  perror("ERROR_OUTPUTFILE");	
 	}
     fclose (fout);
 		
     //"read" (parse)
-    result = boolector_parse(arg1, fparse, "tempparse", fout, &errormsg, &status, &parsedFlag);
+    result = boolector_parse(arg1, fparse, filenameIn, fout, &errormsg, &status, &parsedFlag);
     jresult = (jint)result;
-    
+	
+	int delIn = remove(filenameIn);
+	if(delIn != 0) {
+	  perror("Error deleting temporary text inputfile");	
+	}
+	
+	int delOut = remove(filenameOut);
+	if(delOut != 0) {
+	  perror("Error deleting temporary text outputfile");	
+	}		
+	
     return jresult;
 }
 	
@@ -3502,6 +3519,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	jstring jresult = 0;
 	Btor *arg1 = (Btor *) 0 ;
     char *result = 0 ;
+	char *filename = "tempdump.txt";
 	
 	(void)jenv;
     (void)jcls;
@@ -3513,7 +3531,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   arg2 = *(BoolectorNode **)&jarg2; 
 	
     FILE *f = 0;
-    f = fopen("temp", "w+");
+    f = fopen(filename, "w+");
 	if(f==NULL) {
 	  perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");	
 	}
@@ -3532,7 +3550,9 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
      buffer = malloc (length);
      if (buffer)
      {
-       fread (buffer, 1, length, f);
+       if(fread (buffer, 1, length, f) != (unsigned long)length) {
+		   perror("ERROR READING FILE INTO BUFFER");
+	   }
       }
       fclose (f);
     }
@@ -3541,6 +3561,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     {
      result = buffer;
     }
+	
+	int delIn = remove(filename);
+	if(delIn != 0) {
+	  perror("Error deleting temporary text file");	
+	}
 	
 	
 	if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
@@ -3681,6 +3706,8 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 
 //Call this with the return value of the method boolector_set_termination to free ressources
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1free_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+	(void)jcls;
+	
 	struct callback_info *helper = (struct callback_info *)(long)jarg1;
   if (helper == NULL) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback may not be null");
