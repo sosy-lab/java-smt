@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
@@ -44,6 +45,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final BoolectorFormulaCreator creator;
   protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
+  private final TerminationCallback terminationCallback;
+  private final long terminationCallbackHelper;
 
   // Used/Built by TheoremProver
   protected BoolectorAbstractProver(
@@ -56,17 +59,26 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
+
+    terminationCallback = () -> {
+      return shutdownNotifier.shouldShutdown();
+    };
+
+    terminationCallbackHelper = addTerminationCallback();
   }
 
   @Override
   public void close() {
     if (!closed) {
-      // Problem: Cloning results in not beeing able to access var with old name (string)
-      // NOT Cloning results in murdering btor that is still beeing used
-      // closing of assertions only by using boolector_release
-      // BtorJNI.boolector_delete(btor);
+      // Debug if btor instance was terminated using the termination callback (1==true)
+      // System.out.println("did it terminate? = " + BtorJNI.boolector_terminate(btor));
+      // Free resources of callback
+      BtorJNI.boolector_free_termination(terminationCallbackHelper);
       BtorJNI.boolector_pop(manager.getEnvironment(), assertedFormulas.size());
       assertedFormulas.clear();
+      // You can't use delete here because you wouldn't be able to access model
+      // Wait till we have visitor/toList, after that we can delete here
+      // BtorJNI.boolector_delete(btor);
       closed = true;
     }
   }
@@ -163,4 +175,10 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected boolean isClosed() {
     return closed;
   }
+
+  private long addTerminationCallback() {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return BtorJNI.boolector_set_termination(btor, terminationCallback);
+  }
+
 }
