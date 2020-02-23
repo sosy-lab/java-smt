@@ -176,6 +176,12 @@ typedef struct {
   const char *java_exception;
 } SWIG_JavaExceptions_t;
 
+struct callback_info {
+	JNIEnv *jenv;
+	jmethodID callback_method;
+	jobject obj;
+};
+
 
 static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionCodes code, const char *msg) {
   jclass excep;
@@ -211,6 +217,23 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "boolector.h"
 #include "btortypes.h"
 
+static int32_t java_termination_callback(void *user_data) {
+	struct callback_info *helper = (struct callback_info *) user_data;
+	JNIEnv *jenv = helper->jenv;
+
+	if (helper->obj == NULL) {
+		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Illegal termination callback object");
+		return 1;
+	}
+
+	jboolean result = (*jenv)->CallBooleanMethod(jenv, helper->obj, helper->callback_method);
+
+	if ((*jenv)->ExceptionCheck(jenv)) {
+		return 1;
+	}
+
+	return (int32_t)(result != JNI_FALSE);
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -3439,9 +3462,9 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	int32_t  result = 0;
 	Btor *arg1 = (Btor *) 0 ;
     jint jresult = 0 ;
-    int32_t *status = (int32_t *) 0 ;
-	char **errormsg = (char **) 0 ;
-	bool *parsedFlag;
+    int32_t status = (int32_t) 0 ;
+	char *errormsg = (char *) 0 ;
+	bool parsedFlag = (bool) 0;
 	
 	(void)jenv;
     (void)jcls;
@@ -3452,13 +3475,13 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
       if (!arg2) return 0;
     }
 	
-    FILE *f = 0;
-    f = fopen("temp", "w+");
-	if(f==NULL) {
+    FILE *fparse = 0;
+    fparse = fopen("tempparse", "w+");
+	if(fparse==NULL) {
 	  perror("ERROR_INPUTFILE");	
 	}
-	fputs(arg2, f);
-	fclose (f);
+	fputs(arg2, fparse);
+	fclose (fparse);
 		
 	FILE *fout = 0;
     fout = fopen("tempout", "w+");
@@ -3468,7 +3491,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     fclose (fout);
 		
     //"read" (parse)
-    result = boolector_parse(arg1, f, "temp", fout, errormsg, status, parsedFlag);
+    result = boolector_parse(arg1, fparse, "tempparse", fout, &errormsg, &status, &parsedFlag);
     jresult = (jint)result;
     
     return jresult;
@@ -3617,6 +3640,56 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   (*jenv)->DeleteLocalRef(jenv, classArray);
 
   return outerJNIArray;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
+  Btor *arg1 = (Btor *) 0 ;
+	
+  (void)jenv;
+  (void)jcls;
+	
+  arg1 = *(Btor **)&jarg1; 
+  
+   jclass cls = (*jenv)->FindClass(jenv,
+    "org/sosy_lab/java_smt/solvers/boolector/BtorJNI$TerminationCallback");
+  if (cls == NULL) {
+    return 0;
+  }
+  
+  jmethodID methodID = (*jenv)->GetMethodID(jenv, cls, "shouldTerminate", "()Z");
+  if (methodID == NULL) {
+    return 0;
+  }
+  
+  if (jarg2 == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback may not be null");
+    return 0;
+  }
+  
+  struct callback_info *helper = malloc(sizeof(struct callback_info));
+  helper->jenv = jenv;
+  helper->callback_method = methodID;
+  helper->obj = (*jenv)->NewGlobalRef(jenv, jarg2);
+
+  boolector_set_term(arg1, &java_termination_callback, helper);
+  
+  //Returns address to helper to be freed after termination has been called. See method bla
+  return (long)helper;
+  //TODO: test; pray for the machine spirit;
+}
+
+
+//Call this with the return value of the method boolector_set_termination to free ressources
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1free_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+	struct callback_info *helper = (struct callback_info *)(long)jarg1;
+  if (helper == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback may not be null");
+    return;
+  }
+
+  (*jenv)->DeleteGlobalRef(jenv, helper->obj);
+  helper->obj = NULL;
+  free(helper);
 }
 
 #ifdef __cplusplus

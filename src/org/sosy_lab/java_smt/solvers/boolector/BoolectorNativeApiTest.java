@@ -55,6 +55,8 @@ public class BoolectorNativeApiTest {
 
   // some options have a different name in the API that their internal representation.
   // TODO why?
+  // Because for some reason the return value of the get_opt method is not the correct option name
+  // (check btortypes.h for correct options)
   private static final ImmutableMap<String, String> ALLOWED_DIFFS =
       ImmutableMap.<String, String>builder()
           .put("BTOR_OPT_ACKERMANNIZE", "BTOR_OPT_ACKERMANN")
@@ -62,9 +64,10 @@ public class BoolectorNativeApiTest {
           .put("BTOR_OPT_QUANT_SYNTHLIMIT", "BTOR_OPT_QUANT_SYNTH_LIMIT")
           .put("BTOR_OPT_QUANT_SYNTHQI", "BTOR_OPT_QUANT_SYNTH_QI")
           .put("BTOR_OPT_QUANT_MS", "BTOR_OPT_QUANT_MINISCOPE")
-          .put("BTOR_OPT_DEFAULT_CADICAL", "BTOR_OPT_DEFAULT_TO_CADICAL")
           .put("BTOR_OPT_QUANT_SYNTHCOMPLETE", "BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE")
-          .put("BTOR_OPT_BETA_REDUCE", "BTOR_OPT_BETA_REDUCE_ALL")
+          .put("BTOR_OPT_BETA_REDUCE", "BTOR_OPT_BETA_REDUCE")
+          .put("BTOR_OPT_DUMP_DIMACS", "BTOR_OPT_PRINT_DIMACS")
+          .put("BTOR_OPT_SIMP_NORM_ADDS", "BTOR_OPT_SIMP_NORMAMLIZE_ADDERS")
           .build();
 
   @Test

@@ -95,12 +95,7 @@ public enum BtorOption {
   BTOR_OPT_QUANT_SYNTH_ITE_COMPLETE,
   BTOR_OPT_QUANT_FIXSYNTH,
   BTOR_OPT_RW_ZERO_LOWER_SLICE,
-  BTOR_OPT_NONDESTR_SUBST,
-  /*
-   * This last entry probably does nothing and is only the end marker for btor, but to be sure its
-   * included
-   */
-  BTOR_OPT_NUM_OPTS;
+  BTOR_OPT_NONDESTR_SUBST;
 
 
   private static class EnumIndexCounter {

@@ -459,9 +459,35 @@ class BtorJNI {
    *
    * @param jarg1 btor
    * @param jarg2 array node
-   * @return Returns 2Dim Array or Strings. Size [2][x], x beeing the length of the uf used. First
-   *     String Array will be argument assignment strings. Second String Array will be value
-   *     assignment strings.
+   * @return Returns 2Dim Array or Strings. Size [2][x], x being the length of the uf used. First
+   *         String Array will be argument assignment strings. Second String Array will be value
+   *         assignment strings.
    */
   protected static final native String[][] boolector_uf_assignment_helper(long jarg1, long jarg2);
+
+  /**
+   * Sets termination callback to chosen implementation of a method.
+   *
+   * @param btor instance
+   * @param terminationCallback TerminationCallback method
+   * @return address to helper struct. Call method boolector_free_termination with it to free its
+   *         ressources after termination!
+   */
+  protected static final native long
+      boolector_set_termination(long btor, TerminationCallback terminationCallback);
+
+  /**
+   * Frees resources of the termination callback function. Call ONLY after termination has occured
+   * with the return value of boolector_set_termination of its instance!
+   *
+   * @param helper address to helper struct used in termination callback.
+   */
+  protected static final native void boolector_free_termination(long helper);
+
+  /**
+   * This is used to get the methodID for the JNI call to the termination callback method.
+   */
+  interface TerminationCallback {
+    boolean shouldTerminate() throws InterruptedException;
+  }
 }
