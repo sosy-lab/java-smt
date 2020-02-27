@@ -206,7 +206,7 @@
             <arg value="libpicosat.so" />
         </exec>
         <exec executable="strip" dir="${boolector.path}/deps/install/lib/">
-            <arg value="libminisat.so" />
+            <arg value="libminisat.so.2" />
         </exec>
         <exec executable="strip" dir="${boolector.path}/build/lib/">
             <arg value="libboolector.so" />

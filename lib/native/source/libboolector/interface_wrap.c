@@ -156,7 +156,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
 
 /* Support for throwing Java exceptions */
 typedef enum {
@@ -217,6 +219,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "boolector.h"
 #include "btortypes.h"
 
+//Used for checking JavaSMT TerminationCallback boolean to determin if Boolector should temrinate
 static int32_t java_termination_callback(void *user_data) {
 	struct callback_info *helper = (struct callback_info *) user_data;
 	JNIEnv *jenv = helper->jenv;
@@ -233,6 +236,30 @@ static int32_t java_termination_callback(void *user_data) {
 	}
 
 	return (int32_t)(result != JNI_FALSE);
+}
+
+//Takes String and appends it to valid path for temporary files
+//Make sure that filename is compliant with the used temp file method
+//Returns NULL in case of NULL filename (so make sure you dont enter NULL!)
+char *addTemppathToFilename(char *filename) {
+	
+	if(!filename) {
+		return NULL;
+	}
+	
+	char* dir = getenv("TMPDIR");
+	if(dir == NULL) {
+		 dir = "/tmp/";
+	} else  if(strlen(dir) == 0) {
+		dir = "/tmp/";
+    }
+
+	int n = (int)strlen(dir) + (int)strlen(filename) + 1 ;
+	char *tfnwd = (char *)malloc(n * sizeof(char));
+	strncpy(tfnwd, dir, strlen(dir));
+	strncat(tfnwd, filename, (strlen(filename) + 1));
+	
+	return tfnwd;
 }
 
 #ifdef __cplusplus
@@ -404,7 +431,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   FILE *f = 0;
   f = fopen(arg2, "w");
   if(f==NULL) {
-    perror("ERROR: couldn't set api trace because it couldnt open trace file.");	
+    perror("ERROR: couldn't set api trace because it couldn't open trace file.");	
   }
   boolector_set_trapi(arg1,f);
 }
@@ -3412,53 +3439,53 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	jstring jresult = 0;
 	Btor *arg1 = (Btor *) 0 ;
     char *result = 0 ;
-	char *filename = "tempdumpsmt2.txt";
+	char tfn[] = "boolector_help_dump_smt2_tempfile-XXXXXX";
+	char *tfnwd = addTemppathToFilename(tfn);
+    int fd = -1;
+
+    fd = mkstemp(tfnwd);
+    if(fd == -1) {
+      perror("ERROR CREATING TEMPORARY FILE FOR SMT2 DUMPING");
+    }
+
+    FILE *f = fdopen(fd,"w+");
+    if(f==NULL) {
+	  perror("ERROR OPENING FILE FOR SMT2 DUMPING");	
+	}
 	
 	(void)jenv;
     (void)jcls;
+	
 	arg1 = *(Btor **)&jarg1; 
 	
 	char * buffer = 0;
     long length;
-    FILE *f = 0;
-    f = fopen(filename, "w+");
-	if(f==NULL) {
-	  perror("ERROR");	
-	}
-
-	fclose (f);
     
     //write
     boolector_dump_smt2(arg1, f);
     
     //read
-    if (f)
-    {
+    if (f) {
      fseek (f, 0, SEEK_END);
       length = ftell (f);
       fseek (f, 0, SEEK_SET);
      buffer = malloc (length);
-     if (buffer)
-     {
-      if(fread (buffer, 1, length, f) != (unsigned long)length) {
+     if (buffer) {
+       if(fread (buffer, 1, length, f) != (unsigned long)length) {
 		  perror("ERROR READING FILE INTO BUFFER");
-	  }
+	    }
       }
-      fclose (f);
     }
 
-    if (buffer)
-    {
-     result = buffer;
+    if (buffer) {
+      result = buffer;
     }
-	
-	int delIn = remove(filename);
-	if(delIn != 0) {
-	  perror("Error deleting temporary text file");	
-	}
 	
 	
 	if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+	unlink(tfnwd);  //only call if file is not needed anymore as the next close() will delete the temp-file
+	free(tfnwd);
+    fclose (f);
     return jresult;
 }
 	
@@ -3470,11 +3497,16 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     int32_t status = (int32_t) 0 ;
 	char *errormsg = (char *) 0 ;
 	bool parsedFlag = (bool) 0;
-	char filenameIn[] = "tempparse.txt";
-	char filenameOut[] = "tempout.txt";
+	char fnIn[] = "boolector_help_parse_tempinfile-XXXXXX";
+	char fnOut[] = "boolector_help_parse_tempoutfile-XXXXXX";
+	char *tfnwdIn = addTemppathToFilename(fnIn);
+    int fdIn = -1;
+	char *tfnwdOut = addTemppathToFilename(fnOut);
+    int fdOut = -1;
 	
 	(void)jenv;
     (void)jcls;
+	
 	arg1 = *(Btor **)&jarg1; 
 	char *arg2 = (char *) 0 ;
     if (jarg2) {
@@ -3483,34 +3515,39 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     }
 	
     FILE *fparse = 0;
-    fparse = fopen(filenameIn, "w+");
+	fdIn = mkstemp(tfnwdIn);
+    if(fdIn == -1) {
+      perror("ERROR CREATING TEMPORARY FILE FOR");
+    }
+    fparse = fdopen(fdIn, "w+");
 	if(fparse==NULL) {
 	  perror("ERROR_INPUTFILE");	
 	}
 	fputs(arg2, fparse);
-	fclose (fparse);
 		
 	FILE *fout = 0;
-    fout = fopen(filenameOut, "w+");
+	fdOut = mkstemp(tfnwdOut);
+    if(fdOut == -1) {
+      perror("ERROR CREATING TEMPORARY FILE FOR");
+    }
+    fout = fdopen(fdOut, "w+");
 	if(fout==NULL) {
 	  perror("ERROR_OUTPUTFILE");	
 	}
-    fclose (fout);
 		
     //"read" (parse)
-    result = boolector_parse(arg1, fparse, filenameIn, fout, &errormsg, &status, &parsedFlag);
+    result = boolector_parse(arg1, fparse, tfnwdIn, fout, &errormsg, &status, &parsedFlag);
     jresult = (jint)result;
 	
-	int delIn = remove(filenameIn);
-	if(delIn != 0) {
-	  perror("Error deleting temporary text inputfile");	
-	}
+	unlink(tfnwdIn);
+	free(tfnwdIn);
+	fclose(fparse);
 	
-	int delOut = remove(filenameOut);
-	if(delOut != 0) {
-	  perror("Error deleting temporary text outputfile");	
-	}		
+	unlink(tfnwdOut);  
+	free(tfnwdOut);
+	fclose(fout);
 	
+	//TODO: better return value (Array with errormsg status parsedflag)
     return jresult;
 }
 	
@@ -3519,7 +3556,14 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	jstring jresult = 0;
 	Btor *arg1 = (Btor *) 0 ;
     char *result = 0 ;
-	char *filename = "tempdump.txt";
+	char filename[] = "boolector_help_dump_node_smt2_tempinfile-XXXXXX";
+	char *tfnwd = addTemppathToFilename(filename);
+    int fd = -1;
+
+    fd = mkstemp(tfnwd);
+    if(fd == -1) {
+      perror("ERROR CREATING TEMPORARY FILE FOR");
+    }
 	
 	(void)jenv;
     (void)jcls;
@@ -3527,48 +3571,42 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 	
 	char * buffer = 0;
     long length;
-  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  arg2 = *(BoolectorNode **)&jarg2; 
+    BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+    arg2 = *(BoolectorNode **)&jarg2; 
 	
     FILE *f = 0;
-    f = fopen(filename, "w+");
+    f = fdopen(fd, "w+");
 	if(f==NULL) {
 	  perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");	
 	}
 
-	//fclose (f);
     
     //write
     boolector_dump_smt2_node(arg1, f, arg2);
     
     //read
-    if (f)
-    {
+    if (f) {
      fseek (f, 0, SEEK_END);
       length = ftell (f);
       fseek (f, 0, SEEK_SET);
-     buffer = malloc (length);
+     buffer = malloc (length);		//We leak this memory at the moment!
      if (buffer)
      {
        if(fread (buffer, 1, length, f) != (unsigned long)length) {
 		   perror("ERROR READING FILE INTO BUFFER");
 	   }
       }
-      fclose (f);
     }
 
-    if (buffer)
-    {
-     result = buffer;
+    if (buffer) {
+      result = buffer;
     }
 	
-	int delIn = remove(filename);
-	if(delIn != 0) {
-	  perror("Error deleting temporary text file");	
-	}
-	
-	
 	if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+	
+	unlink(tfnwd); 
+	free(tfnwd);
+    fclose(f);	
     return jresult;
 }
 	
@@ -3698,9 +3736,9 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 
   boolector_set_term(arg1, &java_termination_callback, helper);
   
-  //Returns address to helper to be freed after termination has been called. See method bla
+  //Returns address to helper to be freed after termination has been called. See method boolector_free_termination
   return (long)helper;
-  //TODO: test; pray for the machine spirit;
+
 }
 
 

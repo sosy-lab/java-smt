@@ -87,7 +87,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * Boolector should throw its own exceptions that tell you what went wrong!
    */
   @Override
-  public boolean isUnsat() throws SolverException {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = BtorJNI.boolector_sat(btor);
@@ -97,9 +97,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;
     } else if (result == BtorJNI.BTOR_RESULT_UNKNOWN_get()) {
-      throw new SolverException(
-          "Boolector encountered a problem or ran out of stack or heap memory, "
-              + "try increasing their sizes.");
+      if (BtorJNI.boolector_terminate(btor) == 0) {
+        throw new SolverException(
+            "Boolector has encountered a problem or ran out of stack or heap memory, "
+                + "try increasing their sizes.");
+      } else {
+        throw new InterruptedException("Boolector was terminated via ShutdownManager.");
+      }
     } else {
       throw new SolverException("Boolector sat call returned " + result);
     }
