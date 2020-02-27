@@ -74,6 +74,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvdiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvge_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvlshr;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvmul;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvpower;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvproduct;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvrem;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsdiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsge_atom;
@@ -102,6 +104,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_v
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_power;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
@@ -383,11 +386,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_POWER_PRODUCT:
         if (yices_type_is_bitvector(yices_type_of_term(pF))) {
           functionKind = FunctionDeclarationKind.BV_MUL;
-          functionArgs = getMultiplyArgs(pF);
+          functionArgs = getMultiplyArgs(pF, true);
           functionDeclaration = -YICES_BV_MUL;
+          // TODO Product of more then 2 bitvectors ?
         } else {
           functionKind = FunctionDeclarationKind.MUL;
-          functionArgs = getMultiplyArgs(pF);
+          functionArgs = getMultiplyArgs(pF, false);
         }
         break;
       case YICES_BIT_TERM:
@@ -495,7 +499,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       int term = Integer.parseInt(child[1]);
       if (term == -1) { // No term just a number
         children.add(yices_parse_rational(coeff));
-      } else { // return only term / ignores coefficient
+      } else {
         int coeffTerm = yices_parse_rational(coeff);
         children.add(yices_mul(coeffTerm, term));
       }
@@ -515,7 +519,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       int term = component[component.length - 1];
       if (term == -1) { // No term
         children.add(coeff);
-      } else { // return only term / ignores coefficient
+      } else {
         children.add(yices_bvmul(coeff, term));
       }
     }
@@ -543,11 +547,16 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return ImmutableList.of(coeffTerm, term);
   }
 
-  private static List<Integer> getMultiplyArgs(int parent) {
+  private static List<Integer> getMultiplyArgs(int parent, boolean isBV) {
+    // TODO Add exponent?
     List<Integer> result = new ArrayList<>();
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       int[] component = yices_product_component(parent, i);
-      result.add(component[0]); // add term, ignore exponent
+      if (isBV) {
+        result.add(yices_bvpower(component[0], component[1]));
+      } else {
+        result.add(yices_power(component[0], component[1])); // add term, ignore exponent
+      }
     }
     return result;
   }
@@ -645,14 +654,13 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         case YICES_BV_ARRAY:
           return yices_bvarray(pArgs.size(), Ints.toArray(pArgs));
         case YICES_BV_MUL:
-          checkArgsLength("YICES_BV_MUL", pArgs, 2);
-          return yices_bvmul(pArgs.get(0), pArgs.get(1));
+          return yices_bvproduct(pArgs.size(), Ints.toArray(pArgs));
         case YICES_AND:
           return yices_and(pArgs.size(), Ints.toArray(pArgs));
         default:
           // TODO add more cases
           // if something bad happens here,
-          // in most cases the solution is a fix in the method getDeclarationKind
+          // in most cases the solution is a fix in the method visitFunctionApplication
           throw new IllegalArgumentException(
               String.format(
                   "Unknown function declaration with constructor %d and arguments %s (%s)",

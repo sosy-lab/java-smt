@@ -81,6 +81,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational32;
@@ -656,4 +657,17 @@ public class Yices2NativeApiTest {
     int constructor = yices_term_constructor(add);
     assertThat(constructor).isEqualTo(YICES_BV_SUM);
   }
+
+  @Test
+  public void bvMul() {
+    int type = yices_bv_type(5);
+    int bv1 = yices_parse_bvbin("00001");
+    int bv2 = yices_named_variable(type, "x");
+    int mul = yices_bvmul(bv2, bv2);
+    System.out.println(yices_term_constructor(mul));
+    int[] component = yices_product_component(mul, 0);
+    System.out.println(component[0]);
+    System.out.println(component[1]);
+  }
+
 }

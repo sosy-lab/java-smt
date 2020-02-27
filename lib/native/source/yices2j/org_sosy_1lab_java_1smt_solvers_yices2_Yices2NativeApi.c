@@ -1085,7 +1085,7 @@ CALL2(int, rational_const_value)
 MPQ_RETURN(2)
 
 //TODO FREE strings/arrays // setObjectiveArray
-DEFINE_FUNC(objectArray, 1sum_1component) WITH_THREE_ARGS(jterm, int, object)
+DEFINE_FUNC(objectArray, 1sum_1component) WITH_TWO_ARGS(jterm, int)
 TERM_ARG(1)
 SIMPLE_ARG(int32_t, 2)
 MPQ_ARG(3)
