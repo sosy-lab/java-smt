@@ -1141,7 +1141,7 @@ free(m_arg3);
 return jretval;
 }
 
-//TODO FREE strings/arrays
+//TODO FREE strings/arrays, Potential overflow uint32 -> jint
 DEFINE_FUNC(intArray, 1product_1component) WITH_TWO_ARGS(jterm, int)
 TERM_ARG(1)
 SIMPLE_ARG(int32_t, 2)

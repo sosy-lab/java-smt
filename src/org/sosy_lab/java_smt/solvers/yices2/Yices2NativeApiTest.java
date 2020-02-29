@@ -48,6 +48,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconst_one;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bveq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvmul;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvpower;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
@@ -668,6 +669,7 @@ public class Yices2NativeApiTest {
     int[] component = yices_product_component(mul, 0);
     System.out.println(component[0]);
     System.out.println(component[1]);
+    System.out.println(yices_term_constructor(yices_bvpower(component[0], component[1])));
   }
 
 }

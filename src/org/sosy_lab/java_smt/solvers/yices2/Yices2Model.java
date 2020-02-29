@@ -25,6 +25,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_FUNCTION
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_MAPPING;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_SCALAR;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_TUPLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
@@ -96,7 +97,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     List<Integer> complex =
-        ImmutableList.of(YVAL_SCALAR, YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN);
+        ImmutableList.of(YVAL_SCALAR, YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN, YVAL_TUPLE);
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int[] termsInModel = yices_def_terms(model);
     for (int i = 0; i < termsInModel.length; i++) {
