@@ -671,5 +671,4 @@ public class Yices2NativeApiTest {
     System.out.println(component[1]);
     System.out.println(yices_term_constructor(yices_bvpower(component[0], component[1])));
   }
-
 }
