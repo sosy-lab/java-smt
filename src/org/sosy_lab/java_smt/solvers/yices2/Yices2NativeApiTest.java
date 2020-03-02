@@ -662,7 +662,6 @@ public class Yices2NativeApiTest {
   @Test
   public void bvMul() {
     int type = yices_bv_type(5);
-    int bv1 = yices_parse_bvbin("00001");
     int bv2 = yices_named_variable(type, "x");
     int mul = yices_bvmul(bv2, bv2);
     System.out.println(yices_term_constructor(mul));
