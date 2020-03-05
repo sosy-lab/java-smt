@@ -414,6 +414,22 @@ class BtorJNI {
   protected static final native long boolector_rori(long btor, long node, int nbits);
 
   /**
+   * Returns int representation of BOOLECTOR_PARSE_ERROR. Used for checking return value of
+   * boolector_help_parse().
+   *
+   * @return int BOOLECTOR_PARSE_UNKNOWN
+   */
+  protected static final native int boolector_help_get_parse_error();
+
+  /**
+   * Returns int representation of BOOLECTOR_PARSE_UNKNOWN. Used for checking return value of
+   * boolector_help_parse().
+   *
+   * @return int BOOLECTOR_PARSE_UNKNOWN
+   */
+  protected static final native int boolector_help_get_parse_unknown();
+
+  /**
    * Returns string dump in smt2 format of the entire formula. No guarantee that that string is
    * useful.
    *
@@ -437,9 +453,11 @@ class BtorJNI {
    *
    * @param jarg1 btor
    * @param jarg2 string to parse
-   * @return int representing boolector error/sat codes.
+   * @return String[5] with following contents in that order (original data-type in brackets): 1.
+   *         return value (int); 2. outputfile (String); 3. error_msg(String); 4. status(int); 5.
+   *         parsed_smt2(Bool as 1(true) or 0(false))
    */
-  protected static final native int boolector_help_parse(long jarg1, String jarg2);
+  protected static final native String[] boolector_help_parse(long jarg1, String jarg2);
 
   /**
    * Gives back the assignment of the array node entered. Return will be arguments and assignments
