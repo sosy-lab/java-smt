@@ -96,7 +96,7 @@ class SmtInterpolBooleanFormulaManager
   @Override
   protected Term andImpl(Collection<Term> pParams) {
     // SMTInterpol does all simplifications itself
-    return theory.and(pParams.toArray(new Term[pParams.size()]));
+    return theory.and(pParams.toArray(new Term[0]));
   }
 
   @Override
@@ -112,7 +112,7 @@ class SmtInterpolBooleanFormulaManager
   @Override
   protected Term orImpl(Collection<Term> pParams) {
     // SMTInterpol does all simplifications itself
-    return theory.or(pParams.toArray(new Term[pParams.size()]));
+    return theory.or(pParams.toArray(new Term[0]));
   }
 
   @Override

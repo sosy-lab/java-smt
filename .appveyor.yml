@@ -1,20 +1,21 @@
 version: build {build} {branch}
 
-os: Visual Studio 2015
+os: Visual Studio 2019
 
 clone_depth: 1
 
 install:
   - ps: |
       Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\ant\apache-ant-1.9.9" )) {
+      if (!(Test-Path -Path "C:\ant\apache-ant-1.10.7" )) {
         (new-object System.Net.WebClient).DownloadFile(
-        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip',
+        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.7-bin.zip',
           'C:\ant-bin.zip'
         )
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
       }
-  - cmd: SET PATH=C:\ant\apache-ant-1.9.9\bin;%JAVA_HOME%\bin;%PATH%
+  - cmd: SET JAVA_HOME=C:\Program Files\Java\jdk13
+  - cmd: SET PATH=C:\ant\apache-ant-1.10.7\bin;%JAVA_HOME%\bin;%PATH%
   - cmd: SET IVY_CACHE_DIR=C:\ivy
   - cmd: echo %USERPROFILE%
   - cmd: echo %PATH%
@@ -28,9 +29,13 @@ test_script:
 
 on_finish:
   - ps: |
+      $wc = New-Object 'System.Net.WebClient'
+      $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "*VariableNames*"
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      $file = '.\junit\TESTS-TestSuites.xml'
-      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
+      foreach($file in $files){
+        echo $file.FullName
+        $wc.UploadFile($url, $file.FullName)
+      }
   - ps: |
       Push-AppveyorArtifact JUnit.html -DeploymentName "JUnit Report"
 

@@ -7,7 +7,7 @@
       <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 
       <description homepage="https://github.com/sosy-lab/java-smt">
-          Java wrapper for Z3, MathSAT5, SMTInterpol, Princess, CVC4, and Yices2 SMT solvers.
+          Java wrapper for SMT solvers like Z3, MathSAT5, SMTInterpol, Princess, CVC4, Boolector, and Yices2.
       </description>
     </info>
 
@@ -97,8 +97,8 @@
 
         <!-- Truth
              Library for writing literal assertions. -->
-        <dependency org="com.google.truth" name="truth" rev="1.0" conf="test->default; contrib->sources"/>
-        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.0" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth" name="truth" rev="1.0.1" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.0.1" conf="test->default; contrib->sources"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
@@ -120,11 +120,11 @@
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="runtime->default; contrib->sources"/>
 
         <!-- Checkstyle -->
-        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.36.0" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.26" conf="checkstyle->default"/>
+        <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.1" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.29" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-533-ga4ba1513" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-604-g71e72f93" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
         <dependency org="uuverifiers" name="princess_2.12" rev="2019-11-20-assertionless" conf="runtime-princess->default; contrib->sources">
@@ -133,7 +133,7 @@
                because the latter does not provide a separate JAR for java-cup-runtime. -->
           <exclude org="net.sf.squirrel-sql.thirdparty-non-maven" name="java-cup"/>
         </dependency>
-        <dependency org="edu.tum.cs" name="java-cup" rev="11a" conf="runtime->runtime"/>
+        <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime->runtime"/>
 
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.4-sosy0" conf="runtime-mathsat->solver-mathsat" />

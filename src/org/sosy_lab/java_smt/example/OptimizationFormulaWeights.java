@@ -103,7 +103,7 @@ public class OptimizationFormulaWeights {
     logger.log(
         Level.INFO,
         "maximal sum ",
-        prover.upper(handle, Rational.ZERO).get(),
+        prover.upper(handle, Rational.ZERO).orElseThrow(),
         "with model",
         prover.getModel());
   }

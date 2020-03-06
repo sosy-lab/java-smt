@@ -31,6 +31,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_test;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
@@ -108,6 +109,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private final ShutdownNotifier shutdownNotifier;
   private final TerminationTest terminationTest;
   private final Mathsat5FormulaCreator creator;
+  private boolean closed = false;
 
   private static boolean loaded = false;
 
@@ -254,18 +256,21 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options);
   }
 
@@ -281,12 +286,16 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    logger.log(Level.FINER, "Freeing Mathsat environment");
-    msat_destroy_env(creator.getEnv());
-    msat_destroy_config(mathsatConfig);
+    if (!closed) {
+      closed = true;
+      logger.log(Level.FINER, "Freeing Mathsat environment");
+      msat_destroy_env(creator.getEnv());
+      msat_destroy_config(mathsatConfig);
+    }
   }
 
   long addTerminationTest(long env) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     return msat_set_termination_test(env, terminationTest);
   }
 

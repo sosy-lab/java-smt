@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
-class Z3Model extends CachingAbstractModel<Long, Long, Long> {
+final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;

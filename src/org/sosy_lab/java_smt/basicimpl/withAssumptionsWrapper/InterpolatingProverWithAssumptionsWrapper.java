@@ -120,7 +120,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
     private boolean solverAssumptionsContainsVar(String variableName) {
       for (BooleanFormula solverVar : solverAssumptionsAsFormula) {
-        if (fmgr.extractVariables(solverVar).keySet().contains(variableName)) {
+        if (fmgr.extractVariables(solverVar).containsKey(variableName)) {
           return true;
         }
       }

@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
@@ -75,6 +76,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   private final LogManager logger;
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
+  private boolean closed = false;
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
@@ -228,6 +230,7 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     long z3context = creator.getEnv();
     Native.paramsSetBool(
         z3context,
@@ -247,6 +250,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     long z3context = creator.getEnv();
     Native.paramsSetBool(z3context, z3params, Native.mkStringSymbol(z3context, ":model"), true);
     Native.paramsSetBool(
@@ -258,6 +262,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     Z3OptimizationProver out =
         new Z3OptimizationProver(creator, logger, z3params, manager, options);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
@@ -282,11 +287,14 @@ final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    long context = creator.getEnv();
-    creator.forceClose();
-    Native.paramsDecRef(context, z3params);
-    Native.closeLog();
-    Native.delContext(context);
+    if (!closed) {
+      closed = true;
+      long context = creator.getEnv();
+      creator.forceClose();
+      Native.paramsDecRef(context, z3params);
+      Native.closeLog();
+      Native.delContext(context);
+    }
   }
 
   @Override

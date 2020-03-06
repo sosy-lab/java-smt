@@ -25,12 +25,11 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
-import java.util.Iterator;
+import java.util.function.Supplier;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -364,12 +363,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     }
 
     // remove non-duplicates
-    Iterator<Multiset.Entry<String>> it = funDeclares.entrySet().iterator();
-    while (it.hasNext()) {
-      if (it.next().getCount() <= 1) {
-        it.remove();
-      }
-    }
+    funDeclares.entrySet().removeIf(pStringEntry -> pStringEntry.getCount() <= 1);
     assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 

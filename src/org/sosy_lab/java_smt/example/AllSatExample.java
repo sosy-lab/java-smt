@@ -64,6 +64,8 @@ public class AllSatExample {
         prover.push();
         System.out.println(ase.allSatIntegers2());
         prover.pop();
+      } catch (UnsupportedOperationException e) {
+        System.out.println("    " + e.getMessage());
       }
     }
   }
@@ -85,7 +87,7 @@ public class AllSatExample {
     prover.addConstraint(bfmgr.implication(p, q));
 
     return prover.allSat(
-        new AllSatCallback<List<List<BooleanFormula>>>() {
+        new AllSatCallback<>() {
 
           List<List<BooleanFormula>> models = new ArrayList<>();
 

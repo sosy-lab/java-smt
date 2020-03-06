@@ -44,7 +44,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * #proverEnvironments()}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
-public class ProverEnvironmentSubject extends Subject {
+public final class ProverEnvironmentSubject extends Subject {
 
   private final BasicProverEnvironment<?> stackUnderTest;
 
@@ -59,14 +59,14 @@ public class ProverEnvironmentSubject extends Subject {
    */
   public static Subject.Factory<ProverEnvironmentSubject, BasicProverEnvironment<?>>
       proverEnvironments() {
-    return (metadata, formula) -> new ProverEnvironmentSubject(metadata, formula);
+    return ProverEnvironmentSubject::new;
   }
 
   /**
    * Use this for checking assertions about ProverEnvironments with Truth: <code>
    * assertThat(stack).is...()</code>.
    */
-  public static final ProverEnvironmentSubject assertThat(BasicProverEnvironment<?> prover) {
+  public static ProverEnvironmentSubject assertThat(BasicProverEnvironment<?> prover) {
     return assert_().about(proverEnvironments()).that(prover);
   }
 

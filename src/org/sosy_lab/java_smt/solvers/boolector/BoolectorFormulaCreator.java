@@ -62,7 +62,8 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
       long sort = BtorJNI.boolector_get_sort(getEnv(), extractInfo(pFormula));
       checkArgument(
           BtorJNI.boolector_is_bitvec_sort(getEnv(), sort),
-          "BitvectorFormula with type missmatch: " + pFormula);
+          "BitvectorFormula with type missmatch: %s",
+          pFormula);
       return (FormulaType<T>)
           FormulaType.getBitvectorTypeWithSize(
               BtorJNI.boolector_get_width(getEnv(), extractInfo(pFormula)));

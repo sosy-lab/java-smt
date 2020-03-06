@@ -20,12 +20,12 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.List;
-import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,6 +39,9 @@ import org.sosy_lab.java_smt.api.visitors.ExpectedFormulaVisitor;
 
 @RunWith(Parameterized.class)
 public class UFManagerTest extends SolverBasedTest0 {
+
+  private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
+
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -55,20 +58,10 @@ public class UFManagerTest extends SolverBasedTest0 {
   @Test
   public void testDeclareAndCallUFWithInt() {
     requireIntegers();
-    List<String> names = ImmutableList.of("Func", "|Func|", "(Func)");
-    for (String name : names) {
-      Formula f;
-      try {
-        f =
-            fmgr.declareAndCallUF(
-                name, FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
-      } catch (RuntimeException e) {
-        if (name.equals("|Func|")) {
-          throw new AssumptionViolatedException("unsupported UF name", e);
-        } else {
-          throw e;
-        }
-      }
+    for (String name : VALID_NAMES) {
+      Formula f =
+          fmgr.declareAndCallUF(
+              name, FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
       Truth.assertThat(declaration.getName()).isEqualTo(name);
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
@@ -76,30 +69,39 @@ public class UFManagerTest extends SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
+  @Test(expected = IllegalArgumentException.class)
+  public void testDeclareAndCallUFWithIntWithUnsupportedName() {
+    requireIntegers();
+    fmgr.declareAndCallUF("|Func|", FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
+    assert_().fail();
+  }
+
   @Test
   public void testDeclareAndCallUFWithBv() {
     requireBitvectors();
-    List<String> names = ImmutableList.of("Func", "|Func|", "(Func)");
-    for (String name : names) {
-      Formula f;
-      try {
-        f =
-            fmgr.declareAndCallUF(
-                name,
-                FormulaType.getBitvectorTypeWithSize(4),
-                ImmutableList.of(bvmgr.makeBitvector(4, 1)));
-      } catch (RuntimeException e) {
-        if (name.equals("|Func|")) {
-          throw new AssumptionViolatedException("unsupported UF name", e);
-        } else {
-          throw e;
-        }
-      }
+    for (String name : VALID_NAMES) {
+      Formula f =
+          fmgr.declareAndCallUF(
+              name,
+              FormulaType.getBitvectorTypeWithSize(4),
+              ImmutableList.of(bvmgr.makeBitvector(4, 1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
       Truth.assertThat(declaration.getName()).isEqualTo(name);
       Formula f2 = mgr.makeApplication(declaration, bvmgr.makeBitvector(4, 1));
       Truth.assertThat(f2).isEqualTo(f);
     }
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  @Test(expected = IllegalArgumentException.class)
+  public void testDeclareAndCallUFWithBvWithUnsupportedName() {
+    requireBitvectors();
+    fmgr.declareAndCallUF(
+        "|Func|",
+        FormulaType.getBitvectorTypeWithSize(4),
+        ImmutableList.of(bvmgr.makeBitvector(4, 1)));
+    assert_().fail();
   }
 
   @Test
@@ -183,7 +185,7 @@ public class UFManagerTest extends SolverBasedTest0 {
         .isNotEqualTo(Solvers.BOOLECTOR);
     return mgr.visit(
         pFormula,
-        new ExpectedFormulaVisitor<FunctionDeclaration<?>>() {
+        new ExpectedFormulaVisitor<>() {
           @Override
           public FunctionDeclaration<?> visitFunction(
               Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {

@@ -204,7 +204,7 @@ class PrincessFormulaCreator
       Sort sort = Sort$.MODULE$.sortOf(input);
       scala.Option<Object> bitWidth = getBitWidth(sort);
       checkArgument(
-          bitWidth.isDefined(), "BitvectorFormula with actual type " + sort + ": " + pFormula);
+          bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
@@ -306,7 +306,7 @@ class PrincessFormulaCreator
       final FunctionDeclarationKind kind = getDeclarationKind(input);
 
       if (kind == FunctionDeclarationKind.EQ) {
-        scala.Option<scala.Tuple2<ap.parser.ITerm, ap.parser.ITerm>> maybeArgs =
+        scala.Option<scala.Tuple2<ITerm, ITerm>> maybeArgs =
             IExpression.Eq$.MODULE$.unapply((IFormula) input);
 
         assert maybeArgs.isDefined();

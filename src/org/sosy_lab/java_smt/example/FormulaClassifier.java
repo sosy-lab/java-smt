@@ -137,48 +137,48 @@ public class FormulaClassifier {
   @Override
   public String toString() {
     // build logic string
-    String logic = "";
+    StringBuilder logic = new StringBuilder();
     if (!v.hasQuantifiers) {
-      logic += "QF_";
+      logic.append("QF_");
     }
     if (v.hasArrays) {
-      logic += "A";
+      logic.append("A");
     }
     if (v.hasUFs) {
-      logic += "UF";
+      logic.append("UF");
     }
     if (v.hasBVs) {
-      logic += "BV";
+      logic.append("BV");
     }
     if (v.nonLinearArithmetic || v.linearArithmetic) {
       if (v.hasInts && v.hasReals) {
         if (v.nonLinearArithmetic) {
-          logic += "N";
+          logic.append("N");
         } else if (v.linearArithmetic) {
-          logic += "L";
+          logic.append("L");
         }
-        logic += "IRA";
+        logic.append("IRA");
       } else if (v.hasInts) {
         if (v.nonLinearArithmetic) {
-          logic += "N";
+          logic.append("N");
         } else if (v.linearArithmetic) {
-          logic += "L";
+          logic.append("L");
         }
-        logic += "IA";
+        logic.append("IA");
       } else if (v.hasReals) {
         if (v.nonLinearArithmetic) {
-          logic += "N";
+          logic.append("N");
         } else if (v.linearArithmetic) {
-          logic += "L";
+          logic.append("L");
         }
-        logic += "RA";
+        logic.append("RA");
       }
     }
     if (v.hasFloats) {
       // TODO forthcoming, see http://smtlib.cs.uiowa.edu/logics.shtml
-      logic += "FP";
+      logic.append("FP");
     }
-    return logic;
+    return logic.toString();
   }
 
   private static class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {

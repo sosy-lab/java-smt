@@ -49,7 +49,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * via the method {@link #booleanFormulasOf(SolverContext)}.
  */
 @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
-public class BooleanFormulaSubject extends Subject {
+public final class BooleanFormulaSubject extends Subject {
 
   private final SolverContext context;
   private final BooleanFormula formulaUnderTest;

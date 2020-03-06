@@ -34,7 +34,6 @@ import ap.parser.ITermITE;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.types.Sort;
 import ap.types.SortedIFunction$;
-import com.google.common.base.Preconditions;
 import java.util.List;
 import scala.collection.mutable.ArrayBuffer;
 
@@ -147,7 +146,7 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-      Preconditions.checkArgument(args.size() == 2);
+      checkArgument(args.size() == 2);
       return ((ITerm) args.get(0)).$eq$eq$eq((ITerm) args.get(1));
     }
   }
@@ -160,7 +159,7 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-      Preconditions.checkArgument(args.size() == 2);
+      checkArgument(args.size() == 2);
       return GroebnerMultiplication.mult((ITerm) args.get(0), (ITerm) args.get(1));
     }
   }

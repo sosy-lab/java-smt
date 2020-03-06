@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -384,8 +383,7 @@ public class SmtInterpolEnvironment {
     return script.term(funcname, params);
   }
 
-  public Term term(
-      String funcname, BigInteger[] indices, @Nullable Sort returnSort, Term... params) {
+  public Term term(String funcname, String[] indices, @Nullable Sort returnSort, Term... params) {
     return script.term(funcname, indices, returnSort, params);
   }
 
@@ -509,9 +507,9 @@ public class SmtInterpolEnvironment {
    * @throws IllegalArgumentException if symbol contains | or \.
    */
   private void checkSymbol(String symbol) throws SMTLIBException {
-    Preconditions.checkArgument(
+    checkArgument(
         symbol.indexOf('|') == -1 && symbol.indexOf('\\') == -1, "Symbol must not contain | or \\");
-    Preconditions.checkArgument(
+    checkArgument(
         !UNSUPPORTED_IDENTIFIERS.contains(symbol),
         "SMTInterpol does not support %s as identifier.",
         symbol);

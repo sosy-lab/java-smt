@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
 
-public class SmtInterpolSolverContext extends AbstractSolverContext {
+public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
   private final SmtInterpolEnvironment environment;
   private final SmtInterpolFormulaManager manager;

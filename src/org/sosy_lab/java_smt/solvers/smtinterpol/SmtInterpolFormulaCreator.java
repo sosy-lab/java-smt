@@ -191,7 +191,14 @@ class SmtInterpolFormulaCreator
         List<Formula> args =
             transformedImmutableListCopy(
                 app.getParameters(), term -> encapsulate(getFormulaType(term), term));
-        List<FormulaType<?>> argTypes = transformedImmutableListCopy(args, this::getFormulaType);
+        final List<FormulaType<?>> argTypes;
+        final Term definition = func.getDefinition();
+        if (definition == null) { // generic function application, e.g., EQUALS
+          argTypes = transformedImmutableListCopy(args, this::getFormulaType);
+        } else {
+          Sort[] paramSorts = ((ApplicationTerm) definition).getFunction().getParameterSorts();
+          argTypes = transformedImmutableListCopy(paramSorts, this::getFormulaTypeOfSort);
+        }
 
         // Any function application.
         return visitor.visitFunction(
@@ -297,13 +304,13 @@ class SmtInterpolFormulaCreator
 
   @Override
   public FunctionSymbol declareUFImpl(String pName, Sort returnType, List<Sort> pArgs) {
-    Sort[] types = pArgs.toArray(new Sort[pArgs.size()]);
+    Sort[] types = pArgs.toArray(new Sort[0]);
     return environment.declareFun(pName, types, returnType);
   }
 
   @Override
   public Term callFunctionImpl(FunctionSymbol declaration, List<Term> args) {
-    return environment.term(declaration.getName(), args.toArray(new Term[args.size()]));
+    return environment.term(declaration.getName(), args.toArray(new Term[0]));
   }
 
   @Override

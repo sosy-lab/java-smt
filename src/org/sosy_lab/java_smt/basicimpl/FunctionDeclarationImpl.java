@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 
 /** Declaration of a function. */
 @Immutable(containerOf = "T")
-public class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDeclaration<F> {
+public final class FunctionDeclarationImpl<F extends Formula, T> implements FunctionDeclaration<F> {
   private final String name;
   private final FunctionDeclarationKind kind;
   private final ImmutableList<FormulaType<?>> argumentTypes;

@@ -316,7 +316,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       final BiConsumer<String, Formula> pConsumer) {
 
     visitRecursively(
-        new DefaultFormulaVisitor<TraversalProcess>() {
+        new DefaultFormulaVisitor<>() {
 
           @Override
           protected TraversalProcess visitDefault(Formula f) {

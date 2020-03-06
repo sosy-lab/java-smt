@@ -19,7 +19,6 @@
  */
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_WRITE;
@@ -80,6 +79,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
@@ -175,17 +175,19 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     long env = getEnv();
     if (pFormula instanceof BitvectorFormula) {
       long type = msat_term_get_type(extractInfo(pFormula));
-      checkArgument(
-          msat_is_bv_type(env, type),
-          "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
+      if (!msat_is_bv_type(env, type)) {
+        throw new IllegalArgumentException(
+            "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
+      }
       return (FormulaType<T>)
           FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
 
     } else if (pFormula instanceof FloatingPointFormula) {
       long type = msat_term_get_type(extractInfo(pFormula));
-      checkArgument(
-          msat_is_fp_type(env, type),
-          "FloatingPointFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
+      if (!msat_is_fp_type(env, type)) {
+        throw new IllegalArgumentException(
+            "FloatingPointFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
+      }
       return (FormulaType<T>)
           FormulaType.getFloatingPointType(
               msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
@@ -322,7 +324,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
     } else {
 
-      final String name = msat_decl_get_name(msat_term_get_decl(f));
+      final long declaration = msat_term_get_decl(f);
+      final String name = msat_decl_get_name(declaration);
       if (arity == 0 && name.startsWith("'")) {
         // symbols starting with "'" are missed as constants, but seen as functions of type OTHER
         return visitor.visitFreeVariable(formula, name);
@@ -331,10 +334,13 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
+        // argumentType can be sub-type of parameterType, e.g., int < rational
         long arg = msat_term_get_arg(f, i);
         FormulaType<?> argumentType = getFormulaType(arg);
         args.add(encapsulate(argumentType, arg));
-        argTypes.add(argumentType);
+        long argType = msat_decl_get_arg_type(declaration, i);
+        FormulaType<?> parameterType = getFormulaTypeFromTermType(argType);
+        argTypes.add(parameterType);
       }
 
       return visitor.visitFunction(

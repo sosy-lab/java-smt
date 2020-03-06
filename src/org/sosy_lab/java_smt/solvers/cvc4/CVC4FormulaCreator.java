@@ -32,6 +32,7 @@ import edu.nyu.acsys.CVC4.Expr;
 import edu.nyu.acsys.CVC4.ExprManager;
 import edu.nyu.acsys.CVC4.FloatingPoint;
 import edu.nyu.acsys.CVC4.FloatingPointSize;
+import edu.nyu.acsys.CVC4.FunctionType;
 import edu.nyu.acsys.CVC4.Integer;
 import edu.nyu.acsys.CVC4.Kind;
 import edu.nyu.acsys.CVC4.Rational;
@@ -88,7 +89,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     Expr exp = variablesCache.computeIfAbsent(name, n -> exprManager.mkVar(name, type));
     Preconditions.checkArgument(
         type.equals(exp.getType()),
-        "symbol name already in use for different type " + exp.getType());
+        "symbol name already in use for different type %s",
+        exp.getType());
     return exp;
   }
 
@@ -132,12 +134,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     Type t = extractInfo(pFormula).getType();
     if (pFormula instanceof BitvectorFormula) {
-      checkArgument(t.isBitVector(), "BitvectorFormula with actual type " + t + ": " + pFormula);
+      checkArgument(t.isBitVector(), "BitvectorFormula with actual type %s: %s", t, pFormula);
       return (FormulaType<T>) getFormulaType(extractInfo(pFormula));
 
     } else if (pFormula instanceof FloatingPointFormula) {
       checkArgument(
-          t.isFloatingPoint(), "FloatingPointFormula with actual type " + t + ": " + pFormula);
+          t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
       edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
           FormulaType.getFloatingPointType(
@@ -299,8 +301,20 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       for (Expr arg : f) {
         FormulaType<?> argType = getFormulaType(arg);
         args.add(encapsulate(argType, arg));
-        argsTypes.add(argType);
       }
+      Expr operator = f.getOperator();
+      if (operator.getType().isFunction()) {
+        vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
+        for (int i = 0; i < argTypes.size(); i++) {
+          argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
+        }
+      } else {
+        for (Expr arg : f) {
+          argsTypes.add(getFormulaType(arg));
+        }
+      }
+
+      Preconditions.checkState(args.size() == argsTypes.size());
 
       // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
       // part of the operator itself, thus the arity is one too small and there might be no
@@ -413,7 +427,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
-    if (pArgs.size() == 0) {
+    if (pArgs.isEmpty()) {
       return exprManager.mkExpr(pDeclaration);
     } else {
       vectorExpr args = new vectorExpr();

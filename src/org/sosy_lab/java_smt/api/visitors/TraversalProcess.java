@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
  * Return class that lets the visitor guide the recursive formula traversal process started with
  * {@link FormulaManager#visitRecursively}. or {@link BooleanFormulaManager#visitRecursively}.
  */
-public class TraversalProcess {
+public final class TraversalProcess {
   /** Continue traversal and recurse into current formula subtree. */
   public static final TraversalProcess CONTINUE =
       new TraversalProcess(TraversalType.CONTINUE_TYPE, ImmutableSet.of());

@@ -23,7 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 /** Collection of utilities for working with SmtInterpol. */
-class SmtInterpolUtil {
+final class SmtInterpolUtil {
   private SmtInterpolUtil() {}
 
   /** this function can be used to print a bigger term. */
@@ -34,9 +34,7 @@ class SmtInterpolUtil {
   }
 
   private static void prettyPrint(Term t, StringBuilder str, int n) {
-    for (int i = 0; i < n; i++) {
-      str.append("  ");
-    }
+    str.append("  ".repeat(n));
     if (t instanceof ApplicationTerm) {
       ApplicationTerm at = (ApplicationTerm) t;
       String function = at.getFunction().getName();
@@ -45,9 +43,7 @@ class SmtInterpolUtil {
         for (Term child : at.getParameters()) {
           prettyPrint(child, str, n + 1);
         }
-        for (int i = 0; i < n; i++) {
-          str.append("  ");
-        }
+        str.append("  ".repeat(n));
         str.append(")\n");
       } else {
         str.append(t.toStringDirect()).append('\n');

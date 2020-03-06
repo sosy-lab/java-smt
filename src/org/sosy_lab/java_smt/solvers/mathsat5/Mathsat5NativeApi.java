@@ -195,7 +195,7 @@ class Mathsat5NativeApi {
           throw new SolverException(msg);
         }
 
-        String code = (resultCode == MSAT_UNKNOWN) ? "\"unknown\"" : resultCode + "";
+        String code = (resultCode == MSAT_UNKNOWN) ? "\"unknown\"" : String.valueOf(resultCode);
         throw new IllegalStateException(
             "msat_solve returned " + code + (msg != null ? ": " + msg : ""));
     }

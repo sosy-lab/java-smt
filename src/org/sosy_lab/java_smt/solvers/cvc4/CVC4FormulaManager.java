@@ -112,7 +112,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
 
               @Override
               public void write(int chr) throws IOException {
-                out.append(Character.valueOf((char) chr));
+                out.append((char) chr);
               }
             }) {
           f.toStream(stream);

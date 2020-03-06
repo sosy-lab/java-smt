@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
             Arrays.asList(NonLinearArithmetic.values()))
         .stream()
-        .map(e -> e.toArray())
+        .map(List::toArray)
         .collect(toImmutableList());
   }
 

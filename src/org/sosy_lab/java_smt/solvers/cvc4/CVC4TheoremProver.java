@@ -169,7 +169,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     Preconditions.checkState(!closed);
     setChanged();
     assertedFormulas.pop();
-    Preconditions.checkState(assertedFormulas.size() > 0, "initial level must remain until close");
+    Preconditions.checkState(!assertedFormulas.isEmpty(), "initial level must remain until close");
     if (incremental) {
       smtEngine.pop();
     }
