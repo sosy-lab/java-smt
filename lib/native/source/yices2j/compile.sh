@@ -38,24 +38,27 @@ cd ${DIR}
 
 JNI_HEADERS="$(../get_jni_headers.sh)"
 
-if [ ! -f "$1/build/x86_64-pc-linux-gnu-release/lib/libyices.a" ]; then
-	echo "You need to specify the directory with the downloaded and compiled Yices on the command line!"
+RELATIVE_ROOT_DIR="../../../.."
+YICES_SRC_DIR=$RELATIVE_ROOT_DIR/"$1"/src/include
+YICES_LIB_DIR=$RELATIVE_ROOT_DIR/"$1"/build/x86_64-pc-linux-gnu-release/lib/
+GMP_HEADER_DIR=$RELATIVE_ROOT_DIR/"$2"
+GMP_LIB_DIR=$GMP_HEADER_DIR/.libs
+GPERF_HEADER_DIR=$RELATIVE_ROOT_DIR/"$3"
+GPERF_LIB_DIR=$GPERF_HEADER_DIR/lib
+
+if [ ! -f "$YICES_LIB_DIR/libyices.a" ]; then
+    echo "You need to specify the directory with the downloaded and compiled Yices on the command line!"
+    echo "Can not find $YICES_LIB_DIR/libyices.a"
 	exit 1
 fi
-
-YICES_SRC_DIR="$1"/src/include
-YICES_LIB_DIR="$1"/build/x86_64-pc-linux-gnu-release/lib/
-GMP_LIB_DIR="$2"/.libs
-GMP_HEADER_DIR="$2"
-GPERF_LIB_DIR="$3"/lib
-GPERF_HEADER_DIR="$3"
-
 if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
-	echo "You need to specify the GMP directory on the command line!"
+    echo "You need to specify the GMP directory on the command line!"
+    echo "Can not find $GMP_LIB_DIR/libgmp.a"
 	exit 1
 fi
 if [ ! -f "$GPERF_LIB_DIR/libgp.a" ]; then
-	echo "You need to specify the GPERF directory on the command line!"
+    echo "You need to specify the GPERF directory on the command line!"
+    echo "Can not find $GPERF_LIB_DIR/libgp.a"
 	exit 1
 fi
 
