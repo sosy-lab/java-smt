@@ -92,6 +92,14 @@ public class SolverContextTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
+    // Yices2 allows nothing, lets abort here.
+    assume()
+        .withMessage(
+            "Solver %s does not support to access formulae after closing the context",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     assertThat(bmgr.isTrue(term)).isFalse();
     assertThat(bmgr.isFalse(term)).isFalse();
     assertThat(bmgr.isTrue(termTrue)).isTrue();
@@ -104,14 +112,6 @@ public class SolverContextTest extends SolverBasedTest0 {
             solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
-
-    // Yices2 allows simple checks (comparison against constants like TRUE/FALSE), lets abort here.
-    assume()
-        .withMessage(
-            "Solver %s does not support to access formulae after closing the context",
-            solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.YICES2);
 
     // try to access some data about formulae and managers
     assertThat(term.toString()).isEqualTo("variable");
