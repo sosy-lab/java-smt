@@ -111,7 +111,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return BtorJNI.boolector_version(creator.getEnv());
+    return "Boolector " + BtorJNI.boolector_version(creator.getEnv());
   }
 
   @Override
