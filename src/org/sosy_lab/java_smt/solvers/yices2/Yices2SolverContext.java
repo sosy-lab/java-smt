@@ -44,6 +44,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private final ShutdownNotifier shutdownManager;
 
   private static int numLoadedInstances = 0;
+  private boolean closed = false;
 
   public Yices2SolverContext(
       FormulaManager pFmgr,
@@ -59,12 +60,13 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic, ShutdownNotifier pShutdownManager) {
 
+    NativeLibraries.loadLibrary("yices2j");
+
     synchronized (Yices2SolverContext.class) {
       if (numLoadedInstances == 0) {
         // Avoid loading and initializing twice,
         // because this would make all existing terms and types unavailable,
         // which is bad behavior and a potential memory leak.
-        NativeLibraries.loadLibrary("yices2j");
         yices_init();
       }
       numLoadedInstances++;
@@ -97,10 +99,13 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public synchronized void close() {
-    synchronized (Yices2SolverContext.class) {
-      numLoadedInstances--;
-      if (numLoadedInstances == 0) {
-        yices_exit();
+    if (!closed) {
+      closed = true;
+      synchronized (Yices2SolverContext.class) {
+        numLoadedInstances--;
+        if (numLoadedInstances == 0) {
+          yices_exit();
+        }
       }
     }
   }
