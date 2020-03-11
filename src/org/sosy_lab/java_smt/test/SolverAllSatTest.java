@@ -80,7 +80,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
         // CVC4 and Boolector do not support interpolation
-        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
+        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.Z3);
 
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
         break;
