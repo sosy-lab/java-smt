@@ -28,6 +28,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext.SatSolver;
 
 public class BoolectorNativeApiTest {
@@ -92,6 +100,34 @@ public class BoolectorNativeApiTest {
       int result = BtorJNI.boolector_sat(btor1);
       assertThat(result).isEqualTo(BtorJNI.BTOR_RESULT_SAT_get());
       BtorJNI.boolector_delete(btor1);
+    }
+  }
+
+  /**
+   * For each available solver, we build a context and solver a small formula.
+   *
+   * This should be sufficient to test whether the sat-solver can be loaded.
+   */
+  @Test
+  public void satSolverBackendTest()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+
+    for (SatSolver satsolver : BoolectorSolverContext.SatSolver.values()) {
+      ConfigurationBuilder config =
+          Configuration.builder().setOption("solver.boolector.satSolver", satsolver.name());
+      try (BoolectorSolverContext context =
+          BoolectorSolverContext.create(config.build(), ShutdownNotifier.createDummy(), null, 1)) {
+        BooleanFormulaManager bfmgr = context.getFormulaManager().getBooleanFormulaManager();
+        BooleanFormula fa = bfmgr.makeVariable("a");
+        BooleanFormula fb = bfmgr.makeVariable("b");
+        BooleanFormula fc = bfmgr.makeVariable("c");
+        BooleanFormula f1 = bfmgr.or(fa, fb, fc);
+        BooleanFormula f2 = bfmgr.and(fa, fb, fc);
+        try (ProverEnvironment prover = context.newProverEnvironment()) {
+          prover.addConstraint(bfmgr.equivalence(f1, f2));
+          prover.isUnsat();
+        }
+      }
     }
   }
 }
