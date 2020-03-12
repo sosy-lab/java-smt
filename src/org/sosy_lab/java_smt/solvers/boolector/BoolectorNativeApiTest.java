@@ -106,7 +106,7 @@ public class BoolectorNativeApiTest {
   /**
    * For each available solver, we build a context and solver a small formula.
    *
-   * This should be sufficient to test whether the sat-solver can be loaded.
+   * <p>This should be sufficient to test whether the sat-solver can be loaded.
    */
   @Test
   public void satSolverBackendTest()

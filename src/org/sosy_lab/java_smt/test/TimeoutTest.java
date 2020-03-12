@@ -139,17 +139,18 @@ public class TimeoutTest extends SolverBasedTest0 {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     BooleanFormula instance = gen.generate(20);
     expectedEx.expect(InterruptedException.class);
-    Thread t = new Thread() {
-      @Override
-      public void run() {
-        try {
-          sleep(1);
-          shutdownManager.requestShutdown("Shutdown Request");
-        } catch (InterruptedException pE) {
-          throw new UnsupportedOperationException("Unexpected interrupt");
-        }
-      }
-    };
+    Thread t =
+        new Thread() {
+          @Override
+          public void run() {
+            try {
+              sleep(1);
+              shutdownManager.requestShutdown("Shutdown Request");
+            } catch (InterruptedException pE) {
+              throw new UnsupportedOperationException("Unexpected interrupt");
+            }
+          }
+        };
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
       pe.push(instance);
       t.start();

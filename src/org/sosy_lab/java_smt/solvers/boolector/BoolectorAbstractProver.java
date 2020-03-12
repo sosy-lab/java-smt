@@ -60,9 +60,10 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     this.creator = creator;
     this.btor = btor;
 
-    terminationCallback = () -> {
-      return shutdownNotifier.shouldShutdown();
-    };
+    terminationCallback =
+        () -> {
+          return shutdownNotifier.shouldShutdown();
+        };
 
     terminationCallbackHelper = addTerminationCallback();
   }
@@ -184,5 +185,4 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed, "solver context is already closed");
     return BtorJNI.boolector_set_termination(btor, terminationCallback);
   }
-
 }
