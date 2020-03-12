@@ -97,7 +97,6 @@ public enum BtorOption {
   BTOR_OPT_RW_ZERO_LOWER_SLICE,
   BTOR_OPT_NONDESTR_SUBST;
 
-
   private static class EnumIndexCounter {
     private static int nextValue = 0;
   }
