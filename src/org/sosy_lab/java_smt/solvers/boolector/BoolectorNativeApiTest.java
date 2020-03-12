@@ -125,7 +125,7 @@ public class BoolectorNativeApiTest {
         BooleanFormula f2 = bfmgr.and(fa, fb, fc);
         try (ProverEnvironment prover = context.newProverEnvironment()) {
           prover.addConstraint(bfmgr.equivalence(f1, f2));
-          prover.isUnsat();
+          assertThat(prover.isUnsat()).isFalse();
         }
       }
     }
