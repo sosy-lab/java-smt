@@ -136,7 +136,7 @@
 
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.4-sosy0" conf="runtime-mathsat->solver-mathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.7.1" conf="runtime-z3->solver-z3" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.8.7" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.6.3" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2019-11-30-gae93e65" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.0.0-2019-11-11-g9d06cc0" conf="runtime-boolector->solver-boolector" />
