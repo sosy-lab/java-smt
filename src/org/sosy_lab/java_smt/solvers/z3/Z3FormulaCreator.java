@@ -99,9 +99,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // Set of error messages that might occur if Z3 is interrupted.
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
-      ImmutableSet.of(
-          "canceled",
-          "Proof error!");
+      ImmutableSet.of("canceled", "Proof error!");
 
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
