@@ -1,3 +1,13 @@
+/*
+ *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  This file is part of JavaSMT.
+ *
+ *  Copyright (C) 2007-2020  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-or-later
+ */
+
 #include<stdint.h>
 
 #include "includes/defines.h"
