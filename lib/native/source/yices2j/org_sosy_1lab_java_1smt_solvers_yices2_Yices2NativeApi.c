@@ -1405,7 +1405,7 @@ EMPTY_YVAL_ARG(3)
 YVAL_VECTOR_ARG(4)
 CALL4(int, val_expand_function)
 jintArray jretval = NULL;
-if(retval == -1){  
+if(retval == -1){
   const char *msg = yices_error_string();
   throwException(jenv, "java/lang/IllegalArgumentException", msg);
   goto out;
@@ -1445,7 +1445,7 @@ EMPTY_YVAL_ARRAY_ARG(3)
 EMPTY_YVAL_ARG(4)
 CALL4(int, val_expand_mapping)
 jintArray jretval = NULL;
-if(retval == -1){  
+if(retval == -1){
   const char *msg = yices_error_string();
   throwException(jenv, "java/lang/IllegalArgumentException", msg);
   goto out;
@@ -1485,7 +1485,7 @@ TERM_RETURN
 //skipping following model functions
 
 /*
- * TERM NAMING, PRINTING, PARSING and SUBSTITUTION 
+ * TERM NAMING, PRINTING, PARSING and SUBSTITUTION
  */
 
 //skipping type functions
