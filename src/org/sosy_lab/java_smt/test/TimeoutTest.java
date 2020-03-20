@@ -86,7 +86,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.YICES2);
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
