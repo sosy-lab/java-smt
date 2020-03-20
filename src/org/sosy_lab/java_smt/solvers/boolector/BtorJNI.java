@@ -407,6 +407,28 @@ class BtorJNI {
 
   protected static final native long btor_abort_callback_get();
 
+  protected static final native int boolector_bitvec_sort_get_width(long jarg1, long jarg2);
+
+  protected static final native long boolector_roli(long btor, long node, int nbits);
+
+  protected static final native long boolector_rori(long btor, long node, int nbits);
+
+  /**
+   * Returns int representation of BOOLECTOR_PARSE_ERROR. Used for checking return value of
+   * boolector_help_parse().
+   *
+   * @return int BOOLECTOR_PARSE_UNKNOWN
+   */
+  protected static final native int boolector_help_get_parse_error();
+
+  /**
+   * Returns int representation of BOOLECTOR_PARSE_UNKNOWN. Used for checking return value of
+   * boolector_help_parse().
+   *
+   * @return int BOOLECTOR_PARSE_UNKNOWN
+   */
+  protected static final native int boolector_help_get_parse_unknown();
+
   /**
    * Returns string dump in smt2 format of the entire formula. No guarantee that that string is
    * useful.
@@ -431,9 +453,11 @@ class BtorJNI {
    *
    * @param jarg1 btor
    * @param jarg2 string to parse
-   * @return int representing boolector error/sat codes.
+   * @return String[5] with following contents in that order (original data-type in brackets): 1.
+   *     return value (int); 2. outputfile (String); 3. error_msg(String); 4. status(int); 5.
+   *     parsed_smt2(Bool as 1(true) or 0(false))
    */
-  protected static final native int boolector_help_parse(long jarg1, String jarg2);
+  protected static final native String[] boolector_help_parse(long jarg1, String jarg2);
 
   /**
    * Gives back the assignment of the array node entered. Return will be arguments and assignments
@@ -453,9 +477,33 @@ class BtorJNI {
    *
    * @param jarg1 btor
    * @param jarg2 array node
-   * @return Returns 2Dim Array or Strings. Size [2][x], x beeing the length of the uf used. First
+   * @return Returns 2Dim Array or Strings. Size [2][x], x being the length of the uf used. First
    *     String Array will be argument assignment strings. Second String Array will be value
    *     assignment strings.
    */
   protected static final native String[][] boolector_uf_assignment_helper(long jarg1, long jarg2);
+
+  /**
+   * Sets termination callback to chosen implementation of a method.
+   *
+   * @param btor instance
+   * @param terminationCallback TerminationCallback method
+   * @return address to helper struct. Call method boolector_free_termination with it to free its
+   *     ressources after termination!
+   */
+  protected static final native long boolector_set_termination(
+      long btor, TerminationCallback terminationCallback);
+
+  /**
+   * Frees resources of the termination callback function. Call ONLY after termination has occured
+   * with the return value of boolector_set_termination of its instance!
+   *
+   * @param helper address to helper struct used in termination callback.
+   */
+  protected static final native void boolector_free_termination(long helper);
+
+  /** This is used to get the methodID for the JNI call to the termination callback method. */
+  interface TerminationCallback {
+    boolean shouldTerminate() throws InterruptedException;
+  }
 }

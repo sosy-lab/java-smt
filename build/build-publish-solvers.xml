@@ -188,6 +188,7 @@
         <!-- build Boolector -->
         <exec executable="./contrib/setup-picosat.sh"    dir="${boolector.path}"/>
         <exec executable="./contrib/setup-minisat.sh"    dir="${boolector.path}"/>
+    	<exec executable="./contrib/setup-cms.sh"    	 dir="${boolector.path}"/>
         <exec executable="./contrib/setup-lingeling.sh"  dir="${boolector.path}"/>
         <exec executable="./contrib/setup-cadical.sh"    dir="${boolector.path}"/>
         <exec executable="./contrib/setup-btor2tools.sh" dir="${boolector.path}"/>

@@ -155,7 +155,10 @@
 #include <jni.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
 
 /* Support for throwing Java exceptions */
 typedef enum {
@@ -174,6 +177,12 @@ typedef struct {
   SWIG_JavaExceptionCodes code;
   const char *java_exception;
 } SWIG_JavaExceptions_t;
+
+struct callback_info {
+    JNIEnv *jenv;
+    jmethodID callback_method;
+    jobject obj;
+};
 
 
 static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionCodes code, const char *msg) {
@@ -210,6 +219,46 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "boolector.h"
 #include "btortypes.h"
 
+//Used for checking JavaSMT TerminationCallback boolean to determin if Boolector should temrinate
+static int32_t java_termination_callback(void *user_data) {
+    struct callback_info *helper = (struct callback_info *) user_data;
+    JNIEnv *jenv = helper->jenv;
+
+    if (helper->obj == NULL) {
+        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Illegal termination callback object");
+        return 1;
+    }
+
+    jboolean result = (*jenv)->CallBooleanMethod(jenv, helper->obj, helper->callback_method);
+
+    if ((*jenv)->ExceptionCheck(jenv)) {
+        return 1;    //This is for safety reasons here as one could use shutdownIfNecessary() as callback method in theory (not advised)
+    }
+
+    return (int32_t)(result != JNI_FALSE);
+}
+
+//Takes String and appends it to valid path for temporary files
+//Make sure that filename is compliant with the used temp file method
+//Returns NULL in case of NULL filename (so make sure you dont enter NULL!)
+char *addTemppathToFilename(char *filename) {
+    
+  if(!filename) {
+    return NULL;
+  }
+    
+  char* dir = getenv("TMPDIR");
+  if(dir == NULL || strlen(dir) == 0) {
+    dir = "/tmp/";
+  }
+
+  int n = (int)strlen(dir) + (int)strlen(filename) + 1 ;
+  char *tfnwd = (char *)malloc(n * sizeof(char));
+  strncpy(tfnwd, dir, strlen(dir));
+  strncat(tfnwd, filename, (strlen(filename) + 1));
+    
+  return tfnwd;
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -380,7 +429,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   FILE *f = 0;
   f = fopen(arg2, "w");
   if(f==NULL) {
-    perror("ERROR: couldn't set api trace because it couldnt open trace file.");	
+    perror("ERROR: couldn't set api trace because it couldn't open trace file.");   
   }
   boolector_set_trapi(arg1,f);
 }
@@ -2162,7 +2211,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   (*jenv)->ReleaseLongArrayElements(jenv, jarg2, array, 0);
   return jresult;
 }
-	
+    
 
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1inc(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
@@ -2228,7 +2277,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   (void)jenv;
   (void)jcls;
   arg1 = *(Btor **)&jarg1; 
-	
+    
   jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0);
   arg4 = *(BoolectorNode **)&jarg4; 
   result = (BoolectorNode *)boolector_exists(arg1,(BoolectorNode**)array,arg3,arg4);
@@ -2254,10 +2303,8 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1node_1id(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  int32_t result;
   
   (void)jenv;
   (void)jcls;
@@ -2469,7 +2516,6 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1fun_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  uint32_t result;
   
   (void)jenv;
   (void)jcls;
@@ -2617,7 +2663,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   (void)jenv;
   (void)jcls;
   arg1 = *(Btor **)&jarg1; 
-	jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0);
+    jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0);
   argp3 = (uint32_t *)&jarg3; 
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
@@ -2945,6 +2991,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   FILE *arg4 = (FILE *) 0 ;
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
+  bool parsedFlag = (bool) 0;
   jint result;
   
   (void)jenv;
@@ -2959,7 +3006,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   arg4 = *(FILE **)&jarg4; 
   arg5 = *(char ***)&jarg5; 
   arg6 = *(int32_t **)&jarg6; 
-  result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6);
+  result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6,&parsedFlag);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
 }
@@ -3329,188 +3376,424 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   result = (BtorAbortCallback *)&btor_abort_callback;
   *(BtorAbortCallback **)&jresult = result; 
   return jresult;
-}	
+}   
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1bitvec_1sort_1get_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorSort arg2 = (BoolectorSort) 0 ;
+  int32_t  result = 0;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorSort *)&jarg2; 
+ 
+  result = boolector_bitvec_sort_get_width(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+} 
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  uint32_t arg3 = 0 ;
+  BoolectorNode *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorNode **)&jarg2; 
+  arg3 = (uint32_t)jarg3;  
+  result = (BoolectorNode *)boolector_rori(arg1,arg2,arg3);
+  *(BoolectorNode **)&jresult = result; 
+  return jresult;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1roli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  uint32_t arg3 = 0 ;
+  BoolectorNode *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1; 
+  arg2 = *(BoolectorNode **)&jarg2; 
+  arg3 = (uint32_t)jarg3; 
+  result = (BoolectorNode *)boolector_roli(arg1,arg2,arg3);
+  *(BoolectorNode **)&jresult = result; 
+  return jresult;
+}
+
 
 //helpmethods
-	
-	//dumps complete model into new file and reads it to give it back
+
+//Returns the int value of BOOLECTOR_PARSE_ERROR
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1get_1parse_1error(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  jresult = (jint)BOOLECTOR_PARSE_ERROR; 
+  return jresult;
+}
+
+//Returns the int value of BOOLECTOR_PARSE_UNKNOWN
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1get_1parse_1unknown(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  jresult = (jint)BOOLECTOR_PARSE_UNKNOWN; 
+  return jresult;
+}
+
+
+//dumps complete model into new file and reads it to give it back
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-	jstring jresult = 0;
-	Btor *arg1 = (Btor *) 0 ;
-    char *result = 0 ;
-	
-	(void)jenv;
-    (void)jcls;
-	arg1 = *(Btor **)&jarg1; 
-	
-	char * buffer = 0;
-    long length;
-    FILE *f = 0;
-    f = fopen("temp", "w+");
-	if(f==NULL) {
-	  perror("ERROR");	
-	}
+  jstring jresult = 0;
+  Btor *arg1 = (Btor *) 0 ;
+  char *result = 0 ;
+  char tfn[] = "boolector_help_dump_smt2_tempfile-XXXXXX";
+  FILE *f = 0;
+  int fd = -1;
+  char * buffer = 0;
+  long length = 0;
+  char *tfnwd = addTemppathToFilename(tfn);
 
-	//fclose (f);
+  fd = mkstemp(tfnwd);
+  if(fd == -1) {
+    free(tfnwd);
+    perror("ERROR CREATING TEMPORARY FILE FOR SMT2 DUMPING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for file used in boolector_help_dump_smt2 may not be NULL");
+    return 0;
+  }
+
+  f = fdopen(fd,"w+");
+  if(f==NULL) {
+    unlink(tfnwd);
+    free(tfnwd);
+    perror("ERROR OPENING FILE FOR SMT2 DUMPING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_smt2 may not be NULL");
+    return 0;
+  }
     
-    //write
-    boolector_dump_smt2(arg1, f);
+  (void)jenv;
+  (void)jcls;
     
-    //read
-    if (f)
-    {
-     fseek (f, 0, SEEK_END);
-      length = ftell (f);
-      fseek (f, 0, SEEK_SET);
-     buffer = malloc (length);
-     if (buffer)
-     {
-       fread (buffer, 1, length, f);
+  arg1 = *(Btor **)&jarg1; 
+    
+  //write
+  boolector_dump_smt2(arg1, f);
+    
+  //read
+  if (f) {
+    fseek (f, 0, SEEK_END);
+    length = ftell (f);
+    fseek (f, 0, SEEK_SET);
+    buffer = malloc (length);
+    if (buffer) {
+      if(fread (buffer, 1, length, f) != (unsigned long)length) {
+        perror("ERROR READING FILE INTO BUFFER");
+        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_smt2 may not be NULL");
+        return 0;
       }
-      fclose (f);
     }
+  }
 
-    if (buffer)
-    {
-     result = buffer;
-    }
-	
-	
-	if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-    return jresult;
-}
-	
-	//helper method for parsing string into btor
-	SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1parse(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
-	int32_t  result = 0;
-	Btor *arg1 = (Btor *) 0 ;
-    jint jresult = 0 ;
-    int32_t *status = (int32_t *) 0 ;
-	char **errormsg = (char **) 0 ;
-	
-	(void)jenv;
-    (void)jcls;
-	arg1 = *(Btor **)&jarg1; 
-	char *arg2 = (char *) 0 ;
-    if (jarg2) {
-      arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
-      if (!arg2) return 0;
-    }
-	
-    FILE *f = 0;
-    f = fopen("temp", "w+");
-	if(f==NULL) {
-	  perror("ERROR_INPUTFILE");	
-	}
-	fputs(arg2, f);
-	fclose (f);
-		
-	FILE *fout = 0;
-    fout = fopen("tempout", "w+");
-	if(fout==NULL) {
-	  perror("ERROR_OUTPUTFILE");	
-	}
-    fclose (fout);
-		
-    //"read" (parse)
-    result = boolector_parse(arg1, f, "temp", fout, errormsg, status);
-    jresult = (jint)result;
+  if (buffer) {
+    result = buffer;
+  }  
     
-    return jresult;
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  
+  unlink(tfnwd);
+  free(tfnwd);
+  fclose (f);
+  free(buffer);
+  return jresult;
 }
-	
-		//dumps NODE into new file and reads it to give it back
+    
+//helper method for parsing string into btor
+//insert java string into jarg2
+//returns array of (java)strings, length 5, for (in that order): result (int in String), outfile(As string), errormsg, status (int as String), parsedFlag (bool as String)
+SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1parse(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  int32_t  result = 0;
+  Btor *arg1 = (Btor *) 0 ;
+  int32_t status = (int32_t) 0 ;
+  char *errormsg = (char *) 0 ;
+  bool parsedFlag = (bool) 0;
+  char fnIn[] = "boolector_help_parse_tempinfile-XXXXXX";
+  char fnOut[] = "boolector_help_parse_tempoutfile-XXXXXX";
+  char *tfnwdIn = addTemppathToFilename(fnIn);
+  int fdIn = -1;
+  char *tfnwdOut = addTemppathToFilename(fnOut);
+  int fdOut = -1;
+  char *arg2 = (char *) 0 ;
+  FILE *fparse = 0;
+  FILE *fout = 0;
+    
+  (void)jenv;
+  (void)jcls;
+    
+  arg1 = *(Btor **)&jarg1; 
+  
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) {
+      free(tfnwdIn);
+      free(tfnwdOut);
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Inputstring for boolector_help_parse may not be NULL");
+      return 0;
+    }
+  }
+    
+  fdIn = mkstemp(tfnwdIn);
+  if(fdIn == -1) {
+    free(tfnwdIn); 
+    free(tfnwdOut);
+    perror("ERROR CREATING TEMPORARY FILE FOR");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for inputfile for boolector_help_parse may not be NULL");
+    return 0;
+  }
+  
+  fparse = fdopen(fdIn, "w+");
+  if(fparse==NULL) {
+    unlink(tfnwdIn);
+    free(tfnwdIn);
+    free(tfnwdOut);
+    perror("ERROR_INPUTFILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Inputfile for boolector_help_parse may not be NULL");
+    return 0;
+  }
+  
+  fputs(arg2, fparse);
+  
+  fdOut = mkstemp(tfnwdOut);
+  if(fdOut == -1) {
+    unlink(tfnwdIn);
+    free(tfnwdIn);
+    fclose(fparse);  
+    free(tfnwdOut);
+    perror("ERROR CREATING TEMPORARY FILE FOR");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for outputfile for boolector_help_parse may not be NULL");
+    return 0;
+  }
+  fout = fdopen(fdOut, "w+");
+  if(fout==NULL) {
+    unlink(tfnwdIn);
+    free(tfnwdIn);
+    fclose(fparse);
+    unlink(tfnwdOut);  
+    free(tfnwdOut);
+    perror("ERROR_OUTPUTFILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Outputfile for boolector_help_parse may not be NULL");
+    return 0;
+  }
+
+  //"read" (parse)
+  result = boolector_parse(arg1, fparse, tfnwdIn, fout, &errormsg, &status, &parsedFlag);
+  
+  //We create an java String Array length 5
+  jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
+  jobjectArray jniArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, 5, classString, (*jenv)->NewStringUTF(jenv, ""));
+  for(int i = 0; i < 5; i++) {
+    (*jenv)->SetObjectArrayElement(jenv, jniArray, i, (*jenv)->NewStringUTF(jenv, ""));
+  }
+  
+  //For output array
+  char *foutString = (char *) 0;
+  char * buffer = 0;
+  int length = 0;
+  
+  char *statusString = (char *) 0;
+  char flagString[2];
+  char *resultString = (char *) 0;
+  
+  sprintf(flagString, "%d", (int)parsedFlag);
+  
+  length = snprintf(NULL, 0,"%d",result);
+  resultString = malloc((length+1)*sizeof(char));
+  sprintf(resultString, "%d", result);
+  strncat(resultString, "\0", 1);
+  length = 0;
+
+  length = snprintf(NULL, 0,"%d",status);
+  statusString = malloc((length+1)*sizeof(char));
+  sprintf(statusString, "%d", status);
+  strncat(statusString, "\0", 1);
+  length = 0;
+
+  //We dont really care if fout is empty, we just return an empty string in that case
+  if(fout) {
+   fseek(fout, 0, SEEK_END);
+    length = ftell(fout);
+    fseek(fout, 0, SEEK_SET);
+    buffer = malloc(length);
+    if(buffer) {
+      if(fread (buffer, 1, length, fout) != (unsigned long)length) {
+        unlink(tfnwdIn);
+        free(tfnwdIn);
+        fclose(fparse);
+        unlink(tfnwdOut);  
+        free(tfnwdOut);
+        fclose(fout);
+        free(buffer);
+        free(resultString);
+        free(statusString);
+        (*jenv)->DeleteLocalRef(jenv, classString);
+        perror("ERROR READING FILE INTO BUFFER");
+        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_parse may not be NULL");
+        return 0;
+      }
+    }
+  }
+
+  if (buffer) {
+    foutString = buffer;
+  } else {
+    foutString = "";
+  }
+  
+  (*jenv)->SetObjectArrayElement(jenv, jniArray, 0, (*jenv)->NewStringUTF(jenv, resultString));
+  
+  (*jenv)->SetObjectArrayElement(jenv, jniArray, 1, (*jenv)->NewStringUTF(jenv, (const char *)foutString));
+  
+  (*jenv)->SetObjectArrayElement(jenv, jniArray, 2, (*jenv)->NewStringUTF(jenv, errormsg));
+  
+  (*jenv)->SetObjectArrayElement(jenv, jniArray, 3, (*jenv)->NewStringUTF(jenv, statusString));
+  
+  (*jenv)->SetObjectArrayElement(jenv, jniArray, 4, (*jenv)->NewStringUTF(jenv, flagString));
+
+  (*jenv)->DeleteLocalRef(jenv, classString);
+  free(buffer);
+  unlink(tfnwdIn);
+  free(tfnwdIn);
+  fclose(fparse);
+  unlink(tfnwdOut);  
+  free(tfnwdOut);
+  fclose(fout);
+  free(statusString);
+  free(resultString);
+  return jniArray;
+}
+    
+//dumps NODE into new file and reads it to give it back
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1node_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-	jstring jresult = 0;
-	Btor *arg1 = (Btor *) 0 ;
-    char *result = 0 ;
-	
-	(void)jenv;
-    (void)jcls;
-	arg1 = *(Btor **)&jarg1; 
-	
-	char * buffer = 0;
-    long length;
+  jstring jresult = 0;
+  Btor *arg1 = (Btor *) 0 ;
+  char *result = 0 ;
+  char filename[] = "boolector_help_dump_node_smt2_tempinfile-XXXXXX";
+  FILE *f = 0;
+  char * buffer = 0;
+  int fd = -1;
+  long length = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  char *tfnwd = addTemppathToFilename(filename);
+
+  fd = mkstemp(tfnwd);
+  if(fd == -1) {
+    free(tfnwd);
+    perror("ERROR CREATING TEMPORARY FILE FOR");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
+    
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
   arg2 = *(BoolectorNode **)&jarg2; 
-	
-    FILE *f = 0;
-    f = fopen("temp", "w+");
-	if(f==NULL) {
-	  perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");	
-	}
 
-	//fclose (f);
+  f = fdopen(fd, "w+");
+  if(f==NULL) {
+    free(tfnwd);
+    unlink(tfnwd);
+    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE"); 
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
     
-    //write
-    boolector_dump_smt2_node(arg1, f, arg2);
+  //write
+  boolector_dump_smt2_node(arg1, f, arg2);
     
-    //read
-    if (f)
-    {
-     fseek (f, 0, SEEK_END);
-      length = ftell (f);
-      fseek (f, 0, SEEK_SET);
-     buffer = malloc (length);
-     if (buffer)
-     {
-       fread (buffer, 1, length, f);
+  //read
+  if (f) {
+   fseek (f, 0, SEEK_END);
+    length = ftell (f);
+    fseek (f, 0, SEEK_SET);
+    buffer = malloc (length);
+    if (buffer) {
+      if(fread (buffer, 1, length, f) != (unsigned long)length) {
+        unlink(tfnwd); 
+        free(tfnwd);
+        free(buffer);
+        perror("ERROR READING FILE INTO BUFFER");
+        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
+        return 0;
       }
-      fclose (f);
     }
+  }
 
-    if (buffer)
-    {
-     result = buffer;
-    }
-	
-	
-	if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-    return jresult;
+  if (buffer) {
+    result = buffer;
+  }
+    
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+    
+  unlink(tfnwd); 
+  free(tfnwd);
+  fclose(f); 
+  free(buffer);
+  return jresult;
 }
-	
-	
-	//reads uf assignment and gives back array with 3 slots, first is size of the other 2 entrys, second and third are arrays, second is uf argument assignment strings, third is uf value assignments
+    
+    
+//reads uf assignment and gives back array with 3 slots, first is size of the other 2 entrys, second and third are arrays, second is uf argument assignment strings, third is uf value assignments
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1uf_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
-	
+    
   (void)jenv;
   (void)jcls;
-	
+    
   int i = 0;
   int j = 0;
-	
+    
   arg1 = *(Btor **)&jarg1; 
   arg2 = *(BoolectorNode **)&jarg2; 
  
   boolector_uf_assignment(arg1,arg2,arg3,arg4,arg5);
-	
+    
   if(arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
-	
+    
   jsize arrayLength = *arg5;
   int arrayLengthInt = *arg5;
   char **workArray = *arg3;
-	
+    
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
 
   jobjectArray outerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, 2, classArray, NULL);
-	
+    
   for(i=0;i<2;i++) {
     jobjectArray innerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, arrayLength, classString, (*jenv)->NewStringUTF(jenv, ""));
-	
+    
     for(j=0;j<arrayLengthInt;j++) {
-  	  (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
-	}
-	//switch to second Array
+      (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
+    }
+    //switch to second Array
     workArray = *arg4;
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
+  
   (*jenv)->DeleteLocalRef(jenv, classString);
   (*jenv)->DeleteLocalRef(jenv, classArray);
 
@@ -3524,44 +3807,100 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
-	
+    
   (void)jenv;
   (void)jcls;
-	
+    
   int i = 0;
   int j = 0;
-	
+    
   arg1 = *(Btor **)&jarg1; 
   arg2 = *(BoolectorNode **)&jarg2; 
  
   boolector_array_assignment(arg1,arg2,arg3,arg4,arg5);
-	
+    
   if(arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
-	
+    
   jsize arrayLength = *arg5;
   int arrayLengthInt = *arg5;
   char **workArray = *arg3;
-	
+    
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
 
   jobjectArray outerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, 2, classArray, NULL);
-	
+    
   for(i=0;i<2;i++) {
     jobjectArray innerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, arrayLength, classString, (*jenv)->NewStringUTF(jenv, ""));
-	
+    
     for(j=0;j<arrayLengthInt;j++) {
-  	  (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
-	}
-	//switch to second Array
+      (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
+    }
+    //switch to second Array
     workArray = *arg4;
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
+  
   (*jenv)->DeleteLocalRef(jenv, classString);
   (*jenv)->DeleteLocalRef(jenv, classArray);
 
   return outerJNIArray;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
+  Btor *arg1 = (Btor *) 0 ;
+    
+  (void)jenv;
+  (void)jcls;
+    
+  arg1 = *(Btor **)&jarg1; 
+  
+   jclass cls = (*jenv)->FindClass(jenv,
+    "org/sosy_lab/java_smt/solvers/boolector/BtorJNI$TerminationCallback");
+  if (cls == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Class for boolector_set_termination may not be NULL");
+    return 0;
+  }
+  
+  jmethodID methodID = (*jenv)->GetMethodID(jenv, cls, "shouldTerminate", "()Z");
+  if (methodID == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MethodID in boolector_set_termination may not be NULL");
+    return 0;
+  }
+  
+  if (jarg2 == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback of boolector_set_termination may not be NULL");
+    return 0;
+  }
+  
+  struct callback_info *helper = malloc(sizeof(struct callback_info));
+  helper->jenv = jenv;
+  helper->callback_method = methodID;
+  helper->obj = (*jenv)->NewGlobalRef(jenv, jarg2);
+
+  boolector_set_term(arg1, &java_termination_callback, helper);
+  
+  //Returns address to helper to be freed after termination has been called. See method boolector_free_termination
+  return (jlong)helper;
+}
+
+
+
+
+//Call this with the return value of the method boolector_set_termination to free ressources
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1free_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  (void)jcls;
+    
+  struct callback_info *helper = (struct callback_info *)(long)jarg1;
+  if (helper == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback of boolector_free_termination may not be NULL");
+    return;
+  }
+
+  (*jenv)->DeleteGlobalRef(jenv, helper->obj);
+  helper->obj = NULL;
+  free(helper);
 }
 
 #ifdef __cplusplus
