@@ -59,13 +59,8 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
       @Override
       public void appendTo(Appendable out) throws IOException {
         String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment(), pT);
-        int length = dump.length();
-        int i = 1;
-        while (dump.charAt(length - i) != ')' && i < length) {
-          dump = dump.substring(0, length - i);
-          i++;
-        }
-        out.append(dump);
+        // strip removes the newline at the end of the string
+        out.append(dump.strip());
       }
     };
   }
