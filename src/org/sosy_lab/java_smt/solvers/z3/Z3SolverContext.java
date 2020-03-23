@@ -122,13 +122,6 @@ final class Z3SolverContext extends AbstractSolverContext {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
 
-    if (solverLogfile != null) {
-      logger.log(
-          Level.WARNING,
-          "Z3 does not support dumping a log file in SMTLIB format. "
-              + "Please use the option solver.z3.log for a Z3-specific log instead.");
-    }
-
     // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
@@ -185,6 +178,24 @@ final class Z3SolverContext extends AbstractSolverContext {
     Native.paramsIncRef(context, z3params);
     Native.paramsSetUint(
         context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
+
+    if (solverLogfile != null) {
+      Path filename = solverLogfile.getFreshPath();
+      try {
+        Path absolutePath = filename.toAbsolutePath();
+        IO.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
+        Native.paramsSetSymbol(
+            context,
+            z3params,
+            Native.mkStringSymbol(context, "smtlib2_log"),
+            Native.mkStringSymbol(context, absolutePath.toString()));
+      } catch (IOException e) {
+        logger.log(
+            Level.WARNING,
+            "Z3 could not open the SMTLIB2 log. "
+                + "Please use the option solver.z3.log for a Z3-specific log instead.");
+      }
+    }
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config, pShutdownNotifier);
