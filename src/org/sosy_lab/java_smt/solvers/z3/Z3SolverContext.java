@@ -180,21 +180,10 @@ final class Z3SolverContext extends AbstractSolverContext {
         context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
 
     if (solverLogfile != null) {
-      Path filename = solverLogfile.getFreshPath();
-      try {
-        Path absolutePath = filename.toAbsolutePath();
-        IO.writeFile(absolutePath, StandardCharsets.US_ASCII, "");
-        Native.paramsSetSymbol(
-            context,
-            z3params,
-            Native.mkStringSymbol(context, "smtlib2_log"),
-            Native.mkStringSymbol(context, absolutePath.toString()));
-      } catch (IOException e) {
-        logger.log(
-            Level.WARNING,
-            "Z3 could not open the SMTLIB2 log. "
-                + "Please use the option solver.z3.log for a Z3-specific log instead.");
-      }
+      logger.log(
+          Level.WARNING,
+          "Z3's SMTLIB2-log is currently not available. "
+              + "Please use the option solver.z3.log for a Z3-specific log instead.");
     }
 
     Z3FormulaCreator creator =
