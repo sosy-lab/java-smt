@@ -251,11 +251,14 @@ char *addTemppathToFilename(char *filename) {
   if(dir == NULL || strlen(dir) == 0) {
     dir = "/tmp/";
   }
+	
+  int dirLength = (int)strlen(dir);
+  int filenameLength = (int)strlen(filename);
+  int completeNameLength = dirLength + filenameLength + 1;
 
-  int n = (int)strlen(dir) + (int)strlen(filename) + 1 ;
-  char *tfnwd = (char *)malloc(n * sizeof(char));
-  strncpy(tfnwd, dir, strlen(dir));
-  strncat(tfnwd, filename, (strlen(filename) + 1));
+  char *tfnwd = (char *)malloc(completeNameLength * sizeof(char));
+  strncpy(tfnwd, dir, dirLength);
+  strncat(tfnwd, filename, (filenameLength + 1));
     
   return tfnwd;
 }
@@ -3586,8 +3589,8 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   fout = fdopen(fdOut, "w+");
   if(fout==NULL) {
     unlink(tfnwdIn);
-    free(tfnwdIn);
     fclose(fparse);
+    free(tfnwdIn);
     unlink(tfnwdOut);  
     free(tfnwdOut);
     perror("ERROR_OUTPUTFILE");
@@ -3630,17 +3633,17 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 
   //We dont really care if fout is empty, we just return an empty string in that case
   if(fout) {
-   fseek(fout, 0, SEEK_END);
+    fseek(fout, 0, SEEK_END);
     length = ftell(fout);
     fseek(fout, 0, SEEK_SET);
     buffer = malloc(length);
     if(buffer) {
       if(fread (buffer, 1, length, fout) != (unsigned long)length) {
         unlink(tfnwdIn);
-        free(tfnwdIn);
         fclose(fparse);
         unlink(tfnwdOut);  
         free(tfnwdOut);
+        free(tfnwdIn);
         fclose(fout);
         free(buffer);
         free(resultString);
@@ -3670,13 +3673,13 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   (*jenv)->SetObjectArrayElement(jenv, jniArray, 4, (*jenv)->NewStringUTF(jenv, flagString));
 
   (*jenv)->DeleteLocalRef(jenv, classString);
-  free(buffer);
   unlink(tfnwdIn);
-  free(tfnwdIn);
   fclose(fparse);
   unlink(tfnwdOut);  
-  free(tfnwdOut);
   fclose(fout);
+  free(tfnwdIn);
+  free(buffer);
+  free(tfnwdOut);
   free(statusString);
   free(resultString);
   return jniArray;
@@ -3689,16 +3692,22 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   char *result = 0 ;
   char filename[] = "boolector_help_dump_node_smt2_tempinfile-XXXXXX";
   FILE *f = 0;
-  char * buffer = 0;
+  char *buffer = NULL;
   int fd = -1;
   long length = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char *tfnwd = addTemppathToFilename(filename);
+	
+  if(tfnwd == NULL) {
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileName for boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
 
   fd = mkstemp(tfnwd);
   if(fd == -1) {
     free(tfnwd);
-    perror("ERROR CREATING TEMPORARY FILE FOR");
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
@@ -3710,8 +3719,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 
   f = fdopen(fd, "w+");
   if(f==NULL) {
-    free(tfnwd);
-    unlink(tfnwd);
+	unlink(tfnwd);
     perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE"); 
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
@@ -3719,34 +3727,59 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     
   //write
   boolector_dump_smt2_node(arg1, f, arg2);
+  rewind(f);  //Just to be sure
     
   //read
-  if (f) {
-   fseek (f, 0, SEEK_END);
-    length = ftell (f);
-    fseek (f, 0, SEEK_SET);
-    buffer = malloc (length);
-    if (buffer) {
-      if(fread (buffer, 1, length, f) != (unsigned long)length) {
-        unlink(tfnwd); 
-        free(tfnwd);
-        free(buffer);
-        perror("ERROR READING FILE INTO BUFFER");
-        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
-        return 0;
-      }
-    }
+  if(!f) {
+    unlink(tfnwd); 
+    perror("ERROR: FILE RETURNED BY BOOLECTOR_DUMP_SMT2_NODE IS NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File returned by boolector_dump_smt2_node() is NULL. boolector_help_dump_node_smt2 aborted.");
+    return 0;
   }
 
-  if (buffer) {
+  if(fseek(f, 0, SEEK_END) != 0) {
+    unlink(tfnwd);
+    perror("ERROR SEEKING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determin the end of the used file");
+    return 0;
+  }
+
+  length = ftell(f);
+  rewind(f);
+  if(!length) {
+    unlink(tfnwd); 
+    free(buffer);
+    perror("ERROR READING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File length in boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
+
+  buffer = (char *)malloc((length + 1) * sizeof(char));
+  size_t readLength = fread(buffer, 1, length, f);
+  if((unsigned long)length != readLength) {  //technically this isn't a nullpointerexception
+    unlink(tfnwd);
+    free(buffer);
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 did not read the whole length of the file into the buffer");
+    return 0;
+  }
+
+  buffer[length] = '\0';
+  fclose(f);
+
+  if(buffer) {
     result = buffer;
+  } else {
+	unlink(tfnwd); 
+    free(buffer);
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_node_smt2 may not be NULL after reading the buffer");
+    return 0;
   }
     
-  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-    
+  jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  
   unlink(tfnwd); 
-  free(tfnwd);
-  fclose(f); 
   free(buffer);
   return jresult;
 }
