@@ -29,7 +29,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.truth.TruthJUnit;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -200,12 +199,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
-
-    // Z3 does not fully support interpolation for bit-vectors
-    assume()
-        .withMessage("As of now, Z3 does not fully support bit-vector interpolation")
-        .that(solver)
-        .isNotSameInstanceAs(Solvers.Z3);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -398,10 +391,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
-    // Boolector does not support Interpolation
-    TruthJUnit.assume().that(solver).isEqualTo(Solvers.BOOLECTOR);
     requireBitvectors();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();

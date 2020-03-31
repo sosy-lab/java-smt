@@ -83,7 +83,13 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     Preconditions.checkState(!closed);
     int status;
     try {
-      status = Native.optimizeCheck(z3context, z3optSolver);
+      status =
+          Native.optimizeCheck(
+              z3context,
+              z3optSolver,
+              0, // number of assumptions
+              null // assumptions
+              );
     } catch (Z3Exception ex) {
       throw creator.handleZ3Exception(ex);
     }

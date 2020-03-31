@@ -6,7 +6,7 @@
     <!-- SECTION: Publishing Z3 {{{1
          ===============================================================
     -->
-    <target name="package-z3"
+    <target name="package-z3" depends="get-z3-version"
         description="Copy Z3 binaries to the root folder along with the version postfix.
             This package provides the JNI for direct usage.">
         <fail unless="z3.path">
@@ -26,12 +26,15 @@
             libz3.so has missing SONAME property.
             Please run 'patchelf --set-soname libz3.so ${z3.path}/libz3.so'.
         </fail>
-        <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
-            <arg value="describe" />
-        </exec>
         <copy file="${z3.path}/libz3.so" tofile="libz3-${z3.version}.so"/>
         <copy file="${z3.path}/libz3java.so" tofile="libz3java-${z3.version}.so"/>
         <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
+    </target>
+
+    <target name="get-z3-version" unless="z3.version">
+        <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
+            <arg value="describe" />
+        </exec>
     </target>
 
     <target name="publish-z3" depends="package-z3, load-ivy"

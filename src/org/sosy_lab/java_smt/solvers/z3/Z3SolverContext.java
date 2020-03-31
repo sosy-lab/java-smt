@@ -64,13 +64,6 @@ final class Z3SolverContext extends AbstractSolverContext {
       values = {"lex", "pareto", "box"})
   String objectivePrioritizationMode = "box";
 
-  @Option(
-      secure = true,
-      description = "Dump failed interpolation queries to this file in SMTLIB2 format")
-  @FileOption(Type.OUTPUT_FILE)
-  private @Nullable PathCounterTemplate dumpFailedInterpolationQueries =
-      PathCounterTemplate.ofFormatString("z3-failed-interpolation-query.%d.smt2");
-
   private final ShutdownRequestListener interruptListener;
   private final long z3params;
   private final LogManager logger;
@@ -129,13 +122,6 @@ final class Z3SolverContext extends AbstractSolverContext {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
 
-    if (solverLogfile != null) {
-      logger.log(
-          Level.WARNING,
-          "Z3 does not support dumping a log file in SMTLIB format. "
-              + "Please use the option solver.z3.log for a Z3-specific log instead.");
-    }
-
     // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
@@ -169,6 +155,7 @@ final class Z3SolverContext extends AbstractSolverContext {
       Native.setParamValue(cfg, "PROOF", "true");
     }
     Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
+    Native.globalParamSet("model.compact", "false");
 
     final long context = Native.mkContextRc(cfg);
     ShutdownNotifier.ShutdownRequestListener interruptListener =
@@ -191,6 +178,13 @@ final class Z3SolverContext extends AbstractSolverContext {
     Native.paramsIncRef(context, z3params);
     Native.paramsSetUint(
         context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
+
+    if (solverLogfile != null) {
+      logger.log(
+          Level.WARNING,
+          "Z3's SMTLIB2-log is currently not available. "
+              + "Please use the option solver.z3.log for a Z3-specific log instead.");
+    }
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(context, boolSort, integerSort, realSort, config, pShutdownNotifier);
@@ -250,13 +244,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    Preconditions.checkState(!closed, "solver context is already closed");
-    long z3context = creator.getEnv();
-    Native.paramsSetBool(z3context, z3params, Native.mkStringSymbol(z3context, ":model"), true);
-    Native.paramsSetBool(
-        z3context, z3params, Native.mkStringSymbol(z3context, ":unsat_core"), false);
-    return new Z3InterpolatingProver(
-        creator, z3params, logger, dumpFailedInterpolationQueries, manager, options);
+    throw new UnsupportedOperationException("Z3 does not support interpolation");
   }
 
   @Override
