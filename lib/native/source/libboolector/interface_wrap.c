@@ -219,7 +219,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "boolector.h"
 #include "btortypes.h"
 
-//Used for checking JavaSMT TerminationCallback boolean to determin if Boolector should temrinate
+//Used for checking JavaSMT TerminationCallback boolean to determine if Boolector should temrinate
 static int32_t java_termination_callback(void *user_data) {
     struct callback_info *helper = (struct callback_info *) user_data;
     JNIEnv *jenv = helper->jenv;
@@ -257,8 +257,9 @@ char *addTemppathToFilename(char *filename) {
   int completeNameLength = dirLength + filenameLength + 1;
 
   char *tempfileName = (char *)malloc(completeNameLength * sizeof(char));
+  memset(tempfileName,0,sizeof(tempfileName));
   strncpy(tempfileName, dir, dirLength);
-  strncat(tempfileName, filename, (filenameLength + 1));
+  strncat(tempfileName, filename, filenameLength);
     
   return tempfileName;
 }
@@ -3676,7 +3677,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   free(resultString);
   return jniArray;
 }
-    
+
 //dumps NODE into new file and reads it to give it back
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1node_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jstring jresult = 0;
@@ -3688,7 +3689,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   long fileLength = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char *tempfileName = addTemppathToFilename(filenameTemplate);
-  
+
   if(tempfileName == NULL) {
     perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileName for boolector_help_dump_node_smt2 may not be NULL");
@@ -3743,11 +3744,14 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   }
 
   buffer = (char *)malloc((fileLength + 1) * sizeof(char));
+
   if(!buffer) {
     perror("ERROR READING FILE INTO BUFFER");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
+
+  memset(buffer,0,sizeof(buffer));
   size_t readLength = fread(buffer, 1, fileLength, file);
 
   if((unsigned long)fileLength != readLength) {
@@ -3757,8 +3761,6 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     return 0;
   }
   fclose(file);
-
-  buffer[fileLength] = '\0';
     
   jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
   free(buffer);
