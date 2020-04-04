@@ -257,9 +257,8 @@ char *addTemppathToFilename(char *filename) {
   int completeNameLength = dirLength + filenameLength + 1;
 
   char *tempfileName = (char *)malloc(completeNameLength * sizeof(char));
-  memset(tempfileName,0,sizeof(tempfileName));
-  strncpy(tempfileName, dir, dirLength);
-  strncat(tempfileName, filename, filenameLength);
+  strncpy(tempfileName, dir, (completeNameLength - filenameLength - 1));  //completeNameLength - filenameLength - 1 = dirLength (without null-terminating char)
+  strcat(tempfileName, filename);
     
   return tempfileName;
 }
@@ -3751,7 +3750,6 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     return 0;
   }
 
-  memset(buffer,0,sizeof(buffer));
   size_t readLength = fread(buffer, 1, fileLength, file);
 
   if((unsigned long)fileLength != readLength) {
@@ -3761,6 +3759,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     return 0;
   }
   fclose(file);
+  buffer[fileLength] = '\0';
     
   jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
   free(buffer);
@@ -3769,7 +3768,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     
     
 //reads uf assignment and gives back array with 3 slots, first is size of the other 2 entrys, second and third are arrays, second is uf argument assignment strings, third is uf value assignments
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1uf_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1uf_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char ***arg3 = (char ***) 0 ;
@@ -3787,7 +3786,10 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
  
   boolector_uf_assignment(arg1,arg2,arg3,arg4,arg5);
     
-  if(arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
+  if(arg3 == 0 || arg4 == 0 || arg5 == 0) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_uf_assignment_helper returned NULL");
+    return 0;
+  }
     
   jsize arrayLength = *arg5;
   int arrayLengthInt = *arg5;
