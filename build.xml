@@ -7,9 +7,14 @@
     <property file="build.properties"/>
     <property environment="env"/>
 
+    <!-- Yices2 is under GPL3 and has to be seperated from Apache2-licensed software. -->
+    <property name="yices2Source" value="org/sosy_lab/java_smt/solvers/yices2/**.java"/>
+    <property name="yices2Classes" value="org/sosy_lab/java_smt/solvers/yices2/**.class"/>
+
     <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
-    <property name="jar.excludes" value=""/>
+    <property name="jar.excludes" value="${yices2Classes}"/>
+    <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
     <property name="documentation.javadoc.exclude" value="org.sosy_lab.java_smt.solvers.mathsat5,org.sosy_lab.java_smt.solvers.princess,org.sosy_lab.java_smt.solvers.smtinterpol,org.sosy_lab.java_smt.solvers.z3"/>
 
@@ -28,6 +33,7 @@
     <import file="build/build-compile.xml"/>
     <import file="build/build-documentation.xml"/>
     <import file="build/build-jar.xml"/>
+    <import file="build/build-jar-yices2.xml"/>
     <import file="build/build-junit.xml"/>
     <import file="build/build-format-source.xml"/>
     <import file="build/build-checkstyle.xml"/>
@@ -57,7 +63,7 @@
 
     <target name="build" depends="build-project, collect-options" description="Build"/>
 
-    <target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>
+    <target name="dist" depends="jar, jar-yices2, sources, javadoc-jar" description="Make a distributable release"/>
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 

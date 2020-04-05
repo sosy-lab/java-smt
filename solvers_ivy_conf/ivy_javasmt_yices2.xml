@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-yices2">
+        <license name="Apache2 and GNU GPLv3" url="https://github.com/SRI-CSL/yices2/blob/master/LICENSE.txt"/>
+        <description>
+            JavaSMT components for the Yices2 solver.
+            Seperated from the main package of JavaSMT because of the licence.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="javasmt-yices2" />
+    </configurations>
+
+    <publications defaultconf="javasmt-yices2">
+        <artifact name="org.sosy-lab.javasmt-yices2" conf="javasmt-yices2" ext="jar" />
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>
