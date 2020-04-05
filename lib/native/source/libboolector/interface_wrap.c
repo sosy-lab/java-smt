@@ -3729,7 +3729,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 
   if (fseek(file, 0, SEEK_END) != 0) {
     perror("ERROR SEEKING FILE LENGTH");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determin the end of the used file");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determine the end of the used file");
     return 0;
   }
 
