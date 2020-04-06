@@ -3715,6 +3715,12 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
+  
+  if (fflush(file) != 0) {
+    perror("ERROR: COULDNT FLUSH DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 could not be flushed");
+    return 0;
+  }
 
   //write
   boolector_dump_smt2_node(arg1, file, arg2);
