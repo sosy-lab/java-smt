@@ -3715,16 +3715,19 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
-  
+
+  //write
+  boolector_dump_smt2_node(arg1, file, arg2);
   if (fflush(file) != 0) {
     perror("ERROR: COULDNT FLUSH DUMP FILE");
     SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 could not be flushed");
     return 0;
   }
-
-  //write
-  boolector_dump_smt2_node(arg1, file, arg2);
-  rewind(file);  //Just to be sure
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
+    return 0;
+  }
 
   //read
   if (!file) {
@@ -3740,7 +3743,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   }
 
   fileLength = ftell(file);
-  rewind(file);
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
+    return 0;
+  }
 
   if (fileLength <= 0) {
     perror("ERROR READING FILE LENGTH");
