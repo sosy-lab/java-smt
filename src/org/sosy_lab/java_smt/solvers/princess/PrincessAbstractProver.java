@@ -240,7 +240,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     final List<IFunction> functionSymbols = new ArrayList<>();
     // the number of constraints asserted up to this point, this is needed
     // for unsat core computation
-    int constraintNum = 0;
+    int constraintNum;
 
     Level(int constraintNum) {
       this.constraintNum = constraintNum;

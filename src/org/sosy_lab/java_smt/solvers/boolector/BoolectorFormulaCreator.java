@@ -255,7 +255,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
   @Override
   public Object convertValue(Long key, Long term) {
-    String value = null;
+    String value;
     if (BtorJNI.boolector_is_array(getEnv(), term)) {
       value = BtorJNI.boolector_bv_assignment(getEnv(), term);
     } else if (BtorJNI.boolector_is_const(getEnv(), term)) {
