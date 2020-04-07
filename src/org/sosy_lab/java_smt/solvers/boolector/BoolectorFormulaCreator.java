@@ -270,7 +270,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     // To get the correct type, we check the width of the term (== 1 means bool).
     int width = BtorJNI.boolector_get_width(getEnv(), term);
     if (width == 1) {
-      Long longValue = parseBigInt(value).longValue();
+      long longValue = parseBigInt(value).longValue();
       if (longValue == 1) {
         return true;
       } else if (longValue == 0) {
