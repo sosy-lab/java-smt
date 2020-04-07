@@ -28,6 +28,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -190,7 +191,9 @@ public class VariableNamesTest extends SolverBasedTest0 {
     List<Object> allNames =
         ImmutableList.builder()
             .addAll(NAMES)
+            .addAll(Iterables.transform(NAMES, n -> n + n + n))
             .addAll(AbstractFormulaManager.BASIC_OPERATORS)
+            .addAll(Iterables.transform(AbstractFormulaManager.BASIC_OPERATORS, n -> n + n + n))
             .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
             .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
             .addAll(FURTHER_SMTLIB2_KEYWORDS)
