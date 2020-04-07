@@ -3691,7 +3691,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 
   if (tempfileName == NULL) {
     perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileName for boolector_help_dump_node_smt2 may not be NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
 
@@ -3699,7 +3699,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   if (fileDesrc == -1) {
     free(tempfileName);
     perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
 
@@ -3712,7 +3712,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   unlink(tempfileName);
   if (file == NULL) {
     perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_node_smt2 may not be NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
 
@@ -3725,33 +3725,33 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   }
   if (fseek(file, 0, SEEK_SET) != 0) {
     perror("ERROR SEEKING FILE BEGINNING");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
     return 0;
   }
 
   //read
   if (!file) {
     perror("ERROR: FILE RETURNED BY BOOLECTOR_DUMP_SMT2_NODE IS NULL");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File returned by boolector_dump_smt2_node() is NULL. boolector_help_dump_node_smt2 aborted.");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File returned by boolector_dump_smt2_node() is NULL. boolector_help_dump_node_smt2 aborted.");
     return 0;
   }
 
   if (fseek(file, 0, SEEK_END) != 0) {
     perror("ERROR SEEKING FILE LENGTH");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determine the end of the used file");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the end of the used file");
     return 0;
   }
 
   fileLength = ftell(file);
   if (fseek(file, 0, SEEK_SET) != 0) {
     perror("ERROR SEEKING FILE BEGINNING");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
     return 0;
   }
 
   if (fileLength <= 0) {
     perror("ERROR READING FILE LENGTH");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File length in boolector_help_dump_node_smt2 may not be NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File length in boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
 
@@ -3759,7 +3759,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 
   if (!buffer) {
     perror("ERROR READING FILE INTO BUFFER");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
 
