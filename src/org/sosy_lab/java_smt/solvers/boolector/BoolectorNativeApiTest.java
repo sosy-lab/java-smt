@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
@@ -34,6 +35,7 @@ import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext.SatSolver;
@@ -127,6 +129,42 @@ public class BoolectorNativeApiTest {
           prover.addConstraint(bfmgr.equivalence(f1, f2));
           assertThat(prover.isUnsat()).isFalse();
         }
+      }
+    }
+  }
+
+  @Test
+  public void dumpVariableTest() throws InvalidConfigurationException {
+    ConfigurationBuilder config = Configuration.builder();
+    try (BoolectorSolverContext context =
+        BoolectorSolverContext.create(config.build(), ShutdownNotifier.createDummy(), null, 1)) {
+      FormulaManager mgr = context.getFormulaManager();
+      BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
+      for (String name : ImmutableList.of("a", "a", "b", "abc", "ABC")) {
+        BooleanFormula f = bfmgr.makeVariable(name);
+        String s = new StringBuilder().append(mgr.dumpFormula(f)).toString();
+        assertThat(s).contains(String.format("(declare-fun %s () (_ BitVec 1))", name));
+        // assertThat(s).contains(String.format("(assert %s)", name)); // assertion not available
+      }
+    }
+  }
+
+  @Test
+  public void repeatedDumpFormulaTest() throws InvalidConfigurationException {
+    ConfigurationBuilder config = Configuration.builder();
+    try (BoolectorSolverContext context =
+        BoolectorSolverContext.create(config.build(), ShutdownNotifier.createDummy(), null, 1)) {
+      FormulaManager mgr = context.getFormulaManager();
+      BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
+      BooleanFormula fa = bfmgr.makeVariable("a");
+      BooleanFormula fb = bfmgr.makeVariable("b");
+      BooleanFormula fc = bfmgr.makeVariable("c");
+      BooleanFormula f1 = bfmgr.or(fa, bfmgr.and(fb, fc));
+      BooleanFormula f2 = bfmgr.or(fa, bfmgr.and(fb, fc));
+      String s1 = new StringBuilder().append(mgr.dumpFormula(f1)).toString();
+      // repeat several times to increase probability for non-deterministic behavior
+      for (int i = 0; i < 10; i++) {
+        assertThat(s1).isEqualTo(new StringBuilder().append(mgr.dumpFormula(f2)).toString());
       }
     }
   }

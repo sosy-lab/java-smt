@@ -58,6 +58,12 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
+
+        // TODO This method only dumps the current node, i.e., in case of "symbol" we get the
+        // declaration, in case of "formula with operator" we get a nice String.
+        // We need to traverse the formula to declare all variables and dump all nodes.
+        // We need to add the "assert" and check for redundant sub-formulas (and avoid them).
+
         String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment(), pT);
         // strip removes the newline at the end of the string
         out.append(dump.strip());

@@ -162,9 +162,9 @@
 
 /* Support for throwing Java exceptions */
 typedef enum {
-  SWIG_JavaOutOfMemoryError = 1, 
-  SWIG_JavaIOException, 
-  SWIG_JavaRuntimeException, 
+  SWIG_JavaOutOfMemoryError = 1,
+  SWIG_JavaIOException,
+  SWIG_JavaRuntimeException,
   SWIG_JavaIndexOutOfBoundsException,
   SWIG_JavaArithmeticException,
   SWIG_JavaIllegalArgumentException,
@@ -219,7 +219,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "boolector.h"
 #include "btortypes.h"
 
-//Used for checking JavaSMT TerminationCallback boolean to determin if Boolector should temrinate
+//Used for checking JavaSMT TerminationCallback boolean to determine if Boolector should temrinate
 static int32_t java_termination_callback(void *user_data) {
     struct callback_info *helper = (struct callback_info *) user_data;
     JNIEnv *jenv = helper->jenv;
@@ -242,22 +242,30 @@ static int32_t java_termination_callback(void *user_data) {
 //Make sure that filename is compliant with the used temp file method
 //Returns NULL in case of NULL filename (so make sure you dont enter NULL!)
 char *addTemppathToFilename(char *filename) {
-    
-  if(!filename) {
+
+  if (!filename) {
     return NULL;
   }
-    
-  char* dir = getenv("TMPDIR");
-  if(dir == NULL || strlen(dir) == 0) {
+
+  char *dir = getenv("TMPDIR");
+  if (dir == NULL || strlen(dir) == 0) {
     dir = "/tmp/";
   }
 
-  int n = (int)strlen(dir) + (int)strlen(filename) + 1 ;
-  char *tfnwd = (char *)malloc(n * sizeof(char));
-  strncpy(tfnwd, dir, strlen(dir));
-  strncat(tfnwd, filename, (strlen(filename) + 1));
-    
-  return tfnwd;
+  int dirLength = (int)strlen(dir);
+  int filenameLength = (int)strlen(filename);
+  int completeNameLength = dirLength + filenameLength + 2;  //+2 because we may need 1 additional for '/'
+  char *tempfileName = (char *)malloc(completeNameLength);
+  if (!tempfileName) {
+    return NULL;
+  }
+  strcpy(tempfileName, dir);
+  if (dir[dirLength - 1] != '/') {
+    strcat(tempfileName, "/");
+  }
+  strcat(tempfileName, filename);
+
+  return tempfileName;
 }
 
 #ifdef __cplusplus
@@ -267,11 +275,11 @@ extern "C" {
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BOOLECTOR_1PARSE_1ERROR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
-  
+
   (void)jenv;
   (void)jcls;
   result = (int)(1);
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -279,11 +287,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_B
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BOOLECTOR_1PARSE_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
-  
+
   (void)jenv;
   (void)jcls;
   result = (int)(2);
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -291,11 +299,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_B
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1new(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   Btor *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   result = (Btor *)boolector_new();
-  *(Btor **)&jresult = result; 
+  *(Btor **)&jresult = result;
   return jresult;
 }
 
@@ -304,22 +312,22 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   Btor *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (Btor *)boolector_clone(arg1);
-  *(Btor **)&jresult = result; 
+  *(Btor **)&jresult = result;
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_delete(arg1);
 }
 
@@ -328,32 +336,32 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   int32_t (*arg2)(void *) = (int32_t (*)(void *)) 0 ;
   void *arg3 = (void *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(int32_t (**)(void *))&jarg2; 
-  arg3 = *(void **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(int32_t (**)(void *))&jarg2;
+  arg3 = *(void **)&jarg3;
   boolector_set_term(arg1,arg2,arg3);
 }
 
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1terminate(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   return boolector_terminate(arg1);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1abort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   void (*arg1)(char const *) = (void (*)(char const *)) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(void (**)(char const *))&jarg1; 
+  arg1 = *(void (**)(char const *))&jarg1;
   boolector_set_abort(arg1);
 }
 
@@ -361,10 +369,10 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1msg_1prefix(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
@@ -377,40 +385,40 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1refs(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   return boolector_get_refs(arg1);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1reset_1time(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_reset_time(arg1);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1reset_1stats(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_reset_stats(arg1);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1print_1stats(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_print_stats(arg1);
 }
 
@@ -418,20 +426,20 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1trapi(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) perror("ERROR: couldn't set api trace because given path was wrong.");
   }
-  FILE *f = 0;
-  f = fopen(arg2, "w");
-  if(f==NULL) {
-    perror("ERROR: couldn't set api trace because it couldn't open trace file.");   
+  FILE *file = 0;
+  file = fopen(arg2, "w");
+  if (file == NULL) {
+    perror("ERROR: couldn't set api trace because it couldn't open trace file.");
   }
-  boolector_set_trapi(arg1,f);
+  boolector_set_trapi(arg1,file);
 }
 
 
@@ -439,12 +447,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   FILE *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (FILE *)boolector_get_trapi(arg1);
-  *(FILE **)&jresult = result; 
+  *(FILE **)&jresult = result;
   return jresult;
 }
 
@@ -453,16 +461,16 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   uint32_t arg2 ;
   uint32_t *argp2 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (uint32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (uint32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return ;
   }
-  arg2 = *argp2; 
+  arg2 = *argp2;
   boolector_push(arg1,arg2);
 }
 
@@ -471,16 +479,16 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   uint32_t arg2 ;
   uint32_t *argp2 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (uint32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (uint32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return ;
   }
-  arg2 = *argp2; 
+  arg2 = *argp2;
   boolector_pop(arg1,arg2);
 }
 
@@ -488,11 +496,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1assert(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   boolector_assert(arg1,arg2);
 }
 
@@ -500,11 +508,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1assume(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   boolector_assume(arg1,arg2);
 }
 
@@ -514,13 +522,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_failed(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -529,42 +537,42 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode **result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (BoolectorNode **)boolector_get_failed_assumptions(arg1);
-  *(BoolectorNode ***)&jresult = result; 
+  *(BoolectorNode ***)&jresult = result;
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1fixate_1assumptions(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_fixate_assumptions(arg1);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1reset_1assumptions(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_reset_assumptions(arg1);
 }
 
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1sat(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   return boolector_sat(arg1);
 }
 
@@ -575,32 +583,32 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   int32_t arg3 ;
   int32_t *argp2 ;
   int32_t *argp3 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (int32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (int32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
     return 0;
   }
-  arg2 = *argp2; 
-  argp3 = (int32_t *)&jarg3; 
+  arg2 = *argp2;
+  argp3 = (int32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
     return 0;
   }
-  arg3 = *argp3; 
+  arg3 = *argp3;
   return boolector_limited_sat(arg1,arg2,arg3);
 }
 
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1simplify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   return boolector_simplify(arg1);
 }
 
@@ -608,10 +616,10 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1sat_1solver(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
@@ -627,17 +635,17 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   BtorOption arg2 ;
   uint32_t arg3 ;
   uint32_t *argp3 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return ;
   }
-  arg3 = *argp3; 
+  arg3 = *argp3;
   boolector_set_opt(arg1,arg2,arg3);
 }
 
@@ -645,11 +653,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1opt(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   return boolector_get_opt(arg1,arg2);
 }
 
@@ -657,11 +665,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1opt_1min(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   return boolector_get_opt_min(arg1,arg2);
 }
 
@@ -669,11 +677,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1opt_1max(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   return boolector_get_opt_max(arg1,arg2);
 }
 
@@ -681,11 +689,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1opt_1dflt(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   return boolector_get_opt_dflt(arg1,arg2);
 }
 
@@ -695,11 +703,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   result = (char *)boolector_get_opt_lng(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -711,11 +719,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   result = (char *)boolector_get_opt_shrt(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -727,11 +735,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   result = (char *)boolector_get_opt_desc(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -743,13 +751,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   result = (bool)boolector_has_opt(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -758,12 +766,12 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   jint jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BtorOption result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (BtorOption)boolector_first_opt(arg1);
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -773,13 +781,13 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   BtorOption arg2 ;
   BtorOption result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = (BtorOption)jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = (BtorOption)jarg2;
   result = (BtorOption)boolector_next_opt(arg1,arg2);
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -789,13 +797,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_copy(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -803,21 +811,21 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1release(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   boolector_release(arg1,arg2);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1release_1all(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Btor *arg1 = (Btor *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   boolector_release_all(arg1);
 }
 
@@ -826,12 +834,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (BoolectorNode *)boolector_true(arg1);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -840,12 +848,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (BoolectorNode *)boolector_false(arg1);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -856,14 +864,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_implies(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -874,14 +882,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_iff(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -892,14 +900,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_eq(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -910,14 +918,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ne(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -927,13 +935,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_bv_const_zero(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -943,13 +951,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_bv_const_one(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -959,13 +967,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_bv_const_ones(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -975,13 +983,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_bv_const_max_signed(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -991,13 +999,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_bv_const_min_signed(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -1007,17 +1015,17 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return 0;
   }
   result = (BoolectorNode *)boolector_const(arg1,(char const *)arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   return jresult;
 }
@@ -1029,18 +1037,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   char *arg3 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
   result = (BoolectorNode *)boolector_constd(arg1,arg2,(char const *)arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
 }
@@ -1052,18 +1060,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   char *arg3 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
   result = (BoolectorNode *)boolector_consth(arg1,arg2,(char const *)arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
 }
@@ -1074,13 +1082,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (BoolectorNode *)boolector_zero(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1090,13 +1098,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (BoolectorNode *)boolector_ones(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1106,13 +1114,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (BoolectorNode *)boolector_one(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1122,13 +1130,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (BoolectorNode *)boolector_min_signed(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1138,13 +1146,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (BoolectorNode *)boolector_max_signed(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1156,19 +1164,19 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg3 = (BoolectorSort) 0 ;
   uint32_t *argp2 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (uint32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (uint32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg2 = *argp2; 
-  arg3 = *(BoolectorSort *)&jarg3; 
+  arg2 = *argp2;
+  arg3 = *(BoolectorSort *)&jarg3;
   result = (BoolectorNode *)boolector_unsigned_int(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1180,19 +1188,19 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg3 = (BoolectorSort) 0 ;
   int32_t *argp2 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (int32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (int32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
     return 0;
   }
-  arg2 = *argp2; 
-  arg3 = *(BoolectorSort *)&jarg3; 
+  arg2 = *argp2;
+  arg3 = *(BoolectorSort *)&jarg3;
   result = (BoolectorNode *)boolector_int(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1203,18 +1211,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   char *arg3 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
   result = (BoolectorNode *)boolector_var(arg1,arg2,(char const *)arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
 }
@@ -1226,18 +1234,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   char *arg3 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
   result = (BoolectorNode *)boolector_array(arg1,arg2,(char const *)arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
 }
@@ -1249,18 +1257,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   char *arg3 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
   result = (BoolectorNode *)boolector_uf(arg1,arg2,(char const *)arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
 }
@@ -1271,13 +1279,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_not(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1287,13 +1295,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_neg(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1303,13 +1311,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_redor(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1319,13 +1327,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_redxor(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1335,13 +1343,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_redand(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1355,25 +1363,25 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t *argp3 ;
   uint32_t *argp4 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
-  argp4 = (uint32_t *)&jarg4; 
+  arg3 = *argp3;
+  argp4 = (uint32_t *)&jarg4;
   if (!argp4) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg4 = *argp4; 
+  arg4 = *argp4;
   result = (BoolectorNode *)boolector_slice(arg1,arg2,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1385,19 +1393,19 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t arg3 ;
   uint32_t *argp3 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
+  arg3 = *argp3;
   result = (BoolectorNode *)boolector_uext(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1409,19 +1417,19 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t arg3 ;
   uint32_t *argp3 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
+  arg3 = *argp3;
   result = (BoolectorNode *)boolector_sext(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1432,14 +1440,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_xor(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1450,14 +1458,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_xnor(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1468,14 +1476,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_and(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1486,14 +1494,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_nand(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1504,14 +1512,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_or(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1522,14 +1530,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_nor(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1540,14 +1548,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_add(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1558,14 +1566,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_uaddo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1576,14 +1584,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_saddo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1594,14 +1602,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_mul(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1612,14 +1620,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_umulo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1630,14 +1638,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_smulo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1648,14 +1656,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ult(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1666,14 +1674,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_slt(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1684,14 +1692,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ulte(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1702,14 +1710,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_slte(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1720,14 +1728,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ugt(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1738,14 +1746,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sgt(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1756,14 +1764,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ugte(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1774,14 +1782,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sgte(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1792,14 +1800,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sll(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1810,14 +1818,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_srl(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1828,14 +1836,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sra(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1846,14 +1854,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_rol(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1864,14 +1872,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ror(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1882,14 +1890,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sub(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1900,14 +1908,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_usubo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1918,14 +1926,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_ssubo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1936,14 +1944,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_udiv(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1954,14 +1962,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sdiv(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1972,14 +1980,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_sdivo(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -1990,14 +1998,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_urem(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2008,14 +2016,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_srem(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2026,14 +2034,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_smod(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2044,14 +2052,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_concat(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2063,19 +2071,19 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t arg3 ;
   uint32_t *argp3 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
+  arg3 = *argp3;
   result = (BoolectorNode *)boolector_repeat(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2086,14 +2094,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (BoolectorNode *)boolector_read(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2105,15 +2113,15 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
+  arg4 = *(BoolectorNode **)&jarg4;
   result = (BoolectorNode *)boolector_write(arg1,arg2,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2125,15 +2133,15 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
+  arg4 = *(BoolectorNode **)&jarg4;
   result = (BoolectorNode *)boolector_cond(arg1,arg2,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2144,18 +2152,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   char *arg3 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
   result = (BoolectorNode *)boolector_param(arg1,arg2,(char const *)arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
 }
@@ -2169,20 +2177,20 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   uint32_t *argp3 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode ***)&jarg2; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode ***)&jarg2;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg3 = *argp3;
+  arg4 = *(BoolectorNode **)&jarg4;
   result = (BoolectorNode *)boolector_fun(arg1,arg2,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2195,36 +2203,36 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   uint32_t *argp3 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg3 = *argp3;
+  arg4 = *(BoolectorNode **)&jarg4;
   result = (BoolectorNode *)boolector_apply(arg1,(BoolectorNode**)array,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   (*jenv)->ReleaseLongArrayElements(jenv, jarg2, array, 0);
   return jresult;
 }
-    
+
 
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1inc(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_inc(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2234,13 +2242,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_dec(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2251,18 +2259,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t arg3 = jarg3;
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
 
   BoolectorNode **array = 0;
   array = (BoolectorNode**)(*jenv)->GetLongArrayElements(jenv, jarg2, 0);
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg4 = *(BoolectorNode **)&jarg4;
   result = (BoolectorNode *)boolector_forall(arg1, array,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   (*jenv)->ReleaseLongArrayElements(jenv, jarg2, (jlong*)array, 0);
-  
+
   return jresult;
 }
 
@@ -2273,17 +2281,17 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t arg3 = jarg3;
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-    
+  arg1 = *(Btor **)&jarg1;
+
   jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0);
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg4 = *(BoolectorNode **)&jarg4;
   result = (BoolectorNode *)boolector_exists(arg1,(BoolectorNode**)array,arg3,arg4);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   (*jenv)->ReleaseLongArrayElements(jenv, jarg2, array, 0);
-  
+
   return jresult;
 }
 
@@ -2292,12 +2300,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   BoolectorNode *arg1 = (BoolectorNode *) 0 ;
   Btor *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(BoolectorNode **)&jarg1; 
+  arg1 = *(BoolectorNode **)&jarg1;
   result = (Btor *)boolector_get_btor(arg1);
-  *(Btor **)&jresult = result; 
+  *(Btor **)&jresult = result;
   return jresult;
 }
 
@@ -2305,11 +2313,11 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1node_1id(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   return boolector_get_node_id(arg1,arg2);
 }
 
@@ -2319,13 +2327,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorSort)boolector_get_sort(arg1,(struct BoolectorNode const *)arg2);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2335,13 +2343,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorSort)boolector_fun_get_domain_sort(arg1,(struct BoolectorNode const *)arg2);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2351,13 +2359,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorSort)boolector_fun_get_codomain_sort(arg1,(struct BoolectorNode const *)arg2);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2368,18 +2376,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   int32_t arg2 ;
   int32_t *argp2 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (int32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (int32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
     return 0;
   }
-  arg2 = *argp2; 
+  arg2 = *argp2;
   result = (BoolectorNode *)boolector_match_node_by_id(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2389,17 +2397,17 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return 0;
   }
   result = (BoolectorNode *)boolector_match_node_by_symbol(arg1,(char const *)arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   return jresult;
 }
@@ -2410,13 +2418,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (BoolectorNode *)boolector_match_node(arg1,arg2);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -2426,11 +2434,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (char *)boolector_get_symbol(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -2441,11 +2449,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char *arg3 = (char *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
@@ -2459,11 +2467,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   return boolector_get_width(arg1,arg2);
 }
 
@@ -2471,11 +2479,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1index_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   return boolector_get_index_width(arg1,arg2);
 }
 
@@ -2485,11 +2493,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (char *)boolector_get_bits(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -2499,10 +2507,10 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1free_1bits(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
@@ -2516,11 +2524,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1fun_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   return boolector_get_fun_arity(arg1,arg2);
 }
 
@@ -2530,13 +2538,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_const(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2546,13 +2554,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_var(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2562,13 +2570,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_array(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2578,13 +2586,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_array_var(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2594,13 +2602,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_param(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2610,13 +2618,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_bound_param(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2626,13 +2634,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_uf(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2642,13 +2650,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (bool)boolector_is_fun(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2659,18 +2667,18 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   BoolectorNode *arg4 = (BoolectorNode *) 0 ;
   uint32_t *argp3 ;
   jint result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
     jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0);
-  argp3 = (uint32_t *)&jarg3; 
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
-  arg4 = *(BoolectorNode **)&jarg4; 
+  arg3 = *argp3;
+  arg4 = *(BoolectorNode **)&jarg4;
   result = boolector_fun_sort_check(arg1,(BoolectorNode**)array,arg3,arg4);
   (*jenv)->ReleaseLongArrayElements(jenv, jarg2, array, 0);
   return result;
@@ -2682,11 +2690,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
   result = (char *)boolector_bv_assignment(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -2696,10 +2704,10 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1free_1bv_1assignment(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
@@ -2716,14 +2724,14 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(char ****)&jarg3; 
-  arg4 = *(char ****)&jarg4; 
-  arg5 = (uint32_t *)&jarg5; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(char ****)&jarg3;
+  arg4 = *(char ****)&jarg4;
+  arg5 = (uint32_t *)&jarg5;
   boolector_array_assignment(arg1,arg2,arg3,arg4,arg5);
 }
 
@@ -2734,18 +2742,18 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char **arg3 = (char **) 0 ;
   uint32_t arg4 ;
   uint32_t *argp4 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(char ***)&jarg2; 
-  arg3 = *(char ***)&jarg3; 
-  argp4 = (uint32_t *)&jarg4; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(char ***)&jarg2;
+  arg3 = *(char ***)&jarg3;
+  argp4 = (uint32_t *)&jarg4;
   if (!argp4) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return ;
   }
-  arg4 = *argp4; 
+  arg4 = *argp4;
   boolector_free_array_assignment(arg1,arg2,arg3,arg4);
 }
 
@@ -2756,14 +2764,14 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(char ****)&jarg3; 
-  arg4 = *(char ****)&jarg4; 
-  arg5 = *(uint32_t **)&jarg5; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(char ****)&jarg3;
+  arg4 = *(char ****)&jarg4;
+  arg5 = *(uint32_t **)&jarg5;
   boolector_uf_assignment(arg1,arg2,arg3,arg4,arg5);
 }
 
@@ -2774,18 +2782,18 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char **arg3 = (char **) 0 ;
   uint32_t arg4 ;
   uint32_t *argp4 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(char ***)&jarg2; 
-  arg3 = *(char ***)&jarg3; 
-  argp4 = (uint32_t *)&jarg4; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(char ***)&jarg2;
+  arg3 = *(char ***)&jarg3;
+  argp4 = (uint32_t *)&jarg4;
   if (!argp4) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return ;
   }
-  arg4 = *argp4; 
+  arg4 = *argp4;
   boolector_free_uf_assignment(arg1,arg2,arg3,arg4);
 }
 
@@ -2794,16 +2802,16 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   char *arg2 = (char *) 0 ;
   FILE *arg3 = (FILE *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return ;
   }
-  arg3 = *(FILE **)&jarg3; 
+  arg3 = *(FILE **)&jarg3;
   boolector_print_model(arg1,arg2,arg3);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
 }
@@ -2813,12 +2821,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (BoolectorSort)boolector_bool_sort(arg1);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2829,18 +2837,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   uint32_t arg2 ;
   uint32_t *argp2 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  argp2 = (uint32_t *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  argp2 = (uint32_t *)&jarg2;
   if (!argp2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg2 = *argp2; 
+  arg2 = *argp2;
   result = (BoolectorSort)boolector_bitvec_sort(arg1,arg2);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2853,18 +2861,18 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg4 = (BoolectorSort) 0 ;
   uint32_t *argp3 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0); 
-  argp3 = (uint32_t *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  jlong *array = (*jenv)->GetLongArrayElements(jenv, jarg2, 0);
+  argp3 = (uint32_t *)&jarg3;
   if (!argp3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
     return 0;
   }
-  arg3 = *argp3; 
-  arg4 = *(BoolectorSort *)&jarg4; 
+  arg3 = *argp3;
+  arg4 = *(BoolectorSort *)&jarg4;
   result = (BoolectorSort)boolector_fun_sort(arg1,(BoolectorSort*)array,arg3,arg4);
   *(BoolectorSort *)&jresult = result;
   (*jenv)->ReleaseLongArrayElements(jenv, jarg2, array, 0);
@@ -2878,14 +2886,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorSort arg3 = (BoolectorSort) 0 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
-  arg3 = *(BoolectorSort *)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
+  arg3 = *(BoolectorSort *)&jarg3;
   result = (BoolectorSort)boolector_array_sort(arg1,arg2,arg3);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2895,13 +2903,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   BoolectorSort result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (BoolectorSort)boolector_copy_sort(arg1,arg2);
-  *(BoolectorSort *)&jresult = result; 
+  *(BoolectorSort *)&jresult = result;
   return jresult;
 }
 
@@ -2909,11 +2917,11 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1release_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   boolector_release_sort(arg1,arg2);
 }
 
@@ -2924,14 +2932,14 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   result = (bool)boolector_is_equal_sort(arg1,arg2,arg3);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2941,13 +2949,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (bool)boolector_is_array_sort(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2957,13 +2965,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (bool)boolector_is_bitvec_sort(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2973,13 +2981,13 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJ
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   bool result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
   result = (bool)boolector_is_fun_sort(arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = (jboolean)result;
   return jresult;
 }
 
@@ -2993,19 +3001,19 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   int32_t *arg6 = (int32_t *) 0 ;
   bool parsedFlag = (bool) 0;
   jint result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
-  arg4 = *(FILE **)&jarg4; 
-  arg5 = *(char ***)&jarg5; 
-  arg6 = *(int32_t **)&jarg6; 
+  arg4 = *(FILE **)&jarg4;
+  arg5 = *(char ***)&jarg5;
+  arg6 = *(int32_t **)&jarg6;
   result = boolector_parse(arg1,arg2,(char const *)arg3,arg4,arg5,arg6,&parsedFlag);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
@@ -3020,19 +3028,19 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
   jint result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
-  arg4 = *(FILE **)&jarg4; 
-  arg5 = *(char ***)&jarg5; 
-  arg6 = *(int32_t **)&jarg6; 
+  arg4 = *(FILE **)&jarg4;
+  arg5 = *(char ***)&jarg5;
+  arg6 = *(int32_t **)&jarg6;
   result = boolector_parse_btor(arg1,arg2,(char const *)arg3,arg4,arg5,arg6);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
@@ -3047,19 +3055,19 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
   jint result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
-  arg4 = *(FILE **)&jarg4; 
-  arg5 = *(char ***)&jarg5; 
-  arg6 = *(int32_t **)&jarg6; 
+  arg4 = *(FILE **)&jarg4;
+  arg5 = *(char ***)&jarg5;
+  arg6 = *(int32_t **)&jarg6;
   result = boolector_parse_btor2(arg1,arg2,(char const *)arg3,arg4,arg5,arg6);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
@@ -3074,19 +3082,19 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
   jint result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
-  arg4 = *(FILE **)&jarg4; 
-  arg5 = *(char ***)&jarg5; 
-  arg6 = *(int32_t **)&jarg6; 
+  arg4 = *(FILE **)&jarg4;
+  arg5 = *(char ***)&jarg5;
+  arg6 = *(int32_t **)&jarg6;
   result = boolector_parse_smt1(arg1,arg2,(char const *)arg3,arg4,arg5,arg6);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
@@ -3101,19 +3109,19 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   char **arg5 = (char **) 0 ;
   int32_t *arg6 = (int32_t *) 0 ;
   jint result;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   arg3 = 0;
   if (jarg3) {
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
-  arg4 = *(FILE **)&jarg4; 
-  arg5 = *(char ***)&jarg5; 
-  arg6 = *(int32_t **)&jarg6; 
+  arg4 = *(FILE **)&jarg4;
+  arg5 = *(char ***)&jarg5;
+  arg6 = *(int32_t **)&jarg6;
   result = boolector_parse_smt2(arg1,arg2,(char const *)arg3,arg4,arg5,arg6);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return result;
@@ -3124,12 +3132,12 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   boolector_dump_btor_node(arg1,arg2,arg3);
 }
 
@@ -3137,11 +3145,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1dump_1btor(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   boolector_dump_btor(arg1,arg2);
 }
 
@@ -3150,12 +3158,12 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
   BoolectorNode *arg3 = (BoolectorNode *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
-  arg3 = *(BoolectorNode **)&jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
+  arg3 = *(BoolectorNode **)&jarg3;
   boolector_dump_smt2_node(arg1,arg2,arg3);
 }
 
@@ -3163,11 +3171,11 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1dump_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
   boolector_dump_smt2(arg1,arg2);
 }
 
@@ -3176,12 +3184,12 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
   bool arg3 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
-  arg3 = jarg3 ? true : false; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
+  arg3 = jarg3 ? true : false;
   boolector_dump_aiger_ascii(arg1,arg2,arg3);
 }
 
@@ -3190,12 +3198,12 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   Btor *arg1 = (Btor *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
   bool arg3 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(FILE **)&jarg2; 
-  arg3 = jarg3 ? true : false; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(FILE **)&jarg2;
+  arg3 = jarg3 ? true : false;
   boolector_dump_aiger_binary(arg1,arg2,arg3);
 }
 
@@ -3204,10 +3212,10 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   jstring jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (char *)boolector_copyright(arg1);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -3218,10 +3226,10 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   jstring jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (char *)boolector_version(arg1);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -3232,10 +3240,10 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
   jstring jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   char *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
+  arg1 = *(Btor **)&jarg1;
   result = (char *)boolector_git_id(arg1);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
@@ -3245,11 +3253,11 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BTOR_1RESULT_1SAT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BtorSolverResult result;
-  
+
   (void)jenv;
   (void)jcls;
   result = (enum BtorSolverResult)BTOR_RESULT_SAT;
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -3257,11 +3265,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_B
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BTOR_1RESULT_1UNSAT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BtorSolverResult result;
-  
+
   (void)jenv;
   (void)jcls;
   result = (enum BtorSolverResult)BTOR_RESULT_UNSAT;
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -3269,11 +3277,11 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_B
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BTOR_1RESULT_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BtorSolverResult result;
-  
+
   (void)jenv;
   (void)jcls;
   result = (enum BtorSolverResult)BTOR_RESULT_UNKNOWN;
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
 }
 
@@ -3281,12 +3289,12 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_B
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BtorAbortCallback_1abort_1fun_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct BtorAbortCallback *arg1 = (struct BtorAbortCallback *) 0 ;
   void (*arg2)(char const *) = (void (*)(char const *)) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(struct BtorAbortCallback **)&jarg1; 
-  arg2 = *(void (**)(char const *))&jarg2; 
+  arg1 = *(struct BtorAbortCallback **)&jarg1;
+  arg2 = *(void (**)(char const *))&jarg2;
   if (arg1) (arg1)->abort_fun = arg2;
 }
 
@@ -3295,13 +3303,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   struct BtorAbortCallback *arg1 = (struct BtorAbortCallback *) 0 ;
   void (*result)(char const *) = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(struct BtorAbortCallback **)&jarg1; 
+  arg1 = *(struct BtorAbortCallback **)&jarg1;
   result = (void (*)(char const *)) ((arg1)->abort_fun);
-  *(void (**)(char const *))&jresult = result; 
+  *(void (**)(char const *))&jresult = result;
   return jresult;
 }
 
@@ -3309,12 +3317,12 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_BtorAbortCallback_1cb_1fun_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct BtorAbortCallback *arg1 = (struct BtorAbortCallback *) 0 ;
   void *arg2 = (void *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(struct BtorAbortCallback **)&jarg1; 
-  arg2 = *(void **)&jarg2; 
+  arg1 = *(struct BtorAbortCallback **)&jarg1;
+  arg2 = *(void **)&jarg2;
   if (arg1) (arg1)->cb_fun = arg2;
 }
 
@@ -3323,13 +3331,13 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   jlong jresult = 0 ;
   struct BtorAbortCallback *arg1 = (struct BtorAbortCallback *) 0 ;
   void *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(struct BtorAbortCallback **)&jarg1; 
+  arg1 = *(struct BtorAbortCallback **)&jarg1;
   result = (void *) ((arg1)->cb_fun);
-  *(void **)&jresult = result; 
+  *(void **)&jresult = result;
   return jresult;
 }
 
@@ -3337,32 +3345,32 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_new_1BtorAbortCallback(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   struct BtorAbortCallback *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   result = (struct BtorAbortCallback *)calloc(1, sizeof(struct BtorAbortCallback));
-  *(struct BtorAbortCallback **)&jresult = result; 
+  *(struct BtorAbortCallback **)&jresult = result;
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_delete_1BtorAbortCallback(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   struct BtorAbortCallback *arg1 = (struct BtorAbortCallback *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(struct BtorAbortCallback **)&jarg1; 
+  arg1 = *(struct BtorAbortCallback **)&jarg1;
   free((char *) arg1);
 }
 
 
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_btor_1abort_1callback_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   BtorAbortCallback *arg1 = (BtorAbortCallback *) 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(BtorAbortCallback **)&jarg1; 
+  arg1 = *(BtorAbortCallback **)&jarg1;
   btor_abort_callback = *arg1;
 }
 
@@ -3370,29 +3378,29 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_btor_1abort_1callback_1get(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   BtorAbortCallback *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
   result = (BtorAbortCallback *)&btor_abort_callback;
-  *(BtorAbortCallback **)&jresult = result; 
+  *(BtorAbortCallback **)&jresult = result;
   return jresult;
-}   
+}
 
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1bitvec_1sort_1get_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jint jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
   BoolectorSort arg2 = (BoolectorSort) 0 ;
   int32_t  result = 0;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorSort *)&jarg2; 
- 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorSort *)&jarg2;
+
   result = boolector_bitvec_sort_get_width(arg1,arg2);
-  jresult = (jint)result; 
+  jresult = (jint)result;
   return jresult;
-} 
+}
 
 
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
@@ -3401,14 +3409,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   uint32_t arg3 = 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = (uint32_t)jarg3;  
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = (uint32_t)jarg3;
   result = (BoolectorNode *)boolector_rori(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -3418,14 +3426,14 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   uint32_t arg3 = 0 ;
   BoolectorNode *result = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
-  arg3 = (uint32_t)jarg3; 
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = (uint32_t)jarg3;
   result = (BoolectorNode *)boolector_roli(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result; 
+  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 
@@ -3435,20 +3443,20 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 //Returns the int value of BOOLECTOR_PARSE_ERROR
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1get_1parse_1error(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  jresult = (jint)BOOLECTOR_PARSE_ERROR; 
+  jresult = (jint)BOOLECTOR_PARSE_ERROR;
   return jresult;
 }
 
 //Returns the int value of BOOLECTOR_PARSE_UNKNOWN
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1get_1parse_1unknown(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  
+
   (void)jenv;
   (void)jcls;
-  jresult = (jint)BOOLECTOR_PARSE_UNKNOWN; 
+  jresult = (jint)BOOLECTOR_PARSE_UNKNOWN;
   return jresult;
 }
 
@@ -3457,67 +3465,67 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  char *result = 0 ;
-  char tfn[] = "boolector_help_dump_smt2_tempfile-XXXXXX";
-  FILE *f = 0;
-  int fd = -1;
-  char * buffer = 0;
-  long length = 0;
-  char *tfnwd = addTemppathToFilename(tfn);
+  char tempFilenameTemplate[] = "boolector_help_dump_smt2_tempfile-XXXXXX";
+  FILE *file = 0;
+  int fileDescr = -1;
+  char *buffer = 0;
+  long fileLength = 0;
+  char *tempfileName = addTemppathToFilename(tempFilenameTemplate);
 
-  fd = mkstemp(tfnwd);
-  if(fd == -1) {
-    free(tfnwd);
+  fileDescr = mkstemp(tempfileName);
+  if (fileDescr == -1) {
+    free(tempfileName);
     perror("ERROR CREATING TEMPORARY FILE FOR SMT2 DUMPING");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for file used in boolector_help_dump_smt2 may not be NULL");
     return 0;
   }
 
-  f = fdopen(fd,"w+");
-  if(f==NULL) {
-    unlink(tfnwd);
-    free(tfnwd);
+  file = fdopen(fileDescr,"w+");
+  if (file == NULL) {
+    unlink(tempfileName);
     perror("ERROR OPENING FILE FOR SMT2 DUMPING");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_smt2 may not be NULL");
     return 0;
   }
-    
+
   (void)jenv;
   (void)jcls;
-    
-  arg1 = *(Btor **)&jarg1; 
-    
+
+  arg1 = *(Btor **)&jarg1;
+
   //write
-  boolector_dump_smt2(arg1, f);
-    
+  boolector_dump_smt2(arg1, file);
+
+  unlink(tempfileName);
   //read
-  if (f) {
-    fseek (f, 0, SEEK_END);
-    length = ftell (f);
-    fseek (f, 0, SEEK_SET);
-    buffer = malloc (length);
-    if (buffer) {
-      if(fread (buffer, 1, length, f) != (unsigned long)length) {
-        perror("ERROR READING FILE INTO BUFFER");
-        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_smt2 may not be NULL");
-        return 0;
-      }
+  if (file) {
+    fseek(file, 0, SEEK_END);
+    fileLength = ftell(file);
+    rewind(file);
+    buffer = (char *)malloc((fileLength + 1) * sizeof(char));
+    if (!buffer) {
+      free(buffer);
+      perror("ERROR CREATING BUFFER");
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_smt2 may not be NULL");
+      return 0;
+    }
+    if (fread (buffer, 1, fileLength, file) != (unsigned long)fileLength) {
+      free(buffer);
+      perror("ERROR READING FILE INTO BUFFER");
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Error reading file into buffer in boolector_help_dump_smt2.");
+      return 0;
     }
   }
 
-  if (buffer) {
-    result = buffer;
-  }  
-    
-  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-  
-  unlink(tfnwd);
-  free(tfnwd);
-  fclose (f);
+  buffer[fileLength] = '\0';
+
+  jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
+
+  fclose(file);
   free(buffer);
   return jresult;
 }
-    
+
 //helper method for parsing string into btor
 //insert java string into jarg2
 //returns array of (java)strings, length 5, for (in that order): result (int in String), outfile(As string), errormsg, status (int as String), parsedFlag (bool as String)
@@ -3527,95 +3535,93 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   int32_t status = (int32_t) 0 ;
   char *errormsg = (char *) 0 ;
   bool parsedFlag = (bool) 0;
-  char fnIn[] = "boolector_help_parse_tempinfile-XXXXXX";
-  char fnOut[] = "boolector_help_parse_tempoutfile-XXXXXX";
-  char *tfnwdIn = addTemppathToFilename(fnIn);
-  int fdIn = -1;
-  char *tfnwdOut = addTemppathToFilename(fnOut);
-  int fdOut = -1;
+  char fileNameIn[] = "boolector_help_parse_tempinfile-XXXXXX";
+  char fileNameOut[] = "boolector_help_parse_tempoutfile-XXXXXX";
+  char *tempfileNameIn = addTemppathToFilename(fileNameIn);
+  int fileDescrIn = -1;
+  char *tempfileNameOut = addTemppathToFilename(fileNameOut);
+  int fileDescrOut = -1;
   char *arg2 = (char *) 0 ;
-  FILE *fparse = 0;
-  FILE *fout = 0;
-    
+  FILE *fileParse = 0;
+  FILE *fileOut = 0;
+
   (void)jenv;
   (void)jcls;
-    
-  arg1 = *(Btor **)&jarg1; 
-  
+
+  arg1 = *(Btor **)&jarg1;
+
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) {
-      free(tfnwdIn);
-      free(tfnwdOut);
+      free(tempfileNameIn);
+      free(tempfileNameOut);
       SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Inputstring for boolector_help_parse may not be NULL");
       return 0;
     }
   }
-    
-  fdIn = mkstemp(tfnwdIn);
-  if(fdIn == -1) {
-    free(tfnwdIn); 
-    free(tfnwdOut);
+
+  fileDescrIn = mkstemp(tempfileNameIn);
+  if (fileDescrIn == -1) {
+    free(tempfileNameIn);
+    free(tempfileNameOut);
     perror("ERROR CREATING TEMPORARY FILE FOR");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for inputfile for boolector_help_parse may not be NULL");
     return 0;
   }
-  
-  fparse = fdopen(fdIn, "w+");
-  if(fparse==NULL) {
-    unlink(tfnwdIn);
-    free(tfnwdIn);
-    free(tfnwdOut);
+
+  fileParse = fdopen(fileDescrIn, "w+");
+  if (fileParse==NULL) {
+    unlink(tempfileNameIn);
+    free(tempfileNameOut);
     perror("ERROR_INPUTFILE");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Inputfile for boolector_help_parse may not be NULL");
     return 0;
   }
-  
-  fputs(arg2, fparse);
-  
-  fdOut = mkstemp(tfnwdOut);
-  if(fdOut == -1) {
-    unlink(tfnwdIn);
-    free(tfnwdIn);
-    fclose(fparse);  
-    free(tfnwdOut);
+
+  fputs(arg2, fileParse);
+
+  fileDescrOut = mkstemp(tempfileNameOut);
+  if (fileDescrOut == -1) {
+    unlink(tempfileNameIn);
+    fclose(fileParse);
+    free(tempfileNameOut);
     perror("ERROR CREATING TEMPORARY FILE FOR");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for outputfile for boolector_help_parse may not be NULL");
     return 0;
   }
-  fout = fdopen(fdOut, "w+");
-  if(fout==NULL) {
-    unlink(tfnwdIn);
-    free(tfnwdIn);
-    fclose(fparse);
-    unlink(tfnwdOut);  
-    free(tfnwdOut);
+  fileOut = fdopen(fileDescrOut, "w+");
+  if (fileOut==NULL) {
+    unlink(tempfileNameIn);
+    fclose(fileParse);
+    unlink(tempfileNameOut);
     perror("ERROR_OUTPUTFILE");
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Outputfile for boolector_help_parse may not be NULL");
     return 0;
   }
 
   //"read" (parse)
-  result = boolector_parse(arg1, fparse, tfnwdIn, fout, &errormsg, &status, &parsedFlag);
-  
+  result = boolector_parse(arg1, fileParse, tempfileNameIn, fileOut, &errormsg, &status, &parsedFlag);
+
+  unlink(tempfileNameIn);
+  fclose(fileParse);
   //We create an java String Array length 5
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jobjectArray jniArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, 5, classString, (*jenv)->NewStringUTF(jenv, ""));
   for(int i = 0; i < 5; i++) {
     (*jenv)->SetObjectArrayElement(jenv, jniArray, i, (*jenv)->NewStringUTF(jenv, ""));
   }
-  
+
   //For output array
-  char *foutString = (char *) 0;
+  char *fileOutString = (char *) 0;
   char * buffer = 0;
   int length = 0;
-  
+
   char *statusString = (char *) 0;
   char flagString[2];
   char *resultString = (char *) 0;
-  
+  //TODO: check return values for methods below (if we ever use this method....)
   sprintf(flagString, "%d", (int)parsedFlag);
-  
+
   length = snprintf(NULL, 0,"%d",result);
   resultString = malloc((length+1)*sizeof(char));
   sprintf(resultString, "%d", result);
@@ -3626,22 +3632,19 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   statusString = malloc((length+1)*sizeof(char));
   sprintf(statusString, "%d", status);
   strncat(statusString, "\0", 1);
-  length = 0;
+  length = -1;  //Reset for buffer use
 
-  //We dont really care if fout is empty, we just return an empty string in that case
-  if(fout) {
-   fseek(fout, 0, SEEK_END);
-    length = ftell(fout);
-    fseek(fout, 0, SEEK_SET);
-    buffer = malloc(length);
-    if(buffer) {
-      if(fread (buffer, 1, length, fout) != (unsigned long)length) {
-        unlink(tfnwdIn);
-        free(tfnwdIn);
-        fclose(fparse);
-        unlink(tfnwdOut);  
-        free(tfnwdOut);
-        fclose(fout);
+  //We dont really care if fileOut is empty, we just return an empty string in that case
+  if (fileOut) {
+    rewind(fileOut);
+    fseek(fileOut, 0, SEEK_END);
+    length = ftell(fileOut);
+    rewind(fileOut);
+    buffer = (char *)malloc((length + 1) * sizeof(char));
+    if (buffer) {
+      if (fread (buffer, 1, length, fileOut) != (unsigned long)length) {
+        unlink(tempfileNameOut);
+        fclose(fileOut);
         free(buffer);
         free(resultString);
         free(statusString);
@@ -3654,137 +3657,179 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   }
 
   if (buffer) {
-    foutString = buffer;
+    buffer[length] = '\0';
+    fileOutString = buffer;
   } else {
-    foutString = "";
+    fileOutString = "";
   }
-  
+
   (*jenv)->SetObjectArrayElement(jenv, jniArray, 0, (*jenv)->NewStringUTF(jenv, resultString));
-  
-  (*jenv)->SetObjectArrayElement(jenv, jniArray, 1, (*jenv)->NewStringUTF(jenv, (const char *)foutString));
-  
+
+  (*jenv)->SetObjectArrayElement(jenv, jniArray, 1, (*jenv)->NewStringUTF(jenv, (const char *)fileOutString));
+
   (*jenv)->SetObjectArrayElement(jenv, jniArray, 2, (*jenv)->NewStringUTF(jenv, errormsg));
-  
+
   (*jenv)->SetObjectArrayElement(jenv, jniArray, 3, (*jenv)->NewStringUTF(jenv, statusString));
-  
+
   (*jenv)->SetObjectArrayElement(jenv, jniArray, 4, (*jenv)->NewStringUTF(jenv, flagString));
 
   (*jenv)->DeleteLocalRef(jenv, classString);
+  unlink(tempfileNameOut);
+  fclose(fileOut);
   free(buffer);
-  unlink(tfnwdIn);
-  free(tfnwdIn);
-  fclose(fparse);
-  unlink(tfnwdOut);  
-  free(tfnwdOut);
-  fclose(fout);
   free(statusString);
   free(resultString);
   return jniArray;
 }
-    
+
 //dumps NODE into new file and reads it to give it back
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1node_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  char *result = 0 ;
-  char filename[] = "boolector_help_dump_node_smt2_tempinfile-XXXXXX";
-  FILE *f = 0;
-  char * buffer = 0;
-  int fd = -1;
-  long length = 0;
+  FILE *file = 0;
+  char *buffer = NULL;
+  int fileDesrc = -1;
+  long fileLength = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  char *tfnwd = addTemppathToFilename(filename);
 
-  fd = mkstemp(tfnwd);
-  if(fd == -1) {
-    free(tfnwd);
-    perror("ERROR CREATING TEMPORARY FILE FOR");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
+  char *filenameBuffer = (char *)malloc(53);  //sizeof(char) == 1 in C and string is 52 long
+  if (!filenameBuffer) {
+    perror("ERROR: COULDNT ALLOCATE MEMORY FOR THE FILENAME");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Couldn't create filenameBuffer for boolector_help_dump_node_smt2");
     return 0;
   }
-    
+  memset(filenameBuffer, 0, 53);
+  strncpy(filenameBuffer, "boolector_help_dump_node_smt2_tempinfile-XXXXXX", 52);
+  char *tempfileName = addTemppathToFilename(filenameBuffer);
+  free(filenameBuffer);
+
+  if (tempfileName == NULL) {
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName for boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
+
+  fileDesrc = mkstemp(tempfileName);
+  if (fileDesrc == -1) {
+    free(tempfileName);
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
+
   (void)jenv;
   (void)jcls;
   arg1 = *(Btor **)&jarg1;
-  arg2 = *(BoolectorNode **)&jarg2; 
+  arg2 = *(BoolectorNode **)&jarg2;
 
-  f = fdopen(fd, "w+");
-  if(f==NULL) {
-    free(tfnwd);
-    unlink(tfnwd);
-    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE"); 
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_node_smt2 may not be NULL");
+  file = fdopen(fileDesrc, "w+");
+  unlink(tempfileName);
+  if (file == NULL) {
+    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 may not be NULL");
     return 0;
   }
-    
+
   //write
-  boolector_dump_smt2_node(arg1, f, arg2);
-    
-  //read
-  if (f) {
-   fseek (f, 0, SEEK_END);
-    length = ftell (f);
-    fseek (f, 0, SEEK_SET);
-    buffer = malloc (length);
-    if (buffer) {
-      if(fread (buffer, 1, length, f) != (unsigned long)length) {
-        unlink(tfnwd); 
-        free(tfnwd);
-        free(buffer);
-        perror("ERROR READING FILE INTO BUFFER");
-        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
-        return 0;
-      }
-    }
+  boolector_dump_smt2_node(arg1, file, arg2);
+  if (fflush(file) != 0) {
+    perror("ERROR: COULDNT FLUSH DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 could not be flushed");
+    return 0;
+  }
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
+    return 0;
   }
 
-  if (buffer) {
-    result = buffer;
+  //read
+  if (!file) {
+    perror("ERROR: FILE RETURNED BY BOOLECTOR_DUMP_SMT2_NODE IS NULL");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File returned by boolector_dump_smt2_node() is NULL. boolector_help_dump_node_smt2 aborted.");
+    return 0;
   }
-    
-  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-    
-  unlink(tfnwd); 
-  free(tfnwd);
-  fclose(f); 
+
+  if (fseek(file, 0, SEEK_END) != 0) {
+    perror("ERROR SEEKING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the end of the used file");
+    return 0;
+  }
+
+  fileLength = ftell(file);
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
+    return 0;
+  }
+
+  if (fileLength <= 0) {
+    perror("ERROR READING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File length in boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
+
+  buffer = (char *)malloc((fileLength + 1) * sizeof(char));
+
+  if (!buffer) {
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
+    return 0;
+  }
+
+  size_t readLength = fread(buffer, 1, fileLength, file);
+
+  if ((unsigned long)fileLength != readLength) {
+    free(buffer);
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 did not read the whole length of the file into the buffer");
+    return 0;
+  }
+  fclose(file);
+  buffer[fileLength] = '\0';
+
+  jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
   free(buffer);
   return jresult;
 }
-    
-    
+
+
 //reads uf assignment and gives back array with 3 slots, first is size of the other 2 entrys, second and third are arrays, second is uf argument assignment strings, third is uf value assignments
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1uf_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1uf_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *arg1 = (Btor *) 0 ;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
-    
+
   (void)jenv;
   (void)jcls;
-    
+
   int i = 0;
   int j = 0;
-    
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
- 
+
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+
   boolector_uf_assignment(arg1,arg2,arg3,arg4,arg5);
-    
-  if(arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
-    
+
+  if (arg3 == 0 || arg4 == 0 || arg5 == 0) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_uf_assignment_helper returned NULL");
+    return 0;
+  }
+
   jsize arrayLength = *arg5;
   int arrayLengthInt = *arg5;
   char **workArray = *arg3;
-    
+
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
 
   jobjectArray outerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, 2, classArray, NULL);
-    
+
   for(i=0;i<2;i++) {
     jobjectArray innerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, arrayLength, classString, (*jenv)->NewStringUTF(jenv, ""));
-    
+
     for(j=0;j<arrayLengthInt;j++) {
       (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
     }
@@ -3793,7 +3838,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
-  
+
   (*jenv)->DeleteLocalRef(jenv, classString);
   (*jenv)->DeleteLocalRef(jenv, classArray);
 
@@ -3807,32 +3852,32 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
-    
+
   (void)jenv;
   (void)jcls;
-    
+
   int i = 0;
   int j = 0;
-    
-  arg1 = *(Btor **)&jarg1; 
-  arg2 = *(BoolectorNode **)&jarg2; 
- 
+
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+
   boolector_array_assignment(arg1,arg2,arg3,arg4,arg5);
-    
-  if(arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
-    
+
+  if (arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
+
   jsize arrayLength = *arg5;
   int arrayLengthInt = *arg5;
   char **workArray = *arg3;
-    
+
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
 
   jobjectArray outerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, 2, classArray, NULL);
-    
+
   for(i=0;i<2;i++) {
     jobjectArray innerJNIArray = (jobjectArray)(*jenv)->NewObjectArray(jenv, arrayLength, classString, (*jenv)->NewStringUTF(jenv, ""));
-    
+
     for(j=0;j<arrayLengthInt;j++) {
       (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
     }
@@ -3841,7 +3886,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
-  
+
   (*jenv)->DeleteLocalRef(jenv, classString);
   (*jenv)->DeleteLocalRef(jenv, classArray);
 
@@ -3850,48 +3895,45 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
   Btor *arg1 = (Btor *) 0 ;
-    
+
   (void)jenv;
   (void)jcls;
-    
-  arg1 = *(Btor **)&jarg1; 
-  
-   jclass cls = (*jenv)->FindClass(jenv,
-    "org/sosy_lab/java_smt/solvers/boolector/BtorJNI$TerminationCallback");
+
+  arg1 = *(Btor **)&jarg1;
+
+  jclass cls = (*jenv)->FindClass(jenv, "org/sosy_lab/java_smt/solvers/boolector/BtorJNI$TerminationCallback");
   if (cls == NULL) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Class for boolector_set_termination may not be NULL");
     return 0;
   }
-  
+
   jmethodID methodID = (*jenv)->GetMethodID(jenv, cls, "shouldTerminate", "()Z");
   if (methodID == NULL) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MethodID in boolector_set_termination may not be NULL");
     return 0;
   }
-  
+
   if (jarg2 == NULL) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback of boolector_set_termination may not be NULL");
     return 0;
   }
-  
+
   struct callback_info *helper = malloc(sizeof(struct callback_info));
   helper->jenv = jenv;
   helper->callback_method = methodID;
   helper->obj = (*jenv)->NewGlobalRef(jenv, jarg2);
 
   boolector_set_term(arg1, &java_termination_callback, helper);
-  
+
   //Returns address to helper to be freed after termination has been called. See method boolector_free_termination
   return (jlong)helper;
 }
 
 
-
-
 //Call this with the return value of the method boolector_set_termination to free ressources
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1free_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   (void)jcls;
-    
+
   struct callback_info *helper = (struct callback_info *)(long)jarg1;
   if (helper == NULL) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback of boolector_free_termination may not be NULL");
@@ -3906,4 +3948,3 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 #ifdef __cplusplus
 }
 #endif
-
