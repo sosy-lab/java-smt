@@ -247,17 +247,22 @@ char *addTemppathToFilename(char *filename) {
     return NULL;
   }
 
-  char* dir = getenv("TMPDIR");
+  char *dir = getenv("TMPDIR");
   if (dir == NULL || strlen(dir) == 0) {
     dir = "/tmp/";
   }
 
   int dirLength = (int)strlen(dir);
   int filenameLength = (int)strlen(filename);
-  int completeNameLength = dirLength + filenameLength + 1;
-
-  char *tempfileName = (char *)malloc(completeNameLength * sizeof(char));
-  strncpy(tempfileName, dir, (completeNameLength - filenameLength - 1));  //completeNameLength - filenameLength - 1 = dirLength (without null-terminating char)
+  int completeNameLength = dirLength + filenameLength + 2;  //+2 because we may need 1 additional for '/'
+  char *tempfileName = (char *)malloc(completeNameLength);
+  if (!tempfileName) {
+    return NULL;
+  }
+  strcpy(tempfileName, dir);
+  if (dir[dirLength - 1] != '/') {
+    strcat(tempfileName, "/");
+  }
   strcat(tempfileName, filename);
 
   return tempfileName;
@@ -3681,13 +3686,22 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1node_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  char filenameTemplate[] = "boolector_help_dump_node_smt2_tempinfile-XXXXXX";
   FILE *file = 0;
   char *buffer = NULL;
   int fileDesrc = -1;
   long fileLength = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  char *tempfileName = addTemppathToFilename(filenameTemplate);
+
+  char *filenameBuffer = (char *)malloc(53);  //sizeof(char) == 1 in C and string is 52 long
+  if (!filenameBuffer) {
+    perror("ERROR: COULDNT ALLOCATE MEMORY FOR THE FILENAME");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Couldn't create filenameBuffer for boolector_help_dump_node_smt2");
+    return 0;
+  }
+  memset(filenameBuffer, 0, 53);
+  strncpy(filenameBuffer, "boolector_help_dump_node_smt2_tempinfile-XXXXXX", 52);
+  char *tempfileName = addTemppathToFilename(filenameBuffer);
+  free(filenameBuffer);
 
   if (tempfileName == NULL) {
     perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
