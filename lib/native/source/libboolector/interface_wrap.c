@@ -296,6 +296,62 @@ FILE* openTempFile(JNIEnv *jenv) {
   return file;
 }
 
+/** Read all content from the given file pointer and store it in a Java String.
+ * We assume the file pointer to be open and do not close it.
+ * On error, we report an exception to JNIEnv and return NULL. */
+jstring copyFileContentToString(JNIEnv *jenv, FILE *file) {
+
+  // flush any buffered data.
+  if (fflush(file) != 0) {
+    perror("ERROR: COULDNT FLUSH DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File could not be flushed");
+    return NULL;
+  }
+
+  // get file size
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not determine the beginning of the used file");
+    return NULL;
+  }
+  if (fseek(file, 0, SEEK_END) != 0) {
+    perror("ERROR SEEKING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not determine the end of the used file");
+    return NULL;
+  }
+  long fileLength = ftell(file);
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not determine the beginning of the used file");
+    return NULL;
+  }
+  if (fileLength <= 0) {
+    perror("ERROR READING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File length may not be NULL");
+    return NULL;
+  }
+
+  // get file content
+  char *buffer = (char *)malloc((fileLength + 1) * sizeof(char));
+  if (!buffer) {
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Buffer may not be NULL");
+    return NULL;
+  }
+  size_t readLength = fread(buffer, 1, fileLength, file);
+  if ((unsigned long)fileLength != readLength) {
+    free(buffer);
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not read the whole length of the file into the buffer");
+    return 0;
+  }
+  buffer[fileLength] = '\0';
+  jstring jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
+  free(buffer);
+
+  return jresult;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -3491,10 +3547,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 
 //dumps complete model into new file and reads it to give it back
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  char *buffer = 0;
-  long fileLength = 0;
 
   (void)jenv;
   (void)jcls;
@@ -3506,35 +3559,15 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     return NULL;
   }
 
-  //write
+  // write
   boolector_dump_smt2(arg1, file);
 
-  //read
-  if (file) {
-    fseek(file, 0, SEEK_END);
-    fileLength = ftell(file);
-    rewind(file);
-    buffer = (char *)malloc((fileLength + 1) * sizeof(char));
-    if (!buffer) {
-      free(buffer);
-      perror("ERROR CREATING BUFFER");
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Buffer for boolector_help_dump_smt2 may not be NULL");
-      return 0;
-    }
-    if (fread (buffer, 1, fileLength, file) != (unsigned long)fileLength) {
-      free(buffer);
-      perror("ERROR READING FILE INTO BUFFER");
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Error reading file into buffer in boolector_help_dump_smt2.");
-      return 0;
-    }
-  }
+  // read
+  jstring jresult = copyFileContentToString(jenv, file);
 
-  buffer[fileLength] = '\0';
-
-  jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
-
+  // cleanup
   fclose(file);
-  free(buffer);
+
   return jresult;
 }
 
@@ -3696,10 +3729,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 
 //dumps NODE into new file and reads it to give it back
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1node_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  char *buffer = NULL;
-  long fileLength = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
 
   (void)jenv;
@@ -3712,66 +3742,15 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJN
     return NULL;
   }
 
-  //write
+  // write
   boolector_dump_smt2_node(arg1, file, arg2);
-  if (fflush(file) != 0) {
-    perror("ERROR: COULDNT FLUSH DUMP FILE");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 could not be flushed");
-    return 0;
-  }
-  if (fseek(file, 0, SEEK_SET) != 0) {
-    perror("ERROR SEEKING FILE BEGINNING");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
-    return 0;
-  }
 
-  //read
-  if (!file) {
-    perror("ERROR: FILE RETURNED BY BOOLECTOR_DUMP_SMT2_NODE IS NULL");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File returned by boolector_dump_smt2_node() is NULL. boolector_help_dump_node_smt2 aborted.");
-    return 0;
-  }
+  // read
+  jstring jresult = copyFileContentToString(jenv, file);
 
-  if (fseek(file, 0, SEEK_END) != 0) {
-    perror("ERROR SEEKING FILE LENGTH");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the end of the used file");
-    return 0;
-  }
-
-  fileLength = ftell(file);
-  if (fseek(file, 0, SEEK_SET) != 0) {
-    perror("ERROR SEEKING FILE BEGINNING");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 could not determine the beginning of the used file");
-    return 0;
-  }
-
-  if (fileLength <= 0) {
-    perror("ERROR READING FILE LENGTH");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File length in boolector_help_dump_node_smt2 may not be NULL");
-    return 0;
-  }
-
-  buffer = (char *)malloc((fileLength + 1) * sizeof(char));
-
-  if (!buffer) {
-    perror("ERROR READING FILE INTO BUFFER");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Buffer for boolector_help_dump_node_smt2 may not be NULL");
-    return 0;
-  }
-
-  size_t readLength = fread(buffer, 1, fileLength, file);
-
-  if ((unsigned long)fileLength != readLength) {
-    free(buffer);
-    perror("ERROR READING FILE INTO BUFFER");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_help_dump_node_smt2 did not read the whole length of the file into the buffer");
-    return 0;
-  }
+  // cleanup
   fclose(file);
-  buffer[fileLength] = '\0';
 
-  jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
-  free(buffer);
   return jresult;
 }
 
