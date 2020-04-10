@@ -268,6 +268,34 @@ char *addTemppathToFilename(char *filename) {
   return tempfileName;
 }
 
+/** Open a temporary file for reading and writing and return the file-pointer.
+ * The file will be cleaned up when closed.
+ * On error, we report an Exception to JNIEnv and return NULL. */
+FILE* openTempFile(JNIEnv *jenv) {
+  char *tempfileName = addTemppathToFilename("boolector_temp_XXXXXX");
+  if (tempfileName == NULL) {
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName may not be NULL");
+    return NULL;
+  }
+  int fileDesrc = mkstemp(tempfileName);
+  if (fileDesrc == -1) {
+    free(tempfileName);
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor may not be NULL");
+    return NULL;
+  }
+  FILE *file = fdopen(fileDesrc, "w+");
+  unlink(tempfileName);
+  free(tempfileName);
+  if (file == NULL) {
+    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File may not be NULL");
+    return NULL;
+  }
+  return file;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -3465,38 +3493,22 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  char tempFilenameTemplate[] = "boolector_help_dump_smt2_tempfile-XXXXXX";
-  FILE *file = 0;
-  int fileDescr = -1;
   char *buffer = 0;
   long fileLength = 0;
-  char *tempfileName = addTemppathToFilename(tempFilenameTemplate);
-
-  fileDescr = mkstemp(tempfileName);
-  if (fileDescr == -1) {
-    free(tempfileName);
-    perror("ERROR CREATING TEMPORARY FILE FOR SMT2 DUMPING");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileDescriptor for file used in boolector_help_dump_smt2 may not be NULL");
-    return 0;
-  }
-
-  file = fdopen(fileDescr,"w+");
-  if (file == NULL) {
-    unlink(tempfileName);
-    perror("ERROR OPENING FILE FOR SMT2 DUMPING");
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "File for boolector_help_dump_smt2 may not be NULL");
-    return 0;
-  }
 
   (void)jenv;
   (void)jcls;
 
   arg1 = *(Btor **)&jarg1;
 
+  FILE *file = openTempFile(jenv);
+  if (!file) {
+    return NULL;
+  }
+
   //write
   boolector_dump_smt2(arg1, file);
 
-  unlink(tempfileName);
   //read
   if (file) {
     fseek(file, 0, SEEK_END);
@@ -3686,48 +3698,18 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1help_1dump_1node_1smt2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jstring jresult = 0;
   Btor *arg1 = (Btor *) 0 ;
-  FILE *file = 0;
   char *buffer = NULL;
-  int fileDesrc = -1;
   long fileLength = 0;
   BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-
-  char *filenameBuffer = (char *)malloc(53);  //sizeof(char) == 1 in C and string is 52 long
-  if (!filenameBuffer) {
-    perror("ERROR: COULDNT ALLOCATE MEMORY FOR THE FILENAME");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Couldn't create filenameBuffer for boolector_help_dump_node_smt2");
-    return 0;
-  }
-  memset(filenameBuffer, 0, 53);
-  strncpy(filenameBuffer, "boolector_help_dump_node_smt2_tempinfile-XXXXXX", 52);
-  char *tempfileName = addTemppathToFilename(filenameBuffer);
-  free(filenameBuffer);
-
-  if (tempfileName == NULL) {
-    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName for boolector_help_dump_node_smt2 may not be NULL");
-    return 0;
-  }
-
-  fileDesrc = mkstemp(tempfileName);
-  if (fileDesrc == -1) {
-    free(tempfileName);
-    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor for boolector_help_dump_node_smt2 may not be NULL");
-    return 0;
-  }
 
   (void)jenv;
   (void)jcls;
   arg1 = *(Btor **)&jarg1;
   arg2 = *(BoolectorNode **)&jarg2;
 
-  file = fdopen(fileDesrc, "w+");
-  unlink(tempfileName);
-  if (file == NULL) {
-    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
-    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File for boolector_help_dump_node_smt2 may not be NULL");
-    return 0;
+  FILE *file = openTempFile(jenv);
+  if (!file) {
+    return NULL;
   }
 
   //write
