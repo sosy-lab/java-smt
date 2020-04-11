@@ -150,6 +150,31 @@ public class BoolectorNativeApiTest {
   }
 
   @Test
+  public void dumpVariableWithAssertionsOnStackTest()
+      throws InvalidConfigurationException, InterruptedException {
+    ConfigurationBuilder config = Configuration.builder();
+    try (BoolectorSolverContext context =
+        BoolectorSolverContext.create(config.build(), ShutdownNotifier.createDummy(), null, 1)) {
+      FormulaManager mgr = context.getFormulaManager();
+      BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
+      try (ProverEnvironment prover = context.newProverEnvironment()) {
+        prover.push(bfmgr.makeVariable("x"));
+        for (String name : ImmutableList.of("a", "a", "b", "abc", "ABC")) {
+          BooleanFormula f = bfmgr.makeVariable(name);
+          String s = new StringBuilder().append(mgr.dumpFormula(f)).toString();
+          // TODO why is there a prefix "BTOR_2@"?
+          // Possible reason: we are on the second level of the solver stack.
+          // - first level comes from the constructor of ReusableStackTheoremProver.
+          // - second level comes from the PUSH above.
+          // We do actually not want to have such names in the dump.
+          assertThat(s).contains(String.format("(declare-fun BTOR_2@%s () (_ BitVec 1))", name));
+          // assertThat(s).contains(String.format("(assert "));
+        }
+      }
+    }
+  }
+
+  @Test
   public void repeatedDumpFormulaTest() throws InvalidConfigurationException {
     ConfigurationBuilder config = Configuration.builder();
     try (BoolectorSolverContext context =
