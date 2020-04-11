@@ -142,7 +142,7 @@ public class BoolectorNativeApiTest {
       BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
       for (String name : ImmutableList.of("a", "a", "b", "abc", "ABC")) {
         BooleanFormula f = bfmgr.makeVariable(name);
-        String s = new StringBuilder().append(mgr.dumpFormula(f)).toString();
+        String s = mgr.dumpFormula(f).toString();
         assertThat(s).contains(String.format("(declare-fun %s () (_ BitVec 1))", name));
         // assertThat(s).contains(String.format("(assert %s)", name)); // assertion not available
       }
@@ -161,7 +161,7 @@ public class BoolectorNativeApiTest {
         prover.push(bfmgr.makeVariable("x"));
         for (String name : ImmutableList.of("a", "a", "b", "abc", "ABC")) {
           BooleanFormula f = bfmgr.makeVariable(name);
-          String s = new StringBuilder().append(mgr.dumpFormula(f)).toString();
+          String s = mgr.dumpFormula(f).toString();
           // TODO why is there a prefix "BTOR_2@"?
           // Possible reason: we are on the second level of the solver stack.
           // - first level comes from the constructor of ReusableStackTheoremProver.
@@ -186,7 +186,7 @@ public class BoolectorNativeApiTest {
       BooleanFormula fc = bfmgr.makeVariable("c");
       BooleanFormula f1 = bfmgr.or(fa, bfmgr.and(fb, fc));
       BooleanFormula f2 = bfmgr.or(fa, bfmgr.and(fb, fc));
-      String s1 = new StringBuilder().append(mgr.dumpFormula(f1)).toString();
+      String s1 = mgr.dumpFormula(f1).toString();
       // repeat several times to increase probability for non-deterministic behavior
       for (int i = 0; i < 10; i++) {
         assertThat(s1).isEqualTo(new StringBuilder().append(mgr.dumpFormula(f2)).toString());
