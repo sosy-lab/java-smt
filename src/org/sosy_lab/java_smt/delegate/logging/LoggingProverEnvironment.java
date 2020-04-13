@@ -17,8 +17,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.logging;
+package org.sosy_lab.java_smt.delegate.logging;
 
-import com.google.common.testing.AbstractPackageSanityTests;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 
-public class PackageSanityTest extends AbstractPackageSanityTests {}
+/** Wraps a prover environment with a logging object. */
+class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
+    implements ProverEnvironment {
+
+  LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
+    super(pe, logger);
+  }
+}

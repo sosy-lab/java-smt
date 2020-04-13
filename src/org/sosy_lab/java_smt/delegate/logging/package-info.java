@@ -17,16 +17,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.logging;
 
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
-
-/** Wraps a prover environment with a logging object. */
-class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
-    implements ProverEnvironment {
-
-  LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
-    super(pe, logger);
-  }
-}
+/** Wraps the proving environment with loggers. */
+@com.google.errorprone.annotations.CheckReturnValue
+@javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
+package org.sosy_lab.java_smt.delegate.logging;
