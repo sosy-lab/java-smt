@@ -36,7 +36,9 @@ public interface BooleanFormulaManager {
    * @param value the boolean value the returned <code>Formula</code> should represent
    * @return a Formula representing the given value
    */
-  BooleanFormula makeBoolean(boolean value);
+  default BooleanFormula makeBoolean(boolean value) {
+    return value ? makeTrue() : makeFalse();
+  }
 
   /** Shortcut for {@code makeBoolean(true)}. */
   BooleanFormula makeTrue();

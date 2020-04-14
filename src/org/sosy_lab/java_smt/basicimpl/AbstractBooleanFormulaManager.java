@@ -93,11 +93,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     return falseFormula;
   }
 
-  @Override
-  public BooleanFormula makeBoolean(boolean value) {
-    return value ? makeTrue() : makeFalse();
-  }
-
   protected abstract TFormulaInfo makeBooleanImpl(boolean value);
 
   @Override
