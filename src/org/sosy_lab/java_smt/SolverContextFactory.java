@@ -49,6 +49,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
+import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
@@ -102,6 +103,11 @@ public class SolverContextFactory {
       secure = true,
       description = "Sequentialize all solver actions to allow concurrent access!")
   private boolean synchronize = false;
+
+  @Option(
+      secure = true,
+      description = "Counts all operations and interactions towards the SMT solver.")
+  private boolean collectStatistics = false;
 
   @Option(secure = true, description = "Default rounding mode for floating point operations.")
   private FloatingPointRoundingMode floatingPointRoundingMode =
@@ -187,6 +193,10 @@ public class SolverContextFactory {
     }
     if (synchronize) {
       context = new SynchronizedSolverContext(config, logger, shutdownNotifier, context);
+    }
+    if (collectStatistics) {
+      // statistics need to be the most outer wrapping layer.
+      context = new StatisticsSolverContext(context);
     }
     return context;
   }
