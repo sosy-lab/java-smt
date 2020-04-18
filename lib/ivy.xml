@@ -60,14 +60,14 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-380-gd4e86457" conf="runtime->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-392-g680ac82" conf="runtime->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="28.1-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="29.0-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="28.1-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="29.0-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -83,7 +83,7 @@
 
         <!-- JUnit
              Testing framework. -->
-        <dependency org="junit" name="junit" rev="4.12" conf="test->default"/>
+        <dependency org="junit" name="junit" rev="4.13" conf="test->default"/>
 
         <!-- JaCoCo
              Library for code coverage -->
@@ -106,7 +106,7 @@
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
-        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.11" conf="build->default"/>
+        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.14" conf="build->default"/>
 
         <!-- google-java-format
              A source-code formatter for Java -->
@@ -140,6 +140,10 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.6.3" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2019-11-30-gae93e65" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-2.3-g3249ae0f" conf="runtime-boolector->solver-boolector" />
+
+        <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest although they do not really need it.
+             As long as this is the case we need to provide the JAR, otherwise javac complains. -->
+        <dependency org="org.codehaus.mojo" name="animal-sniffer-annotations" rev="1.18" conf="runtime->default;"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.4"/>
