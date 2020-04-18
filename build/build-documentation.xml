@@ -49,8 +49,8 @@
                 <exclude name="**/*Test.java"/>
             </fileset>
             <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
-            <link href="https://google.github.io/guava/releases/snapshot/api/docs/"/>
-            <link href="https://google.github.io/truth/api/latest/"/>
+            <link href="https://guava.dev/releases/snapshot/api/docs/"/>
+            <link href="https://truth.dev/api/latest/"/>
             <link href="https://sosy-lab.github.io/java-common-lib/api/"/>
             <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
             <tag name="apiNote" description="API Note:"/>
