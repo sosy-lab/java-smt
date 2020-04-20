@@ -237,6 +237,39 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void largeStackUsageTest() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    for (int i = 0; i < 100; i++) {
+      stack.push();
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("X" + (i + 1))));
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("Y" + i), bmgr.makeVariable("Y" + (i + 1))));
+      stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
+    }
+    assertThat(stack.isUnsat()).isFalse();
+  }
+
+  @Test
+  public void largerStackUsageTest() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    for (int i = 0; i < 1000; i++) {
+      stack.push();
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("X" + (i + 1))));
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("Y" + i), bmgr.makeVariable("Y" + (i + 1))));
+      stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
+    }
+    if (Solvers.PRINCESS == solverToUse()) {
+      // TODO Princes has problems with larger stacks and runs out of memory.
+      assertThrows(SolverException.class, stack::isUnsat);
+    } else {
+      assertThat(stack.isUnsat()).isFalse();
+    }
+  }
+
+  @Test
   public void stackTest5() {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.push();
