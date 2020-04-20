@@ -239,7 +239,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void largeStackUsageTest() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 20; i++) {
       stack.push();
       stack.addConstraint(
           bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("X" + (i + 1))));
