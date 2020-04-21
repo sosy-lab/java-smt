@@ -187,13 +187,13 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     checkNotNull(api);
     checkNotNull(mgr);
     if (!closed) {
-      if (shutdownNotifier.shouldShutdown()) {
-        api.shutDown();
-      } else {
+      if (!shutdownNotifier.shouldShutdown()) { // normal cleanup
         for (int i = 0; i < trackingStack.size(); i++) {
           pop();
         }
       }
+      api.shutDown();
+      api.reset();
       creator.getEnv().unregisterStack(this);
     }
     closed = true;
