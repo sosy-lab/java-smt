@@ -252,6 +252,11 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void largerStackUsageTest() throws InterruptedException, SolverException {
+    assume()
+        .withMessage("Solver does not support larger stacks yet")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
+
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     for (int i = 0; i < 1000; i++) {
       stack.push();
@@ -261,12 +266,7 @@ public class SolverStackTest extends SolverBasedTest0 {
           bmgr.equivalence(bmgr.makeVariable("Y" + i), bmgr.makeVariable("Y" + (i + 1))));
       stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
     }
-    if (Solvers.PRINCESS == solverToUse()) {
-      // TODO Princes has problems with larger stacks and runs out of memory.
-      assertThrows(SolverException.class, stack::isUnsat);
-    } else {
-      assertThat(stack.isUnsat()).isFalse();
-    }
+    assertThat(stack.isUnsat()).isFalse();
   }
 
   @Test
