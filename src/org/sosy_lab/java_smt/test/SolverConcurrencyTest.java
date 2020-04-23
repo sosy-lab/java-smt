@@ -363,15 +363,16 @@ public class SolverConcurrencyTest {
    * @param testName Name of the test for accurate error messages
    */
   private static void assertConcurrency(List<? extends Runnable> runnableList, String testName) {
-    final ExecutorService threadPool = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    int numOfThreads = runnableList.size();
+    final ExecutorService threadPool = Executors.newFixedThreadPool(numOfThreads);
 
     try {
       // Waits for all threads to be started
-      final CountDownLatch allExecutorThreadsReady = new CountDownLatch(NUMBER_OF_THREADS);
+      final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numOfThreads);
       // Syncs start of tests after all threads are already created
       final CountDownLatch afterInitBlocker = new CountDownLatch(1);
       // Syncs end of tests (And prevents Deadlocks in test-threads etc.)
-      final CountDownLatch allDone = new CountDownLatch(NUMBER_OF_THREADS);
+      final CountDownLatch allDone = new CountDownLatch(numOfThreads);
       for (Runnable runnable : runnableList) {
         threadPool.submit(new Runnable() {
           @Override
@@ -390,7 +391,7 @@ public class SolverConcurrencyTest {
       }
       assertTrue(
           "Timeout initializing the Threads for " + testName,
-          allExecutorThreadsReady.await(NUMBER_OF_THREADS * 10, TimeUnit.MILLISECONDS));
+          allExecutorThreadsReady.await(numOfThreads * 10, TimeUnit.MILLISECONDS));
       afterInitBlocker.countDown();
       assertTrue("Timeout in " + testName, allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
     } catch (Throwable e) {
