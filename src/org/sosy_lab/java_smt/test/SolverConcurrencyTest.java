@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -94,13 +95,41 @@ public class SolverConcurrencyTest {
     exceptionsList.clear();
   }
 
+  private void requireConcurrentMultipleStackSupport() {
+    assume().withMessage(
+        "Solver does not support concurrent solving in multiple stacks")
+        .that(solver)
+        .isNoneOf(
+            Solvers.SMTINTERPOL,
+            Solvers.BOOLECTOR,
+            Solvers.MATHSAT5,
+            Solvers.Z3,
+            Solvers.PRINCESS);
+  }
+
+  private void requireIntegers() {
+    assume().withMessage("Solver does not support integers")
+        .that(solver)
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  private void requireBitvectors() {
+    assume().withMessage("Solver does not support bitvectors")
+        .that(solver)
+        .isNotEqualTo(Solvers.SMTINTERPOL);
+  }
+
+  private void requireOptimization() {
+    assume().withMessage("Solver does not support optimization")
+        .that(solver)
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4);
+  }
+
   @Test
   public void testIntConcurrencyWithConcurrentContext() {
     // Test concurrency of integers (while every thread creates its unique context on its own
     // concurrently)
-    assume().withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
@@ -125,9 +154,7 @@ public class SolverConcurrencyTest {
   public void testBvConcurrencyWithConcurrentContext() {
     // Test concurrency of bitvectors (while every thread creates its unique context on its own
     // concurrently)
-    assume().withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
@@ -181,9 +208,7 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     // Test concurrency with already present and unique context per thread
-    assume().withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     List<Runnable> runnableList = new ArrayList<>();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -208,7 +233,7 @@ public class SolverConcurrencyTest {
 
   @Test
   public void testConcurrentOptimization() {
-    assume().that(solverToUse()).isAnyOf(Solvers.Z3, Solvers.MATHSAT5);
+    requireOptimization();
     List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
@@ -227,6 +252,48 @@ public class SolverConcurrencyTest {
       runnableList.add(test);
     }
     assertConcurrency(runnableList, "testBasicIntConcurrency");
+  }
+
+  /**
+   * Test solving of large formula on concurrent stacks in one context (Stacks are not created in
+   * the Threads)
+   */
+  @Test
+  public void testConcurrentStack()
+      throws InvalidConfigurationException, InterruptedException {
+    requireConcurrentMultipleStackSupport();
+    List<Runnable> runnableList = new ArrayList<>();
+    @SuppressWarnings("resource")
+    SolverContext context = initSolver();
+    ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
+    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+      FormulaManager mgr = context.getFormulaManager();
+      IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+      BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+
+      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+      BooleanFormula instance =
+          gen.generate(integerFormulaGen.getOrDefault(solver, 9));
+      @SuppressWarnings("resource")
+      BasicProverEnvironment<?> pe = context.newProverEnvironment();
+      pe.push(instance);
+      proverList.add(pe);
+      Runnable test = new Runnable() {
+        @SuppressWarnings("resource")
+        @Override
+        public void run() {
+          try {
+            BasicProverEnvironment<?> stack = proverList.poll();
+            assertTrue("Solver %s failed a concurrency test", stack.isUnsat());
+          } catch (Throwable e) {
+            exceptionsList.add(e);
+          }
+        }
+      };
+      runnableList.add(test);
+    }
+    assertConcurrency(runnableList, "testConcurrentStack");
+    closeSolver(context);
   }
 
 
@@ -281,6 +348,7 @@ public class SolverConcurrencyTest {
     }
   }
 
+  // TODO: make proper "long" test
   private void optimizationTest(SolverContext context)
       throws InterruptedException, SolverException {
     FormulaManager mgr = context.getFormulaManager();
@@ -374,7 +442,7 @@ public class SolverConcurrencyTest {
       // Syncs end of tests (And prevents Deadlocks in test-threads etc.)
       final CountDownLatch allDone = new CountDownLatch(numOfThreads);
       for (Runnable runnable : runnableList) {
-        threadPool.submit(new Runnable() {
+        Future<?> future = threadPool.submit(new Runnable() {
           @Override
           public void run() {
             allExecutorThreadsReady.countDown();
