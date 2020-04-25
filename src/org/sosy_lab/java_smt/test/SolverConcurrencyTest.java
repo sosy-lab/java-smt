@@ -175,7 +175,7 @@ public class SolverConcurrencyTest {
   @SuppressWarnings("resource")
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
-    requireBitvectors();
+    requireIntegers();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
