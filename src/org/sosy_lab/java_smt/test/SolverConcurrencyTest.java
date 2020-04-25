@@ -20,9 +20,9 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,8 +35,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -64,6 +62,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
+@SuppressWarnings("resource")
 @RunWith(Parameterized.class)
 public class SolverConcurrencyTest {
 
@@ -71,9 +70,9 @@ public class SolverConcurrencyTest {
   private static final int TIMEOUT_SECONDS = 30;
 
   /**
-   * As some Solvers are slower/faster, we choose an appropriate number of formulas to solve here
+   * As some Solvers are slower/faster, we choose an appropriate number of formulas to solve here.
    */
-  private final Map<Solvers, Integer> INTEGER_FORMULA_GEN =
+  private static final Map<Solvers, Integer> INTEGER_FORMULA_GEN =
       Map.of(
           Solvers.SMTINTERPOL,
           12,
@@ -86,7 +85,7 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           16);
 
-  private final Map<Solvers, Integer> BITVECTOR_FORMULA_GEN =
+  private static final Map<Solvers, Integer> BITVECTOR_FORMULA_GEN =
       Map.of(
           Solvers.BOOLECTOR,
           60,
@@ -99,9 +98,6 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           50);
 
-  private static List<Throwable> exceptionsList;
-  private static List<Runnable> runnableList;
-
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -110,116 +106,72 @@ public class SolverConcurrencyTest {
   @Parameter(0)
   public Solvers solver;
 
-
   protected Solvers solverToUse() {
     return solver;
   }
 
-  @BeforeClass
-  public static void createExceptionsList() {
-    exceptionsList = Collections.synchronizedList(new ArrayList<Throwable>());
-  }
-
-  @BeforeClass
-  public static void createRunnableList() {
-    runnableList = new ArrayList<>();
-  }
-
-  @After
-  public void resetExceptionsList() {
-    exceptionsList.clear();
-  }
-
-  @After
-  public void resetRunnableList() {
-    runnableList.clear();
-  }
-
   private void requireConcurrentMultipleStackSupport() {
-    assume().withMessage(
-        "Solver does not support concurrent solving in multiple stacks")
+    assume()
+        .withMessage("Solver does not support concurrent solving in multiple stacks")
         .that(solver)
         .isNoneOf(
-            Solvers.SMTINTERPOL,
-            Solvers.BOOLECTOR,
-            Solvers.MATHSAT5,
-            Solvers.Z3,
-            Solvers.PRINCESS);
+            Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.Z3, Solvers.PRINCESS);
   }
 
   private void requireIntegers() {
-    assume().withMessage("Solver does not support integers")
+    assume()
+        .withMessage("Solver does not support integers")
         .that(solver)
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   private void requireBitvectors() {
-    assume().withMessage("Solver does not support bitvectors")
+    assume()
+        .withMessage("Solver does not support bitvectors")
         .that(solver)
         .isNotEqualTo(Solvers.SMTINTERPOL);
   }
 
   private void requireOptimization() {
-    assume().withMessage("Solver does not support optimization")
+    assume()
+        .withMessage("Solver does not support optimization")
         .that(solver)
         .isNoneOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4);
   }
 
   /**
    * Test concurrency of integers (while every thread creates its unique context on its own
-   * concurrently)
+   * concurrently).
    */
   @Test
   public void testIntConcurrencyWithConcurrentContext() {
     requireIntegers();
-    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      Runnable test = new Runnable() {
-        @SuppressWarnings("resource")
-        @Override
-        public void run() {
-          try {
-            SolverContext context = initSolver();
-            intConcurrencyTest(context);
-            closeSolver(context);
-          } catch (Throwable e) {
-            exceptionsList.add(e);
-          }
-        }
-      };
-      runnableList.add(test);
-    }
-    assertConcurrency("testIntConcurrencyWithConcurrentContext");
+    assertConcurrency(
+        "testIntConcurrencyWithConcurrentContext",
+        () -> {
+          SolverContext context = initSolver();
+          intConcurrencyTest(context);
+          closeSolver(context);
+        });
   }
 
   /**
    * Test concurrency of bitvectors (while every thread creates its unique context on its own
-   * concurrently)
+   * concurrently).
    */
   @Test
   public void testBvConcurrencyWithConcurrentContext() {
     requireBitvectors();
-    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      Runnable test = new Runnable() {
-        @SuppressWarnings("resource")
-        @Override
-        public void run() {
-          try {
-            SolverContext context = initSolver();
-            bvConcurrencyTest(context);
-            closeSolver(context);
-          } catch (Throwable e) {
-            exceptionsList.add(e);
-          }
-        }
-      };
-      runnableList.add(test);
-    }
-    assertConcurrency("testBvConcurrencyWithConcurrentContext");
+    assertConcurrency(
+        "testBvConcurrencyWithConcurrentContext",
+        () -> {
+          SolverContext context = initSolver();
+          bvConcurrencyTest(context);
+          closeSolver(context);
+        });
   }
 
-  /**
-   * Test concurrency with already present and unique context per thread
-   */
+  /** Test concurrency with already present and unique context per thread. */
   @SuppressWarnings("resource")
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
@@ -229,123 +181,83 @@ public class SolverConcurrencyTest {
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       contextList.add(initSolver());
     }
-    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      Runnable test = new Runnable() {
-        @SuppressWarnings("resource")
-        @Override
-        public void run() {
-          try {
-            SolverContext context = contextList.poll();
-            intConcurrencyTest(context);
-            closeSolver(context);
-          } catch (Throwable e) {
-            exceptionsList.add(e);
-          }
-        }
-      };
-      runnableList.add(test);
-    }
-    assertConcurrency("testIntConcurrencyWithoutConcurrentContext");
+    assertConcurrency(
+        "testIntConcurrencyWithoutConcurrentContext",
+        () -> {
+          SolverContext context = contextList.poll();
+          intConcurrencyTest(context);
+          closeSolver(context);
+        });
   }
 
-  /**
-   * Test concurrency with already present and unique context per thread
-   */
+  /** Test concurrency with already present and unique context per thread. */
   @SuppressWarnings("resource")
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
+    // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       contextList.add(initSolver());
-      Runnable test = new Runnable() {
-        @SuppressWarnings("resource")
-        @Override
-        public void run() {
-          try {
-            SolverContext context = contextList.poll();
-            bvConcurrencyTest(context);
-            closeSolver(context);
-          } catch (Throwable e) {
-            exceptionsList.add(e);
-          }
-        }
-      };
-      runnableList.add(test);
     }
-    assertConcurrency("testBvConcurrencyWithoutConcurrentContext");
+    assertConcurrency(
+        "testBvConcurrencyWithoutConcurrentContext",
+        () -> {
+          SolverContext context = contextList.poll();
+          bvConcurrencyTest(context);
+          closeSolver(context);
+        });
   }
 
   @Test
   public void testConcurrentOptimization() {
     requireOptimization();
-    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      Runnable test = new Runnable() {
-        @SuppressWarnings("resource")
-        @Override
-        public void run() {
-          try {
-            SolverContext context = initSolver();
-            optimizationTest(context);
-            closeSolver(context);
-          } catch (Throwable e) {
-            exceptionsList.add(e);
-          }
-        }
-      };
-      runnableList.add(test);
-    }
-    assertConcurrency("testConcurrentOptimization");
+    assertConcurrency(
+        "testConcurrentOptimization",
+        () -> {
+          SolverContext context = initSolver();
+          optimizationTest(context);
+          closeSolver(context);
+        });
   }
 
   /**
    * Test solving of large formula on concurrent stacks in one context (Stacks are not created in
-   * the Threads)
+   * the Threads).
    */
   @Test
-  public void testConcurrentStack()
-      throws InvalidConfigurationException, InterruptedException {
+  public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
     requireConcurrentMultipleStackSupport();
-    @SuppressWarnings("resource")
     SolverContext context = initSolver();
+    FormulaManager mgr = context.getFormulaManager();
+    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+
     ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      FormulaManager mgr = context.getFormulaManager();
-      IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-      BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-
-      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-      BooleanFormula instance =
-          gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
-      @SuppressWarnings("resource")
+      BooleanFormula instance = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
       BasicProverEnvironment<?> pe = context.newProverEnvironment();
       pe.push(instance);
       proverList.add(pe);
-      Runnable test = new Runnable() {
-        @SuppressWarnings("resource")
-        @Override
-        public void run() {
-          try {
-            BasicProverEnvironment<?> stack = proverList.poll();
-            assertTrue("Solver %s failed a concurrency test", stack.isUnsat());
-          } catch (Throwable e) {
-            exceptionsList.add(e);
-          }
-        }
-      };
-      runnableList.add(test);
     }
-    assertConcurrency("testConcurrentStack");
+    assertConcurrency(
+        "testConcurrentStack",
+        () -> {
+          BasicProverEnvironment<?> stack = proverList.poll();
+          assertWithMessage("Solver %s failed a concurrency test", solverToUse())
+              .that(stack.isUnsat())
+              .isTrue();
+        });
     closeSolver(context);
   }
-
 
   /**
    * Uses HardBitvectorFormulaGenerator for longer test-cases to assess concurrency problems. Length
    * is very solver depended, so make sure you choose a appropriate number for the used solver. Make
    * sure to not call this method with a SolverContext that does not support bitvectors! (No
    * requireBitvector() because the exceptionList would collect it and throw an exception failing
-   * the test!)
+   * the test!).
    *
    * @param context used context for the test-thread (Do not reuse contexts!)
    */
@@ -359,7 +271,9 @@ public class SolverConcurrencyTest {
     BooleanFormula instance = gen.generate(BITVECTOR_FORMULA_GEN.getOrDefault(solver, 9));
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       pe.push(instance);
-      assertTrue("Solver %s failed a concurrency test", pe.isUnsat());
+      assertWithMessage("Solver %s failed a concurrency test", solverToUse())
+          .that(pe.isUnsat())
+          .isTrue();
     }
   }
 
@@ -368,10 +282,10 @@ public class SolverConcurrencyTest {
    * is very solver depended, so make sure you choose a appropriate number for the used solver. Make
    * sure to not call this method with a SolverContext that does not support integers! (No
    * requireIntegers() because the exceptionList would collect it and throw an exception failing the
-   * test!)
+   * test!).
    *
    * @param context used context for the test-thread (Do not reuse contexts unless you know what you
-   *        are doing!)
+   *     are doing!)
    */
   private void intConcurrencyTest(SolverContext context)
       throws SolverException, InterruptedException {
@@ -383,7 +297,9 @@ public class SolverConcurrencyTest {
     BooleanFormula instance = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       pe.push(instance);
-      assertTrue("Solver %s failed a concurrency test", pe.isUnsat());
+      assertWithMessage("Solver %s failed a concurrency test", solverToUse())
+          .that(pe.isUnsat())
+          .isTrue();
     }
   }
 
@@ -429,7 +345,7 @@ public class SolverConcurrencyTest {
 
   /**
    * Creates and returns a completely new SolverContext for the currently used solver (We need this
-   * to get more than one Context in 1 method in a controlled way)
+   * to get more than one Context in 1 method in a controlled way).
    *
    * @return new and unique SolverContext for current solver (Parameter(0))
    */
@@ -464,51 +380,56 @@ public class SolverConcurrencyTest {
    * will make sure that all exceptions are collected and assessed at the end, as well as stop the
    * execution after TIMEOUT_SECONDS seconds in case of a deadlock or long calculation.
    *
-   * @param runnableList A list of Runnable to be tested (make sure its NUMBER_OF_THREADS long for
-   *        proper testing)
+   * @param runnable A Runnable to be tested, make sure that it can be executed several times in
+   *     parallel, i.e. no internal state except the solver itself.
    * @param testName Name of the test for accurate error messages
    */
-  private static void assertConcurrency(String testName) {
-    int numOfThreads = runnableList.size();
-    final ExecutorService threadPool = Executors.newFixedThreadPool(numOfThreads);
+  private static void assertConcurrency(String testName, Run runnable) {
+    final ExecutorService threadPool = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    final List<Throwable> exceptionsList = Collections.synchronizedList(new ArrayList<>());
 
+    // Waits for all threads to be started
+    final CountDownLatch allExecutorThreadsReady = new CountDownLatch(NUMBER_OF_THREADS);
+    // Syncs start of tests after all threads are already created
+    final CountDownLatch afterInitBlocker = new CountDownLatch(1);
+    // Syncs end of tests (And prevents Deadlocks in test-threads etc.)
+    final CountDownLatch allDone = new CountDownLatch(NUMBER_OF_THREADS);
+    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+      @SuppressWarnings("unused")
+      Future<?> future =
+          threadPool.submit(
+              () -> {
+                allExecutorThreadsReady.countDown();
+                try {
+                  afterInitBlocker.await();
+                  runnable.run();
+                } catch (Throwable e) {
+                  exceptionsList.add(e);
+                } finally {
+                  allDone.countDown();
+                }
+              });
+    }
     try {
-      // Waits for all threads to be started
-      final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numOfThreads);
-      // Syncs start of tests after all threads are already created
-      final CountDownLatch afterInitBlocker = new CountDownLatch(1);
-      // Syncs end of tests (And prevents Deadlocks in test-threads etc.)
-      final CountDownLatch allDone = new CountDownLatch(numOfThreads);
-      for (Runnable runnable : runnableList) {
-        Future<?> future = threadPool.submit(new Runnable() {
-          @Override
-          public void run() {
-            allExecutorThreadsReady.countDown();
-            try {
-              afterInitBlocker.await();
-              runnable.run();
-            } catch (Throwable e) {
-              exceptionsList.add(e);
-            } finally {
-              allDone.countDown();
-            }
-          }
-        });
-      }
-      assertTrue(
-          "Timeout initializing the Threads for " + testName,
-          allExecutorThreadsReady.await(numOfThreads * 10, TimeUnit.MILLISECONDS));
+      assertWithMessage("Timeout initializing the Threads for " + testName)
+          .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 10, TimeUnit.MILLISECONDS))
+          .isTrue();
       afterInitBlocker.countDown();
-      assertTrue("Timeout in " + testName, allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
+      assertWithMessage("Timeout in " + testName)
+          .that(allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS))
+          .isTrue();
     } catch (Throwable e) {
       exceptionsList.add(e);
     } finally {
       threadPool.shutdownNow();
     }
-    assertTrue(
-        "Test " + testName + " failed with exception(s): " + exceptionsList,
-        exceptionsList.isEmpty());
+    assertWithMessage("Test %s failed with exception(s): %s", testName, exceptionsList)
+        .that(exceptionsList.isEmpty())
+        .isTrue();
   }
 
-
+  /** just a small lambda-compatible interface. */
+  private interface Run {
+    void run() throws SolverException, InterruptedException, InvalidConfigurationException;
+  }
 }
