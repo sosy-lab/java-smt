@@ -73,7 +73,7 @@ public class SolverConcurrencyTest {
   /**
    * As some Solvers are slower/faster, we choose an appropriate number of formulas to solve here
    */
-  private final Map<Solvers, Integer> integerFormulaGen =
+  private final Map<Solvers, Integer> INTEGER_FORMULA_GEN =
       Map.of(
           Solvers.SMTINTERPOL,
           12,
@@ -86,7 +86,7 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           16);
 
-  private final Map<Solvers, Integer> bitvectorFormulaGen =
+  private final Map<Solvers, Integer> BITVECTOR_FORMULA_GEN =
       Map.of(
           Solvers.BOOLECTOR,
           60,
@@ -100,6 +100,7 @@ public class SolverConcurrencyTest {
           50);
 
   private static List<Throwable> exceptionsList;
+  private static List<Runnable> runnableList;
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -119,9 +120,19 @@ public class SolverConcurrencyTest {
     exceptionsList = Collections.synchronizedList(new ArrayList<Throwable>());
   }
 
+  @BeforeClass
+  public static void createRunnableList() {
+    runnableList = new ArrayList<>();
+  }
+
   @After
   public void resetExceptionsList() {
     exceptionsList.clear();
+  }
+
+  @After
+  public void resetRunnableList() {
+    runnableList.clear();
   }
 
   private void requireConcurrentMultipleStackSupport() {
@@ -161,7 +172,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testIntConcurrencyWithConcurrentContext() {
     requireIntegers();
-    List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
         @SuppressWarnings("resource")
@@ -178,7 +188,7 @@ public class SolverConcurrencyTest {
       };
       runnableList.add(test);
     }
-    assertConcurrency(runnableList, "testBasicIntConcurrency");
+    assertConcurrency("testIntConcurrencyWithConcurrentContext");
   }
 
   /**
@@ -188,7 +198,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithConcurrentContext() {
     requireBitvectors();
-    List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
         @SuppressWarnings("resource")
@@ -205,7 +214,7 @@ public class SolverConcurrencyTest {
       };
       runnableList.add(test);
     }
-    assertConcurrency(runnableList, "testBasicIntConcurrency");
+    assertConcurrency("testBvConcurrencyWithConcurrentContext");
   }
 
   /**
@@ -215,7 +224,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-    List<Runnable> runnableList = new ArrayList<>();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -237,7 +245,7 @@ public class SolverConcurrencyTest {
       };
       runnableList.add(test);
     }
-    assertConcurrency(runnableList, "testBasicIntConcurrency");
+    assertConcurrency("testIntConcurrencyWithoutConcurrentContext");
   }
 
   /**
@@ -247,7 +255,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-    List<Runnable> runnableList = new ArrayList<>();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       contextList.add(initSolver());
@@ -266,13 +273,12 @@ public class SolverConcurrencyTest {
       };
       runnableList.add(test);
     }
-    assertConcurrency(runnableList, "testBasicIntConcurrency");
+    assertConcurrency("testBvConcurrencyWithoutConcurrentContext");
   }
 
   @Test
   public void testConcurrentOptimization() {
     requireOptimization();
-    List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
         @SuppressWarnings("resource")
@@ -289,7 +295,7 @@ public class SolverConcurrencyTest {
       };
       runnableList.add(test);
     }
-    assertConcurrency(runnableList, "testBasicIntConcurrency");
+    assertConcurrency("testConcurrentOptimization");
   }
 
   /**
@@ -300,7 +306,6 @@ public class SolverConcurrencyTest {
   public void testConcurrentStack()
       throws InvalidConfigurationException, InterruptedException {
     requireConcurrentMultipleStackSupport();
-    List<Runnable> runnableList = new ArrayList<>();
     @SuppressWarnings("resource")
     SolverContext context = initSolver();
     ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
@@ -311,7 +316,7 @@ public class SolverConcurrencyTest {
 
       HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
       BooleanFormula instance =
-          gen.generate(integerFormulaGen.getOrDefault(solver, 9));
+          gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
       @SuppressWarnings("resource")
       BasicProverEnvironment<?> pe = context.newProverEnvironment();
       pe.push(instance);
@@ -330,7 +335,7 @@ public class SolverConcurrencyTest {
       };
       runnableList.add(test);
     }
-    assertConcurrency(runnableList, "testConcurrentStack");
+    assertConcurrency("testConcurrentStack");
     closeSolver(context);
   }
 
@@ -351,7 +356,7 @@ public class SolverConcurrencyTest {
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    BooleanFormula instance = gen.generate(bitvectorFormulaGen.getOrDefault(solver, 9));
+    BooleanFormula instance = gen.generate(BITVECTOR_FORMULA_GEN.getOrDefault(solver, 9));
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       pe.push(instance);
       assertTrue("Solver %s failed a concurrency test", pe.isUnsat());
@@ -375,7 +380,7 @@ public class SolverConcurrencyTest {
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    BooleanFormula instance = gen.generate(integerFormulaGen.getOrDefault(solver, 9));
+    BooleanFormula instance = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       pe.push(instance);
       assertTrue("Solver %s failed a concurrency test", pe.isUnsat());
@@ -463,7 +468,7 @@ public class SolverConcurrencyTest {
    *        proper testing)
    * @param testName Name of the test for accurate error messages
    */
-  private static void assertConcurrency(List<? extends Runnable> runnableList, String testName) {
+  private static void assertConcurrency(String testName) {
     int numOfThreads = runnableList.size();
     final ExecutorService threadPool = Executors.newFixedThreadPool(numOfThreads);
 
