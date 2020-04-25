@@ -70,6 +70,35 @@ public class SolverConcurrencyTest {
   private static final int NUMBER_OF_THREADS = 4;
   private static final int TIMEOUT_SECONDS = 30;
 
+  /**
+   * As some Solvers are slower/faster, we choose an appropriate number of formulas to solve here
+   */
+  private final Map<Solvers, Integer> integerFormulaGen =
+      Map.of(
+          Solvers.SMTINTERPOL,
+          12,
+          Solvers.CVC4,
+          16,
+          Solvers.MATHSAT5,
+          16,
+          Solvers.PRINCESS,
+          12,
+          Solvers.Z3,
+          16);
+
+  private final Map<Solvers, Integer> bitvectorFormulaGen =
+      Map.of(
+          Solvers.BOOLECTOR,
+          60,
+          Solvers.CVC4,
+          9,
+          Solvers.MATHSAT5,
+          60,
+          Solvers.PRINCESS,
+          9,
+          Solvers.Z3,
+          50);
+
   private static List<Throwable> exceptionsList;
 
   @Parameters(name = "{0}")
@@ -125,10 +154,12 @@ public class SolverConcurrencyTest {
         .isNoneOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4);
   }
 
+  /**
+   * Test concurrency of integers (while every thread creates its unique context on its own
+   * concurrently)
+   */
   @Test
   public void testIntConcurrencyWithConcurrentContext() {
-    // Test concurrency of integers (while every thread creates its unique context on its own
-    // concurrently)
     requireIntegers();
     List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -150,10 +181,12 @@ public class SolverConcurrencyTest {
     assertConcurrency(runnableList, "testBasicIntConcurrency");
   }
 
+  /**
+   * Test concurrency of bitvectors (while every thread creates its unique context on its own
+   * concurrently)
+   */
   @Test
   public void testBvConcurrencyWithConcurrentContext() {
-    // Test concurrency of bitvectors (while every thread creates its unique context on its own
-    // concurrently)
     requireBitvectors();
     List<Runnable> runnableList = new ArrayList<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -175,10 +208,12 @@ public class SolverConcurrencyTest {
     assertConcurrency(runnableList, "testBasicIntConcurrency");
   }
 
+  /**
+   * Test concurrency with already present and unique context per thread
+   */
   @SuppressWarnings("resource")
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
-    // Test concurrency with already present and unique context per thread
     assume().withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
@@ -204,10 +239,12 @@ public class SolverConcurrencyTest {
     assertConcurrency(runnableList, "testBasicIntConcurrency");
   }
 
+  /**
+   * Test concurrency with already present and unique context per thread
+   */
   @SuppressWarnings("resource")
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
-    // Test concurrency with already present and unique context per thread
     requireBitvectors();
     List<Runnable> runnableList = new ArrayList<>();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
@@ -305,8 +342,6 @@ public class SolverConcurrencyTest {
    * the test!)
    *
    * @param context used context for the test-thread (Do not reuse contexts!)
-   * @throws SolverException
-   * @throws InterruptedException
    */
   private void bvConcurrencyTest(SolverContext context)
       throws SolverException, InterruptedException {
@@ -331,8 +366,6 @@ public class SolverConcurrencyTest {
    *
    * @param context used context for the test-thread (Do not reuse contexts unless you know what you
    *        are doing!)
-   * @throws SolverException
-   * @throws InterruptedException
    */
   private void intConcurrencyTest(SolverContext context)
       throws SolverException, InterruptedException {
@@ -392,8 +425,7 @@ public class SolverConcurrencyTest {
    * Creates and returns a completely new SolverContext for the currently used solver (We need this
    * to get more than one Context in 1 method in a controlled way)
    *
-   * @return new SolverContext
-   * @throws InvalidConfigurationException
+   * @return new and unique SolverContext for current solver (Parameter(0))
    */
   private SolverContext initSolver() throws InvalidConfigurationException {
     try {
@@ -414,7 +446,7 @@ public class SolverConcurrencyTest {
     }
   }
 
-  // TODO: make a Collection of used contextes and end them with annotation after
+  // TODO: make a Collection of used contexts and end them with annotation after
   private void closeSolver(SolverContext context) {
     if (context != null) {
       context.close();
@@ -472,34 +504,5 @@ public class SolverConcurrencyTest {
         exceptionsList.isEmpty());
   }
 
-  /**
-   * As some Solvers are slow... very slow.... and we don't want to wait till the heat death of the
-   * universe nor a 0,1 second test for the faster ones we choose an appropriate number of formulas
-   * to solve here
-   */
-  Map<Solvers, Integer> integerFormulaGen =
-      Map.of(
-          Solvers.SMTINTERPOL,
-          12,
-          Solvers.CVC4,
-          16,
-          Solvers.MATHSAT5,
-          16,
-          Solvers.PRINCESS,
-          12,
-          Solvers.Z3,
-          16);
 
-  Map<Solvers, Integer> bitvectorFormulaGen =
-      Map.of(
-          Solvers.BOOLECTOR,
-          60,
-          Solvers.CVC4,
-          9,
-          Solvers.MATHSAT5,
-          60,
-          Solvers.PRINCESS,
-          9,
-          Solvers.Z3,
-          50);
 }
