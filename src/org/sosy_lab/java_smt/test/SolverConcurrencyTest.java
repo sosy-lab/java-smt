@@ -75,15 +75,15 @@ public class SolverConcurrencyTest {
   private static final Map<Solvers, Integer> INTEGER_FORMULA_GEN =
       Map.of(
           Solvers.SMTINTERPOL,
-          12,
+          10,
           Solvers.CVC4,
-          16,
+          14,
           Solvers.MATHSAT5,
           16,
           Solvers.PRINCESS,
-          12,
+          10,
           Solvers.Z3,
-          16);
+          14);
 
   private static final Map<Solvers, Integer> BITVECTOR_FORMULA_GEN =
       Map.of(
