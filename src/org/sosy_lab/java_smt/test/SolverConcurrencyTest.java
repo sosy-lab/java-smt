@@ -214,13 +214,14 @@ public class SolverConcurrencyTest {
   @SuppressWarnings("resource")
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
-    assume().withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+    requireBitvectors();
     List<Runnable> runnableList = new ArrayList<>();
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
+    // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       contextList.add(initSolver());
+    }
+    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       Runnable test = new Runnable() {
         @SuppressWarnings("resource")
         @Override
