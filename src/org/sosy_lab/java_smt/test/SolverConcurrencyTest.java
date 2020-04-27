@@ -43,6 +43,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
@@ -212,10 +213,14 @@ public class SolverConcurrencyTest {
   @Test
   public void testConcurrentOptimization() {
     requireOptimization();
+    assume()
+        .withMessage("Solver does support optimization, but is not yet reentrant.")
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
     assertConcurrency(
         "testConcurrentOptimization",
         () -> {
-          SolverContext context = initSolver();
+          SolverContext context = initSolver("solver.mathsat5.loadOptimathsat5", "true");
           optimizationTest(context);
           closeSolver(context);
         });
@@ -347,12 +352,18 @@ public class SolverConcurrencyTest {
    * Creates and returns a completely new SolverContext for the currently used solver (We need this
    * to get more than one Context in 1 method in a controlled way).
    *
+   * @param additionalOptions a list of pairs (key, value) for creating a new solver context.
    * @return new and unique SolverContext for current solver (Parameter(0))
    */
-  private SolverContext initSolver() throws InvalidConfigurationException {
+  private SolverContext initSolver(String... additionalOptions)
+      throws InvalidConfigurationException {
     try {
-      Configuration config =
-          Configuration.builder().setOption("solver.solver", solverToUse().toString()).build();
+      ConfigurationBuilder options =
+          Configuration.builder().setOption("solver.solver", solverToUse().toString());
+      for (int i = 0; i < additionalOptions.length; i += 2) {
+        options.setOption(additionalOptions[i], additionalOptions[i + 1]);
+      }
+      Configuration config = options.build();
       LogManager logger = LogManager.createTestLogManager();
       ShutdownNotifier shutdownNotifier = ShutdownManager.create().getNotifier();
 
