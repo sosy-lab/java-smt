@@ -35,8 +35,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
@@ -64,6 +66,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("resource")
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
 public class SolverConcurrencyTest {
 
@@ -213,10 +216,11 @@ public class SolverConcurrencyTest {
   @Test
   public void testConcurrentOptimization() {
     requireOptimization();
-    assume()
-        .withMessage("Solver does support optimization, but is not yet reentrant.")
+
+    assume().withMessage("Solver does support optimization, but is not yet reentrant.")
         .that(solver)
         .isNotEqualTo(Solvers.MATHSAT5);
+
     assertConcurrency(
         "testConcurrentOptimization",
         () -> {
@@ -308,7 +312,7 @@ public class SolverConcurrencyTest {
     }
   }
 
-  // TODO: make proper "long" test
+  // As optimization is not used much at the moment this small test is ok
   private void optimizationTest(SolverContext context)
       throws InterruptedException, SolverException {
     FormulaManager mgr = context.getFormulaManager();
@@ -379,7 +383,6 @@ public class SolverConcurrencyTest {
     }
   }
 
-  // TODO: make a Collection of used contexts and end them with annotation after
   private void closeSolver(SolverContext context) {
     if (context != null) {
       context.close();
