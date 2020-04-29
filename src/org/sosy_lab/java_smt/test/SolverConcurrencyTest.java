@@ -96,7 +96,7 @@ public class SolverConcurrencyTest {
           Solvers.MATHSAT5,
           60,
           Solvers.PRINCESS,
-          9,
+          7,
           Solvers.Z3,
           50);
 
