@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -109,6 +110,15 @@ public class SolverConcurrencyTest {
 
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  /**
+   * If UnsatisfiedLinkError (wrapped in InvalidConfigurationException) is thrown, abort the test.
+   * On some systems (like Windows), some solvers are not available.
+   */
+  @Before
+  public void checkThatSolverIsAvailable() throws InvalidConfigurationException {
+    initSolver().close();
   }
 
   private void requireConcurrentMultipleStackSupport() {
