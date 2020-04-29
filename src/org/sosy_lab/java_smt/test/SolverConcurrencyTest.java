@@ -24,11 +24,11 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.ImmutableMap;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -73,8 +73,8 @@ public class SolverConcurrencyTest {
   /**
    * As some Solvers are slower/faster, we choose an appropriate number of formulas to solve here.
    */
-  private static final Map<Solvers, Integer> INTEGER_FORMULA_GEN =
-      Map.of(
+  private static final ImmutableMap<Solvers, Integer> INTEGER_FORMULA_GEN =
+      ImmutableMap.of(
           Solvers.SMTINTERPOL,
           10,
           Solvers.CVC4,
@@ -86,8 +86,8 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           14);
 
-  private static final Map<Solvers, Integer> BITVECTOR_FORMULA_GEN =
-      Map.of(
+  private static final ImmutableMap<Solvers, Integer> BITVECTOR_FORMULA_GEN =
+      ImmutableMap.of(
           Solvers.BOOLECTOR,
           60,
           Solvers.CVC4,
@@ -214,7 +214,8 @@ public class SolverConcurrencyTest {
   public void testConcurrentOptimization() {
     requireOptimization();
 
-    assume().withMessage("Solver does support optimization, but is not yet reentrant.")
+    assume()
+        .withMessage("Solver does support optimization, but is not yet reentrant.")
         .that(solver)
         .isNotEqualTo(Solvers.MATHSAT5);
 
