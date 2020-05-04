@@ -45,19 +45,69 @@ import org.sosy_lab.java_smt.api.SolverException;
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0 {
   private static final String MATHSAT_DUMP1 =
-      "(set-info :source |printed by MathSAT|)\n(declare-fun a () Bool)\n(declare-fun b () Bool)\n(declare-fun d () Bool)\n(declare-fun e () Bool)\n(define-fun .def_9 () Bool (= a b))\n(define-fun .def_10 () Bool (not .def_9))\n(define-fun .def_13 () Bool (and .def_10 d))\n(define-fun .def_14 () Bool (or e .def_13))\n(assert .def_14)";
+      "(set-info :source |printed by MathSAT|)\n"
+          + "(declare-fun a () Bool)\n"
+          + "(declare-fun b () Bool)\n"
+          + "(declare-fun d () Bool)\n"
+          + "(declare-fun e () Bool)\n"
+          + "(define-fun .def_9 () Bool (= a b))\n"
+          + "(define-fun .def_10 () Bool (not .def_9))\n"
+          + "(define-fun .def_13 () Bool (and .def_10 d))\n"
+          + "(define-fun .def_14 () Bool (or e .def_13))\n"
+          + "(assert .def_14)";
   private static final String MATHSAT_DUMP2 =
-      "(set-info :source |printed by MathSAT|)\n(declare-fun a () Int)\n(declare-fun b () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(define-fun .def_15 () Int (* (- 1) c))\n(define-fun .def_16 () Int (+ b .def_15))\n(define-fun .def_17 () Int (+ a .def_16))\n(define-fun .def_19 () Bool (= .def_17 0))\n(define-fun .def_27 () Bool (= .def_19 q))\n(define-fun .def_28 () Bool (not .def_27))\n(define-fun .def_23 () Bool (<= b a))\n(define-fun .def_29 () Bool (and .def_23 .def_28))\n(define-fun .def_11 () Bool (= a b))\n(define-fun .def_34 () Bool (and .def_11 .def_29))\n(define-fun .def_30 () Bool (or u .def_29))\n(define-fun .def_31 () Bool (and q .def_30))\n(define-fun .def_35 () Bool (and .def_31 .def_34))\n(assert .def_35)";
+      "(set-info :source |printed by MathSAT|)\n"
+          + "(declare-fun a () Int)\n"
+          + "(declare-fun b () Int)\n"
+          + "(declare-fun c () Int)\n"
+          + "(declare-fun q () Bool)\n"
+          + "(declare-fun u () Bool)\n"
+          + "(define-fun .def_15 () Int (* (- 1) c))\n"
+          + "(define-fun .def_16 () Int (+ b .def_15))\n"
+          + "(define-fun .def_17 () Int (+ a .def_16))\n"
+          + "(define-fun .def_19 () Bool (= .def_17 0))\n"
+          + "(define-fun .def_27 () Bool (= .def_19 q))\n"
+          + "(define-fun .def_28 () Bool (not .def_27))\n"
+          + "(define-fun .def_23 () Bool (<= b a))\n"
+          + "(define-fun .def_29 () Bool (and .def_23 .def_28))\n"
+          + "(define-fun .def_11 () Bool (= a b))\n"
+          + "(define-fun .def_34 () Bool (and .def_11 .def_29))\n"
+          + "(define-fun .def_30 () Bool (or u .def_29))\n"
+          + "(define-fun .def_31 () Bool (and q .def_30))\n"
+          + "(define-fun .def_35 () Bool (and .def_31 .def_34))\n"
+          + "(assert .def_35)";
   private static final String MATHSAT_DUMP3 =
-      "(set-info :source |printed by MathSAT|)\n(declare-fun fun_b (Int) Bool)\n(define-fun .def_11 () Bool (fun_b 1))\n(assert .def_11)";
+      "(set-info :source |printed by MathSAT|)\n"
+          + "(declare-fun fun_b (Int) Bool)\n"
+          + "(define-fun .def_11 () Bool (fun_b 1))\n"
+          + "(assert .def_11)";
   private static final String SMTINTERPOL_DUMP1 =
-      "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert (or e (and (xor a b) d)))";
+      "(declare-fun d () Bool)\n"
+          + "(declare-fun b () Bool)\n"
+          + "(declare-fun a () Bool)\n"
+          + "(declare-fun e () Bool)\n"
+          + "(assert (or e (and (xor a b) d)))";
   private static final String SMTINTERPOL_DUMP2 =
-      "(declare-fun b () Int)(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert (let ((.cse0 (xor q (= (+ a b) c))) (.cse1 (>= a b))) (and (or (and .cse0 .cse1) u) q (= a b) .cse0 .cse1)))";
+      "(declare-fun b () Int)(declare-fun a () Int)\n"
+          + "(declare-fun c () Int)\n"
+          + "(declare-fun q () Bool)\n"
+          + "(declare-fun u () Bool)\n"
+          + "(assert (let ((.cse0 (xor q (= (+ a b) c))) (.cse1 (>= a b))) (and (or (and .cse0"
+          + " .cse1) u) q (= a b) .cse0 .cse1)))";
   private static final String Z3_DUMP1 =
-      "(declare-fun d () Bool)\n(declare-fun b () Bool)\n(declare-fun a () Bool)\n(declare-fun e () Bool)\n(assert  (or e (and (xor a b) d)))";
+      "(declare-fun d () Bool)\n"
+          + "(declare-fun b () Bool)\n"
+          + "(declare-fun a () Bool)\n"
+          + "(declare-fun e () Bool)\n"
+          + "(assert  (or e (and (xor a b) d)))";
   private static final String Z3_DUMP2 =
-      "(declare-fun b () Int)\n(declare-fun a () Int)\n(declare-fun c () Int)\n(declare-fun q () Bool)\n(declare-fun u () Bool)\n(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and (and (or $x35 u) q) (and $x9 $x35)))))";
+      "(declare-fun b () Int)\n"
+          + "(declare-fun a () Int)\n"
+          + "(declare-fun c () Int)\n"
+          + "(declare-fun q () Bool)\n"
+          + "(declare-fun u () Bool)\n"
+          + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
+          + " (and (or $x35 u) q) (and $x9 $x35)))))";
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
