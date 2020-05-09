@@ -53,11 +53,12 @@ The following features are supported (depending on the used SMT solver):
  - Formula introspection using visitors
 
 #### Multithreading Support
-Most solvers support multithreading,
+The solvers Z3(w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
 provided that different threads use different contexts,
 and _all_ operations on a single context are performed from a single thread.
 Interruption using [ShutdownNotifier][] may be used to interrupt a
 a solver from any thread.
+CVC4 supports multithreading on a single context with multiple stacks(=provers).
 
 #### Garbage Collection in Native Solvers
 JavaSMT exposes an API for performing garbage collection on solvers
