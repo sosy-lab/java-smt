@@ -69,7 +69,7 @@
 
     <target name="build" depends="build-project, collect-options" description="Build"/>
 
-    <target name="dist" depends="jar, jar-yices2, sources, javadoc-jar" description="Make a distributable release"/>
+    <target name="dist" depends="jar, jar-yices2, sources, sources-yices2, javadoc-jar" description="Make a distributable release"/>
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 

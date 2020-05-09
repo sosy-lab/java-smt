@@ -29,4 +29,16 @@
             </manifest>
         </jar>
     </target>
+
+    <target name="sources-yices2" depends="determine-version, resolve-dependencies">
+        <jar destfile="${ivy.module}-${version}-sources-yices2.jar"
+                whenmanifestonly="fail">
+            <fileset dir="${source.dir}/" includes="**/*Yices2*.java"/>
+            <fileset dir="${source.generated.dir}/" includes="**/*Yices2*.java"/>
+            <manifest>
+                    <attribute name="Implementation-Title" value="${ant.project.name} - Yices2"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+            </manifest>
+        </jar>
+    </target>
 </project>

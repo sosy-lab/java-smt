@@ -38,8 +38,8 @@
     <target name="sources" depends="determine-version, resolve-dependencies">
         <jar destfile="${ivy.module}-${version}-sources.jar"
                 whenmanifestonly="fail">
-            <fileset dir="${source.dir}/" includes="**/*.java"/>
-            <fileset dir="${source.generated.dir}/" includes="**/*.java"/>
+            <fileset dir="${source.dir}/" includes="**/*.java" excludes="**/*Yices2*.java"/>
+            <fileset dir="${source.generated.dir}/" includes="**/*.java" excludes="**/*Yices2*.java"/>
             <manifest>
                     <attribute name="Implementation-Title" value="${ant.project.name}"/>
                     <attribute name="Implementation-Version" value="${version}"/>
