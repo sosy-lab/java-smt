@@ -17,10 +17,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package org.sosy_lab.java_smt.delegate.logging;
 
-/** Wraps the proving environment with loggers. */
-@com.google.errorprone.annotations.CheckReturnValue
-@javax.annotation.ParametersAreNonnullByDefault
-@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
-@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
-package org.sosy_lab.java_smt.logging;
+import com.google.common.testing.AbstractPackageSanityTests;
+
+public class PackageSanityTest extends AbstractPackageSanityTests {}

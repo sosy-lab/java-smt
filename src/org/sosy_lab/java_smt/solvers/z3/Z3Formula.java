@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.errorprone.annotations.Immutable;
-import com.google.errorprone.annotations.concurrent.LazyInit;
 import com.microsoft.z3.Native;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -40,8 +39,7 @@ abstract class Z3Formula implements Formula {
 
   private final long z3expr;
   private final long z3context;
-
-  @LazyInit private int hashCache = 0;
+  private final int hashCache;
 
   private Z3Formula(long z3context, long z3expr) {
     checkArgument(z3context != 0, "Z3 context is null");
@@ -50,6 +48,7 @@ abstract class Z3Formula implements Formula {
     this.z3context = z3context;
 
     Native.incRef(z3context, z3expr);
+    this.hashCache = Native.getAstHash(z3context, z3expr);
   }
 
   @Override
@@ -71,9 +70,6 @@ abstract class Z3Formula implements Formula {
 
   @Override
   public final int hashCode() {
-    if (hashCache == 0) {
-      hashCache = Native.getAstHash(z3context, z3expr);
-    }
     return hashCache;
   }
 

@@ -59,12 +59,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
-
-    terminationCallback =
-        () -> {
-          return shutdownNotifier.shouldShutdown();
-        };
-
+    terminationCallback = shutdownNotifier::shouldShutdown;
     terminationCallbackHelper = addTerminationCallback();
   }
 

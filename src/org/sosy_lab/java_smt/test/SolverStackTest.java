@@ -21,15 +21,14 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -81,8 +80,6 @@ public class SolverStackTest extends SolverBasedTest0 {
       return context.newProverEnvironment(options);
     }
   }
-
-  @Rule public ExpectedException thrown = ExpectedException.none();
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
@@ -211,8 +208,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void stackTest() {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
-    thrown.expect(RuntimeException.class);
-    stack.pop();
+    assertThrows(RuntimeException.class, stack::pop);
   }
 
   @Test
@@ -241,12 +237,44 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void largeStackUsageTest() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    for (int i = 0; i < 20; i++) {
+      stack.push();
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("X" + (i + 1))));
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("Y" + i), bmgr.makeVariable("Y" + (i + 1))));
+      stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
+    }
+    assertThat(stack.isUnsat()).isFalse();
+  }
+
+  @Test
+  public void largerStackUsageTest() throws InterruptedException, SolverException {
+    assume()
+        .withMessage("Solver does not support larger stacks yet")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    BasicProverEnvironment<?> stack = newEnvironmentForTest();
+    for (int i = 0; i < 1000; i++) {
+      stack.push();
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("X" + (i + 1))));
+      stack.addConstraint(
+          bmgr.equivalence(bmgr.makeVariable("Y" + i), bmgr.makeVariable("Y" + (i + 1))));
+      stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
+    }
+    assertThat(stack.isUnsat()).isFalse();
+  }
+
+  @Test
   public void stackTest5() {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.push();
     stack.pop();
-    thrown.expect(RuntimeException.class);
-    stack.pop();
+    assertThrows(RuntimeException.class, stack::pop);
   }
 
   @Test
@@ -352,8 +380,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     }
 
     try (BasicProverEnvironment<?> stack2 = newEnvironmentForTest()) {
-      thrown.expect(RuntimeException.class);
-      stack2.pop();
+      assertThrows(RuntimeException.class, stack2::pop);
     }
   }
 
@@ -362,8 +389,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.addConstraint(bmgr.makeVariable("bool_a"));
     assertThat(stack).isSatisfiable();
-    thrown.expect(RuntimeException.class);
-    stack.pop();
+    assertThrows(RuntimeException.class, stack::pop);
   }
 
   @Test
@@ -470,8 +496,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       assertThat(stack).isUnsatisfiable();
 
-      thrown.expect(Exception.class);
-      stack.getModel();
+      assertThrows(Exception.class, stack::getModel);
     }
   }
 
@@ -485,8 +510,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       stack.push(imgr.lessThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
       assertThat(stack).isUnsatisfiable();
 
-      thrown.expect(Exception.class);
-      stack.getModel();
+      assertThrows(Exception.class, stack::getModel);
     }
   }
 

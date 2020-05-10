@@ -17,7 +17,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.logging;
+package org.sosy_lab.java_smt.delegate.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

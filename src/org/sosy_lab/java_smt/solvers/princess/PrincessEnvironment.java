@@ -44,6 +44,7 @@ import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.util.Debug;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -236,6 +237,16 @@ class PrincessEnvironment {
   void unregisterStack(PrincessAbstractProver<?, ?> stack) {
     assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
     registeredProvers.remove(stack);
+  }
+
+  /** unregister and close all stacks. */
+  void close() {
+    for (PrincessAbstractProver<?, ?> prover : ImmutableList.copyOf(registeredProvers)) {
+      prover.close();
+    }
+    api.shutDown();
+    api.reset();
+    Preconditions.checkState(registeredProvers.isEmpty());
   }
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {

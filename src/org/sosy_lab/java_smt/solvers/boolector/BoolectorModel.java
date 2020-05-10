@@ -94,7 +94,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     List<Object> argumentInterpretation = new ArrayList<>();
     Object value = creator.convertValue(key, evalImpl(key));
     argumentInterpretation.add(value);
-    Long valueNode = null;
+    long valueNode;
     if (value.equals(true)) {
       valueNode = BtorJNI.boolector_true(btor);
     } else if (value.equals(false)) {

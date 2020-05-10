@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import java.util.Map;
@@ -81,7 +82,10 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
             declSymbols,
             decls);
 
-    return getFormulaCreator().encapsulateBoolean(e);
+    final int size = Native.astVectorSize(getEnvironment(), e);
+    Preconditions.checkState(size == 1, "parsing expects exactly one asserted term.");
+    final long term = Native.astVectorGet(getEnvironment(), e, 0);
+    return getFormulaCreator().encapsulateBoolean(term);
   }
 
   @Override

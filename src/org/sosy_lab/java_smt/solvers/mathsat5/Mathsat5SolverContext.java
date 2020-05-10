@@ -114,7 +114,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private static boolean loaded = false;
 
   @SuppressWarnings("checkstyle:parameternumber")
-  public Mathsat5SolverContext(
+  private Mathsat5SolverContext(
       LogManager logger,
       long mathsatConfig,
       Mathsat5Settings settings,

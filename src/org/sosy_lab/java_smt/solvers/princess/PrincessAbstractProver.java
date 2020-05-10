@@ -187,13 +187,13 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     checkNotNull(api);
     checkNotNull(mgr);
     if (!closed) {
-      if (shutdownNotifier.shouldShutdown()) {
-        api.shutDown();
-      } else {
+      if (!shutdownNotifier.shouldShutdown()) { // normal cleanup
         for (int i = 0; i < trackingStack.size(); i++) {
           pop();
         }
       }
+      api.shutDown();
+      api.reset();
       creator.getEnv().unregisterStack(this);
     }
     closed = true;
@@ -240,7 +240,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     final List<IFunction> functionSymbols = new ArrayList<>();
     // the number of constraints asserted up to this point, this is needed
     // for unsat core computation
-    int constraintNum = 0;
+    int constraintNum;
 
     Level(int constraintNum) {
       this.constraintNum = constraintNum;

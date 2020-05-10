@@ -116,7 +116,9 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    creator.getEnv().close();
+  }
 
   @Override
   protected boolean supportsAssumptionSolving() {

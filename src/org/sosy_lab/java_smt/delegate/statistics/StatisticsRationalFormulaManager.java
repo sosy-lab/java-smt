@@ -2,7 +2,7 @@
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
  *
- *  Copyright (C) 2007-2016  Dirk Beyer
+ *  Copyright (C) 2007-2020  Dirk Beyer
  *  All rights reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.sosy_lab.java_smt.logging;
+package org.sosy_lab.java_smt.delegate.statistics;
 
-import com.google.common.testing.AbstractPackageSanityTests;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-public class PackageSanityTest extends AbstractPackageSanityTests {}
+class StatisticsRationalFormulaManager
+    extends StatisticsNumeralFormulaManager<NumeralFormula, RationalFormula>
+    implements RationalFormulaManager {
+
+  StatisticsRationalFormulaManager(RationalFormulaManager pDelegate, SolverStatistics pStats) {
+    super(pDelegate, pStats);
+  }
+}
