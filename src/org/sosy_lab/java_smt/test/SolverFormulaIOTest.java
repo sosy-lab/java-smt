@@ -317,7 +317,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
     assume()
         .withMessage(
-            "Solver %s will fail this anyway since it bools are handled as bitvectors of length one.",
+            "Solver %s will fail this anyway since it bools are handled as bitvectors of length"
+                + " one.",
             solverToUse())
         .that(solver)
         .isNotEqualTo(Solvers.BOOLECTOR);

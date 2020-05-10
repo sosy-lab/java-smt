@@ -153,11 +153,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support optimization")
         .that(solver)
         .isNoneOf(
-            Solvers.SMTINTERPOL,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS,
-            Solvers.CVC4,
-            Solvers.YICES2);
+            Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2);
   }
 
   /**
