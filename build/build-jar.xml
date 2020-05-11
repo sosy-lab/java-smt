@@ -12,7 +12,7 @@
     <!-- These properties can and should be overridden from including file. -->
     <property name="class.main" value=""/>
     <property name="project.url" value=""/>
-    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class **/*Yices2*"/>
+    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class"/>
 
     <target name="jar" depends="determine-version,build" description="Create a runnable JAR file">
         <property name="jar.file" value="${ivy.module}-${version}.jar"/>
