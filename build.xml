@@ -11,7 +11,7 @@
     <property name="package" value="java_smt"/>
     <property name="jar.excludes" value=""/>
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
-    <property name="documentation.javadoc.exclude" value="org.sosy_lab.java_smt.solvers.mathsat5,org.sosy_lab.java_smt.solvers.princess,org.sosy_lab.java_smt.solvers.smtinterpol,org.sosy_lab.java_smt.solvers.z3"/>
+    <property name="documentation.javadoc.exclude" value="org/sosy_lab/java_smt/solvers/**/*"/>
 
     <!-- This check crashes current error-prone -->
     <property name="errorprone.options" value="-Xep:Finally:OFF"/>
