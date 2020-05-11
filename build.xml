@@ -10,19 +10,13 @@
     <!-- Yices2 is under GPL3 and has to be seperated from Apache2-licensed software. -->
     <property name="yices2Source" value="org/sosy_lab/java_smt/solvers/yices2/**.java"/>
     <property name="yices2Classes" value="org/sosy_lab/java_smt/solvers/yices2/**.class"/>
-    <property name="yices2Package" value="org.sosy_lab.java_smt.solvers.yices2"/>
-
-    <property name="mathsat5Package" value="org.sosy_lab.java_smt.solvers.mathsat5"/>
-    <property name="princessPackage" value="org.sosy_lab.java_smt.solvers.princess"/>
-    <property name="smtinterpolPackage" value="org.sosy_lab.java_smt.solvers.smtinterpol"/>
-    <property name="z3Package" value="org.sosy_lab.java_smt.solvers.z3"/>
-
+    
     <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
     <property name="jar.excludes" value="${yices2Classes}"/>
     <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
-    <property name="documentation.javadoc.exclude" value="${mathsat5Package},${princessPackage},${smtinterpolPackage},${z3Package},${yices2Package}"/>
+    <property name="documentation.javadoc.exclude" value="org/sosy_lab/java_smt/solvers/**/*"/>
 
     <!-- This check crashes current error-prone -->
     <property name="errorprone.options" value="-Xep:Finally:OFF"/>
