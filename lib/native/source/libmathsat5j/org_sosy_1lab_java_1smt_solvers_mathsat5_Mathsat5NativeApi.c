@@ -383,12 +383,7 @@ CALL4(msat_term, make_int_modular_congruence)
 FREE_MPZ_ARG(2)
 TERM_RETURN
 
-DEFINE_FUNC(jterm, 1make_1floor) WITH_TWO_ARGS(jenv, jterm)
-ENV_ARG(1)
-TERM_ARG(2)
-CALL2(msat_term, make_floor)
-TERM_RETURN
-
+make_term_unary(floor)
 make_term_constant(pi, 1pi)
 make_term_unary(exp)
 make_term_unary(sin)
