@@ -393,6 +393,8 @@ make_term_constant(pi, 1pi)
 make_term_unary(exp)
 make_term_unary(sin)
 make_term_unary(log)
+make_term_binary(pow)
+make_term_unary(asin)
 
 DEFINE_FUNC(jterm, 1make_1number) WITH_TWO_ARGS(jenv, string)
 ENV_ARG(1)
@@ -698,6 +700,25 @@ make_term_constant(fp_roundingmode_zero, 1fp_1roundingmode_1zero)
 make_term_constant(fp_roundingmode_plus_inf, 1fp_1roundingmode_1plus_1inf)
 make_term_constant(fp_roundingmode_minus_inf, 1fp_1roundingmode_1minus_1inf)
 
+make_term_binary(forall)
+make_term_binary(exists)
+
+DEFINE_FUNC(jterm, 1make_1variable) WITH_THREE_ARGS(jenv, string, jtype)
+ENV_ARG(1)
+STRING_ARG(2)
+TYPE_ARG(3)
+CALL3(msat_term, make_variable)
+FREE_STRING_ARG(2)
+TERM_RETURN
+
+DEFINE_FUNC(jterm, 1existentially_1quantify) WITH_FOUR_ARGS(jenv, jterm, jtermArray, int)
+ENV_ARG(1)
+TERM_ARG(2)
+TERM_ARRAY_ARG(3)
+SIMPLE_ARG(int, 4)
+CALL4(msat_term, existentially_quantify)
+FREE_TERM_ARRAY_ARG(3)
+TERM_RETURN
 
 DEFINE_FUNC(jterm, 1make_1term) WITH_THREE_ARGS(jenv, jdecl, jtermArray)
 ENV_ARG(1)
@@ -761,12 +782,19 @@ func2_term_is(floor, 1pi)
 func2_term_is(floor, 1exp)
 func2_term_is(floor, 1sin)
 func2_term_is(floor, 1log)
+func2_term_is(pow, 1pow)
+func2_term_is(asin, 1asin)
 func2_term_is(array_read, 1array_1read)
 func2_term_is(array_write, 1array_1write)
 func2_term_is(array_const, 1array_1const)
 func2_term_is(int_to_bv, 1int_1to_1bv)
 func2_term_is(int_from_ubv, 1int_1from_1ubv)
 func2_term_is(int_from_sbv, 1int_1from_1sbv)
+
+func2_term_is(quantifier, 1quantifier)
+func2_term_is(forall, 1forall)
+func2_term_is(exists, 1exists)
+func2_term_is(variable, 1variable)
 
 #define func_term_is_bv(name) \
 	DEFINE_FUNC(jboolean, 1term_1is_1bv_1##name) WITH_TWO_ARGS(jenv, jterm) \
@@ -1102,6 +1130,15 @@ ENV_ARG(1)
 TERM_ARRAY_OUTPUT_ARG(2)
 CALL2(msat_term*, get_unsat_core)
 RETURN_TERM_ARRAY(2)
+
+DEFINE_FUNC(jterm, 1simplify) WITH_FOUR_ARGS(jenv, jterm, jtermArray, int)
+ENV_ARG(1)
+TERM_ARG(2)
+TERM_ARRAY_ARG(3)
+SIMPLE_ARG(int, 4)
+CALL4(msat_term, simplify)
+FREE_TERM_ARRAY_ARG(3)
+TERM_RETURN
 
 i_func1s(create_itp_group, 1create_1itp_1group, int, msat_env)
 
