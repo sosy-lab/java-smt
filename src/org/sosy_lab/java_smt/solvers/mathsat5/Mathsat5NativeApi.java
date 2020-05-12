@@ -45,11 +45,9 @@ class Mathsat5NativeApi {
   /** OptiMathSAT codes for queries on objective items. */
   public static final int MSAT_OPTIMUM = 0;
 
-  public static final int MSAT_INITIAL_LOWER = 1;
-  public static final int MSAT_INITIAL_UPPER = 2;
-  public static final int MSAT_FINAL_LOWER = 3;
-  public static final int MSAT_FINAL_UPPER = 4;
-  public static final int MSAT_FINAL_ERROR = 5;
+  public static final int MSAT_FINAL_LOWER = 1;
+  public static final int MSAT_FINAL_UPPER = 2;
+  public static final int MSAT_FINAL_ERROR = 3;
 
   /** OptiMathSAT objective type, either minimize or maximize. */
   public static final int MSAT_OBJECTIVE_MINIMIZE = -1;
@@ -820,14 +818,10 @@ class Mathsat5NativeApi {
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be minimized.
-   * @param lower The constant-valued term representing the value of an initial lower bound. Use
-   *     NULL for negative infinity.
-   * @param upper The constant-valued term representing the value of an initial upper bound. Use
-   *     NULL for positive infinity.
    */
-  public static native long msat_make_minimize(long e, long term, long lower, long upper);
+  public static native long msat_make_minimize(long e, long term);
 
-  public static native long msat_make_minimize_signed(long e, long term, long lower, long upper);
+  public static native long msat_make_minimize_signed(long e, long term);
 
   /**
    * Create the new objective 'max(term)' with optional optimization local interval ]local, upper].
@@ -835,14 +829,10 @@ class Mathsat5NativeApi {
    *
    * @param e msat_env The environment in which to operate.
    * @param term msat_term The term to be maximized.
-   * @param lower The constant-valued term representing the value of an initial lower bound. Use
-   *     NULL (MSAT_ERROR_TERM) for negative infinity.
-   * @param upper The constant-valued term representing the value of an initial upper bound. Use
-   *     NULL (MSAT_ERROR_TERM) for positive infinity.
    */
-  public static native long msat_make_maximize(long e, long term, long lower, long upper);
+  public static native long msat_make_maximize(long e, long term);
 
-  public static native long msat_make_maximize_signed(long e, long term, long lower, long upper);
+  public static native long msat_make_maximize_signed(long e, long term);
 
   /**
    * Create the new objective 'min(max(term0), ..., max(termN))' with optional optimization local
@@ -851,15 +841,10 @@ class Mathsat5NativeApi {
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
    * @param terms msat_term[] The array of terms to be optimized.
-   * @param lower The constant-valued term representing the value of an initial lower bound. Use
-   *     NULL (MSAT_ERROR_TERM) for negative infinity.
-   * @param upper The constant-valued term representing the value of an initial upper bound. Use
-   *     NULL (MSAT_ERROR_TERM) for positive infinity.
    */
-  public static native long msat_make_minmax(long e, int len, long[] terms, long lower, long upper);
+  public static native long msat_make_minmax(long e, int len, long[] terms);
 
-  public static native long msat_make_minmax_signed(
-      long e, int len, long[] terms, long lower, long upper);
+  public static native long msat_make_minmax_signed(long e, int len, long[] terms);
 
   /**
    * Create the new objective 'max(min(term0), ..., min(termN))' with optional optimization local
@@ -868,15 +853,10 @@ class Mathsat5NativeApi {
    * @param e msat_env The environment in which to operate.
    * @param len size_t The size of terms.
    * @param terms msat_term[] The array of terms to be optimized.
-   * @param lower The constant-valued term representing the value of an initial lower bound. Use
-   *     NULL (MSAT_ERROR_TERM) for negative infinity.
-   * @param upper The constant-valued term representing the value of an initial upper bound. Use
-   *     NULL (MSAT_ERROR_TERM) for positive infinity.
    */
-  public static native long msat_make_maxmin(long e, int len, long[] terms, long lower, long upper);
+  public static native long msat_make_maxmin(long e, int len, long[] terms);
 
-  public static native long msat_make_maxmin_signed(
-      long e, int len, long[] terms, long lower, long upper);
+  public static native long msat_make_maxmin_signed(long e, int len, long[] terms);
 
   /**
    * \brief Associate a weight to a term declaration with respect to a MaxSMT group identified by a
