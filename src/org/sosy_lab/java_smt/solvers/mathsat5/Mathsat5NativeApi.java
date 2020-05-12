@@ -133,9 +133,13 @@ class Mathsat5NativeApi {
   public static final int MSAT_TAG_INT_FROM_SBV = 71; // < Signed BV -> INT conversion
   public static final int MSAT_TAG_INT_TO_BV = 72; // < INT -> BV conversion
   public static final int MSAT_TAG_PI = 73; // Pi constant
-  public static final int MSAT_TAG_EXP = 73; // Exponential function
-  public static final int MSAT_TAG_SIN = 73; // Sine function
-  public static final int MSAT_TAG_LOG = 73; // Natural logarithm function
+  public static final int MSAT_TAG_EXP = 74; // Exponential function
+  public static final int MSAT_TAG_SIN = 75; // Sine function
+  public static final int MSAT_TAG_LOG = 76; // Natural logarithm function
+  public static final int MSAT_TAG_POW = 77;
+  public static final int MSAT_TAG_ASIN = 78;
+  public static final int MSAT_TAG_FORALL = 79;
+  public static final int MSAT_TAG_EXISTS = 80;
 
   interface AllSatModelCallback {
 
@@ -326,6 +330,10 @@ class Mathsat5NativeApi {
 
   public static native long msat_make_log(long e, long t);
 
+  public static native long msat_make_pow(long e, long tb, long te);
+
+  public static native long msat_make_asin(long e, long t);
+
   public static native long msat_make_number(long e, String num_rep);
 
   public static native long msat_make_int_number(long e, int value);
@@ -350,6 +358,18 @@ class Mathsat5NativeApi {
   public static native long msat_make_int_from_ubv(long e, long t);
 
   public static native long msat_make_int_from_sbv(long e, long t);
+
+  public static native long msat_make_forall(long e, long var, long body);
+
+  public static native long msat_make_exists(long e, long var, long body);
+
+  public static native long msat_make_variable(long e, String name, long type);
+
+  public static long msat_existentially_quantify(long env, long term, long[] args) {
+    return msat_existentially_quantify(env, term, args, args.length);
+  }
+
+  public static native long msat_existentially_quantify(long e, long t, long[] args, int n);
 
   public static native long msat_make_bv_number(long e, String numRep, int width, int base);
 
@@ -507,6 +527,13 @@ class Mathsat5NativeApi {
 
   public static native long msat_apply_substitution(long e, long t, int s, long[] from, long[] to);
 
+  public static long msat_simplify(long env, long formula, long[] to_protect) {
+    return msat_simplify(env, formula, to_protect, to_protect.length);
+  }
+
+  public static native long msat_simplify(
+      long e, long formula, long[] to_protect, int num_to_protect);
+
   /*
    * Term access and navigation
    */
@@ -561,6 +588,10 @@ class Mathsat5NativeApi {
   public static native boolean msat_term_is_sin(long e, long t);
 
   public static native boolean msat_term_is_log(long e, long t);
+
+  public static native boolean msat_term_is_pow(long e, long t);
+
+  public static native boolean msat_term_is_asin(long e, long t);
 
   public static native boolean msat_term_is_array_read(long e, long t);
 
@@ -625,6 +656,15 @@ class Mathsat5NativeApi {
   public static native boolean msat_term_is_bv_ror(long e, long t);
 
   public static native boolean msat_term_is_bv_comp(long e, long t);
+
+  public static native boolean msat_term_is_quantifier(long e, long t);
+
+  public static native boolean msat_term_is_forall(long e, long t);
+
+  public static native boolean msat_term_is_exists(long e, long t);
+
+  public static native boolean msat_term_is_variable(long e, long t);
+
   // public static native int msat_visit_term(long e, msat_visit_term_callback func)
   public static native long msat_find_decl(long e, String symbol);
 
