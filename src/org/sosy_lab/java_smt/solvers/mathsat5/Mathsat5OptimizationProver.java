@@ -89,7 +89,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int maximize(Formula objective) {
-    long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective), ERROR_TERM, ERROR_TERM);
+    long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
     objectiveMap = objectiveMap.putAndCopy(id, objectiveId);
@@ -98,7 +98,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int minimize(Formula objective) {
-    long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective), ERROR_TERM, ERROR_TERM);
+    long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
     objectiveMap = objectiveMap.putAndCopy(id, objectiveId);
