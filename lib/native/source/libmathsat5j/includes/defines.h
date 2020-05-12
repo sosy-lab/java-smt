@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "mathsat.h"
-#include "optimathsat.h"
+#ifdef INCLUDE_OPTIMATHSAT5_HEADER
+    #include "optimathsat.h"
+#endif
 #include <gmp.h>
 
 #define CHECK_FOR_NULL(var) \
