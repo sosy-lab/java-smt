@@ -5,7 +5,7 @@
  *  Copyright (C) 2007-2020  Dirk Beyer
  *  All rights reserved.
  *
- *  SPDX-License-Identifier: Apache-2.0 AND GPL-3.0
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-3.0
  */
 /** Interface to the SMT solver Yices2. */
 @com.google.errorprone.annotations.CheckReturnValue

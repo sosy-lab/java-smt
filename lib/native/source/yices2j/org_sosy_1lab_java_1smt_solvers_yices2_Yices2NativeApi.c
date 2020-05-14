@@ -5,7 +5,7 @@
  *  Copyright (C) 2007-2020  Dirk Beyer
  *  All rights reserved.
  *
- *  SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-or-later
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
  */
 
 #include<stdint.h>
