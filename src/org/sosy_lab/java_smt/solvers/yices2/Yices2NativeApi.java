@@ -10,7 +10,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
-class Yices2NativeApi {
+public class Yices2NativeApi {
   private Yices2NativeApi() {}
 
   // Yices2 status codes
