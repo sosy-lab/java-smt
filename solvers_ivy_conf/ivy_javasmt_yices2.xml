@@ -3,7 +3,7 @@
     xmlns:e="http://ant.apache.org/ivy/extra"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
-    <info organisation="org.sosy_lab" module="javasmt-yices2">
+    <info organisation="org.sosy_lab" module="java-smt-yices2">
         <license name="Apache2 and GNU GPLv3" url="https://github.com/SRI-CSL/yices2/blob/master/LICENSE.txt"/>
         <description>
             JavaSMT components for the Yices2 solver.
@@ -12,11 +12,15 @@
     </info>
 
     <configurations>
-        <conf name="javasmt-yices2" />
+        <conf name="java-smt-yices2" />
     </configurations>
 
-    <publications defaultconf="javasmt-yices2">
-        <artifact name="org.sosy-lab.javasmt-yices2" conf="javasmt-yices2" ext="jar" />
+    <publications defaultconf="java-smt-yices2">
+        
+        <artifact name="java-smt-yices2" conf="java-smt-yices2" ext="jar"/>
+        
+        <artifact name="java-smt-yices2" conf="java-smt-yices2" e:classifier="sources" ext="jar"/>
+        
     </publications>
 
     <dependencies></dependencies>

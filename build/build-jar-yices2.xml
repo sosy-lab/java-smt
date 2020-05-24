@@ -31,7 +31,7 @@
     </target>
 
     <target name="sources-yices2" depends="determine-version, resolve-dependencies">
-        <jar destfile="${ivy.module}-${version}-sources-yices2.jar"
+        <jar destfile="${ivy.module}-yices2-${version}-sources.jar"
                 whenmanifestonly="fail">
             <fileset dir="${source.dir}/" includes="**/*Yices2*.java"/>
             <fileset dir="${source.generated.dir}/" includes="**/*Yices2*.java"/>
