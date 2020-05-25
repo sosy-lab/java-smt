@@ -58,10 +58,11 @@
     <target name="clean" description="Clean">
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.jar"/>
+            <fileset dir="build-lib" includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.jar"/>
         </delete>
     </target>
     
-    <target name="clean-ivy" description="Cleans ivy files from main dir to be able to publish another target">
+    <target name="clean-ivy" description="Cleans ivy files from main dir to be able to publish another target from the main dir">
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="ivy-*.xml"/>
         </delete>
@@ -75,11 +76,11 @@
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
-    <target name="publish" depends="dist, publish-artifacts" description="Publish current version of JavaSMT to Ivy repository" >
-        <echo message="Don't forget to call publish-yices2 after you uploaded to svn to create the yices2 binaries!" />
+    <target name="publish" depends="tests, dist, dist-yices2, publish-artifacts, publish-artifacts-yices2" description="Publish current version of JavaSMT to Ivy repository" >
+        <echo message="Don't forget to call the svn commands not only for the JavaSMT-Yices2 binaries but also for the JavaSMT binaries above!" />
     </target>
     
-    <target name="publish-yices2" depends="clean-ivy, dist-yices2, publish-artifacts-yices2" description="Publish current version of JavaSMT-Yices2 to Ivy repository" />
+    <target name="publish-yices2" depends="dist-yices2, publish-artifacts-yices2" description="Publish current version of JavaSMT-Yices2 to Ivy repository" />
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 
