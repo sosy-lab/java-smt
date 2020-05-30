@@ -70,7 +70,7 @@
 
     <target name="build" depends="build-project, collect-options" description="Build"/>
 
-    <target name="dist" depends="jar, jar-yices2, sources, sources-yices2, javadoc-jar" description="Make a distributable release"/>
+    <target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>
     
     <target name="dist-yices2" depends="jar-yices2, sources-yices2" description="Make a distributable release with yices2 only"/>
 
