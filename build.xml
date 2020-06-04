@@ -80,7 +80,7 @@
         <echo message="Don't forget to call the svn commands not only for the JavaSMT-Yices2 binaries but also for the JavaSMT binaries above!" />
     </target>
     
-    <target name="publish-yices2" depends="dist-yices2, publish-artifacts-yices2" description="Publish current version of JavaSMT-Yices2 to Ivy repository" />
+    <target name="publish-javasmt-yices2" depends="dist-yices2, publish-artifacts-yices2" description="Publish current version of JavaSMT-Yices2 to Ivy repository" />
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 
