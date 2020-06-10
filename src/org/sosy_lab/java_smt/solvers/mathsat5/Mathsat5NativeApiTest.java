@@ -52,6 +52,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
+  private long const0;
+  private long const1;
+  private long var;
+
   @BeforeClass
   public static void loadMathsat() {
     try {
@@ -67,16 +71,16 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     // msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
     env = msat_create_env(cfg);
     msat_destroy_config(cfg);
+
+    const0 = msat_make_number(env, "0");
+    const1 = msat_make_number(env, "1");
+    long rationalType = msat_get_rational_type(env);
+    var = msat_make_variable(env, "rat", rationalType);
   }
 
   /** x == 0 and sin(x) == 0 SAT; x == 1 and sin(x) == 0 UNSAT. */
   @Test
   public void sinTest() throws IllegalStateException, InterruptedException, SolverException {
-    long const0 = msat_make_number(env, "0");
-    long const1 = msat_make_number(env, "1");
-    long type = msat_get_rational_type(env);
-    long var = msat_make_variable(env, "rat", type);
-
     long sin = msat_make_sin(env, var);
 
     msat_push_backtrack_point(env);
@@ -97,11 +101,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   /** x == 0 and e^x = 1 SAT; x == 1 and e^x == 1 UNSAT. */
   @Test
   public void expTest() throws IllegalStateException, InterruptedException, SolverException {
-    long const0 = msat_make_number(env, "0");
-    long const1 = msat_make_number(env, "1");
-    long type = msat_get_rational_type(env);
-    long var = msat_make_variable(env, "rat", type);
-
     long exp = msat_make_exp(env, var);
 
     msat_push_backtrack_point(env);
@@ -126,10 +125,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   @Ignore
   public void piTest() throws IllegalStateException, InterruptedException, SolverException {
     long pi = msat_make_pi(env);
-    long const0 = msat_make_number(env, "0");
-    long type = msat_get_rational_type(env);
-    long var = msat_make_variable(env, "rat", type);
-
     long sin = msat_make_sin(env, var);
 
     assertThat(msat_term_is_pi(env, pi)).isTrue();
@@ -144,11 +139,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   /** Similar problem as sin(pi); Calculates endlessly (even asin(0) == 0). */
   @Ignore
   public void asinTest() throws IllegalStateException, InterruptedException, SolverException {
-    long const0 = msat_make_number(env, "0");
-    long const1 = msat_make_number(env, "1");
-    long type = msat_get_rational_type(env);
-    long var = msat_make_variable(env, "rat", type);
-
     long asin = msat_make_asin(env, var);
 
     msat_push_backtrack_point(env);
@@ -172,11 +162,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
    */
   @Ignore
   public void logTest() throws IllegalStateException, InterruptedException, SolverException {
-    long const0 = msat_make_number(env, "0");
-    long const1 = msat_make_number(env, "1");
-    long type = msat_get_rational_type(env);
-    long var = msat_make_variable(env, "rat", type);
-
     // exp(1) == e
     long logE = msat_make_log(env, msat_make_exp(env, var));
     long logVar = msat_make_log(env, var);
@@ -212,8 +197,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   public void powTest() throws IllegalStateException, InterruptedException, SolverException {
     long const2 = msat_make_number(env, "2");
     long const3 = msat_make_number(env, "3");
-    long type = msat_get_rational_type(env);
-    long var = msat_make_variable(env, "rat", type);
 
     long pow2 = msat_make_pow(env, var, const2);
     long pow3 = msat_make_pow(env, var, const3);
