@@ -5,7 +5,7 @@ if [ `uname` = "Darwin" ] ; then
   LINK_OPT="-dynamiclib -o libJOct.jnilib"
 elif [ `uname` = "Linux" ] ; then
   java_home=`readlink -f \`which java\``
-  java_home=`echo $java_home | sed 's#/bin/java##'`
+  java_home=`echo $java_home | sed 's#/jre/bin/java##' | sed 's#/bin/java##'`
   echo "-I$java_home/include/ -I$java_home/include/linux/"
 elif [[ `uname` == CYGWIN* ]] ; then
   java_home_dos=`cygpath -d "$JAVA_HOME"`

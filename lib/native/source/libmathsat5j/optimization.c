@@ -16,77 +16,31 @@ ENV_ARG(2)
 CALL2(msat_env, create_shared_opt_env)
 ENV_RETURN
 
-DEFINE_FUNC(jobjective, 1make_1minimize) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
-ENV_ARG(1)
-TERM_ARG(2)
-ERROR_TERM_ARG(3)
-ERROR_TERM_ARG(4)
-CALL4(msat_objective, make_minimize)
-STRUCT_RETURN_WITH_ENV
+#define make_minmax(func, func_escaped) \
+  DEFINE_FUNC(jobjective, 1make_##func_escaped) WITH_TWO_ARGS(jenv, jterm) \
+  ENV_ARG(1) \
+  TERM_ARG(2) \
+  CALL2(msat_objective, make_##func) \
+  STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jobjective, 1make_1minimize_1signed) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
-ENV_ARG(1)
-TERM_ARG(2)
-ERROR_TERM_ARG(3)
-ERROR_TERM_ARG(4)
-CALL4(msat_objective, make_minimize_signed)
-STRUCT_RETURN_WITH_ENV
+#define make_minmax_array(func, func_escaped) \
+  DEFINE_FUNC(jobjective, 1make_##func_escaped) WITH_THREE_ARGS(jenv, int, jtermArray) \
+  ENV_ARG(1) \
+  SIMPLE_ARG(size_t, 2) \
+  TERM_ARRAY_ARG(3) \
+  CALL3(msat_objective, make_##func) \
+  FREE_TERM_ARRAY_ARG(3)\
+  STRUCT_RETURN_WITH_ENV
 
-DEFINE_FUNC(jobjective, 1make_1maximize) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
-ENV_ARG(1)
-TERM_ARG(2)
-ERROR_TERM_ARG(3)
-ERROR_TERM_ARG(4)
-CALL4(msat_objective, make_maximize)
-STRUCT_RETURN_WITH_ENV
+make_minmax(minimize, 1minimize)
+make_minmax(minimize_signed, 1minimize_1signed)
+make_minmax(maximize, 1maximize)
+make_minmax(maximize_signed, 1maximize_1signed)
 
-DEFINE_FUNC(jobjective, 1make_1maximize_1signed) WITH_FOUR_ARGS(jenv, jterm, jterm, jterm)
-ENV_ARG(1)
-TERM_ARG(2)
-ERROR_TERM_ARG(3)
-ERROR_TERM_ARG(4)
-CALL4(msat_objective, make_maximize_signed)
-STRUCT_RETURN_WITH_ENV
-
-DEFINE_FUNC(jobjective, 1make_1minmax) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
-ENV_ARG(1)
-SIMPLE_ARG(size_t, 2)
-TERM_ARRAY_ARG(3)
-ERROR_TERM_ARG(4)
-ERROR_TERM_ARG(5)
-CALL5(msat_objective, make_minmax)
-FREE_TERM_ARRAY_ARG(3)
-STRUCT_RETURN_WITH_ENV
-
-DEFINE_FUNC(jobjective, 1make_1minmax_1signed) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
-ENV_ARG(1)
-SIMPLE_ARG(size_t, 2)
-TERM_ARRAY_ARG(3)
-ERROR_TERM_ARG(4)
-ERROR_TERM_ARG(5)
-CALL5(msat_objective, make_minmax_signed)
-FREE_TERM_ARRAY_ARG(3)
-STRUCT_RETURN_WITH_ENV
-
-DEFINE_FUNC(jobjective, 1make_1maxmin) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
-ENV_ARG(1)
-SIMPLE_ARG(size_t, 2)
-TERM_ARRAY_ARG(3)
-ERROR_TERM_ARG(4)
-ERROR_TERM_ARG(5)
-CALL5(msat_objective, make_maxmin)
-FREE_TERM_ARRAY_ARG(3)
-STRUCT_RETURN_WITH_ENV
-
-DEFINE_FUNC(jobjective, 1make_1maxmin_1signed) WITH_FIVE_ARGS(jenv, int, jtermArray, jterm, jterm)
-ENV_ARG(1)
-SIMPLE_ARG(size_t, 2)
-TERM_ARRAY_ARG(3)
-ERROR_TERM_ARG(4)
-ERROR_TERM_ARG(5)
-CALL5(msat_objective, make_maxmin_signed)
-FREE_TERM_ARRAY_ARG(3)
-STRUCT_RETURN_WITH_ENV
+make_minmax_array(minmax, 1minmax)
+make_minmax_array(minmax_signed, 1minmax_1signed)
+make_minmax_array(maxmin, 1maxmin)
+make_minmax_array(maxmin_signed, 1maxmin_1signed)
 
 DEFINE_FUNC(jfailureCode, 1assert_1soft_1formula) WITH_FOUR_ARGS(jenv, jterm, jterm, string)
 ENV_ARG_VOID(1)

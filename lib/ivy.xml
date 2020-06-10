@@ -61,7 +61,7 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-392-g680ac82" conf="runtime->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-420-gef84297" conf="runtime->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
@@ -136,9 +136,9 @@
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.5.4-sosy0" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.3" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.8.7" conf="runtime-z3->solver-z3" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.6.3" conf="runtime-optimathsat->solver-optimathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2019-11-30-gae93e65" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-2.3-g3249ae0f" conf="runtime-boolector->solver-boolector" />
         <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-2020-03-06-ge902b0b5" conf="runtime-yices2->solver-yices2" />
