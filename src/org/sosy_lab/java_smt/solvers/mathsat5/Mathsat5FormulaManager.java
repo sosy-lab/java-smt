@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
 import com.google.common.base.Splitter;
@@ -122,5 +123,13 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
                 fromToMapping.size(),
                 changeFrom,
                 changeTo));
+  }
+
+  @Override
+  protected Long simplify(Long f) throws InterruptedException {
+    // TODO should we protect some symbols? Otherwise they might be missing in the model.
+    // I can currently not find an example for that specific case.
+    final long[] protectedSymbols = new long[0];
+    return msat_simplify(getFormulaCreator().getEnv(), f, protectedSymbols);
   }
 }

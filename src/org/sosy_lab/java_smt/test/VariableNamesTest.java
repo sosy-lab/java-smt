@@ -89,9 +89,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "\"",
           "\"\"",
           "\"\"\"",
-          "'",
-          "''",
-          "'''",
+          // TODO next line is disabled because of a problem in MathSAT5 (version 5.6.3).
+          // "'", "''", "'''",
           "\n",
           "\t",
           "\u0000",
