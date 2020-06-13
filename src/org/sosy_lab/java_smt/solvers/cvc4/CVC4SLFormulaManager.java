@@ -19,10 +19,10 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.Type;
+import edu.stanford.CVC4.Expr;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.Kind;
+import edu.stanford.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 
 public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprManager, Expr> {

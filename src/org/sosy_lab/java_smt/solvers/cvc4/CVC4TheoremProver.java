@@ -21,12 +21,12 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.ExprManagerMapCollection;
-import edu.nyu.acsys.CVC4.Result;
-import edu.nyu.acsys.CVC4.SExpr;
-import edu.nyu.acsys.CVC4.SmtEngine;
+import edu.stanford.CVC4.Expr;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.ExprManagerMapCollection;
+import edu.stanford.CVC4.Result;
+import edu.stanford.CVC4.SExpr;
+import edu.stanford.CVC4.SmtEngine;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;

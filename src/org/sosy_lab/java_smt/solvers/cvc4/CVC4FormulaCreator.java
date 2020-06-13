@@ -26,19 +26,19 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
-import edu.nyu.acsys.CVC4.ArrayType;
-import edu.nyu.acsys.CVC4.BitVectorType;
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.FloatingPoint;
-import edu.nyu.acsys.CVC4.FloatingPointSize;
-import edu.nyu.acsys.CVC4.FunctionType;
-import edu.nyu.acsys.CVC4.Integer;
-import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.Rational;
-import edu.nyu.acsys.CVC4.Type;
-import edu.nyu.acsys.CVC4.vectorExpr;
-import edu.nyu.acsys.CVC4.vectorType;
+import edu.stanford.CVC4.ArrayType;
+import edu.stanford.CVC4.BitVectorType;
+import edu.stanford.CVC4.Expr;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.FloatingPoint;
+import edu.stanford.CVC4.FloatingPointSize;
+import edu.stanford.CVC4.FunctionType;
+import edu.stanford.CVC4.Integer;
+import edu.stanford.CVC4.Kind;
+import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.Type;
+import edu.stanford.CVC4.vectorExpr;
+import edu.stanford.CVC4.vectorType;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +69,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   private static final Pattern FLOATING_POINT_PATTERN =
-      Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)\\)$");
+      Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
   private final Map<String, Expr> variablesCache = new HashMap<>();
   private final Map<String, Expr> functionsCache = new HashMap<>();
@@ -140,7 +140,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (pFormula instanceof FloatingPointFormula) {
       checkArgument(
           t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
-      edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
+      edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
           FormulaType.getFloatingPointType(
               (int) fpType.getExponentSize(),
@@ -169,7 +169,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // not hold, hence we use the new BitVectorType(t) here as a workaround:
       return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
     } else if (t.isFloatingPoint()) {
-      edu.nyu.acsys.CVC4.FloatingPointType fpType = new edu.nyu.acsys.CVC4.FloatingPointType(t);
+      edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
       return FormulaType.getFloatingPointType(
           (int) fpType.getExponentSize(),
           (int) fpType.getSignificandSize() - 1); // without sign bit

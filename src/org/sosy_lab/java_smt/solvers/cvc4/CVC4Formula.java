@@ -20,7 +20,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.errorprone.annotations.Immutable;
-import edu.nyu.acsys.CVC4.Expr;
+import edu.stanford.CVC4.Expr;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;

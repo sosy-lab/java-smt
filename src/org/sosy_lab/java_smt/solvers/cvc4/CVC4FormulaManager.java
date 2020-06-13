@@ -21,9 +21,9 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Joiner;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.Type;
+import edu.stanford.CVC4.Expr;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.Type;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
