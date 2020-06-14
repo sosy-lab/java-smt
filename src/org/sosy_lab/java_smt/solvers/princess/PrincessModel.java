@@ -139,10 +139,9 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
         case "store":
           // array-access, for explanation see #getArrayAddresses
           // IdealInt sourceArray = cKey.args().apply(0);
-          ITerm arrayId2 = (ITerm) value;
           ITerm arrayIndex2 = cKey.args().apply(Int.box(1));
           ITerm arrayContent = cKey.args().apply(Int.box(2));
-          ITerm arrayF2 = pArrays.get(arrayId2);
+          ITerm arrayF2 = pArrays.get(value);
           if (arrayF2 == null) {
             // intermediate array store, like a tmp-variable, happens for repeated
             // store-operations
