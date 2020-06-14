@@ -21,7 +21,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static scala.collection.JavaConverters.asJava;
-import static scala.collection.JavaConverters.asScala;
+import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
 import ap.parser.IAtom;
@@ -440,7 +440,7 @@ class PrincessEnvironment {
       IFunction funcDecl =
           api.createFunction(
               name,
-              asScala(args).toSeq(),
+              collectionAsScalaIterableConverter(args).asScala().toSeq(),
               returnType,
               false,
               SimpleAPI.FunctionalityMode$.MODULE$.Full());
@@ -452,12 +452,12 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    return api.select(asScala(args).toSeq());
+    return api.select(collectionAsScalaIterableConverter(args).asScala().toSeq());
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    return api.store(asScala(args).toSeq());
+    return api.store(collectionAsScalaIterableConverter(args).asScala().toSeq());
   }
 
   public boolean hasArrayType(IExpression exp) {
