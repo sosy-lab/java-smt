@@ -19,8 +19,8 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static scala.collection.JavaConversions.asJavaIterable;
-import static scala.collection.JavaConversions.collectionAsScalaIterable;
+import static scala.collection.JavaConverters.asJava;
+import static scala.collection.JavaConverters.asScala;
 
 import ap.SimpleAPI;
 import ap.basetypes.Tree;
@@ -124,7 +124,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
     for (Collection<Integer> partition : partitions) {
-      args.$plus$eq(collectionAsScalaIterable(partition).toSet());
+      args.$plus$eq(asScala(partition).toSet());
     }
 
     // do the hard work
@@ -145,7 +145,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
     // convert data-structure back
     // TODO check that interpolants do not contain abbreviations we did not introduce ourselves
     final List<BooleanFormula> result = new ArrayList<>();
-    for (final IFormula itp : asJavaIterable(itps)) {
+    for (final IFormula itp : asJava(itps)) {
       result.add(mgr.encapsulateBooleanFormula(itp));
     }
     return result;
@@ -174,9 +174,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
         children.$plus$eq(stack.pop());
       }
       subtreeStarts.push(start);
-      stack.push(
-          new Tree<>(
-              collectionAsScalaIterable(partitionedFormulas.get(i)).toSet(), children.toList()));
+      stack.push(new Tree<>(asScala(partitionedFormulas.get(i)).toSet(), children.toList()));
     }
 
     Preconditions.checkState(subtreeStarts.peek() == 0, "subtree of root should start at 0.");
@@ -203,7 +201,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
   private List<BooleanFormula> tree2List(Tree<IFormula> tree) {
     List<BooleanFormula> lst =
         FluentIterable.from(
-                Traverser.<Tree<IFormula>>forTree(node -> asJavaIterable(node.children()))
+                Traverser.<Tree<IFormula>>forTree(node -> asJava(node.children()))
                     .depthFirstPostOrder(tree))
             .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
             .toList();

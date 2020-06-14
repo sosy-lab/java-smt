@@ -20,7 +20,8 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static scala.collection.JavaConversions.iterableAsScalaIterable;
+import static scala.collection.JavaConverters.asJava;
+import static scala.collection.JavaConverters.asScala;
 
 import ap.SimpleAPI;
 import ap.parser.IExpression;
@@ -124,8 +125,8 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
 
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
     Level level = trackingStack.pop();
-    api.addBooleanVariables(iterableAsScalaIterable(level.booleanSymbols));
-    api.addConstants(iterableAsScalaIterable(level.intSymbols));
+    api.addBooleanVariables(asScala(level.booleanSymbols));
+    api.addConstants(asScala(level.intSymbols));
     level.functionSymbols.forEach(api::addFunction);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().mergeWithHigher(level);
@@ -156,7 +157,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     final List<BooleanFormula> result = new ArrayList<>();
-    final scala.collection.immutable.Set<Object> core = api.getUnsatCore();
+    final Set<Object> core = asJava(api.getUnsatCore());
 
     int cnt = 0;
     for (IExpression formula : getAssertedFormulas()) {

@@ -19,8 +19,7 @@
  */
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static scala.collection.JavaConversions.asJavaIterable;
-import static scala.collection.JavaConversions.seqAsJavaList;
+import static scala.collection.JavaConverters.asJava;
 
 import ap.SimpleAPI.PartialModel;
 import ap.parser.IAtom;
@@ -39,11 +38,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
-import scala.Tuple2;
 
 class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PartialModel model;
@@ -64,8 +63,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
-    for (Tuple2<IExpression, IExpression> entry : asJavaIterable(interpretation)) {
-      ValueAssignment assignment = getAssignment(entry._1, entry._2, arrays);
+    for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+      ValueAssignment assignment = getAssignment(entry.getKey(), entry.getValue(), arrays);
       if (assignment != null) {
         assignments.add(assignment);
       }
@@ -84,11 +83,11 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   private Map<IIntLit, ITerm> getArrayAddresses(
       scala.collection.Map<IExpression, IExpression> interpretation) {
     Map<IIntLit, ITerm> arrays = new HashMap<>();
-    for (Tuple2<IExpression, IExpression> entry : asJavaIterable(interpretation)) {
-      if (entry._1 instanceof IConstant) {
-        ITerm maybeArray = (IConstant) entry._1;
-        if (creator.getEnv().hasArrayType(maybeArray) && entry._2 instanceof IIntLit) {
-          arrays.put((IIntLit) entry._2, maybeArray);
+    for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+      if (entry.getKey() instanceof IConstant) {
+        ITerm maybeArray = (IConstant) entry.getKey();
+        if (creator.getEnv().hasArrayType(maybeArray) && entry.getValue() instanceof IIntLit) {
+          arrays.put((IIntLit) entry.getValue(), maybeArray);
         }
       }
     }
@@ -156,7 +155,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
         default:
           // normal variable or UF
           argumentInterpretations = new ArrayList<>();
-          for (ITerm arg : seqAsJavaList(cKey.args())) {
+          for (ITerm arg : asJava(cKey.args())) {
             argumentInterpretations.add(creator.convertValue(arg));
           }
           fKey = cKey;
