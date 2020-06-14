@@ -41,7 +41,6 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import scala.Int;
 import scala.Option;
 
 class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
@@ -123,8 +122,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
       switch (cKey.fun().name()) {
         case "select":
           // array-access, for explanation see #getArrayAddresses
-          ITerm arrayId = cKey.args().apply(Int.box(0));
-          ITerm arrayIndex = cKey.args().apply(Int.box(1));
+          ITerm arrayId = cKey.args().apply(Integer.valueOf(0));
+          ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
           ITerm arrayF = pArrays.get(arrayId);
           if (arrayF == null) {
             // intermediate array store, like a tmp-variable, happens for repeated
@@ -138,8 +137,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
         case "store":
           // array-access, for explanation see #getArrayAddresses
           // IdealInt sourceArray = cKey.args().apply(0);
-          ITerm arrayIndex2 = cKey.args().apply(Int.box(1));
-          ITerm arrayContent = cKey.args().apply(Int.box(2));
+          ITerm arrayIndex2 = cKey.args().apply(Integer.valueOf(1));
+          ITerm arrayContent = cKey.args().apply(Integer.valueOf(2));
           ITerm arrayF2 = pArrays.get(value);
           if (arrayF2 == null) {
             // intermediate array store, like a tmp-variable, happens for repeated
