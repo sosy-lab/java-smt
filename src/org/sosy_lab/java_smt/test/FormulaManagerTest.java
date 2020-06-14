@@ -36,9 +36,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -315,5 +317,39 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
       assertThat(mgr.extractVariables(bvConstraint).keySet()).containsExactly("x", "y");
     }
+  }
+
+  @Test
+  public void simplifyIntTest() throws SolverException, InterruptedException {
+    requireIntegers();
+    // x=1 && y=x+2 && z=y+3 --> simplified: x=1 && y=3 && z=6
+    IntegerFormula num1 = imgr.makeNumber(1);
+    IntegerFormula num2 = imgr.makeNumber(2);
+    IntegerFormula num3 = imgr.makeNumber(3);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+    BooleanFormula f =
+        bmgr.and(
+            imgr.equal(x, num1),
+            imgr.equal(y, imgr.add(x, num2)),
+            imgr.equal(z, imgr.add(y, num3)));
+    assertThatFormula(mgr.simplify(f)).isEquisatisfiableTo(f);
+  }
+
+  @Test
+  public void simplifyArrayTest() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireArrays();
+    // exists arr : (arr[0]=5 && x=arr[0]) --> simplified: x=5
+    ArrayFormula<IntegerFormula, IntegerFormula> arr =
+        amgr.makeArray("arr", new ArrayFormulaType<>(IntegerType, IntegerType));
+    IntegerFormula index = imgr.makeNumber(0);
+    IntegerFormula value = imgr.makeNumber(5);
+    IntegerFormula x = imgr.makeVariable("x");
+    ArrayFormula<IntegerFormula, IntegerFormula> write = amgr.store(arr, index, value);
+    IntegerFormula read = amgr.select(write, index);
+    BooleanFormula f = imgr.equal(x, read);
+    assertThatFormula(mgr.simplify(f)).isEquisatisfiableTo(f);
   }
 }
