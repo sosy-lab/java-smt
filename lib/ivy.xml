@@ -101,8 +101,8 @@
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.3.4" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.3.4" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.4.0" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.4.0" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -120,7 +120,7 @@
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.29" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.33" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-604-g71e72f93" conf="runtime-smtinterpol->master; contrib->sources"/>
@@ -146,7 +146,7 @@
         <dependency org="org.codehaus.mojo" name="animal-sniffer-annotations" rev="1.18" conf="runtime->default;"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.4"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.4.0"/>
 
     </dependencies>
 </ivy-module>
