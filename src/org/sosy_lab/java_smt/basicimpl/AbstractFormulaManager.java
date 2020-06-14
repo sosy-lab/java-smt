@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -281,14 +280,21 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   /**
-   * @param pF Input to apply the UFE transformation to.
+   * Eliminate UFs from the given input formula.
+   *
    * @throws InterruptedException Can be thrown by the native code.
    */
   protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
-  /** @throws InterruptedException Can be thrown by the native code. */
+  /**
+   * Eliminate quantifiers from the given input formula.
+   *
+   * <p>This is the light version that does not need to eliminate all quantifiers.
+   *
+   * @throws InterruptedException Can be thrown by the native code.
+   */
   protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
 
     // Returning the untouched formula is valid according to QE_LIGHT contract.
@@ -297,6 +303,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   /**
+   * Apply conjunctive normal form (CNF) transformation to the given input formula.
+   *
    * @param pF Input to apply the CNF transformation to.
    * @throws InterruptedException Can be thrown by the native code.
    */
@@ -307,7 +315,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         "Currently there is no generic implementation for CNF conversion");
   }
 
-  /** @throws InterruptedException Can be thrown by the native code. */
+  /**
+   * Apply negation normal form (NNF) transformation to the given input formula.
+   *
+   * @throws InterruptedException Can be thrown by the native code.
+   */
   protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
     return getBooleanFormulaManager().transformRecursively(input, new NNFVisitor(this));
   }
@@ -317,7 +329,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), simplify(extractInfo(f)));
   }
 
-  /** @throws InterruptedException Can be thrown by the native code. */
+  /**
+   * Apply a simplification procedure for the given formula.
+   *
+   * <p>This does not need to change something, but it might simplify the formula.
+   *
+   * @throws InterruptedException Can be thrown by the native code.
+   */
   protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException {
     return f;
   }
@@ -510,7 +528,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       pVar = pVar.replace("" + ESCAPE, "" + ESCAPE + ESCAPE);
     }
     if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
-      for (Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
+      for (Map.Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
         pVar = pVar.replace(e.getKey().toString(), ESCAPE + e.getValue());
       }
     }
@@ -540,7 +558,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             i++;
           } else {
             String rest = pVar.substring(i + 1);
-            for (Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
+            for (Map.Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
               if (rest.startsWith(e.getValue())) {
                 str.append(e.getKey());
                 i += e.getValue().length();

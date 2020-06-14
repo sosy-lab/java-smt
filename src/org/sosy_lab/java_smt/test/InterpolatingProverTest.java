@@ -954,10 +954,10 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       List<BooleanFormula> itps)
       throws SolverException, InterruptedException {
 
-    assert formulas.size() - 1 == itps.size()
-        : String.format(
-            "there should be N-1 interpolants for N formulas, but we got %s for %s",
-            itps, formulas);
+    assertWithMessage(
+            "there should be N-1 interpolants for N formulas, but we got %s for %s", itps, formulas)
+        .that(formulas.size() - 1 == itps.size())
+        .isTrue();
 
     if (!itps.isEmpty()) {
       checkImplies(stack, formulas.get(0), itps.get(0));

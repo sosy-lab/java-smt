@@ -62,6 +62,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
         try {
           Thread.sleep(10);
         } catch (InterruptedException e) {
+          // ignore
         }
       }
     }

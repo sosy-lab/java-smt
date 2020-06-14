@@ -26,7 +26,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -173,7 +172,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     try (ProverEnvironment prover =
         context.newProverEnvironment(
             ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
-      for (Entry<Long, Long> entry : values.entrySet()) {
+      for (Map.Entry<Long, Long> entry : values.entrySet()) {
         prover.push(bvmgr.equal(var, bvmgr.makeBitvector(32, entry.getKey())));
         assertThat(prover).isSatisfiable();
         try (Model model = prover.getModel()) {

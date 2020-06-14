@@ -20,6 +20,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -983,10 +984,11 @@ public class ModelTest extends SolverBasedTest0 {
   @SuppressWarnings("unchecked")
   private BooleanFormula makeAssignment(Formula pFormula1, Formula pFormula2) {
     FormulaType<?> pType = mgr.getFormulaType(pFormula1);
-    assert mgr.getFormulaType(pFormula1).equals(mgr.getFormulaType(pFormula2))
-        : String.format(
+    assertWithMessage(
             "Trying to equalize two formulas %s and %s of different types %s and %s",
-            pFormula1, pFormula2, pType, mgr.getFormulaType(pFormula2));
+            pFormula1, pFormula2, pType, mgr.getFormulaType(pFormula2))
+        .that(mgr.getFormulaType(pFormula1).equals(mgr.getFormulaType(pFormula2)))
+        .isTrue();
     if (pType.isBooleanType()) {
       return bmgr.equivalence((BooleanFormula) pFormula1, (BooleanFormula) pFormula2);
     } else if (pType.isIntegerType()) {

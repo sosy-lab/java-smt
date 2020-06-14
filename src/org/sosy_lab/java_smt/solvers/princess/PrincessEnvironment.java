@@ -60,7 +60,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -69,7 +68,6 @@ import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
-import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -100,7 +98,7 @@ class PrincessEnvironment {
   private boolean logAllQueriesAsScala = false;
 
   @Option(secure = true, description = "file for Princess-specific dump of queries as Scala code")
-  @FileOption(Type.OUTPUT_FILE)
+  @FileOption(FileOption.Type.OUTPUT_FILE)
   private PathCounterTemplate logAllQueriesAsScalaFile =
       PathCounterTemplate.ofFormatString("princess-query-%03d-");
 
@@ -346,7 +344,7 @@ class PrincessEnvironment {
 
         // now as everything we know from the formula is declared we have to add
         // the abbreviations, too
-        for (Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
+        for (Map.Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
           IExpression abbrev = entry.getKey();
           IExpression fullFormula = entry.getValue();
           String name =

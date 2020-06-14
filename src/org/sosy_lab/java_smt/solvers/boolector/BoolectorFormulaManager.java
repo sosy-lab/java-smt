@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
-  protected BoolectorFormulaManager(
+  BoolectorFormulaManager(
       BoolectorFormulaCreator pFormulaCreator,
       BoolectorUFManager pFunctionManager,
       BoolectorBooleanFormulaManager pBooleanManager,
@@ -110,7 +110,7 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
     };
   }
 
-  protected static long getBtorTerm(Formula pT) {
+  static long getBtorTerm(Formula pT) {
     return ((BoolectorFormula) pT).getTerm();
   }
 }

@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -64,7 +63,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
-    for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+    for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       ValueAssignment assignment = getAssignment(entry.getKey(), entry.getValue(), arrays);
       if (assignment != null) {
         assignments.add(assignment);
@@ -84,7 +83,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   private Map<IIntLit, ITerm> getArrayAddresses(
       scala.collection.Map<IExpression, IExpression> interpretation) {
     Map<IIntLit, ITerm> arrays = new HashMap<>();
-    for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+    for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       if (entry.getKey() instanceof IConstant) {
         ITerm maybeArray = (IConstant) entry.getKey();
         if (creator.getEnv().hasArrayType(maybeArray) && entry.getValue() instanceof IIntLit) {

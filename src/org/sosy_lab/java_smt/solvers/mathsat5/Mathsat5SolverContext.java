@@ -38,7 +38,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -170,7 +170,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     msat_set_option_checked(msatConf, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(msatConf, "random_seed", Long.toString(randomSeed));
 
-    for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
+    for (Map.Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       try {
         msat_set_option_checked(msatConf, option.getKey(), option.getValue());
       } catch (IllegalArgumentException e) {
@@ -219,7 +219,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
     msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
     msat_set_option_checked(cfg, "random_seed", Long.toString(randomSeed));
-    for (Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
+    for (Map.Entry<String, String> option : settings.furtherOptionsMap.entrySet()) {
       msat_set_option_checked(cfg, option.getKey(), option.getValue());
     }
 

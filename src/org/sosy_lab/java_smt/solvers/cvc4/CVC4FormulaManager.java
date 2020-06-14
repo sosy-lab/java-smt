@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -85,7 +84,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
         creator.extractVariablesAndUFs(f, true, allVars::put);
 
         // print all symbols
-        for (Entry<String, Expr> entry : allVars.entrySet()) {
+        for (Map.Entry<String, Expr> entry : allVars.entrySet()) {
           String name = entry.getKey();
           Expr var = entry.getValue();
 

@@ -33,7 +33,6 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
-import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -84,7 +83,7 @@ final class Z3SolverContext extends AbstractSolverContext {
         description =
             "Activate replayable logging in Z3."
                 + " The log can be given as an input to the solver and replayed.")
-    @FileOption(Type.OUTPUT_FILE)
+    @FileOption(FileOption.Type.OUTPUT_FILE)
     @Nullable
     Path log = null;
   }

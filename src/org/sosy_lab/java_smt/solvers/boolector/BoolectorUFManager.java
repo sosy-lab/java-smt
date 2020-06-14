@@ -21,9 +21,9 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-class BoolectorUFManager extends AbstractUFManager<Long, Long, Long, Long> {
+final class BoolectorUFManager extends AbstractUFManager<Long, Long, Long, Long> {
 
-  protected BoolectorUFManager(BoolectorFormulaCreator pCreator) {
+  BoolectorUFManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
   }
 }

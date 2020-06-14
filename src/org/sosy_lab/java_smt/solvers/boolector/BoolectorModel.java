@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
@@ -73,7 +73,8 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     for (Long formula : assertedTerms) {
-      for (Entry<String, Long> entry : creator.extractVariablesAndUFs(formula, true).entrySet()) {
+      for (Map.Entry<String, Long> entry :
+          creator.extractVariablesAndUFs(formula, true).entrySet()) {
         String name = entry.getKey();
         Long var = entry.getValue();
         if (BtorJNI.boolector_is_array(btor, var)) {

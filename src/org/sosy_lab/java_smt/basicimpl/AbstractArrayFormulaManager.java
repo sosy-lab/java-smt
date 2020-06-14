@@ -33,7 +33,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements ArrayFormulaManager {
 
-  public AbstractArrayFormulaManager(
+  protected AbstractArrayFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
     super(pFormulaCreator);
   }

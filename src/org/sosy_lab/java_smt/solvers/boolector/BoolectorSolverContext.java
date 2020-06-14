@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
@@ -75,7 +75,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   private final ShutdownNotifier shutdownNotifier;
   private boolean closed = false;
 
-  protected BoolectorSolverContext(
+  BoolectorSolverContext(
       BoolectorFormulaManager pManager,
       BoolectorFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier) {
@@ -203,7 +203,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
       throw new InvalidConfigurationException(
           "Invalid Boolector option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
     }
-    for (Entry<String, String> option : furtherOptionsMap.entrySet()) {
+    for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
       try {
         BtorOption btorOption = BtorOption.valueOf(option.getKey());
         long optionValue = Long.parseLong(option.getValue());
