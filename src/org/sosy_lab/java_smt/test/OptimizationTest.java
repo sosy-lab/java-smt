@@ -214,7 +214,7 @@ public class OptimizationTest extends SolverBasedTest0 {
         Rational approximation = prover.upper(handle, epsilon).get();
         assertWithMessage(
                 "%s should be nearer to 1 than %s", prover.upper(handle, epsilon).get(), epsilon)
-            .that((approximation).compareTo(lowerBoundOfRange))
+            .that(approximation.compareTo(lowerBoundOfRange))
             .isAtLeast(0);
       }
 
@@ -227,9 +227,10 @@ public class OptimizationTest extends SolverBasedTest0 {
       for (long i : new long[] {1, 10, 100, 1000, 10000, 100000}) {
         Rational epsilon = Rational.ofLongs(1, i);
         Rational lowerBoundOfRange = Rational.ONE.minus(epsilon).minus(epsilon);
+        Rational approximation = prover.upper(handle, epsilon).get();
         assertWithMessage(
                 "%s should be nearer to 1 than %s", prover.upper(handle, epsilon).get(), epsilon)
-            .that(prover.upper(handle, epsilon).get().compareTo(lowerBoundOfRange))
+            .that(approximation.compareTo(lowerBoundOfRange))
             .isAtLeast(0);
       }
 
