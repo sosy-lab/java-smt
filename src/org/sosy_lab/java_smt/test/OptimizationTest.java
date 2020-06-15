@@ -21,10 +21,10 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.Range;
 import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
@@ -212,9 +212,7 @@ public class OptimizationTest extends SolverBasedTest0 {
         Rational epsilon = Rational.ofLongs(1, largeI);
         Rational lowerBoundOfRange = Rational.ONE.minus(epsilon).minus(epsilon);
         Rational approximation = prover.upper(handle, epsilon).orElseThrow();
-        assertWithMessage("%s should be nearer to 1 than %s", approximation, epsilon)
-            .that(approximation.compareTo(lowerBoundOfRange))
-            .isAtLeast(0);
+        assertThat(approximation).isIn(Range.closedOpen(lowerBoundOfRange, Rational.ONE));
       }
 
       // OptiMathSAT5 has at least an epsilon of 1/1000000. It does not allow larger values.
@@ -227,9 +225,7 @@ public class OptimizationTest extends SolverBasedTest0 {
         Rational epsilon = Rational.ofLongs(1, i);
         Rational lowerBoundOfRange = Rational.ONE.minus(epsilon).minus(epsilon);
         Rational approximation = prover.upper(handle, epsilon).orElseThrow();
-        assertWithMessage("%s should be nearer to 1 than %s", approximation, epsilon)
-            .that(approximation.compareTo(lowerBoundOfRange))
-            .isAtLeast(0);
+        assertThat(approximation).isIn(Range.closedOpen(lowerBoundOfRange, Rational.ONE));
       }
 
       // check strict value
