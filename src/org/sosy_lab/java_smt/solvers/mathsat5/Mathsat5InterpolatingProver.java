@@ -59,7 +59,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
           "AB-mixed term not found in eq_itp map",
           "uncolored atom found in Array proof",
           "uncolorable Array proof",
-          "arr: proof splitting not supported");
+          "arr: proof splitting not supported",
+          "AB-mixed term in LaHyp");
   private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGE_PREFIXES =
       ImmutableSet.of("uncolorable NA lemma");
 
