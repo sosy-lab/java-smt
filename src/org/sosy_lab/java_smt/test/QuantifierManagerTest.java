@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -323,10 +322,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThat(f1).isEqualTo(f2);
   }
 
-  @Ignore // TODO Z3 seems to fail this test since 4.8.8
+  @Test
   public void testQELight() throws InterruptedException {
     requireIntegers();
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
+    // exists y : (y=4 && x=y+3) --> simplified: x=7
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
         qmgr.exists(

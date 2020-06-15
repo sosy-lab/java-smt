@@ -76,7 +76,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   @Options(prefix = "solver.z3")
   private static class ExtraOptions {
     @Option(secure = true, description = "Require proofs from SMT solver")
-    boolean requireProofs = true;
+    boolean requireProofs = false;
 
     @Option(
         secure = true,
