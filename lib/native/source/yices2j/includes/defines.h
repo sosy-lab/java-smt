@@ -41,6 +41,12 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 #define WITH_FIVE_ARGS(jtype1, jtype2, jtype3, jtype4, jtype5) \
   (JNIEnv *jenv, jclass jcls, j##jtype1 arg1, j##jtype2 arg2, j##jtype3 arg3, j##jtype4 arg4, j##jtype5 arg5) {
 
+#define WITH_SIX_ARGS(jtype1, jtype2, jtype3, jtype4, jtype5, jtype6) \
+  (JNIEnv *jenv, jclass jcls, j##jtype1 arg1, j##jtype2 arg2, j##jtype3 arg3, j##jtype4 arg4, j##jtype5 arg5, j##jtype6 arg6) {
+
+#define WITH_SEVEN_ARGS(jtype1, jtype2, jtype3, jtype4, jtype5, jtype6, jtype7) \
+  (JNIEnv *jenv, jclass jcls, j##jtype1 arg1, j##jtype2 arg2, j##jtype3 arg3, j##jtype4 arg4, j##jtype5 arg5, j##jtype6 arg6, j##jtype7 arg7) {
+
 #define SIMPLE_ARG(mtype, num) \
   mtype m_arg##num = arg##num;
 
@@ -87,6 +93,10 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 
 #define POINTER_ARG(mtype, num) \
   mtype * m_arg##num = (mtype *) arg##num;
+
+//For ** types
+#define POINTER_POINTER_ARG(mtype, num) \
+  mtype ** m_arg##num = (mtype **) arg##num;
 
 #define INT_POINTER_ARG(num) \
   int32_t s_arg##num = 0; \
@@ -147,6 +157,8 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
 #define CALL3(mreturn, func) mreturn retval = yices_##func(m_arg1, m_arg2, m_arg3);
 #define CALL4(mreturn, func) mreturn retval = yices_##func(m_arg1, m_arg2, m_arg3, m_arg4);
 #define CALL5(mreturn, func) mreturn retval = yices_##func(m_arg1, m_arg2, m_arg3, m_arg4, m_arg5);
+#define CALL6(mreturn, func) mreturn retval = yices_##func(m_arg1, m_arg2, m_arg3, m_arg4, m_arg5, m_arg6);
+#define CALL7(mreturn, func) mreturn retval = yices_##func(m_arg1, m_arg2, m_arg3, m_arg4, m_arg5, m_arg6, m_arg7);
 #define VOID_CALL0(func) yices_##func(); }
 #define VOID_CALL1(func) yices_##func(m_arg1); }
 #define VOID_CALL2(func) yices_##func(m_arg1, m_arg2); }
@@ -405,6 +417,9 @@ typedef jlong jjmodel;
 #define MODEL_ARG(num) POINTER_ARG(model_t, num)
 #define MODEL_ARG_VOID(num) POINTER_ARG(model_t, num)
 #define MODEL_RETURN POINTER_RETURN
+//For things like model_t **
+#define MODEL_ARG_POINTER(num) POINTER_POINTER_ARG(model_t, num)
+
 
 typedef jintArray jjtermArray;
 #define TERM_ARRAY_ARG(num) INT_ARRAY_ARG(term_t, num)

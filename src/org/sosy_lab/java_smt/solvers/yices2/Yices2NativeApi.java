@@ -766,4 +766,35 @@ public class Yices2NativeApi {
     yices_set_term_name(var, name);
     return var;
   }
+
+  /**
+   * @return int 1 if the Yices2-lib is compiled thread-safe and 0 otherwise
+   */
+  public static native int yices_is_thread_safe();
+
+  /**
+   * The function first checks whether f is satisifiable or unsatisfiable.
+   */
+  public static native int yices_check_formula(int term, String logic, long model, String delegate);
+
+  /**
+   * This is similar to yices_check_formula except that it checks whether the conjunction of f[0]
+   * ... f[n-1] is satisfiable.
+   */
+  public static native int yices_check_formulas(int[] termArray, int numberOfFormulas, String logic, long model, String delegate);
+
+  /**
+   * @return int 1 if delegate(SAT-Solver) available for use, 0 otherwise
+   */
+  public static native int yices_has_delegate(String delegate);
+
+  /**
+   * @return type of a function node
+   */
+  public static native int yices_val_function_type(long model, int id, int tag);
+
+  /**
+   * @return term_vector (NOT int with error code) that is supported. Empty if error!
+   */
+  public static native int[] yices_model_term_support(long model, int term);
 }

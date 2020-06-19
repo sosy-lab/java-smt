@@ -1572,3 +1572,87 @@ return __YICES_VERSION_MAJOR;
 DEFINE_FUNC(int, 1get_1patch_1level) WITHOUT_ARGS
 return __YICES_VERSION_PATCHLEVEL;
 }
+
+/*
+ * Functions in 2.6.2 that are not part of this wrapper:
+ *
+ * We don't use arrays at the moment:
+ * -yices_model_term_array_support
+ *
+ * We dont need bit-blasting results:
+ * -yices_export_formula_to_dimacs
+ * -yices_export_formulas_to_dimacs
+ *
+ * Model/Term printing is managed via Strings, so we dont need these:
+ * -yices_pp_model
+ * -yices_print_term_values
+ * -yices_pp_term_values
+ * -yices_pp_term_values_fd
+ * -yices_pp_model_fd
+ * -yices_print_term_values_fd
+ */
+
+/*
+ * Check for thread-safe compiliation
+ */
+DEFINE_FUNC(int, 1is_1thread_1safe) WITHOUT_ARGS
+CALL0(int, is_thread_safe)
+INT_RETURN
+
+/*
+ * The function first checks whether f is satisifiable or unsatisfiable.
+ * 
+ */
+DEFINE_FUNC(int, 1check_1formula) WITH_FOUR_ARGS(jterm, string, jmodel, string)
+TERM_ARG(1)
+STRING_ARG(2)
+MODEL_ARG_POINTER(3)
+STRING_ARG(4)
+CALL4(smt_status_t, check_formula)
+FREE_STRING_ARG(2)
+FREE_STRING_ARG(4)
+INT_RETURN
+
+/*
+ * This is similar to yices_check_formula except that it checks whether
+ * the conjunction of f[0] ... f[n-1] is satisfiable.
+ */
+DEFINE_FUNC(int, 1check_1formulas) WITH_FIVE_ARGS(jtermArray, int, string, jmodel, string)
+TERM_ARRAY_ARG(1)
+UINT32_ARG(2)
+STRING_ARG(3)
+MODEL_ARG_POINTER(4)
+STRING_ARG(5)
+CALL5(smt_status_t, check_formulas)
+FREE_TERM_ARRAY_ARG(1)
+FREE_STRING_ARG(3)
+FREE_STRING_ARG(5)
+INT_RETURN
+
+/*
+ * Checks if the SAT-Solver entered as String is available
+ */
+DEFINE_FUNC(int, 1has_1delegate) WITH_ONE_ARG(string)
+STRING_ARG(1)
+CALL1(int, has_delegate)
+FREE_STRING_ARG(1)
+INT_RETURN
+
+/*
+ * Returns type of a function node.
+ */
+DEFINE_FUNC(jtype, 1val_1function_1type) WITH_THREE_ARGS(jmodel, jnodeid, jnodetag)
+MODEL_ARG(1)
+YVAL_ARG(2, 2, 3)
+CALL2(type_t, val_function_type)
+TYPE_RETURN
+
+/*
+ * Returns term_vector instead of error int.
+ */
+DEFINE_FUNC(jtermArray, 1model_1term_1support) WITH_TWO_ARGS(jmodel, jterm)
+MODEL_ARG(1)
+TERM_ARG(2)
+TERM_VECTOR_ARG(3)
+CALL3(int, model_term_support)
+TERM_VECTOR_ARG_RETURN(3)
