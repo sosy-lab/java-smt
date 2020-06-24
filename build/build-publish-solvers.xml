@@ -377,7 +377,7 @@
     </target>
 
     <target name="publish-artifacts-yices2" depends="determine-version"
-         description="Publish JavaSMT with Yices2 only.">
+         description="Publish JavaSMT (bindings for Yices2 only).">
         <sequential>
             <ivy:resolve conf="java-smt-yices2" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
             <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
@@ -385,15 +385,15 @@
                 message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
             <fail unless="version.publishable"
                 message="Cannot publish version ${version}, only unmodified working copies may be published." />
-                
-            <copy file="${ivy.module}-${version}.jar" tofile="build-lib/${ivy.module}-${version}.jar"/>
-            <copy file="${ivy.module}-${version}-sources.jar" tofile="build-lib/${ivy.module}-${version}-sources.jar"/>
-            
+
+            <copy file="${ivy.module}-${version}.jar" tofile="${ivy.module}-${version}.jar"/>
+            <copy file="${ivy.module}-${version}-sources.jar" tofile="${ivy.module}-${version}-sources.jar"/>
+
             <ivy:publish
                 pubrevision="${version}"
                 resolver="Sosy-Lab-Publish"
                 status="release"
-                artifactspattern="build-lib/[artifact]-[revision](-[classifier]).[ext]">
+                artifactspattern="[artifact]-[revision](-[classifier]).[ext]">
             </ivy:publish>
             <echo>
                 You now want to run

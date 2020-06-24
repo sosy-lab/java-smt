@@ -2,12 +2,15 @@
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
 <project name="jar-yices2" basedir=".">
 
+    <!-- Targets for generating JAR files for Yices2 bindings. -->
+
+    <!-- This is a copy of the default build-jar.xml with some changes. -->
+
     <!-- These properties can and should be overridden from including file. -->
     <property name="class.main" value=""/>
     <property name="project.url" value=""/>
     <property name="jar.excludesInYices2Jar" value="**/*Test.class **/*Test$*.class"/>
 
-    <!-- copied from build.jar.xml -->
     <target name="jar-yices2" depends="determine-version, build"
               description="Create a runnable JAR file of all classes related to Yices2">
         <property name="yices2jar.file" value="${ivy.module}-yices2-${version}.jar"/>
@@ -33,8 +36,8 @@
     <target name="sources-yices2" depends="determine-version, resolve-dependencies">
         <jar destfile="${ivy.module}-yices2-${version}-sources.jar"
                 whenmanifestonly="fail">
-            <fileset dir="${source.dir}/" includes="**/*Yices2*.java"/>
-            <fileset dir="${source.generated.dir}/" includes="**/*Yices2*.java"/>
+            <fileset dir="${source.dir}/" includes="${yices2Sources}"/>
+            <fileset dir="${source.generated.dir}/" includes="${yices2Sources}"/>
             <manifest>
                     <attribute name="Implementation-Title" value="${ant.project.name} - Yices2"/>
                     <attribute name="Implementation-Version" value="${version}"/>
