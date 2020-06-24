@@ -112,7 +112,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     };
   }
 
-  /** copied from {@link PrintTerm#quoteIdentifier(String)} */
+  /** copied from {@link PrintTerm#quoteIdentifier(String)}. */
   private static String quoteIdentifier(String id) {
     assert id.indexOf('|') < 0 && id.indexOf('\\') < 0;
     for (int idx = 0; idx < id.length(); idx++) {
