@@ -13,8 +13,8 @@
 
     <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
-    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class org/sosy_lab/java_smt/test/**.class ${yices2Classes}"/>
-    <property name="jar.sources.excludes" value="**/*Test.java org/sosy_lab/java_smt/test/**.java ${yices2Sources}"/>
+    <property name="jar.excludes" value="${yices2Classes}"/>
+    <property name="jar.sources.excludes" value="${yices2Sources}"/>
     <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
     <property name="documentation.javadoc.exclude" value="org/sosy_lab/java_smt/solvers/**/*"/>
