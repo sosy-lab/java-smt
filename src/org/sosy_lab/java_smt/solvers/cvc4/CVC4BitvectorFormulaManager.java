@@ -19,17 +19,17 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import edu.nyu.acsys.CVC4.BitVector;
-import edu.nyu.acsys.CVC4.BitVectorExtract;
-import edu.nyu.acsys.CVC4.BitVectorSignExtend;
-import edu.nyu.acsys.CVC4.BitVectorType;
-import edu.nyu.acsys.CVC4.BitVectorZeroExtend;
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.IntToBitVector;
-import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.Rational;
-import edu.nyu.acsys.CVC4.Type;
+import edu.stanford.CVC4.BitVector;
+import edu.stanford.CVC4.BitVectorExtract;
+import edu.stanford.CVC4.BitVectorSignExtend;
+import edu.stanford.CVC4.BitVectorType;
+import edu.stanford.CVC4.BitVectorZeroExtend;
+import edu.stanford.CVC4.Expr;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.IntToBitVector;
+import edu.stanford.CVC4.Kind;
+import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.Type;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 

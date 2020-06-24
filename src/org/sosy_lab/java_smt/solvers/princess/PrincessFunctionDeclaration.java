@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
@@ -34,8 +35,9 @@ import ap.parser.ITermITE;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.types.Sort;
 import ap.types.SortedIFunction$;
+import java.util.ArrayList;
 import java.util.List;
-import scala.collection.mutable.ArrayBuffer;
+import scala.collection.immutable.Seq;
 
 /**
  * Unlike other solvers, Princess does not have a class representing the built-in functions (OR,
@@ -62,7 +64,7 @@ abstract class PrincessFunctionDeclaration {
       // TODO: check argument types
       checkArgument(args.size() == app.arity(), "functiontype has different number of args.");
 
-      final ArrayBuffer<ITerm> argsBuf = new ArrayBuffer<>();
+      final List<ITerm> argsList = new ArrayList<>();
       for (IExpression arg : args) {
         ITerm termArg;
         if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
@@ -72,9 +74,10 @@ abstract class PrincessFunctionDeclaration {
         } else {
           termArg = (ITerm) arg;
         }
-        argsBuf.$plus$eq(termArg);
+        argsList.add(termArg);
       }
-      IFunApp returnFormula = new IFunApp(app, argsBuf.toSeq());
+      final Seq<ITerm> argsBuf = collectionAsScalaIterableConverter(argsList).asScala().toSeq();
+      IFunApp returnFormula = new IFunApp(app, argsBuf);
       Sort returnType = SortedIFunction$.MODULE$.iResultSort(app, returnFormula.args());
 
       // boolean term, so we have to use the fun-applier instead of the function itself
@@ -124,7 +127,7 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-      return example.update(scala.collection.JavaConversions.asScalaBuffer(args));
+      return example.update(collectionAsScalaIterableConverter(args).asScala().toSeq());
     }
 
     @Override

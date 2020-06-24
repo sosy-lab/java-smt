@@ -42,7 +42,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -91,7 +90,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     createConfig(config); // ask sub-classes for their options
 
     long cfg = msat_create_config();
-    for (Entry<String, String> entry : config.entrySet()) {
+    for (Map.Entry<String, String> entry : config.entrySet()) {
       msat_set_option_checked(cfg, entry.getKey(), entry.getValue());
     }
     return cfg;

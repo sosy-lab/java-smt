@@ -20,7 +20,7 @@
     <property name="documentation.javadoc.exclude" value="org/sosy_lab/java_smt/solvers/**/*"/>
 
     <!-- This check crashes current error-prone -->
-    <property name="errorprone.options" value="-Xep:Finally:OFF"/>
+    <property name="errorprone.options" value="-Xep:Finally:OFF -Xep:MissingSummary:OFF -Xep:UnescapedEntity:OFF"/>
 
     <!-- Maven Central metadata -->
     <property name="ivy.pom.description" value="Unified acccess layer to SMT solvers"/>

@@ -109,8 +109,8 @@
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.3.4" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.3.4" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.4.0" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.4.0" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -128,13 +128,13 @@
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.29" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.33" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-604-g71e72f93" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess -->
-        <dependency org="uuverifiers" name="princess_2.12" rev="2019-11-20-assertionless" conf="runtime-princess->default; contrib->sources">
+        <dependency org="uuverifiers" name="princess_2.13" rev="2020-05-01-assertionless" conf="runtime-princess->default; contrib->sources">
           <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
@@ -144,10 +144,10 @@
 
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.3" conf="runtime-mathsat->solver-mathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.8.7" conf="runtime-z3->solver-z3" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.8.8" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1" conf="runtime-optimathsat->solver-optimathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2019-11-30-gae93e65" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-2.3-g3249ae0f" conf="runtime-boolector->solver-boolector" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-15-g59c9ade5" conf="runtime-boolector->solver-boolector" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-yices2" rev="3.3.0-136-g23c52ef-207-gc9bee2a9" conf="runtime-yices2->runtime; contrib->sources" />
@@ -158,7 +158,7 @@
         <dependency org="org.codehaus.mojo" name="animal-sniffer-annotations" rev="1.18" conf="runtime->default;"/>
 
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
-        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.3.4"/>
+        <override org="com.google.errorprone" module="error_prone_annotations" rev="2.4.0"/>
 
     </dependencies>
 </ivy-module>

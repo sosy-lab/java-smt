@@ -24,6 +24,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.Range;
 import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
@@ -200,15 +201,18 @@ public class OptimizationTest extends SolverBasedTest0 {
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");
 
+      // assume (x < 1)
       prover.addConstraint(rmgr.lessThan(x, rmgr.makeNumber(1)));
       int handle = prover.maximize(x);
       assertThat(prover.check()).isEqualTo(OptStatus.OPT);
 
+      // lets check how close we can get to value 1.
       for (long i : new long[] {1, 10, 100, 1000, 10000, 100000000L, 1000000000000L}) {
         long largeI = i * 1000000L; // increase precision
-        Rational nearZero = Rational.ofLongs(1, largeI);
-        Rational nearOne = Rational.ofLongs(largeI - 1, largeI);
-        assertThat(prover.upper(handle, nearZero)).hasValue(nearOne);
+        Rational epsilon = Rational.ofLongs(1, largeI);
+        Rational lowerBoundOfRange = Rational.ONE.minus(epsilon).minus(epsilon);
+        Rational approximation = prover.upper(handle, epsilon).orElseThrow();
+        assertThat(approximation).isIn(Range.closedOpen(lowerBoundOfRange, Rational.ONE));
       }
 
       // OptiMathSAT5 has at least an epsilon of 1/1000000. It does not allow larger values.
@@ -218,9 +222,10 @@ public class OptimizationTest extends SolverBasedTest0 {
           .isNotEqualTo(Solvers.MATHSAT5);
 
       for (long i : new long[] {1, 10, 100, 1000, 10000, 100000}) {
-        Rational nearZero = Rational.ofLongs(1, i);
-        Rational nearOne = Rational.ofLongs(i - 1, i);
-        assertThat(prover.upper(handle, nearZero)).hasValue(nearOne);
+        Rational epsilon = Rational.ofLongs(1, i);
+        Rational lowerBoundOfRange = Rational.ONE.minus(epsilon).minus(epsilon);
+        Rational approximation = prover.upper(handle, epsilon).orElseThrow();
+        assertThat(approximation).isIn(Range.closedOpen(lowerBoundOfRange, Rational.ONE));
       }
 
       // check strict value

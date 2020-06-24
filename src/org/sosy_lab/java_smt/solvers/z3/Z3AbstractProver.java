@@ -48,7 +48,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private int level = 0;
 
-  private static final String UNSAT_CORE_TEMP_VARNAME = "Z3_UNSAT_CORE_%d";
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
@@ -134,7 +133,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.incRef(z3context, e);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
-        String varName = String.format(UNSAT_CORE_TEMP_VARNAME, trackId.getFreshId());
+        String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
         Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));

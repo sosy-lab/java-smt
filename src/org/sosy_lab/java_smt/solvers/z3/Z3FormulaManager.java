@@ -23,7 +23,6 @@ import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -146,7 +145,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     long[] changeFrom = new long[fromToMapping.size()];
     long[] changeTo = new long[fromToMapping.size()];
     int idx = 0;
-    for (Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+    for (Map.Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
       changeFrom[idx] = extractInfo(e.getKey());
       changeTo[idx] = extractInfo(e.getValue());
       idx++;

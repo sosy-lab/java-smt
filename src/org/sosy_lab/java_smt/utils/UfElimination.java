@@ -35,7 +35,6 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -205,7 +204,7 @@ public class UfElimination {
   private void merge(
       Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> pUfs,
       Result pPreviousResult) {
-    for (Entry<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufInOtherFormula :
+    for (Map.Entry<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufInOtherFormula :
         pPreviousResult.getUfs().entries()) {
       if (pUfs.containsKey(ufInOtherFormula.getKey())) {
         pUfs.put(ufInOtherFormula.getKey(), ufInOtherFormula.getValue());

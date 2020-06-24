@@ -326,6 +326,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   public void testQELight() throws InterruptedException {
     requireIntegers();
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
+    // exists y : (y=4 && x=y+3) --> simplified: x=7
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula f1 =
         qmgr.exists(

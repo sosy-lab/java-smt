@@ -1,5 +1,27 @@
 # JavaSMT ChangeLog
 
+## JavaSMT 3.5.1
+
+### Improvements and Fixes:
+ - improve interpolation error detection for MathSAT5
+ - fix simplification procedure for MathSAT5
+ - improve interrupt detection for Z3
+ - fix quantifier elimination for Z3
+
+## JavaSMT 3.5.0
+
+This release mostly contains updated solvers,
+including the new version of Z3 without support for interpolation.
+There were some internal fixes and improvements.
+
+### Updates solver versions:
+ - CVC4 prerelease-2020-06-13-g3a1bce1b8
+ - Boolector 3.2.1-15-g59c9ade5
+ - MathSAT5 5.6.3
+ - OptiMathSAT 1.7.1
+ - Princess 2.13
+ - Z3 4.8.8 (info: interpolation no longer available!)
+
 ## JavaSMT 3.4.0
 
 ### Changes in the API:

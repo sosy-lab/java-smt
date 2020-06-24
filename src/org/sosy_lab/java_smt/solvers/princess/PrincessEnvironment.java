@@ -20,11 +20,8 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static scala.collection.JavaConversions.asJavaIterable;
-import static scala.collection.JavaConversions.asScalaBuffer;
-import static scala.collection.JavaConversions.iterableAsScalaIterable;
-import static scala.collection.JavaConversions.mapAsJavaMap;
-import static scala.collection.JavaConversions.seqAsJavaList;
+import static scala.collection.JavaConverters.asJava;
+import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
 import ap.parser.IAtom;
@@ -63,7 +60,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -72,7 +68,6 @@ import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
-import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -80,7 +75,6 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
-import scala.collection.Seq;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -104,7 +98,7 @@ class PrincessEnvironment {
   private boolean logAllQueriesAsScala = false;
 
   @Option(secure = true, description = "file for Princess-specific dump of queries as Scala code")
-  @FileOption(Type.OUTPUT_FILE)
+  @FileOption(FileOption.Type.OUTPUT_FILE)
   private PathCounterTemplate logAllQueriesAsScalaFile =
       PathCounterTemplate.ofFormatString("princess-query-%03d-");
 
@@ -252,12 +246,12 @@ class PrincessEnvironment {
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
     Tuple3<
-            Seq<IFormula>,
+            scala.collection.immutable.Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>>
         triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
 
-    List<? extends IExpression> formula = seqAsJavaList(triple._1());
+    List<? extends IExpression> formula = asJava(triple._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formula) {
@@ -287,7 +281,7 @@ class PrincessEnvironment {
     Tuple2<IExpression, scala.collection.immutable.Map<IExpression, IExpression>> tuple =
         api.abbrevSharedExpressionsWithMap(formula, 1);
     final IExpression lettedFormula = tuple._1();
-    final Map<IExpression, IExpression> abbrevMap = mapAsJavaMap(tuple._2());
+    final Map<IExpression, IExpression> abbrevMap = asJava(tuple._2());
 
     return new Appenders.AbstractAppender() {
 
@@ -329,7 +323,7 @@ class PrincessEnvironment {
             out.append(" (");
             if (var instanceof IFunApp) {
               IFunApp function = (IFunApp) var;
-              Iterator<ITerm> args = asJavaIterable(function.args()).iterator();
+              Iterator<ITerm> args = asJava(function.args()).iterator();
               while (args.hasNext()) {
                 args.next();
                 // Princess does only support IntegerFormulas in UIFs we don't need
@@ -350,7 +344,7 @@ class PrincessEnvironment {
 
         // now as everything we know from the formula is declared we have to add
         // the abbreviations, too
-        for (Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
+        for (Map.Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
           IExpression abbrev = entry.getKey();
           IExpression fullFormula = entry.getValue();
           String name =
@@ -435,7 +429,7 @@ class PrincessEnvironment {
       final IFunction res = functionsCache.get(name);
       assert (res instanceof MonoSortedIFunction)
           ? (((MonoSortedIFunction) res).resSort().equals(returnType)
-              && seqAsJavaList(((MonoSortedIFunction) res).argSorts()).equals(args))
+              && asJava(((MonoSortedIFunction) res).argSorts()).equals(args))
           : (returnType == INTEGER_SORT
               && res.arity() == args.size()
               && args.stream().allMatch(s -> s == INTEGER_SORT));
@@ -444,7 +438,7 @@ class PrincessEnvironment {
       IFunction funcDecl =
           api.createFunction(
               name,
-              asScalaBuffer(args),
+              collectionAsScalaIterableConverter(args).asScala().toSeq(),
               returnType,
               false,
               SimpleAPI.FunctionalityMode$.MODULE$.Full());
@@ -456,12 +450,12 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    return api.select(iterableAsScalaIterable(args).toSeq());
+    return api.select(collectionAsScalaIterableConverter(args).asScala().toSeq());
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    return api.store(iterableAsScalaIterable(args).toSeq());
+    return api.store(collectionAsScalaIterableConverter(args).asScala().toSeq());
   }
 
   public boolean hasArrayType(IExpression exp) {

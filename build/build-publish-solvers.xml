@@ -12,8 +12,7 @@
         <fail unless="z3.path">
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
             The path has to point to the root Z3 folder.
-            Note that shell substitutions do not work and a full absolute
-            path has to be specified.
+            Note that shell substitutions do not work.
         </fail>
         <exec executable="readelf" dir="${z3.path}" outputproperty="z3.elf_details" logError="true" failonerror="true">
             <arg value="-d"/>
@@ -32,6 +31,11 @@
     </target>
 
     <target name="get-z3-version" unless="z3.version">
+        <fail unless="z3.path">
+            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
+            The path has to point to the root Z3 folder.
+            Note that shell substitutions do not work.
+        </fail>
         <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
             <arg value="describe" />
         </exec>

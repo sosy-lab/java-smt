@@ -39,7 +39,6 @@ import org.sosy_lab.common.Classes.ClassLoaderBuilder;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
-import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -81,7 +80,7 @@ public class SolverContextFactory {
   private boolean logAllQueries = false;
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
-  @FileOption(Type.OUTPUT_FILE)
+  @FileOption(FileOption.Type.OUTPUT_FILE)
   private @Nullable PathCounterTemplate logfile =
       PathCounterTemplate.ofFormatString("smtquery.%03d.smt2");
 

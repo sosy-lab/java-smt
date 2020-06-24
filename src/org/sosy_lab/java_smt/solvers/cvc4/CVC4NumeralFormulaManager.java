@@ -19,22 +19,22 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import static edu.nyu.acsys.CVC4.Kind.DIVISION;
-import static edu.nyu.acsys.CVC4.Kind.INTS_DIVISION;
-import static edu.nyu.acsys.CVC4.Kind.INTS_MODULUS;
-import static edu.nyu.acsys.CVC4.Kind.ITE;
-import static edu.nyu.acsys.CVC4.Kind.MINUS;
-import static edu.nyu.acsys.CVC4.Kind.MULT;
-import static edu.nyu.acsys.CVC4.Kind.PLUS;
+import static edu.stanford.CVC4.Kind.DIVISION;
+import static edu.stanford.CVC4.Kind.INTS_DIVISION;
+import static edu.stanford.CVC4.Kind.INTS_MODULUS;
+import static edu.stanford.CVC4.Kind.ITE;
+import static edu.stanford.CVC4.Kind.MINUS;
+import static edu.stanford.CVC4.Kind.MULT;
+import static edu.stanford.CVC4.Kind.PLUS;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import edu.nyu.acsys.CVC4.Expr;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.Kind;
-import edu.nyu.acsys.CVC4.Rational;
-import edu.nyu.acsys.CVC4.Type;
-import edu.nyu.acsys.CVC4.vectorExpr;
+import edu.stanford.CVC4.Expr;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.Kind;
+import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.Type;
+import edu.stanford.CVC4.vectorExpr;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;

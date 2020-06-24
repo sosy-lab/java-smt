@@ -99,7 +99,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // Set of error messages that might occur if Z3 is interrupted.
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
-      ImmutableSet.of("canceled", "Proof error!");
+      ImmutableSet.of(
+          "canceled", // Z3::src/util/common_msgs.cpp
+          "Proof error!",
+          "interrupted", // Z3::src/solver/check_sat_result.cpp
+          "maximization suspended" // Z3::src/opt/opt_solver.cpp
+          );
 
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;

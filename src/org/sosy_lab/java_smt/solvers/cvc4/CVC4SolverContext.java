@@ -19,11 +19,11 @@
  */
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import edu.nyu.acsys.CVC4.CVC4JNI;
-import edu.nyu.acsys.CVC4.Configuration;
-import edu.nyu.acsys.CVC4.ExprManager;
-import edu.nyu.acsys.CVC4.SExpr;
-import edu.nyu.acsys.CVC4.SmtEngine;
+import edu.stanford.CVC4.CVC4JNI;
+import edu.stanford.CVC4.Configuration;
+import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.SExpr;
+import edu.stanford.CVC4.SmtEngine;
 import java.util.Set;
 import java.util.logging.Level;
 import org.sosy_lab.common.NativeLibraries;
