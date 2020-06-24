@@ -13,7 +13,7 @@
 
     <target name="jar-yices2" depends="determine-version, build"
               description="Create a runnable JAR file of all classes related to Yices2">
-        <property name="yices2jar.file" value="${ivy.module}-yices2-${version}.jar"/>
+        <property name="yices2jar.file" value="javasmt-yices2-${version}.jar"/>
         <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
         <manifestclasspath property="yices2Classpath.jar" jarfile="${ivy.lib.dir}/runtime/${jar.file}" maxParentLevels="0">
             <classpath><fileset dir="${ivy.lib.dir}/runtime" includes="*.jar"/></classpath>
@@ -34,7 +34,7 @@
     </target>
 
     <target name="sources-yices2" depends="determine-version, resolve-dependencies">
-        <jar destfile="${ivy.module}-yices2-${version}-sources.jar"
+        <jar destfile="javasmt-yices2-${version}-sources.jar"
                 whenmanifestonly="fail">
             <fileset dir="${source.dir}/" includes="${yices2Sources}"/>
             <fileset dir="${source.generated.dir}/" includes="${yices2Sources}"/>

@@ -15,7 +15,6 @@
     </configurations>
 
     <publications defaultconf="solver-yices2">
-
         <artifact name="libyices2j" conf="solver-yices2" type="shared-object" ext="so" />
     </publications>
 

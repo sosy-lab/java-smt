@@ -376,10 +376,13 @@
         </sequential>
     </target>
 
-    <target name="publish-artifacts-yices2" depends="determine-version"
-         description="Publish JavaSMT (bindings for Yices2 only).">
+    <import file="build-jar-yices2.xml"/>
+    <target name="dist-yices2" depends="jar-yices2, sources-yices2" description="Make a distributable release with yices2 only"/>
+
+    <target name="publish-artifacts-yices2" depends="determine-version, dist-yices2, load-ivy"
+         description="Publish Java bindings for Yices2 to Ivy repo.">
         <sequential>
-            <ivy:resolve conf="java-smt-yices2" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
+            <ivy:resolve conf="javasmt-yices2" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
             <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
             <fail unless="ivy.hasrepository"
                 message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
