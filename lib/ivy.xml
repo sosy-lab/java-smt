@@ -141,7 +141,7 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2019-11-30-gae93e65" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-2.3-g3249ae0f" conf="runtime-boolector->solver-boolector" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-2020-03-06-ge902b0b5" conf="runtime-yices2->solver-yices2" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-83-g084019ce" conf="runtime-yices2->solver-yices2" />
 
         <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest although they do not really need it.
              As long as this is the case we need to provide the JAR, otherwise javac complains. -->
