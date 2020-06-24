@@ -13,6 +13,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
@@ -100,11 +101,13 @@ public class OptimizationFormulaWeights {
 
     // for integer theory we get the optimal solution directly as model.
     // ideal solution: sum=32 with e.g. x=0,y=6,z=4  or  x=0,y=7,z=3  or  x=0,y=8,z=2 ...
-    logger.log(
-        Level.INFO,
-        "maximal sum ",
-        prover.upper(handle, Rational.ZERO).orElseThrow(),
-        "with model",
-        prover.getModel());
+    try (Model model = prover.getModel()) {
+      logger.log(
+          Level.INFO,
+          "maximal sum ",
+          prover.upper(handle, Rational.ZERO).orElseThrow(),
+          "with model",
+          model);
+    }
   }
 }

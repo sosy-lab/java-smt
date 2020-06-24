@@ -85,6 +85,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     stats.model.getAndIncrement();

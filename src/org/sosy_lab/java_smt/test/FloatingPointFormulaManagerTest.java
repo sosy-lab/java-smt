@@ -905,7 +905,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "resource"})
   public void fpInterpolation() throws SolverException, InterruptedException {
     requireInterpolation();
     assume()

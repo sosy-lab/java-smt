@@ -12,6 +12,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -107,7 +108,9 @@ public class OptimizationIntReal {
       OptStatus status = prover.check();
       assert status == OptStatus.OPT;
       Optional<Rational> lower = prover.lower(handleX, EPSILON);
-      logger.log(Level.INFO, "lower bound:", lower.orElseThrow(), "with model:", prover.getModel());
+      try (Model model = prover.getModel()) {
+        logger.log(Level.INFO, "lower bound:", lower.orElseThrow(), "with model:", model);
+      }
     }
     prover.pop();
 
@@ -118,7 +121,9 @@ public class OptimizationIntReal {
       OptStatus status = prover.check();
       assert status == OptStatus.OPT;
       Optional<Rational> upper = prover.upper(handleX, EPSILON);
-      logger.log(Level.INFO, "upper bound:", upper.orElseThrow(), "with model:", prover.getModel());
+      try (Model model = prover.getModel()) {
+        logger.log(Level.INFO, "upper bound:", upper.orElseThrow(), "with model:", model);
+      }
     }
     prover.pop();
   }
