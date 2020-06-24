@@ -88,7 +88,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           }
           if (types.length > 0) {
             out.append("(declare-fun ");
-            out.append(PrintTerm.quoteIdentifier(entry.getKey()));
+            out.append(quoteIdentifier(entry.getKey()));
             out.append(" (");
             for (int i = 0; i < types.length - 1; i++) {
               out.append(getTypeRepr(types[i]));
@@ -110,5 +110,20 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         return typeRepr.substring(0, 1).toUpperCase() + typeRepr.substring(1);
       }
     };
+  }
+
+  /** copied from {@link PrintTerm#quoteIdentifier(String)} */
+  private static String quoteIdentifier(String id) {
+    assert id.indexOf('|') < 0 && id.indexOf('\\') < 0;
+    for (int idx = 0; idx < id.length(); idx++) {
+      final char c = id.charAt(idx);
+      if (!(c >= 'A' && c <= 'Z')
+          && !(c >= 'a' && c <= 'z')
+          && !(c >= '0' && c <= '9' && idx > 0)
+          && "~!@$%^&*_+-=<>.?/".indexOf(c) < 0) {
+        return "|" + id + "|";
+      }
+    }
+    return id;
   }
 }
