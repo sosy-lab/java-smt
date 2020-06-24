@@ -26,6 +26,7 @@
                 includes="**"
                 excludes="${jar.excludes}"
                 whenmanifestonly="fail">
+            <metainf dir="." includes="LICENSE"/>
             <manifest>
                 <attribute name="Class-Path" value="${classpath.jar}"/>
                 <attribute name="Main-Class" value="${class.main}"/>
@@ -41,6 +42,7 @@
                 whenmanifestonly="fail">
             <fileset dir="${source.dir}/" includes="**/*.java" excludes="${jar.sources.excludes}"/>
             <fileset dir="${source.generated.dir}/" includes="**/*.java" excludes="${jar.sources.excludes}"/>
+            <metainf dir="." includes="LICENSE"/>
             <manifest>
                     <attribute name="Implementation-Title" value="${ant.project.name}"/>
                     <attribute name="Implementation-Version" value="${version}"/>

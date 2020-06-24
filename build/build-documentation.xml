@@ -64,6 +64,7 @@
     <target name="javadoc-jar" depends="javadoc,determine-version,build" description="Pack Javadoc into a JAR">
         <property name="javadoc-jar.file" value="${ivy.module}-${version}-javadoc.jar"/>
         <jar jarfile="${javadoc-jar.file}">
+            <metainf dir="." includes="LICENSE"/>
             <fileset dir="Javadoc" />
         </jar>
     </target>
