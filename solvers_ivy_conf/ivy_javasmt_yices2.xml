@@ -12,22 +12,30 @@
     </info>
 
     <configurations>
-        <conf name="javasmt-yices2" />
+      <conf name="runtime"/>
+      <conf name="sources" description="sources of JavaSMT's component for Yices2" />
     </configurations>
 
-    <publications defaultconf="javasmt-yices2">
-        <artifact name="javasmt-yices2" conf="javasmt-yices2" ext="jar"/>
-        <artifact name="javasmt-yices2" conf="javasmt-yices2" e:classifier="sources" ext="jar"/>
+    <publications defaultconf="runtime">
+        <artifact />
+        <artifact conf="sources" type="source" e:classifier="sources" ext="jar"/>
     </publications>
 
     <dependencies>
-        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-83-g084019ce" conf="javasmt-yices2->solver-yices2" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-83-g084019ce" conf="runtime->solver-yices2" />
 
-        <!--
-        There are a few dependencies for this package, like Google-Guava and JUnit.
-        As this package is only intended for use within JavaSMT and JavaSMT already
-        includes those dependencies, we do not list them here explicitly.
-        -->
+        <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
+
+        <!-- SoSy-Lab Common Library -->
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-420-gef84297" conf="runtime->runtime; sources->sources"/>
+
+        <!-- Google Core Libraries for Java
+             Contains a lot of helpful data structures. -->
+        <dependency org="com.google.guava" name="guava" rev="29.0-jre" conf="runtime->default; sources->sources"/>
+
+        <!-- Annotations we use for @Nullable etc. -->
+        <dependency org="org.checkerframework" name="checker-qual" rev="2.5.2" conf="runtime->default; sources->sources"/>
+
     </dependencies>
 
 </ivy-module>
