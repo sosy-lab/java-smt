@@ -201,6 +201,49 @@ The scripts for publishing Princess and SMTInterpol are available
 at the root of the [Ivy Repository](https://svn.sosy-lab.org/software/ivy).
 
 
+### Publishing Yices2
+
+Yices2 consists of two components: the solver binary and the Java components in JavaSMT.
+The Java components were splitt from the rest of JavaSMT because of the GPL.
+
+#### Publishing the solver binary for Yices2
+
+Prepare gperf and gmp (required for our own static binary):
+```
+wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure && make
+wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure && make
+```
+
+Download and build Yices2 from source:
+```
+git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure && make
+```
+
+Get the version of yices:
+```
+git describe --tags
+```
+
+Publish the solver binary from within JavaSMT (adjust all paths to your system!):
+```
+ant publish-yices2 -Dyices2.path=../solver/yices2 -Dgmp.path=../solver/gmp-6.2.0 -Dgperf.path=../solver/gperf-3.1 -Dyices2.version=2.6.2-83-g084019ce
+```
+
+Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
+
+#### Publish the Java components for Yices2
+
+Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
+
+As long as no API was changed and compilation suceeds, simply execute `ant publish-artifact-yices2`.
+
+If the API was changed, we need to break the dependency cycle for the publication and revert this later:
+edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
+(the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
+Then run `ant publish-artifact-yices2`.
+We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
+
+
 ## Writing Solver Backends
 
 In order to write a solver backend it is sufficient to provide the
