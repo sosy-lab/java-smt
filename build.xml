@@ -61,12 +61,6 @@
         </delete>
     </target>
 
-    <target name="clean-ivy" description="Cleans ivy files from main dir to be able to publish another target from the main dir">
-        <delete includeEmptyDirs="true">
-            <fileset dir="." includes="ivy-*.xml"/>
-        </delete>
-    </target>
-
     <target name="build" depends="build-project, collect-options" description="Build"/>
 
     <target name="dist" depends="jar, sources, javadoc-jar" description="Make a distributable release"/>
