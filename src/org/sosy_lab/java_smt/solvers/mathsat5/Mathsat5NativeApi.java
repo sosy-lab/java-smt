@@ -144,7 +144,7 @@ class Mathsat5NativeApi {
     void callback(long[] model) throws InterruptedException;
   }
 
-  interface TerminationTest {
+  interface TerminationCallback {
     boolean shouldTerminate() throws InterruptedException;
   }
 
@@ -790,9 +790,9 @@ class Mathsat5NativeApi {
   /*
    * Special functions
    */
-  public static native long msat_set_termination_test(long e, TerminationTest callback);
+  public static native long msat_set_termination_callback(long e, TerminationCallback callback);
 
-  public static native void msat_free_termination_test(long t);
+  public static native void msat_free_termination_callback(long t);
 
   public static native String msat_get_version();
 
