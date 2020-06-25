@@ -37,7 +37,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   private static final CharMatcher LETTERS = inRange('a', 'z').or(inRange('A', 'Z'));
   private static final CharMatcher DIGITS = inRange('0', '9');
   private static final CharMatcher ADDITIONAL_CHARS = CharMatcher.anyOf("~!@$%^&*_-+=<>.?/");
-  private static final CharMatcher VALID_CHARS = LETTERS.or(DIGITS).or(ADDITIONAL_CHARS);
+  private static final CharMatcher VALID_CHARS =
+      LETTERS.or(DIGITS).or(ADDITIONAL_CHARS).precomputed();
 
   protected Yices2FormulaManager(
       Yices2FormulaCreator pFormulaCreator,
