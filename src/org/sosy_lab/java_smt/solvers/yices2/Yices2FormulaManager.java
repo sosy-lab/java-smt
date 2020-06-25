@@ -34,6 +34,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
 
+  private static final CharMatcher LETTERS = inRange('a', 'z').or(inRange('A', 'Z'));
+  private static final CharMatcher DIGITS = inRange('0', '9');
+  private static final CharMatcher ADDITIONAL_CHARS = CharMatcher.anyOf("~!@$%^&*_-+=<>.?/");
+  private static final CharMatcher VALID_CHARS = LETTERS.or(DIGITS).or(ADDITIONAL_CHARS);
+
   protected Yices2FormulaManager(
       Yices2FormulaCreator pFormulaCreator,
       Yices2UFManager pFunctionManager,
@@ -126,12 +131,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     Preconditions.checkArgument(CharMatcher.anyOf("|\\").matchesNoneOf(str));
     Preconditions.checkArgument(!SMTLIB2_KEYWORDS.contains(str));
 
-    CharMatcher letters = inRange('a', 'z').or(inRange('A', 'Z'));
-    CharMatcher digits = inRange('0', '9');
-    CharMatcher additionalChars = CharMatcher.anyOf("~!@$%^&*_-+=<>.?/");
-
-    if (letters.or(digits).or(additionalChars).matchesAllOf(str)
-        && !digits.matches(str.charAt(0))) {
+    if (VALID_CHARS.matchesAllOf(str) && !DIGITS.matches(str.charAt(0))) {
       // simple symbol
       return str;
     } else {
