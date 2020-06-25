@@ -19,7 +19,7 @@
         <property name="jar.file" value="${ivy.module}-${version}.jar"/>
         <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
         <manifestclasspath property="classpath.jar" jarfile="${ivy.lib.dir}/runtime/${jar.file}" maxParentLevels="0">
-            <classpath><fileset dir="${ivy.lib.dir}/runtime" includes="*.jar"/></classpath>
+            <classpath><dirset dir="${ivy.lib.dir}" includes="runtime"/></classpath>
         </manifestclasspath>
         <jar basedir="${class.dir}/"
                 destfile="${jar.file}"
