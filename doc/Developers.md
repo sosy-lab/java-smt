@@ -210,23 +210,23 @@ The Java components were splitt from the rest of JavaSMT because of the GPL.
 
 Prepare gperf and gmp (required for our own static binary):
 ```
-wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure && make
-wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure && make
+wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
+wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
 ```
 
 Download and build Yices2 from source:
 ```
-git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure && make
+git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure --with-pic-gmp=../gmp-6.2.0/.libs/libgmp.a && make
 ```
 
-Get the version of yices:
+Get the version of Yices2:
 ```
 git describe --tags
 ```
 
 Publish the solver binary from within JavaSMT (adjust all paths to your system!):
 ```
-ant publish-yices2 -Dyices2.path=../solver/yices2 -Dgmp.path=../solver/gmp-6.2.0 -Dgperf.path=../solver/gperf-3.1 -Dyices2.version=2.6.2-83-g084019ce
+ant publish-yices2 -Dyices2.path=../solver/yices2 -Dgmp.path=../solver/gmp-6.2.0 -Dgperf.path=../solver/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
 ```
 
 Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.

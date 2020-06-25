@@ -2,20 +2,8 @@
 
 # This script builds libyices2j.so.
 
-# For building libyices2j.so, you need:
-# - The Yices2 source as can be downloaded from https://yices.csl.sri.com
-#   git clone git@github.com:SRI-CSL/yices2.git
-# - Download gperf from https://www.gnu.org/software/gperf/
-#   for example: http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
-# - Download GMP from https://gmplib.org
-#   for example: https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
-# - Run for GMP and gperf
-#   ./configure --enable-cxx --with-pic --disable-shared --enable-fat
-#   make -j4
-# - Compile Yices2 with
-#   autoconf
-#   ./configure --with-pic-gmp=../gmp-6.1.2/.libs/libgmp.a
-#   make -j4
+# INFO: Before running this script, you need to do build Yices2.
+# See the corresponding section in doc/Developers.md for details.
 
 # This script searches for all included libraries in the current directory first.
 # You can use this to override specific libraries installed on your system.

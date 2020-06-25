@@ -22,7 +22,7 @@
     </publications>
 
     <dependencies>
-        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-83-g084019ce" conf="runtime->solver-yices2" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-89-g0f77dc4b" conf="runtime->solver-yices2" />
 
         <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
 
