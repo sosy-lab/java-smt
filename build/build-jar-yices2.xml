@@ -43,6 +43,11 @@
                 whenmanifestonly="fail">
             <fileset dir="${source.dir}/" includes="${yices2Sources}"/>
             <fileset dir="${source.generated.dir}/" includes="${yices2Sources}"/>
+            <metainf dir="." includes="LICENSE"/>
+            <mappedresources>
+                <fileset dir="." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
+                <globmapper from="LICENSES/*" to="META-INF/*"/>
+            </mappedresources>
             <manifest>
                     <attribute name="Implementation-Title" value="${ant.project.name} - Yices2"/>
                     <attribute name="Implementation-Version" value="${version}"/>
