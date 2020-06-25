@@ -24,6 +24,10 @@
                 excludes="${jar.excludesInYices2Jar}"
                 whenmanifestonly="fail">
             <metainf dir="." includes="LICENSE"/>
+            <mappedresources>
+                <fileset dir="." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
+                <globmapper from="LICENSES/*" to="META-INF/*"/>
+            </mappedresources>
             <manifest>
                 <attribute name="Class-Path" value="${yices2Classpath.jar}"/>
                 <attribute name="Main-Class" value="${class.main}"/>
