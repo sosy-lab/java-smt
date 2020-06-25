@@ -9,6 +9,7 @@
  */
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.CharMatcher.inRange;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
@@ -19,7 +20,9 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_nu
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
-import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -88,7 +91,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           }
           if (types.length > 0) {
             out.append("(declare-fun ");
-            out.append(quoteIdentifier(entry.getKey()));
+            out.append(quote(entry.getKey()));
             out.append(" (");
             for (int i = 0; i < types.length - 1; i++) {
               out.append(getTypeRepr(types[i]));
@@ -112,18 +115,28 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     };
   }
 
-  /** copied from {@link PrintTerm#quoteIdentifier(String)}. */
-  private static String quoteIdentifier(String id) {
-    assert id.indexOf('|') < 0 && id.indexOf('\\') < 0;
-    for (int idx = 0; idx < id.length(); idx++) {
-      final char c = id.charAt(idx);
-      if (!(c >= 'A' && c <= 'Z')
-          && !(c >= 'a' && c <= 'z')
-          && !(c >= '0' && c <= '9' && idx > 0)
-          && "~!@$%^&*_+-=<>.?/".indexOf(c) < 0) {
-        return "|" + id + "|";
-      }
+  /**
+   * Quote symbols if required.
+   *
+   * <p>See http://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2017-07-18.pdf, Section 3.1.
+   * "Symbols"
+   */
+  private static String quote(String str) {
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(str));
+    Preconditions.checkArgument(CharMatcher.anyOf("|\\").matchesNoneOf(str));
+    Preconditions.checkArgument(!SMTLIB2_KEYWORDS.contains(str));
+
+    CharMatcher letters = inRange('a', 'z').or(inRange('A', 'Z'));
+    CharMatcher digits = inRange('0', '9');
+    CharMatcher additionalChars = CharMatcher.anyOf("~!@$%^&*_-+=<>.?/");
+
+    if (letters.or(digits).or(additionalChars).matchesAllOf(str)
+        && !digits.matches(str.charAt(0))) {
+      // simple symbol
+      return str;
+    } else {
+      // quoted symbol
+      return "|" + str + "|";
     }
-    return id;
   }
 }
