@@ -150,7 +150,7 @@
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-15-g59c9ade5" conf="runtime-boolector->solver-boolector" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="3.3.0-136-g23c52ef-207-gc9bee2a9" conf="runtime-yices2->runtime; contrib->sources" />
+        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="3.5.1-196-g649ac716" conf="runtime-yices2->runtime; contrib->sources" />
         <!-- <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-83-g084019ce" conf="runtime-yices2->solver-yices2" /> -->
 
         <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest although they do not really need it.
