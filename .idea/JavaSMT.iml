@@ -40,6 +40,24 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/checker-compat-qual.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/diffutils.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/core/common.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -175,7 +193,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser_2.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -184,7 +202,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-smt-parser.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-smt-parser_2.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -194,6 +212,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/scala-library.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/java-cup-runtime.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
