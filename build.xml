@@ -11,8 +11,20 @@
     <property name="yices2Sources" value="org/sosy_lab/java_smt/solvers/yices2/**.java"/>
     <property name="yices2Classes" value="org/sosy_lab/java_smt/solvers/yices2/**.class"/>
 
-    <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
+    <!-- one configuration per solver -->
+    <property name="ivy.solver.configurations" value="
+        runtime-boolector,
+        runtime-cvc4,
+        runtime-mathsat,
+        runtime-optimathsat,
+        runtime-princess,
+        runtime-smtinterpol,
+        runtime-yices2,
+        runtime-z3
+    "/>
+    <property name="ivy.configurations" value="build, core, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
+    <property name="jar.libdir" value="core"/> <!-- only include the minimal set of libraries in the classpath of the JAR-MANIFEST -->
     <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes}"/>
     <property name="jar.sources.excludes" value="**/*Test.java ${yices2Sources}"/>
     <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
@@ -44,7 +56,7 @@
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
     </path>
 
     <!-- Needs to include all annotation processors and error-prone -->

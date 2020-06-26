@@ -12,14 +12,15 @@
     <!-- These properties can and should be overridden from including file. -->
     <property name="class.main" value=""/>
     <property name="project.url" value=""/>
+    <property name="jar.libdir" value="runtime"/>
     <property name="jar.excludes" value="**/*Test.class **/*Test$*.class"/>
     <property name="jar.sources.excludes" value="**/*Test.java"/>
 
     <target name="jar" depends="determine-version,build" description="Create a runnable JAR file">
         <property name="jar.file" value="${ivy.module}-${version}.jar"/>
         <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
-        <manifestclasspath property="classpath.jar" jarfile="${ivy.lib.dir}/runtime/${jar.file}" maxParentLevels="0">
-            <classpath><dirset dir="${ivy.lib.dir}" includes="runtime"/></classpath>
+        <manifestclasspath property="classpath.jar" jarfile="${ivy.lib.dir}/${jar.libdir}/${jar.file}" maxParentLevels="0">
+            <classpath><fileset dir="${ivy.lib.dir}/${jar.libdir}" includes="*.jar"/></classpath>
         </manifestclasspath>
         <jar basedir="${class.dir}/"
                 destfile="${jar.file}"
