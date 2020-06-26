@@ -30,7 +30,7 @@
 
         <!-- The normal dependencies with all solvers included. -->
         <conf name="runtime"
-              extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-boolector,runtime-yices2"
+              extends="runtime-without-gpl,runtime-yices2"
               description="all solvers included"/>
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
