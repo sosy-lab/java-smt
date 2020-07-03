@@ -68,7 +68,7 @@
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-420-gef84297" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-427-g2475fc6" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
@@ -83,15 +83,15 @@
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.7" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7" conf="build->default; contrib->sources"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.7.3" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7.3" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="2.5.2" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.4.1" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
-        <dependency org="junit" name="junit" rev="4.13" conf="test->default"/>
+        <dependency org="junit" name="junit" rev="4.13" conf="test->default; contrib->sources"/>
 
         <!-- JaCoCo
              Library for code coverage -->
@@ -114,16 +114,16 @@
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
-        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.14" conf="build->default"/>
+        <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="4.16" conf="build->default"/>
 
         <!-- google-java-format
              A source-code formatter for Java -->
         <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.8" conf="format-source->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="3.1.12" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.0.6" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="3.1.12" conf="core->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.0.6" conf="core->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="core->default; contrib->sources"/>
 
         <!-- Checkstyle -->

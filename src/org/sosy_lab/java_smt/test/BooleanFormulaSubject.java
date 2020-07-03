@@ -125,7 +125,7 @@ public final class BooleanFormulaSubject extends Subject {
    *
    * @param generateModel whether we check model iteration.
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"unused", "resource"})
   public void isSatisfiable(boolean generateModel) throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {

@@ -45,11 +45,13 @@ public final class LoggingSolverContext implements SolverContext {
     return delegate.getFormulaManager();
   }
 
+  @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... pOptions) {
     return new LoggingProverEnvironment(logger, delegate.newProverEnvironment(pOptions));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
@@ -57,6 +59,7 @@ public final class LoggingSolverContext implements SolverContext {
         logger, delegate.newProverEnvironmentWithInterpolation(options));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     return new LoggingOptimizationProverEnvironment(

@@ -92,6 +92,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
     return delegate.isUnsatWithAssumptions(translate(pAssumptions, manager, otherManager));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     synchronized (sync) {

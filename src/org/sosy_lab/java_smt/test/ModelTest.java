@@ -939,6 +939,7 @@ public class ModelTest extends SolverBasedTest0 {
     checkModelIteration(f, false);
   }
 
+  @SuppressWarnings("resource")
   private void checkModelIteration(BooleanFormula f, boolean useOptProver)
       throws SolverException, InterruptedException {
     ImmutableList<ValueAssignment> assignments;
@@ -1447,6 +1448,7 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("resource")
   @Test(expected = IllegalStateException.class)
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option

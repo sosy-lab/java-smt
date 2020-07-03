@@ -79,6 +79,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
     return new ReusableStackTheoremProver(new SmtInterpolTheoremProver(manager, options));
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
