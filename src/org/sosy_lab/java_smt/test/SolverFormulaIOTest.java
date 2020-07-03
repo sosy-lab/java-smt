@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultiset;
@@ -308,8 +309,20 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void redundancyTest() {
-    // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    assume()
+        .withMessage(
+            "Solver %s does not remove redundant sub formulae from formula dump.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
+    assume()
+        .withMessage(
+            "Solver %s will fail this anyway since it bools are handled as bitvectors of length"
+                + " one.",
+            solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
     String formDump = mgr.dumpFormula(redundancyExprGen()).toString();
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;

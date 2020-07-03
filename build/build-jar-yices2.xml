@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
+<project name="jar-yices2" basedir=".">
+
+    <!-- Targets for generating JAR files for Yices2 bindings. -->
+
+    <!-- This is a copy of the default build-jar.xml with some changes. -->
+
+    <!-- These properties can and should be overridden from including file. -->
+    <property name="class.main" value=""/>
+    <property name="project.url" value=""/>
+    <property name="jar.excludesInYices2Jar" value="**/*Test.class **/*Test$*.class"/>
+
+    <target name="jar-yices2" depends="determine-version, build"
+              description="Create a runnable JAR file of all classes related to Yices2">
+        <property name="yices2jar.file" value="javasmt-yices2-${version}.jar"/>
+        <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
+        <manifestclasspath property="yices2Classpath.jar" jarfile="${ivy.lib.dir}/runtime/${jar.file}" maxParentLevels="0">
+            <classpath><fileset dir="${ivy.lib.dir}/runtime" includes="checker-qual.jar common.jar guava.jar"/></classpath>
+        </manifestclasspath>
+        <jar basedir="${class.dir}/"
+                destfile="${yices2jar.file}"
+                includes="${yices2Classes}"
+                excludes="${jar.excludesInYices2Jar}"
+                whenmanifestonly="fail">
+            <metainf dir="." includes="LICENSE"/>
+            <mappedresources>
+                <fileset dir="." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
+                <globmapper from="LICENSES/*" to="META-INF/*"/>
+            </mappedresources>
+            <manifest>
+                <attribute name="Class-Path" value="${yices2Classpath.jar}"/>
+                <attribute name="Main-Class" value="${class.main}"/>
+                <attribute name="Implementation-Title" value="${ant.project.name} - Yices2"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-URL" value="${project.url}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="sources-yices2" depends="determine-version, resolve-dependencies">
+        <jar destfile="javasmt-yices2-${version}-sources.jar"
+                whenmanifestonly="fail">
+            <fileset dir="${source.dir}/" includes="${yices2Sources}"/>
+            <fileset dir="${source.generated.dir}/" includes="${yices2Sources}"/>
+            <metainf dir="." includes="LICENSE"/>
+            <mappedresources>
+                <fileset dir="." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
+                <globmapper from="LICENSES/*" to="META-INF/*"/>
+            </mappedresources>
+            <manifest>
+                    <attribute name="Implementation-Title" value="${ant.project.name} - Yices2"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+            </manifest>
+        </jar>
+    </target>
+</project>

@@ -56,12 +56,12 @@ static int call_java_callback(msat_term *model, int size, void *user_data) {
 	return retval;
 }
 
-static int call_java_termination_test(void *user_data) {
+static int call_java_termination_callback(void *user_data) {
 	struct msat_callback_info *helper = (struct msat_callback_info *) user_data;
 	JNIEnv *jenv = helper->jenv;
 
 	if (helper->obj == NULL) {
-		throwException(jenv, "java/lang/IllegalArgumentException", "Illegal termination test object");
+		throwException(jenv, "java/lang/IllegalArgumentException", "Illegal termination callback object");
 		return 1;
 	}
 
@@ -1151,11 +1151,11 @@ CALL3(msat_term, get_interpolant)
 FREE_INT_ARRAY_ARG(2)
 TERM_RETURN
 
-DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
+DEFINE_FUNC(long, 1set_1termination_1callback) WITH_TWO_ARGS(jenv, object)
   ENV_ARG(1)
 
   jclass cls = (*jenv)->FindClass(jenv,
-    "org/sosy_lab/java_smt/solvers/mathsat5/Mathsat5NativeApi$TerminationTest");
+    "org/sosy_lab/java_smt/solvers/mathsat5/Mathsat5NativeApi$TerminationCallback");
   if (cls == NULL) {
     return 0;
   }
@@ -1164,7 +1164,7 @@ DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
     return 0;
   }
   if (arg2 == NULL) {
-    throwException(jenv, "java/lang/NullPointerException", "TerminationTest may not be null");
+    throwException(jenv, "java/lang/NullPointerException", "TerminationCallback may not be null");
     return 0;
   }
 
@@ -1176,7 +1176,7 @@ DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
   // Similarly we need a global ref to arg2 instance of a local ref.
   helper->obj = (*jenv)->NewGlobalRef(jenv, arg2);
 
-  int retval = msat_set_termination_test(m_arg1, &call_java_termination_test, helper);
+  int retval = msat_set_termination_test(m_arg1, &call_java_termination_callback, helper);
   if (retval != 0) {
     const char *msg = msat_last_error_message(m_arg1);
     throwException(jenv, "java/lang/IllegalArgumentException", msg);
@@ -1189,10 +1189,10 @@ DEFINE_FUNC(long, 1set_1termination_1test) WITH_TWO_ARGS(jenv, object)
 // This method is not defined by Mathsat,
 // we need it to prevent a memory leak.
 // This may be called only after the environment with this termination test has been destroyed.
-DEFINE_FUNC(void, 1free_1termination_1test) WITH_ONE_ARG(long)
+DEFINE_FUNC(void, 1free_1termination_1callback) WITH_ONE_ARG(long)
   struct msat_callback_info *helper = (struct msat_callback_info *)(long)arg1;
   if (helper == NULL) {
-    throwException(jenv, "java/lang/NullPointerException", "TerminationTest may not be null");
+    throwException(jenv, "java/lang/NullPointerException", "TerminationCallback may not be null");
     return;
   }
 

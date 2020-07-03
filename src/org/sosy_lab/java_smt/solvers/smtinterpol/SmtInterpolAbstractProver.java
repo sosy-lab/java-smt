@@ -138,12 +138,10 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
       annotatedTerms.put(termName, t);
       env.assertTerm(annotated);
     }
-    if (!isUnsat()) {
-      return Optional.empty();
-    }
-    List<BooleanFormula> out = getUnsatCore0();
+    Optional<List<BooleanFormula>> result =
+        isUnsat() ? Optional.of(getUnsatCore0()) : Optional.empty();
     pop();
-    return Optional.of(out);
+    return result;
   }
 
   @Override

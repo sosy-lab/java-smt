@@ -70,8 +70,9 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
   @Test
   public void simpleTest() throws SolverException, InterruptedException {
-    // f := uf(v1, v3) XOR uf(v2, v4)
     requireIntegers();
+
+    // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -101,8 +102,9 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
   @Test
   public void nestedUfs() throws SolverException, InterruptedException {
-    // f := uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     requireIntegers();
+
+    // f := uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -137,8 +139,9 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
   @Test
   public void nestedUfs2() throws SolverException, InterruptedException {
-    // f := uf2(uf1(v1, uf2(v3, v6)), v3) < uf2(uf1(v2, uf2(v4, v5)), v4)
     requireIntegers();
+
+    // f := uf2(uf1(v1, uf2(v3, v6)), v3) < uf2(uf1(v2, uf2(v4, v5)), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
@@ -163,6 +166,34 @@ public class UfEliminationTest extends SolverBasedTest0 {
     IntegerFormula f2 = fmgr.callUF(uf2Decl, uf1b, variable4);
     BooleanFormula f = imgr.lessThan(f1, f2);
     BooleanFormula argsEqual = bmgr.and(v1EqualsV2, v3EqualsV4, v5EqualsV6);
+
+    BooleanFormula withOutUfs = ackermannization.eliminateUfs(f);
+    assertThatFormula(f).isSatisfiable(); // sanity check
+    assertThatFormula(withOutUfs).isSatisfiable();
+    assertThatFormula(bmgr.and(argsEqual, f)).isUnsatisfiable(); // sanity check
+    assertThatFormula(bmgr.and(argsEqual, withOutUfs)).isUnsatisfiable();
+
+    // check that UFs were really eliminated
+    Map<String, Formula> variablesAndUFs = mgr.extractVariablesAndUFs(withOutUfs);
+    Map<String, Formula> variables = mgr.extractVariables(withOutUfs);
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf1");
+    Truth.assertThat(variablesAndUFs).doesNotContainKey("uf2");
+    Truth.assertThat(variablesAndUFs).isEqualTo(variables);
+  }
+
+  @Test
+  public void nestedUfs3() throws SolverException, InterruptedException {
+    requireIntegers();
+
+    // f := uf(v1) < uf(v2)
+    IntegerFormula variable1 = imgr.makeVariable("variable1");
+    IntegerFormula variable2 = imgr.makeVariable("variable2");
+
+    FunctionDeclaration<IntegerFormula> ufDecl = fmgr.declareUF("uf", IntegerType, IntegerType);
+    IntegerFormula f1 = fmgr.callUF(ufDecl, variable1);
+    IntegerFormula f2 = fmgr.callUF(ufDecl, variable2);
+    BooleanFormula f = imgr.lessThan(f1, f2);
+    BooleanFormula argsEqual = imgr.equal(variable1, variable2);
 
     BooleanFormula withOutUfs = ackermannization.eliminateUfs(f);
     assertThatFormula(f).isSatisfiable(); // sanity check
@@ -221,6 +252,7 @@ public class UfEliminationTest extends SolverBasedTest0 {
   public void quantifierTest() {
     requireQuantifiers();
     requireIntegers();
+
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -244,8 +276,9 @@ public class UfEliminationTest extends SolverBasedTest0 {
 
   @Test
   public void substitutionTest() throws SolverException, InterruptedException {
-    // f := uf(v1, v3) \/ NOT(uf(v2, v4)))
     requireIntegers();
+
+    // f := uf(v1, v3) \/ NOT(uf(v2, v4)))
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
     IntegerFormula variable3 = imgr.makeVariable("variable3");
