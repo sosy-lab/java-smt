@@ -150,13 +150,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   public void unsatCoreWithAssumptionsNullTest() {
     assume()
         .withMessage(
-            "Solver %s does not support unsat core generation over assumptions",
-            solverToUse())
+            "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
         .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
 
-    try (
-        ProverEnvironment pe = context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+    try (ProverEnvironment pe =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }

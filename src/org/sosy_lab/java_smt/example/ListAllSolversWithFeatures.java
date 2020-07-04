@@ -47,16 +47,14 @@ import org.sosy_lab.java_smt.api.SolverException;
 // TODO: find shorter name
 public class ListAllSolversWithFeatures {
 
-  public static void main(String[] args)
-      throws SolverException, InterruptedException {
+  public static void main(String[] args) throws SolverException, InterruptedException {
 
     ListAllSolversWithFeatures listAllSolversWithFeatures = new ListAllSolversWithFeatures();
     String[][] infoArray = listAllSolversWithFeatures.getInformationForAllSolvers();
     listAllSolversWithFeatures.printGridToStdOut(infoArray);
   }
 
-  public ListAllSolversWithFeatures() {
-  }
+  public ListAllSolversWithFeatures() {}
 
   /**
    * Prints the infoArray to StdOut in a nice table using the formating method (through printf()).
@@ -109,10 +107,7 @@ public class ListAllSolversWithFeatures {
    * and columns of the later table. Columns represent (in order): Solver, Version, Theories,
    * Features. Rows represent the solvers available to the installed JavaSMT.
    */
-  private
-      String[][]
-      getInformationForAllSolvers()
-          throws SolverException, InterruptedException {
+  private String[][] getInformationForAllSolvers() throws SolverException, InterruptedException {
     List<String[]> info = new ArrayList<>();
     for (Solvers s : Solvers.values()) {
       String[] solverInfo = getSolverInformation(s);
@@ -129,13 +124,11 @@ public class ListAllSolversWithFeatures {
    *
    * @param solver to check for information. Taken from Solvers enum only.
    * @return String[] of length 4 of the solver you entered. Array content as String in the
-   *         following order: SolverName, SolverVersion, SolverTheories, SolverFeatures. String[]
-   *         length 0 if invalid solver.
+   *     following order: SolverName, SolverVersion, SolverTheories, SolverFeatures. String[] length
+   *     0 if invalid solver.
    */
-  private String[]
-      getSolverInformation(
-      Solvers solver)
-          throws SolverException, InterruptedException {
+  private String[] getSolverInformation(Solvers solver)
+      throws SolverException, InterruptedException {
     List<String> info = new ArrayList<>();
 
     Configuration config = Configuration.defaultConfiguration();
@@ -165,18 +158,14 @@ public class ListAllSolversWithFeatures {
    *
    * @param context SolverContext you want to check for features.
    * @return String with the features of the entered solver separated by a comma. Empty if none
-   *         available.
+   *     available.
    */
-  private String
-      getFeatures(
-      SolverContext context)
-      throws SolverException, InterruptedException {
+  private String getFeatures(SolverContext context) throws SolverException, InterruptedException {
     List<String> features = new ArrayList<>();
 
     // Optimization: Will throw UnsupportedOperationException in creation of prover if not
     // available.
-    try (
-        OptimizationProverEnvironment prover =
+    try (OptimizationProverEnvironment prover =
         context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       if (prover != null) {
         features.add("Optimization");
@@ -186,8 +175,7 @@ public class ListAllSolversWithFeatures {
 
     // Interpolation: Will throw UnsupportedOperationException in creation of prover if not
     // available.
-    try (
-        InterpolatingProverEnvironment<?> prover =
+    try (InterpolatingProverEnvironment<?> prover =
         context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
       if (prover != null) {
         features.add("Interpolation");
@@ -208,9 +196,8 @@ public class ListAllSolversWithFeatures {
     }
 
     // UnsatCoreOverAssumptions: throws NullPointerException if available.
-    try (
-        ProverEnvironment prover =
-            context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       prover.unsatCoreOverAssumptions(null);
     } catch (UnsupportedOperationException e) {
     } catch (NullPointerException e) {
@@ -221,20 +208,23 @@ public class ListAllSolversWithFeatures {
     // AllSat: All solvers support this through JavaSMT.
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT)) {
       try {
-        if (prover.allSat(new AllSatCallback<>() {
+        if (prover.allSat(
+                new AllSatCallback<>() {
 
-          List<List<BooleanFormula>> models = new ArrayList<>();
+                  List<List<BooleanFormula>> models = new ArrayList<>();
 
-          @Override
-          public void apply(List<BooleanFormula> pModel) {
-            models.add(pModel);
-          }
+                  @Override
+                  public void apply(List<BooleanFormula> pModel) {
+                    models.add(pModel);
+                  }
 
-          @Override
-          public List<List<BooleanFormula>> getResult() {
-            return models;
-          }
-        }, ImmutableList.of()) != null) {
+                  @Override
+                  public List<List<BooleanFormula>> getResult() {
+                    return models;
+                  }
+                },
+                ImmutableList.of())
+            != null) {
           features.add("AllSAT");
         }
       } catch (UnsupportedOperationException e) {
@@ -260,7 +250,7 @@ public class ListAllSolversWithFeatures {
    *
    * @param context JavaSMT SolverContext of the Solver you want to check for theories.
    * @return String of all supported theories except Booleans, separated by a comma. Empty if none
-   *         available.
+   *     available.
    */
   private String getTheories(SolverContext context) {
     List<String> theories = new ArrayList<>();
@@ -275,53 +265,53 @@ public class ListAllSolversWithFeatures {
     }
 
     try {
-    if (mgr.getBitvectorFormulaManager() != null) {
-      theories.add("Bitvector");
+      if (mgr.getBitvectorFormulaManager() != null) {
+        theories.add("Bitvector");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
-  try {
-    if (mgr.getRationalFormulaManager() != null) {
-      theories.add("Rational");
+    try {
+      if (mgr.getRationalFormulaManager() != null) {
+        theories.add("Rational");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
-  try {
-    if (mgr.getFloatingPointFormulaManager() != null) {
-      theories.add("Float");
+    try {
+      if (mgr.getFloatingPointFormulaManager() != null) {
+        theories.add("Float");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
-  try {
-    if (mgr.getArrayFormulaManager() != null) {
-      theories.add("Array");
+    try {
+      if (mgr.getArrayFormulaManager() != null) {
+        theories.add("Array");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
-  try {
-    if (mgr.getQuantifiedFormulaManager() != null) {
-      theories.add("Quantifier");
+    try {
+      if (mgr.getQuantifiedFormulaManager() != null) {
+        theories.add("Quantifier");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
-  try {
-    if (mgr.getUFManager() != null) {
-      theories.add("UF");
+    try {
+      if (mgr.getUFManager() != null) {
+        theories.add("UF");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
-  try {
-    if (mgr.getSLFormulaManager() != null) {
-      theories.add("Seperation-Logic");
+    try {
+      if (mgr.getSLFormulaManager() != null) {
+        theories.add("Seperation-Logic");
+      }
+    } catch (UnsupportedOperationException e) {
     }
-  } catch (UnsupportedOperationException e) {
-  }
 
     return String.join(",", theories);
   }
@@ -333,8 +323,7 @@ public class ListAllSolversWithFeatures {
    * @return length of String in column, but at least 8 (max length of the descriptor Strings).
    */
   private int lineLength(String[][] infoArray, int columnToCheck) {
-    if (columnToCheck > 3
-        || columnToCheck < 0) {
+    if (columnToCheck > 3 || columnToCheck < 0) {
       return 8;
     }
     int length = 8;
@@ -346,5 +335,4 @@ public class ListAllSolversWithFeatures {
     }
     return length;
   }
-
 }
