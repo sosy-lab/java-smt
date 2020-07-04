@@ -50,9 +50,9 @@ public class ListAllSolversWithFeatures {
   public static void main(String[] args)
       throws SolverException, InterruptedException {
 
-    ListAllSolversWithFeatures ListAllSolversWithFeatures = new ListAllSolversWithFeatures();
-    String[][] infoArray = ListAllSolversWithFeatures.getInformationForAllSolvers();
-    ListAllSolversWithFeatures.printGridToStdOut(infoArray);
+    ListAllSolversWithFeatures listAllSolversWithFeatures = new ListAllSolversWithFeatures();
+    String[][] infoArray = listAllSolversWithFeatures.getInformationForAllSolvers();
+    listAllSolversWithFeatures.printGridToStdOut(infoArray);
   }
 
   public ListAllSolversWithFeatures() {
@@ -113,7 +113,7 @@ public class ListAllSolversWithFeatures {
       String[][]
       getInformationForAllSolvers()
           throws SolverException, InterruptedException {
-    ArrayList<String[]> info = new ArrayList<>();
+    List<String[]> info = new ArrayList<>();
     for (Solvers s : Solvers.values()) {
       String[] solverInfo = getSolverInformation(s);
       if (solverInfo != null && solverInfo.length == 4) {
@@ -127,17 +127,16 @@ public class ListAllSolversWithFeatures {
    * Checks for solver-name, version, theories and features and packs them into a String[] of length
    * 4.
    *
-   * @param solver: solver to check for information. Taken from Solvers enum only.
+   * @param solver to check for information. Taken from Solvers enum only.
    * @return String[] of length 4 of the solver you entered. Array content as String in the
    *         following order: SolverName, SolverVersion, SolverTheories, SolverFeatures. String[]
    *         length 0 if invalid solver.
    */
-  @SuppressWarnings("javadoc")
   private String[]
       getSolverInformation(
       Solvers solver)
           throws SolverException, InterruptedException {
-    ArrayList<String> info = new ArrayList<>();
+    List<String> info = new ArrayList<>();
 
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = LogManager.createNullLogManager();
@@ -172,7 +171,7 @@ public class ListAllSolversWithFeatures {
       getFeatures(
       SolverContext context)
       throws SolverException, InterruptedException {
-    ArrayList<String> features = new ArrayList<>();
+    List<String> features = new ArrayList<>();
 
     // Optimization: Will throw UnsupportedOperationException in creation of prover if not
     // available.
@@ -264,7 +263,7 @@ public class ListAllSolversWithFeatures {
    *         available.
    */
   private String getTheories(SolverContext context) {
-    ArrayList<String> theories = new ArrayList<>();
+    List<String> theories = new ArrayList<>();
     FormulaManager mgr = context.getFormulaManager();
 
     // Every solver has to have Bool-Theory, should we add it?
