@@ -24,6 +24,7 @@ import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNS
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -258,63 +259,34 @@ public class ListAllSolversWithFeatures {
     FormulaManager mgr = context.getFormulaManager();
 
     // Every solver has to have Bool-Theory, should we add it?
-    try {
-      if (mgr.getIntegerFormulaManager() != null) {
-        theories.add("Integer");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getBitvectorFormulaManager() != null) {
-        theories.add("Bitvector");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getRationalFormulaManager() != null) {
-        theories.add("Rational");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getFloatingPointFormulaManager() != null) {
-        theories.add("Float");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getArrayFormulaManager() != null) {
-        theories.add("Array");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getQuantifiedFormulaManager() != null) {
-        theories.add("Quantifier");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getUFManager() != null) {
-        theories.add("UF");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
-
-    try {
-      if (mgr.getSLFormulaManager() != null) {
-        theories.add("Seperation-Logic");
-      }
-    } catch (UnsupportedOperationException e) {
-    }
+    addIfAvailable(theories, mgr::getIntegerFormulaManager, "Integer");
+    addIfAvailable(theories, mgr::getBitvectorFormulaManager, "Bitvector");
+    addIfAvailable(theories, mgr::getRationalFormulaManager, "Rational");
+    addIfAvailable(theories, mgr::getFloatingPointFormulaManager, "Float");
+    addIfAvailable(theories, mgr::getArrayFormulaManager, "Array");
+    addIfAvailable(theories, mgr::getQuantifiedFormulaManager, "Quantifier");
+    addIfAvailable(theories, mgr::getUFManager, "UF");
+    addIfAvailable(theories, mgr::getSLFormulaManager, "Seperation-Logic");
 
     return String.join(",", theories);
+  }
+
+  /**
+   * Try to construct an object and add its name to the list of theories. If an object cannot be
+   * constructed, we ignore it.
+   *
+   * @param names where to add the new name if available.
+   * @param creator creates the object, allowed to fail with {@link UnsupportedOperationException}.
+   * @param name the name to be added.
+   */
+  private void addIfAvailable(List<String> names, Supplier<Object> creator, String name) {
+    try {
+      if (creator.get() != null) {
+        names.add(name);
+      }
+    } catch (UnsupportedOperationException e) {
+      // ignore, theory is not supported.
+    }
   }
 
   /**
