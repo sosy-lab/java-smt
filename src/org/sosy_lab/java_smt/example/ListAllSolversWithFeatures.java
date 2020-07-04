@@ -50,7 +50,7 @@ public class ListAllSolversWithFeatures {
   public static void main(String[] args) throws SolverException, InterruptedException {
 
     ListAllSolversWithFeatures listAllSolversWithFeatures = new ListAllSolversWithFeatures();
-    String[][] infoArray = listAllSolversWithFeatures.getInformationForAllSolvers();
+    List<List<String>> infoArray = listAllSolversWithFeatures.getInformationForAllSolvers();
     listAllSolversWithFeatures.printGridToStdOut(infoArray);
   }
 
@@ -60,8 +60,8 @@ public class ListAllSolversWithFeatures {
    * Prints the infoArray to StdOut in a nice table using the formating method (through printf()).
    * Note that this conforms to the row/columns specified in getInformationForAllSolvers().
    */
-  private void printGridToStdOut(String[][] infoArray) {
-    if (infoArray == null || infoArray[0].length == 0) {
+  private void printGridToStdOut(List<List<String>> infoArray) {
+    if (infoArray == null || infoArray.get(0).size() == 0) {
       System.out.println("Could not find any installed SMT-Solvers.");
       return;
     }
@@ -95,8 +95,8 @@ public class ListAllSolversWithFeatures {
     System.out.printf(infoColumn, "Solver", "Version", "Theories", "Features");
     System.out.printf(seperatorColumn);
 
-    for (String[] s : infoArray) {
-      System.out.printf(infoColumn, s[0], s[1], s[2], s[3]);
+    for (List<String> s : infoArray) {
+      System.out.printf(infoColumn, s.get(0), s.get(1), s.get(2), s.get(3));
     }
 
     System.out.printf(seperatorColumn);
@@ -107,15 +107,16 @@ public class ListAllSolversWithFeatures {
    * and columns of the later table. Columns represent (in order): Solver, Version, Theories,
    * Features. Rows represent the solvers available to the installed JavaSMT.
    */
-  private String[][] getInformationForAllSolvers() throws SolverException, InterruptedException {
-    List<String[]> info = new ArrayList<>();
+  private List<List<String>> getInformationForAllSolvers()
+      throws SolverException, InterruptedException {
+    List<List<String>> info = new ArrayList<>();
     for (Solvers s : Solvers.values()) {
-      String[] solverInfo = getSolverInformation(s);
-      if (solverInfo != null && solverInfo.length == 4) {
+      List<String> solverInfo = getSolverInformation(s);
+      if (solverInfo != null && solverInfo.size() == 4) {
         info.add(solverInfo);
       }
     }
-    return info.toArray(new String[0][0]);
+    return info;
   }
 
   /**
@@ -127,7 +128,7 @@ public class ListAllSolversWithFeatures {
    *     following order: SolverName, SolverVersion, SolverTheories, SolverFeatures. String[] length
    *     0 if invalid solver.
    */
-  private String[] getSolverInformation(Solvers solver)
+  private List<String> getSolverInformation(Solvers solver)
       throws SolverException, InterruptedException {
     List<String> info = new ArrayList<>();
 
@@ -149,7 +150,7 @@ public class ListAllSolversWithFeatures {
       // Catches missing solvers
     }
 
-    return info.toArray(new String[0]);
+    return info;
   }
 
   /**
@@ -322,13 +323,13 @@ public class ListAllSolversWithFeatures {
    * @param columnToCheck column of the infoArray you want the length for.
    * @return length of String in column, but at least 8 (max length of the descriptor Strings).
    */
-  private int lineLength(String[][] infoArray, int columnToCheck) {
+  private int lineLength(List<List<String>> infoArray, int columnToCheck) {
     if (columnToCheck > 3 || columnToCheck < 0) {
       return 8;
     }
     int length = 8;
-    for (String[] s : infoArray) {
-      int checkedLength = s[columnToCheck].length();
+    for (List<String> s : infoArray) {
+      int checkedLength = s.get(columnToCheck).length();
       if (length < checkedLength) {
         length = checkedLength;
       }
