@@ -292,15 +292,16 @@ public class SolverOverviewTable {
             + "s |%n";
 
     private static final String SEPERATOR_LINE =
-        "+-"
-            + "-".repeat(SOLVER_COLUMN_WIDTH)
-            + "-+-"
-            + "-".repeat(VERSION_COLUMN_WIDTH)
-            + "-+-"
-            + "-".repeat(THEORIES_COLUMN_WIDTH)
-            + "-+-"
-            + "-".repeat(FEATURES_COLUMN_WIDTH)
-            + "-+%n";
+        String.format(
+            "+-"
+                + "-".repeat(SOLVER_COLUMN_WIDTH)
+                + "-+-"
+                + "-".repeat(VERSION_COLUMN_WIDTH)
+                + "-+-"
+                + "-".repeat(THEORIES_COLUMN_WIDTH)
+                + "-+-"
+                + "-".repeat(FEATURES_COLUMN_WIDTH)
+                + "-+%n");
 
     /** The constructor builds the header of the table. */
     RowBuilder() {
