@@ -21,12 +21,15 @@ package org.sosy_lab.java_smt.example;
 
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -52,41 +55,32 @@ public class ListAllSolversWithFeatures {
 
   public static void main(String[] args) throws SolverException, InterruptedException {
 
-    ListAllSolversWithFeatures laswf = new ListAllSolversWithFeatures();
-    RowBuilder rowBuilder = laswf.new RowBuilder();
-    laswf.getInformationForAllSolvers(rowBuilder);
-    System.out.println(rowBuilder.toString());
-  }
-
-  public ListAllSolversWithFeatures() {}
-
-  /**
-   * Gathers information about every available solver into a 2-Dimensional array representing rows
-   * and columns of the later table. Columns represent (in order): Solver, Version, Theories,
-   * Features. Rows represent the solvers available to the installed JavaSMT.
-   */
-  private void getInformationForAllSolvers(
-      RowBuilder rowBuilder)
-      throws SolverException, InterruptedException {
+    final List<SolverInfo> infos = new ArrayList<>();
     for (Solvers s : Solvers.values()) {
-      SolverInfo solverInfo = getSolverInformation(s);
+      SolverInfo solverInfo = new ListAllSolversWithFeatures().getSolverInformation(s);
       if (solverInfo != null) {
-        rowBuilder.addSolver(solverInfo);
+        infos.add(solverInfo);
       }
     }
+
+    infos.sort(Comparator.comparing(SolverInfo::getName)); // alphabetical ordering
+
+    RowBuilder rowBuilder = new RowBuilder();
+    for (SolverInfo info : infos) {
+      rowBuilder.addSolver(info);
+    }
+    System.out.println(rowBuilder);
   }
 
+  private ListAllSolversWithFeatures() {}
+
   /**
-   * Checks for solver-name, version, theories and features and packs them into a String[] of length
-   * 4.
+   * Checks for solver-name, version, theories and features.
    *
    * @param solver to check for information. Taken from Solvers enum only.
-   * @return String[] of length 4 of the solver you entered. Array content as String in the
-   *     following order: SolverName, SolverVersion, SolverTheories, SolverFeatures. String[] length
-   *     0 if invalid solver.
+   * @return Information about the solver you entered or NULL if the solver is not available.
    */
-  private SolverInfo getSolverInformation(
-      Solvers solver)
+  private @Nullable SolverInfo getSolverInformation(Solvers solver)
       throws SolverException, InterruptedException {
 
     Configuration config = Configuration.defaultConfiguration();
@@ -96,15 +90,11 @@ public class ListAllSolversWithFeatures {
     try (SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
 
-      Solvers name = solver;
-
       String version = context.getVersion();
-
       String theories = String.join(", ", getTheories(context));
-
       String features = String.join(", ", getFeatures(context));
 
-      return new SolverInfo(name, version, theories, features);
+      return new SolverInfo(solver, version, theories, features);
     } catch (InvalidConfigurationException e) {
       // Catches missing solvers
       return null;
@@ -119,6 +109,7 @@ public class ListAllSolversWithFeatures {
    * @return String with the features of the entered solver separated by a comma. Empty if none
    *     available.
    */
+  @SuppressWarnings("CheckReturnValue")
   private List<String> getFeatures(SolverContext context)
       throws SolverException, InterruptedException {
     List<String> features = new ArrayList<>();
@@ -175,16 +166,12 @@ public class ListAllSolversWithFeatures {
         if (prover.allSat(
                 new AllSatCallback<>() {
 
-                  List<List<BooleanFormula>> models = new ArrayList<>();
+                  @Override
+                  public void apply(List<BooleanFormula> pModel) {}
 
                   @Override
-                  public void apply(List<BooleanFormula> pModel) {
-                    models.add(pModel);
-                  }
-
-                  @Override
-                  public List<List<BooleanFormula>> getResult() {
-                    return models;
+                  public Void getResult() {
+                    return null;
                   }
                 },
                 ImmutableList.of())
@@ -253,11 +240,12 @@ public class ListAllSolversWithFeatures {
     }
   }
 
-  private class SolverInfo {
-    private Solvers solver;
-    private String solverVersion;
-    private String solverTheories;
-    private String solverFeatures;
+  /** just a wrapper for some data. */
+  private static class SolverInfo {
+    private final Solvers solver;
+    private final String solverVersion;
+    private final String solverTheories;
+    private final String solverFeatures;
 
     /**
      * Saves the information of an solver.
@@ -267,11 +255,7 @@ public class ListAllSolversWithFeatures {
      * @param solverTheories Solver theories.
      * @param solverFeatures Solver features.
      */
-    public SolverInfo(
-        Solvers solver,
-        String solverVersion,
-        String solverTheories,
-        String solverFeatures) {
+    SolverInfo(Solvers solver, String solverVersion, String solverTheories, String solverFeatures) {
       this.solver = solver;
       this.solverVersion = solverVersion;
       this.solverTheories = solverTheories;
@@ -295,16 +279,18 @@ public class ListAllSolversWithFeatures {
     }
   }
 
-  private class RowBuilder {
+  /** This class builds the table row-by-row. */
+  private static class RowBuilder {
+
     private List<String> lines = new ArrayList<>();
     // Minimum number of lines so that you can be sure a solver was added
-    private final int MIN_NUM_OF_LINES = 4;
-    private final int SOLVER_COLUMN_WIDTH = 15;
-    private final int VERSION_COLUMN_WIDTH = 40;
-    private final int THEORIES_COLUMN_WIDTH = 25;
-    private final int FEATURES_COLUMN_WIDTH = 25;
+    private static final int MIN_NUM_OF_LINES = 4;
+    private static final int SOLVER_COLUMN_WIDTH = 11;
+    private static final int VERSION_COLUMN_WIDTH = 38;
+    private static final int THEORIES_COLUMN_WIDTH = 30;
+    private static final int FEATURES_COLUMN_WIDTH = 30;
 
-    private String infoColumn =
+    private static final String INFO_COLUMN =
         "| %-"
             + SOLVER_COLUMN_WIDTH
             + "s | %-"
@@ -315,7 +301,7 @@ public class ListAllSolversWithFeatures {
             + FEATURES_COLUMN_WIDTH
             + "s |%n";
 
-    private String seperatorLine =
+    private static final String SEPERATOR_LINE =
         "+-"
             + "-".repeat(SOLVER_COLUMN_WIDTH)
             + "-+-"
@@ -326,73 +312,64 @@ public class ListAllSolversWithFeatures {
             + "-".repeat(FEATURES_COLUMN_WIDTH)
             + "-+%n";
 
-    /**
-     *
-     */
-    public RowBuilder() {
-      lines.add(String.format(seperatorLine));
-      lines.add(String.format(infoColumn, "Solver", "Version", "Theories", "Features"));
-      lines.add(String.format(seperatorLine));
+    /** The constructor builds the header of the table. */
+    RowBuilder() {
+      lines.add(String.format(SEPERATOR_LINE));
+      lines.add(String.format(INFO_COLUMN, "Solver", "Version", "Theories", "Features"));
+      lines.add(String.format(SEPERATOR_LINE));
     }
 
     /**
-     * Takes a SolverInfo object and splits it into lines which are added to the final String.
+     * Takes a SolverInfo object and splits it into multiple lines which are added to the row.
      *
      * @param solverInfo the solver with information you want added.
      */
     public void addSolver(SolverInfo solverInfo) {
-      List<String> nameLines = new LinkedList<>();
-      List<String> versionLines = getLines(solverInfo.getVersion(), VERSION_COLUMN_WIDTH);
-      List<String> TheoriesLines = getLines(solverInfo.getTheories(), THEORIES_COLUMN_WIDTH);
-      List<String> FeaturesLines = getLines(solverInfo.getFeatures(), FEATURES_COLUMN_WIDTH);
-
-      nameLines.add(solverInfo.getName());
+      List<String> nameLines = Lists.newArrayList(solverInfo.getName());
+      List<String> versionLines = formatLines(solverInfo.getVersion(), VERSION_COLUMN_WIDTH);
+      List<String> theoriesLines = formatLines(solverInfo.getTheories(), THEORIES_COLUMN_WIDTH);
+      List<String> featuresLines = formatLines(solverInfo.getFeatures(), FEATURES_COLUMN_WIDTH);
 
       int maxLines =
-          Math.max(Math.max(versionLines.size(), TheoriesLines.size()), FeaturesLines.size());
+          Math.max(Math.max(versionLines.size(), theoriesLines.size()), featuresLines.size());
 
+      // add empty lines where needed for the layout
       padLines(nameLines, maxLines);
       padLines(versionLines, maxLines);
-      padLines(TheoriesLines, maxLines);
-      padLines(FeaturesLines, maxLines);
+      padLines(theoriesLines, maxLines);
+      padLines(featuresLines, maxLines);
 
+      // build the full lines for this row
       for (int i = 0; i < maxLines; i++) {
         String nameL = nameLines.get(i);
         String versionL = versionLines.get(i);
-        String theoriesL = TheoriesLines.get(i);
-        String featuresL = FeaturesLines.get(i);
+        String theoriesL = theoriesLines.get(i);
+        String featuresL = featuresLines.get(i);
 
-        lines.add(String.format(infoColumn, nameL, versionL, theoriesL, featuresL));
+        lines.add(String.format(INFO_COLUMN, nameL, versionL, theoriesL, featuresL));
       }
 
-      lines.add(String.format(seperatorLine));
+      lines.add(String.format(SEPERATOR_LINE));
     }
 
+    /** Add as many empty lines as needed to fulfill the amount of lines. */
     private void padLines(List<String> linesToPad, int amountOfLines) {
-      if (linesToPad.size() == amountOfLines) {
-        return;
-      }
-      int loop = amountOfLines - linesToPad.size();
-      for (int i = 0; i < loop; i++) {
-        if (Math.floorMod(i, 2) == 1) {
-          linesToPad.add(0, "");
-        } else {
-          linesToPad.add(linesToPad.size(), "");
-        }
+      int numMissingLines = amountOfLines - linesToPad.size();
+      for (int i = 0; i < numMissingLines; i++) {
+        linesToPad.add("");
       }
     }
 
-    private List<String> getLines(String lineToSplit, int maxLength) {
-      List<String> versionSplit =
-          new LinkedList<>(Arrays.asList(lineToSplit.split(" ")));
-      List<String> versionLines = new LinkedList<>();
+    /** split a String into multiple lines where each is shorter than the given maxLength. */
+    private List<String> formatLines(String lineToSplit, int maxLength) {
+      List<String> versionSplit = Splitter.on(" ").splitToList(lineToSplit);
+      List<String> versionLines = new ArrayList<>();
       String line = versionSplit.get(0);
       int lineCounter = line.length();
-      for (int i = 1; i < versionSplit.size(); i++) {
-        String current = versionSplit.get(i);
+      for (String current : Iterables.skip(versionSplit, 1)) {
         lineCounter += current.length() + 1;
 
-        if ((lineCounter - 1) > maxLength - 1) {
+        if (lineCounter > maxLength) {
           lineCounter = current.length() + 1;
           versionLines.add(line);
           line = current;
@@ -411,6 +388,5 @@ public class ListAllSolversWithFeatures {
       }
       return String.join("", lines);
     }
-
   }
 }
