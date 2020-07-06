@@ -107,7 +107,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return "Princess (" + ap.SimpleAPI.version() + ")";
+    return "Princess " + ap.SimpleAPI.version();
   }
 
   @Override
