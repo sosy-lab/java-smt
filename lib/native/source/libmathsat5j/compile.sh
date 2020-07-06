@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # This script builds either libmathsat5j.so (bindings to mathsat5), or
 # liboptimathsat5j.so (bindings to optimathsat5).
 # In future, mathsat5 and optimathsat should merge, making the switching

@@ -1,3 +1,11 @@
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
+
 #include <stdlib.h>
 #include <jni.h>
 #include <gmp.h>
@@ -471,4 +479,4 @@ typedef jint jjnodetag;
   TERM_ARG(1) \
   CALL1(type_t, term_is_##name) \
   BOOLEAN_RETURN
-  
+
