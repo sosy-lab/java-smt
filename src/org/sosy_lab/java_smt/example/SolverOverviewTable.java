@@ -304,9 +304,9 @@ public class SolverOverviewTable {
 
     /** The constructor builds the header of the table. */
     RowBuilder() {
-      lines.add(String.format(SEPERATOR_LINE));
+      lines.add(SEPERATOR_LINE);
       lines.add(String.format(INFO_COLUMN, "Solver", "Version", "Theories", "Features"));
-      lines.add(String.format(SEPERATOR_LINE));
+      lines.add(SEPERATOR_LINE);
     }
 
     /**
@@ -339,7 +339,7 @@ public class SolverOverviewTable {
         lines.add(String.format(INFO_COLUMN, nameL, versionL, theoriesL, featuresL));
       }
 
-      lines.add(String.format(SEPERATOR_LINE));
+      lines.add(SEPERATOR_LINE);
     }
 
     /** Add as many empty lines as needed to fulfill the amount of lines. */
