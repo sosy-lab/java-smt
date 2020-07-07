@@ -26,8 +26,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -40,7 +38,6 @@ import org.sosy_lab.java_smt.api.SolverException;
  * This program takes all installed solvers and checks them for version, theories and features and
  * prints them to StdOut in a nice table.
  */
-// TODO: find shorter name
 public class SolverOverviewTable {
 
   public static void main(String[] args) throws SolverException, InterruptedException {
@@ -127,7 +124,6 @@ public class SolverOverviewTable {
     }
 
     // UnsatCore: throws UnsupportedOperationException if not available.
-    // TODO: check behavior with null argument properly
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       if (prover.getUnsatCore() != null) {
@@ -136,6 +132,8 @@ public class SolverOverviewTable {
     } catch (UnsupportedOperationException e) {
       // ignore, feature is not supported.
     } catch (Exception e) {
+      // UnsatCore throws different Exceptions in some solvers because we use native Exceptions. As
+      // long as its not UnsupportedOperationException UnsatCore is supported.
       features.add("UnsatCore");
     }
 
@@ -149,29 +147,8 @@ public class SolverOverviewTable {
       features.add("UnsatCore /w Assumption");
     }
 
-    // TODO: Remove or rework to check if solver overrides!
-    // AllSat: All solvers support this through JavaSMT.
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT)) {
-      try {
-        if (prover.allSat(
-                new AllSatCallback<>() {
-
-                  @Override
-                  public void apply(List<BooleanFormula> pModel) {}
-
-                  @Override
-                  public Void getResult() {
-                    return null;
-                  }
-                },
-                ImmutableList.of())
-            != null) {
-          features.add("AllSAT");
-        }
-      } catch (UnsupportedOperationException e) {
-        // ignore, feature is not supported.
-      }
-    }
+    // There is currently no good way of checking if a solver implements AllSat over our
+    // implementation
 
     // We don't care about the return value, just that it doesn't throw an
     // UnsupportedOperationException.
@@ -241,9 +218,9 @@ public class SolverOverviewTable {
      * Saves the information of an solver.
      *
      * @param solver Solvers enum object for a solver.
-     * @param solverVersion Solver version.
-     * @param solverTheories Solver theories.
-     * @param solverFeatures Solver features.
+     * @param solverVersion Solver version String.
+     * @param solverTheories Solver theories String.
+     * @param solverFeatures Solver features String.
      */
     SolverInfo(Solvers solver, String solverVersion, String solverTheories, String solverFeatures) {
       this.solver = solver;
