@@ -4,7 +4,7 @@
 //
 // SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Unlicense OR Apache-2.0 OR MIT
 
 package org.sosy_lab.java_smt.example;
 
