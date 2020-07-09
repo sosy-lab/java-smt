@@ -7,9 +7,27 @@
     <property file="build.properties"/>
     <property environment="env"/>
 
-    <property name="ivy.configurations" value="build, runtime, test, format-source, checkstyle, spotbugs"/>
+    <!-- Yices2 is under GPL3 and has to be seperated from Apache2-licensed software. -->
+    <property name="yices2Sources" value="org/sosy_lab/java_smt/solvers/yices2/**.java"/>
+    <property name="yices2Classes" value="org/sosy_lab/java_smt/solvers/yices2/**.class"/>
+
+    <!-- one configuration per solver -->
+    <property name="ivy.solver.configurations" value="
+        runtime-boolector,
+        runtime-cvc4,
+        runtime-mathsat,
+        runtime-optimathsat,
+        runtime-princess,
+        runtime-smtinterpol,
+        runtime-yices2,
+        runtime-z3
+    "/>
+    <property name="ivy.configurations" value="build, core, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
-    <property name="jar.excludes" value=""/>
+    <property name="jar.libdir" value="core"/> <!-- only include the minimal set of libraries in the classpath of the JAR-MANIFEST -->
+    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes}"/>
+    <property name="jar.sources.excludes" value="**/*Test.java ${yices2Sources}"/>
+    <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
     <property name="documentation.javadoc.exclude" value="org/sosy_lab/java_smt/solvers/**/*"/>
 
@@ -38,7 +56,7 @@
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
     </path>
 
     <!-- Needs to include all annotation processors and error-prone -->
@@ -61,7 +79,7 @@
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
-    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version to Ivy repository"/>
+    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version of JavaSMT to Ivy repository" />
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 

@@ -29,7 +29,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/guava.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/core/guava.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
@@ -40,7 +40,25 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/common.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/test/checker-compat-qual.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/test/diffutils.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/core/common.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
@@ -104,6 +122,39 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/core/checker-qual.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/checker-qual-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/core/spotbugs-annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/spotbugs-annotations-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/core/spotbugs-annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/spotbugs-annotations-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/test/truth-java8-extension.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -115,7 +166,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/smtinterpol.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/smtinterpol.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
@@ -131,18 +182,45 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/princess-assertionless.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess_2.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/princess-sources-assertionless.zip!/" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/princess_2.13-sources.zip!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/scala-library.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser_2.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-smt-parser_2.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/scala-library.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/java-cup-runtime.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -189,7 +267,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/smt-parser.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/smt-parser.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -198,7 +276,16 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime/com.microsoft.z3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-z3/com.microsoft.z3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc4/CVC4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

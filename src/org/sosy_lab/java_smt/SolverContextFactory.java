@@ -55,6 +55,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 
 /**
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
@@ -71,7 +72,8 @@ public class SolverContextFactory {
     Z3,
     PRINCESS,
     BOOLECTOR,
-    CVC4
+    CVC4,
+    YICES2
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -242,6 +244,9 @@ public class SolverContextFactory {
       case PRINCESS:
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+
+      case YICES2:
+        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier);
 
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, (int) randomSeed);

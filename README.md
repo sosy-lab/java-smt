@@ -33,12 +33,13 @@ JavaSMT can express formulas in the following theories:
  - Uninterpreted Function
 
 Currently JavaSMT support several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
- - [MathSAT5](http://mathsat.fbk.eu/)
- - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
- - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
- - [Z3](https://github.com/Z3Prover/z3)
- - [CVC4](https://cvc4.github.io/)
  - [Boolector](https://boolector.github.io/)
+ - [CVC4](https://cvc4.github.io/)
+ - [MathSAT5](http://mathsat.fbk.eu/)
+ - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
+ - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
+ - [Yices2](https://yices.csl.sri.com/)
+ - [Z3](https://github.com/Z3Prover/z3)
 
 The following features are supported (depending on the used SMT solver):
 

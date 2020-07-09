@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-yices2">
+        <license name="Apache2 and GNU GPLv3" url="https://github.com/SRI-CSL/yices2/blob/master/LICENSE.txt"/>
+        <description>
+            JavaSMT components for the Yices2 solver.
+            Seperated from the main package of JavaSMT because of the licence.
+        </description>
+    </info>
+
+    <configurations>
+      <conf name="runtime"/>
+      <conf name="sources" description="sources of JavaSMT's component for Yices2" />
+    </configurations>
+
+    <publications defaultconf="runtime">
+        <artifact />
+        <artifact conf="sources" type="source" e:classifier="sources" ext="jar"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-89-g0f77dc4b" conf="runtime->solver-yices2" />
+
+        <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
+
+        <!-- SoSy-Lab Common Library -->
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-420-gef84297" conf="runtime->runtime; sources->sources"/>
+
+        <!-- Google Core Libraries for Java
+             Contains a lot of helpful data structures. -->
+        <dependency org="com.google.guava" name="guava" rev="29.0-jre" conf="runtime->default; sources->sources"/>
+
+        <!-- Annotations we use for @Nullable etc. -->
+        <dependency org="org.checkerframework" name="checker-qual" rev="2.5.2" conf="runtime->default; sources->sources"/>
+
+    </dependencies>
+
+</ivy-module>

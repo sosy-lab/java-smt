@@ -29,7 +29,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_version;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_test;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_callback;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -57,7 +57,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationTest;
+import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationCallback;
 
 public final class Mathsat5SolverContext extends AbstractSolverContext {
 
@@ -107,7 +107,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private final long randomSeed;
 
   private final ShutdownNotifier shutdownNotifier;
-  private final TerminationTest terminationTest;
+  private final TerminationCallback terminationTest;
   private final Mathsat5FormulaCreator creator;
   private boolean closed = false;
 
@@ -296,7 +296,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   long addTerminationTest(long env) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return msat_set_termination_test(env, terminationTest);
+    return msat_set_termination_callback(env, terminationTest);
   }
 
   @Override

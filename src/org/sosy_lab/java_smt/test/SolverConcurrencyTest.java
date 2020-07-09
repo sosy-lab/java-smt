@@ -126,28 +126,34 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support concurrent solving in multiple stacks")
         .that(solver)
         .isNoneOf(
-            Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.Z3, Solvers.PRINCESS);
+            Solvers.SMTINTERPOL,
+            Solvers.BOOLECTOR,
+            Solvers.MATHSAT5,
+            Solvers.Z3,
+            Solvers.PRINCESS,
+            Solvers.YICES2);
   }
 
   private void requireIntegers() {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
   }
 
   private void requireBitvectors() {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNotEqualTo(Solvers.SMTINTERPOL);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2);
   }
 
   private void requireOptimization() {
     assume()
         .withMessage("Solver does not support optimization")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4);
+        .isNoneOf(
+            Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2);
   }
 
   /**

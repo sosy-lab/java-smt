@@ -60,7 +60,13 @@ case "$platform" in
     ;;
 esac
 
-export CLASSPATH="$CLASSPATH:$PATH_TO_JAVASMT/bin:$PATH_TO_JAVASMT/JAVASMT.jar:$PATH_TO_JAVASMT/lib/*:$PATH_TO_JAVASMT/lib/java/runtime/*"
+# build the classpath including all solvers
+CLASSPATH="$CLASSPATH:$PATH_TO_JAVASMT/bin:$PATH_TO_JAVASMT/lib/java/core/*"
+SOLVERS="boolector cvc4 mathsat optimathsat princess smtinterpol yices2 z3"
+for solver in $SOLVERS ; do
+  CLASSPATH="$CLASSPATH:$PATH_TO_JAVASMT/lib/java/runtime-$solver/*"
+done
+export CLASSPATH="$CLASSPATH"
 
 # Run Examples for Java-SMT.
 # PerfDisableSharedMem avoids hsperfdata in /tmp (disable it to connect easily with VisualConsole and Co.).

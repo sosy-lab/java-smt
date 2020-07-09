@@ -277,6 +277,43 @@ public class SolverStackTest extends SolverBasedTest0 {
     assertThrows(RuntimeException.class, stack::pop);
   }
 
+  @Test
+  public void stackTestUnsat() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+    assertThat(stack).isSatisfiable();
+    stack.push();
+    stack.addConstraint(bmgr.makeFalse());
+    assertThat(stack).isUnsatisfiable();
+    stack.push();
+    stack.addConstraint(bmgr.makeFalse());
+    assertThat(stack).isUnsatisfiable();
+    stack.pop();
+    assertThat(stack).isUnsatisfiable();
+    stack.pop();
+    assertThat(stack).isSatisfiable();
+  }
+
+  @Test
+  public void stackTestUnsat2() throws InterruptedException, SolverException {
+    BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
+    assertThat(stack).isSatisfiable();
+    stack.push();
+    stack.addConstraint(bmgr.makeTrue());
+    assertThat(stack).isSatisfiable();
+    stack.push();
+    stack.addConstraint(bmgr.makeFalse());
+    assertThat(stack).isUnsatisfiable();
+    stack.push();
+    stack.addConstraint(bmgr.makeFalse());
+    assertThat(stack).isUnsatisfiable();
+    stack.pop();
+    assertThat(stack).isUnsatisfiable();
+    stack.pop();
+    assertThat(stack).isSatisfiable();
+    stack.pop();
+    assertThat(stack).isSatisfiable();
+  }
+
   /** Create a symbol on a level and pop this level. Symbol must remain valid and usable! */
   @SuppressWarnings("unused")
   @Test

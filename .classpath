@@ -2,30 +2,30 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="bin/"/>
-	<classpathentry kind="lib" path="lib/java/runtime/guava.jar" sourcepath="lib/java-contrib/guava-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/guava.jar" sourcepath="lib/java-contrib/guava-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/guava-testlib.jar" sourcepath="lib/java-contrib/guava-testlib-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth.jar" sourcepath="lib/java-contrib/truth-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/junit.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/hamcrest-core.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/spotbugs-annotations.jar" sourcepath="lib/java-contrib/spotbugs-annotations-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/jsr305.jar" sourcepath="lib/java-contrib/jsr305-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/spotbugs-annotations.jar" sourcepath="lib/java-contrib/spotbugs-annotations-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/jsr305.jar" sourcepath="lib/java-contrib/jsr305-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/auto-value-annotations.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/princess_2.13.jar" sourcepath="lib/java-contrib/princess_2.13-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/scala-library.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/princess-smt-parser_2.13.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/java-cup-runtime.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/com.microsoft.z3.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/CVC4.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-smtinterpol/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/princess_2.13.jar" sourcepath="lib/java-contrib/princess_2.13-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/scala-library.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/princess-smt-parser_2.13.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/java-cup-runtime.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-z3/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-cvc4/CVC4.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/runtime/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/diffutils.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
 		<attributes>
 			<attribute name="module" value="true"/>
-			<attribute name="limit-modules" value="java.base,java.logging"/>
+			<attribute name="limit-modules" value="java.compiler,java.logging,java.management"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path=".apt-generated">

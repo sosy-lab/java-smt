@@ -132,39 +132,42 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireBitvectors();
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
-    BitvectorFormula y = bvmgr.makeVariable(bv8, "y");
-    BitvectorFormula z = bvmgr.add(y, bvmgr.makeBitvector(8, 13));
+    BitvectorFormula y1 = bvmgr.makeVariable(bv8, "y");
+    BitvectorFormula y2 = bvmgr.add(y1, bvmgr.makeBitvector(8, 13));
+    BitvectorFormula y3 = bvmgr.makeBitvector(8, 13);
 
-    for (Formula f :
-        ImmutableList.of(
-            bvmgr.equal(x, y),
-            bmgr.not(bvmgr.equal(x, z)),
-            bvmgr.add(x, y),
-            bvmgr.subtract(x, y),
-            bvmgr.multiply(x, y),
-            bvmgr.and(x, y),
-            bvmgr.or(x, y),
-            bvmgr.xor(x, y),
-            bvmgr.lessThan(x, y, true),
-            bvmgr.lessThan(x, y, false),
-            bvmgr.lessOrEquals(x, y, true),
-            bvmgr.lessOrEquals(x, y, false),
-            bvmgr.greaterThan(x, y, true),
-            bvmgr.greaterThan(x, y, false),
-            bvmgr.greaterOrEquals(x, y, true),
-            bvmgr.greaterOrEquals(x, y, false),
-            bvmgr.divide(x, y, true),
-            bvmgr.divide(x, y, false),
-            bvmgr.modulo(x, y, true),
-            bvmgr.modulo(x, y, false),
-            bvmgr.not(x),
-            bvmgr.negate(x),
-            bvmgr.extract(x, 7, 5, true),
-            bvmgr.extract(x, 7, 5, false),
-            bvmgr.concat(x, y))) {
-      mgr.visit(f, new FunctionDeclarationVisitor());
-      Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
-      assertThat(f2).isEqualTo(f);
+    for (BitvectorFormula y : new BitvectorFormula[] {y1, y2, y3}) {
+      for (Formula f :
+          ImmutableList.of(
+              bvmgr.equal(x, y),
+              bmgr.not(bvmgr.equal(x, y)),
+              bvmgr.add(x, y),
+              bvmgr.subtract(x, y),
+              bvmgr.multiply(x, y),
+              bvmgr.and(x, y),
+              bvmgr.or(x, y),
+              bvmgr.xor(x, y),
+              bvmgr.lessThan(x, y, true),
+              bvmgr.lessThan(x, y, false),
+              bvmgr.lessOrEquals(x, y, true),
+              bvmgr.lessOrEquals(x, y, false),
+              bvmgr.greaterThan(x, y, true),
+              bvmgr.greaterThan(x, y, false),
+              bvmgr.greaterOrEquals(x, y, true),
+              bvmgr.greaterOrEquals(x, y, false),
+              bvmgr.divide(x, y, true),
+              bvmgr.divide(x, y, false),
+              bvmgr.modulo(x, y, true),
+              bvmgr.modulo(x, y, false),
+              bvmgr.not(x),
+              bvmgr.negate(x),
+              bvmgr.extract(x, 7, 5, true),
+              bvmgr.extract(x, 7, 5, false),
+              bvmgr.concat(x, y))) {
+        mgr.visit(f, new FunctionDeclarationVisitor());
+        Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+        assertThat(f2).isEqualTo(f);
+      }
     }
   }
 
@@ -192,6 +195,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_NEGATIVE),
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
       mgr.visit(f, new FunctionDeclarationVisitor());
+      Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
     }
   }
 
@@ -238,6 +243,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     for (Formula f : ImmutableList.of(bvmgr.extend(x, 10, true), bvmgr.extend(x, 10, false))) {
       mgr.visit(f, new FunctionDeclarationVisitor());
+      Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
     }
   }
 

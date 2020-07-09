@@ -26,7 +26,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_chec
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_test;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_callback;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
@@ -176,7 +176,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public void close() {
     if (!closed) {
       msat_destroy_env(curEnv);
-      msat_free_termination_test(terminationTest);
+      msat_free_termination_callback(terminationTest);
       msat_destroy_config(curConfig);
       closed = true;
     }

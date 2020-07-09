@@ -49,7 +49,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   // Boolector, CVC4, SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4);
+      ImmutableSet.of(
+          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolvers() {
@@ -225,6 +226,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   public void testDivision() throws SolverException, InterruptedException {
     T a = nmgr.makeVariable("a");
 
+    // (a == 2) && (3 == 6 / a)
     BooleanFormula f =
         bmgr.and(
             nmgr.equal(a, nmgr.makeNumber(2)),

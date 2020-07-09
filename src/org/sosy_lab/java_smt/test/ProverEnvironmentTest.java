@@ -111,7 +111,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void unsatCoreTestItp() throws SolverException, InterruptedException {
+  public void unsatCoreTestForInterpolation() throws SolverException, InterruptedException {
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {

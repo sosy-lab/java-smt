@@ -196,6 +196,15 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requireBitvectorToInt() {
+    assume()
+        .withMessage(
+            "Solver %s does not yet support the conversion between bitvectors and integers",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+  }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
@@ -246,7 +255,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
   }
 
   protected void requireModel() {
