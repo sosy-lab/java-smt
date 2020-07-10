@@ -1,4 +1,13 @@
 #!/bin/bash
+
+# This file is part of SoSy-Lab Java-Project Template,
+# a collection of common files and build definitions for Java projects:
+# https://gitlab.com/sosy-lab/software/java-project-template
+#
+# SPDX-FileCopyrightText: 2018-2020 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 set -e # exit with nonzero exit code if anything fails
 
 # DO NOT EDIT LOCALLY!

@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 if [ `uname` = "Darwin" ] ; then
   echo "-I/usr/local/include -I/sw/include -I/System/Library/Frameworks/JavaVM.framework/Headers"
   LINK_OPT="-dynamiclib -o libJOct.jnilib"

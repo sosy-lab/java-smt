@@ -1,12 +1,11 @@
-/*
- *  JavaSMT is an API wrapper for a collection of SMT solvers.
- *  This file is part of JavaSMT.
- *
- *  Copyright (C) 2007-2020  Dirk Beyer
- *  All rights reserved.
- *
- *  SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
- */
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// Copyright (C) 2007-2020  Dirk Beyer
+// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
 
 #include<stdint.h>
 
@@ -1601,7 +1600,7 @@ INT_RETURN
 
 /*
  * The function first checks whether f is satisifiable or unsatisfiable.
- * 
+ *
  */
 DEFINE_FUNC(int, 1check_1formula) WITH_FOUR_ARGS(jterm, string, jmodel, string)
 TERM_ARG(1)

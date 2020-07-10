@@ -1,3 +1,16 @@
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// This file is based on "btortypes.h" from Boolector.
+//
+// SPDX-FileCopyrightText: 2007-2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2015-2020 Mathias Preiner
+// SPDX-FileCopyrightText: 2016 Armin Biere
+// SPDX-FileCopyrightText: 2016-2020 Aina Niemetz
+//
+// SPDX-License-Identifier: MIT AND Apache-2.0
+
 package org.sosy_lab.java_smt.solvers.boolector;
 
 /** We keep this synchronized with "btortypes.h". */
