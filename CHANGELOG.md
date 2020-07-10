@@ -10,7 +10,7 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
-## JavaSMT 3.6
+## JavaSMT 3.6.0
 
 ### News on Solvers:
  - a new solver is available: Yices 2.6.2
