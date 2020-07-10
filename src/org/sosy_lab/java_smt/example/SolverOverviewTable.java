@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.example;
 
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -44,10 +45,7 @@ public class SolverOverviewTable {
 
     final List<SolverInfo> infos = new ArrayList<>();
     for (Solvers s : Solvers.values()) {
-      SolverInfo solverInfo = new SolverOverviewTable().getSolverInformation(s);
-      if (solverInfo != null) {
-        infos.add(solverInfo);
-      }
+      infos.add(new SolverOverviewTable().getSolverInformation(s));
     }
 
     infos.sort(Comparator.comparing(SolverInfo::getName)); // alphabetical ordering
@@ -84,7 +82,7 @@ public class SolverOverviewTable {
       return new SolverInfo(solver, version, theories, features);
     } catch (InvalidConfigurationException e) {
       // Catches missing solvers
-      return null;
+      return new SolverInfo(solver, "NOT AVAILABLE", "", "");
     }
   }
 
@@ -105,9 +103,8 @@ public class SolverOverviewTable {
     // available.
     try (OptimizationProverEnvironment prover =
         context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      if (prover != null) {
-        features.add("Optimization");
-      }
+      Preconditions.checkNotNull(prover);
+      features.add("Optimization");
     } catch (UnsupportedOperationException e) {
       // ignore, feature is not supported.
     }
@@ -116,9 +113,8 @@ public class SolverOverviewTable {
     // available.
     try (InterpolatingProverEnvironment<?> prover =
         context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
-      if (prover != null) {
-        features.add("Interpolation");
-      }
+      Preconditions.checkNotNull(prover);
+      features.add("Interpolation");
     } catch (UnsupportedOperationException e) {
       // ignore, feature is not supported.
     }
@@ -137,25 +133,21 @@ public class SolverOverviewTable {
     // UnsatCoreOverAssumptions: throws NullPointerException if available.
     try (ProverEnvironment prover =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
-      prover.unsatCoreOverAssumptions(null);
+      prover.unsatCoreOverAssumptions(ImmutableList.of());
+      features.add("UnsatCore /w Assumption");
     } catch (UnsupportedOperationException e) {
       // ignore, feature is not supported.
-    } catch (NullPointerException e) {
-      features.add("UnsatCore /w Assumption");
     }
 
     // UnsatCore: throws UnsupportedOperationException if not available.
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
-      if (prover.getUnsatCore() != null) {
-        features.add("UnsatCore");
-      }
+      prover.push(context.getFormulaManager().getBooleanFormulaManager().makeFalse());
+      Preconditions.checkState(prover.isUnsat());
+      Preconditions.checkNotNull(prover.getUnsatCore());
+      features.add("UnsatCore");
     } catch (UnsupportedOperationException e) {
       // ignore, feature is not supported.
-    } catch (Exception e) {
-      // UnsatCore throws different Exceptions in some solvers because we use native Exceptions. As
-      // long as its not UnsupportedOperationException UnsatCore is supported.
-      features.add("UnsatCore");
     }
 
     // There is currently no good way of checking if a solver implements AllSat over our
