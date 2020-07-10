@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
@@ -132,6 +133,20 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
         .containsExactly(
             imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
             imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+  }
+
+  @Test
+  public void unsatCoreWithAssumptionsNullTest() {
+    assume()
+        .withMessage(
+            "Solver %s does not support unsat core generation over assumptions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
+
+    try (ProverEnvironment pe =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
+    }
   }
 
   @Test

@@ -79,7 +79,7 @@ export CLASSPATH="$CLASSPATH"
 # Run Examples for Java-SMT.
 # PerfDisableSharedMem avoids hsperfdata in /tmp (disable it to connect easily with VisualConsole and Co.).
 
-for EXAMPLE in AllSatExample HoudiniApp Interpolation OptimizationFormulaWeights OptimizationIntReal; do
+for EXAMPLE in AllSatExample HoudiniApp Interpolation OptimizationFormulaWeights OptimizationIntReal SolverOverviewTable; do
   echo "####################################################"
   echo "#  executing example $EXAMPLE"
   echo "####################################################"
