@@ -36,8 +36,10 @@ SPDX-License-Identifier: Apache-2.0
             />
         <echo>
             You now want to run
-            svn add repository/${ivy.organisation}/${ivy.module}/*-${version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${version} of ${ant.project.name}"
+            cd repository/${ivy.organisation}/${ivy.module}
+            svn add *-${version}*
+            svn ci -m"publish version ${version} of ${ant.project.name}"
+            cd -
             to make the new version publicly available.</echo>
     </target>
 </project>
