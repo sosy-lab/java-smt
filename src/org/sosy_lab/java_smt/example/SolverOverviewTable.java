@@ -123,6 +123,27 @@ public class SolverOverviewTable {
       // ignore, feature is not supported.
     }
 
+    // We don't care about the return value, just that it doesn't throw an
+    // UnsupportedOperationException.
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      try {
+        prover.isUnsatWithAssumptions(ImmutableList.of());
+        features.add("Assumptions");
+      } catch (UnsupportedOperationException e) {
+        // ignore, feature is not supported.
+      }
+    }
+
+    // UnsatCoreOverAssumptions: throws NullPointerException if available.
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      prover.unsatCoreOverAssumptions(null);
+    } catch (UnsupportedOperationException e) {
+      // ignore, feature is not supported.
+    } catch (NullPointerException e) {
+      features.add("UnsatCore /w Assumption");
+    }
+
     // UnsatCore: throws UnsupportedOperationException if not available.
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
@@ -137,29 +158,8 @@ public class SolverOverviewTable {
       features.add("UnsatCore");
     }
 
-    // UnsatCoreOverAssumptions: throws NullPointerException if available.
-    try (ProverEnvironment prover =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
-      prover.unsatCoreOverAssumptions(null);
-    } catch (UnsupportedOperationException e) {
-      // ignore, feature is not supported.
-    } catch (NullPointerException e) {
-      features.add("UnsatCore /w Assumption");
-    }
-
     // There is currently no good way of checking if a solver implements AllSat over our
     // implementation
-
-    // We don't care about the return value, just that it doesn't throw an
-    // UnsupportedOperationException.
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      try {
-        prover.isUnsatWithAssumptions(ImmutableList.of());
-        features.add("Assumptions");
-      } catch (UnsupportedOperationException e) {
-        // ignore, feature is not supported.
-      }
-    }
 
     return features;
   }
