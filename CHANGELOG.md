@@ -10,6 +10,14 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.6
+
+### News on Solvers:
+ - a new solver is available: Yices 2.6.2
+
+### Licensing:
+ - JavaSMT is now [REUSE](https://reuse.software/) compatible.
+
 ## JavaSMT 3.5.1
 
 ### Improvements and Fixes:
