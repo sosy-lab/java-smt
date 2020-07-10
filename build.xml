@@ -31,9 +31,9 @@ SPDX-License-Identifier: Apache-2.0
         runtime-yices2,
         runtime-z3
     "/>
-    <property name="ivy.configurations" value="build, core, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
+    <property name="ivy.configuration.main" value="core"/>
+    <property name="ivy.configurations" value="build, ${ivy.configuration.main}, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
-    <property name="jar.libdir" value="core"/> <!-- only include the minimal set of libraries in the classpath of the JAR-MANIFEST -->
     <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes}"/>
     <property name="jar.sources.excludes" value="**/*Test.java ${yices2Sources}"/>
     <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
