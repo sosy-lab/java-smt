@@ -93,7 +93,7 @@ public class SolverOverviewTable {
    * @return String with the features of the entered solver separated by a comma. Empty if none
    *     available.
    */
-  @SuppressWarnings("CheckReturnValue")
+  @SuppressWarnings({"CheckReturnValue", "resource"})
   private List<String> getFeatures(SolverContext context)
       throws SolverException, InterruptedException {
     List<String> features = new ArrayList<>();
