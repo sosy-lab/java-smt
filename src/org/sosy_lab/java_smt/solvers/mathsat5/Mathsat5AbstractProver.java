@@ -145,9 +145,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) {
+      Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
-    // TODO: do we want a checkState for closed as well?
+
+    if (!isUnsatWithAssumptions(assumptions)) {
+      return Optional.empty();
+    }
 
     long[] unsatAssumptions = msat_get_unsat_assumptions(curEnv);
     return Optional.of(encapsulate(unsatAssumptions));

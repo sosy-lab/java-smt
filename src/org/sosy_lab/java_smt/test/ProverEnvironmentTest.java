@@ -155,7 +155,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, MATHSAT5, BOOLECTOR, CVC4);
+        .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
