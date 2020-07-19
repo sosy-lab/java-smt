@@ -35,9 +35,8 @@ to integer ones at _compile_ time) sometimes at the cost of verbosity.
 #### References
 
 - E. G. Karpenkov, K. Friedberger, and D. Beyer.
-  **JavaSMT: A Unified Interface for SMT Solvers in Java.**
-  In Proc. VSTTE, LNCS 9971, pages 139--148, 2016. Springer.
-  [Download](https://www.sosy-lab.org/research/pub/2016-VSTTE.JavaSMT_A_Unified_Interface_For_SMT_Solvers_in_Java.pdf)
+  [**JavaSMT: A Unified Interface for SMT Solvers in Java.**](https://www.sosy-lab.org/research/pub/2016-VSTTE.JavaSMT_A_Unified_Interface_For_SMT_Solvers_in_Java.pdf)
+  In Proc. VSTTE, LNCS 9971, pages 139–148, 2016. Springer.
 
 ### Feature overview
 JavaSMT can express formulas in the following theories:
