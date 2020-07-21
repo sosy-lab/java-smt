@@ -79,7 +79,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-427-g2475fc6" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-442-ge6ac6c3" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
@@ -94,8 +94,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google Auto-Value
              Library for auto-generating value types. -->
-        <dependency org="com.google.auto.value" name="auto-value" rev="1.7.3" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7.3" conf="build->default; contrib->sources"/>
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.7.4" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7.4" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="3.5.0" conf="core->default; contrib->sources"/>
