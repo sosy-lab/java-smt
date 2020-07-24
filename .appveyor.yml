@@ -45,7 +45,20 @@ on_finish:
         $wc.UploadFile($url, $file.FullName)
       }
   - ps: |
-      Push-AppveyorArtifact JUnit.html -DeploymentName "JUnit Report"
+      $files = Get-ChildItem -Path ".\hs_err_pid*"
+      foreach($file in $files){
+        echo $file.FullName
+        Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
+      }
+  - ps: |
+      $files = Get-ChildItem -Path ".\replay_pid*"
+      foreach($file in $files){
+        echo $file.FullName
+        Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
+      }
+  - ps: |
+      7z a JUnit.html.zip JUnit.html
+      Push-AppveyorArtifact JUnit.html.zip -DeploymentName "JUnit Report"
 
 cache:
   - C:\ant
