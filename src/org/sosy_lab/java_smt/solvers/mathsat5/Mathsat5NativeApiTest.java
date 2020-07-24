@@ -340,8 +340,8 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   public void modelIteratorCrash()
       throws IllegalStateException, InterruptedException, SolverException {
 
-    long parsed_formula = msat_from_smtlib2(env, QUERY);
-    msat_assert_formula(env, parsed_formula);
+    long parsedFormula = msat_from_smtlib2(env, QUERY);
+    msat_assert_formula(env, parsedFormula);
 
     boolean isSat = msat_check_sat(env);
     assertThat(isSat).isTrue();
