@@ -22,12 +22,12 @@ install:
         )
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
       }
-  - cmd: SET JAVA_HOME=C:\Program Files\Java\jdk14
-  - cmd: SET PATH=C:\ant\apache-ant-1.10.8\bin;%JAVA_HOME%\bin;%PATH%
-  - cmd: SET IVY_CACHE_DIR=C:\ivy
-  - cmd: echo %USERPROFILE%
-  - cmd: echo %PATH%
-  - cmd: java -version
+  - SET JAVA_HOME=C:\Program Files\Java\jdk14
+  - SET PATH=C:\ant\apache-ant-1.10.8\bin;%JAVA_HOME%\bin;%PATH%
+  - SET IVY_CACHE_DIR=C:\ivy
+  - echo %USERPROFILE%
+  - echo %PATH%
+  - java -version
 
 build_script:
   - ant build
