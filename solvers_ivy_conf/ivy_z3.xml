@@ -27,8 +27,13 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
 
     <publications defaultconf="solver-z3">
+        <!-- Linux64 files -->
         <artifact name="libz3" conf="solver-z3" type="shared-object" ext="so" />
         <artifact name="libz3java" conf="solver-z3" type="shared-object" ext="so"/>
+        <!-- Windows64 files -->
+        <artifact name="libz3" conf="solver-z3" type="dll" ext="dll" />
+        <artifact name="libz3java" conf="solver-z3" type="dll" ext="dll"/>
+        <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3" conf="solver-z3" ext="jar"/>
     </publications>
 

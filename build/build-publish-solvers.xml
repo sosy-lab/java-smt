@@ -19,7 +19,10 @@ SPDX-License-Identifier: Apache-2.0
     -->
     <target name="package-z3" depends="get-z3-version"
         description="Copy Z3 binaries to the root folder along with the version postfix.
-            This package provides the JNI for direct usage.">
+            This package provides the JNI for direct usage.
+            Please copy both Linux64 and Windows64 release into the same root directory.
+            The only overlap between those releases is the JAR file, which should be equal anyway.
+            ">
         <fail unless="z3.path">
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
             The path has to point to the root Z3 folder.
@@ -36,8 +39,13 @@ SPDX-License-Identifier: Apache-2.0
             libz3.so has missing SONAME property.
             Please run 'patchelf --set-soname libz3.so ${z3.path}/libz3.so'.
         </fail>
+        <!-- Linux64 files -->
         <copy file="${z3.path}/libz3.so" tofile="libz3-${z3.version}.so"/>
         <copy file="${z3.path}/libz3java.so" tofile="libz3java-${z3.version}.so"/>
+        <!-- Windows64 files -->
+        <copy file="${z3.path}/libz3.dll" tofile="libz3-${z3.version}.dll"/>
+        <copy file="${z3.path}/libz3java.dll" tofile="libz3java-${z3.version}.dll"/>
+        <!-- common Java file, Java is platform independent -->
         <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
 
