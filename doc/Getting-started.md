@@ -12,7 +12,20 @@ SPDX-License-Identifier: Apache-2.0
 For existing code examples, please see our [examples][example code].
 
 ## Step 1: Install JavaSMT
-### Automatic Installation from Maven Central
+
+### Automatic Installation using Ivy (preferred)
+
+If your build tool supports fetching packages from [Apache Ivy](https://ant.apache.org/ivy/),
+you can point it to [Sosy-Lab](https://www.sosy-lab.org/) [Ivy repository][],
+which would automatically fetch `JavaSMT` and all of its dependencies.
+
+After the repository URL is configured, you only need to add the following dependency:
+
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="3.6.0"/>
+```
+
+### Automatic Installation from Maven Central (possibly outdated)
 
 If you use Maven/Gradle/SBT/etc to build your project, a dependency to JavaSMT
 can be added using a single configuration item.
@@ -32,47 +45,39 @@ because they are written in Java and Scala, and thus are available on every mach
 Shared object for _other solvers, such as `MathSAT5` or `Z3`, would have to be installed manually_:
 see the section "Manual Installation" below.
 
-### Automatic Installation using Ivy
-
-If your build tool supports fetching packages from [Apache Ivy](https://ant.apache.org/ivy/), you can point it to [Sosy-Lab](https://www.sosy-lab.org/) [Ivy repository][], which would automatically fetch `JavaSMT` and all of its dependencies.
-
-After the repository URL is configured, you only need to add the following dependency:
-
-```xml
-<dependency org="org.sosy_lab" name="java-smt" rev="3.2.0"/>
-```
-
 ### Manual Installation
 
-JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository][] manually. In order to perform the manual installation, the following steps should be followed:
+JARs for JavaSMT and its dependencies can be downloaded from our [Ivy repository][] manually.
+In order to perform the manual installation, the following steps should be followed:
 
  - The desired version has to be chosen.
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
    **JavaSMT might not yet support the latest version on the solver's webpage,
    but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).**
- - Suppose the version `3.2.0` was chosen.
-   Ivy description file [`ivy-3.2.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-3.2.0.xml) can
+ - Suppose the version `3.6.0` was chosen.
+   Ivy description file [`ivy-3.6.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-3.6.0.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `java-smt-3.2.0.jar` and (optionally)
-   `java-smt-3.2.0-sources.jar`, located in the same directory.
+   In the example case, those are `java-smt-3.6.0.jar` and (optionally)
+   `java-smt-3.6.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
-   E.g. in the example, Z3 version `z3-4.7.1` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.7.1.xml)
+   E.g. in the example, Z3 version `z3-4.8.8` is specified,
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.8.8.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
 ### Binaries for Native Solvers (MathSAT and Z3)
 
-When using Ivy for installation on a 64-bit Linux platform, solver binaries for native solvers are downloaded automatically. Everything should work as is after installation.
+When using Ivy for installation on a 64-bit Linux platform, solver binaries for native solvers are downloaded automatically.
+Everything should work as is after installation.
 
 Without Ivy you need to download and install the binaries manually as described above under [Manual Installation](#manual-installation).
 You can either copy them into the directory of the JavaSMT JAR file,
 or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
 
-For systems other than 64-bit Linux (e.g., Windows, or 32-bit systems)
-we do not provide binaries so you need to download or compile them for yourself.
+For systems other than 64-bit Linux (e.g., Windows, or 32-bit systems) we might not always provide binaries,
+so you need to download or compile them for yourself.
 For [Z3](https://github.com/Z3Prover/z3), download either the [official binaries](https://github.com/Z3Prover/z3/releases)
 or build it with the flags `--java --git-describe` according to its documentation.
 Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
@@ -82,6 +87,9 @@ script.
 
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
+
+Currently, the support for newly integrated solvers like Boolector, CVC4, and Yices2 is limited.
+We are working on supporting more solvers on more operating systems.
 
 ## Step 2: Initialization
 Below is a small example showing how to initialize the library using the entry point [SolverContextFactory][]:
@@ -183,7 +191,7 @@ through all of the returned data, or by querying for the variables we need:
     BigInteger value = model.evaluate(a);
 ```
 
-For further information, look at our full example [HoudiniApp][], or at the [JavaDoc][].
+For further information, look at our full example [HoudiniApp][], [other examples][example code], or at the [JavaDoc][].
 
 [SolverContext]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/api/SolverContext.html
 [SolverContextFactory]: https://sosy-lab.github.io/java-smt/api/org/sosy_lab/java_smt/SolverContextFactory.html
