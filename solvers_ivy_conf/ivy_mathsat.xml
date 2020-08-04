@@ -26,8 +26,12 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
 
     <publications defaultconf="solver-mathsat">
-
+        <!-- Linux64 files -->
         <artifact name="libmathsat5j" conf="solver-mathsat" type="shared-object" ext="so" />
+        <!-- Windows64 files -->
+        <artifact name="mathsat5j" conf="solver-mathsat" type="dll" ext="dll" />
+        <artifact name="mathsat"   conf="solver-mathsat" type="dll" ext="dll" />
+        <artifact name="mpir"      conf="solver-mathsat" type="dll" ext="dll" />
     </publications>
 
     <dependencies></dependencies>

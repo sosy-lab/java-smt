@@ -278,6 +278,26 @@ SPDX-License-Identifier: Apache-2.0
     <target name="compile-mathsat-bindings"
         description="Compile MathSAT bindings">
         <compile-mathsatlike-bindings flag="mathsat"/>
+        <fail unless="mathsat-windows.path">
+            Please specify the path to the Mathsat5 source folder (Windows version) with the flag -Dmathsat-windows.path=/path/to/mathsat.
+            The path has to point to the root Mathsat5 folder.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="gmp-windows.path">
+            Please specify the path to the GMP source folder (Windows version) with the flag -Dgmp-windows.path=/path/to/gmp.
+            The path has to point to the root GMP folder.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="jdk-windows.path">
+            Please specify the path to the JDK source folder (Windows version) with the flag -Djdk-windows.path=/path/to/jdk.
+            The path has to point to the root JDK folder.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh">
+            <arg value="${mathsat-windows.path}" />
+            <arg value="${gmp-windows.path}" />
+            <arg value="${jdk-windows.path}" />
+        </exec>
     </target>
 
     <target name="compile-optimathsat-bindings"
@@ -286,14 +306,18 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="publish-mathsat" depends="compile-mathsat-bindings, load-ivy"
-        description="Publish OptiMathSAT binaries to Ivy repo.">
-
+        description="Publish MathSAT binaries to Ivy repo.">
+        <fail unless="mathsat.version">
+            Please specify the @{flag} version with the flag -Dmathsat.version=... .
+        </fail>
+        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="mathsat5j-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows.path}/lib/mathsat.dll" tofile="mathsat-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows.path}/bin/mpir.dll" tofile="mpir-${mathsat.version}.dll"/>
         <publish-mathsatlike flag="mathsat" />
     </target>
 
     <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
         description="Publish OptiMathSAT binaries to Ivy repo.">
-
         <publish-mathsatlike flag="optimathsat" />
     </target>
 
@@ -303,8 +327,12 @@ SPDX-License-Identifier: Apache-2.0
            <fail unless="mathsat.path">
                Please specify the path to the Mathsat5 source folder with the flag -Dmathsat.path=/path/to/mathsat.
                The path has to point to the root Mathsat5 folder.
-               Note that shell substitutions do not work and a full absolute
-               path has to be specified.
+               Note that shell substitutions do not work and a full absolute path has to be specified.
+           </fail>
+           <fail unless="gmp.path">
+               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
+               The path has to point to the root Mathsat5 folder.
+               Note that shell substitutions do not work and a full absolute path has to be specified.
            </fail>
 
            <exec executable="lib/native/source/libmathsat5j/compile.sh">
@@ -312,7 +340,6 @@ SPDX-License-Identifier: Apache-2.0
                <arg value="${gmp.path}" />
                <arg value="-@{flag}" />
            </exec>
-
        </sequential>
     </macrodef>
 
@@ -345,6 +372,7 @@ SPDX-License-Identifier: Apache-2.0
         </sequential>
     </macrodef>
     <!-- }}} -->
+
     <!-- SECTION: Publishing Yices2 {{{1
          ===============================================================
     -->
