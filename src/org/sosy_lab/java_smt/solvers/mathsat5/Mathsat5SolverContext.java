@@ -213,7 +213,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
    *
    * <p>Each list is applied in the given ordering.
    */
-  private static final void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
+  private static void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
     // we try Linux first, and then Windows.
     // TODO we could simply switch over the OS-name.
     // TODO move this method upwards? more solvers could use it.
