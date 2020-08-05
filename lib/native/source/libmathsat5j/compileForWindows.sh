@@ -16,10 +16,6 @@
 #
 # #########################################
 
-# This script builds either libmathsat5j.so (bindings to mathsat5), or
-# liboptimathsat5j.so (bindings to optimathsat5).
-# In future, mathsat5 and optimathsat should merge, making the switching obsolete.
-
 # For building libmathsat5j.dll on Linux for Windows, there are the following dependencies:
 # - The Mathsat5 library for Windows64 as can be downloaded from http://mathsat.fbk.eu/download.html
 # - The static GMP library compiled with the "-fPIC" option.
