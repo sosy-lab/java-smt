@@ -308,7 +308,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="publish-mathsat" depends="compile-mathsat-bindings, load-ivy"
         description="Publish MathSAT binaries to Ivy repo.">
         <fail unless="mathsat.version">
-            Please specify the @{flag} version with the flag -Dmathsat.version=... .
+            Please specify the MathSAT5 version with the flag -Dmathsat.version=... .
         </fail>
         <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="mathsat5j-${mathsat.version}.dll"/>
         <copy file="${mathsat-windows.path}/lib/mathsat.dll" tofile="mathsat-${mathsat.version}.dll"/>
