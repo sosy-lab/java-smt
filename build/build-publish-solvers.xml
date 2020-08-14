@@ -42,6 +42,9 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Windows64 files -->
         <copy file="${z3.path}/libz3.dll" tofile="libz3-${z3.version}.dll"/>
         <copy file="${z3.path}/libz3java.dll" tofile="libz3java-${z3.version}.dll"/>
+        <!-- MacOS files -->
+        <copy file="${z3.path}/libz3.dylib" tofile="libz3-${z3.version}.dylib"/>
+        <copy file="${z3.path}/libz3java.dylib" tofile="libz3java-${z3.version}.dylib"/>
         <!-- common Java file, Java is platform independent -->
         <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
@@ -51,8 +54,8 @@ SPDX-License-Identifier: Apache-2.0
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
             The path has to point to the root Z3 folder and can be relative or absolute.
             Note that shell substitutions do not work.
-            Please provide both Linux64 and Windows64 release in the same root directory,
-            e.g., copy the releases together into one directory.
+            Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
+            e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
         </fail>
         <exec executable="git" dir="${z3.path}" outputproperty="z3.version">

@@ -33,6 +33,9 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Windows64 files -->
         <artifact name="libz3" conf="solver-z3" type="dll" ext="dll" />
         <artifact name="libz3java" conf="solver-z3" type="dll" ext="dll"/>
+        <!-- MacOS files -->
+        <artifact name="libz3" conf="solver-z3" type="dylib" ext="dylib" />
+        <artifact name="libz3java" conf="solver-z3" type="dylib" ext="dylib"/>
         <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3" conf="solver-z3" ext="jar"/>
     </publications>

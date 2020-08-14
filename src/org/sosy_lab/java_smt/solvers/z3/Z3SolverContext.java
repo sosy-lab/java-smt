@@ -113,11 +113,12 @@ final class Z3SolverContext extends AbstractSolverContext {
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
     try {
+      // On Linux and MacOS, the plain name of the library works.
       System.loadLibrary("z3");
       System.loadLibrary("z3java");
     } catch (UnsatisfiedLinkError e1) {
-      // On Windows, the library name is different, so we try again.
       try {
+        // On Windows, the library name is different, so we try again.
         System.loadLibrary("libz3");
         System.loadLibrary("libz3java");
       } catch (UnsatisfiedLinkError e2) {
