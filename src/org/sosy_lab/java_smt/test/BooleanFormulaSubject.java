@@ -17,6 +17,7 @@ import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.SimpleSubjectBuilder;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
+import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +131,8 @@ public final class BooleanFormulaSubject extends Subject {
    * <p>Will show an unsat core on failure.
    */
   @SuppressWarnings({"unused", "resource"})
-  protected void isSatisfiableAndHasModel() throws SolverException, InterruptedException {
+  protected void isSatisfiableAndHasModel(int maxSizeOfModel)
+      throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {
       failWithoutActual(
@@ -143,6 +145,7 @@ public final class BooleanFormulaSubject extends Subject {
       prover.push(formulaUnderTest);
       if (!prover.isUnsat()) {
         // check whether the model exists and we can iterate over it.
+        // We allow an empty model, but it must be available.
         try (Model m = prover.getModel()) {
           for (ValueAssignment v : m) {
             // ignore, we just check iteration
@@ -150,6 +153,7 @@ public final class BooleanFormulaSubject extends Subject {
         }
         @SuppressWarnings("unused")
         List<ValueAssignment> lst = prover.getModelAssignments();
+        Truth.assertThat(lst.size()).isAtMost(maxSizeOfModel);
         return; // success
       }
     }
