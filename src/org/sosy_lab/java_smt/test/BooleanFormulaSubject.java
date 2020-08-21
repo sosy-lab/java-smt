@@ -131,7 +131,7 @@ public final class BooleanFormulaSubject extends Subject {
    * <p>Will show an unsat core on failure.
    */
   @SuppressWarnings({"unused", "resource"})
-  protected void isSatisfiableAndHasModel(int maxSizeOfModel)
+  void isSatisfiableAndHasModel(int maxSizeOfModel)
       throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {
