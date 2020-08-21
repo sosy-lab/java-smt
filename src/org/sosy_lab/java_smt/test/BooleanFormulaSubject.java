@@ -143,10 +143,19 @@ public final class BooleanFormulaSubject extends Subject {
       }
     }
 
+    reportUnsatCoreForUnexpectedUnsatisfiableFormula();
+  }
+
+  private void reportUnsatCoreForUnexpectedUnsatisfiableFormula()
+      throws InterruptedException, SolverException, AssertionError {
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       // Try to report unsat core for failure message if the solver supports it.
-      for (BooleanFormula part : bmgr.toConjunctionArgs(formulaUnderTest, true)) {
+      for (BooleanFormula part :
+          context
+              .getFormulaManager()
+              .getBooleanFormulaManager()
+              .toConjunctionArgs(formulaUnderTest, true)) {
         prover.push(part);
       }
       if (!prover.isUnsat()) {
