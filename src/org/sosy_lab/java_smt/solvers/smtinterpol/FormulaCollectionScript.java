@@ -199,8 +199,8 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
-  public Term string(String str) throws SMTLIBException {
-    return script.string(str);
+  public Term string(QuotedObject pStr) throws SMTLIBException {
+    return script.string(pStr);
   }
 
   @Override
@@ -308,6 +308,12 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
+  public Term[] getInterpolants(Term[] pPartition, int[] pStartOfSubtree, Term pProofTree)
+      throws SMTLIBException, UnsupportedOperationException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public LBool checkSat() {
     throw new UnsupportedOperationException();
   }
@@ -380,5 +386,10 @@ class FormulaCollectionScript implements Script {
       Term pDataArg, TermVariable[][] pVars, Term[] pCases, Constructor[] pConstructors)
       throws SMTLIBException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Theory getTheory() {
+    return theory;
   }
 }

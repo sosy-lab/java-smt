@@ -121,14 +121,9 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model mmodel =
         (de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model) model;
 
-    for (Map.Entry<Index, Integer> v : mmodel.getFunctionValue(symbol).values().entrySet()) {
-      int[] indizes = v.getKey().getArray();
-      Term[] arguments = new Term[indizes.length];
-      for (int i = 0; i < indizes.length; i++) {
-        arguments[i] = mmodel.toModelTerm(indizes[i], symbol.getParameterSorts()[i]);
-      }
+    for (Map.Entry<Index, Term> v : mmodel.getFunctionValue(symbol).values().entrySet()) {
       assignments.add(
-          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, arguments)));
+          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, v.getKey().toArray())));
     }
 
     return assignments;
