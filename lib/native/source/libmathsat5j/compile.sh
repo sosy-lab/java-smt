@@ -24,7 +24,7 @@
 # - The static Mathsat5 library as can be downloaded from http://mathsat.fbk.eu/download.html
 # - The static GMP library compiled with the "-fPIC" option.
 #   To create this, download GMP from http://gmplib.org/ and run
-#     ./configure --enable-cxx --with-pic --disable-shared --enable-fat --host=x86_64-w64-mingw32
+#     ./configure --enable-cxx --with-pic --disable-shared --enable-fat
 #     make
 
 # For building liboptimathsat5.so, OptiMathSat5 can be downloaded from
