@@ -361,4 +361,31 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     }
     msat_destroy_model_iterator(iter);
   }
+
+  private static final String LARGE_NUMBER_QUERY =
+      "(declare-fun a () Int) (assert (= a 10000000000000000000000001))";
+
+  @Test
+  public void invalidLargeNumberInModelTest()
+      throws IllegalStateException, InterruptedException, SolverException {
+    long parsed = msat_from_smtlib2(env, LARGE_NUMBER_QUERY);
+    msat_assert_formula(env, parsed);
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isTrue();
+
+    long iter = msat_model_create_iterator(env);
+    while (msat_model_iterator_has_next(iter)) {
+      long[] key = new long[1];
+      long[] value = new long[1];
+      // System.out.println("before crash");
+      @SuppressWarnings("unused")
+      boolean check = msat_model_iterator_next(iter, key, value); // crash here
+      // System.out.println(" " + check);
+      // String k = msat_term_repr(key[0]);
+      // System.out.println("after crash");
+      // String v = msat_term_repr(value[0]);
+      // System.out.println(k + " := " + v);
+    }
+    msat_destroy_model_iterator(iter);
+  }
 }
