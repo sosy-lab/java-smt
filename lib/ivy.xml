@@ -99,7 +99,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7.4" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.6.0" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.6.1" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -107,7 +107,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.5" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.6" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
@@ -140,10 +140,10 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.36" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.36.1" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-715-g3a7695dc" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-732-gd208e931" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess for our Maven release -->
         <dependency org="uuverifiers" name="princess_2.13" rev="2020-05-01-assertionless" conf="runtime-princess-with-javacup->default; contrib->sources"/>
