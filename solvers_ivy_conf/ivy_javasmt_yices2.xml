@@ -33,19 +33,19 @@ SPDX-License-Identifier: Apache-2.0
     </publications>
 
     <dependencies>
-        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-89-g0f77dc4b" conf="runtime->solver-yices2" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-396-g194350c1" conf="runtime->solver-yices2" />
 
         <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
 
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-420-gef84297" conf="runtime->runtime; sources->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-442-ge6ac6c3" conf="runtime->runtime; sources->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
         <dependency org="com.google.guava" name="guava" rev="29.0-jre" conf="runtime->default; sources->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="2.5.2" conf="runtime->default; sources->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.6.1" conf="runtime->default; sources->sources"/>
 
     </dependencies>
 
