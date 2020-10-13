@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_asin;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
@@ -334,7 +335,8 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
           + "(define-fun v18750 () Bool (and v6142 v18749))"
           + "(assert v18750)";
 
-  // TODO The next method crashes with MathSAT5 version 5.6.3,
+  // TODO The next method crashes with MathSAT5 version 5.6.4
+  // (NullPointer during iterator creation).
   // The bug is reported, we need to check this with the next release.
   @Ignore
   public void modelIteratorCrash()
@@ -346,7 +348,8 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     boolean isSat = msat_check_sat(env);
     assertThat(isSat).isTrue();
 
-    long iter = msat_model_create_iterator(env);
+    long model = msat_get_model(env);
+    long iter = msat_model_create_iterator(model);
     while (msat_model_iterator_has_next(iter)) {
       long[] key = new long[1];
       long[] value = new long[1];
@@ -373,7 +376,8 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     boolean isSat = msat_check_sat(env);
     assertThat(isSat).isTrue();
 
-    long iter = msat_model_create_iterator(env);
+    long model = msat_get_model(env);
+    long iter = msat_model_create_iterator(model);
     while (msat_model_iterator_has_next(iter)) {
       long[] key = new long[1];
       long[] value = new long[1];
