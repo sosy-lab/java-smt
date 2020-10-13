@@ -51,7 +51,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="get-z3-version" unless="z3.version">
         <fail unless="z3.path">
-            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
+            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
             The path has to point to the root Z3 folder and can be relative or absolute.
             Note that shell substitutions do not work.
             Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
