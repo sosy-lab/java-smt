@@ -121,8 +121,9 @@ This is one of the most critical steps in JavaSMT development.
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu 14.04** binary for the [latest release](https://github.com/Z3Prover/z3/releases)
-and unzip it.
+To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary for the
+[latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
+For simpler handling, we copy the files from their `bin` directories together into one directory.
 Then execute the following command in the JavaSMT directory,
 where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
 and `$Z3_VERSION` is the version number:
@@ -131,19 +132,13 @@ ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
 ```
 Finally follow the instructions shown in the message at the end.
 
-As long as [PR #1650](https://github.com/Z3Prover/z3/pull/1650) is not merged,
-you need to run the following command before running ant:
-```
-patchelf --set-soname libz3.so libz3.so
-```
-
 To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
-it with the following command in its directory on a 64bit Ubuntu 14.04 system
-(building on Ubuntu 16.04 introduces unwanted dependencies to new libstdc++ and libgomp versions):
-
+it with the following command in its directory on a 64bit Ubuntu 16.04 system:
 ```
 ./configure --staticlib --java --git-describe && cd build && make -j 2
 ```
+(Note that additional binaries for other operating systems need to be provided, too.
+This step is currently not fully tested from our side.)
 Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
 ```
 ant publish-z3 -Dz3.path=$Z3_DIR/build
@@ -190,15 +185,30 @@ Finally follow the instructions shown in the message at the end.
 ### Publishing (Opti)-MathSAT5
 
 For publishing MathSAT5, you need to use a machine with at least GCC 4.9.
-First, [download the (reentrant!) binary release](http://mathsat.fbk.eu/download.html), unpack it,
-and then execute the following command in the JavaSMT directory,
-where `$MATHSAT_PATH` is the path to the MathSAT directory,
+First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html), unpack them,
+then provide the necessary dependencies (GMP and MPIR) as described in the compilation scripts
+(see `lib/native/source/libmathsat5j/`), and then execute the following command in the JavaSMT directory,
+where `$MATHSAT_LINUX_PATH` and `$MATHSAT_WINDOWS_PATH` are the paths to the MathSAT directories,
 and `$MATHSAT_VERSION` is the version number of MathSAT:
 ```
-ant publish-mathsat -Dmathsat.path=$MATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$MATHSAT_VERSION
+ant publish-mathsat -Dmathsat.path=$MATHSAT_LINUX_PATH \
+                    -Dgmp.path=$GMP_PATH \
+                    -Dmathsat-windows.path=$MATHSAT_WINDOWS_PATH \
+                    -Dmpir-windows.path=$MPIR_PATH \
+                    -Djdk-windows.path=JDK_11_PATH \
+                    -Dmathsat.version=$MATHSAT_VERSION
+```
+Concrete example:
+```
+ant publish-mathsat -Dmathsat.path=$TMP/mathsat-5.6.4-linux-x86_64-reentrant/ \
+                    -Dgmp.path=$TMP/gmp-6.1.2 \
+                    -Dmathsat-windows.path=$TMP/mathsat-5.6.4-win64-msvc \
+                    -Dmpir-windows.path=$TMP/mpir-2.7.2-win \
+                    -Djdk-windows.path=$TMP/jdk-11 \
+                    -Dmathsat.version=5.6.4
 ```
 Finally follow the instructions shown in the message at the end.
-The same procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
+A similar procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
 except the publishing command is:
 
 ```
