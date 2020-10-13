@@ -16,19 +16,21 @@
 #
 # #########################################
 
-# For building libmathsat5j.dll on Linux for Windows, there are the following dependencies:
-# - The Mathsat5 library for Windows64 as can be downloaded from http://mathsat.fbk.eu/download.html
-# - The static GMP library compiled with the "-fPIC" option.
-#   To create this, download GMP from http://gmplib.org/ and run
-#     ./configure --enable-cxx --with-pic --disable-shared --enable-fat --host=x86_64-w64-mingw32
+# This script cross-compiles the MathSAT5 library `mathsat5j.dll` on a Linux host for a Windows64 target.
+# There are the following dependencies:
+# - MinGW (install Ubuntu package: `mingw-w64`)
+# - The MathSAT5 library for Windows64 as can be downloaded from http://mathsat.fbk.eu/download.html
+# - MathSAT5 is linked against MPIR which aims to be compatible to GMP.
+#   We actually only need the headers, but we do a full build, and then use `mpir.dll` from the MathSAT5 archive.
+#   To build MPIR, download MPIR 2.7.2 from http://mpir.org/downloads.html and run
+#     ./configure --enable-cxx --with-pic --enable-shared --disable-static --enable-fat --host=x86_64-w64-mingw32 --enable-gmpcompat
 #     make
-#   TODO: MathSAT5 is linked against MPIR which aims to be compatible to GMP.
-#   Perhaps, we should also use MPIR.
 # - The Windows JNI headers in a reasonable LTS version:
 #   Download the zip archive from https://jdk.java.net/ and unpack it
 #   (e.g., https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip).
+#
+# To build mathsat bindings: ./compileForWindows.sh $MATHSAT_DIR $MPIR_DIR $JNI_DIR
 
-# To build mathsat bindings: ./compileForWindows.sh $MATHSAT_DIR $GMP_DIR $JNI_DIR
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
