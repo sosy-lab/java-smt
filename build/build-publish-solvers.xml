@@ -286,9 +286,9 @@ SPDX-License-Identifier: Apache-2.0
             The path has to point to the root Mathsat5 folder.
             Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
-        <fail unless="gmp-windows.path">
-            Please specify the path to the GMP source folder (Windows version) with the flag -Dgmp-windows.path=/path/to/gmp.
-            The path has to point to the root GMP folder.
+        <fail unless="mpir-windows.path">
+            Please specify the path to the MPIR source folder (Windows version) with the flag -Dmpir-windows.path=/path/to/mpir.
+            The path has to point to the root MPIR folder.
             Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
         <fail unless="jdk-windows.path">
@@ -298,7 +298,7 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
         <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh">
             <arg value="${mathsat-windows.path}" />
-            <arg value="${gmp-windows.path}" />
+            <arg value="${mpir-windows.path}" />
             <arg value="${jdk-windows.path}" />
         </exec>
     </target>
