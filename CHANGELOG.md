@@ -10,6 +10,18 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.6.1
+
+### Updates solver versions:
+ - Boolector 3.2.1-30-g95859db8
+ - Princess 2.13 (2020-09-18)
+ - SMTInterpol 2.5-732-gd208e931
+ - Yices2 2.6.2-396-g194350c1
+ - Z3 4.8.9
+
+### Improvements:
+ - Maven release is working again (available solvers: SMTInterpol and Princess)
+
 ## JavaSMT 3.6.0
 
 ### News on Solvers:

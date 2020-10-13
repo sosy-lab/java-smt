@@ -34,6 +34,7 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-optimathsat" extends="core" description="only one solver included"/>
         <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
         <conf name="runtime-princess" extends="core" description="only one solver included"/>
+        <conf name="runtime-princess-with-javacup" extends="core" description="only one solver included"/>
         <conf name="runtime-z3" extends="core" description="only one solver included"/>
         <conf name="runtime-cvc4" extends="core" description="only one solver included"/>
         <conf name="runtime-boolector" extends="core" description="only one solver included"/>
@@ -98,7 +99,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7.4" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.5.0" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.6.1" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -106,7 +107,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.5" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.6" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
@@ -129,23 +130,25 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.8" conf="format-source->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.9" conf="format-source->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.0.6" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.1.2" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.0.6" conf="core->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.1.2" conf="core->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="core->default; contrib->sources"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.37.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.34" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.36.1" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-604-g71e72f93" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-732-gd208e931" conf="runtime-smtinterpol->master; contrib->sources"/>
 
-        <!-- Princess -->
-        <dependency org="uuverifiers" name="princess_2.13" rev="2020-05-01-assertionless" conf="runtime-princess->default; contrib->sources">
+        <!-- Princess for our Maven release -->
+        <dependency org="uuverifiers" name="princess_2.13" rev="2020-09-18-assertionless" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <!-- Princess for our Ivy release-->
+        <dependency org="uuverifiers" name="princess_2.13" rev="2020-09-18-assertionless" conf="runtime-princess->default; contrib->sources">
           <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
@@ -158,10 +161,10 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.8.9-sosy0" conf="runtime-z3->solver-z3" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-15-g59c9ade5" conf="runtime-boolector->solver-boolector" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.1-30-g95859db8" conf="runtime-boolector->solver-boolector" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="3.5.1-203-g39ccf3c6" conf="runtime-yices2->runtime; contrib->sources" />
+        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="3.6.0-27-g42532e0b" conf="runtime-yices2->runtime; contrib->sources" />
         <!-- <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-89-g0f77dc4b" conf="runtime-yices2->solver-yices2" /> -->
 
         <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest although they do not really need it.

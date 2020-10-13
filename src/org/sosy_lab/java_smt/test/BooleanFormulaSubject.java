@@ -17,6 +17,7 @@ import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.SimpleSubjectBuilder;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
+import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,16 +107,6 @@ public final class BooleanFormulaSubject extends Subject {
 
   /** Check that the subject is satisfiable. Will show an unsat core on failure. */
   public void isSatisfiable() throws SolverException, InterruptedException {
-    isSatisfiable(false);
-  }
-
-  /**
-   * Check that the subject is satisfiable. Will show an unsat core on failure.
-   *
-   * @param generateModel whether we check model iteration.
-   */
-  @SuppressWarnings({"unused", "resource"})
-  public void isSatisfiable(boolean generateModel) throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {
       failWithoutActual(
@@ -124,29 +115,61 @@ public final class BooleanFormulaSubject extends Subject {
       return;
     }
 
-    try (ProverEnvironment prover =
-        generateModel
-            ? context.newProverEnvironment(ProverOptions.GENERATE_MODELS)
-            : context.newProverEnvironment()) {
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
       prover.push(formulaUnderTest);
       if (!prover.isUnsat()) {
-        if (generateModel) {
-          try (Model m = prover.getModel()) {
-            for (ValueAssignment v : m) {
-              // ignore, we just check iteration
-            }
-          }
-          @SuppressWarnings("unused")
-          List<ValueAssignment> lst = prover.getModelAssignments();
-        }
         return; // success
       }
     }
 
+    reportUnsatCoreForUnexpectedUnsatisfiableFormula();
+  }
+
+  /**
+   * Check that the subject is satisfiable and provides a model for iteration.
+   *
+   * <p>Will show an unsat core on failure.
+   */
+  @SuppressWarnings({"unused", "resource"})
+  void isSatisfiableAndHasModel(int maxSizeOfModel) throws SolverException, InterruptedException {
+    final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
+    if (bmgr.isFalse(formulaUnderTest)) {
+      failWithoutActual(
+          Fact.fact("expected to be", "satisfiable"),
+          Fact.fact("but was", "trivially unsatisfiable"));
+      return;
+    }
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(formulaUnderTest);
+      if (!prover.isUnsat()) {
+        // check whether the model exists and we can iterate over it.
+        // We allow an empty model, but it must be available.
+        try (Model m = prover.getModel()) {
+          for (ValueAssignment v : m) {
+            // ignore, we just check iteration
+          }
+        }
+        @SuppressWarnings("unused")
+        List<ValueAssignment> lst = prover.getModelAssignments();
+        Truth.assertThat(lst.size()).isAtMost(maxSizeOfModel);
+        return; // success
+      }
+    }
+
+    reportUnsatCoreForUnexpectedUnsatisfiableFormula();
+  }
+
+  private void reportUnsatCoreForUnexpectedUnsatisfiableFormula()
+      throws InterruptedException, SolverException, AssertionError {
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       // Try to report unsat core for failure message if the solver supports it.
-      for (BooleanFormula part : bmgr.toConjunctionArgs(formulaUnderTest, true)) {
+      for (BooleanFormula part :
+          context
+              .getFormulaManager()
+              .getBooleanFormulaManager()
+              .toConjunctionArgs(formulaUnderTest, true)) {
         prover.push(part);
       }
       if (!prover.isUnsat()) {

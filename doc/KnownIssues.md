@@ -20,16 +20,10 @@ try increasing the stack size with the JVM parameter `-Xss`.
 ## SMTInterpol
 
  - SMTInterpol does not support multiple concurrent stacks under the same context.
- - With JavaSMT up to 1.0.1,
-variables and UFs that are used for the first time after a solver stack has been created
-will be deleted on the next call to `pop()` and will be invalid afterwards.
-This will be changed in the next release of JavaSMT such that variable declarations
-in SMTInterpol work like those in other solvers.
 
-## Z3
+## CVC4
 
- - Z3 interpolation procedure might require a large amount of stack memory.
-If you get segmentation fault on interpolation, try increasing the stack size 
-with the JVM parameter `-Xss`.
+ - Our version of CVC4 does not support any garbage collection in the native library.
+   This might cause memory leaks.
 
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html

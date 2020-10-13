@@ -35,7 +35,6 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -152,7 +151,7 @@ public class SmtInterpolEnvironment {
       // create a thin wrapper around Benchmark,
       // this allows to write most formulas of the solver to outputfile
       return new LoggingScript(smtInterpol, filename, true, true);
-    } catch (FileNotFoundException e) {
+    } catch (IOException e) {
       logger.logUserException(Level.WARNING, e, "Could not open log file for SMTInterpol queries");
       // go on without logging
       return smtInterpol;
