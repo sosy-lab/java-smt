@@ -281,21 +281,9 @@ SPDX-License-Identifier: Apache-2.0
     <target name="compile-mathsat-bindings"
         description="Compile MathSAT bindings">
         <compile-mathsatlike-bindings flag="mathsat"/>
-        <fail unless="mathsat-windows.path">
-            Please specify the path to the Mathsat5 source folder (Windows version) with the flag -Dmathsat-windows.path=/path/to/mathsat.
-            The path has to point to the root Mathsat5 folder.
-            Note that shell substitutions do not work and a full absolute path has to be specified.
-        </fail>
-        <fail unless="mpir-windows.path">
-            Please specify the path to the MPIR source folder (Windows version) with the flag -Dmpir-windows.path=/path/to/mpir.
-            The path has to point to the root MPIR folder.
-            Note that shell substitutions do not work and a full absolute path has to be specified.
-        </fail>
-        <fail unless="jdk-windows.path">
-            Please specify the path to the JDK source folder (Windows version) with the flag -Djdk-windows.path=/path/to/jdk.
-            The path has to point to the root JDK folder.
-            Note that shell substitutions do not work and a full absolute path has to be specified.
-        </fail>
+        <checkPathOption pathOption="mathsat-windows.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Windows version)"/>
+        <checkPathOption pathOption="mpir-windows.path" defaultPath="/path/to/mpir" targetName="MPIR source folder (Windows version)"/>
+        <checkPathOption pathOption="jdk-windows.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Windows version)"/>
         <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh">
             <arg value="${mathsat-windows.path}" />
             <arg value="${mpir-windows.path}" />
@@ -327,17 +315,8 @@ SPDX-License-Identifier: Apache-2.0
     <macrodef name="compile-mathsatlike-bindings">
        <attribute name="flag"/>
        <sequential>
-           <fail unless="mathsat.path">
-               Please specify the path to the Mathsat5 source folder with the flag -Dmathsat.path=/path/to/mathsat.
-               The path has to point to the root Mathsat5 folder.
-               Note that shell substitutions do not work and a full absolute path has to be specified.
-           </fail>
-           <fail unless="gmp.path">
-               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
-               The path has to point to the root Mathsat5 folder.
-               Note that shell substitutions do not work and a full absolute path has to be specified.
-           </fail>
-
+            <checkPathOption pathOption="mathsat.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Linux version)"/>
+            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder (Linux version)"/>
            <exec executable="lib/native/source/libmathsat5j/compile.sh">
                <arg value="${mathsat.path}" />
                <arg value="${gmp.path}" />
@@ -382,18 +361,9 @@ SPDX-License-Identifier: Apache-2.0
     <target name="compile-yices2-bindings"
         description="Compile Yices2 bindings">
         <sequential>
-           <fail unless="yices2.path">
-               Please specify the path to the Yices2 source folder with the flag -Dyices2.path=/path/to/yices2.
-               The path has to point to the root Yices2 folder.
-           </fail>
-           <fail unless="gmp.path">
-               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
-               The path has to point to the root GMP folder.
-           </fail>
-           <fail unless="gperf.path">
-               Please specify the path to the GPERF source folder with the flag -Dgperf.path=/path/to/gperf.
-               The path has to point to the root GPERF folder.
-           </fail>
+            <checkPathOption pathOption="yices2.path" defaultPath="/path/to/yices2" targetName="Yices2 source folder"/>
+            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder"/>
+            <checkPathOption pathOption="gperf.path" defaultPath="/path/to/gperf" targetName="GPERF source folder"/>
            <exec executable="lib/native/source/yices2j/compile.sh">
                <arg value="${yices2.path}" />
                <arg value="${gmp.path}" />
@@ -457,4 +427,18 @@ SPDX-License-Identifier: Apache-2.0
         </sequential>
     </target>
     <!-- }}} -->
+
+    <macrodef name="checkPathOption">
+        <attribute name="pathOption"/>
+        <attribute name="defaultPath"/>
+        <attribute name="targetName"/>
+        <sequential>
+            <fail unless="@{pathOption}">-
+    Please specify the path to the @{targetName} with the following flag:
+        -D@{pathOption}=@{defaultPath}
+    The path has to point to the root of the @{targetName}.
+    Note that shell substitutions do not work and a full absolute path is preferred.
+            </fail>
+        </sequential>
+    </macrodef>
 </project>
