@@ -61,7 +61,8 @@ SPDX-License-Identifier: Apache-2.0
             e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
         </fail>
-        <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
+        <echo>Option -Dz3.version=... not specified. Trying to determine z3.version from git repository. This will crash if git repository is not available.</echo>
+        <exec executable="git" dir="${z3.path}" outputproperty="z3.version" failonerror="true">
             <arg value="describe" />
         </exec>
     </target>
