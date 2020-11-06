@@ -309,8 +309,6 @@ public class Sudoku {
       final List<BooleanFormula> rules = new ArrayList<>();
 
       // each symbol has a value from 1 to 9
-      IntegerFormula one = imgr.makeNumber(1);
-      IntegerFormula nine = imgr.makeNumber(9);
       for (int row = 0; row < SIZE; row++) {
         for (int col = 0; col < SIZE; col++) {
           rules.add(oneHot(ImmutableList.copyOf(symbols[row][col])));
