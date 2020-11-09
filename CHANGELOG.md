@@ -10,6 +10,17 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.7.0
+
+This release contains the first official support for native SMT solvers on Windows.
+We provide MathSAT5 and Z3 for Windows (64bit) as part of the Ivy build.
+A user can of course exclude the native libraries from the dependencies,
+if disk space is a critical point.
+
+### Updated solvers:
+ - MathSAT5 5.6.5 (inculding binary for Windows)
+ - Z3 4.8.9 (including binaries for Windows and MacOS)
+
 ## JavaSMT 3.6.1
 
 ### Updates solver versions:
