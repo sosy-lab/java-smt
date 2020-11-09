@@ -78,7 +78,8 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="clean" description="Clean">
         <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.jar"/>
+            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
+            <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
         </delete>
     </target>
 

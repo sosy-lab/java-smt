@@ -21,9 +21,12 @@ SPDX-License-Identifier: Apache-2.0
         description="Copy Z3 binaries to the root folder along with the version postfix.
             This package provides the JNI for direct usage.">
         <fail unless="z3.path">
-            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
-            The path has to point to the root Z3 folder.
+            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
+            The path has to point to the root Z3 folder and can be relative or absolute.
             Note that shell substitutions do not work.
+            Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
+            e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
+            The only overlap between those releases is the JAR file, which should be equal anyway.
         </fail>
         <exec executable="readelf" dir="${z3.path}" outputproperty="z3.elf_details" logError="true" failonerror="true">
             <arg value="-d"/>
@@ -36,18 +39,30 @@ SPDX-License-Identifier: Apache-2.0
             libz3.so has missing SONAME property.
             Please run 'patchelf --set-soname libz3.so ${z3.path}/libz3.so'.
         </fail>
+        <!-- Linux64 files -->
         <copy file="${z3.path}/libz3.so" tofile="libz3-${z3.version}.so"/>
         <copy file="${z3.path}/libz3java.so" tofile="libz3java-${z3.version}.so"/>
+        <!-- Windows64 files -->
+        <copy file="${z3.path}/libz3.dll" tofile="libz3-${z3.version}.dll"/>
+        <copy file="${z3.path}/libz3java.dll" tofile="libz3java-${z3.version}.dll"/>
+        <!-- MacOS files -->
+        <copy file="${z3.path}/libz3.dylib" tofile="libz3-${z3.version}.dylib"/>
+        <copy file="${z3.path}/libz3java.dylib" tofile="libz3java-${z3.version}.dylib"/>
+        <!-- common Java file, Java is platform independent -->
         <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
 
     <target name="get-z3-version" unless="z3.version">
         <fail unless="z3.path">
-            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3.
-            The path has to point to the root Z3 folder.
+            Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
+            The path has to point to the root Z3 folder and can be relative or absolute.
             Note that shell substitutions do not work.
+            Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
+            e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
+            The only overlap between those releases is the JAR file, which should be equal anyway.
         </fail>
-        <exec executable="git" dir="${z3.path}" outputproperty="z3.version">
+        <echo>Option -Dz3.version=... not specified. Trying to determine z3.version from git repository. This will crash if git repository is not available.</echo>
+        <exec executable="git" dir="${z3.path}" outputproperty="z3.version" failonerror="true">
             <arg value="describe" />
         </exec>
     </target>
@@ -267,94 +282,116 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing [Opti-]MathSAT {{{1
          ===============================================================
     -->
-    <target name="compile-mathsat-bindings"
-        description="Compile MathSAT bindings">
-        <compile-mathsatlike-bindings flag="mathsat"/>
+    <target name="compile-mathsat-bindings-linux"
+        description="Compile MathSAT bindings for Linux">
+        <compile-mathsatlike-bindings-linux flag="mathsat"/>
+    </target>
+
+    <target name="compile-mathsat-bindings-windows"
+        description="Compile MathSAT bindings for Windows">
+        <compile-mathsatlike-bindings-windows flag="mathsat"/>
     </target>
 
     <target name="compile-optimathsat-bindings"
         description="Compile OptiMathSAT bindings">
-        <compile-mathsatlike-bindings flag="optimathsat"/>
+        <compile-mathsatlike-bindings-linux flag="optimathsat"/>
     </target>
 
-    <target name="publish-mathsat" depends="compile-mathsat-bindings, load-ivy"
-        description="Publish OptiMathSAT binaries to Ivy repo.">
-
-        <publish-mathsatlike flag="mathsat" />
-    </target>
-
-    <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
-        description="Publish OptiMathSAT binaries to Ivy repo.">
-
-        <publish-mathsatlike flag="optimathsat" />
-    </target>
-
-    <macrodef name="compile-mathsatlike-bindings">
-       <attribute name="flag"/>
+    <macrodef name="compile-mathsatlike-bindings-linux">
+       <attribute name="flag" default="mathsat"/>
        <sequential>
-           <fail unless="mathsat.path">
-               Please specify the path to the Mathsat5 source folder with the flag -Dmathsat.path=/path/to/mathsat.
-               The path has to point to the root Mathsat5 folder.
-               Note that shell substitutions do not work and a full absolute
-               path has to be specified.
-           </fail>
-
-           <exec executable="lib/native/source/libmathsat5j/compile.sh">
+            <checkPathOption pathOption="mathsat.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Linux version)"/>
+            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder (Linux version)"/>
+           <exec executable="lib/native/source/libmathsat5j/compile.sh" failonerror="true">
                <arg value="${mathsat.path}" />
                <arg value="${gmp.path}" />
                <arg value="-@{flag}" />
            </exec>
-
        </sequential>
     </macrodef>
 
-    <macrodef name="publish-mathsatlike">
-        <attribute name="flag" default="mathsat"/>
-
+    <macrodef name="compile-mathsatlike-bindings-windows">
+        <attribute name="flag" default="mathsat"/> <!-- unused, OptiMathSAT not yet build for Windows -->
         <sequential>
-            <fail unless="mathsat.version">
-                Please specify the @{flag} version with the flag -Dmathsat.version=... .
-            </fail>
-
-            <copy file="lib/native/source/libmathsat5j/lib@{flag}5j.so" tofile="lib@{flag}5j-${mathsat.version}.so"/>
-
-            <ivy:resolve conf="solver-@{flag}" file="solvers_ivy_conf/ivy_@{flag}.xml" />
-            <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-            <fail unless="ivy.hasrepository"
-                message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-            <ivy:publish
-                pubrevision="${mathsat.version}"
-                resolver="Sosy-Lab-Publish"
-                artifactspattern="[artifact]-[revision].[ext]"
-                status="release"
-                />
-            <echo>
-                You now want to run
-                svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
-                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of @{flag} Solver"
-                to make the new version publicly available.</echo>
+            <checkPathOption pathOption="mathsat-windows.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Windows version)"/>
+            <checkPathOption pathOption="mpir-windows.path" defaultPath="/path/to/mpir" targetName="MPIR source folder (Windows version)"/>
+            <checkPathOption pathOption="jdk-windows.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Windows version)"/>
+            <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh" failonerror="true">
+                <arg value="${mathsat-windows.path}" />
+                <arg value="${mpir-windows.path}" />
+                <arg value="${jdk-windows.path}" />
+            </exec>
         </sequential>
     </macrodef>
+
+    <target name="publish-mathsat" depends="compile-mathsat-bindings-linux, compile-mathsat-bindings-windows, load-ivy"
+        description="Publish MathSAT binaries to Ivy repo.">
+        <fail unless="mathsat.version">
+            Please specify the MathSAT5 version with the flag -Dmathsat.version=... .
+        </fail>
+        <fail unless="mathsat.version">
+            Please specify the mathsat version with the flag -Dmathsat.version=... .
+        </fail>
+
+        <copy file="lib/native/source/libmathsat5j/libmathsat5j.so" tofile="libmathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="mathsat5j-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows.path}/lib/mathsat.dll" tofile="mathsat-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows.path}/bin/mpir.dll" tofile="mpir-${mathsat.version}.dll"/>
+
+        <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${mathsat.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of mathsat Solver"
+            to make the new version publicly available.</echo>
+    </target>
+
+    <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
+        description="Publish OptiMathSAT binaries to Ivy repo.">
+        <fail unless="mathsat.version">
+            Please specify the @{flag} version with the flag -Dmathsat.version=... .
+        </fail>
+
+        <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="liboptimathsat5j-${mathsat.version}.so"/>
+
+        <ivy:resolve conf="solver-optimathsat" file="solvers_ivy_conf/ivy_optimathsat.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${mathsat.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of optimathsat Solver"
+            to make the new version publicly available.</echo>
+    </target>
     <!-- }}} -->
+
     <!-- SECTION: Publishing Yices2 {{{1
          ===============================================================
     -->
     <target name="compile-yices2-bindings"
         description="Compile Yices2 bindings">
         <sequential>
-           <fail unless="yices2.path">
-               Please specify the path to the Yices2 source folder with the flag -Dyices2.path=/path/to/yices2.
-               The path has to point to the root Yices2 folder.
-           </fail>
-           <fail unless="gmp.path">
-               Please specify the path to the GMP source folder with the flag -Dgmp.path=/path/to/gmp.
-               The path has to point to the root GMP folder.
-           </fail>
-           <fail unless="gperf.path">
-               Please specify the path to the GPERF source folder with the flag -Dgperf.path=/path/to/gperf.
-               The path has to point to the root GPERF folder.
-           </fail>
+            <checkPathOption pathOption="yices2.path" defaultPath="/path/to/yices2" targetName="Yices2 source folder"/>
+            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder"/>
+            <checkPathOption pathOption="gperf.path" defaultPath="/path/to/gperf" targetName="GPERF source folder"/>
            <exec executable="lib/native/source/yices2j/compile.sh">
                <arg value="${yices2.path}" />
                <arg value="${gmp.path}" />
@@ -418,4 +455,18 @@ SPDX-License-Identifier: Apache-2.0
         </sequential>
     </target>
     <!-- }}} -->
+
+    <macrodef name="checkPathOption">
+        <attribute name="pathOption"/>
+        <attribute name="defaultPath"/>
+        <attribute name="targetName"/>
+        <sequential>
+            <fail unless="@{pathOption}">-
+    Please specify the path to the @{targetName} with the following flag:
+        -D@{pathOption}=@{defaultPath}
+    The path has to point to the root of the @{targetName}.
+    Note that shell substitutions do not work and a full absolute path is preferred.
+            </fail>
+        </sequential>
+    </macrodef>
 </project>

@@ -19,13 +19,16 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_callback;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -151,7 +154,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     if (settings.loadOptimathsat5) {
       NativeLibraries.loadLibrary("optimathsat5j");
     } else {
-      NativeLibraries.loadLibrary("mathsat5j");
+      loadLibrary();
     }
 
     long msatConf = msat_create_config();
@@ -198,6 +201,36 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             arrayTheory);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
+  }
+
+  @VisibleForTesting
+  static void loadLibrary() {
+    loadLibrary(ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
+  }
+
+  /**
+   * This method loads the given library, depending on the operating system.
+   *
+   * <p>Each list is applied in the given ordering.
+   */
+  private static void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
+    // we try Linux first, and then Windows.
+    // TODO we could simply switch over the OS-name.
+    // TODO move this method upwards? more solvers could use it.
+    try {
+      for (String libraryName : linuxLibrary) {
+        NativeLibraries.loadLibrary(libraryName);
+      }
+    } catch (UnsatisfiedLinkError e1) {
+      try {
+        for (String libraryName : windowsLibrary) {
+          NativeLibraries.loadLibrary(libraryName);
+        }
+      } catch (UnsatisfiedLinkError e2) {
+        e1.addSuppressed(e2);
+        throw e1;
+      }
+    }
   }
 
   long createEnvironment(long cfg) {

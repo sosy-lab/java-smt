@@ -131,6 +131,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   mtype s_arg##num; \
   mtype * m_arg##num = &s_arg##num;
 
+// jint is int32 on Linux and Windows, thus the cast from jint* to int* is safe.
 #define INT_ARRAY_ARG(num) \
   int * m_arg##num = (int *)((*jenv)->GetIntArrayElements(jenv, arg##num, NULL)); \
   if (m_arg##num == NULL) { \
@@ -165,8 +166,9 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   free(m_arg##num); \
   out##num##a:
 
+// jint is int32 on Linux and Windows, thus the cast from int* to jint* is safe.
 #define FREE_INT_ARRAY_ARG(num) \
-  (*jenv)->ReleaseIntArrayElements(jenv, arg##num, m_arg##num, 0); \
+  (*jenv)->ReleaseIntArrayElements(jenv, arg##num, (jint *)m_arg##num, 0); \
   out##num:
 
 #define PUT_STRUCT_POINTER_ARG(num) \

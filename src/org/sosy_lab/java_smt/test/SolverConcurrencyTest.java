@@ -108,6 +108,13 @@ public class SolverConcurrencyTest {
   @Before
   public void checkThatSolverIsAvailable() throws InvalidConfigurationException {
     initSolver().close();
+
+    if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+      assume()
+          .withMessage("MathSAT5 is not reentant on Windows")
+          .that(solver)
+          .isNotEqualTo(Solvers.MATHSAT5);
+    }
   }
 
   private void requireConcurrentMultipleStackSupport() {

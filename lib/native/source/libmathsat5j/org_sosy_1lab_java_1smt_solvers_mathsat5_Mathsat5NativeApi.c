@@ -1191,14 +1191,14 @@ DEFINE_FUNC(long, 1set_1termination_1callback) WITH_TWO_ARGS(jenv, object)
     return 0;
   }
   // Ugly: return the struct's address so that it can be free'd later on.
-  return (long)helper;
+  return (size_t)helper;
 }
 
 // This method is not defined by Mathsat,
 // we need it to prevent a memory leak.
 // This may be called only after the environment with this termination test has been destroyed.
 DEFINE_FUNC(void, 1free_1termination_1callback) WITH_ONE_ARG(long)
-  struct msat_callback_info *helper = (struct msat_callback_info *)(long)arg1;
+  struct msat_callback_info *helper = (struct msat_callback_info *)(size_t)arg1;
   if (helper == NULL) {
     throwException(jenv, "java/lang/NullPointerException", "TerminationCallback may not be null");
     return;

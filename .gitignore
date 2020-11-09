@@ -42,6 +42,7 @@ lib/native/source/*/*.o
 .idea/uiDesigner.xml
 
 /*.so
+/*.dll
 /*.jar
 
 build.properties

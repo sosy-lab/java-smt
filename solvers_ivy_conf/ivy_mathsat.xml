@@ -22,14 +22,19 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-        <conf name="solver-mathsat" />
+        <conf name="solver-mathsat" extends="solver-mathsat-linux,solver-mathsat-windows"/>
+        <conf name="solver-mathsat-linux" />
+        <conf name="solver-mathsat-windows" />
     </configurations>
 
     <publications defaultconf="solver-mathsat">
-
-        <artifact name="libmathsat5j" conf="solver-mathsat" type="shared-object" ext="so" />
+        <!-- Linux64 files -->
+        <artifact name="libmathsat5j" conf="solver-mathsat-linux" type="shared-object" ext="so" />
+        <!-- Windows64 files -->
+        <artifact name="mathsat5j" conf="solver-mathsat-windows" type="dll" ext="dll" />
+        <artifact name="mathsat"   conf="solver-mathsat-windows" type="dll" ext="dll" />
+        <artifact name="mpir"      conf="solver-mathsat-windows" type="dll" ext="dll" />
     </publications>
-
     <dependencies></dependencies>
 
 </ivy-module>
