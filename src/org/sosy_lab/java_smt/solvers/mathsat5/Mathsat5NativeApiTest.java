@@ -391,4 +391,66 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     }
     msat_destroy_model_iterator(iter);
   }
+
+  private static final String LIA_QUERY =
+      "(declare-fun |__ADDRESS_OF_main::a@| () Int)"
+          + "(declare-fun |main::a@2| () Int)"
+          + "(declare-fun *int@1 () (Array Int Int))"
+          + "(declare-fun |main::p@2| () Int)"
+          + "(declare-fun *int@2 () (Array Int Int))"
+          + "(define-fun .8 () Int 0)"
+          + "(define-fun .13 () Int |__ADDRESS_OF_main::a@|)"
+          + "(define-fun .14 () Bool (<= .13 .8))"
+          + "(define-fun .15 () Bool (not .14))"
+          + "(define-fun .16 () Bool ((_ divisible 4) (- .13 .8)))"
+          + "(define-fun .18 () Int (- 4))"
+          + "(define-fun .19 () Bool (<= .13 .18))"
+          + "(define-fun .20 () Bool (not .19))"
+          + "(define-fun .21 () Int |main::a@2|)"
+          + "(define-fun .22 () Bool (= .21 .8))"
+          + "(define-fun .23 () Bool (and .15 .16))"
+          + "(define-fun .24 () Bool (and .20 .23))"
+          + "(define-fun .25 () Bool (and .22 .24))"
+          + "(define-fun .26 () (Array Int Int) *int@1)"
+          + "(define-fun .27 () Int (select .26 .13))"
+          + "(define-fun .28 () Bool (= .21 .27))"
+          + "(define-fun .29 () Int |main::p@2|)"
+          + "(define-fun .30 () Bool (= .13 .29))"
+          + "(define-fun .31 () Bool (and .28 .30))"
+          + "(define-fun .32 () Bool (and .25 .31))"
+          + "(define-fun .33 () Int 5)"
+          + "(define-fun .34 () (Array Int Int) *int@2)"
+          + "(define-fun .35 () (Array Int Int) (store .26 .13 .33))"
+          + "(define-fun .36 () Bool (= .34 .35))"
+          + "(define-fun .37 () Bool (and .32 .36))"
+          + "(define-fun .38 () Int (select .34 .29))"
+          + "(define-fun .39 () Bool (<= .38 .8))"
+          + "(define-fun .40 () Bool (not .39))"
+          + "(define-fun .43 () Bool (and .37 .40))"
+          + "(assert .43)";
+
+  @Test
+  public void linearArithmeticModelTest()
+      throws IllegalStateException, InterruptedException, SolverException {
+    System.out.println(LIA_QUERY);
+    long parsed = msat_from_smtlib2(env, LIA_QUERY);
+    msat_assert_formula(env, parsed);
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isTrue();
+
+    long model = msat_get_model(env);
+    long iter = msat_model_create_iterator(model);
+    while (msat_model_iterator_has_next(iter)) {
+      long[] key = new long[1];
+      long[] value = new long[1];
+      @SuppressWarnings("unused")
+      boolean check = msat_model_iterator_next(iter, key, value); // crash here
+      // System.out.println(" " + check);
+      // String k = msat_term_repr(key[0]);
+      // System.out.println("after crash");
+      // String v = msat_term_repr(value[0]);
+      // System.out.println(k + " := " + v);
+    }
+    msat_destroy_model_iterator(iter);
+  }
 }
