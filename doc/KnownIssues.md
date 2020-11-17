@@ -26,4 +26,9 @@ try increasing the stack size with the JVM parameter `-Xss`.
  - Our version of CVC4 does not support any garbage collection in the native library.
    This might cause memory leaks.
 
+## MathSAT (on Windows)
+
+ - Missing requirement `msvcr120.dll` causes an `UnsatisfiedLinkError`.
+   Please install the [Visual C++ 2013 Redistributable Package](https://support.microsoft.com/en-us/help/4032938/update-for-visual-c-2013-redistributable-package).
+
 [ShutdownNotifier]: https://sosy-lab.github.io/java-common-lib/api/org/sosy_lab/common/ShutdownNotifier.html
