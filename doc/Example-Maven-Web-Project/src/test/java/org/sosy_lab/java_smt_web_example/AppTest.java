@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.sosy_lab.java_smt_web_example;
 
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;

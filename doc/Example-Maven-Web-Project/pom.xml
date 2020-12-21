@@ -4,15 +4,65 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.sosy_lab</groupId>
-  <artifactId>my-app</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <groupId>org.sosy_lab.java_smt_web_example</groupId>
+  <artifactId>java-smt-web-example</artifactId>
+  <version>1.1</version>
   <packaging>war</packaging>
 
   <!-- This is the pom for my war test -->
   
-  <name>my-app</name>
-  <url>http://www.example.com</url>
+  <name>java-smt-maven-web-example</name>
+  <description>Example Maven project to show how to use JavaSMT with Z3/Mathsat5 in a web project.</description>
+  <url>https://github.com/sosy-lab/java-smt</url>
+  
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Software Systems Lab</name>
+    <url>https://www.sosy-lab.org/</url>
+  </organization>
+
+  <scm>
+    <url>https://github.com/sosy-lab/java-smt/</url>
+    <connection>scm:git:git://github.com/sosy-lab/java-smt.git</connection>
+    <developerConnection>scm:git:git@github.com:sosy-lab/java-smt.git</developerConnection>
+  </scm>
+
+   <developers>
+     <developer>
+       <name>Karlheinz Friedberger</name>
+       <email>kfriedberger@gmail.com</email>
+       <organization>Software Systems Lab</organization>
+       <url>https://www.sosy-lab.org/people/friedberger/</url>
+       <roles>
+         <role>project maintainer</role>
+       </roles>
+      </developer>
+      <developer>
+      <name>Philipp Wendler</name>
+      <email>uni@philippwendler.de</email>
+      <organization>Software Systems Lab</organization>
+      <url>https://www.sosy-lab.org/people/wendler/</url>
+      <roles>
+        <role>project maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Dirk Beyer</name>
+      <email>dirk.beyer@sosy-lab.org</email>
+      <url>https://www.sosy-lab.org/people/beyer/</url>
+      <organization>Software Systems Lab</organization>
+      <organizationUrl>http://www.sosy-lab.org/</organizationUrl>
+      <roles>
+        <role>project manager</role>
+      </roles>
+    </developer>
+  </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,9 +79,29 @@
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
-      <artifactId>libmathsat5j</artifactId>
-      <version>1.0</version>
+      <artifactId>java-smt-mathsat5</artifactId>
+      <version>1.1</version>
       <type>so</type>
+    </dependency>
+    <!-- Z3 has 3 dependencies (from the same repo) -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>java-smt-z3</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>java-smt-z3</artifactId>
+      <version>1.1</version>
+      <type>so</type>
+      <classifier>libz3</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>java-smt-z3</artifactId>
+      <version>1.1</version>
+      <type>so</type>
+      <classifier>libz3java</classifier>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -87,6 +157,8 @@
                         <directory>target/dependency</directory>
                         <includes>
                             <include>libmathsat5j.so</include>
+                            <include>libz3.so</include>
+                            <include>libz3java.so</include>
                         </includes>
                         <targetPath>WEB-INF/lib</targetPath>
                     </resource>
@@ -132,6 +204,13 @@
           <version>3.1.1</version>
           <executions>
             <execution>
+              <id>copy-dependencies</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+            </execution>
+            <execution>
               <id>copy</id>
               <phase>initialize</phase>
               <goals>
@@ -144,100 +223,37 @@
             <artifactItems>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
-                <artifactId>libmathsat5j</artifactId>
-                <version>1.0</version>
+                <artifactId>java-smt-mathsat5</artifactId>
+                <version>1.1</version>
                 <type>so</type>
                 <overWrite>true</overWrite>
-                <!--<outputDirectory>${commonpath}</outputDirectory>-->
                 <outputDirectory>${project.build.directory}/dependency</outputDirectory>
                 <destFileName>libmathsat5j.so</destFileName>
+              </artifactItem>
+               <!-- If you want Z3, you need to copy 2 artifacts: libz3java.so, libz3.so -->
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>java-smt-z3</artifactId>
+                <version>1.1</version>
+                <type>so</type>
+                <classifier>libz3java</classifier>
+                <!-- We put all dependencies in ${project.build.directory}/dependency so we put z3 there as well -->
+                <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                <destFileName>libz3java.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>java-smt-z3</artifactId>
+                <version>1.1</version>
+                <type>so</type>
+                <classifier>libz3</classifier>
+                <!-- We put all dependencies in ${project.build.directory}/dependency so we put z3 there as well -->
+                <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                <destFileName>libz3.so</destFileName>
               </artifactItem>
             </artifactItems>
           </configuration>
       </plugin>
-      <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>1.8</version>
-                        <executions>
-                            <execution>
-                              <phase>initialize</phase>
-                                <id>regex-property</id>
-                                <goals>
-                                    <goal>regex-property</goal>
-                                </goals>
-                                <configuration>
-                                    <name>commonpath</name>
-                                    <value>${org.sosy-lab:common:jar}</value>
-                                    <!--<regex>\.+(\/common-\d+.+)</regex>-->
-                                    <regex>\/common-.+</regex>
-                                    <replacement></replacement>
-                                    <failIfNoMatch>false</failIfNoMatch>
-                                    <!--<failIfNoMatch>true</failIfNoMatch>-->
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-        <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <echo>******** Displaying value of property ********</echo>
-                                        <echo>${java.library.path}</echo>
-                                      <echo>${org.sosy-lab:common:jar}</echo>
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-      <!--
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
-          <executions>
-            <execution>
-              <id>install-file</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>common</artifactId>
-                <version>native.x86_64-linux</version>
-                <type>so</type>
-                <overWrite>true</overWrite>
-                <file>${project.build.directory}/dependency/libmathsat5j.so</file>
-                <packaging>so</packaging>
-          </configuration>
-      </plugin>
--->
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.0</version>
-          <executions>
-            <execution>
-              <id>copy-dependencies</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-            </execution>
-          </executions>
-      </plugin>
-
     </plugins>
   </build>
 </project>
