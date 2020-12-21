@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>javasmt-maven-example</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>javasmt-maven-example</name>
+  <!-- FIXME change it to the project's website -->
+  <url>http://www.example.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>java-smt</artifactId>
+      <version>3.7.0</version> 
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>libmathsat5j</artifactId>
+      <version>1.0</version>
+      <type>so</type>
+    </dependency>
+    <!-- Z3 has 3 dependencies (from the same repo) -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-z3</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-z3</artifactId>
+      <version>1.2</version>
+      <type>so</type>
+      <classifier>libz3</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-z3</artifactId>
+      <version>1.2</version>
+      <type>so</type>
+      <classifier>libz3java</classifier>
+    </dependency>
+    <!-- For testing we take Junit 4. As we only need it for the tests we restrict the scope. -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+          <configuration>
+            <!-- Enter the Java Version below that you have installed. i.e. 11 -->
+            <release>11</release>
+          </configuration>
+        </plugin>
+        <plugin>
+          <!-- This shit starts its own JVM that ignores system properties set by the user, because why would those ever be important?! -->
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+          <!-- For solvers with native binaries (i.e. Z3, Mathsat5) you need to add a classpath or
+               java.library.path to test properly. This has to have
+               the location of the sosy-lab.commons.jar + the solver binaries. 
+               See maven-dependency-plugin below for more information.   -->
+          <configuration>
+            <argLine>-Djava.library.path=${project.build.directory}/dependency</argLine>
+          </configuration>  
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
+          <configuration>
+          <archive>
+            <manifest>
+              <!-- For solvers with native binaries (i.e. Z3, Mathsat5) you need to add a classpath to
+                   the location of the sosy-lab.commons.jar + the solver binaries. 
+                   See maven-dependency-plugin below for more information.   -->
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>${project.build.directory}/dependency</classpathPrefix>
+              <mainClass>com.mycompany.app.SolverOverviewTable</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      
+        <plugin>
+          <!-- This plugin allows us to copy/delete stuff around. -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.1.1</version>
+          <executions>
+            <execution>
+              <!-- We want to init the goal properties very early (phase initialize) executed.
+                   This allows us to find the folder to every dependency on every system like this: 
+                   ${groupId:artifactId:type:[classifier]} 
+                   More infos on this: https://maven.apache.org/plugins/maven-dependency-plugin/properties-mojo.html
+ 
+                   The goal copy is used to change the name of the solver binaries (i.e. Z3)   -->
+              <id>copy</id>
+              <phase>initialize</phase>
+              <goals>
+                <goal>properties</goal>
+                <goal>copy</goal>
+              </goals>
+            </execution>
+            <execution>
+              <!-- This copys all dependencies to ${project.build.directory}/dependency -->
+              <!-- We do this because the sosy-lab.commons dependency (in JavaSMT) needs the 
+                   nativ solver binaries(i.e. Z3) at specifc locations (see below) and with specifc names.
+                   So we just copy all dependencies and set the classpath to this location.
+                   You may of course change this if you know how to.
+                   Locations for commons: in its own folder (by far the easiest)
+                   or in the "native library path" as returned by getNativeLibraryPath() in java, which is the
+                   directory ../native/<arch>-<os>/ relative to the JAR file of sosy-lab.commons, with
+                   <arch>-<os> being one of the following values depending on your system:
+                   x86_64-linux
+                   x86-linux
+                   x86-windows
+                   x86_64-windows
+                   x86-macosx
+                   x86_64-macosx       -->
+              <id>copy-dependencies</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <artifactItems>
+              <!-- Here we specify what we want to copy.
+                   In our case we copy the solver dependencies (binaries) to change their names.
+                   groupId/artifactId/version/type/classifier have to match the dependency!
+                   We copy them to ${project.build.directory}/dependency as this is the location
+                   that copy-dependencies uses by default. destFileName specifies the final name.
+                   You may only need some of the artifacts below, depending on what solver(s) you want.
+                   Important: you NEED to set the classpath to ${project.build.directory}/dependency or
+                   wherever you have your sosy-lab.commons + solver binaries!   -->
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>libmathsat5j</artifactId>
+                <version>1.0</version>
+                <type>so</type>
+                <!-- We put all dependencies in ${project.build.directory}/dependency so we put mathsat there as well -->
+                <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                <destFileName>libmathsat5j.so</destFileName>
+              </artifactItem>
+              <!-- If you want Z3, you need to copy 2 artifacts: libz3java.so, libz3.so -->
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-z3</artifactId>
+                <version>1.2</version>
+                <type>so</type>
+                <classifier>libz3java</classifier>
+                <!-- We put all dependencies in ${project.build.directory}/dependency so we put z3 there as well -->
+                <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                <destFileName>libz3java.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-z3</artifactId>
+                <version>1.2</version>
+                <type>so</type>
+                <classifier>libz3</classifier>
+                <!-- We put all dependencies in ${project.build.directory}/dependency so we put z3 there as well -->
+                <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                <destFileName>libz3.so</destFileName>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+      </plugin>
+      <!--
+      <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                              <phase>initialize</phase>
+                                <id>regex-property</id>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>commonpath</name>
+                                    <value>${org.sosy-lab:common:jar}</value>
+-->
+                                    <!--<regex>\.+(\/common-\d+.+)</regex>-->
+      <!--
+                                    <regex>\/common-.+</regex>
+                                    <replacement></replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+-->
+                                    <!--<failIfNoMatch>true</failIfNoMatch>-->
+      <!--
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+-->
+      <!--
+      <plugin>
+<artifactId>maven-assembly-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+                <goal>single</goal>
+            </goals>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>com.mycompany.app.App</mainClass>
+                    </manifest>
+                </archive>
+                <descriptors>
+                    <descriptor>assembly.xml</descriptor> 
+                </descriptors>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+-->
+      <!--
+      <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo>******** Displaying value of property ********</echo>
+                                        <echo>${java.library.path}</echo>
+                                      <echo>${org.sosy-lab:common:jar}</echo>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+-->
+    </plugins>
+  </build>
+</project>
