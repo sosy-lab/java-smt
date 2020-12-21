@@ -6,4 +6,4 @@ mvn org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file -Durl=${o
 
 Publish Z3:
 
-mvn org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file -Durl=${ossrh-staging-repository-url} -DrepositoryId=${ossrh-server-id} -Dfile=lib/java/runtime-z3/com.microsoft.z3.jar -Dfiles=lib/java/runtime-z3/libz3java.so,lib/java/runtime-z3/libz3.so -Dtypes=so,so -DgroupId=org.sosy-lab -Dclassifiers=libz3java,libz3 -DartifactId=javasmt-solver-z3 -Dversion=4.8.9-sosy0 -Dpackaging=jar -DpomFile=solvers_maven_conf/maven_z3_pom.xml -DgeneratePom=false -Ppgp
+mvn org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file -Durl=${ossrh-staging-repository-url} -DrepositoryId=${ossrh-server-id} -Dfile=lib/java/runtime-z3/com.microsoft.z3.jar -Dfiles=lib/java/runtime-z3/libz3java.so,lib/java/runtime-z3/libz3.so -Dtypes=so,so -DgroupId=org.sosy-lab -Dclassifiers=libz3java,libz3 -DartifactId=javasmt-solver-z3 -Dversion=4.8.9-sosy0 -Dpackaging=jar -DpomFile=solvers_maven_conf/maven_z3_pom.xml -DgeneratePom=false -Pgpg
