@@ -9,7 +9,7 @@
 <body>
 <hl>Welcome</hl>
 <hr/>
-<form action="MyServlet">
+<form action="SolverOverviewServlet">
   <input type="submit" value="Send" />
 </form>
 </body>

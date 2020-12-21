@@ -173,7 +173,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>dependency</classpathPrefix>
-              <mainClass>org.sosy_lab.MyServlet</mainClass>
+              <mainClass>org.sosy_lab.SolverOverviewServlet</mainClass>
             </manifest>
           </archive>
         </configuration>
