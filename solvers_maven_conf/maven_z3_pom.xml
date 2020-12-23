@@ -4,7 +4,6 @@
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-z3</artifactId>
   <version>4.8.9-sosy0</version>
-  <packaging>jar</packaging>
   <name>javasmt-solver-z3</name>
   <description>SMT solver Z3 for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
