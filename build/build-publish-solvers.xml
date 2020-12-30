@@ -17,9 +17,9 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing Z3 {{{1
          ===============================================================
     -->
-    <target name="package-z3" depends="get-z3-version, package-z3-sources"
-        description="Copy Z3 binaries to the root folder along with the version postfix.
-            This package provides the JNI for direct usage.">
+    <target name="package-z3" depends="get-z3-version, package-z3-sources">
+        <!-- Copy Z3 binaries to the root folder along with the version postfix.
+             This package provides the JNI for direct usage. -->
         <fail unless="z3.path">
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
             The path has to point to the root Z3 folder (i.e., the path is ending with '/bin') and can be relative or absolute.
@@ -111,8 +111,8 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing CVC4 {{{1
          ==================================================================
     -->
-    <target name="package-cvc4" depends=""
-        description="Copy CVC4 binaries to the root folder along with the version postfix.">
+    <target name="package-cvc4" depends="">
+        <!-- Copy CVC4 binaries to the root folder along with the version postfix. -->
         <fail unless="cvc4.path">
             Please specify the path to CVC4 with the flag -Dcvc4.path=/path/to/cvc4.
             The path has to point to the root CVC4 folder, i.e.,
@@ -204,8 +204,8 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing Boolector {{{1
          ==================================================================
     -->
-    <target name="package-boolector" depends=""
-        description="Copy Boolector repository to the root folder along with the version postfix.">
+    <target name="package-boolector" depends="">
+        <!-- Copy Boolector repository to the root folder along with the version postfix. -->
         <fail unless="boolector.path">
             Please specify the path to Boolector with the flag -Dboolector.path=/path/to/boolector.
             The path has to point to the root Boolector folder, i.e.,
@@ -302,18 +302,15 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing [Opti-]MathSAT {{{1
          ===============================================================
     -->
-    <target name="compile-mathsat-bindings-linux"
-        description="Compile MathSAT bindings for Linux">
+    <target name="compile-mathsat-bindings-linux">
         <compile-mathsatlike-bindings-linux flag="mathsat"/>
     </target>
 
-    <target name="compile-mathsat-bindings-windows"
-        description="Compile MathSAT bindings for Windows">
+    <target name="compile-mathsat-bindings-windows">
         <compile-mathsatlike-bindings-windows flag="mathsat"/>
     </target>
 
-    <target name="compile-optimathsat-bindings"
-        description="Compile OptiMathSAT bindings">
+    <target name="compile-optimathsat-bindings">
         <compile-mathsatlike-bindings-linux flag="optimathsat"/>
     </target>
 
