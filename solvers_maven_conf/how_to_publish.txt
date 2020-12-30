@@ -4,6 +4,8 @@ Publish Mathsat5:
 
 mvn org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file -Durl=${ossrh-staging-repository-url} -DrepositoryId=${ossrh-server-id} -Dfile=lib/native/x86_64-linux/libmathsat5j.so -Dpackaging=so -DpomFile=solvers_maven_conf/maven_mathsat_pom.xml -DgeneratePom=false -gpgg
 
+or use "ant stage-mathsat5", it applies the same cmdline.
+
 Publish Z3:
 
 <<<<<<< HEAD

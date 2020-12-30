@@ -4,7 +4,7 @@
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-mathsat5</artifactId>
   <version>5.6.5</version>
-  <packaging>pom</packaging>
+  <packaging>so</packaging>
   <name>javasmt-solver-mathsat5</name>
   <description>Recompiled Version of the SMT solver Mathsat5 for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
