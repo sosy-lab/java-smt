@@ -17,16 +17,20 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing Z3 {{{1
          ===============================================================
     -->
-    <target name="package-z3" depends="get-z3-version"
+    <target name="package-z3" depends="get-z3-version, package-z3-sources"
         description="Copy Z3 binaries to the root folder along with the version postfix.
             This package provides the JNI for direct usage.">
         <fail unless="z3.path">
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
-            The path has to point to the root Z3 folder and can be relative or absolute.
+            The path has to point to the root Z3 folder (i.e., the path is ending with '/bin') and can be relative or absolute.
             Note that shell substitutions do not work.
             Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
             e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
+            Additionally, make the Java sources available in this directory.
+            This can be done by:
+            - copying the content of sources-zip into the current directory (or vice versa)
+            - executing `python scripts/mk_make.py --java` to generate all Java related files. Executing `make` is not required.
         </fail>
         <exec executable="readelf" dir="${z3.path}" outputproperty="z3.elf_details" logError="true" failonerror="true">
             <arg value="-d"/>
@@ -78,7 +82,7 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:publish
             pubrevision="${z3.version}"
             resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
+            artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
             status="release"
             />
         <echo>
@@ -86,6 +90,22 @@ SPDX-License-Identifier: Apache-2.0
             svn add repository/${ivy.organisation}/${ivy.module}/*-${z3.version}*
             svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${z3.version} of Z3 Solver"
             to make the new version publicly available.</echo>
+    </target>
+
+    <target name="package-z3-sources" depends="get-z3-version">
+        <!-- check for prepared Java sources-->
+        <available file="${z3.path}/../src/api/java/Expr.java" property="isZ3NativeExprAvailable" />
+        <fail unless="isZ3NativeExprAvailable" message="The sources of Z3 (Java bindings) can not be found." />
+        <available file="${z3.path}/../src/api/java/Native.java" property="isZ3NativeApiFileAvailable" />
+        <fail unless="isZ3NativeApiFileAvailable" message="The sources of Z3 are not yet prepared. Please execute `python scripts/mk_make.py --java` to generate all Java related files. Executing `make` is not required." />
+        <jar destfile="com.microsoft.z3-${z3.version}-sources.jar" whenmanifestonly="fail">
+            <zipfileset dir="${z3.path}/../src/api/java" includes="*.java" prefix="com/microsoft/z3"/>
+            <zipfileset dir="${z3.path}/../" includes="LICENSE.txt" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="com.microsoft.z3"/>
+                <attribute name="Implementation-Version" value="${z3.version}"/>
+            </manifest>
+        </jar>
     </target>
 
     <!-- SECTION: Publishing CVC4 {{{1
