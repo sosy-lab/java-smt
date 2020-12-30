@@ -85,8 +85,8 @@ SPDX-License-Identifier: Apache-2.0
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
-      <artifactId>java-smt-mathsat5</artifactId>
-      <version>1.1</version>
+      <artifactId>javasmt-solver-mathsat5</artifactId>
+      <version>5.6.5</version>
       <type>so</type>
     </dependency>
     <!-- Z3 has 3 dependencies (from the same repo) -->
@@ -224,8 +224,8 @@ SPDX-License-Identifier: Apache-2.0
                    wherever you have your sosy-lab.commons + solver binaries!   -->
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
-                <artifactId>java-smt-mathsat5</artifactId>
-                <version>1.1</version>
+                <artifactId>javasmt-solver-mathsat5</artifactId>
+                <version>5.6.5</version>
                 <type>so</type>
                 <!-- We put all dependencies in ${project.build.directory}/dependency so we put mathsat there as well -->
                 <outputDirectory>${project.build.directory}/dependency</outputDirectory>
