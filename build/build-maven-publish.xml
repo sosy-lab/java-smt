@@ -84,15 +84,14 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <!-- before this, update project files (../solvers_maven_conf/maven_mathsat_pom.xml) -->
-    <target name="stage-mathsat5" description="deploy current version of MathSAT to Maven staging repository">
-
-        <!-- Sign and deploy the artifact. -->
+    <target name="stage-mathsat5" depends="build-dependencies" description="deploy current version of MathSAT to Maven staging repository">
+        <!-- 'build-dependencies' downloads the libraries, sources, javadoc for Z3 -->
         <artifact:mvn>
             <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
             <arg value="-Durl=${ossrh-staging-repository-url}" />
             <arg value="-DrepositoryId=${ossrh-server-id}" />
             <arg value="-DpomFile=solvers_maven_conf/maven_mathsat_pom.xml" />
-            <arg value="-Dfile=lib/native/x86_64-linux/libmathsat5j.so" />
+            <arg value="-Dfile=lib/java/runtime-mathsat/libmathsat5j.so" />
             <arg value="-DgeneratePom=false" />
             <arg value="-Pgpg" />
         </artifact:mvn>
@@ -100,7 +99,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- before this, update project files (../solvers_maven_conf/maven_z3_pom.xml) -->
     <target name="stage-z3" depends="build-dependencies, install-contrib" description="deploy current version of Z3 to Maven staging repository">
-        <!-- install-contrib downloads the libraries, sources, javadoc for Z3 -->
+        <!-- 'build-dependencies/install-contrib' downloads the libraries, sources, javadoc for Z3 -->
         <artifact:mvn>
             <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
             <arg value="-Durl=${ossrh-staging-repository-url}" />
