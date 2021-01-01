@@ -9,6 +9,7 @@ SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -18,7 +19,7 @@ SPDX-License-Identifier: Apache-2.0
   <version>1.0</version>
 
   <name>java-smt-maven-example</name>
-  <description>Example Maven project to show how to use JavaSMT with Z3/Mathsat5.</description>
+  <description>Example Maven project to show how to use JavaSMT with native solver libraries.</description>
   <url>https://github.com/sosy-lab/java-smt</url>
 
   <licenses>
@@ -66,7 +67,8 @@ SPDX-License-Identifier: Apache-2.0
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
-    <project.dependency.path>${project.build.directory}/dependency</project.dependency.path>
+    <project.dependency.relativepath>dependency</project.dependency.relativepath>
+    <project.dependency.path>${project.build.directory}/${project.dependency.relativepath}</project.dependency.path>
   </properties>
 
   <dependencies>
@@ -105,7 +107,7 @@ SPDX-License-Identifier: Apache-2.0
       <classifier>libz3java</classifier>
     </dependency>
 
-    <!-- For testing we take Junit 4. As we only need it for the tests we restrict the scope. -->
+    <!-- JUnit for testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -116,21 +118,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <build>
     <pluginManagement>
-      <!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
-        <!-- the clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.0</version>
-          <configuration>
-            <!-- the installed Java Version, e.g., 11 -->
-            <release>11</release>
-          </configuration>
-        </plugin>
         <plugin>
           <!-- This step starts its own JVM that ignores system properties set by the user,
                because why would those ever be important?! -->
@@ -147,21 +135,17 @@ SPDX-License-Identifier: Apache-2.0
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
           <configuration>
-          <archive>
-            <manifest>
-              <!-- For solvers with native binaries, you need to add the classpath to test properly.
-                   This path needs to be the location of the sosy-lab.commons.jar and the solver binaries.
-                   See maven-dependency-plugin below for more information. -->
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>${project.dependency.path}</classpathPrefix>
-              <mainClass>org.sosy_lab.java_smt_example.SolverOverviewTable</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
+            <archive>
+              <manifest>
+                <!-- For solvers with native binaries, you need to add the classpath to test properly.
+                     This path needs to be the location of the sosy-lab.commons.jar and the solver binaries.
+                     See maven-dependency-plugin below for more information. -->
+                <addClasspath>true</addClasspath>
+                <classpathPrefix>${project.dependency.relativepath}</classpathPrefix>
+                <mainClass>org.sosy_lab.java_smt_example.SolverOverviewTable</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -173,30 +157,25 @@ SPDX-License-Identifier: Apache-2.0
           <version>3.1.1</version>
           <executions>
             <execution>
-              <!-- We want to execute the goal "properties" very early (phase "initialize").
-                   This allows us to find the folder to every dependency on every system like this:
-                   ${groupId:artifactId:type:[classifier]}
-                   More infos on this: https://maven.apache.org/plugins/maven-dependency-plugin/properties-mojo.html
-                   The goal "copy" is used to change the name of the solver libraries (i.e. Z3)
+              <!-- The goal "copy" is used to change the name of the solver libraries (i.e. Z3)
                    from the name that is used internally in Maven to the normal name. -->
               <id>copy</id>
               <phase>initialize</phase>
               <goals>
-                <goal>properties</goal>
                 <goal>copy</goal>
               </goals>
             </execution>
             <execution>
-              <!-- This copies all dependencies to ${project.build.directory}/dependency -->
-              <!-- We do this because the sosy-lab.commons dependency (in JavaSMT) needs the
-                   native solver binaries (i.e. Z3) at specific locations (see below) and with specific names.
-                   So we just copy all dependencies and set the classpath to this location.
+              <!-- This copies all dependencies to ${project.dependency.path}. -->
+              <!-- We do this, because the sosy-lab.commons dependency (in JavaSMT) searches the
+                   native solver binaries (i.e. MathSAT or Z3) at specific locations and with specific names.
+                   So we just copy the dependencies and set the classpath to this location.
                    You may of course change this if you know how to.
-                   Locations for commons: in its own folder (by far the easiest)
-                   or in the "native library path" as returned by getNativeLibraryPath() in java, which is the
-                   directory ../native/<arch>-<os>/ relative to the JAR file of sosy-lab.commons, with
-                   <arch>-<os> being one of the following values depending on your system
-                   (arch=x86_64|x86; os=linux|windows|macosx) -->
+                   Default search locations for sosy-lab.commons:
+                   (1) in its own folder (by far the easiest, just copy everything together) or
+                   (2) in the "native library path" as returned by getNativeLibraryPath() in Java,
+                   which is the directory ../native/<arch>-<os>/ relative to the JAR file of sosy-lab.commons,
+                   with the following values depending on your system (arch=x86_64|x86; os=linux|windows|macosx). -->
               <id>copy-dependencies</id>
               <phase>validate</phase>
               <goals>
@@ -206,14 +185,13 @@ SPDX-License-Identifier: Apache-2.0
           </executions>
           <configuration>
             <artifactItems>
-
-              <!-- Here we specify what we want to copy.
+              <!-- Here we specify what we want to use for the goal "copy".
                    In our case we copy the solver dependencies (binaries) to change their names.
                    groupId/artifactId/version/type/classifier have to match the dependency!
                    We copy them to ${project.dependency.path} as this is the location
                    that copy-dependencies uses by default. destFileName specifies the final name.
                    You may only need some of the artifacts below, depending on what solver(s) you want.
-                   Important: you NEED to set the classpath to ${project.build.directory}/dependency or
+                   Important: you NEED to set the classpath to ${project.dependency.path} or
                    wherever you have your sosy-lab.commons + solver binaries!   -->
 
               <!-- MathSAT5 has one native library -->
