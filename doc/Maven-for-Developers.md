@@ -1,3 +1,13 @@
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 Local Test for Maven (Still needs internet to pull dependencys for Maven)
 0. If you are only interested in the JavaSMT part and know basic Maven, skip to 13.
 1. Install Maven
