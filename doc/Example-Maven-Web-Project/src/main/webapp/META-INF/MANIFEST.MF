@@ -1,3 +1,6 @@
-Manifest-Version: 1.0
-Class-Path: 
+License: This file is part of JavaSMT, an API wrapper for a collection of SMT solvers
+SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-License-Identifier: Apache-2.0
 
+Manifest-Version: 1.0
+Class-Path:
