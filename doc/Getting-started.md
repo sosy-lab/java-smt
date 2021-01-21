@@ -42,98 +42,45 @@ For Maven:
 
 Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
 because they are written in Java and Scala, and thus are available on every machine.
-Shared object for the solvers `MathSAT5` and `Z3` can be added by adding this to your dependencies:
+Shared object for the solvers `MathSAT5` and `Z3` can be added by using additional dependencies:
 
 ```xml
-<dependency>
-  <groupId>org.sosy-lab</groupId>
-  <artifactId>java-smt-mathsat5</artifactId>
-  <version>5.6.5</version>
-  <type>so</type>
-</dependency>
-<!-- Z3 has 3 dependencies (from the same repo) -->
-<dependency>
-  <groupId>org.sosy-lab</groupId>
-  <artifactId>java-smt-z3</artifactId>
-  <version>4.8.9-sosy0</version>
-</dependency>
-<dependency>
-  <groupId>org.sosy-lab</groupId>
-  <artifactId>java-smt-z3</artifactId>
-  <version>4.8.9-sosy0</version>
-  <type>so</type>
-  <classifier>libz3</classifier>
-</dependency>
-<dependency>
-  <groupId>org.sosy-lab</groupId>
-  <artifactId>java-smt-z3</artifactId>
-  <version>4.8.9-sosy0</version>
-  <type>so</type>
-  <classifier>libz3java</classifier>
-</dependency>
+    <!-- MathSAT5 has one dependency -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-mathsat5</artifactId>
+      <version>5.6.5</version>
+      <type>so</type>
+    </dependency>
+
+    <!-- Z3 has three dependencies -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-z3</artifactId>
+      <version>4.8.9-sosy1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-z3</artifactId>
+      <version>4.8.9-sosy1</version>
+      <type>so</type>
+      <classifier>libz3</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-z3</artifactId>
+      <version>4.8.9-sosy1</version>
+      <type>so</type>
+      <classifier>libz3java</classifier>
+    </dependency>
 ```
 
-and add the following under plugins:
-(This copys all dependencys to target/dependency and renames the `MathSAT5` and `Z3` objects.
- A detailed explanation as to why is given in the pom.xml of the `Example-Maven-Project`.)
-
-```xml
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-dependency-plugin</artifactId>
-  <version>3.1.1</version>
-  <executions>
-    <execution>
-      <id>copy</id>
-      <phase>initialize</phase>
-      <goals>
-        <goal>properties</goal>
-        <goal>copy</goal>
-      </goals>
-    </execution>
-    <execution>
-      <id>copy-dependencies</id>
-      <phase>validate</phase>
-      <goals>
-        <goal>copy-dependencies</goal>
-      </goals>
-    </execution>
-  </executions>
-  <configuration>
-    <artifactItems>
-      <artifactItem>
-        <groupId>org.sosy-lab</groupId>
-        <artifactId>java-smt-mathsat5</artifactId>
-        <version>5.6.5</version>
-        <type>so</type>
-        <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-        <destFileName>libmathsat5j.so</destFileName>
-      </artifactItem>
-      <!-- If you want Z3, you need to copy 2 artifacts: libz3java.so, libz3.so -->
-      <artifactItem>
-        <groupId>org.sosy-lab</groupId>
-        <artifactId>java-smt-z3</artifactId>
-        <version>4.8.9-sosy0</version>
-        <type>so</type>
-        <classifier>libz3java</classifier>
-        <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-        <destFileName>libz3java.so</destFileName>
-      </artifactItem>
-      <artifactItem>
-        <groupId>org.sosy-lab</groupId>
-        <artifactId>java-smt-z3</artifactId>
-        <version>4.8.9-sosy0</version>
-        <type>so</type>
-        <classifier>libz3</classifier>
-        <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-        <destFileName>libz3.so</destFileName>
-      </artifactItem>
-    </artifactItems>
-  </configuration>
-</plugin>
-```
-
-Add the classpath to the dependency folder for your test-engine. Example:
+Additionally you can add and configure some plugins to load the libraries automatically.
+The plugins copy all dependencies (including the solver binaries) to the target/dependency directory
+and rename the libraries as required for automated loading.
+A detailed explanation for these plugins is given in the `Example-Maven-Project/pom.xml`.
+For testing, you might need to add the dependency directory to the classpath for your test-engine.
+Example:
 
 ```xml
 <configuration>
@@ -141,7 +88,7 @@ Add the classpath to the dependency folder for your test-engine. Example:
 </configuration>
 ```
 
-And finally add it to your jar-plugin:
+And finally configure the classpath for your jar-plugin:
 
 ```xml
 <manifest>
@@ -153,8 +100,9 @@ And finally add it to your jar-plugin:
 See `Example-Maven-Project` for more information and a working example.
 See `Example-Maven-Web-Project` for more information about a Dynamic-Web-Project runnable by Tomcat 9.
 
-Shared object for _other solvers would have to be installed manually_:
+Shared object for _other solvers still need to be installed manually_:
 see the section "Manual Installation" below.
+
 
 ### Manual Installation
 
@@ -177,12 +125,15 @@ In order to perform the manual installation, the following steps should be follo
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
-### Binaries for Native Solvers (MathSAT and Z3)
 
-When using Ivy for installation on a 64-bit Linux platform, solver binaries for native solvers are downloaded automatically.
+### Binaries for Native Solvers (MathSAT, Z3, Boolector, CVC4, Yices2)
+
+When using Ivy or Maven for installation on a 64-bit Linux platform,
+solver binaries for native solvers are downloaded automatically, if available.
+Some solvers are also available for supporting Windows or MacOS.
 Everything should work as is after installation.
 
-Without Ivy you need to download and install the binaries manually as described above under [Manual Installation](#manual-installation).
+Without Ivy or Maven you need to download and install the binaries manually as described above under [Manual Installation](#manual-installation).
 You can either copy them into the directory of the JavaSMT JAR file,
 or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
