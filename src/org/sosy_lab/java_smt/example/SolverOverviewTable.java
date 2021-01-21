@@ -56,15 +56,13 @@ public class SolverOverviewTable {
     System.out.println(rowBuilder);
   }
 
-  private SolverOverviewTable() {}
-
   /**
    * Checks for solver-name, version, theories and features.
    *
    * @param solver to check for information. Taken from Solvers enum only.
    * @return Information about the solver you entered or NULL if the solver is not available.
    */
-  private @Nullable SolverInfo getSolverInformation(Solvers solver)
+  public @Nullable SolverInfo getSolverInformation(Solvers solver)
       throws SolverException, InterruptedException {
 
     Configuration config = Configuration.defaultConfiguration();
@@ -199,7 +197,7 @@ public class SolverOverviewTable {
   }
 
   /** just a wrapper for some data. */
-  private static class SolverInfo {
+  public static class SolverInfo {
     private final Solvers solver;
     private final String solverVersion;
     private final String solverTheories;
@@ -238,7 +236,7 @@ public class SolverOverviewTable {
   }
 
   /** This class builds the table row-by-row. */
-  private static class RowBuilder {
+  public static class RowBuilder {
 
     private List<String> lines = new ArrayList<>();
     // Minimum number of lines so that you can be sure a solver was added
@@ -272,7 +270,7 @@ public class SolverOverviewTable {
             + System.lineSeparator();
 
     /** The constructor builds the header of the table. */
-    RowBuilder() {
+    public RowBuilder() {
       lines.add(SEPERATOR_LINE);
       lines.add(String.format(INFO_COLUMN, "Solver", "Version", "Theories", "Features"));
       lines.add(SEPERATOR_LINE);
