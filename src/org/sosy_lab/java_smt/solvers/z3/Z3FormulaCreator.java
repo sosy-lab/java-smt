@@ -29,7 +29,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -103,7 +102,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /** Automatic clean-up of Z3 ASTs. */
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
-  private final Map<PhantomReference<? extends Z3Formula>, Long> referenceMap =
+  private final IdentityHashMap<PhantomReference<? extends Z3Formula>, Long> referenceMap =
       new IdentityHashMap<>();
 
   // todo: getters for statistic.
