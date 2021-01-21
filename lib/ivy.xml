@@ -80,14 +80,14 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-442-ge6ac6c3" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-457-g2465cf3" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="30.0-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="30.1-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="30.0-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="30.1-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -99,7 +99,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.7.4" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.7.1" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.9.1" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -121,8 +121,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.4.0" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.4.0" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.5.1" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.5.1" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -133,14 +133,14 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.9" conf="format-source->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.1.4" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.2.0" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.1.4" conf="core->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.2.0" conf="core->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="core->default; contrib->sources"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.38.0" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.37" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="8.39" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-732-gd208e931" conf="runtime-smtinterpol->master; contrib->sources"/>
