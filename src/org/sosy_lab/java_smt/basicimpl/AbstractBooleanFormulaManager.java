@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -286,9 +285,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public void visitRecursively(
       BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor) {
     formulaCreator.visitRecursively(
-        new DelegatingFormulaVisitor<>(pFormulaVisitor),
-        pF,
-        Predicates.instanceOf(BooleanFormula.class)::apply);
+        new DelegatingFormulaVisitor<>(pFormulaVisitor), pF, p -> p instanceof BooleanFormula);
   }
 
   @Override

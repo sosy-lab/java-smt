@@ -6,21 +6,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+dist: bionic # Ubuntu 18.04
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk11 # Java 11 is sufficient, larger tests are executed in Gitlab-CI
 addons:
   apt:
     packages:
-      - oracle-java8-installer
       - jq
 env:
   global:
     - GH_REF: github.com/sosy-lab/java-smt.git
 before_install: # lets update the very old version of ANT in TravisCI
-  - wget --no-check-certificate https://www.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.tar.bz2
-  - tar -xvf apache-ant-1.10.5-bin.tar.bz2
-  - export PATH=`pwd`/apache-ant-1.10.5/bin:$PATH
+  - wget --no-check-certificate https://www.apache.org/dist/ant/binaries/apache-ant-1.10.9-bin.tar.bz2
+  - tar -xvf apache-ant-1.10.9-bin.tar.bz2
+  - export PATH=`pwd`/apache-ant-1.10.9/bin:$PATH
   - echo $(ant -version)
 install:
   - ant resolve-dependencies
