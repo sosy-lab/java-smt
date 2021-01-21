@@ -9,9 +9,8 @@
 package org.sosy_lab.java_smt_web_example;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.sosy_lab.java_smt.example.Sudoku.SIZE;
-import static org.sosy_lab.java_smt.example.Sudoku.UNSOLVABLE_SUDOKU;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -143,7 +142,7 @@ public class SudokuTest {
     SudokuSolver<?> sudoku = new IntegerBasedSudokuSolver(context);
     Integer[][] solution = sudoku.solve(grid);
 
-    assertNotEquals(solution, UNSOLVABLE_SUDOKU);
+    assertNotNull(solution);
     assertEquals(sudokuSolution, solutionToString(solution));
   }
 

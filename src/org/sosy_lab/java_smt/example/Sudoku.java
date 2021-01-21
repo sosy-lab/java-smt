@@ -75,7 +75,7 @@ public class Sudoku {
 
   public static final int SIZE = 9;
   private static final int BLOCKSIZE = 3;
-  public static final Integer[][] UNSOLVABLE_SUDOKU = null;
+  private static final Integer[][] UNSOLVABLE_SUDOKU = null;
 
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
