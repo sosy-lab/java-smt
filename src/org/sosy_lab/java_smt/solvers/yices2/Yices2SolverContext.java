@@ -80,7 +80,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @VisibleForTesting
   static void loadLibrary() {
-    loadLibrary(ImmutableList.of("yices2j"), ImmutableList.of("yices", "yices2j"));
+    loadLibrary(ImmutableList.of("yices2j"), ImmutableList.of("libyices", "libyices2j"));
   }
 
   /**
