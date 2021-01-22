@@ -20,9 +20,12 @@
 lib/native/source/libz3j/org_sosy_lab_solver_z3_Z3NativeApi.c
 lib/native/source/*/*.so
 lib/native/source/*/*.o
+lib/native/*/*.asc
 
 doc/Example-Maven-Project/target*
 doc/Example-Maven-Web-Project/target*
+
+solvers_maven_conf/*.asc
 
 /ivy-*.xml
 /common-*.jar
