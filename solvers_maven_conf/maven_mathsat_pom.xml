@@ -15,7 +15,6 @@ SPDX-License-Identifier: Apache-2.0
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-mathsat5</artifactId>
   <version>5.6.5</version>
-  <packaging>so</packaging>
   <name>javasmt-solver-mathsat5</name>
   <description>Recompiled Version of the SMT solver Mathsat5 for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
@@ -39,6 +38,10 @@ SPDX-License-Identifier: Apache-2.0
               MathSAT5 or obtaining more up-to-date versions.
           </name>
           <url>http://mathsat.fbk.eu/download.html</url>
+      </license>
+      <license>
+          <name>MPIR is licensed LGPL v3+</name>
+          <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
       </license>
   </licenses>
 
