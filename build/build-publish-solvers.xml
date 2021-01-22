@@ -17,16 +17,23 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing Z3 {{{1
          ===============================================================
     -->
-    <target name="package-z3" depends="get-z3-version"
-        description="Copy Z3 binaries to the root folder along with the version postfix.
-            This package provides the JNI for direct usage.">
+    <property name="z3.project.name" value="Java Bindings for Z3"/>
+    <property name="z3.javadoc.dir" value="Javadoc-z3"/>
+
+    <target name="package-z3" depends="get-z3-version, package-z3-sources, package-z3-javadoc">
+        <!-- Copy Z3 binaries to the root folder along with the version postfix.
+             This package provides the JNI for direct usage. -->
         <fail unless="z3.path">
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
-            The path has to point to the root Z3 folder and can be relative or absolute.
+            The path has to point to the root Z3 folder (i.e., the path is ending with '/bin') and can be relative or absolute.
             Note that shell substitutions do not work.
             Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
             e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
+            Additionally, make the Java sources available in this directory.
+            This can be done by:
+            - copying the content of sources-zip into the current directory (or vice versa)
+            - executing `python scripts/mk_make.py --java` to generate all Java related files. Executing `make` is not required.
         </fail>
         <exec executable="readelf" dir="${z3.path}" outputproperty="z3.elf_details" logError="true" failonerror="true">
             <arg value="-d"/>
@@ -78,7 +85,7 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:publish
             pubrevision="${z3.version}"
             resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
+            artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
             status="release"
             />
         <echo>
@@ -88,11 +95,64 @@ SPDX-License-Identifier: Apache-2.0
             to make the new version publicly available.</echo>
     </target>
 
+    <target name="check-z3-sources">
+        <!-- check for prepared Java sources -->
+        <available file="${z3.path}/../src/api/java/Expr.java" property="isZ3NativeExprAvailable" />
+        <fail unless="isZ3NativeExprAvailable" message="The sources of Z3 (Java bindings) can not be found." />
+        <available file="${z3.path}/../src/api/java/Native.java" property="isZ3NativeApiFileAvailable" />
+        <fail unless="isZ3NativeApiFileAvailable" message="The sources of Z3 are not yet prepared. Please execute `python scripts/mk_make.py --java` to generate all Java related files. Executing `make` is not required." />
+    </target>
+
+    <target name="package-z3-sources" depends="get-z3-version, check-z3-sources">
+        <jar destfile="com.microsoft.z3-${z3.version}-sources.jar" whenmanifestonly="fail">
+            <zipfileset dir="${z3.path}/../src/api/java" includes="**/*.java" prefix="com/microsoft/z3"/>
+            <zipfileset dir="${z3.path}/../" includes="LICENSE.txt" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="${z3.project.name}"/>
+                <attribute name="Implementation-Version" value="${z3.version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="z3-javadoc" depends="get-z3-version, check-z3-sources">
+        <!-- cleanup -->
+        <delete dir="${z3.javadoc.dir}" quiet="true"/>
+        <!-- then write new files.
+             Lets ignore minor issues, e.g. using html tag <tt> instead of <code> -->
+        <javadoc
+            destdir="${z3.javadoc.dir}"
+            classpathref="classpath"
+            locale="en_US"
+            encoding="utf-8"
+            windowtitle="${z3.project.name}"
+            failonerror="false"
+            failonwarning="false"
+            overview="doc/javadoc_overview.html"
+            >
+            <fileset dir="${z3.path}/../src/api/java">
+                <include name="**/*.java"/>
+            </fileset>
+            <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
+            <doctitle><![CDATA[<h1>${z3.project.name}</h1>]]></doctitle>
+            <tag name="apiNote" description="API Note:"/>
+            <tag name="implSpec" description="Implementation Requirements:"/>
+            <tag name="implNote" description="Implementation Note:"/>
+            <arg line="${javadoc.doclint}"/>
+        </javadoc>
+    </target>
+
+    <target name="package-z3-javadoc" depends="z3-javadoc">
+        <jar jarfile="com.microsoft.z3-${z3.version}-javadoc.jar" whenmanifestonly="fail">
+            <zipfileset dir="${z3.path}/../" includes="LICENSE.txt" prefix="META-INF"/>
+            <fileset dir="${z3.javadoc.dir}" />
+        </jar>
+    </target>
+
     <!-- SECTION: Publishing CVC4 {{{1
          ==================================================================
     -->
-    <target name="package-cvc4" depends=""
-        description="Copy CVC4 binaries to the root folder along with the version postfix.">
+    <target name="package-cvc4" depends="">
+        <!-- Copy CVC4 binaries to the root folder along with the version postfix. -->
         <fail unless="cvc4.path">
             Please specify the path to CVC4 with the flag -Dcvc4.path=/path/to/cvc4.
             The path has to point to the root CVC4 folder, i.e.,
@@ -184,8 +244,8 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing Boolector {{{1
          ==================================================================
     -->
-    <target name="package-boolector" depends=""
-        description="Copy Boolector repository to the root folder along with the version postfix.">
+    <target name="package-boolector" depends="">
+        <!-- Copy Boolector repository to the root folder along with the version postfix. -->
         <fail unless="boolector.path">
             Please specify the path to Boolector with the flag -Dboolector.path=/path/to/boolector.
             The path has to point to the root Boolector folder, i.e.,
@@ -282,18 +342,15 @@ SPDX-License-Identifier: Apache-2.0
     <!-- SECTION: Publishing [Opti-]MathSAT {{{1
          ===============================================================
     -->
-    <target name="compile-mathsat-bindings-linux"
-        description="Compile MathSAT bindings for Linux">
+    <target name="compile-mathsat-bindings-linux">
         <compile-mathsatlike-bindings-linux flag="mathsat"/>
     </target>
 
-    <target name="compile-mathsat-bindings-windows"
-        description="Compile MathSAT bindings for Windows">
+    <target name="compile-mathsat-bindings-windows">
         <compile-mathsatlike-bindings-windows flag="mathsat"/>
     </target>
 
-    <target name="compile-optimathsat-bindings"
-        description="Compile OptiMathSAT bindings">
+    <target name="compile-optimathsat-bindings">
         <compile-mathsatlike-bindings-linux flag="optimathsat"/>
     </target>
 

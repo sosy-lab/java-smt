@@ -73,9 +73,9 @@ import org.sosy_lab.java_smt.api.SolverException;
 @SuppressWarnings("unused")
 public class Sudoku {
 
-  private static final int SIZE = 9;
+  public static final int SIZE = 9;
   private static final int BLOCKSIZE = 3;
-  private static final Integer[][] UNSOLVABLE_SUDOKU = new Integer[0][0];
+  private static final Integer[][] UNSOLVABLE_SUDOKU = null;
 
   public static void main(String... args)
       throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
@@ -130,7 +130,7 @@ public class Sudoku {
     return grid;
   }
 
-  private abstract static class SudokuSolver<S> {
+  public abstract static class SudokuSolver<S> {
 
     private final SolverContext context;
     final BooleanFormulaManager bmgr;
@@ -156,7 +156,7 @@ public class Sudoku {
      * </code> if Sudoku cannot be solved.
      */
     @Nullable
-    private Integer[][] solve(Integer[][] grid) throws InterruptedException, SolverException {
+    public Integer[][] solve(Integer[][] grid) throws InterruptedException, SolverException {
       S symbols = getSymbols();
       List<BooleanFormula> rules = getRules(symbols);
       List<BooleanFormula> assignments = getAssignments(symbols, grid);
@@ -185,9 +185,9 @@ public class Sudoku {
     }
   }
 
-  private static class IntegerBasedSudokuSolver extends SudokuSolver<IntegerFormula[][]> {
+  public static class IntegerBasedSudokuSolver extends SudokuSolver<IntegerFormula[][]> {
 
-    private IntegerBasedSudokuSolver(SolverContext context) {
+    public IntegerBasedSudokuSolver(SolverContext context) {
       super(context);
     }
 
@@ -279,7 +279,7 @@ public class Sudoku {
     }
   }
 
-  private static class BooleanBasedSudokuSolver extends SudokuSolver<BooleanFormula[][][]> {
+  public static class BooleanBasedSudokuSolver extends SudokuSolver<BooleanFormula[][][]> {
 
     private BooleanBasedSudokuSolver(SolverContext context) {
       super(context);

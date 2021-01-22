@@ -28,6 +28,8 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="solver-z3-windows" extends="solver-z3-common"/>
         <conf name="solver-z3-os" extends="solver-z3-common"/>
         <conf name="solver-z3-common" visibility="private"/>
+        <conf name="sources"/>
+        <conf name="javadoc"/>
     </configurations>
 
     <publications defaultconf="solver-z3">
@@ -42,6 +44,8 @@ SPDX-License-Identifier: Apache-2.0
         <artifact name="libz3java" conf="solver-z3-os" type="dylib" ext="dylib"/>
         <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3" conf="solver-z3-common" ext="jar"/>
+        <artifact name="com.microsoft.z3" conf="sources" e:classifier="sources" type="source" ext="jar"/>
+        <artifact name="com.microsoft.z3" conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>
     </publications>
 
     <dependencies></dependencies>
