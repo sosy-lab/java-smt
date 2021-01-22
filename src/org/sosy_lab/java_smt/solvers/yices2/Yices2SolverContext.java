@@ -14,6 +14,9 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_pat
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_version;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -49,7 +52,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic, ShutdownNotifier pShutdownManager) {
 
-    NativeLibraries.loadLibrary("yices2j");
+    loadLibrary();
 
     synchronized (Yices2SolverContext.class) {
       if (numLoadedInstances == 0) {
@@ -73,6 +76,37 @@ public class Yices2SolverContext extends AbstractSolverContext {
         new Yices2FormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
     return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
+  }
+
+  @VisibleForTesting
+  static void loadLibrary() {
+    loadLibrary(ImmutableList.of("yices2j"), ImmutableList.of("yices", "yices2j"));
+  }
+
+  /**
+   * This method loads the given library, depending on the operating system.
+   *
+   * <p>
+   * Each list is applied in the given ordering.
+   */
+  private static void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
+    // we try Linux first, and then Windows.
+    // TODO we could simply switch over the OS-name.
+    // TODO move this method upwards? more solvers could use it.
+    try {
+      for (String libraryName : linuxLibrary) {
+        NativeLibraries.loadLibrary(libraryName);
+      }
+    } catch (UnsatisfiedLinkError e1) {
+      try {
+        for (String libraryName : windowsLibrary) {
+          NativeLibraries.loadLibrary(libraryName);
+        }
+      } catch (UnsatisfiedLinkError e2) {
+        e1.addSuppressed(e2);
+        throw e1;
+      }
+    }
   }
 
   @Override
