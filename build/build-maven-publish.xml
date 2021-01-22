@@ -86,7 +86,7 @@ SPDX-License-Identifier: Apache-2.0
     <!-- before this, update project files (../solvers_maven_conf/maven_mathsat_pom.xml) -->
     <target name="stage-mathsat5" depends="build-dependencies"
             description="deploy current version of MathSAT to Maven staging repository">
-        <!-- 'build-dependencies' downloads the libraries, sources, javadoc for Z3 -->
+        <!-- 'build-dependencies' downloads the libraries for MathSAT -->
         <artifact:mvn>
             <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
             <arg value="-Durl=${ossrh-staging-repository-url}" />
@@ -240,7 +240,7 @@ SPDX-License-Identifier: Apache-2.0
     <!-- before this, update project files (../solvers_maven_conf/maven_boolector_pom.xml) -->
     <target name="stage-boolector" depends="build-dependencies"
             description="deploy current version of Boolector to Maven staging repository">
-        <!-- 'build-dependencies' downloads the libraries, sources, javadoc for Z3 -->
+        <!-- 'build-dependencies' downloads the libraries for Boolector -->
         <artifact:mvn>
             <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
             <arg value="-Durl=${ossrh-staging-repository-url}" />
