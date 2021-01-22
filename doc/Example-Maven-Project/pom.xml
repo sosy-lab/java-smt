@@ -78,7 +78,7 @@ SPDX-License-Identifier: Apache-2.0
       <version>3.7.0</version>
     </dependency>
 
-    <!-- MathSAT5 has one dependency -->
+    <!-- MathSAT5 has one dependency (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-mathsat5</artifactId>
@@ -86,7 +86,7 @@ SPDX-License-Identifier: Apache-2.0
       <type>so</type>
     </dependency>
 
-    <!-- Z3 has three dependencies -->
+    <!-- Z3 has three dependencies (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>

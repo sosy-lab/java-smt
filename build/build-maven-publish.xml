@@ -84,7 +84,8 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <!-- before this, update project files (../solvers_maven_conf/maven_mathsat_pom.xml) -->
-    <target name="stage-mathsat5" depends="build-dependencies" description="deploy current version of MathSAT to Maven staging repository">
+    <target name="stage-mathsat5" depends="build-dependencies"
+            description="deploy current version of MathSAT to Maven staging repository">
         <!-- 'build-dependencies' downloads the libraries, sources, javadoc for Z3 -->
         <artifact:mvn>
             <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
@@ -133,7 +134,8 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <!-- before this, update project files (../solvers_maven_conf/maven_z3_pom.xml) -->
-    <target name="stage-z3" depends="build-dependencies, install-contrib" description="deploy current version of Z3 to Maven staging repository">
+    <target name="stage-z3" depends="build-dependencies, install-contrib"
+            description="deploy current version of Z3 to Maven staging repository">
         <!-- 'build-dependencies/install-contrib' downloads the libraries, sources, javadoc for Z3 -->
         <artifact:mvn>
             <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
