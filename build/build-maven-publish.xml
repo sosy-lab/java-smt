@@ -132,8 +132,6 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libz3" fileending="so"/>
         <stage-solver-file filename="libz3" fileending="dll"/>
         <stage-solver-file filename="libz3" fileending="dylib"/>
-        <stage-solver-file filename="com.microsoft.z3-javadoc" fileending="jar" filedirectory="java-contrib"/>
-        <stage-solver-file filename="com.microsoft.z3-sources" fileending="jar" filedirectory="java-contrib"/>
     </target>
 
     <target name="stage-boolector" depends="build-dependencies"

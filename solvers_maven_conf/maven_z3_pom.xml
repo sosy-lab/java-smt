@@ -14,6 +14,7 @@ SPDX-License-Identifier: Apache-2.0
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-z3</artifactId>
+  <packaging>so</packaging>
   <name>javasmt-solver-z3</name>
   <description>SMT solver Z3 for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
