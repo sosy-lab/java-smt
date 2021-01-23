@@ -107,7 +107,6 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="stage-mathsat5" depends="build-dependencies"
             description="deploy current version of MathSAT to Maven staging repository">
-        <!-- 'build-dependencies' downloads the libraries for MathSAT -->
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="mathsat"/>
@@ -121,7 +120,6 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="stage-z3" depends="build-dependencies, install-contrib"
             description="deploy current version of Z3 to Maven staging repository">
-        <!-- 'build-dependencies/install-contrib' downloads the libraries, sources, javadoc for Z3 -->
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="z3"/>
@@ -140,7 +138,6 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="stage-boolector" depends="build-dependencies"
             description="deploy current version of Boolector to Maven staging repository">
-        <!-- 'build-dependencies' downloads the libraries for Boolector -->
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="boolector"/>
@@ -151,10 +148,8 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libpicosat" fileending="so"/>
     </target>
 
-    <!-- before this, update project files (../solvers_maven_conf/maven_cvc4_pom.xml) -->
     <target name="stage-cvc4" depends="build-dependencies"
             description="deploy current version of CVC4 to Maven staging repository">
-        <!-- 'build-dependencies' downloads the libraries for CVC4 -->
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="cvc4"/>
