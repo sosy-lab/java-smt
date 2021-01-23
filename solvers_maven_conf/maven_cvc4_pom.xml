@@ -14,7 +14,7 @@ SPDX-License-Identifier: Apache-2.0
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-cvc4</artifactId>
-  <packaging>so</packaging>
+  <packaging>pom</packaging>
   <name>javasmt-solver-cvc4</name>
   <description>SMT solver CVC4 for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
