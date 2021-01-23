@@ -269,6 +269,8 @@ SPDX-License-Identifier: Apache-2.0
             </execution>
           </executions>
           <configuration>
+            <outputDirectory>${project.dependency.path}</outputDirectory>
+
             <artifactItems>
               <!-- Here we specify what we want to use for the goal "copy".
                    In our case we copy the solver dependencies (binaries) to change their names.
@@ -283,9 +285,7 @@ SPDX-License-Identifier: Apache-2.0
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-mathsat5</artifactId>
-                <version>5.6.5</version>
                 <type>so</type>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libmathsat5j.so</destFileName>
               </artifactItem>
 
@@ -293,19 +293,15 @@ SPDX-License-Identifier: Apache-2.0
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-z3</artifactId>
-                <version>4.8.9-sosy1</version>
                 <type>so</type>
                 <classifier>libz3java</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libz3java.so</destFileName>
               </artifactItem>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-z3</artifactId>
-                <version>4.8.9-sosy1</version>
                 <type>so</type>
                 <classifier>libz3</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libz3.so</destFileName>
               </artifactItem>
 
@@ -313,68 +309,46 @@ SPDX-License-Identifier: Apache-2.0
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-boolector</artifactId>
-                <version>3.2.1-30-g95859db8</version>
                 <type>so</type>
                 <classifier>libboolector</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libboolector.so</destFileName>
               </artifactItem>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-boolector</artifactId>
-                <version>3.2.1-30-g95859db8</version>
                 <type>so</type>
                 <classifier>libminisat</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libminisat.so</destFileName>
               </artifactItem>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-boolector</artifactId>
-                <version>3.2.1-30-g95859db8</version>
                 <type>so</type>
                 <classifier>libpicosat</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libpicosat.so</destFileName>
               </artifactItem>
 
-              <!-- CVC4 has four dependencies (on Linux) -->
-              <!-- TODO : do we need this entry for a JAR file?
+              <!-- CVC4 has four dependencies (on Linux),
+                   and renaming the JAR file is not required -->
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-cvc4</artifactId>
-                <version>1.8-prerelease-2020-06-24-g7825d8f28</version>
-                <type>jar</type>
-                <classifier>CVC4</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
-                <destFileName>CVC4.jar</destFileName>
-              </artifactItem>
-              -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc4</artifactId>
-                <version>1.8-prerelease-2020-06-24-g7825d8f28</version>
                 <type>so</type>
                 <classifier>libcvc4</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libcvc4.so</destFileName>
               </artifactItem>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-cvc4</artifactId>
-                <version>1.8-prerelease-2020-06-24-g7825d8f28</version>
                 <type>so</type>
                 <classifier>libcvc4jni</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libcvc4jni.so</destFileName>
               </artifactItem>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-cvc4</artifactId>
-                <version>1.8-prerelease-2020-06-24-g7825d8f28</version>
                 <type>so</type>
                 <classifier>libcvc4parser</classifier>
-                <outputDirectory>${project.dependency.path}</outputDirectory>
                 <destFileName>libcvc4parser.so</destFileName>
               </artifactItem>
 
