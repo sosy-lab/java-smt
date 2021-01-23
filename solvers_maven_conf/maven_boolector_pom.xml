@@ -14,7 +14,6 @@ SPDX-License-Identifier: Apache-2.0
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-boolector</artifactId>
-  <version>3.2.1-30-g95859db8</version>
   <packaging>so</packaging>
   <name>javasmt-solver-boolector</name>
   <description>SMT solver Boolector for use in JavaSMT</description>
