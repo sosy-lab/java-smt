@@ -42,6 +42,7 @@ solvers_maven_conf/*.asc
 /SpotBugs.diff.html
 /SpotBugs.diff.xml
 /Javadoc
+/Javadoc-z3
 /gh-pages
 
 .idea/workspace.xml
