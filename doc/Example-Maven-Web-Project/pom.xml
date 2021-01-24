@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_web_example</groupId>
   <artifactId>java-smt-web-example</artifactId>
-  <version>1.1</version>
+  <version>1.2</version>
   <packaging>war</packaging>
 
   <name>java-smt-maven-web-example</name>
@@ -76,7 +76,7 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>java-smt</artifactId>
-      <version>3.7.0</version>
+      <version>3.7.0-61-gea80187e</version>
     </dependency>
 
     <!-- MathSAT5 has one dependency (on Linux) -->
@@ -91,19 +91,19 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
       <type>so</type>
       <classifier>libz3</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
       <type>so</type>
       <classifier>libz3java</classifier>
     </dependency>
@@ -206,10 +206,16 @@ SPDX-License-Identifier: Apache-2.0
                     <resource>
                         <directory>target/dependency</directory>
                         <includes>
-
+                            <!-- this example includes all solvers -->
                             <include>libmathsat5j.so</include>
                             <include>libz3.so</include>
                             <include>libz3java.so</include>
+                            <include>libboolector.so</include>
+                            <include>libminisat.so</include>
+                            <include>libpicosat.so</include>
+                            <include>libcvc4.so</include>
+                            <include>libcvc4jni.so</include>
+                            <include>libcvc4parser.so</include>
                         </includes>
                         <targetPath>WEB-INF/lib</targetPath>
                     </resource>
