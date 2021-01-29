@@ -9,10 +9,14 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -40,15 +45,19 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
+  private final @Nullable PathCounterTemplate logfile;
+
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
       long z3params,
       Z3FormulaManager pMgr,
-      Set<ProverOptions> pOptions) {
+      Set<ProverOptions> pOptions,
+      @Nullable PathCounterTemplate pLogfile) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pCreator.shutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
+    logfile = pLogfile;
     mgr = pMgr;
     Native.solverIncRef(z3context, z3solver);
     Native.solverSetParams(z3context, z3solver, z3params);
@@ -59,6 +68,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    logSolverStack();
     int result;
     try {
       result = Native.solverCheck(z3context, z3solver);
@@ -67,6 +77,20 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
+  }
+
+  /** dump the current solver stack into a new SMTLIB file. */
+  private void logSolverStack() throws Z3SolverException {
+    if (logfile != null) { // if logging is not disabled
+      try {
+        // write stack content to logfile
+        Path filename = logfile.getFreshPath();
+        MoreFiles.createParentDirectories(filename);
+        Files.writeString(filename, Native.solverToString(z3context, z3solver) + "(check-sat)\n");
+      } catch (IOException e) {
+        throw new Z3SolverException("Cannot write Z3 log file: " + e.getMessage());
+      }
+    }
   }
 
   @Override
