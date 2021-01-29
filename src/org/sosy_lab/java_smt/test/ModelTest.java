@@ -17,7 +17,10 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1371,6 +1374,25 @@ public class ModelTest extends SolverBasedTest0 {
         .isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
+    checkModelIteration(formula, false);
+  }
+
+  @Test
+  public void arrayTest5()
+      throws SolverException, InterruptedException, IllegalArgumentException, IOException {
+    requireParser();
+    requireArrays();
+    requireBitvectors();
+    // Boolector can't parse formulas
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula formula =
+        context
+            .getFormulaManager()
+            .parse(
+                Files.readString(
+                    Paths.get("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
+
     checkModelIteration(formula, false);
   }
 
