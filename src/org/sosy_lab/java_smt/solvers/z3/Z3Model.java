@@ -76,11 +76,15 @@ final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
    * method is only a heuristic, because the user can also create a symbol containing "!".
    */
   private boolean isInternalSymbol(long funcDecl) {
-    return Z3_IRRELEVANT_MODEL_TERM_PATTERN
+    switch (Z3_decl_kind.fromInt(Native.getDeclKind(z3context, funcDecl))) {
+      case Z3_OP_SELECT:
+      case Z3_OP_ARRAY_EXT:
+        return true;
+      default:
+        return Z3_IRRELEVANT_MODEL_TERM_PATTERN
             .matcher(z3creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
-            .matches()
-        || Z3_decl_kind.Z3_OP_SELECT
-            == Z3_decl_kind.fromInt(Native.getDeclKind(z3context, funcDecl));
+            .matches();
+    }
   }
 
   /** @return ValueAssignments for a constant declaration in the model */
@@ -333,8 +337,9 @@ final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
       Native.incRef(z3context, arg);
       // indirect assignments
       assert !Native.isAsArray(z3context, arg)
-          : "unexpected array-reference as evaluation of a UF parameter: "
-              + Native.astToString(z3context, arg);
+          : String.format(
+              "unexpected array-reference '%s' as evaluation of a UF parameter for UF '%s'.",
+              Native.astToString(z3context, arg), Native.funcDeclToString(z3context, funcDecl));
       argumentInterpretation.add(z3creator.convertValue(arg));
       args[k] = arg;
     }
