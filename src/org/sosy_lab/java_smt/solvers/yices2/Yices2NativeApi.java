@@ -745,7 +745,7 @@ public class Yices2NativeApi {
   /**
    * Parse a single expression/term in SMTLIB2-based Yices input language.
    *
-   * Declarations of symbols not are allowed. All symbols must already be known.
+   * <p>Declarations of symbols not are allowed. All symbols must already be known.
    */
   public static native int yices_parse_term(String t);
 
