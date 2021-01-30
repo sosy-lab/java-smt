@@ -742,7 +742,11 @@ public class Yices2NativeApi {
     return yices_model_to_string(m, Integer.MAX_VALUE, 1, 0);
   }
 
-  /** Parse Term in SMT-Lib2 / Yices input language. */
+  /**
+   * Parse a single expression/term in SMTLIB2-based Yices input language.
+   *
+   * Declarations of symbols not are allowed. All symbols must already be known.
+   */
   public static native int yices_parse_term(String t);
 
   public static native int yices_subst_term(int size, int[] from, int[] to, int t);
