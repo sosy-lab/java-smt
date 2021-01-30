@@ -736,8 +736,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays4() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -766,8 +764,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -793,8 +789,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays5() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -1300,8 +1294,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void arrayTest1() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     for (String query :
         ImmutableList.of(
@@ -1354,8 +1346,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void arrayTest3() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
     checkModelIteration(formula, false);
@@ -1366,8 +1356,6 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
     requireBitvectors();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("solver does not fully support arrays over bitvectors")
         .that(solverToUse())
@@ -1383,8 +1371,6 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
     requireBitvectors();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula formula =
         context
