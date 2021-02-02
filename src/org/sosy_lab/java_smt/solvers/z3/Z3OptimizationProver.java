@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -37,8 +38,9 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
       LogManager pLogger,
       long z3params,
       Z3FormulaManager pMgr,
-      Set<ProverOptions> pOptions) {
-    super(creator, z3params, pMgr, pOptions);
+      Set<ProverOptions> pOptions,
+      @Nullable PathCounterTemplate pLogfile) {
+    super(creator, z3params, pMgr, pOptions, pLogfile);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;

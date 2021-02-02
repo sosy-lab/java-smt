@@ -17,7 +17,10 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -733,8 +736,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays4() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -763,8 +764,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -790,8 +789,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetArrays5() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -1297,8 +1294,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void arrayTest1() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     for (String query :
         ImmutableList.of(
@@ -1351,8 +1346,6 @@ public class ModelTest extends SolverBasedTest0 {
   public void arrayTest3() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
     checkModelIteration(formula, false);
@@ -1363,14 +1356,29 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
     requireBitvectors();
-    // Boolector can't parse formulas
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("solver does not fully support arrays over bitvectors")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
+    checkModelIteration(formula, false);
+  }
+
+  @Test
+  public void arrayTest5()
+      throws SolverException, InterruptedException, IllegalArgumentException, IOException {
+    requireParser();
+    requireArrays();
+    requireBitvectors();
+
+    BooleanFormula formula =
+        context
+            .getFormulaManager()
+            .parse(
+                Files.readString(
+                    Paths.get("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
+
     checkModelIteration(formula, false);
   }
 

@@ -169,7 +169,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
     throw new UnsupportedOperationException(
-        "We wait till the Boolector devs give us methods to do this.");
+        "Boolector has no methods to access internal nodes for visitation.");
   }
 
   // Hopefully a helpful template for when visitor gets implemented

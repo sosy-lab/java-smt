@@ -41,12 +41,17 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
   private final class ShutdownHook implements ShutdownRequestListener {
-    private final AtomicBoolean interrupted = new AtomicBoolean(false);
+    private final AtomicBoolean isActiveHook = new AtomicBoolean(true);
 
+    // Due to a small delay in CVC4, smtEngine.interrupt() has no effect when it is called too soon.
+    // For example in the case of smtEngine.checkSat(), this is if interrupt() is called
+    // before the line "Result result = d_propEngine->checkSat();" is called in the CVC4 C++
+    // method SmtEngine::check(), which seems to take about 10 ms. When this is fixed in
+    // CVC4, we can remove the Thread.sleep(10), the AtomicBoolean interrupted and the while
+    // loop surrounding this block.
     @Override
     public void shutdownRequested(String reason) {
-      interrupted.set(true);
-      while (interrupted.get()) { // flag is reset after leaving isUnsat()
+      while (isActiveHook.get()) { // flag is reset after leaving isUnsat()
         smtEngine.interrupt();
         try {
           Thread.sleep(10);
@@ -59,7 +64,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   private final CVC4FormulaCreator creator;
   private SmtEngine smtEngine; // final except for SL theory
-  private ShutdownHook hook; // final except for SL theory
   private boolean changedSinceLastSatQuery = false;
 
   /** Tracks formulas on the stack, needed for model generation. */
@@ -83,7 +87,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   /** We copy expression between different ExprManagers. The map serves as cache. */
   private final ExprManagerMapCollection exportMapping = new ExprManagerMapCollection();
 
-  // CVC4 does not support separation login in incremental mode.
+  // CVC4 does not support separation logic in incremental mode.
   private final boolean incremental;
 
   protected CVC4TheoremProver(
@@ -100,7 +104,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
     setOptions(randomSeed, pOptions);
-    hook = registerShutdownHandler(pShutdownNotifier);
   }
 
   private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
@@ -120,18 +123,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   protected void setOptionForIncremental() {
     smtEngine.setOption("incremental", new SExpr(true));
-  }
-
-  // Due to a bug in CVC4, smtEngine.interrupt() has no effect when it is called too soon.
-  // For example in the case of smtEngine.checkSat(), this is if interrupt() is called
-  // before the line "Result result = d_propEngine->checkSat();" is called in the CVC4 C++
-  // method SmtEngine::check(), which seems to take about 10 ms. When this is fixed in
-  // CVC4, we can remove the Thread.sleep(10), the AtomicBoolean interrupted and the while
-  // loop surrounding this block.
-  private ShutdownHook registerShutdownHandler(ShutdownNotifier pShutdownNotifier) {
-    ShutdownHook listener = new ShutdownHook();
-    pShutdownNotifier.register(listener);
-    return listener;
   }
 
   /** import an expression from global context into this prover's context. */
@@ -202,9 +193,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       closeAllModels();
       if (!incremental) {
         // create a new clean smtEngine
-        shutdownNotifier.unregister(hook);
         smtEngine = new SmtEngine(exprManager);
-        hook = registerShutdownHandler(shutdownNotifier);
       }
     }
   }
@@ -240,12 +229,16 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
         smtEngine.assertFormula(importExpr(expr));
       }
     }
-    shutdownNotifier.shutdownIfNecessary();
+
     Result result;
+    ShutdownHook hook = new ShutdownHook();
     try {
+      shutdownNotifier.register(hook);
+      shutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
     } finally {
-      hook.interrupted.set(false);
+      hook.isActiveHook.set(false);
+      shutdownNotifier.unregister(hook);
       shutdownNotifier.shutdownIfNecessary();
     }
     return convertSatResult(result);
@@ -306,7 +299,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();
-      shutdownNotifier.unregister(hook);
       closed = true;
     }
   }

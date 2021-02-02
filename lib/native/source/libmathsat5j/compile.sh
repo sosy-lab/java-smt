@@ -80,6 +80,7 @@ if [ ! -f "$MSAT_LIB_DIR/libmathsat.a" ]; then
 fi
 if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
     echo "You need to specify the GMP directory on the command line!"
+    echo "Can not find $GMP_LIB_DIR/libgmp.a"
     exit 1
 fi
 
