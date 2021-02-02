@@ -1143,7 +1143,7 @@ if ((*jenv)->ExceptionCheck(jenv)) {
 }
 jretval = (*jenv)->NewIntArray(jenv, sz);
 if (jretval != NULL) {
-  (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, m_arg3);
+  (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, (jint *)m_arg3);
 }
 out:
 free(m_arg3);

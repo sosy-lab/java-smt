@@ -181,7 +181,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   out##num:
 
 #define FREE_INT_ARRAY_ARG(num) \
-  (*jenv)->ReleaseIntArrayElements(jenv, arg##num, m_arg##num, 0); \
+  (*jenv)->ReleaseIntArrayElements(jenv, arg##num, (jint *)m_arg##num, 0); \
   out##num:
 
 #define FREE_LONG_ARRAY_ARG(num) \
@@ -235,7 +235,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
     return 0; \
   } \
-  return (long) retval; \
+  return (size_t) retval; \
 }
 
 #define POINTER_ARG_RETURN(num) \
@@ -309,7 +309,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewIntArray(jenv, 2); \
     if(jretval != NULL){ \
-      (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, yval); \
+      (*jenv)->SetIntArrayRegion(jenv, jretval, 0, 2, (jint *)yval); \
     } \
   } \
   return jretval; \
@@ -325,7 +325,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewIntArray(jenv, sz); \
     if(jretval != NULL){ \
-      (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, m_arg##num); \
+      (*jenv)->SetIntArrayRegion(jenv, jretval, 0, sz, (jint *)m_arg##num); \
     } \
   } \
   out: \
