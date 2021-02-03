@@ -103,9 +103,12 @@
 # 
 # Build the JNI wrapper dll:
 #     To build yices2 bindings: ./compileForWindows.sh $YICES_SRC_DIR $SHARED_GMP_SRC_DIR $JNI_DIR
+#
+#  Note: You must change the line/file endings of this script on your Windows
+#        environment to Unix style so that you can run it in Cygwin
 #     
 #     After running the script, copy the libyices.dll from the Yices2 folder 
-#     (yices2/build/x86_64-unknown-mingw32-release/bin) and the libyices2j.dll 
+#     (yices2/build/x86_64-unknown-mingw32-release/bin), the shared gmp dll and the libyices2j.dll 
 #     to java-smt\lib\native\x86_64-windows or publish it.
 # 
 
@@ -146,10 +149,10 @@ OUT_FILE="libyices2j.dll"
 
 echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 
-# This will compile the JNI wrapper part, given the JNI and the Mathsat header files
+# This will compile the JNI wrapper part, given the JNI and the Yices2 header files
 x86_64-w64-mingw32-gcc -g -o $OUT_FILE -shared -Wl,-soname,$OUT_FILE \
     -D_JNI_IMPLEMENTATION_ -Wl,--kill-at $JNI_HEADERS \
-    -I$YICES_RLS_DIR/dist/include -L$YICES_RLS_DIR/lib -L$SHARED_GMP_SRC_DIR/include -L. \
+    -I$YICES_RLS_DIR/dist/include -L$YICES_RLS_DIR/lib -I$SHARED_GMP_SRC_DIR/include -L. \
     org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c \
     -lyices $YICES_RLS_DIR/bin/libyices.dll -lgmp -L$SHARED_GMP_SRC_DIR/lib \
     -lstdc++
