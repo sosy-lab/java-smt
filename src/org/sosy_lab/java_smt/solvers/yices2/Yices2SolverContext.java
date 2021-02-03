@@ -84,10 +84,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
   }
 
   /**
-   * This method loads the given library, depending on the operating system.
-   *
-   * <p>
-   * Each list is applied in the given ordering.
+   * This method loads the given library, depending on the operating system. Each list is applied in
+   * the given ordering.
    */
   private static void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
     // we try Linux first, and then Windows.
