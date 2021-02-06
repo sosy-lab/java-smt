@@ -223,7 +223,11 @@ public class SmtInterpolEnvironment {
           public void printSuccess() {}
         };
 
-    parseEnv.parseStream(new StringReader(s), "<stdin>");
+    try {
+      parseEnv.parseStream(new StringReader(s), "<stdin>");
+    } catch (SMTLIBException nested) {
+      throw new IllegalArgumentException(nested);
+    }
 
     return parseScript.getAssertedTerms();
   }
@@ -247,11 +251,11 @@ public class SmtInterpolEnvironment {
       return theory.getFunction(fun, paramSorts);
     } else {
       if (!fsym.getReturnSort().equals(resultSort)) {
-        throw new SMTLIBException(
+        throw new IllegalArgumentException(
             "Function " + fun + " is already declared with different definition");
       }
       if (fun.equals("true") || fun.equals("false")) {
-        throw new SMTLIBException("Cannot declare a variable named " + fun);
+        throw new IllegalArgumentException("Cannot declare a variable named " + fun);
       }
       return fsym;
     }
