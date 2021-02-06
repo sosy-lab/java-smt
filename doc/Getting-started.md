@@ -36,13 +36,13 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>3.2.0</version>
+  <version>3.7.0-61-gea80187e</version>
 </dependency>
 ```
 
 Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
 because they are written in Java and Scala, and thus are available on every machine.
-Shared object for the solvers `MathSAT5` and `Z3` can be added by using additional dependencies:
+Shared object for the solvers `MathSAT5` and `Z3` can be added by using additional dependencies (example for Linux):
 
 ```xml
     <!-- MathSAT5 has one dependency -->
@@ -57,29 +57,34 @@ Shared object for the solvers `MathSAT5` and `Z3` can be added by using addition
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
       <type>so</type>
       <classifier>libz3</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
       <type>so</type>
       <classifier>libz3java</classifier>
     </dependency>
 ```
 
-Additionally you can add and configure some plugins to load the libraries automatically.
+The XML snippets for other solvers available via Maven, such as `Boolector` and `CVC4`,
+can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
+
+Additionally you can add and configure some Maven plugins to load the libraries automatically
+and place them in the correct directories when assembling your application.
 The plugins copy all dependencies (including the solver binaries) to the target/dependency directory
 and rename the libraries as required for automated loading.
-A detailed explanation for these plugins is given in the `Example-Maven-Project/pom.xml`.
+A detailed explanation for these plugins is given in the [`Example-Maven-Project/pom.xml`](Example-Maven-Project/pom.xml).
 For testing, you might need to add the dependency directory to the classpath for your test-engine.
+
 Example:
 
 ```xml
@@ -97,8 +102,8 @@ And finally configure the classpath for your jar-plugin:
 </manifest>
 ```
 
-See `Example-Maven-Project` for more information and a working example.
-See `Example-Maven-Web-Project` for more information about a Dynamic-Web-Project runnable by Tomcat 9.
+See [`Example-Maven-Project`](Example-Maven-Project) for more information and a working example.
+See [`Example-Maven-Web-Project`](Example-Maven-Web-Project) for more information about a Dynamic-Web-Project runnable by Tomcat 9.
 
 Shared object for _other solvers still need to be installed manually_:
 see the section "Manual Installation" below.
@@ -138,15 +143,9 @@ You can either copy them into the directory of the JavaSMT JAR file,
 or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
 
-For systems other than 64-bit Linux (e.g., Windows, or 32-bit systems) we might not always provide binaries,
+For systems other than 64-bit Linux (e.g., Windows, MacOS, or 32-bit systems) we might not always provide binaries,
 so you need to download or compile them for yourself.
-For [Z3](https://github.com/Z3Prover/z3), download either the [official binaries](https://github.com/Z3Prover/z3/releases)
-or build it with the flags `--java --git-describe` according to its documentation.
-Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
-In order to compile MathSAT binaries,
-see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](../lib/native/source/libmathsat5j/compile.sh)
-script.
-
+You can find the necessary steps for compiling and using solver binaries in [`lib/native/source/`](../lib/native/source/) and [`build`](../build).
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
 
