@@ -13,6 +13,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
+import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
@@ -21,6 +22,7 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
+import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
@@ -63,6 +65,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
+import scala.collection.immutable.Seq;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -237,12 +240,18 @@ class PrincessEnvironment {
             scala.collection.immutable.Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>>
-        triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
+        triple;
 
-    List<? extends IExpression> formula = asJava(triple._1());
+    try {
+      triple = extractFromSTMLIB(s);
+    } catch (TranslationException | EnvironmentException nested) {
+      throw new IllegalArgumentException(nested);
+    }
+
+    List<? extends IExpression> formulas = asJava(triple._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
-    for (IExpression f : formula) {
+    for (IExpression f : formulas) {
       declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
     }
     for (IExpression var : declaredFunctions.build()) {
@@ -258,7 +267,24 @@ class PrincessEnvironment {
         addFunction(fun);
       }
     }
-    return formula;
+    return formulas;
+  }
+
+  /**
+   * Parse a SMTLIB query and returns a triple of the asserted formulas, the defined functions and
+   * symbols.
+   *
+   * @throws EnvironmentException from Princess when the parsing fails
+   * @throws TranslationException from Princess when the parsing fails due to type mismatch
+   */
+  /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
+  @SuppressWarnings("unused")
+  private Tuple3<
+          Seq<IFormula>,
+          scala.collection.immutable.Map<IFunction, SMTFunctionType>,
+          scala.collection.immutable.Map<ConstantTerm, SMTType>>
+      extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
+    return api.extractSMTLIBAssertionsSymbols(new StringReader(s));
   }
 
   public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
