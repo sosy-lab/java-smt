@@ -59,16 +59,21 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     long[] sorts = new long[0];
     long[] declSymbols = new long[0];
     long[] decls = new long[0];
-    long e =
-        Native.parseSmtlib2String(
-            getEnvironment(),
-            str,
-            sorts.length,
-            sortSymbols,
-            sorts,
-            declSymbols.length,
-            declSymbols,
-            decls);
+    long e;
+    try {
+      e =
+          Native.parseSmtlib2String(
+              getEnvironment(),
+              str,
+              sorts.length,
+              sortSymbols,
+              sorts,
+              declSymbols.length,
+              declSymbols,
+              decls);
+    } catch (Z3Exception nested) {
+      throw new IllegalArgumentException(nested);
+    }
 
     final int size = Native.astVectorSize(getEnvironment(), e);
     Preconditions.checkState(size == 1, "parsing expects exactly one asserted term.");
