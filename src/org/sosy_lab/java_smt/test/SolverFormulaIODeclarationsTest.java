@@ -176,13 +176,17 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
   @Test
   public void parseDeclareConflictInQueryTest2() {
     String query = "(declare-fun x () Bool)(declare-fun x (Int Int) Bool)(assert (x 2 3))";
-    assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    if (Solvers.Z3 != solverToUse()) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    }
   }
 
   @Test
   public void parseDeclareConflictInQueryTest3() {
     String query = "(declare-fun x (Int) Bool)(declare-fun x (Int) Int)(assert (x 0))";
-    assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    if (Solvers.Z3 != solverToUse()) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    }
   }
 
   @Test
@@ -198,13 +202,16 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
-    if (Solvers.PRINCESS != solverToUse()) {
+    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
+    } else {
+      Truth.assertThat(mgr.extractVariables(formula).values())
+          .doesNotContain(imgr.makeVariable("x"));
     }
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest() {
+  public void parseDeclareOnceNotTwiceTest1() {
     String query1 = "(declare-fun x () Bool)(assert x)";
     String query2 = "(assert (not x))";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -212,5 +219,33 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
     BooleanFormula formula2 = mgr.parse(query2);
     Truth.assertThat(mgr.extractVariables(formula2).values()).hasSize(1);
     Truth.assertThat(mgr.extractVariables(formula1)).isEqualTo(mgr.extractVariables(formula2));
+  }
+
+  @Test
+  public void parseDeclareOnceNotTwiceTest2() {
+    String query1 =
+        "(declare-fun x () Bool)(declare-fun foo (Int Int) Bool)(assert (= (foo 1 2) x))";
+    String query2 = "(assert (and (not x) (foo 3 4)))";
+    BooleanFormula formula1 = mgr.parse(query1);
+    Truth.assertThat(mgr.extractVariablesAndUFs(formula1).values()).hasSize(2);
+    BooleanFormula formula2 = mgr.parse(query2);
+    Truth.assertThat(mgr.extractVariablesAndUFs(formula2).values()).hasSize(2);
+    Truth.assertThat(mgr.extractVariablesAndUFs(formula1).keySet())
+        .isEqualTo(mgr.extractVariablesAndUFs(formula2).keySet());
+  }
+
+  @Test
+  public void parseDeclareOnceNotTwiceTest3() {
+    String query1 = "(declare-fun x () Bool)(declare-fun y () Bool)(assert x)";
+    String query2 = "(assert y)";
+    BooleanFormula formula1 = mgr.parse(query1);
+    Truth.assertThat(mgr.extractVariablesAndUFs(formula1).values()).hasSize(1);
+    if (Solvers.Z3 == solverToUse()) {
+      // "y" is unknown for the second query.
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(query2));
+    } else {
+      BooleanFormula formula2 = mgr.parse(query2);
+      Truth.assertThat(mgr.extractVariablesAndUFs(formula2).values()).hasSize(1);
+    }
   }
 }
