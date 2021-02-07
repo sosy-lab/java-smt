@@ -31,6 +31,7 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -104,7 +105,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    *
    * <p>This map stores symbols (names) and their declaration (type information).
    */
-  private final Map<Long, Long> symbolsToDeclarations = new LinkedHashMap<>();
+  private final Map<String, Long> symbolsToDeclarations = new LinkedHashMap<>();
 
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
@@ -143,7 +144,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     long z3context = getEnv();
     long symbol = Native.mkStringSymbol(z3context, varName);
     long var = Native.mkConst(z3context, symbol, type);
-    symbolsToDeclarations.put(symbol, Native.getAppDecl(z3context, var));
+    symbolsToDeclarations.put(varName, Native.getAppDecl(z3context, var));
     return var;
   }
 
@@ -330,7 +331,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       Reference<? extends Z3Formula> ref;
       while ((ref = referenceQueue.poll()) != null) {
         long z3ast = referenceMap.remove(ref);
-        symbolsToDeclarations.remove(z3ast);
         Native.decRef(environment, z3ast);
       }
     } finally {
@@ -696,7 +696,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     long[] sorts = Longs.toArray(pArgTypes);
     long func = Native.mkFuncDecl(environment, symbol, sorts.length, sorts, returnType);
     Native.incRef(environment, func);
-    symbolsToDeclarations.put(symbol, func);
+    symbolsToDeclarations.put(pName, func);
     return func;
   }
 
@@ -826,8 +826,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  /** returns all currently available symbols (names) with their declarations (type information). */
-  Map<Long, Long> getAllKnownDeclarations() {
-    return symbolsToDeclarations;
+  /**
+   * get a previously created application declaration, or <code>NULL</code> if the symbol is
+   * unknown.
+   */
+  @Nullable
+  Long getKnownDeclaration(String symbolName) {
+    return symbolsToDeclarations.get(symbolName);
   }
 }

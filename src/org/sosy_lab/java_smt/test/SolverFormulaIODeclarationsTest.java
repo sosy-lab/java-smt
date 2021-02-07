@@ -222,6 +222,17 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void parseTwiceTest1() {
+    String query1 = "(declare-fun x () Bool)(assert x)";
+    String query2 = "(declare-fun x () Bool)(assert x)";
+    BooleanFormula formula1 = mgr.parse(query1);
+    Truth.assertThat(mgr.extractVariables(formula1).values()).hasSize(1);
+    BooleanFormula formula2 = mgr.parse(query2);
+    Truth.assertThat(mgr.extractVariables(formula2).values()).hasSize(1);
+    Truth.assertThat(formula1).isEqualTo(formula2);
+  }
+
+  @Test
   public void parseDeclareOnceNotTwiceTest2() {
     String query1 =
         "(declare-fun x () Bool)(declare-fun foo (Int Int) Bool)(assert (= (foo 1 2) x))";
