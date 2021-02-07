@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import java.util.Map;
@@ -49,35 +50,65 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     formulaCreator = pFormulaCreator;
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Override
   public BooleanFormula parse(String str) throws IllegalArgumentException {
 
-    // TODO do we need sorts or decls?
-    // the context should know them already,
-    // TODO check this
+    // Z3 does not access the existing symbols on its own,
+    // but requires all symbols as part of the query and does
+    // Thus, we track the used symbols on our own and give them to the parser call.
+    // Later, we collect all symbols from the parsed query and
+    // define them again to have them tracked.
+
+    final long env = getEnvironment();
+
+    // JavaSMT does currently not allow to define new sorts, future work?
     long[] sortSymbols = new long[0];
     long[] sorts = new long[0];
-    long[] declSymbols = new long[0];
-    long[] decls = new long[0];
+
+    // first step: get all available symbols and let the parser use them
+    final Map<Long, Long> declarations = formulaCreator.getAllKnownDeclarations();
+    int numDecls = declarations.size();
+    long[] declSymbols = new long[numDecls];
+    long[] decls = new long[numDecls];
+    int i = 0;
+    for (Map.Entry<Long, Long> entries : declarations.entrySet()) {
+      declSymbols[i] = entries.getKey();
+      decls[i] = entries.getValue();
+      i++;
+    }
+
     long e;
     try {
       e =
           Native.parseSmtlib2String(
-              getEnvironment(),
-              str,
-              sorts.length,
-              sortSymbols,
-              sorts,
-              declSymbols.length,
-              declSymbols,
-              decls);
+              env, str, sorts.length, sortSymbols, sorts, declSymbols.length, declSymbols, decls);
     } catch (Z3Exception nested) {
       throw new IllegalArgumentException(nested);
     }
 
-    final int size = Native.astVectorSize(getEnvironment(), e);
+    final int size = Native.astVectorSize(env, e);
     Preconditions.checkState(size == 1, "parsing expects exactly one asserted term.");
-    final long term = Native.astVectorGet(getEnvironment(), e, 0);
+    final long term = Native.astVectorGet(env, e, 0);
+
+    // last step: all parsed symbols need to be declared again to have them tracked in the creator.
+    Map<String, Long> symbols = formulaCreator.extractVariablesAndUFs(term, true);
+    for (Map.Entry<String, Long> symbol : symbols.entrySet()) {
+      long sym = symbol.getValue();
+      String name = symbol.getKey();
+      assert Native.isApp(env, sym);
+      int arity = Native.getAppNumArgs(env, sym);
+      if (arity == 0) { // constants
+        formulaCreator.makeVariable(Native.getSort(env, sym), name);
+      } else {
+        ImmutableList.Builder<Long> argTypes = ImmutableList.builder();
+        for (int j = 0; j < arity; j++) {
+          argTypes.add(Native.getSort(env, Native.getAppArg(env, sym, j)));
+        }
+        formulaCreator.declareUFImpl(name, Native.getSort(env, sym), argTypes.build());
+      }
+    }
+
     return getFormulaCreator().encapsulateBoolean(term);
   }
 
