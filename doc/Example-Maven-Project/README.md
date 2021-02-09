@@ -17,7 +17,7 @@ The Maven workflow in this project supports the following steps:
 - Compiling: `mvn compile` downloads all dependencies and compiles the project.
 - Testing: `mvn test` executes the Sudoku example test.
 - Packaging: `mvn package` creates a jar file for the example application.
-  Dependencies like other jar files and binaries for SMT solvers are stored in the directory `dependencies
+  Dependencies like other jar files and binaries for SMT solvers are stored in the directory `dependencies`
 - Running: `java -jar ./target/java-smt-maven-example-VERSION.jar` shows a table in the terminal.
 
 Please note that the Maven repository currently only contains release versions
