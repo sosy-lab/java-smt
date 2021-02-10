@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -72,8 +73,16 @@ public class AllSatExample {
         prover.push();
         System.out.println(ase.allSatIntegers2());
         prover.pop();
+
+      } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+        // on some machines we support only some solvers,
+        // e.g. Windows does not have Mathsat by default.
+        // Thus we can ignore these errors.
+        logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
       } catch (UnsupportedOperationException e) {
-        System.out.println("    " + e.getMessage());
+        logger.logUserException(Level.INFO, e, e.getMessage());
       }
     }
   }
