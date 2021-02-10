@@ -54,7 +54,6 @@ MPIR_LIB_DIR="$2"/.libs
 MPIR_INCLUDE_DIR="$2"
 
 SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c versions.c"
-OBJ_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.o"
 
 # check requirements
 if [ ! -f "$MSAT_LIB_DIR/mathsat.dll" ]; then
@@ -69,7 +68,6 @@ if [ ! -f "$JNI_DIR/jni.h" ]; then
 fi
 
 OUT_FILE="mathsat5j.dll"
-BASIC_OPTIONS="-m64 -g -std=gnu99 -Wall -Wextra -Wpedantic -Wno-return-type -Wno-unused-parameter"
 
 echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 
