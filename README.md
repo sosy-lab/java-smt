@@ -51,7 +51,7 @@ JavaSMT can express formulas in the following theories:
 Currently JavaSMT support several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
  - [Boolector](https://boolector.github.io/)
  - [CVC4](https://cvc4.github.io/)
- - [MathSAT5](http://mathsat.fbk.eu/)
+ - [MathSAT5](http://mathsat.fbk.eu/) and [OptiMathSAT](http://optimathsat.disi.unitn.it/)
  - [Princess](http://www.philipp.ruemmer.org/princess.shtml)
  - [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/)
  - [Yices2](https://yices.csl.sri.com/)
@@ -83,7 +83,7 @@ implemented in a native language.
 As a native solver has no way of knowing whether the created formula
 object is still referenced by the client application, this API is
 necessary to avoid leaking memory.
-Note that due to the _hash consing_ usage inside the solvers, there is
+Note that several solvers already support _hash consing_ and thus, there is
 never more than one copy of an identical formula object in memory.
 Consequently, if all created formulas are later re-used (or re-created)
 in the application, it is not necessary to perform any garbage

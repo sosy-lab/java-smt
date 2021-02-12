@@ -43,3 +43,6 @@ For MathSAT5:
 - copy ..\..\java\runtime-mathsat\mpir.dll mpir.dll
 - copy ..\..\java\runtime-mathsat\mathsat.dll mathsat.dll
 - copy ..\..\java\runtime-mathsat\mathsat5j.dll mathsat5j.dll
+
+Or simply use a wildcard:
+- copy ..\..\java\runtime-*\*dll .\
