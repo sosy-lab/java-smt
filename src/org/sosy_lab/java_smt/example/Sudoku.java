@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -102,6 +103,14 @@ public class Sudoku {
             System.out.println(Joiner.on("").join(line));
           }
         }
+      } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+        // on some machines we support only some solvers,
+        // thus we can ignore these errors.
+        logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
+      } catch (UnsupportedOperationException e) {
+        logger.logUserException(Level.INFO, e, e.getMessage());
       }
     }
   }

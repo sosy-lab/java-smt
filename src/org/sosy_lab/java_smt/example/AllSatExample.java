@@ -77,8 +77,7 @@ public class AllSatExample {
       } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
 
         // on some machines we support only some solvers,
-        // e.g. Windows does not have Mathsat by default.
-        // Thus we can ignore these errors.
+        // thus we can ignore these errors.
         logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
 
       } catch (UnsupportedOperationException e) {
