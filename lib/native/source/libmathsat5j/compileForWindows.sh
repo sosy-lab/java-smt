@@ -31,6 +31,7 @@
 #
 # To build mathsat bindings: ./compileForWindows.sh $MATHSAT_DIR $MPIR_DIR $JNI_DIR
 
+set -e
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -53,7 +54,7 @@ MPIR_HEADER_DIR="$2"
 MPIR_LIB_DIR="$2"/.libs
 MPIR_INCLUDE_DIR="$2"
 
-SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c versions.c"
+SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c"
 
 # check requirements
 if [ ! -f "$MSAT_LIB_DIR/mathsat.dll" ]; then
@@ -74,8 +75,7 @@ echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 # This will compile the JNI wrapper part, given the JNI and the Mathsat header files
 x86_64-w64-mingw32-gcc -g -o $OUT_FILE -shared -Wl,-soname,$OUT_FILE \
     -D_JNI_IMPLEMENTATION_ -Wl,--kill-at $JNI_HEADERS \
-    -I$MSAT_SRC_DIR -I$MPIR_INCLUDE_DIR -L$MSAT_LIB_DIR \
-    org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c \
+    -I$MSAT_SRC_DIR -I$MPIR_INCLUDE_DIR -L$MSAT_LIB_DIR $SRC_FILES \
     -lmathsat $MSAT_BIN_DIR/mpir.dll -lstdc++ -lpsapi 2>&1
 
 echo "Compilation Done"
