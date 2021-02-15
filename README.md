@@ -48,17 +48,17 @@ JavaSMT can express formulas in the following theories:
  - Array
  - Uninterpreted Function
 
-Currently JavaSMT support several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
+Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
 
 | SMT Solver | Linux64 | Windows64 | MacOS | Description |
 | --- |:---:|:---:|:---:|:--- |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | same a MathSAT5, but with support for optimization |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | same as MathSAT5, but with support for optimization |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  |
-| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  |
-| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
+| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  | Java-based SMT solver |
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
 
 The following features are supported (depending on the used SMT solver):
