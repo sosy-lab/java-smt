@@ -130,7 +130,7 @@ public class SmtInterpolEnvironment {
       script.setOption(":unsat-core-check-mode", true);
       script.setOption(":model-check-mode", true);
     }
-    script.setLogic(Logics.QF_AUFLIRA);
+    script.setLogic(Logics.ALL);
 
     for (String option : furtherOptions) {
       try {
