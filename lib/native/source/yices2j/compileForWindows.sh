@@ -97,7 +97,7 @@
 #     ./configure --build=x86_64-pc-mingw32 CC=/usr/bin/x86_64-w64-mingw32-gcc \
 #     LD=/usr/bin/x86_64-w64-mingw32-ld STRIP=/usr/bin/x86_64-w64-mingw32-strip \
 #     RANLIB=/usr/bin/x86_64-w64-mingw32-ranlib CPPFLAGS=-I/usr/tools/shared-gmp/include \
-#     LDFLAGS=-L/usr/tools/shared-gmp/lib --with-static-gmp=/usr/tools/static-gmp/lib/libgmp.a \
+#     LDFLAGS=-L/usr/tools/static-gmp/lib --with-static-gmp=/usr/tools/static-gmp/lib/libgmp.a \
 #     --with-static-gmp-include-dir=/usr/tools/static-gmp/include --host=x86_64-w64-mingw32
 # 
 #     make static-dist OPTION=mingw64
