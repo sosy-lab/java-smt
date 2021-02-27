@@ -89,7 +89,8 @@
 # 
 # Now we build Yices2 (The Yices2 documentation gives 2 options to configure yices2 here. I used the second.)
 #     You may need to edit the compiler etc. just like in step 5 + specify where you have installed your GMP
-#     (CPPFLAGS, LDFLAGS point to the shared GMP. with-static-gmp, with-static-gmp-include-dir point to the static GMP)
+#     (CPPFLAGS, LDFLAGS point to the shared GMP. with-static-gmp, with-static-gmp-include-dir point to the static GMP.
+#      On Windows a static GMP is also PIC per default.)
 #     After using configure you need to give 'OPTION=mingw64' to every make command. 
 #     (including make clean)
 # 
@@ -99,7 +100,8 @@
 #     LDFLAGS=-L/usr/tools/shared-gmp/lib --with-static-gmp=/usr/tools/static-gmp/lib/libgmp.a \
 #     --with-static-gmp-include-dir=/usr/tools/static-gmp/include --host=x86_64-w64-mingw32
 # 
-#     make OPTION=mingw64
+#     make static-dist OPTION=mingw64
+#     static-dist linkds gmp statically into yices
 # 
 # Build the JNI wrapper dll:
 #     To build yices2 bindings: ./compileForWindows.sh $YICES_SRC_DIR $SHARED_GMP_SRC_DIR $JNI_DIR
@@ -152,13 +154,18 @@ echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 # This will compile the JNI wrapper part, given the JNI and the Yices2 header files
 x86_64-w64-mingw32-gcc -g -o $OUT_FILE -shared -Wl,-soname,$OUT_FILE \
     -D_JNI_IMPLEMENTATION_ -Wl,--kill-at $JNI_HEADERS \
-    -I$YICES_RLS_DIR/dist/include -L$YICES_RLS_DIR/lib -I$SHARED_GMP_SRC_DIR/include -L. \
+    -I$YICES_RLS_DIR/static_dist/include -L$YICES_RLS_DIR/static_lib -I$SHARED_GMP_SRC_DIR/include -L. \
     org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c \
-    -lyices $YICES_RLS_DIR/bin/libyices.dll -lgmp -L$SHARED_GMP_SRC_DIR/lib \
+    -lyices $YICES_RLS_DIR/static_bin/libyices.dll -lgmp -L$SHARED_GMP_SRC_DIR/lib \
     -lstdc++
 
 echo "Compilation Done"
 echo "Reducing file size by dropping unused symbols..."
+# pwinthread is linked into yices2, but sometimes this doesn't work properly as it only links against symbols used by compile time not runtime!
+# You can try to not strip and if that doesn't work you need to add the --whole-archive flag to the linking process like so:
+# 
+# Note that you should deactivate the flag after pwinthread!
+echo "Note: If in the future multithread support fails, this might be the cause!"
 
 strip ${OUT_FILE}
 
