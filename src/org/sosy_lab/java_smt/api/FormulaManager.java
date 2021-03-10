@@ -159,12 +159,27 @@ public interface FormulaManager {
    */
   <T extends Formula> T simplify(T input) throws InterruptedException;
 
-  /** Visit the formula with a given visitor. */
+  /**
+   * Visit the formula with a given visitor.
+   *
+   * <p>This method does <b>not recursively visit</b> sub-components of a formula its own, so the
+   * given {@link FormulaVisitor} needs to call such visitation on its own.
+   *
+   * <p>Please be aware that calling this method cause extensive stack usage depending on the
+   * nesting of the given formula and the given {@link FormulaVisitor}. Additionally, sub-formulas
+   * that are used several times in the formula might also be visited several times. For a efficient
+   * formula traversing, we also provide {@link #visitRecursively(Formula, FormulaVisitor)}.
+   *
+   * @param f formula to be visited
+   * @param rFormulaVisitor an implementation that provides steps for each kind of formula.
+   */
   @CanIgnoreReturnValue
   <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor);
 
   /**
-   * Visit the formula recursively with a given {@link FormulaVisitor}.
+   * Visit the formula recursively with a given {@link FormulaVisitor}. This method traverses
+   * sub-components of a formula automatically, depending on the return value of the {@link
+   * TraversalProcess} in the given {@link FormulaVisitor}.
    *
    * <p>This method guarantees that the traversal is done iteratively, without using Java recursion,
    * and thus is not prone to StackOverflowErrors.
