@@ -93,25 +93,25 @@
 #      On Windows a static GMP is also PIC per default.)
 #     After using configure you need to give 'OPTION=mingw64' to every make command. 
 #     (including make clean)
+#     adding "static-dist" linkds gmp statically into yices. This means that binaries etc. are in the build folders static_bin/ and no longer in bin/ in yices2.
 # 
 #     ./configure --build=x86_64-pc-mingw32 CC=/usr/bin/x86_64-w64-mingw32-gcc \
 #     LD=/usr/bin/x86_64-w64-mingw32-ld STRIP=/usr/bin/x86_64-w64-mingw32-strip \
 #     RANLIB=/usr/bin/x86_64-w64-mingw32-ranlib CPPFLAGS=-I/usr/tools/shared-gmp/include \
-#     LDFLAGS=-L/usr/tools/static-gmp/lib --with-static-gmp=/usr/tools/static-gmp/lib/libgmp.a \
+#     LDFLAGS=-L/usr/tools/shared-gmp/lib --with-static-gmp=/usr/tools/static-gmp/lib/libgmp.a \
 #     --with-static-gmp-include-dir=/usr/tools/static-gmp/include --host=x86_64-w64-mingw32
 # 
 #     make static-dist OPTION=mingw64
-#     static-dist linkds gmp statically into yices
 # 
 # Build the JNI wrapper dll:
-#     To build yices2 bindings: ./compileForWindows.sh $YICES_SRC_DIR $SHARED_GMP_SRC_DIR $JNI_DIR
+#     To build yices2 bindings: ./compileForWindows.sh $YICES_SRC_DIR $SHARED_GMP_SRC_DIR $STATIC_GMP_SRC_DIR $JNI_DIR
 #
 #  Note: You must change the line/file endings of this script on your Windows
 #        environment to Unix style so that you can run it in Cygwin
 #     
 #     After running the script, copy the libyices.dll from the Yices2 folder 
-#     (yices2/build/x86_64-unknown-mingw32-release/bin), the shared gmp dll and the libyices2j.dll 
-#     to java-smt\lib\native\x86_64-windows or publish it.
+#     (yices2/build/x86_64-unknown-mingw32-release/bin) and the libyices2j.dll 
+#     to java-smt\lib\native\x86_64-windows and/or publish it.
 # 
 
 
@@ -125,20 +125,22 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 cd ${DIR}
 
-JNI_DIR="$3"/include
 JNI_HEADERS="-I${JNI_DIR}/ -I${JNI_DIR}/win32/"
 
 YICES_SRC_DIR="$1"
 YICES_RLS_DIR="$1"/build/x86_64-unknown-mingw32-release
 
 SHARED_GMP_SRC_DIR="$2"
+STATIC_GMP_SRC_DIR="$2"
+
+JNI_DIR="$3"/include
 
 SRC_FILES="org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c"
 
 # check requirements
 if [ ! -f "$YICES_RLS_DIR/bin/libyices.dll" ]; then
     echo "You need to specify the directory with the built yices2 on the command line!"
-    echo "Can not find $YICES_RLS_DIR/bin/libyices.dll"
+    echo "Can not find $YICES_RLS_DIR/static_bin/libyices.dll"
     exit 1
 fi
 if [ ! -f "$JNI_DIR/jni.h" ]; then
@@ -149,17 +151,24 @@ fi
 
 OUT_FILE="libyices2j.dll"
 
-echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
+echo "Compiling the C wrapper code..."
 
-# This will compile the JNI wrapper part, given the JNI and the Yices2 header files
-x86_64-w64-mingw32-gcc -g -o $OUT_FILE -shared -Wl,-soname,$OUT_FILE \
+x86_64-w64-mingw32-gcc \
     -D_JNI_IMPLEMENTATION_ -Wl,--kill-at $JNI_HEADERS \
-    -I$YICES_RLS_DIR/static_dist/include -L$YICES_RLS_DIR/static_lib -I$SHARED_GMP_SRC_DIR/include -L. \
-    org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c \
-    -lyices $YICES_RLS_DIR/static_bin/libyices.dll -lgmp -L$SHARED_GMP_SRC_DIR/lib \
-    -lstdc++
+    -I$YICES_RLS_DIR/static_dist/include -L$YICES_RLS_DIR/static_lib -L. -I$STATIC_GMP_SRC_DIR/include -I. -Iincludes -I$SHARED_GMP_SRC_DIR/include \
+    -c org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c -o org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.o
 
 echo "Compilation Done"
+echo "Creating the \"$OUT_FILE\" library..."
+
+# This will compile the JNI wrapper part, given the JNI and the Yices2 header files
+x86_64-w64-mingw32-gcc -Wredundant-decls -Wno-format -O3 -fomit-frame-pointer -fno-stack-protector -Wall -g -o $OUT_FILE -shared -Wl,-soname,$OUT_FILE \
+  -Wl,--out-implib=$YICES_RLS_DIR/static_lib/libyices.dll.a -Wl,--no-undefined \
+  -L. -L$YICES_RLS_DIR/static_lib -L$SHARED_GMP_SRC_DIR/lib -L$STATIC_GMP_SRC_DIR/lib \
+  -I$SHARED_GMP_SRC_DIR/include org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.o -Wl,-Bdynamic -lyices $YICES_RLS_DIR/static_bin/libyices.dll \
+  -Wl,-Bstatic -static-libstdc++ -lstdc++ -lgmp -L$STATIC_GMP_SRC_DIR/lib -lm
+
+echo "Linking Done"
 echo "Reducing file size by dropping unused symbols..."
 # pwinthread is linked into yices2, but sometimes this doesn't work properly as it only links against symbols used by compile time not runtime!
 # You can try to not strip and if that doesn't work you need to add the --whole-archive flag to the linking process like so:
