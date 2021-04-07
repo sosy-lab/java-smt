@@ -172,9 +172,9 @@ echo "Linking Done"
 echo "Reducing file size by dropping unused symbols..."
 # pwinthread is linked into yices2, but sometimes this doesn't work properly as it only links against symbols used by compile time not runtime!
 # You can try to not strip and if that doesn't work you need to add the --whole-archive flag to the linking process like so:
-# 
-# Note that you should deactivate the flag after pwinthread!
-echo "Note: If in the future multithread support fails, this might be the cause!"
+#    -Wl,-Bstatic,--whole-archive 
+# Note that you should deactivate the flag after pwinthread with: -Wl,-Bdynamic (or -Wl,-Bstatic if you prefer to link statically but not the whole archive)
+echo "Note: If in the future multithread support fails, please refer to the compiliation script for help!"
 
 strip ${OUT_FILE}
 
