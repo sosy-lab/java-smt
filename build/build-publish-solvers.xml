@@ -386,9 +386,6 @@ SPDX-License-Identifier: Apache-2.0
         <fail unless="mathsat.version">
             Please specify the MathSAT5 version with the flag -Dmathsat.version=... .
         </fail>
-        <fail unless="mathsat.version">
-            Please specify the mathsat version with the flag -Dmathsat.version=... .
-        </fail>
 
         <copy file="lib/native/source/libmathsat5j/libmathsat5j.so" tofile="libmathsat5j-${mathsat.version}.so"/>
         <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="mathsat5j-${mathsat.version}.dll"/>

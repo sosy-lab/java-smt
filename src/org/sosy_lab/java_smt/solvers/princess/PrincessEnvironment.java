@@ -13,6 +13,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
+import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
@@ -21,12 +22,12 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
+import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.theories.SimpleArray;
-import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.util.Debug;
@@ -64,6 +65,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
+import scala.collection.immutable.Seq;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -238,12 +240,18 @@ class PrincessEnvironment {
             scala.collection.immutable.Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>>
-        triple = api.extractSMTLIBAssertionsSymbols(new StringReader(s));
+        triple;
 
-    List<? extends IExpression> formula = asJava(triple._1());
+    try {
+      triple = extractFromSTMLIB(s);
+    } catch (TranslationException | EnvironmentException nested) {
+      throw new IllegalArgumentException(nested);
+    }
+
+    List<? extends IExpression> formulas = asJava(triple._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
-    for (IExpression f : formula) {
+    for (IExpression f : formulas) {
       declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
     }
     for (IExpression var : declaredFunctions.build()) {
@@ -259,7 +267,24 @@ class PrincessEnvironment {
         addFunction(fun);
       }
     }
-    return formula;
+    return formulas;
+  }
+
+  /**
+   * Parse a SMTLIB query and returns a triple of the asserted formulas, the defined functions and
+   * symbols.
+   *
+   * @throws EnvironmentException from Princess when the parsing fails
+   * @throws TranslationException from Princess when the parsing fails due to type mismatch
+   */
+  /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
+  @SuppressWarnings("unused")
+  private Tuple3<
+          Seq<IFormula>,
+          scala.collection.immutable.Map<IFunction, SMTFunctionType>,
+          scala.collection.immutable.Map<ConstantTerm, SMTType>>
+      extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
+    return api.extractSMTLIBAssertionsSymbols(new StringReader(s));
   }
 
   public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
@@ -415,14 +440,7 @@ class PrincessEnvironment {
   /** This function declares a new functionSymbol with the given argument types and result. */
   public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
-      final IFunction res = functionsCache.get(name);
-      assert (res instanceof MonoSortedIFunction)
-          ? (((MonoSortedIFunction) res).resSort().equals(returnType)
-              && asJava(((MonoSortedIFunction) res).argSorts()).equals(args))
-          : (returnType == INTEGER_SORT
-              && res.arity() == args.size()
-              && args.stream().allMatch(s -> s == INTEGER_SORT));
-      return res;
+      return functionsCache.get(name);
     } else {
       IFunction funcDecl =
           api.createFunction(

@@ -64,6 +64,15 @@ public class Interpolation {
       prover.push();
       interpolateProgramTrace(prover, imgr, logger);
       prover.pop();
+
+    } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+      // on some machines we support only some solvers,
+      // thus we can ignore these errors.
+      logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
+    } catch (UnsupportedOperationException e) {
+      logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
 

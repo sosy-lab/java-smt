@@ -22,7 +22,7 @@ which would automatically fetch `JavaSMT` and all of its dependencies.
 After the repository URL is configured, you only need to add the following dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="java-smt" rev="3.6.0"/>
+<dependency org="org.sosy_lab" name="java-smt" rev="3.7.0"/>
 ```
 
 ### Automatic Installation from Maven Central (possibly outdated)
@@ -36,13 +36,13 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>3.2.0</version>
+  <version>3.7.0-61-gea80187e</version>
 </dependency>
 ```
 
 Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
 because they are written in Java and Scala, and thus are available on every machine.
-Shared object for the solvers `MathSAT5` and `Z3` can be added by using additional dependencies:
+Shared object for the solvers `MathSAT5` and `Z3` can be added by using additional dependencies (example for Linux):
 
 ```xml
     <!-- MathSAT5 has one dependency -->
@@ -57,29 +57,39 @@ Shared object for the solvers `MathSAT5` and `Z3` can be added by using addition
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
       <type>so</type>
       <classifier>libz3</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.9-sosy1</version>
+      <version>4.8.10</version>
       <type>so</type>
       <classifier>libz3java</classifier>
     </dependency>
 ```
 
-Additionally you can add and configure some plugins to load the libraries automatically.
+The XML snippets for other solvers available via Maven, such as `Boolector` and `CVC4`,
+can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
+
+If you are not using Linux and we provide a solver binary for your system,
+you might need to set the dependencies accordingly, e.g.,
+change the type from `so` to `dll` (for Windows) or `dylib` (for MacOS).
+You can lookup the required dependency files and filename extension in the [Ivy repository][].
+
+Additionally you can add and configure some Maven plugins to load the libraries automatically
+and place them in the correct directories when assembling your application.
 The plugins copy all dependencies (including the solver binaries) to the target/dependency directory
 and rename the libraries as required for automated loading.
-A detailed explanation for these plugins is given in the `Example-Maven-Project/pom.xml`.
+A detailed explanation for these plugins is given in the [`Example-Maven-Project/pom.xml`](Example-Maven-Project/pom.xml).
 For testing, you might need to add the dependency directory to the classpath for your test-engine.
+
 Example:
 
 ```xml
@@ -97,8 +107,8 @@ And finally configure the classpath for your jar-plugin:
 </manifest>
 ```
 
-See `Example-Maven-Project` for more information and a working example.
-See `Example-Maven-Web-Project` for more information about a Dynamic-Web-Project runnable by Tomcat 9.
+See [`Example-Maven-Project`](Example-Maven-Project) for more information and a working example.
+See [`Example-Maven-Web-Project`](Example-Maven-Web-Project) for more information about a Dynamic-Web-Project runnable by Tomcat 9.
 
 Shared object for _other solvers still need to be installed manually_:
 see the section "Manual Installation" below.
@@ -113,20 +123,20 @@ In order to perform the manual installation, the following steps should be follo
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
    **JavaSMT might not yet support the latest version on the solver's webpage,
    but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).**
- - Suppose the version `3.6.0` was chosen.
-   Ivy description file [`ivy-3.6.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-3.6.0.xml) can
+ - Suppose the version `3.7.0` was chosen.
+   Ivy description file [`ivy-3.7.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-3.7.0.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `java-smt-3.6.0.jar` and (optionally)
-   `java-smt-3.6.0-sources.jar`, located in the same directory.
+   In the example case, those are `java-smt-3.7.0.jar` and (optionally)
+   `java-smt-3.7.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
-   E.g. in the example, Z3 version `z3-4.8.8` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.8.8.xml)
+   E.g. in the example, Z3 version `4.8.9-sosy0` is specified,
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.8.9-sosy0.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
 
-### Binaries for Native Solvers (MathSAT, Z3, Boolector, CVC4, Yices2)
+### Binaries for Native Solvers
 
 When using Ivy or Maven for installation on a 64-bit Linux platform,
 solver binaries for native solvers are downloaded automatically, if available.
@@ -138,20 +148,14 @@ You can either copy them into the directory of the JavaSMT JAR file,
 or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
 
-For systems other than 64-bit Linux (e.g., Windows, or 32-bit systems) we might not always provide binaries,
+For systems other than 64-bit Linux (e.g., Windows, MacOS, or 32-bit systems) we might not always provide binaries,
 so you need to download or compile them for yourself.
-For [Z3](https://github.com/Z3Prover/z3), download either the [official binaries](https://github.com/Z3Prover/z3/releases)
-or build it with the flags `--java --git-describe` according to its documentation.
-Then install the files `libz3.(so|dll)` and `libz3java.(so|dll)` as described above.
-In order to compile MathSAT binaries,
-see the comments in the [`lib/native/source/libmathsat5j/compile.sh`](../lib/native/source/libmathsat5j/compile.sh)
-script.
-
+You can find the necessary steps for compiling and using solver binaries in [`lib/native/source/`](../lib/native/source/) and [`build`](../build).
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
 
 Currently, the support for newly integrated solvers like Boolector, CVC4, and Yices2 is limited.
-We are working on supporting more solvers on more operating systems.
+We are working on supporting more solvers on more operating systems. A helping hand or feedback is also welcome.
 
 ## Step 2: Initialization
 Below is a small example showing how to initialize the library using the entry point [SolverContextFactory][]:

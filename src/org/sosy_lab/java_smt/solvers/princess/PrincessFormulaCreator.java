@@ -42,6 +42,7 @@ import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
+import ap.types.Sort.MultipleValueBool$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -144,6 +145,8 @@ class PrincessFormulaCreator
         return FormulaType.IntegerType;
       } else if (sort instanceof SimpleArray.ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
+      } else if (sort instanceof MultipleValueBool$) {
+        return FormulaType.BooleanType;
       } else {
         scala.Option<Object> bitWidth = getBitWidth(sort);
         if (bitWidth.isDefined()) {

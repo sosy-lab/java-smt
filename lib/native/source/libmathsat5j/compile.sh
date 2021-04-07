@@ -23,7 +23,7 @@
 # For building libmathsat5j.so, there are two dependencies:
 # - The static Mathsat5 library as can be downloaded from http://mathsat.fbk.eu/download.html
 # - The static GMP library compiled with the "-fPIC" option.
-#   To create this, download GMP from http://gmplib.org/ and run
+#   To create this, download GMP 6.1.2 from http://gmplib.org/ and run
 #     ./configure --enable-cxx --with-pic --disable-shared --enable-fat
 #     make
 

@@ -192,9 +192,8 @@ First, [download the (reentrant!) Linux and Windows64 binary release](http://mat
 then provide the necessary dependencies (GMP for Linux and MPIR/JDK for Windows) as described in the compilation scripts.
 (see `lib/native/source/libmathsat5j/`), and then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH_LINUX` and `$MATHSAT_PATH_WINDOWS` are the paths to the MathSAT root directory,
-and `$MATHSAT_VERSION` is the version number of MathSAT:
-- for direct build and publishing (all-in-one, runtime: less than 5s):
-  ```
+and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: less than 5s):
+```
   ant publish-mathsat \
       -Dmathsat.path=$MATHSAT_PATH_LINUX \
       -Dgmp.path=$GMP_PATH \
@@ -202,9 +201,9 @@ and `$MATHSAT_VERSION` is the version number of MathSAT:
       -Dmpir-windows.path=$MPIR_PATH \
       -Djdk-windows.path=$JDK_11_PATH \
       -Dmathsat.version=$MATHSAT_VERSION
-  ```
-  Concrete example (`$WD` is a working directory where all dependencies are located):
-  ```
+```
+Concrete example (`$WD` is a working directory where all dependencies are located):
+```
   ant publish-mathsat \
       -Dmathsat.path=$WD/mathsat-5.6.4-linux-x86_64-reentrant \
       -Dgmp.path=$WD/gmp-6.1.2 \
@@ -212,7 +211,7 @@ and `$MATHSAT_VERSION` is the version number of MathSAT:
       -Dmpir-windows.path=$WD/mpir-2.7.2-win \
       -Djdk-windows.path=$WD/jdk-11 \
       -Dmathsat.version=5.6.4-debug
-  ```
+```
 Finally follow the instructions shown in the message at the end.
 
 A similar procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,

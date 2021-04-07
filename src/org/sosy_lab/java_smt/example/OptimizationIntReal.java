@@ -60,7 +60,7 @@ public class OptimizationIntReal {
   /** Solve the problem with integer logic. */
   private static void optimizeWithIntegers(
       Configuration config, LogManager logger, ShutdownNotifier notifier, Solvers solver)
-      throws InterruptedException, SolverException, InvalidConfigurationException {
+      throws InterruptedException, SolverException {
     // create solver context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
@@ -78,13 +78,22 @@ public class OptimizationIntReal {
 
       logger.log(Level.INFO, "optimizing with integer logic");
       printUpperAndLowerBound(prover, x, logger);
+
+    } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+      // on some machines we support only some solvers,
+      // thus we can ignore these errors.
+      logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
+    } catch (UnsupportedOperationException e) {
+      logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
 
   /** Solve the problem with rational logic. */
   private static void optimizeWithRationals(
       Configuration config, LogManager logger, ShutdownNotifier notifier, Solvers solver)
-      throws InterruptedException, SolverException, InvalidConfigurationException {
+      throws InterruptedException, SolverException {
     // create solver context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
@@ -101,6 +110,14 @@ public class OptimizationIntReal {
 
       logger.log(Level.INFO, "optimizing with rational logic");
       printUpperAndLowerBound(prover, x, logger);
+    } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+      // on some machines we support only some solvers,
+      // thus we can ignore these errors.
+      logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
+    } catch (UnsupportedOperationException e) {
+      logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
 

@@ -9,9 +9,15 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -52,28 +58,87 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   @Override
   public BooleanFormula parse(String str) throws IllegalArgumentException {
 
-    // TODO do we need sorts or decls?
-    // the context should know them already,
-    // TODO check this
+    // Z3 does not access the existing symbols on its own,
+    // but requires all symbols as part of the query and does
+    // Thus, we track the used symbols on our own and give them to the parser call, if required.
+    // Later, we collect all symbols from the parsed query and
+    // define them again to have them tracked.
+
+    final long env = getEnvironment();
+
+    // JavaSMT does currently not allow to define new sorts, future work?
     long[] sortSymbols = new long[0];
     long[] sorts = new long[0];
-    long[] declSymbols = new long[0];
-    long[] decls = new long[0];
-    long e =
-        Native.parseSmtlib2String(
-            getEnvironment(),
-            str,
-            sorts.length,
-            sortSymbols,
-            sorts,
-            declSymbols.length,
-            declSymbols,
-            decls);
 
-    final int size = Native.astVectorSize(getEnvironment(), e);
+    // first step: lets try to parse the query directly, without additional information
+    List<Long> declSymbols = new ArrayList<>();
+    List<Long> decls = new ArrayList<>();
+
+    long e = 0;
+    boolean finished = false;
+    while (!finished) {
+      try {
+        e =
+            Native.parseSmtlib2String(
+                env,
+                str,
+                sorts.length,
+                sortSymbols,
+                sorts,
+                declSymbols.size(),
+                Longs.toArray(declSymbols),
+                Longs.toArray(decls));
+        finished = true;
+
+      } catch (Z3Exception nested) {
+        // get the missing symbol and restart the parsing with them
+        Pattern pattern =
+            Pattern.compile(
+                "\\(error \"line \\d+ column \\d+: unknown (?:function\\/)?constant (.*)\"\\)\\n");
+        Matcher matcher = pattern.matcher(nested.getMessage());
+        if (matcher.matches()) {
+          String missingSymbol = matcher.group(1);
+          Long appDecl = formulaCreator.getKnownDeclaration(missingSymbol);
+          if (appDecl != null) { // if the symbol is known, then use it
+            declSymbols.add(Native.mkStringSymbol(env, missingSymbol));
+            decls.add(appDecl);
+            continue; // restart the parsing
+          }
+        }
+        throw new IllegalArgumentException(nested);
+      }
+    }
+
+    Preconditions.checkState(e != 0, "parsing aborted");
+    final int size = Native.astVectorSize(env, e);
     Preconditions.checkState(size == 1, "parsing expects exactly one asserted term.");
-    final long term = Native.astVectorGet(getEnvironment(), e, 0);
+    final long term = Native.astVectorGet(env, e, 0);
+
+    // last step: all parsed symbols need to be declared again to have them tracked in the creator.
+    declareAllSymbols(term);
+
     return getFormulaCreator().encapsulateBoolean(term);
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  private void declareAllSymbols(final long term) {
+    final long env = getEnvironment();
+    final Map<String, Long> symbols = formulaCreator.extractVariablesAndUFs(term, true);
+    for (Map.Entry<String, Long> symbol : symbols.entrySet()) {
+      long sym = symbol.getValue();
+      String name = symbol.getKey();
+      assert Native.isApp(env, sym);
+      int arity = Native.getAppNumArgs(env, sym);
+      if (arity == 0) { // constants
+        formulaCreator.makeVariable(Native.getSort(env, sym), name);
+      } else {
+        ImmutableList.Builder<Long> argTypes = ImmutableList.builder();
+        for (int j = 0; j < arity; j++) {
+          argTypes.add(Native.getSort(env, Native.getAppArg(env, sym, j)));
+        }
+        formulaCreator.declareUFImpl(name, Native.getSort(env, sym), argTypes.build());
+      }
+    }
   }
 
   @Override

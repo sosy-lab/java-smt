@@ -28,7 +28,10 @@ import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -97,6 +100,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Option(secure = true, description = "Whether to use PhantomReferences for discarding Z3 AST")
   private boolean usePhantomReferences = false;
 
+  /**
+   * We need to track all created symbols for parsing.
+   *
+   * <p>This map stores symbols (names) and their declaration (type information).
+   */
+  private final Map<String, Long> symbolsToDeclarations = new LinkedHashMap<>();
+
   private final Table<Long, Long, Long> allocatedArraySorts = HashBasedTable.create();
 
   /** Automatic clean-up of Z3 ASTs. */
@@ -133,7 +143,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public Long makeVariable(Long type, String varName) {
     long z3context = getEnv();
     long symbol = Native.mkStringSymbol(z3context, varName);
-    return Native.mkConst(z3context, symbol, type);
+    long var = Native.mkConst(z3context, symbol, type);
+    symbolsToDeclarations.put(varName, Native.getAppDecl(z3context, var));
+    return var;
   }
 
   @Override
@@ -684,6 +696,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     long[] sorts = Longs.toArray(pArgTypes);
     long func = Native.mkFuncDecl(environment, symbol, sorts.length, sorts, returnType);
     Native.incRef(environment, func);
+    symbolsToDeclarations.put(pName, func);
     return func;
   }
 
@@ -811,5 +824,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     for (long ast : referenceMap.values()) {
       Native.decRef(getEnv(), ast);
     }
+  }
+
+  /**
+   * get a previously created application declaration, or <code>NULL</code> if the symbol is
+   * unknown.
+   */
+  @Nullable
+  Long getKnownDeclaration(String symbolName) {
+    return symbolsToDeclarations.get(symbolName);
   }
 }

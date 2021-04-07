@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -93,6 +94,15 @@ public class FormulaClassifier {
         }
       }
       System.out.println(fc + ", checked formulas: " + formulas.size());
+
+    } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+
+      // on some machines we support only some solvers,
+      // thus we can ignore these errors.
+      logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
+    } catch (UnsupportedOperationException e) {
+      logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
 

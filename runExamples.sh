@@ -42,12 +42,17 @@ fi
 #------------------------------------------------------------------------------
 
 platform="`uname -s`"
+SEP=":"
 
 # where the project directory is, relative to the location of this script
 case "$platform" in
   Linux|CYGWIN*)
     SCRIPT="$(readlink -f "$0")"
     [ -n "$PATH_TO_JAVASMT" ] || PATH_TO_JAVASMT="$(readlink -f "$(dirname "$SCRIPT")")"
+    ;;
+  MINGW64*)
+	PATH_TO_JAVASMT="." # assume working directory is the current directory
+	SEP=";"
     ;;
   # other platforms like Mac don't support readlink -f
   *)
@@ -69,12 +74,11 @@ case "$platform" in
 esac
 
 # build the classpath including all solvers
-CLASSPATH="$CLASSPATH:$PATH_TO_JAVASMT/bin:$PATH_TO_JAVASMT/lib/java/core/*"
+CLASSPATH="$CLASSPATH$SEP$PATH_TO_JAVASMT/bin$SEP$PATH_TO_JAVASMT/lib/java/core/*"
 SOLVERS="boolector cvc4 mathsat optimathsat princess smtinterpol yices2 z3"
 for solver in $SOLVERS ; do
-  CLASSPATH="$CLASSPATH:$PATH_TO_JAVASMT/lib/java/runtime-$solver/*"
+  CLASSPATH="$CLASSPATH$SEP$PATH_TO_JAVASMT/lib/java/runtime-$solver/*"
 done
-export CLASSPATH="$CLASSPATH"
 
 # Run Examples for Java-SMT.
 # PerfDisableSharedMem avoids hsperfdata in /tmp (disable it to connect easily with VisualConsole and Co.).
@@ -87,6 +91,7 @@ for EXAMPLE in AllSatExample HoudiniApp Interpolation OptimizationFormulaWeights
       -XX:+PerfDisableSharedMem \
       -Djava.awt.headless=true \
       -ea \
+	  -cp "$CLASSPATH" \
       $JAVA_VM_ARGUMENTS \
       org.sosy_lab.java_smt.example.$EXAMPLE
 done
