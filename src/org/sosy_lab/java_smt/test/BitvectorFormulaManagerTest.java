@@ -302,4 +302,60 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
           .isTautological();
     }
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtractTooLargeNumEndSigned() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extract(bv, 5, 0, true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtractTooLargeNumStartSigned() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extract(bv, 4, 5, true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtractTooLargeNumStartAltSigned() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extract(bv, 3, 4, true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtractNegNumEnd() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extract(bv, -1, 0, true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtractNegNumStart() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extract(bv, 1, -1, true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtractNegNumStartEnd() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extract(bv, -1, -1, true);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @SuppressWarnings("CheckReturnValue")
+  public void bvExtendNegNum() {
+    // Use bv > 1 because of Boolector
+    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
+    bvmgr.extend(bv, -1, true);
+  }
 }
