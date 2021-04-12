@@ -20,6 +20,7 @@ import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
 import ap.parser.IConstant;
 import ap.parser.IEpsilon;
+import ap.parser.IEquation;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
@@ -37,6 +38,8 @@ import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
+import ap.theories.ExtArray;
+import ap.theories.ExtArray.ArraySort;
 import ap.theories.SimpleArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
@@ -143,7 +146,7 @@ class PrincessFormulaCreator
         return FormulaType.BooleanType;
       } else if (sort == PrincessEnvironment.INTEGER_SORT) {
         return FormulaType.IntegerType;
-      } else if (sort instanceof SimpleArray.ArraySort) {
+      } else if (sort instanceof SimpleArray.ArraySort || sort instanceof ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
       } else if (sort instanceof MultipleValueBool$) {
         return FormulaType.BooleanType;
@@ -234,6 +237,8 @@ class PrincessFormulaCreator
     } else if (input instanceof IEpsilon) {
       // in princess epsilon representation is the complete formula which we do not want here
       return "eps";
+    } else if (input instanceof IEquation) {
+      return "=";
     } else {
       throw new AssertionError("Unhandled type " + input.getClass());
     }
@@ -381,9 +386,11 @@ class PrincessFormulaCreator
       final FunctionDeclarationKind theoryKind = theoryFunctionKind.get(fun);
       if (theoryKind != null) {
         return theoryKind;
-      } else if (SimpleArray.Select$.MODULE$.unapply(fun)) {
+      } else if (SimpleArray.Select$.MODULE$.unapply(fun)
+          || ExtArray.Select$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.SELECT;
-      } else if (SimpleArray.Store$.MODULE$.unapply(fun)) {
+      } else if (SimpleArray.Store$.MODULE$.unapply(fun)
+          || ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.STORE;
       } else {
         return FunctionDeclarationKind.UF;
@@ -409,6 +416,8 @@ class PrincessFormulaCreator
     } else if (input instanceof IPlus) {
       // SUB does not exist in princess a - b is a + (-b) there
       return FunctionDeclarationKind.ADD;
+    } else if (input instanceof IEquation) {
+      return FunctionDeclarationKind.EQ;
     } else if (input instanceof IIntFormula) {
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {

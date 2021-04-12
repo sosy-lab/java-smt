@@ -953,6 +953,8 @@ public class ModelTest extends SolverBasedTest0 {
       assignmentFormulas.add(va.getAssignmentAsFormula());
       assertThatFormula(va.getAssignmentAsFormula())
           .isEqualTo(makeAssignment(va.getKey(), va.getValueAsFormula()));
+      assertThat(va.getValue().getClass())
+          .isIn(ImmutableList.of(Boolean.class, BigInteger.class, Rational.class, Double.class));
     }
 
     // Check that model is not contradicting

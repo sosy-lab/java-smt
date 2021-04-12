@@ -27,6 +27,7 @@ import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
+import ap.theories.ExtArray;
 import ap.theories.SimpleArray;
 import ap.types.Sort;
 import ap.types.Sort$;
@@ -468,7 +469,8 @@ class PrincessEnvironment {
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
       final ITerm t = (ITerm) exp;
-      return Sort$.MODULE$.sortOf(t) instanceof SimpleArray.ArraySort;
+      return Sort$.MODULE$.sortOf(t) instanceof SimpleArray.ArraySort
+          || Sort$.MODULE$.sortOf(t) instanceof ExtArray.ArraySort;
     } else {
       return false;
     }
