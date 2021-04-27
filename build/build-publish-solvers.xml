@@ -406,7 +406,7 @@ SPDX-License-Identifier: Apache-2.0
         <echo>
             You now want to run
             svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of mathsat Solver"
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of MathSAT5"
             to make the new version publicly available.</echo>
     </target>
 
@@ -432,7 +432,7 @@ SPDX-License-Identifier: Apache-2.0
         <echo>
             You now want to run
             svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of optimathsat Solver"
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of OptiMathSAT"
             to make the new version publicly available.</echo>
     </target>
     <!-- }}} -->
