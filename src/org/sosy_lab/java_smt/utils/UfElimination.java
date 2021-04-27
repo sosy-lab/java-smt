@@ -16,6 +16,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -59,7 +60,7 @@ public class UfElimination {
 
     public static Result empty(FormulaManager pFormulaManager) {
       BooleanFormula trueFormula = pFormulaManager.getBooleanFormulaManager().makeTrue();
-      return new Result(trueFormula, trueFormula, ImmutableMap.of(), ImmutableMultimap.of());
+      return new Result(trueFormula, trueFormula, ImmutableMap.of(), ImmutableListMultimap.of());
     }
 
     Result(
@@ -187,7 +188,7 @@ public class UfElimination {
     ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.build();
     BooleanFormula constraints = bfmgr.and(extraConstraints);
     return new Result(
-        formulaWithoutUFs, constraints, allSubstitutions, ImmutableMultimap.copyOf(ufs));
+        formulaWithoutUFs, constraints, allSubstitutions, ImmutableListMultimap.copyOf(ufs));
   }
 
   private void merge(

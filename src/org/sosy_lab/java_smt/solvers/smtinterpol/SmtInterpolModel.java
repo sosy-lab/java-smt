@@ -19,7 +19,6 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
@@ -121,9 +120,9 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model mmodel =
         (de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model) model;
 
-    for (Map.Entry<Index, Term> v : mmodel.getFunctionValue(symbol).values().entrySet()) {
+    for (Index key : mmodel.getFunctionValue(symbol).values().keySet()) {
       assignments.add(
-          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, v.getKey().toArray())));
+          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, key.toArray())));
     }
 
     return assignments;
