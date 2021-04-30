@@ -29,6 +29,7 @@ repositories {
     }
     // SMT-Solver Princess repo
 	maven {
+        allowInsecureProtocol true
         url "http://logicrunch.research.it.uu.se/maven/"
     }
 }
