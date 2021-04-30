@@ -4,72 +4,72 @@ apply plugin: 'application'
 mainClassName = 'org.sosy_lab.java_smt_example.SolverOverviewTable'
 
 repositories {
-    // try to resolve by pom first
-    mavenCentral {
-        metadataSources {
-			mavenPom()
-        }
-	}
+  // try to resolve by pom first
+  mavenCentral {
+    metadataSources {
+      mavenPom()
+    }
+  }
     // try to get artifacts if no useful pom is found
-	mavenCentral {
-        metadataSources {
-            artifact()
-        }
-	}
+  mavenCentral {
+    metadataSources {
+      artifact()
+    }
+  }
     // Ivy can be used as well
-    ivy {
-        url "https://www.sosy-lab.org/ivy"
-        patternLayout {
-            artifact "/[organisation]/[module]/[classifier]-[revision].[ext]"
-            //ivy "/[organisation]/[module]/ivy-[revision].xml"
-        }
-        metadataSources {
-            artifact()
-        }
+  ivy {
+    url "https://www.sosy-lab.org/ivy"
+    patternLayout {
+      artifact "/[organisation]/[module]/[classifier]-[revision].[ext]"
+      //ivy "/[organisation]/[module]/ivy-[revision].xml"
     }
-    // SMT-Solver Princess repo
-	maven {
-        allowInsecureProtocol true
-        url "http://logicrunch.research.it.uu.se/maven/"
+    metadataSources {
+       artifact()
     }
+  }
+  // SMT-Solver Princess repo
+  maven {
+    allowInsecureProtocol true
+    url "http://logicrunch.research.it.uu.se/maven/"
+  }
 }
 
 // You can manage the JavaSMT dependencies via a config if you need to split them from your regular dependencies
 
 dependencies {
-    // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
-	implementation 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
-	
-    // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'com.microsoft.z3', ext: 'jar'
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3', ext: 'so'
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3java', ext: 'so'
+  // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
+  implementation 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
+  
+  // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'com.microsoft.z3', ext: 'jar'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3java', ext: 'so'
 
-    // We don't pull MathSAT5 and OptiMathSAT at the moment because MathSAT5 has an inconsistency in Maven till the next release
-    // Retrieve MathSAT5 with Maven
-	//runtime group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: '5.6.5', ext: 'so'
+  // We don't pull MathSAT5 and OptiMathSAT at the moment because MathSAT5 has an inconsistency in Maven till the next release
+  // Retrieve MathSAT5 with Maven
+  //runtime group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: '5.6.5', ext: 'so'
     
-    // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
-    //runtime 'org.sosy_lab:javasmt-solver-optimathsat:1.7.1-sosy0:liboptimathsat5j@so'
+  // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
+  //runtime 'org.sosy_lab:javasmt-solver-optimathsat:1.7.1-sosy0:liboptimathsat5j@so'
 
-	runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'CVC4', ext: 'jar'
-	runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4', ext: 'so'
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4jni', ext: 'so'
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4parser', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'CVC4', ext: 'jar'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4jni', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4parser', ext: 'so'
 
 
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libboolector', ext: 'so'
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
-    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
-	
-	/* Kotlin version for z3 as an example:
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libboolector', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
+  
+  /* Kotlin version for z3 as an example:
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3", ext = "so")
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
-    */
+  */
     
-    // Tell compile config to use the JavaSMT from our dependencies folder
-    implementation fileTree(dir: 'dependencies', include: '*.jar')
+  // Tell compile config to use the JavaSMT from our dependencies folder
+  implementation fileTree(dir: 'dependencies', include: '*.jar')
 }
 
 
@@ -77,17 +77,17 @@ dependencies {
 // This is necassary as Gradle renames the JavaSMT dependencies 
 // AND they need to be in a specific location for JavaSMT to be found (the easiest ist the same folder)
 task copyDependencies(type: Copy) {
-    // Delete old dependencies as they might cause trouble
-   dependsOn 'cleanDownloadedDependencies'
-   from configurations.runtimeOnly
-   into 'dependencies'
-    // Renames the dependencies
-   rename '.*(lib[^-]*)-?.*.so', '$1.so'
+  // Delete old dependencies as they might cause trouble
+ dependsOn 'cleanDownloadedDependencies'
+ from configurations.runtimeOnly
+ into 'dependencies'
+  // Renames the dependencies
+ rename '.*(lib[^-]*)-?.*.so', '$1.so'
 }
 
 // cleans the dependencies folder
 task cleanDownloadedDependencies(type: Delete) {
-    delete fileTree('dependencies')
+  delete fileTree('dependencies')
 }
 
 // Always copy the dependencies
