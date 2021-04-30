@@ -24,6 +24,7 @@ lib/native/*/*.asc
 
 doc/Example-Maven-Project/target*
 doc/Example-Maven-Web-Project/target*
+doc/Example-Gradle-Project/.gradle
 
 solvers_maven_conf/*.asc
 
