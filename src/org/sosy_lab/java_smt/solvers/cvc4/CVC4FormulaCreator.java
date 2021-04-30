@@ -44,6 +44,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -81,6 +82,20 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         "symbol name already in use for different type %s",
         exp.getType());
     return exp;
+  }
+
+  /**
+   * Makes a bound copy of an variable for use in quantifier. Note that all occurrences of the free
+   * var have to be substituted by the bound once it exists.
+   *
+   * @param var Variable you want a bound copy of.
+   * @return Bound Variable
+   */
+  public Expr makeBoundCopy(Expr var) {
+    Type type = var.getType();
+    String name = getName(var);
+    Expr boundCopy = exprManager.mkBoundVar(name, type);
+    return boundCopy;
   }
 
   @Override
@@ -281,7 +296,29 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     } else if (f.isVariable()) {
       return visitor.visitFreeVariable(formula, getName(f));
-
+    } else if (f.getKind() == Kind.BOUND_VARIABLE) {
+      // BOUND vars are used for all vars that are used in a quantifier,
+      // even if not all occorences of this var are in the quantifier
+      // CVC4 doesn't give you the de-brujin index
+      return visitor.visitBoundVariable(formula, 0);
+    } else if (f.getKind() == Kind.FORALL) {
+      // QUANTIFIER FORALL
+      BooleanFormula body = encapsulateBoolean(f.getChildren().get(1));
+      return visitor
+          .visitQuantifier(
+              (BooleanFormula) formula,
+              Quantifier.FORALL,
+              getBoundVars(f.getChildren().get(0)),
+              body);
+    } else if (f.getKind() == Kind.EXISTS) {
+      // QUANTIFIER EXISTS
+      BooleanFormula body = encapsulateBoolean(f.getChildren().get(1));
+      return visitor
+          .visitQuantifier(
+              (BooleanFormula) formula,
+              Quantifier.EXISTS,
+              getBoundVars(f.getChildren().get(0)),
+              body);
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
@@ -316,6 +353,18 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           FunctionDeclarationImpl.of(
               getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
     }
+  }
+
+  private List<Formula> getBoundVars(final Expr f) {
+    // i doubt that we will ever have a list that needs long values
+    int numBound = (int) f.getChildren().size();
+    List<Formula> boundVars = new ArrayList<>(numBound);
+    for (int i = 0; i < numBound; i++) {
+      Expr expr = f.getChildren().get(i);
+      boundVars.add(
+          encapsulate(getFormulaType(expr), makeBoundCopy(expr)));
+    }
+    return boundVars;
   }
 
   // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)

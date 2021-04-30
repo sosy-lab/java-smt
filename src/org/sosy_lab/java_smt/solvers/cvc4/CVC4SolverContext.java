@@ -83,6 +83,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       // throw new AssertionError("CVC4 was built without support for FloatingPoint theory");
     }
 
+    CVC4QuantifiedFormulaManager qfTheory = new CVC4QuantifiedFormulaManager(creator);
+
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
     CVC4SLFormulaManager slTheory = new CVC4SLFormulaManager(creator);
     CVC4FormulaManager manager =
@@ -94,6 +96,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             fpTheory,
+            qfTheory,
             arrayTheory,
             slTheory);
 
