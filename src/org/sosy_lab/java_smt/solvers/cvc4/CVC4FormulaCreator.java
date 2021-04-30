@@ -304,21 +304,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (f.getKind() == Kind.FORALL) {
       // QUANTIFIER FORALL
       BooleanFormula body = encapsulateBoolean(f.getChildren().get(1));
-      return visitor
-          .visitQuantifier(
-              (BooleanFormula) formula,
-              Quantifier.FORALL,
-              getBoundVars(f.getChildren().get(0)),
-              body);
+      return visitor.visitQuantifier(
+          (BooleanFormula) formula, Quantifier.FORALL, getBoundVars(f.getChildren().get(0)), body);
     } else if (f.getKind() == Kind.EXISTS) {
       // QUANTIFIER EXISTS
       BooleanFormula body = encapsulateBoolean(f.getChildren().get(1));
-      return visitor
-          .visitQuantifier(
-              (BooleanFormula) formula,
-              Quantifier.EXISTS,
-              getBoundVars(f.getChildren().get(0)),
-              body);
+      return visitor.visitQuantifier(
+          (BooleanFormula) formula, Quantifier.EXISTS, getBoundVars(f.getChildren().get(0)), body);
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
@@ -361,8 +353,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     List<Formula> boundVars = new ArrayList<>(numBound);
     for (int i = 0; i < numBound; i++) {
       Expr expr = f.getChildren().get(i);
-      boundVars.add(
-          encapsulate(getFormulaType(expr), makeBoundCopy(expr)));
+      boundVars.add(encapsulate(getFormulaType(expr), makeBoundCopy(expr)));
     }
     return boundVars;
   }
