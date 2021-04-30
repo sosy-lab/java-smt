@@ -39,7 +39,7 @@ repositories {
 dependencies {
   // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
   implementation 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
-  
+
   // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'com.microsoft.z3', ext: 'jar'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3', ext: 'so'
@@ -48,7 +48,7 @@ dependencies {
   // We don't pull MathSAT5 and OptiMathSAT at the moment because MathSAT5 has an inconsistency in Maven till the next release
   // Retrieve MathSAT5 with Maven
   //runtime group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: '5.6.5', ext: 'so'
-    
+
   // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
   //runtime 'org.sosy_lab:javasmt-solver-optimathsat:1.7.1-sosy0:liboptimathsat5j@so'
 
@@ -61,20 +61,20 @@ dependencies {
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libboolector', ext: 'so'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
-  
+
   /* Kotlin version for z3 as an example:
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3", ext = "so")
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
   */
-    
+
   // Tell compile config to use the JavaSMT from our dependencies folder
   implementation fileTree(dir: 'dependencies', include: '*.jar')
 }
 
 
 // Copy and rename all JavaSMT dependencies
-// This is necassary as Gradle renames the JavaSMT dependencies 
+// This is necassary as Gradle renames the JavaSMT dependencies
 // AND they need to be in a specific location for JavaSMT to be found (the easiest ist the same folder)
 task copyDependencies(type: Copy) {
   // Delete old dependencies as they might cause trouble
