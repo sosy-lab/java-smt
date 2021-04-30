@@ -37,12 +37,12 @@ repositories {
 
 dependencies {
     // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
-	compile 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
+	implementation 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
 	
     // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'com.microsoft.z3', ext: 'jar'
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3', ext: 'so'
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3java', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'com.microsoft.z3', ext: 'jar'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3java', ext: 'so'
 
     // We don't pull MathSAT5 and OptiMathSAT at the moment because MathSAT5 has an inconsistency in Maven till the next release
     // Retrieve MathSAT5 with Maven
@@ -51,15 +51,15 @@ dependencies {
     // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
     //runtime 'org.sosy_lab:javasmt-solver-optimathsat:1.7.1-sosy0:liboptimathsat5j@so'
 
-	runtime group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'CVC4', ext: 'jar'
-	runtime group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4', ext: 'so'
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4jni', ext: 'so'
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4parser', ext: 'so'
+	runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'CVC4', ext: 'jar'
+	runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4jni', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4parser', ext: 'so'
 
 
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libboolector', ext: 'so'
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
-    runtime group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libboolector', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
+    runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
 	
 	/* Kotlin version for z3 as an example:
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
@@ -68,7 +68,7 @@ dependencies {
     */
     
     // Tell compile config to use the JavaSMT from our dependencies folder
-    compile fileTree(dir: 'dependencies', include: '*.jar')
+    implementation fileTree(dir: 'dependencies', include: '*.jar')
 }
 
 
@@ -78,7 +78,7 @@ dependencies {
 task copyDependencies(type: Copy) {
     // Delete old dependencies as they might cause trouble
    dependsOn 'cleanDownloadedDependencies'
-   from configurations.runtime
+   from configurations.runtimeOnly
    into 'dependencies'
     // Renames the dependencies
    rename '.*(lib[^-]*)-?.*.so', '$1.so'
