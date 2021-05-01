@@ -123,13 +123,12 @@ public interface BitvectorFormulaManager {
   BitvectorFormula concat(BitvectorFormula number, BitvectorFormula append);
 
   /**
-   *
    * @param number The bitvector to extract.
    * @param msb Upper index. Must be greater then or equal to 0 and less then the bit-width of
-   *        number.
+   *     number.
    * @param lsb Lower index. Must be less then or equal to msb and greater or equal to 0.
    * @param signed Whether the extension should depend on the sign bit. Note: Some SMT-Solvers
-   *        ignore this. (i.e. Boolector)
+   *     ignore this. (i.e. Boolector)
    */
   BitvectorFormula extract(BitvectorFormula number, int msb, int lsb, boolean signed);
 
