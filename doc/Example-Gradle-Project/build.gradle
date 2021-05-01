@@ -34,9 +34,18 @@ repositories {
   }
 }
 
-// You can manage the JavaSMT dependencies via a config if you need to split them from your regular dependencies
+configurations {
+  // Use a custom config that inherits all dependencies from runtimeOnly and implementation.
+  // If you want to seperate your dependencies from the JavaSMT ones
+  // simply use it when pulling the dependencies.
+  javaSMTConfig.extendsFrom(runtimeOnly, implementation)
+}
 
+// You can manage the JavaSMT dependencies via a config if you need to split them from your regular dependencies
 dependencies {
+  // JUnit 4
+  testImplementation 'junit:junit:4.13'
+
   // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
   implementation 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
 
@@ -72,6 +81,11 @@ dependencies {
   implementation fileTree(dir: 'dependencies', include: '*.jar')
 }
 
+// Test with JUnit4 (see dependencies) and 1gig heap
+test {
+  useJUnit()
+  maxHeapSize = '1G'
+}
 
 // Copy and rename all JavaSMT dependencies
 // This is necassary as Gradle renames the JavaSMT dependencies
@@ -79,7 +93,7 @@ dependencies {
 task copyDependencies(type: Copy) {
   // Delete old dependencies as they might cause trouble
  dependsOn 'cleanDownloadedDependencies'
- from configurations.runtimeOnly
+ from configurations.javaSMTConfig
  into 'dependencies'
   // Renames the dependencies
  rename '.*(lib[^-]*)-?.*.so', '$1.so'
