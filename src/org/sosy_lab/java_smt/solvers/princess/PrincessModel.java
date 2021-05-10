@@ -108,45 +108,44 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     } else if (key instanceof IFunApp) {
       IFunApp cKey = (IFunApp) key;
 
-      switch (cKey.fun().name()) {
-        case "select":
-          // array-access, for explanation see #getArrayAddresses
-          ITerm arrayId = cKey.args().apply(Integer.valueOf(0));
-          ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
-          ITerm arrayF = pArrays.get(arrayId);
-          if (arrayF == null) {
-            // intermediate array store, like a tmp-variable, happens for repeated
-            // store-operations
-            return null;
-          }
-          fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
-          name = arrayF.toString();
-          argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex));
-          break;
-        case "store":
-          // array-access, for explanation see #getArrayAddresses
-          // IdealInt sourceArray = cKey.args().apply(0);
-          ITerm arrayIndex2 = cKey.args().apply(Integer.valueOf(1));
-          ITerm arrayContent = cKey.args().apply(Integer.valueOf(2));
-          ITerm arrayF2 = pArrays.get(value);
-          if (arrayF2 == null) {
-            // intermediate array store, like a tmp-variable, happens for repeated
-            // store-operations
-            return null;
-          }
-          fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
-          fValue = arrayContent;
-          name = arrayF2.toString();
-          argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex2));
-          break;
-        default:
-          // normal variable or UF
-          argumentInterpretations = new ArrayList<>();
-          for (ITerm arg : asJava(cKey.args())) {
-            argumentInterpretations.add(creator.convertValue(arg));
-          }
-          fKey = cKey;
-          name = cKey.fun().name();
+      if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
+        // array-access, for explanation see #getArrayAddresses
+        ITerm arrayId = cKey.args().apply(Integer.valueOf(0));
+        ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
+        ITerm arrayF = pArrays.get(arrayId);
+        if (arrayF == null) {
+          // intermediate array store, like a tmp-variable, happens for repeated
+          // store-operations
+          return null;
+        }
+        fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
+        name = arrayF.toString();
+        argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex));
+
+      } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {
+        // array-access, for explanation see #getArrayAddresses
+        // IdealInt sourceArray = cKey.args().apply(0);
+        ITerm arrayIndex2 = cKey.args().apply(Integer.valueOf(1));
+        ITerm arrayContent = cKey.args().apply(Integer.valueOf(2));
+        ITerm arrayF2 = pArrays.get(value);
+        if (arrayF2 == null) {
+          // intermediate array store, like a tmp-variable, happens for repeated
+          // store-operations
+          return null;
+        }
+        fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
+        fValue = arrayContent;
+        name = arrayF2.toString();
+        argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex2));
+
+      } else {
+        // normal variable or UF
+        argumentInterpretations = new ArrayList<>();
+        for (ITerm arg : asJava(cKey.args())) {
+          argumentInterpretations.add(creator.convertValue(arg));
+        }
+        fKey = cKey;
+        name = cKey.fun().name();
       }
 
       fAssignment = ((ITerm) fKey).$eq$eq$eq((ITerm) fValue);
