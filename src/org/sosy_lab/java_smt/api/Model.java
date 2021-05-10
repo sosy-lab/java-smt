@@ -119,14 +119,12 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /**
      * the key should be of simple formula-type (Boolean/Integer/Rational/BitVector).
      *
-     * <p>
-     * For UFs we use the application of the UF with arguments.
+     * <p>For UFs we use the application of the UF with arguments.
      *
-     * <p>
-     * For arrays we use the selection-statement with an index. We do not support Array theory as
-     * {@link #value} during a model evaluation, but we provide assignments like
-     * <code>select(arr, 12) := 34</code> (where <code>arr</code> itself is a plain symbol (without
-     * an explicit const- or zero-based initialization, as done by some SMT solvers).
+     * <p>For arrays we use the selection-statement with an index. We do not support Array theory as
+     * {@link #value} during a model evaluation, but we provide assignments like <code>
+     * select(arr, 12) := 34</code> (where <code>arr</code> itself is a plain symbol (without an
+     * explicit const- or zero-based initialization, as done by some SMT solvers).
      */
     private final Formula keyFormula;
 
@@ -155,13 +153,11 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /**
      * The name should be a 'useful' identifier for the current assignment.
      *
-     * <p>
-     * For UFs we use their name without parameters. Parameters are given as
-     * {@link #argumentsInterpretation}.
+     * <p>For UFs we use their name without parameters. Parameters are given as {@link
+     * #argumentsInterpretation}.
      *
-     * <p>
-     * For arrays we use the name without any index. The index is given as
-     * {@link #argumentsInterpretation}, if required.
+     * <p>For arrays we use the name without any index. The index is given as {@link
+     * #argumentsInterpretation}, if required.
      */
     private final String name;
 
@@ -204,7 +200,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /**
      * Value: see the {@link #evaluate} methods for the possible types.
      *
-     * We return only values that can be used in Java, i.e., boolean or numeral values
+     * <p>We return only values that can be used in Java, i.e., boolean or numeral values
      * (Rational/Double/BigInteger/Long/Integer).
      */
     public Object getValue() {
