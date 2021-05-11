@@ -54,6 +54,9 @@ import org.sosy_lab.java_smt.api.SolverException;
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
 
+  private static final ArrayFormulaType<IntegerFormula, IntegerFormula> ARRAY_TYPE_INT_INT =
+      FormulaType.getArrayType(IntegerType, IntegerType);
+
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
       ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
@@ -717,9 +720,7 @@ public class ModelTest extends SolverBasedTest0 {
             ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
         arrType =
             FormulaType.getArrayType(
-                IntegerType,
-                FormulaType.getArrayType(
-                    IntegerType, FormulaType.getArrayType(IntegerType, IntegerType)));
+                IntegerType, FormulaType.getArrayType(IntegerType, ARRAY_TYPE_INT_INT));
     testModelGetters(
         f,
         amgr.select(
@@ -751,9 +752,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
     testModelGetters(
         f,
-        amgr.select(
-            amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)),
-            imgr.makeNumber(5)),
+        amgr.select(amgr.makeArray("arr", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arr",
         true);
@@ -780,7 +779,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        m.evaluate(amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)));
+        m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT));
       }
     }
   }
@@ -790,7 +789,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
 
-    // create formula for "arr[5]==x && x==123"
+    // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
         mgr.parse(
             "(declare-fun x () Int)\n"
@@ -804,12 +803,61 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
     testModelGetters(
         f,
-        amgr.select(
-            amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType)),
-            imgr.makeNumber(5)),
+        amgr.select(amgr.makeArray("arr", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arr",
         true);
+  }
+
+  @Test
+  public void testGetArrays5b() throws SolverException, InterruptedException {
+    requireParser();
+    requireArrays();
+
+    // create formula for "arr[5]==x && arr[6]==x && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arrgh () (Array Int Int))\n"
+                + "(declare-fun ahoi () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select arrgh 5) x)"
+                + "    (= (select arrgh 6) x)"
+                + "    (= x 123)"
+                + "    (= (select (store ahoi 66 x) 55) x)"
+                + "))");
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "arrgh",
+        true);
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(6)),
+        BigInteger.valueOf(123),
+        "arrgh",
+        true);
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(55)),
+        BigInteger.valueOf(123),
+        "ahoi",
+        true);
+
+    // The value for 'ahoi[66]' is not determined by the constraints from above,
+    // because we only 'store' it in (a copy of) the array, but never read it.
+    // Thus, the following test case depends on the solver and would be potentially wrong:
+    //
+    // testModelGetters(
+    // f,
+    // amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(66)),
+    // BigInteger.valueOf(123),
+    // "ahoi",
+    // true);
   }
 
   private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
