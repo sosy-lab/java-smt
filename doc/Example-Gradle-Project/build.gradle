@@ -86,7 +86,7 @@ dependencies {
   */
 
   // Tell implementation config to use the JavaSMT + dependencies from our dependencies folder
-  implementation fileTree(dir: 'dependencies', include: '*.jar')
+  implementation fileTree(dir: 'build/dependencies', include: '*.jar')
 }
 
 // Test with JUnit4 (see dependencies) and 1gig heap
@@ -102,14 +102,14 @@ task copyDependencies(type: Copy) {
   // Delete old dependencies as they might cause trouble
   dependsOn 'cleanDownloadedDependencies'
   from configurations.javaSMTConfig
-  into 'dependencies'
+  into 'build/dependencies'
   // Renames the dependencies
   rename '.*(lib[^-]*)-?.*.so', '$1.so'
 }
 
 // cleans the dependencies folder
 task cleanDownloadedDependencies(type: Delete) {
-  delete fileTree('dependencies')
+  delete fileTree('build/dependencies')
 }
 
 // Copy the JavaSMT depdendencies before using them in run and test
