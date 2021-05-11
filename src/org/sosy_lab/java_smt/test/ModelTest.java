@@ -860,6 +860,72 @@ public class ModelTest extends SolverBasedTest0 {
     // true);
   }
 
+  @Test
+  public void testGetArrays5c() throws SolverException, InterruptedException {
+    requireParser();
+    requireArrays();
+
+    // create formula for "arr[5:6]==[x,x] && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arrgh () (Array Int Int))\n"
+                + "(declare-fun ahoi () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select (store arrgh 6 x) 5) x)"
+                + "    (= (select (store ahoi 6 x) 5) x)"
+                + "    (= x 123)"
+                + "))");
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "arrgh",
+        true);
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "ahoi",
+        true);
+  }
+
+  @Test
+  public void testGetArrays5d() throws SolverException, InterruptedException {
+    requireParser();
+    requireArrays();
+
+    // create formula for "arr[5:6]==[x,x] && x==123"
+    BooleanFormula f =
+        mgr.parse(
+            "(declare-fun x () Int)\n"
+                + "(declare-fun arrgh () (Array Int Int))\n"
+                + "(declare-fun ahoi () (Array Int Int))\n"
+                + "(assert (and"
+                + "    (= (select (store arrgh 6 x) 5) x)"
+                + "    (= (select (store ahoi 6 x) 7) x)"
+                + "    (= x 123)"
+                + "))");
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
+        BigInteger.valueOf(123),
+        "arrgh",
+        true);
+    testModelGetters(
+        f,
+        amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(7)),
+        BigInteger.valueOf(123),
+        "ahoi",
+        true);
+  }
+
   private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
