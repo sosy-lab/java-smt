@@ -18,8 +18,8 @@ import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
-import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.theories.ExtArray;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -47,7 +47,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     scala.collection.Map<IExpression, IExpression> interpretation = model.interpretation();
 
     // first get the addresses of arrays
-    Map<IIntLit, ITerm> arrays = getArrayAddresses(interpretation);
+    Map<IFunApp, ITerm> arrays = getArrays(interpretation);
 
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
@@ -62,20 +62,39 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   }
 
   /**
-   * Collect array-models, we need them to replace identifiers later. Princess models arrays as
-   * plain numeric "memory-addresses", and the model for an array-access at one of the addresses is
-   * the array-content. Example: "arr[5]=123" is modeled as "{arr=0, select(0,5)=123}" or "{arr=0,
-   * store(0,5,123)=0}", where "0" is the memory-address. The returned mapping contains the mapping
-   * of "0" (=address) to "arr" (=identifier).
+   * Collect array-models, we need them to replace identifiers later.
+   *
+   * <p>Princess models arrays as filled, based on a zero-filled array. The model for an
+   * array-access (via 'select') uses the filled array instead of the name and is handled later (see
+   * #getAssignment). The model gives more information, like the (partially) filled array and all
+   * array accesses based on (here comes the weird part:) some intermediate array evaluation.
+   *
+   * <p>Example: "arr[5]=123" with a following "result_arr[6]=123" (writing into an array in SMT
+   * returns a new copy of it!) is modeled as
+   *
+   * <pre>
+   * {
+   *     x -> 123,
+   *     arr -> store(const(0), 5, 123),
+   *     store(store(const(0), 5, 123), 6, 123) -> store(store(const(0), 5, 123), 6, 123),
+   *     select(store(const(0), 5, 123), 5) -> 123
+   * }
+   * </pre>
+   *
+   * <p>The returned mapping contains the mapping of the complete array value ("store(const(0), 5,
+   * 123)") to the identifier ("arr").
    */
-  private Map<IIntLit, ITerm> getArrayAddresses(
+  private Map<IFunApp, ITerm> getArrays(
       scala.collection.Map<IExpression, IExpression> interpretation) {
-    Map<IIntLit, ITerm> arrays = new HashMap<>();
+    Map<IFunApp, ITerm> arrays = new HashMap<>();
     for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       if (entry.getKey() instanceof IConstant) {
         ITerm maybeArray = (IConstant) entry.getKey();
-        if (creator.getEnv().hasArrayType(maybeArray) && entry.getValue() instanceof IIntLit) {
-          arrays.put((IIntLit) entry.getValue(), maybeArray);
+        IExpression value = entry.getValue();
+        if (creator.getEnv().hasArrayType(maybeArray)
+            && value instanceof IFunApp
+            && ExtArray.Store$.MODULE$.unapply(((IFunApp) value).fun()).isDefined()) {
+          arrays.put((IFunApp) value, maybeArray);
         }
       }
     }
@@ -83,7 +102,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   }
 
   private @Nullable ValueAssignment getAssignment(
-      IExpression key, IExpression value, Map<IIntLit, ITerm> pArrays) {
+      IExpression key, IExpression value, Map<IFunApp, ITerm> pArrays) {
     IExpression fValue = value;
     final IExpression fKey;
     final String name;
@@ -97,7 +116,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     } else if (key instanceof IConstant) {
       if (creator.getEnv().hasArrayType(key)) {
-        // array-access, for explanation see #getArrayAddresses
+        // array-access, for explanation see #getArrays
         return null;
       } else {
         fKey = key;
