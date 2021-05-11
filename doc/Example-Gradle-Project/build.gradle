@@ -85,7 +85,7 @@ dependencies {
     implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
   */
 
-  // Tell compile config to use the JavaSMT from our dependencies folder
+  // Tell implementation config to use the JavaSMT + dependencies from our dependencies folder
   implementation fileTree(dir: 'dependencies', include: '*.jar')
 }
 
@@ -100,11 +100,11 @@ test {
 // AND they need to be in a specific location for JavaSMT to be found (the easiest ist the same folder)
 task copyDependencies(type: Copy) {
   // Delete old dependencies as they might cause trouble
- dependsOn 'cleanDownloadedDependencies'
- from configurations.javaSMTConfig
- into 'dependencies'
+  dependsOn 'cleanDownloadedDependencies'
+  from configurations.javaSMTConfig
+  into 'dependencies'
   // Renames the dependencies
- rename '.*(lib[^-]*)-?.*.so', '$1.so'
+  rename '.*(lib[^-]*)-?.*.so', '$1.so'
 }
 
 // cleans the dependencies folder
@@ -112,5 +112,9 @@ task cleanDownloadedDependencies(type: Delete) {
   delete fileTree('dependencies')
 }
 
-// Always copy the dependencies
-build.finalizedBy(copyDependencies)
+// Copy the JavaSMT depdendencies before using them in run and test
+test.dependsOn copyDependencies
+run.dependsOn copyDependencies
+
+// When clean is called we want to delete our copied JavaSMT files
+clean.dependsOn cleanDownloadedDependencies
