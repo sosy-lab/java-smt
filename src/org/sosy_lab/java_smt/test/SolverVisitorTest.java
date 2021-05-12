@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
@@ -50,7 +51,7 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 public class SolverVisitorTest extends SolverBasedTest0 {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
-  private final class FunctionDeclarationVisitor extends DefaultFormulaVisitor<Formula> {
+  private final class FunctionDeclarationVisitorNoOther extends DefaultFormulaVisitor<Formula> {
 
     private final List<FunctionDeclarationKind> found = new ArrayList<>();
 
@@ -64,6 +65,33 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               functionDeclaration, f, args)
           .that(functionDeclaration.getKind())
           .isNotEqualTo(FunctionDeclarationKind.OTHER);
+      for (Formula arg : args) {
+        mgr.visit(arg, this);
+      }
+      return visitDefault(f);
+    }
+
+    @Override
+    protected Formula visitDefault(Formula pF) {
+      return pF;
+    }
+  }
+
+  /** visit a formula and fail on UF, i.e., uninterpreted function declaration type. */
+  private final class FunctionDeclarationVisitorNoUF extends DefaultFormulaVisitor<Formula> {
+
+    private final List<FunctionDeclarationKind> found = new ArrayList<>();
+
+    @Override
+    public Formula visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      found.add(functionDeclaration.getKind());
+      Truth.assert_()
+          .withMessage(
+              "uninterpreted function declaration '%s' in function '%s' with args '%s'.",
+              functionDeclaration, f, args)
+          .that(functionDeclaration.getKind())
+          .isNotEqualTo(FunctionDeclarationKind.UF);
       for (Formula arg : args) {
         mgr.visit(arg, this);
       }
@@ -117,7 +145,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void bitvectorIdVisit() {
+  public void bitvectorIdVisit() throws SolverException, InterruptedException {
     requireBitvectors();
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
@@ -126,16 +154,10 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BitvectorFormula y3 = bvmgr.makeBitvector(8, 13);
 
     for (BitvectorFormula y : new BitvectorFormula[] {y1, y2, y3}) {
-      for (Formula f :
+      for (BooleanFormula f :
           ImmutableList.of(
               bvmgr.equal(x, y),
               bmgr.not(bvmgr.equal(x, y)),
-              bvmgr.add(x, y),
-              bvmgr.subtract(x, y),
-              bvmgr.multiply(x, y),
-              bvmgr.and(x, y),
-              bvmgr.or(x, y),
-              bvmgr.xor(x, y),
               bvmgr.lessThan(x, y, true),
               bvmgr.lessThan(x, y, false),
               bvmgr.lessOrEquals(x, y, true),
@@ -143,7 +165,25 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               bvmgr.greaterThan(x, y, true),
               bvmgr.greaterThan(x, y, false),
               bvmgr.greaterOrEquals(x, y, true),
-              bvmgr.greaterOrEquals(x, y, false),
+              bvmgr.greaterOrEquals(x, y, false))) {
+        mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+        if (Solvers.PRINCESS != solver) {
+          // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
+          // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
+          mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+        }
+        BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+        assertThat(f2).isEqualTo(f);
+        assertThatFormula(f).isEquivalentTo(f2);
+      }
+      for (BitvectorFormula f :
+          ImmutableList.of(
+              bvmgr.add(x, y),
+              bvmgr.subtract(x, y),
+              bvmgr.multiply(x, y),
+              bvmgr.and(x, y),
+              bvmgr.or(x, y),
+              bvmgr.xor(x, y),
               bvmgr.divide(x, y, true),
               bvmgr.divide(x, y, false),
               bvmgr.modulo(x, y, true),
@@ -153,10 +193,34 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               bvmgr.extract(x, 7, 5, true),
               bvmgr.extract(x, 7, 5, false),
               bvmgr.concat(x, y))) {
-        mgr.visit(f, new FunctionDeclarationVisitor());
-        Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+        mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+        if (Solvers.PRINCESS != solver) {
+          // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
+          // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
+          mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+        }
+        BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
+        assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
       }
+    }
+  }
+
+  @Test
+  public void bitvectorIdVisit2() throws SolverException, InterruptedException {
+    requireBitvectors();
+    BitvectorFormula n = bvmgr.makeBitvector(8, 13);
+
+    for (BitvectorFormula f : new BitvectorFormula[] {n}) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      if (Solvers.PRINCESS != solver) {
+        // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
+        // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
+        mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      }
+      BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
     }
   }
 
@@ -183,7 +247,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_POSITIVE),
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_NEGATIVE),
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
-      mgr.visit(f, new FunctionDeclarationVisitor());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
       Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
     }
@@ -226,19 +291,20 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void bvVisit() {
+  public void bvVisit() throws SolverException, InterruptedException {
     requireBitvectors();
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
 
-    for (Formula f : ImmutableList.of(bvmgr.extend(x, 10, true), bvmgr.extend(x, 10, false))) {
-      mgr.visit(f, new FunctionDeclarationVisitor());
-      Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+    for (BitvectorFormula f :
+        ImmutableList.of(bvmgr.extend(x, 10, true), bvmgr.extend(x, 10, false))) {
+      BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
     }
   }
 
   private void checkKind(Formula f, FunctionDeclarationKind expected) {
-    FunctionDeclarationVisitor visitor = new FunctionDeclarationVisitor();
+    FunctionDeclarationVisitorNoOther visitor = new FunctionDeclarationVisitorNoOther();
     mgr.visit(f, visitor);
     Truth.assert_()
         .withMessage(
