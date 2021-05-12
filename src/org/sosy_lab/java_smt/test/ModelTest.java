@@ -953,9 +953,7 @@ public class ModelTest extends SolverBasedTest0 {
         true);
     testModelGetters(
         f,
-        amgr.select(
-            amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT),
-            imgr.makeNumber(5)),
+        amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "ahoi",
         true);
