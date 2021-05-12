@@ -931,7 +931,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
 
-    // create formula for "arr[5:6]==[x,x] && x==123"
+    // create formula for "arrgh[5:6]==[x,x] && ahoi[5,7] == [x,x] && x==123"
     BooleanFormula f =
         mgr.parse(
             "(declare-fun x () Int)\n"
@@ -966,7 +966,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
 
-    // create formula for "arr[5:6]==[x,x] && x==123"
+    // create formula for "arrgh[5:6]==[x,x] && ahoi[5,6] == [x,y] && y = 125 && x==123"
     BooleanFormula f =
         mgr.parse(
             "(declare-fun x () Int)\n"
