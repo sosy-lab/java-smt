@@ -40,7 +40,6 @@ import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.ExtArray.ArraySort;
-import ap.theories.SimpleArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
@@ -48,6 +47,7 @@ import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +67,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
 import scala.Enumeration;
+import scala.collection.JavaConverters;
 
 class PrincessFormulaCreator
     extends FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
@@ -146,7 +147,7 @@ class PrincessFormulaCreator
         return FormulaType.BooleanType;
       } else if (sort == PrincessEnvironment.INTEGER_SORT) {
         return FormulaType.IntegerType;
-      } else if (sort instanceof SimpleArray.ArraySort || sort instanceof ArraySort) {
+      } else if (sort instanceof ExtArray.ArraySort || sort instanceof ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
       } else if (sort instanceof MultipleValueBool$) {
         return FormulaType.BooleanType;
@@ -189,7 +190,12 @@ class PrincessFormulaCreator
   public Sort getArrayType(Sort pIndexType, Sort pElementType) {
     // no special cases here, princess does only support int arrays with int indexes
     // TODO: check sorts
-    return SimpleArray.ArraySort$.MODULE$.apply(1);
+    scala.collection.immutable.Seq<Sort> indexSeq =
+        JavaConverters.asScalaIteratorConverter(Arrays.asList(pIndexType).iterator())
+            .asScala()
+            .toSeq();
+    ExtArray extArray = new ExtArray(indexSeq, pElementType);
+    return extArray.objSort();
   }
 
   @SuppressWarnings("unchecked")
@@ -386,11 +392,9 @@ class PrincessFormulaCreator
       final FunctionDeclarationKind theoryKind = theoryFunctionKind.get(fun);
       if (theoryKind != null) {
         return theoryKind;
-      } else if (SimpleArray.Select$.MODULE$.unapply(fun)
-          || ExtArray.Select$.MODULE$.unapply(fun).isDefined()) {
+      } else if (ExtArray.Select$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.SELECT;
-      } else if (SimpleArray.Store$.MODULE$.unapply(fun)
-          || ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
+      } else if (ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.STORE;
       } else {
         return FunctionDeclarationKind.UF;
